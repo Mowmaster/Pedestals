@@ -1,6 +1,6 @@
 {
     "pack": {
-        "description": "examplemod resources",
+        "description": "Pedestals is a feature split off the 1.12.2 mod called Dust. It can display items, Transfer items around, and other utility uses like farming and smelting.",
         "pack_format": 5,
         "_comment": "A pack_format of 5 requires json lang files and some texture changes from 1.15. Note: we require v5 pack meta for all mods."
     }

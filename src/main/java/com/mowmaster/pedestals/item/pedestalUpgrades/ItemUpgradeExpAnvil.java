@@ -1,8 +1,8 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.dust.dust;
-import com.mowmaster.dust.tiles.TilePedestal;
+import com.mowmaster.pedestals.pedestals;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -29,12 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
 public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
 {
 
-    public ItemUpgradeExpAnvil(Item.Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeExpAnvil(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -417,7 +418,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         tooltip.add(speed);
     }
 
-    public static final Item XPANVIL = new ItemUpgradeExpAnvil(new Item.Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/xpanvil"));
+    public static final Item XPANVIL = new ItemUpgradeExpAnvil(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpanvil"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

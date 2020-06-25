@@ -1,10 +1,8 @@
 package com.mowmaster.pedestals.tiles;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
-import com.mowmaster.pedestals.item.ItemColorDust;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFilter;
-import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

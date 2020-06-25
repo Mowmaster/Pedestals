@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.blocks;
 
-import com.mowmaster.pedestals.item.ItemCrystalWrench;
+import com.mowmaster.pedestals.item.ItemLinkingTool;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
@@ -208,6 +208,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
     }
 
     /*Directly From CactusBlock Code*/
+    @Override
     public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
         TileEntity tileentity = worldIn.getTileEntity(pos);
 
@@ -291,7 +292,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                     //player.getHeldItemMainhand().getItem() instanceof ItemCoin ||
 
                 }
-                else if(player.getHeldItemMainhand().getItem() instanceof ItemCrystalWrench)
+                else if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
                 {
                     return ActionResultType.FAIL;
                 }

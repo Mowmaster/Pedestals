@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
-import com.mowmaster.dust.tiles.TilePedestal;
+import com.mowmaster.pedestals.pedestals;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IGrowable;
 import net.minecraft.client.util.ITooltipFlag;
@@ -26,11 +26,12 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 {
-    public ItemUpgradeEffectGrower(Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeEffectGrower(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -138,7 +139,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         tooltip.add(speed);
     }
 
-    public static final Item GROWER = new ItemUpgradeEffectGrower(new Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/grower"));
+    public static final Item GROWER = new ItemUpgradeEffectGrower(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/grower"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

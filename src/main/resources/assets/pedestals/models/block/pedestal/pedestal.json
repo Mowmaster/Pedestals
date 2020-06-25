@@ -1,0 +1,7 @@
+{
+  "parent": "pedestals:block/pedestal",
+  "textures": {
+    "type": "pedestals:blocks/stone/stone/tintstone",
+    "typepart":"pedestals:blocks/stone/stone/tintstone"
+  }
+}
