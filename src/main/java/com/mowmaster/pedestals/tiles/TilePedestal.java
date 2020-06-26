@@ -871,7 +871,6 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
         tag.putInt("intStorage",intStorage);
         tag.putInt("intStorageAmp",intStorageAmp);
 
-
         List<Integer> storedX = new ArrayList<Integer>();
         List<Integer> storedY = new ArrayList<Integer>();
         List<Integer> storedZ = new ArrayList<Integer>();
@@ -892,18 +891,13 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
         return tag;
     }
 
-    //https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
-    // When the world loads from disk, the server needs to send the TileEntity information to the client
-    //  it uses getUpdatePacket(), getUpdateTag(), onDataPacket(), and handleUpdateTag() to do this:
-    //  getUpdatePacket() and onDataPacket() are used for one-at-a-time TileEntity updates
-    //  getUpdateTag() and handleUpdateTag() are used by vanilla to collate together into a single chunk update packet
-    // In this case, we need it for the gem colour.  There's no need to save the gem angular position because
-    //  the player will never notice the difference and the client<-->server synchronisation lag will make it
-    //  inaccurate anyway
-    @Override
+    /*//https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
+    */
+
+
     @Nullable
-    public SUpdateTileEntityPacket getUpdatePacket()
-    {
+    @Override
+    public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTagCompound = new CompoundNBT();
         write(nbtTagCompound);
         int tileEntityType = 42;  // arbitrary number; only used for vanilla TileEntities.  You can use it, or not, as you want.
@@ -911,24 +905,21 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        LockCode.read(pkt.getNbtCompound());
+    public CompoundNBT getUpdateTag() {
+        return write(new CompoundNBT());
     }
 
-    /* Creates a tag containing the TileEntity information, used by vanilla to transmit from server to client*/
     @Override
-    public CompoundNBT getUpdateTag()
-    {
-        CompoundNBT nbtTagCompound = new CompoundNBT();
-        write(nbtTagCompound);
-        return nbtTagCompound;
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+        super.onDataPacket(net, pkt);
+        BlockState state = this.world.getBlockState(this.pos);
+        this.world.notifyBlockUpdate(this.pos, state, state, 3);
     }
 
-    /* Populates this TileEntity with information from the tag, used by vanilla to transmit from server to client*/
-    //@Override
-    public void handleUpdateTag(CompoundNBT tag)
+    @Override
+    public void handleUpdateTag(BlockState state, CompoundNBT tag)
     {
-        LockCode.read(tag);
+        this.func_230337_a_(state, tag);
     }
 
     private static Block[] pedArray = new Block[]{BlockPedestalTE.PEDESTAL_000, BlockPedestalTE.PEDESTAL_001, BlockPedestalTE.PEDESTAL_002, BlockPedestalTE.PEDESTAL_003

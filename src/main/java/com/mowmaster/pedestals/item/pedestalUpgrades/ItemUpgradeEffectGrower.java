@@ -104,7 +104,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                     }
                     else
                     {
-                        target.getBlock().tick(target,sworld,posTarget,rand);
+                        target.tick(sworld,posTarget,rand);
                     }
                 }
             }
