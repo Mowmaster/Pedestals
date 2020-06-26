@@ -338,19 +338,18 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-//TODO: Fix Text Stuffs
-        /*TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpstored");
-        xpstored.appendText(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.applyTextStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpstored");
+        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.func_240699_a_(TextFormatting.GREEN);
         TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacity");
         TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacitylvl");
-        xpcapacity.appendText(""+ getExpBuffer(stack) +"");
-        xpcapacity.appendText(xpcapacitylvl.getString());
-        xpcapacity.applyTextStyle(TextFormatting.AQUA);
+        xpcapacity.func_240702_b_(""+ getExpBuffer(stack) +"");
+        xpcapacity.func_240702_b_(xpcapacitylvl.getString());
+        xpcapacity.func_240699_a_(TextFormatting.AQUA);
 
 
         tooltip.add(xpstored);
-        tooltip.add(xpcapacity);*/
+        tooltip.add(xpcapacity);
     }
 
 }

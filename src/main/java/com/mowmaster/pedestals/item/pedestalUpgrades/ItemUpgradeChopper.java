@@ -136,26 +136,25 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getRangeWidth(stack);
         int s4 = getRangeHeight(stack);
-        //TODO: Fix Text Stuffs
 
-        /*String tr = "" + (s3+s3+1) + "";
+        String tr = "" + (s3+s3+1) + "";
         String trr = "" + (s4+1) + "";
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendText(tr);
-        area.appendText(areax.getFormattedText());
-        area.appendText(tr);
-        area.appendText(areax.getFormattedText());
-        area.appendText(trr);
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(trr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        area.applyTextStyle(TextFormatting.WHITE);
+        area.func_240699_a_(TextFormatting.WHITE);
         tooltip.add(area);
 
-        speed.applyTextStyle(TextFormatting.RED);
-        tooltip.add(speed);*/
+        speed.func_240699_a_(TextFormatting.RED);
+        tooltip.add(speed);
     }
 
     public static final Item CHOPPER = new ItemUpgradeChopper(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/chopper"));

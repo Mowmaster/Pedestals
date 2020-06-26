@@ -616,10 +616,9 @@ public class ItemUpgradeBase extends Item {
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        //TODO: Fix Text Stuffs
-        /*TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.applyTextStyle(TextFormatting.GOLD);
-        tooltip.add(t);*/
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.func_240699_a_(TextFormatting.GOLD);
+        tooltip.add(t);
     }
 
 }

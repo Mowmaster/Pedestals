@@ -138,23 +138,21 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getRangeWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        //TODO: Fix Text Stuffs
-
-        /*TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendText(tr);
-        area.appendText(areax.getString());
-        area.appendText(tr);
-        area.appendText(areax.getString());
-        area.appendText(tr);
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        area.applyTextStyle(TextFormatting.WHITE);
-        speed.applyTextStyle(TextFormatting.RED);
+        area.func_240699_a_(TextFormatting.WHITE);
+        speed.func_240699_a_(TextFormatting.RED);
 
         tooltip.add(area);
-        tooltip.add(speed);*/
+        tooltip.add(speed);
     }
 
     public static final Item HARVESTER = new ItemUpgradeEffectHarvester(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvester"));

@@ -123,17 +123,16 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        //TODO: Fix Text Stuffs
-        /*TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.appendText("" + getRange(stack) + "");
+        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
+        range.func_240702_b_("" + getRange(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        range.applyTextStyle(TextFormatting.WHITE);
+        range.func_240699_a_(TextFormatting.WHITE);
         tooltip.add(range);
 
-        speed.applyTextStyle(TextFormatting.RED);
-        tooltip.add(speed);*/
+        speed.func_240699_a_(TextFormatting.RED);
+        tooltip.add(speed);
     }
 
     public static final Item BREAKER = new ItemUpgradeBreaker(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/breaker"));

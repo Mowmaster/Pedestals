@@ -194,19 +194,18 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        //TODO: Fix Text Stuffs
-        /*int s2 = getItemTransferRate(stack);
+        int s2 = getItemTransferRate(stack);
         String trr = getSmeltingSpeedString(stack);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendText(""+s2+"");
+        rate.func_240702_b_(""+s2+"");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(trr);
+        speed.func_240702_b_(trr);
 
-        rate.applyTextStyle(TextFormatting.GRAY);
-        speed.applyTextStyle(TextFormatting.RED);
+        rate.func_240699_a_(TextFormatting.GRAY);
+        speed.func_240699_a_(TextFormatting.RED);
 
         tooltip.add(rate);
-        tooltip.add(speed);*/
+        tooltip.add(speed);
     }
 
 }

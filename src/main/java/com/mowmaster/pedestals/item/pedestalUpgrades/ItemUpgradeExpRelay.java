@@ -58,18 +58,16 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        //TODO: Fix Text Stuffs
-
-        /*TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendText(getExpTransferRateString(stack));
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.func_240702_b_(getExpTransferRateString(stack));
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        rate.applyTextStyle(TextFormatting.GRAY);
-        speed.applyTextStyle(TextFormatting.RED);
+        rate.func_240699_a_(TextFormatting.GRAY);
+        speed.func_240699_a_(TextFormatting.RED);
 
         tooltip.add(rate);
-        tooltip.add(speed);*/
+        tooltip.add(speed);
     }
 
     public static final Item XPRELAY = new ItemUpgradeExpRelay(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xprelay"));

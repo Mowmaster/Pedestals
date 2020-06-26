@@ -179,18 +179,17 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        //TODO: Fix Text Stuffs
 
-        /*TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendText("" + getCobbleGenSpawnRate(stack) + "");
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.func_240702_b_("" + getCobbleGenSpawnRate(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        rate.applyTextStyle(TextFormatting.GRAY);
+        rate.func_240699_a_(TextFormatting.GRAY);
         tooltip.add(rate);
 
-        speed.applyTextStyle(TextFormatting.RED);
-        tooltip.add(speed);*/
+        speed.func_240699_a_(TextFormatting.RED);
+        tooltip.add(speed);
     }
 
     public static final Item COBBLE = new ItemUpgradeCobbleGen(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/cobble"));

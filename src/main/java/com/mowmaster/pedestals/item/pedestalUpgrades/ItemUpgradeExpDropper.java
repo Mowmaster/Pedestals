@@ -119,32 +119,6 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
 
     }
 
-    /*@Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-
-
-
-        if(stack.hasTagCompound())
-        {
-
-
-            if(stack.isItemEnchanted() && getOperationSpeed(stack) >0)
-            {
-
-            }
-            else
-            {
-                tooltip.add(TextFormatting.RED + "Operational Speed: Normal Speed");
-            }
-        }
-        else
-        {
-            tooltip.add(TextFormatting.WHITE + "Dropper Range: " + trr);
-            tooltip.add(TextFormatting.GRAY + "Exp Dropped Ammount: 1 Level");
-            tooltip.add(TextFormatting.RED + "Operational Speed: Normal Speed");
-        }
-    }*/
-
     public int getExpBuffer(ItemStack stack)
     {
         return  10;
@@ -155,9 +129,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        //TODO: Fix Text Stuffs
-
-        /*int tr = 1;
+        int tr = 1;
 
         switch (getTransferRate(stack))
         {
@@ -183,20 +155,20 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
         }
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.appendText("" +  getRange(stack) + "");
+        range.func_240702_b_("" +  getRange(stack) + "");
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendText("" +  tr + "");
+        rate.func_240702_b_("" +  tr + "");
 
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        range.applyTextStyle(TextFormatting.WHITE);
-        rate.applyTextStyle(TextFormatting.GRAY);
-        speed.applyTextStyle(TextFormatting.RED);
+        range.func_240699_a_(TextFormatting.WHITE);
+        rate.func_240699_a_(TextFormatting.GRAY);
+        speed.func_240699_a_(TextFormatting.RED);
 
         tooltip.add(range);
         tooltip.add(rate);
-        tooltip.add(speed);*/
+        tooltip.add(speed);
     }
 
     public static final Item XPDROPPER = new ItemUpgradeExpDropper(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpdropper"));

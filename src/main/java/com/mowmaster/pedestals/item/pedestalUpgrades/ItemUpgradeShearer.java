@@ -107,20 +107,19 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        //TODO: Fix Text Stuffs
-        /*area.appendText(tr);
-        area.appendText(areax.getFormattedText());
-        area.appendText("2");
-        area.appendText(areax.getFormattedText());
-        area.appendText(tr);
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_("2");
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        area.applyTextStyle(TextFormatting.WHITE);
+        area.func_240699_a_(TextFormatting.WHITE);
         tooltip.add(area);
 
-        speed.applyTextStyle(TextFormatting.RED);
-        tooltip.add(speed);*/
+        speed.func_240699_a_(TextFormatting.RED);
+        tooltip.add(speed);
     }
 
     public static final Item SHEARER = new ItemUpgradeShearer(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/shearer"));

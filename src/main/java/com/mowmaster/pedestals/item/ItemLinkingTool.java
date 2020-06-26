@@ -102,21 +102,21 @@ public class ItemLinkingTool extends Item {
                                                             player.getHeldItemMainhand().removeChildTag("ench");
                                                         }
                                                     }
-                                                    //player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Successful"));
+                                                    player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Successful"),player.getUniqueID());
                                                 }
-                                                //else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Unsuccessful - Maximum Links Reached"));
+                                                else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Unsuccessful - Maximum Links Reached"),player.getUniqueID());
                                             }
                                             else
                                             {
                                                 tilePedestal.removeLocation(getStoredPosition(player.getHeldItemMainhand()));
-                                                //player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Successfully Removed"));
+                                                player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Successfully Removed"),player.getUniqueID());
                                             }
                                         }
-                                        //else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Cannot be Linked to Itsself"));
+                                        else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Cannot be Linked to Itsself"),player.getUniqueID());
                                     }
-                                    //else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Cannot Connect to this Network"));
+                                    else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Cannot Connect to this Network"),player.getUniqueID());
                                 }
-                                //else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Too Far to Connect"));
+                                else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Too Far to Connect"),player.getUniqueID());
                             }
                         }
                     }
@@ -140,18 +140,22 @@ public class ItemLinkingTool extends Item {
                     }
                 }
             }
-            /*else
+            else
             {
                 if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE) {
                     //Checks Tile at location to make sure its a TilePedestal
                     TileEntity tileEntity = worldIn.getTileEntity(pos);
                     if (tileEntity instanceof TilePedestal) {
                         TilePedestal tilePedestal = (TilePedestal) tileEntity;
+                        //TODO: Need to localize the chat messages when using the tool.
+                        TranslationTextComponent output = new TranslationTextComponent("Sending Items To These Pedestals: ");
+                        output.func_240702_b_(tilePedestal.debugLocationList());
+                        output.func_240699_a_(TextFormatting.WHITE);
 
-                        System.out.println(tilePedestal.debugLocationList());
+                        player.sendMessage(output,player.getUniqueID());
                     }
                 }
-            }*/
+            }
         }
 
         return super.onItemUse(context);

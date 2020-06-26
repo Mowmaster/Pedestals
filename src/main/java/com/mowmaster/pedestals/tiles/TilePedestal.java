@@ -894,6 +894,7 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
     /*//https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
     */
 
+    // TODO: When syncing data to the client, only update the two itemsstacks that get updated, not everything.
 
     @Nullable
     @Override
@@ -913,6 +914,7 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
         super.onDataPacket(net, pkt);
         BlockState state = this.world.getBlockState(this.pos);
+        this.handleUpdateTag(state,pkt.getNbtCompound());
         this.world.notifyBlockUpdate(this.pos, state, state, 3);
     }
 

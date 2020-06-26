@@ -169,30 +169,28 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        //TODO: Fix Text Stuffs
-
-        /*int s3 = getRangeWidth(stack);
+        int s3 = getRangeWidth(stack);
         String trr = "" + (s3+s3+1) + "";
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendText(trr);
-        area.appendText(areax.getString());
-        area.appendText(trr);
-        area.appendText(areax.getString());
-        area.appendText(trr);
+        area.func_240702_b_(trr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(trr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(trr);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendText(getExpTransferRateString(stack));
+        rate.func_240702_b_(getExpTransferRateString(stack));
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        area.applyTextStyle(TextFormatting.WHITE);
-        rate.applyTextStyle(TextFormatting.GRAY);
-        speed.applyTextStyle(TextFormatting.RED);
+        area.func_240699_a_(TextFormatting.WHITE);
+        rate.func_240699_a_(TextFormatting.GRAY);
+        speed.func_240699_a_(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(rate);
-        tooltip.add(speed);*/
+        tooltip.add(speed);
     }
 
     public static final Item XPMAGNET = new ItemUpgradeExpCollector(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpmagnet"));

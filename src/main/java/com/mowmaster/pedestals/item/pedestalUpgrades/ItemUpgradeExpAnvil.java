@@ -413,9 +413,9 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         //TODO: Fix Text Stuffs
 
         /*TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendText(getOperationSpeedString(stack));
+        speed.func_240702_b_(getOperationSpeedString(stack));
 
-        speed.applyTextStyle(TextFormatting.RED);
+        speed.func_240699_a_(TextFormatting.RED);
 
         tooltip.add(speed);*/
     }

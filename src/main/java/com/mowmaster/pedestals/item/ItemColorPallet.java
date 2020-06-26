@@ -59,7 +59,7 @@ public class ItemColorPallet extends Item {
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
-    public static final Item COLLORPALLET = new ItemColorPallet(new Properties().group(ItemGroup.MATERIALS)).setRegistryName(new ResourceLocation(MODID, "itemcollorpallet"));
+    public static final Item COLLORPALLET = new ItemColorPallet(new Properties().group(ItemGroup.MATERIALS)).setRegistryName(new ResourceLocation(MODID, "itemcolorpallet"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
