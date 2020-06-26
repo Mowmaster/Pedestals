@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
-import com.mowmaster.dust.tiles.TilePedestal;
+
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,13 +28,14 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeMilker extends ItemUpgradeBase
 {
     public int rangeHeight = 1;
 
-    public ItemUpgradeMilker(Item.Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeMilker(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -117,7 +118,10 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        int s3 = getRangeWidth(stack);
+
+        //TODO: Fix Text Stuffs
+
+        /*int s3 = getRangeWidth(stack);
         String tr = "" + (s3+s3+1) + "";
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
@@ -134,10 +138,10 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
         tooltip.add(area);
 
         speed.applyTextStyle(TextFormatting.RED);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item MILKER = new ItemUpgradeMilker(new Item.Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/milker"));
+    public static final Item MILKER = new ItemUpgradeMilker(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/milker"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

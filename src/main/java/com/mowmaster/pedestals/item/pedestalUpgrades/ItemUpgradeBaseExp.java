@@ -338,8 +338,8 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpstored");
+//TODO: Fix Text Stuffs
+        /*TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpstored");
         xpstored.appendText(""+ getExpLevelFromCount(getXPStored(stack)) +"");
         xpstored.applyTextStyle(TextFormatting.GREEN);
         TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacity");
@@ -350,7 +350,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
 
 
         tooltip.add(xpstored);
-        tooltip.add(xpcapacity);
+        tooltip.add(xpcapacity);*/
     }
 
 }

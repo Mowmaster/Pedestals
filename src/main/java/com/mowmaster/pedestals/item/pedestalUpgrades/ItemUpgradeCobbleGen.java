@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
-import com.mowmaster.dust.tiles.TilePedestal;
+import com.mowmaster.pedestals.pedestals;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -26,13 +26,14 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 {
     private int maxStored = Integer.MAX_VALUE;
 
-    public ItemUpgradeCobbleGen(Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeCobbleGen(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -178,7 +179,9 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        //TODO: Fix Text Stuffs
+
+        /*TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendText("" + getCobbleGenSpawnRate(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.appendText(getOperationSpeedString(stack));
@@ -187,10 +190,10 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         tooltip.add(rate);
 
         speed.applyTextStyle(TextFormatting.RED);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item COBBLE = new ItemUpgradeCobbleGen(new Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/cobble"));
+    public static final Item COBBLE = new ItemUpgradeCobbleGen(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/cobble"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

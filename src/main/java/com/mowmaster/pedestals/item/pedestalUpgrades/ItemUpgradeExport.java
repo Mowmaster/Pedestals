@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
-import com.mowmaster.dust.tiles.TilePedestal;
+import com.mowmaster.pedestals.pedestals;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,11 +23,12 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeExport extends ItemUpgradeBase
 {
-    public ItemUpgradeExport(Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeExport(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -158,7 +159,10 @@ public class ItemUpgradeExport extends ItemUpgradeBase
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+
+        //TODO: Fix Text Stuffs
+
+        /*TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendText("" + getItemTransferRate(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.appendText(getOperationSpeedString(stack));
@@ -167,10 +171,10 @@ public class ItemUpgradeExport extends ItemUpgradeBase
         speed.applyTextStyle(TextFormatting.RED);
 
         tooltip.add(rate);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item EXPORT = new ItemUpgradeExport(new Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/export"));
+    public static final Item EXPORT = new ItemUpgradeExport(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/export"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

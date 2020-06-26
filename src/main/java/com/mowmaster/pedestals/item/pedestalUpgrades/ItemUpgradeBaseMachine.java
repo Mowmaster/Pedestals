@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
-import com.mowmaster.dust.tiles.TilePedestal;
+import com.mowmaster.pedestals.pedestals;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -22,11 +22,13 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+
 public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
 
     public final int burnTimeCostPerItemSmelted = 200;
 
-    public ItemUpgradeBaseMachine(Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeBaseMachine(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -192,7 +194,8 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        int s2 = getItemTransferRate(stack);
+        //TODO: Fix Text Stuffs
+        /*int s2 = getItemTransferRate(stack);
         String trr = getSmeltingSpeedString(stack);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendText(""+s2+"");
@@ -203,7 +206,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         speed.applyTextStyle(TextFormatting.RED);
 
         tooltip.add(rate);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
 }

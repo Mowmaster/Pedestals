@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
+import com.mowmaster.pedestals.pedestals;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -29,11 +29,12 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 {
-    public ItemUpgradeEffectPlanter(Item.Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeEffectPlanter(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -121,7 +122,9 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         int s3 = getRangeWidth(stack);
         String tr = "" + (s3+s3+1) + "";
 
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        //TODO: Fix Text Stuffs
+
+        /*TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.appendText(tr);
         area.appendText(areax.getString());
@@ -135,10 +138,10 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         speed.applyTextStyle(TextFormatting.RED);
 
         tooltip.add(area);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item PLANTER = new ItemUpgradeEffectPlanter(new Item.Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/planter"));
+    public static final Item PLANTER = new ItemUpgradeEffectPlanter(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/planter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

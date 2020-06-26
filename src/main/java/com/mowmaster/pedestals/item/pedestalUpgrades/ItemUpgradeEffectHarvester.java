@@ -1,11 +1,14 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
+import com.mowmaster.pedestals.pedestals;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.IGrowable;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.ai.brain.task.VillagerTasks;
+import net.minecraft.entity.merchant.villager.VillagerProfession;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -20,17 +23,19 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 {
-    public ItemUpgradeEffectHarvester(Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeEffectHarvester(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -88,7 +93,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         {
             if(!((IGrowable) target.getBlock()).canGrow(world,posTarget,target,false))
             {
-                FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().getWorld(world.getDimension().getType()));
+                FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                 fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
                 ItemStack choppingAxe = new ItemStack(Items.DIAMOND_AXE,1);
                 if(!itemInPedestal.isEmpty())
@@ -114,11 +119,13 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     }
                 }
 
-                if(fakePlayer.canHarvestBlock(target))
+                if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,false))
                 {
                     target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
+                    world.setBlockState(posTarget, Blocks.AIR.getDefaultState());
                 }
-                target.getBlock().removedByPlayer(target,world,posTarget,fakePlayer,false,null);
+
+                //target.getBlock().removedByPlayer(target,world,posTarget,fakePlayer,false,null);
             }
         }
     }
@@ -129,8 +136,9 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getRangeWidth(stack);
         String tr = "" + (s3+s3+1) + "";
+        //TODO: Fix Text Stuffs
 
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        /*TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.appendText(tr);
         area.appendText(areax.getString());
@@ -144,10 +152,10 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         speed.applyTextStyle(TextFormatting.RED);
 
         tooltip.add(area);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item HARVESTER = new ItemUpgradeEffectHarvester(new Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/harvester"));
+    public static final Item HARVESTER = new ItemUpgradeEffectHarvester(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvester"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

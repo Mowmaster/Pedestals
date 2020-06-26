@@ -1,10 +1,8 @@
 package com.mowmaster.pedestals.tiles;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
-import com.mowmaster.pedestals.item.ItemColorDust;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFilter;
-import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -14,12 +12,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.potion.Effect;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.LockCode;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -57,10 +56,12 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
     private int intStorageAmp = 0;
     private boolean boolLight = false;
     private final List<BlockPos> storedLocations = new ArrayList<BlockPos>();
+    private LockCode lockCode;
 
     public TilePedestal()
     {
         super(PEDESTALTYPE);
+        this.lockCode = LockCode.EMPTY_CODE;
     }
 
     private void update()
@@ -825,8 +826,8 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
         }
     }
 
-    @Override
-    public void read(CompoundNBT tag) {
+    public void func_230337_a_(BlockState p_230337_1_, CompoundNBT tag) {
+        super.func_230337_a_(p_230337_1_, tag);
         CompoundNBT invTag = tag.getCompound("inv");
         handler.ifPresent(h -> ((INBTSerializable<CompoundNBT>) h).deserializeNBT(invTag));
 
@@ -852,13 +853,12 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
             BlockPos gotPos = new BlockPos(getX,getY,getZ);
             storeNewLocation(gotPos);
         }
-        //CompoundNBT itemTagD = compound.getCompound("display");
-        //this.display = new ItemStack(itemTagD);
-        super.read(tag);
+
+        this.lockCode = LockCode.read(tag);
     }
 
-    @Override
     public CompoundNBT write(CompoundNBT tag) {
+        super.write(tag);
         handler.ifPresent(h -> {
             CompoundNBT compound = ((INBTSerializable<CompoundNBT>) h).serializeNBT();
             tag.put("inv", compound);
@@ -885,8 +885,9 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
             counter++;
         }
         tag.putInt("storedBlockPosCounter",counter);
-        //compound.put("display",display.write(new CompoundNBT()));
-        return super.write(tag);
+
+        this.lockCode.write(tag);
+        return tag;
     }
 
     //https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
@@ -907,11 +908,11 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
         return new SUpdateTileEntityPacket(this.pos, tileEntityType, nbtTagCompound);
     }
 
-    @Override
+    /*@Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
         read(pkt.getNbtCompound());
     }
-
+*/
     /* Creates a tag containing the TileEntity information, used by vanilla to transmit from server to client
  */
     @Override
@@ -924,11 +925,11 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
 
     /* Populates this TileEntity with information from the tag, used by vanilla to transmit from server to client
  */
-    @Override
+    /*@Override
     public void handleUpdateTag(CompoundNBT tag)
     {
         this.read(tag);
-    }
+    }*/
 
     private static Block[] pedArray = new Block[]{BlockPedestalTE.PEDESTAL_000, BlockPedestalTE.PEDESTAL_001, BlockPedestalTE.PEDESTAL_002, BlockPedestalTE.PEDESTAL_003
             , BlockPedestalTE.PEDESTAL_010, BlockPedestalTE.PEDESTAL_011, BlockPedestalTE.PEDESTAL_012, BlockPedestalTE.PEDESTAL_013

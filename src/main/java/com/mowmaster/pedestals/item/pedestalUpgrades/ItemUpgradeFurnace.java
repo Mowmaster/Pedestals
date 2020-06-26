@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
-import com.mowmaster.dust.tiles.TilePedestal;
+
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -21,11 +21,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
 {
-    public ItemUpgradeFurnace(Item.Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeFurnace(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Nullable
     protected AbstractCookingRecipe getRecipe(World world, ItemStack stackIn) {
@@ -152,7 +153,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
         }
     }
 
-    public static final Item SMELTER = new ItemUpgradeFurnace(new Item.Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/smelter"));
+    public static final Item SMELTER = new ItemUpgradeFurnace(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/smelter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

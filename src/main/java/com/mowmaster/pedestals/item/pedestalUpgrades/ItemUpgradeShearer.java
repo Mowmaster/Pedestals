@@ -1,8 +1,9 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -15,7 +16,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.IShearable;
+import net.minecraftforge.common.IForgeShearable;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -23,13 +24,14 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeShearer extends ItemUpgradeBase
 {
     public int rangeHeight = 1;
 
-    public ItemUpgradeShearer(Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeShearer(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -63,18 +65,19 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
         //Entity Creature could be used to cover creepers for better with mods and such
         List<LivingEntity> baa = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
+
         for(LivingEntity baaaaaa : baa)
         {
-            if(baaaaaa instanceof IShearable)
+            if(baaaaaa instanceof IForgeShearable)
             {
-                IShearable baabaa = (IShearable)baaaaaa;
-                if (baabaa.isShearable(new ItemStack(Items.SHEARS),world,baaaaaa.getPosition()))
+                IForgeShearable baabaa = (IForgeShearable)baaaaaa;
+                if (baabaa.isShearable(new ItemStack(Items.SHEARS),world,new BlockPos(baaaaaa.getPositionVec())))
                 {
                     if(getStackInPedestal(world,pedestalPos).equals(ItemStack.EMPTY))
                     {
                         Random rando = new Random();
                         int i = 1 + rando.nextInt(3);
-                        List<ItemStack> drops = baabaa.onSheared(new ItemStack(Items.SHEARS),world,baaaaaa.getPosition(),0);
+                        List<ItemStack> drops = baabaa.onSheared(null,new ItemStack(Items.SHEARS),world,new BlockPos(baaaaaa.getPositionVec()),0);
 
                         for (int j = 0; j < i; ++j)
                         {
@@ -104,7 +107,8 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendText(tr);
+        //TODO: Fix Text Stuffs
+        /*area.appendText(tr);
         area.appendText(areax.getFormattedText());
         area.appendText("2");
         area.appendText(areax.getFormattedText());
@@ -116,10 +120,10 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
         tooltip.add(area);
 
         speed.applyTextStyle(TextFormatting.RED);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item SHEARER = new ItemUpgradeShearer(new Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/shearer"));
+    public static final Item SHEARER = new ItemUpgradeShearer(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/shearer"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

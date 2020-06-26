@@ -1,0 +1,83 @@
+{
+  "__comment": "Designed by Mowmaster with BDcraft Cubik PRO 0.96 Beta - http://bdcraft.net",
+  "textures": {
+    "crystal_cores": "#core",
+    "crystal_sides": "#side"
+  },
+  "elements": [
+    {
+      "__comment": "pedestals_core",
+      "from": [ 7, 5, 6.5 ],
+      "to": [ 9, 9.5, 8.5 ],
+      "faces": {
+        "down":  { "uv": [ 2, 2, 0, 0 ], "texture": "#crystal_cores" },
+        "up":    { "uv": [ 0, 0, 2, 2 ], "texture": "#crystal_cores" },
+        "north": { "uv": [ 0, 0, 2, 16 ], "texture": "#crystal_cores" },
+        "south": { "uv": [ 0, 0, 2, 16 ], "texture": "#crystal_cores" },
+        "west":  { "uv": [ 0, 0, 2, 16 ], "texture": "#crystal_cores" },
+        "east":  { "uv": [ 0, 0, 2, 16 ], "texture": "#crystal_cores" }
+      }
+    },
+    {
+      "__comment": "pedestals_north",
+      "from": [ 7, 5.5, 5 ],
+      "to": [ 9, 8, 6.5 ],
+      "faces": {
+        "down":  { "uv": [ 2, 16, 0, 15 ], "texture": "#crystal_sides" },
+        "up":    { "uv": [ 0, 15, 2, 16 ], "texture": "#crystal_sides" },
+        "north": { "uv": [ 0, 12, 2, 14 ], "texture": "#crystal_sides" },
+        "west":  { "uv": [ 0, 14, 1, 16 ], "texture": "#crystal_sides" },
+        "east":  { "uv": [ 1, 14, 2, 16 ], "texture": "#crystal_sides" }
+      }
+    },
+    {
+      "__comment": "pedestals_south",
+      "from": [ 7, 5.5, 8.5 ],
+      "to": [ 9, 8, 10 ],
+      "faces": {
+        "down":  { "uv": [ 2, 15, 0, 14 ], "texture": "#crystal_sides" },
+        "up":    { "uv": [ 0, 14, 2, 15 ], "texture": "#crystal_sides" },
+        "south": { "uv": [ 0, 12, 2, 14 ], "texture": "#crystal_sides" },
+        "west":  { "uv": [ 1, 14, 2, 16 ], "texture": "#crystal_sides" },
+        "east":  { "uv": [ 0, 14, 1, 16 ], "texture": "#crystal_sides" }
+      }
+    },
+    {
+      "__comment": "pedestals_west",
+      "from": [ 5.5, 5.5, 6.5 ],
+      "to": [ 7, 8, 8.5 ],
+      "faces": {
+        "down":  { "uv": [ 2, 16, 1, 14 ], "texture": "#crystal_sides" },
+        "up":    { "uv": [ 1, 14, 2, 16 ], "texture": "#crystal_sides" },
+        "north": { "uv": [ 1, 14, 2, 16 ], "texture": "#crystal_sides" },
+        "south": { "uv": [ 0, 14, 1, 16 ], "texture": "#crystal_sides" },
+        "west":  { "uv": [ 0, 12, 2, 14 ], "texture": "#crystal_sides" }
+      }
+    },
+    {
+      "__comment": "pedestals_east",
+      "from": [ 9, 5.5, 6.5 ],
+      "to": [ 10.5, 8, 8.5 ],
+      "faces": {
+        "down":  { "uv": [ 1, 16, 0, 14 ], "texture": "#crystal_sides" },
+        "up":    { "uv": [ 0, 14, 1, 16 ], "texture": "#crystal_sides" },
+        "north": { "uv": [ 0, 14, 1, 16 ], "texture": "#crystal_sides" },
+        "south": { "uv": [ 1, 14, 2, 16 ], "texture": "#crystal_sides" },
+        "east":  { "uv": [ 0, 12, 2, 14 ], "texture": "#crystal_sides" }
+      }
+    },
+    {
+      "__comment": "pedestals_bottom",
+      "from": [ 6, 6, 5.5 ],
+      "to": [ 10, 7.5, 9.5 ],
+      "faces": {
+        "down":  { "uv": [ 2, 16, 0, 14 ], "texture": "#crystal_sides" },
+        "up":    { "uv": [ 0, 14, 2, 16 ], "texture": "#crystal_sides" },
+        "north": { "uv": [ 0, 14, 2, 16 ], "texture": "#crystal_sides" },
+        "south": { "uv": [ 0, 14, 2, 16 ], "texture": "#crystal_sides" },
+        "west":  { "uv": [ 0, 14, 2, 16 ], "texture": "#crystal_sides" },
+        "east":  { "uv": [ 0, 14, 2, 16 ], "texture": "#crystal_sides" }
+      }
+    }
+  ]
+}

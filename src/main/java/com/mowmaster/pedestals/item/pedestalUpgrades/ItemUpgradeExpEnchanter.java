@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
-import com.mowmaster.dust.tiles.TilePedestal;
+import com.mowmaster.pedestals.pedestals;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -30,12 +30,13 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 {
 
-    public ItemUpgradeExpEnchanter(Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeExpEnchanter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -241,15 +242,17 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        //TODO: Fix Text Stuffs
+
+        /*TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.appendText(getOperationSpeedString(stack));
 
         speed.applyTextStyle(TextFormatting.RED);
 
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item XPENCHANTER = new ItemUpgradeExpEnchanter(new Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/xpenchanter"));
+    public static final Item XPENCHANTER = new ItemUpgradeExpEnchanter(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpenchanter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

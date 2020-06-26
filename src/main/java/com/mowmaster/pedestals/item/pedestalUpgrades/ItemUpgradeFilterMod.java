@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -13,11 +13,12 @@ import net.minecraftforge.items.IItemHandler;
 
 import java.util.stream.IntStream;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFilterMod extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterMod(Item.Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeFilterMod(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
@@ -62,7 +63,7 @@ public class ItemUpgradeFilterMod extends ItemUpgradeBaseFilter
 
     }
 
-    public static final Item MOD = new ItemUpgradeFilterMod(new Item.Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/filtermod"));
+    public static final Item MOD = new ItemUpgradeFilterMod(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filtermod"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

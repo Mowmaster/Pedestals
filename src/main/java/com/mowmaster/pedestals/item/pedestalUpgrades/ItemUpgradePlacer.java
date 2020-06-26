@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -26,11 +26,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradePlacer extends ItemUpgradeBase
 {
-    public ItemUpgradePlacer(Item.Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradePlacer(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -115,7 +116,9 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
+        //TODO: Fix Text Stuffs
+
+        /*TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
         range.appendText("" + getRange(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.appendText(getOperationSpeedString(stack));
@@ -124,10 +127,10 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
         speed.applyTextStyle(TextFormatting.RED);
 
         tooltip.add(range);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item PLACER = new ItemUpgradePlacer(new Item.Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/placer"));
+    public static final Item PLACER = new ItemUpgradePlacer(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/placer"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

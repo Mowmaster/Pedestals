@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.blocks;
 
-import com.mowmaster.pedestals.item.ItemCrystalWrench;
+import com.mowmaster.pedestals.item.ItemLinkingTool;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
@@ -10,7 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
@@ -127,7 +127,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
     }*/
 
     @Override
-    public boolean receiveFluid(IWorld worldIn, BlockPos pos, BlockState state, IFluidState fluidStateIn) {
+    public boolean receiveFluid(IWorld worldIn, BlockPos pos, BlockState state, FluidState fluidStateIn) {
         if (!state.get(BlockStateProperties.WATERLOGGED) && fluidStateIn.getFluid() == Fluids.WATER) {
             if (!worldIn.isRemote()) {
                 worldIn.setBlockState(pos, state.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf(true)), 3);
@@ -154,12 +154,12 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
         return !state.get(WATERLOGGED);
     }
 
-    public IFluidState getFluidState(BlockState state) {
+    public FluidState getFluidState(BlockState state) {
         return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
     }
 
     public int getLightValue(BlockState state) {
-        return state.get(LIT) ? super.getLightValue(state) : 0;
+        return state.get(LIT) ? state.getLightValue() : 0;
     }
 
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
@@ -208,6 +208,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
     }
 
     /*Directly From CactusBlock Code*/
+    @Override
     public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
         TileEntity tileentity = worldIn.getTileEntity(pos);
 
@@ -291,7 +292,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                     //player.getHeldItemMainhand().getItem() instanceof ItemCoin ||
 
                 }
-                else if(player.getHeldItemMainhand().getItem() instanceof ItemCrystalWrench)
+                else if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
                 {
                     return ActionResultType.FAIL;
                 }

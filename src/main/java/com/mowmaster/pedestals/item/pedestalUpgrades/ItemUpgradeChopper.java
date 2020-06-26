@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
+import com.mowmaster.pedestals.pedestals;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -20,17 +20,19 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.mowmaster.dust.references.Reference.MODID;
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeChopper extends ItemUpgradeBase
 {
-    public ItemUpgradeChopper(Item.Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeChopper(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -94,7 +96,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
     {
         if(!blockToChop.getBlock().isAir(blockToChop,world,blockToChopPos) && blockToChop.getBlock().isIn(BlockTags.LOGS) || blockToChop.getBlock().isIn(BlockTags.LEAVES))
         {
-            FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().getWorld(world.getDimension().getType()));
+            FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack choppingAxe = new ItemStack(Items.DIAMOND_AXE,1);
             if(!itemInPedestal.isEmpty())
@@ -120,7 +122,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                 }
             }
 
-            if(fakePlayer.canHarvestBlock(blockToChop))
+            if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,false))
             {
                 blockToChop.getBlock().harvestBlock(world, fakePlayer, blockToChopPos, blockToChop, null, fakePlayer.getHeldItemMainhand());
             }
@@ -134,7 +136,9 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getRangeWidth(stack);
         int s4 = getRangeHeight(stack);
-        String tr = "" + (s3+s3+1) + "";
+        //TODO: Fix Text Stuffs
+
+        /*String tr = "" + (s3+s3+1) + "";
         String trr = "" + (s4+1) + "";
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
@@ -151,10 +155,10 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         tooltip.add(area);
 
         speed.applyTextStyle(TextFormatting.RED);
-        tooltip.add(speed);
+        tooltip.add(speed);*/
     }
 
-    public static final Item CHOPPER = new ItemUpgradeChopper(new Item.Properties().maxStackSize(64).group(dust.ITEM_GROUP)).setRegistryName(new ResourceLocation(MODID, "coin/chopper"));
+    public static final Item CHOPPER = new ItemUpgradeChopper(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/chopper"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

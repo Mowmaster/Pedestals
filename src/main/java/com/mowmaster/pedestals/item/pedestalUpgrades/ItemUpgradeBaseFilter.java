@@ -1,12 +1,14 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.dust.dust;
+import com.mowmaster.pedestals.pedestals;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+
 public class ItemUpgradeBaseFilter extends ItemUpgradeBase {
 
-    public ItemUpgradeBaseFilter(Properties builder) {super(builder.group(dust.ITEM_GROUP));}
+    public ItemUpgradeBaseFilter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
