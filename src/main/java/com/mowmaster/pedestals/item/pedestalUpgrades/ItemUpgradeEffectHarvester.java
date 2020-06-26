@@ -12,6 +12,7 @@ import net.minecraft.entity.merchant.villager.VillagerProfession;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.tileentity.BrewingStandTileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -119,7 +120,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     }
                 }
 
-                if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,false))
+                if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                 {
                     target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
                     world.setBlockState(posTarget, Blocks.AIR.getDefaultState());
@@ -129,6 +130,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             }
         }
     }
+    
 
     @Override
     @OnlyIn(Dist.CLIENT)

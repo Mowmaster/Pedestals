@@ -841,17 +841,14 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
         this.intStorage = tag.getInt("intStorage");
         this.intStorageAmp = tag.getInt("intStorageAmp");
 
-        int counter = tag.getInt("storedBlockPosCounter");
-        for(int i=0;i<counter;i++)
+        int[] storedIX = tag.getIntArray("intArrayXPos");
+        int[] storedIY = tag.getIntArray("intArrayYPos");
+        int[] storedIZ = tag.getIntArray("intArrayZPos");
+
+        for(int i=0;i<storedIX.length;i++)
         {
-            String getKeyNameX = "storedLocationX" + i;
-            String getKeyNameY = "storedLocationY" + i;
-            String getKeyNameZ = "storedLocationZ" + i;
-            int getX = tag.getInt(getKeyNameX);
-            int getY = tag.getInt(getKeyNameY);
-            int getZ = tag.getInt(getKeyNameZ);
-            BlockPos gotPos = new BlockPos(getX,getY,getZ);
-            storeNewLocation(gotPos);
+            BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
+            storedLocations.add(gotPos);
         }
 
         this.lockCode = LockCode.read(tag);
@@ -873,18 +870,23 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
         tag.putInt("intSpeedAmp",intSpeedAmp);
         tag.putInt("intStorage",intStorage);
         tag.putInt("intStorageAmp",intStorageAmp);
-        int counter = 0;
+
+
+        List<Integer> storedX = new ArrayList<Integer>();
+        List<Integer> storedY = new ArrayList<Integer>();
+        List<Integer> storedZ = new ArrayList<Integer>();
+
         for(int i=0;i<getNumberOfStoredLocations();i++)
         {
-            String keyNameX = "storedLocationX" + i;
-            String keyNameY = "storedLocationY" + i;
-            String keyNameZ = "storedLocationZ" + i;
-            tag.putInt(keyNameX,storedLocations.get(i).getX());
-            tag.putInt(keyNameY,storedLocations.get(i).getY());
-            tag.putInt(keyNameZ,storedLocations.get(i).getZ());
-            counter++;
+            storedX.add(storedLocations.get(i).getX());
+            storedY.add(storedLocations.get(i).getY());
+            storedZ.add(storedLocations.get(i).getZ());
         }
-        tag.putInt("storedBlockPosCounter",counter);
+
+        tag.putIntArray("intArrayXPos",storedX);
+        tag.putIntArray("intArrayYPos",storedY);
+        tag.putIntArray("intArrayZPos",storedZ);
+
 
         this.lockCode.write(tag);
         return tag;
@@ -899,7 +901,7 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
     //  the player will never notice the difference and the client<-->server synchronisation lag will make it
     //  inaccurate anyway
     @Override
-    //--+@Nullable
+    @Nullable
     public SUpdateTileEntityPacket getUpdatePacket()
     {
         CompoundNBT nbtTagCompound = new CompoundNBT();
@@ -908,13 +910,12 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
         return new SUpdateTileEntityPacket(this.pos, tileEntityType, nbtTagCompound);
     }
 
-    /*@Override
+    @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        read(pkt.getNbtCompound());
+        LockCode.read(pkt.getNbtCompound());
     }
-*/
-    /* Creates a tag containing the TileEntity information, used by vanilla to transmit from server to client
- */
+
+    /* Creates a tag containing the TileEntity information, used by vanilla to transmit from server to client*/
     @Override
     public CompoundNBT getUpdateTag()
     {
@@ -923,13 +924,12 @@ public class TilePedestal extends TileEntity implements ITickableTileEntity {
         return nbtTagCompound;
     }
 
-    /* Populates this TileEntity with information from the tag, used by vanilla to transmit from server to client
- */
-    /*@Override
+    /* Populates this TileEntity with information from the tag, used by vanilla to transmit from server to client*/
+    //@Override
     public void handleUpdateTag(CompoundNBT tag)
     {
-        this.read(tag);
-    }*/
+        LockCode.read(tag);
+    }
 
     private static Block[] pedArray = new Block[]{BlockPedestalTE.PEDESTAL_000, BlockPedestalTE.PEDESTAL_001, BlockPedestalTE.PEDESTAL_002, BlockPedestalTE.PEDESTAL_003
             , BlockPedestalTE.PEDESTAL_010, BlockPedestalTE.PEDESTAL_011, BlockPedestalTE.PEDESTAL_012, BlockPedestalTE.PEDESTAL_013

@@ -140,6 +140,18 @@ public class ItemLinkingTool extends Item {
                     }
                 }
             }
+            /*else
+            {
+                if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE) {
+                    //Checks Tile at location to make sure its a TilePedestal
+                    TileEntity tileEntity = worldIn.getTileEntity(pos);
+                    if (tileEntity instanceof TilePedestal) {
+                        TilePedestal tilePedestal = (TilePedestal) tileEntity;
+
+                        System.out.println(tilePedestal.debugLocationList());
+                    }
+                }
+            }*/
         }
 
         return super.onItemUse(context);
