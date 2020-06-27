@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.pedestals;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -111,10 +112,11 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                 }
             }
 
-            if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,false)) {
+            if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,true)) {
                 blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
+                world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
             }
-            blockToBreak.getBlock().removedByPlayer(blockToBreak, world, posOfBlock, fakePlayer, false, null);
+            //blockToBreak.getBlock().removedByPlayer(blockToBreak, world, posOfBlock, fakePlayer, false, null);
         }
 
     }
