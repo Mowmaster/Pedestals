@@ -107,17 +107,7 @@ public class pedestals
             TilePedestal.onTileEntityRegistry(event);
         }
 
-        @SubscribeEvent
-        public static void onBlockColorsReady(ColorHandlerEvent.Block event)
-        {
-            BlockPedestalTE.handleBlockColors(event);
-        }
 
-        @SubscribeEvent
-        public static void onItemColorsReady(ColorHandlerEvent.Item event)
-        {
-            ItemRegistry.onItemColorsReady(event);
-        }
 
     }
 }

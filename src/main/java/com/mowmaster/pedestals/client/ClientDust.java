@@ -1,8 +1,11 @@
 package com.mowmaster.pedestals.client;
 
+import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.item.ItemRegistry;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.render.RenderPedestal;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -13,5 +16,17 @@ public class ClientDust {
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent e) {
         RenderPedestal.init(e);
+    }
+
+    @SubscribeEvent
+    public static void onBlockColorsReady(ColorHandlerEvent.Block event)
+    {
+        BlockPedestalTE.handleBlockColors(event);
+    }
+
+    @SubscribeEvent
+    public static void onItemColorsReady(ColorHandlerEvent.Item event)
+    {
+        ItemRegistry.onItemColorsReady(event);
     }
 }
