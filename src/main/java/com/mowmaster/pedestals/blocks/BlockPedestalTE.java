@@ -353,7 +353,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                 }
                 else if(player.getHeldItemMainhand().getItem().equals(Items.GLOWSTONE))
                 {
-                    player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"GLOWSTONE"),player.getUniqueID());
+                    //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"GLOWSTONE"),player.getUniqueID());
                     if(!tilePedestal.hasLight())
                     {
                         tilePedestal.addLight();
