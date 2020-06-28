@@ -4,6 +4,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.SuspiciousStewRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -22,9 +23,10 @@ public class ItemColorPallet extends Item {
         super(builder.group(PEDESTALS_TAB));
     }
 
-    public static void handleItemColors(ColorHandlerEvent.Item event) {
-        event.getItemColors().register((itemstack, tintIndex) -> {if (tintIndex == 1){return getColorFromNBT(itemstack);} else {return -1;}},COLLORPALLET);
+    //Will Need Custom Recipe Handler to make this item: SuspiciousStewRecipe
 
+    public static void handleItemColors(ColorHandlerEvent.Item event) {
+        event.getItemColors().register((itemstack, tintIndex) -> {if (tintIndex == 1){return getColorFromNBT(itemstack);} else {return -1;}},COLORPALLET);
     }
 
     public static int getColorFromNBT(ItemStack stack)
@@ -40,30 +42,18 @@ public class ItemColorPallet extends Item {
         return stack.getTag().getInt("color");
     }
 
-    public static boolean getCombineFromNBT(ItemStack stack)
-    {
-        if(!stack.hasTag())
-        {
-            return true;
-        }
-        if(!stack.getTag().contains("combine"))
-        {
-            return true;
-        }
-
-        return stack.getTag().getBoolean("combine");
-    }
-
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
-    public static final Item COLLORPALLET = new ItemColorPallet(new Properties().group(ItemGroup.MATERIALS)).setRegistryName(new ResourceLocation(MODID, "itemcolorpallet"));
+    public static final Item COLORPALLET_DEFAULT = new ItemColorPallet(new Properties().group(ItemGroup.MATERIALS)).setRegistryName(new ResourceLocation(MODID, "itemcolorpalletdefault"));
+    public static final Item COLORPALLET = new ItemColorPallet(new Properties().group(ItemGroup.MATERIALS)).setRegistryName(new ResourceLocation(MODID, "itemcolorpallet"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(COLLORPALLET);
+        event.getRegistry().register(COLORPALLET_DEFAULT);
+        event.getRegistry().register(COLORPALLET);
     }
 }

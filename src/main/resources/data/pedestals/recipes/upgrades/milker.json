@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BC"
+  ],
+  "key": {
+    "B": {
+      "tag": "pedestals:upgrades"
+    },
+    "C": {
+      "item": "minecraft:milk_bucket"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/milker"
+  }
+}

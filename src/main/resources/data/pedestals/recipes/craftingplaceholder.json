@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AB"
+  ],
+  "key": {
+    "A": {
+      "item": "pedestals:linkingtool"
+    },
+    "B": {
+      "tag": "forge:stone"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/placeholder"
+  }
+}

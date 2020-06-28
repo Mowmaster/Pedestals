@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BC",
+    "DE"
+  ],
+  "key": {
+    "B": {
+      "tag": "pedestals:upgrades"
+    },
+    "C": {
+      "item": "minecraft:carrot"
+    },
+    "D": {
+      "item": "minecraft:potato"
+    },
+    "E": {
+      "item": "minecraft:beetroot"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/planter"
+  }
+}

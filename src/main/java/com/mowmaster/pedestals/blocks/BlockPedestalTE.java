@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.blocks;
 
+import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.item.ItemLinkingTool;
+import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
@@ -11,10 +13,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
+import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.*;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -25,6 +25,8 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -113,18 +115,20 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
         this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)));
     }
 
-    /*public void dropAllItems() {
-        for(List<ItemStack> list : this.allInventories) {
-            for(int i = 0; i < list.size(); ++i) {
-                ItemStack itemstack = list.get(i);
-                if (!itemstack.isEmpty()) {
-                    this.player.dropItem(itemstack, true, false);
-                    list.set(i, ItemStack.EMPTY);
-                }
-            }
-        }
+    /*https://github.com/progwml6/ironchest/blob/1.15/src/main/java/com/progwml6/ironchest/common/block/GenericIronChestBlock.java#L120-L133*/
+    @Override
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (state.getBlock() != newState.getBlock()) {
+            TileEntity tileentity = worldIn.getTileEntity(pos);
 
-    }*/
+            if (tileentity instanceof TilePedestal) {
+                InventoryHelper.dropInventoryItems(worldIn, pos, (TilePedestal) tileentity);
+                worldIn.updateComparatorOutputLevel(pos, this);
+            }
+
+            super.onReplaced(state, worldIn, pos, newState, isMoving);
+        }
+    }
 
     @Override
     public boolean receiveFluid(IWorld worldIn, BlockPos pos, BlockState state, FluidState fluidStateIn) {
@@ -223,6 +227,8 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
         }
     }
 
+
+
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {
         if(!worldIn.isRemote) {
             TileEntity tileEntity = worldIn.getTileEntity(pos);
@@ -275,6 +281,42 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                                 else return ActionResultType.SUCCESS;
                             }
                         }
+                        else if(player.getHeldItemMainhand().getItem().equals(ItemColorPallet.COLORPALLET))
+                        {
+                            if(tilePedestal.addColor(player.getHeldItemMainhand()))
+                            {
+                                player.getHeldItemMainhand().shrink(1);
+                                return ActionResultType.SUCCESS;
+                            }
+                            else
+                            {
+                                player.sendStatusMessage(new StringTextComponent(TextFormatting.WHITE +"Color Can't be set on Pedestals with Items, Upgrades, or Linked Pedestals"),true);
+                                //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"ColorPallet"),player.getUniqueID());
+                                return ActionResultType.FAIL;
+                            }
+
+                        }
+                        else if(player.getHeldItemMainhand().getItem() instanceof ItemPedestalUpgrades)
+                        {
+                            if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.SPEED))
+                            {
+                                if(tilePedestal.addSpeed(player.getHeldItemMainhand()))
+                                {
+                                    player.getHeldItemMainhand().shrink(1);
+                                    return ActionResultType.SUCCESS;
+                                }
+                                else return ActionResultType.FAIL;
+                            }
+                            else
+                            {
+                                if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
+                                {
+                                    player.getHeldItemMainhand().shrink(1);
+                                    return ActionResultType.SUCCESS;
+                                }
+                                else return ActionResultType.FAIL;
+                            }
+                        }
                         else
                         {
                             int availableSpace = tilePedestal.canAcceptItems(player.getHeldItemMainhand());
@@ -289,15 +331,29 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                             else return ActionResultType.SUCCESS;
                         }
                     }
-                    //player.getHeldItemMainhand().getItem() instanceof ItemCoin ||
-
                 }
                 else if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
                 {
                     return ActionResultType.FAIL;
                 }
+                else if(player.getHeldItemMainhand().getItem().equals(ItemColorPallet.COLORPALLET))
+                {
+                    if(tilePedestal.addColor(player.getHeldItemMainhand()))
+                    {
+                        player.getHeldItemMainhand().shrink(1);
+                        return ActionResultType.SUCCESS;
+                    }
+                    else
+                    {
+                        player.sendStatusMessage(new StringTextComponent(TextFormatting.WHITE +"Color Can't be set on Pedestals with Items, Upgrades, or Linked Pedestals"),true);
+                        //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"ColorPallet"),player.getUniqueID());
+                        return ActionResultType.FAIL;
+                    }
+
+                }
                 else if(player.getHeldItemMainhand().getItem().equals(Items.GLOWSTONE))
                 {
+                    player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"GLOWSTONE"),player.getUniqueID());
                     if(!tilePedestal.hasLight())
                     {
                         tilePedestal.addLight();
@@ -316,6 +372,27 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                             }
                         }
                         else return ActionResultType.SUCCESS;
+                    }
+                }
+                else if(player.getHeldItemMainhand().getItem() instanceof ItemPedestalUpgrades)
+                {
+                    if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.SPEED))
+                    {
+                        if(tilePedestal.addSpeed(player.getHeldItemMainhand()))
+                        {
+                            player.getHeldItemMainhand().shrink(1);
+                            return ActionResultType.SUCCESS;
+                        }
+                        else return ActionResultType.FAIL;
+                    }
+                    else
+                    {
+                        if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
+                        {
+                            player.getHeldItemMainhand().shrink(1);
+                            return ActionResultType.SUCCESS;
+                        }
+                        else return ActionResultType.FAIL;
                     }
                 }
                 else if (player.getHeldItemMainhand().isEmpty()) {

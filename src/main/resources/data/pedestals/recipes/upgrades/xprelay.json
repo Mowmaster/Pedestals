@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BCD"
+  ],
+  "key": {
+    "B": {
+      "tag": "pedestals:upgrades"
+    },
+    "C": {
+      "item": "minecraft:redstone"
+    },
+    "D": {
+      "item": "minecraft:experience_bottle"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/xprelay"
+  }
+}

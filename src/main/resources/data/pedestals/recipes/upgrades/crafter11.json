@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C"
+  ],
+  "key": {
+    "C": {
+      "item": "pedestals:coin/crafter3"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/crafter1"
+  }
+}

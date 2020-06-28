@@ -3,7 +3,13 @@
     "itemGroup.pedestals_blocks": "Pedestals",
 
     "item.pedestals.linkingtool": "Linking Tool",
-    "item.pedestals.itemcolorpallet": "Color Pallet",
+    "item.pedestals.itemcolorpallet": "Colored Pallet",
+    "item.pedestals.itemcolorpalletdefault": "Color Pallet",
+    "item.pedestals.upgradespeed": "Pedestal Speed Upgrade",
+    "item.pedestals.upgradecapacity": "Pedestal Transfer Capacity Upgrade",
+
+    "item.pedestals.coin.default": "Pedestal Upgrade Base",
+    "item.pedestals.coin.default.tooltip_name": "Upgrade Base",
 
     "item.pedestals.coin.dropper": "Pedestal Upgrade",
         "item.pedestals.coin.dropper.tooltip_name": "Item Dropper Upgrade",

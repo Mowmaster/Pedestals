@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BC"
+  ],
+  "key": {
+    "B": {
+      "tag": "pedestals:upgrades"
+    },
+    "C": {
+      "item": "minecraft:diamond_axe"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/chopper"
+  }
+}

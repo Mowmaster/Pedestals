@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BCD"
+  ],
+  "key": {
+    "B": {
+      "tag": "pedestals:upgrades"
+    },
+    "C": {
+      "item": "minecraft:dropper"
+    },
+    "D": {
+      "item": "minecraft:experience_bottle"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/xpdropper"
+  }
+}

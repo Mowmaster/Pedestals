@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AD"
+  ],
+  "key": {
+    "A": {
+      "item": "pedestals:linkingtool"
+    },
+    "D": {
+      "tag": "forge:gems/diamond"
+    }
+  },
+  "result": {
+    "item": "pedestals:upgradespeed"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "pedestals:coin/placeholder"
+    }
+  },
+  "result": {
+    "item": "minecraft:stone"
+  }
+}

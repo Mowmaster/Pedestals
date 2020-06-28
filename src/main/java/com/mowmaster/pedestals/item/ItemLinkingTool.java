@@ -36,7 +36,17 @@ public class ItemLinkingTool extends Item {
     public BlockPos storedPosition = defaultPos;
 
     public ItemLinkingTool() {
-        super(new Item.Properties().maxStackSize(1).group(PEDESTALS_TAB));
+        super(new Item.Properties().maxStackSize(1).containerItem(DEFAULT).group(PEDESTALS_TAB));
+    }
+
+    @Override
+    public boolean hasContainerItem(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getContainerItem(ItemStack itemStack) {
+        return new ItemStack(this.getItem());
     }
 
     @Override
@@ -152,7 +162,17 @@ public class ItemLinkingTool extends Item {
                         output.func_240702_b_(tilePedestal.debugLocationList());
                         output.func_240699_a_(TextFormatting.WHITE);
 
+                        TranslationTextComponent output2 = new TranslationTextComponent("Capacity Upgrades: ");
+                        output2.func_240702_b_(""+tilePedestal.getCapacity()+"");
+                        output2.func_240699_a_(TextFormatting.GRAY);
+
+                        TranslationTextComponent output1 = new TranslationTextComponent("Speed Upgrades: ");
+                        output1.func_240702_b_(""+tilePedestal.getSpeed()+"");
+                        output1.func_240699_a_(TextFormatting.RED);
+
                         player.sendMessage(output,player.getUniqueID());
+                        player.sendMessage(output1,player.getUniqueID());
+                        player.sendMessage(output2,player.getUniqueID());
                     }
                 }
             }

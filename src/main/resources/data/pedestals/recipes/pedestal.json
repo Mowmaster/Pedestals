@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SLS",
+    " B ",
+    "BBB"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stone_slab"
+    },
+    "L": {
+      "item": "pedestals:linkingtool"
+    },
+    "B": {
+      "item": "minecraft:stone"
+    }
+  },
+  "result": {
+    "item": "pedestals:pedestal/stone333"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C"
+  ],
+  "key": {
+    "C": {
+      "item": "pedestals:coin/restock"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/import"
+  }
+}
