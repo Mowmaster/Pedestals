@@ -66,7 +66,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
             Block.makeCuboidShape(5.0D, 5.0D, 10.0D, 11.0D, 11.0D, 2.0D),
             Block.makeCuboidShape(4.0D, 4.0D, 12.0D, 12.0D, 12.0D, 10.0D));
     protected static final VoxelShape CWEST = VoxelShapes.or(Block.makeCuboidShape(14.0D, 3.0D, 3.0D, 16.0D, 13.0D, 13.0D),
-            Block.makeCuboidShape(13.0D, 5.0D, 5.0D, 11.0D, 11.0D, 11.0D),
+            Block.makeCuboidShape(14.0D, 5.0D, 5.0D, 6.0D, 11.0D, 11.0D),
             Block.makeCuboidShape(4.0D, 4.0D, 4.0D, 6.0D, 12.0D, 12.0D));
 
     protected static final VoxelShape LCUP = VoxelShapes.or(Block.makeCuboidShape(3.0D, 0.0D, 3.0D, 13.0D, 2.0D, 13.0D),
