@@ -32,14 +32,20 @@ public class ItemUpgradeDefault extends ItemUpgradeBase
 {
     public ItemUpgradeDefault(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
-
+    @Override
+    public int canAcceptCount(ItemStack inPedestal, ItemStack itemStackIncoming) {
+        int allow = 1;
+        if(inPedestal.getCount() > 0)
+        {
+            allow = 0;
+        }
+        return allow;
+    }
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
 
     }
-
-
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {

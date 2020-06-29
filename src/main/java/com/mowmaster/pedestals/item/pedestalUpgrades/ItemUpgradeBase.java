@@ -329,6 +329,12 @@ public class ItemUpgradeBase extends Item {
         return false;
     }
 
+    public int canAcceptCount(ItemStack inPedestal, ItemStack itemStackIncoming)
+    {
+        int stackabe = itemStackIncoming.getMaxStackSize();
+        return stackabe;
+    }
+
     //Mainly Used in the Import, Furnace, and  Milker Upgrades
     /*
         This Method gets the next slot with items in the given tile

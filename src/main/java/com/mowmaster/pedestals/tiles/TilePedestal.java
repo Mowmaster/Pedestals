@@ -212,21 +212,6 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         intTransferRange = transferRange;
         update();
     }
-    public int spaceInPedestal()
-    {
-        int space = 0;
-
-        if(getItemInPedestal().isEmpty() || getItemInPedestal().equals(ItemStack.EMPTY))
-        {
-            space = 64;
-        }
-        else
-        {
-            space = (getMaxStackSize() - getItemInPedestal().getCount());
-        }
-
-        return space;
-    }
 
     public boolean hasItem()
     {
@@ -337,7 +322,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         switch (getCapacity())
         {
             case 0:
-                    itemRate = (getCapacity()>0)?(4):(4);
+                itemRate = (getCapacity()>0)?(4):(4);
                 break;
             case 1:
                 itemRate= (getCapacity()>0)?(8):(4);
@@ -549,6 +534,16 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     public int canAcceptItems(ItemStack itemsIncoming)
     {
         int canAccept = 0;
+        int pedestalAccept = 0;
+
+        if(hasCoin())
+        {
+            Item coinInPed = this.getCoinOnPedestal().getItem();
+            if(coinInPed instanceof ItemUpgradeBase)
+            {
+                pedestalAccept = ((ItemUpgradeBase) coinInPed).canAcceptCount(getItemInPedestal(), itemsIncoming);
+            }
+        }
 
         if(getItemInPedestal().isEmpty() || getItemInPedestal().equals(ItemStack.EMPTY))
         {
@@ -567,6 +562,11 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                     }
                 }
             }
+        }
+
+        if(canAccept > pedestalAccept && hasCoin())
+        {
+            canAccept = pedestalAccept;
         }
 
         return canAccept;
@@ -665,7 +665,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             TilePedestal tileToSendTo = ((TilePedestal)world.getTileEntity(pedestalToSendTo));
 
             //Max that can be recieved
-            int countToSend = tileToSendTo.spaceInPedestal();
+            int countToSend = tileToSendTo.canAcceptItems(getItemInPedestal());
             ItemStack copyStackToSend = getItemInPedestal().copy();
             //Max that is available to send
             if(copyStackToSend.getCount()<countToSend)
