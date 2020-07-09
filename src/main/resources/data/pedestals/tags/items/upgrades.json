@@ -6,6 +6,7 @@
     "pedestals:coin/import",
     "pedestals:coin/breaker",
     "pedestals:coin/chopper",
+    "pedestals:coin/choppershrooms",
     "pedestals:coin/cobble",
     "pedestals:coin/crafter1",
     "pedestals:coin/crafter2",
@@ -35,6 +36,7 @@
     "pedestals:coin/smelter",
     "pedestals:coin/milker",
     "pedestals:coin/shearer",
-    "pedestals:coin/placer"
+    "pedestals:coin/placer",
+    "pedestals:coin/teleporter"
   ]
 }

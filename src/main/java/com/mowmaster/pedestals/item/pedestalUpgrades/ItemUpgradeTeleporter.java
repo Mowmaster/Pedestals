@@ -4,12 +4,15 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.WaterFluid;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,8 +32,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -146,14 +151,14 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                         {
                             if(itItemEntity)
                             {
-                                if(world.isAirBlock(posDestBlock))
+                                if(world.isAirBlock(posDestBlock) || world.getBlockState(posDestBlock).getBlock().equals(Blocks.WATER))
                                 {
                                     return true;
                                 }
                             }
                             else
                             {
-                                if(world.isAirBlock(posDestPedestal) && world.isAirBlock(posDestPedestal.add(0,1,0)))
+                                if(world.isAirBlock(posDestPedestal) || world.getBlockState(posDestBlock).equals(Blocks.WATER) && world.isAirBlock(posDestPedestal.add(0,1,0)) || world.getBlockState(posDestPedestal.add(0,1,0)).equals(Blocks.WATER))
                                 {
                                     return true;
                                 }
