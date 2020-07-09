@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.pedestals;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -31,9 +30,9 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeChopper extends ItemUpgradeBase
+public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
 {
-    public ItemUpgradeChopper(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeChopperShrooms(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -95,7 +94,9 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos blockToChopPos, BlockState blockToChop, BlockPos posOfPedestal)
     {
-        if(!blockToChop.getBlock().isAir(blockToChop,world,blockToChopPos) && blockToChop.getBlock().isIn(BlockTags.LOGS) || blockToChop.getBlock().isIn(BlockTags.LEAVES))
+        //wart blocks*, wart stems*, crimson stems*, shroomlight*, mushroom stems, mushroom brown and mushroom red
+        if(!blockToChop.getBlock().isAir(blockToChop,world,blockToChopPos) && blockToChop.getBlock().isIn(BlockTags.field_232874_ao_) || blockToChop.getBlock().isIn(BlockTags.field_232889_z_) || blockToChop.getBlock().isIn(BlockTags.field_232888_y_)
+                || blockToChop.getBlock().equals(Blocks.field_235383_mw_) || blockToChop.getBlock().equals(Blocks.MUSHROOM_STEM) || blockToChop.getBlock().equals(Blocks.BROWN_MUSHROOM_BLOCK) || blockToChop.getBlock().equals(Blocks.RED_MUSHROOM_BLOCK))
         {
 
             FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
@@ -160,7 +161,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         tooltip.add(speed);
     }
 
-    public static final Item CHOPPER = new ItemUpgradeChopper(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/chopper"));
+    public static final Item CHOPPER = new ItemUpgradeChopperShrooms(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/choppershrooms"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseMachine;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -170,9 +171,17 @@ public class ItemLinkingTool extends Item {
                         output1.func_240702_b_(""+tilePedestal.getSpeed()+"");
                         output1.func_240699_a_(TextFormatting.RED);
 
+                        TranslationTextComponent output3 = new TranslationTextComponent("Fuel Left: ");
+                        output3.func_240702_b_(""+tilePedestal.getStoredValueForUpgrades()+"");
+                        output3.func_240699_a_(TextFormatting.LIGHT_PURPLE);
+
                         player.sendMessage(output,player.getUniqueID());
                         player.sendMessage(output1,player.getUniqueID());
                         player.sendMessage(output2,player.getUniqueID());
+                        if(tilePedestal.getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseMachine)
+                        {
+                            player.sendMessage(output3,player.getUniqueID());
+                        }
                     }
                 }
             }

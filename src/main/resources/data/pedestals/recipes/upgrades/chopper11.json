@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C"
+  ],
+  "key": {
+    "C": {
+      "item": "pedestals:coin/choppershrooms"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/chopper"
+  }
+}

@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.item;
 
-
 import com.mowmaster.pedestals.blocks.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import net.minecraft.item.Item;
@@ -15,12 +14,14 @@ public class ItemRegistry
 
         ItemColorPallet.onItemRegistryReady(e);
         ItemLinkingTool.onItemRegistryReady(e);
+        ItemDust.onItemRegistryReady(e);
         ItemPedestalUpgrades.onItemRegistryReady(e);
         ItemUpgradeDefault.onItemRegistryReady(e);
         ItemUpgradeDropper.onItemRegistryReady(e);
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeBreaker.onItemRegistryReady(e);
         ItemUpgradeChopper.onItemRegistryReady(e);
+        ItemUpgradeChopperShrooms.onItemRegistryReady(e);
         ItemUpgradeCobbleGen.onItemRegistryReady(e);
         ItemUpgradeCrafter.onItemRegistryReady(e);
         ItemCraftingPlaceholder.onItemRegistryReady(e);
@@ -50,6 +51,7 @@ public class ItemRegistry
         ItemUpgradeMilker.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);
         ItemUpgradePlacer.onItemRegistryReady(e);
+        ItemUpgradeTeleporter.onItemRegistryReady(e);
     }
 
     public static void onItemColorsReady(ColorHandlerEvent.Item event)

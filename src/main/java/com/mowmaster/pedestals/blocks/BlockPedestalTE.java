@@ -211,7 +211,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
         return blockstate.getBlock() == this && blockstate.get(FACING) == direction ? this.getDefaultState().with(FACING, direction.getOpposite()).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)) : this.getDefaultState().with(FACING, direction).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false));
     }
 
-    /*Directly From CactusBlock Code*/
+    //TODO: Needs fixed because method is dep. >:(
     @Override
     public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
         TileEntity tileentity = worldIn.getTileEntity(pos);
@@ -227,7 +227,15 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
         }
     }
 
+    @Override
+    public boolean collisionExtendsVertically(BlockState state, IBlockReader world, BlockPos pos, Entity collidingEntity) {
+        return false;
+    }
 
+    @Override
+    public VoxelShape getCollisionShape(BlockState p_220071_1_, IBlockReader p_220071_2_, BlockPos p_220071_3_, ISelectionContext p_220071_4_) {
+        return getShape(p_220071_1_,p_220071_2_,p_220071_3_,p_220071_4_);
+    }
 
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {
         if(!worldIn.isRemote) {
