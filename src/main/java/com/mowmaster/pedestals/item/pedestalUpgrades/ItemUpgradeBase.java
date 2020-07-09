@@ -440,6 +440,7 @@ public class ItemUpgradeBase extends Item {
     public BlockPos getPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
     {
         BlockState state = world.getBlockState(posOfPedestal);
+
         Direction enumfacing = state.get(FACING);
         BlockPos blockBelow = posOfPedestal;
         switch (enumfacing)

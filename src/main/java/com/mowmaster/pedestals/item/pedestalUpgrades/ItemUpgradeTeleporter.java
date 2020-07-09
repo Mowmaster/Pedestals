@@ -133,8 +133,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
     public boolean canTeleportTo(World world, TilePedestal tilePedestal, BlockPos posOrigPedestal, BlockPos posDestPedestal, boolean itItemEntity)
     {
-        int range = getRange(tilePedestal.getCoinOnPedestal());
-        BlockPos posDestBlock = getPosOfBlockBelow(world,posDestPedestal,range);
+
 
         if(world.isAreaLoaded(posDestPedestal,1))
         {
@@ -149,6 +148,8 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                     {
                         if(removeFuel(tilePedestal,getTeleportDistance(posOrigPedestal,posDestPedestal),true)>=0)
                         {
+                            int range = getRange(tilePedestal.getCoinOnPedestal());
+                            BlockPos posDestBlock = getPosOfBlockBelow(world,posDestPedestal,range);
                             if(itItemEntity)
                             {
                                 if(world.isAirBlock(posDestBlock) || world.getBlockState(posDestBlock).getBlock().equals(Blocks.WATER))
