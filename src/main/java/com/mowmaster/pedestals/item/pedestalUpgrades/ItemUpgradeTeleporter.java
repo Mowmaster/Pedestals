@@ -1,28 +1,23 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.WaterFluid;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.*;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -33,9 +28,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -55,6 +47,41 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     @Override
     public Boolean canAcceptCapacity() {
         return false;
+    }
+
+    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    {
+        int speed = getOperationSpeed(coinInPedestal);
+        if(!world.isBlockPowered(pedestalPos))
+        {
+            if (tick%speed == 0) {
+                upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
+            }
+        }
+    }
+
+    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    {
+        int width = 0;
+        int height = 1;
+        BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
+        BlockState state = world.getBlockState(posOfPedestal);
+        if(state.getBlock() instanceof BlockPedestalTE)
+        {
+            TilePedestal pedestal = ((TilePedestal)world.getTileEntity(posOfPedestal));
+
+            AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+
+            List<Entity> entityList = world.getEntitiesWithinAABB(Entity.class,getBox);
+            for(Entity getFromList : entityList)
+            {
+                if(!(getFromList instanceof ItemEntity))
+                {
+                    doTeleport(world, pedestal, posOfPedestal, state, getFromList,false);
+                }
+            }
+        }
     }
 
     @Override
@@ -84,10 +111,6 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                 doTeleport(world, tilePedestal, posPedestal, state, entityIn,true);
             }
         }
-        else
-        {
-            doTeleport(world, tilePedestal, posPedestal, state, entityIn,true);
-        }
     }
 
     public int getTeleportDistance(BlockPos pedestalOrigin, BlockPos pedestalDestination)
@@ -115,12 +138,23 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                 {
                     if(tilePedestal.getStoredPositionAt(i) != posPedestal)
                     {
-                        if(canTeleportTo(world,tilePedestal,posPedestal,tilePedestal.getStoredPositionAt(i),isItemEntity))
+                        if(canTeleportTo(world,tilePedestal,posPedestal,tilePedestal.getStoredPositionAt(i),isItemEntity) == 1)
                         {
-
-                            if(teleportEntity(world, tilePedestal, tilePedestal.getStoredPositionAt(i), state, entityIn))
+                            if(teleportEntity(world, tilePedestal, tilePedestal.getStoredPositionAt(i), entityIn))
                             {
                                 removeFuel(tilePedestal,getTeleportDistance(posPedestal,tilePedestal.getStoredPositionAt(i)),false);
+                            }
+                            break;
+                        }
+                        //Random teleport to use up remaining fuel???
+                        else if (canTeleportTo(world,tilePedestal,posPedestal,tilePedestal.getStoredPositionAt(i),isItemEntity) == 2 && removeFuel(tilePedestal,0,true) > 0)
+                        {
+                            int range = getRange(tilePedestal.getCoinOnPedestal());
+                            int remainingFuel = removeFuel(tilePedestal,0,true);
+                            BlockPos randomPos = world.getBlockRandomPos((int)entityIn.getPosX(),(int)entityIn.getPosY(),(int)entityIn.getPosZ(),range*remainingFuel);
+                            if(teleportEntityRandom(world, randomPos, entityIn))
+                            {
+                                removeFuel(tilePedestal,remainingFuel,false);
                             }
                             break;
                         }
@@ -131,10 +165,8 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         return false;
     }
 
-    public boolean canTeleportTo(World world, TilePedestal tilePedestal, BlockPos posOrigPedestal, BlockPos posDestPedestal, boolean itItemEntity)
+    public int canTeleportTo(World world, TilePedestal tilePedestal, BlockPos posOrigPedestal, BlockPos posDestPedestal, boolean isItemEntity)
     {
-
-
         if(world.isAreaLoaded(posDestPedestal,1))
         {
             //If block ISNT powered
@@ -146,46 +178,77 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                     //Get the tile before checking other things
                     if(world.getTileEntity(posDestPedestal) instanceof TilePedestal)
                     {
-                        if(removeFuel(tilePedestal,getTeleportDistance(posOrigPedestal,posDestPedestal),true)>=0)
+                        if(getTeleportDistance(posOrigPedestal,posDestPedestal) <= tilePedestal.getStoredValueForUpgrades())
                         {
                             int range = getRange(tilePedestal.getCoinOnPedestal());
                             BlockPos posDestBlock = getPosOfBlockBelow(world,posDestPedestal,range);
-                            if(itItemEntity)
+                            BlockState blocktoTPto = world.getBlockState(posDestBlock);
+                            if(isItemEntity)
                             {
-                                if(world.isAirBlock(posDestBlock) || world.getBlockState(posDestBlock).getBlock().equals(Blocks.WATER))
+                                //why this works this way, idk
+                                if(world.isAirBlock(posDestBlock) || (blocktoTPto.getBlock() instanceof IFluidBlock || blocktoTPto.getBlock() instanceof FlowingFluidBlock))
                                 {
-                                    return true;
+                                    return 1;
                                 }
                             }
                             else
                             {
-                                if(world.isAirBlock(posDestPedestal) || world.getBlockState(posDestBlock).equals(Blocks.WATER) && world.isAirBlock(posDestPedestal.add(0,1,0)) || world.getBlockState(posDestPedestal.add(0,1,0)).equals(Blocks.WATER))
+                                if(world.isAirBlock(posDestBlock) || (blocktoTPto.getBlock() instanceof IFluidBlock || blocktoTPto.getBlock() instanceof FlowingFluidBlock)
+                                        && world.isAirBlock(posDestBlock.add(0,1,0)) || (blocktoTPto.getBlock() instanceof IFluidBlock || blocktoTPto.getBlock() instanceof FlowingFluidBlock))
                                 {
-                                    return true;
+                                    return 1;
                                 }
                             }
                         }
+                        //return 2 means not enough fuel so random teleport
+                        else return 2;
                     }
                 }
             }
         }
-        return false;
+        return 0;
     }
 
-    public boolean teleportEntity(World world, TilePedestal tilePedestal, BlockPos posPedestalDest, BlockState state, Entity entityIn)
+    public boolean teleportEntity(World world, TilePedestal tilePedestal, BlockPos posPedestalDest, Entity entityIn)
     {
         int range = getRange(tilePedestal.getCoinOnPedestal());
         BlockPos pos = getPosOfBlockBelow(world,posPedestalDest,range);
         if(entityIn instanceof PlayerEntity)
         {
             ((PlayerEntity)entityIn).stopRiding();
-            ((ServerPlayerEntity)entityIn).connection.setPlayerLocation(pos.getX(), pos.getY(), pos.getZ(), entityIn.rotationYaw, entityIn.rotationPitch);
+            ((ServerPlayerEntity)entityIn).connection.setPlayerLocation(pos.getX()+0.5D, pos.getY(), pos.getZ()+0.5D, entityIn.rotationYaw, entityIn.rotationPitch);
+            world.playSound(null, entityIn.getPosX(), entityIn.getPosY(), entityIn.getPosZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            return true;
+        }
+        else if(entityIn instanceof CreatureEntity) {
+            ((CreatureEntity) entityIn).stopRiding();
+            ((CreatureEntity) entityIn).teleportKeepLoaded(pos.getX()+0.5D, pos.getY(), pos.getZ()+0.5D);
+            world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            return true;
+        }
+        else if(entityIn instanceof ItemEntity)
+        {
+            ((ItemEntity)entityIn).stopRiding();
+            ((ItemEntity)entityIn).teleportKeepLoaded(pos.getX()+0.5D, pos.getY(), pos.getZ()+0.5D);
+            world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean teleportEntityRandom(World world, BlockPos posPedestalDest, Entity entityIn)
+    {
+        if(entityIn instanceof PlayerEntity)
+        {
+            ((PlayerEntity)entityIn).stopRiding();
+            ((ServerPlayerEntity)entityIn).connection.setPlayerLocation(posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), entityIn.rotationYaw, entityIn.rotationPitch);
             world.playSound(null, entityIn.getPosX()+0.5D, entityIn.getPosY(), entityIn.getPosZ()+0.5D, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
         else if(entityIn instanceof CreatureEntity) {
             ((CreatureEntity) entityIn).stopRiding();
-            if (((CreatureEntity) entityIn).attemptTeleport(pos.getX(), pos.getY(), pos.getZ(), true)) {
+            if (((CreatureEntity) entityIn).attemptTeleport(posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), true)) {
 
                 world.playSound(null, posPedestalDest.getX()+0.5D, posPedestalDest.getY(), posPedestalDest.getZ()+0.5D, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
                 return true;
@@ -194,7 +257,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         else if(entityIn instanceof ItemEntity)
         {
             ((ItemEntity)entityIn).stopRiding();
-            ((ItemEntity)entityIn).teleportKeepLoaded(pos.getX()+0.5D, pos.getY(), pos.getZ()+0.5D);
+            ((ItemEntity)entityIn).teleportKeepLoaded(posPedestalDest.getX()+0.5D, posPedestalDest.getY(), posPedestalDest.getZ()+0.5D);
             world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
@@ -229,6 +292,11 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         t.func_240699_a_(TextFormatting.GOLD);
         tooltip.add(t);
+
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        tooltip.add(speed);
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
         range.func_240702_b_("" + getRange(stack) + "");
