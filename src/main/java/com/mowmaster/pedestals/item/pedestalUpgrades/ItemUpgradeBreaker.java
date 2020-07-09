@@ -3,11 +3,14 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.pedestals;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FlowingFluid;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -26,6 +29,8 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -96,7 +101,8 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         /*
         BREAKS BLOCKS AND DROPS THEM IN WORLD FOR PICKUP LATER
          */
-        if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
+
+        if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
             if (itemInPedestal.getItem() instanceof PickaxeItem) {
                 fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
             } else {
