@@ -106,7 +106,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                                 itemInputsPerSmelt = Math.floorDiv(fuelLeft,burnTimeCostPerItemSmelted );
                                                 if(itemInputsPerSmelt >=1)
                                                 {
-                                                    System.out.println(itemInputsPerSmelt);
+                                                    //System.out.println(itemInputsPerSmelt);
                                                     fuelToConsume = burnTimeCostPerItemSmelted * itemInputsPerSmelt;
                                                     itemsOutputWhenStackSmelted = (itemsPerSmelt*resultSmelted.getCount());
                                                     copyIncoming.setCount(itemsOutputWhenStackSmelted);
