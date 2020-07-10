@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "B"
+  ],
+  "key": {
+    "B": {
+      "item": "pedestals:coin/filterfoodb"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/filterfood"
+  }
+}
