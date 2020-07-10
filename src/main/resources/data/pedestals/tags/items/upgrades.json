@@ -37,6 +37,9 @@
     "pedestals:coin/milker",
     "pedestals:coin/shearer",
     "pedestals:coin/placer",
-    "pedestals:coin/teleporter"
+    "pedestals:coin/teleporter",
+    "pedestals:coin/filterfood",
+    "pedestals:coin/filterfoodb",
+    "pedestals:coin/sawmill"
   ]
 }

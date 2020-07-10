@@ -47,11 +47,14 @@ public class ItemRegistry
         ItemUpgradeFilterItemStackBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterMod.onItemRegistryReady(e);
         ItemUpgradeFilterModBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFilterFood.onItemRegistryReady(e);
+        ItemUpgradeFilterFoodBlacklist.onItemRegistryReady(e);
         ItemUpgradeFurnace.onItemRegistryReady(e);
         ItemUpgradeMilker.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);
         ItemUpgradePlacer.onItemRegistryReady(e);
         ItemUpgradeTeleporter.onItemRegistryReady(e);
+        ItemUpgradeSawMill.onItemRegistryReady(e);
     }
 
     public static void onItemColorsReady(ColorHandlerEvent.Item event)
