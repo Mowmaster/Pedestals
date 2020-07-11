@@ -410,14 +410,12 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        //TODO: Fix Text Stuffs
-
-        /*TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.func_240702_b_(getOperationSpeedString(stack));
 
         speed.func_240699_a_(TextFormatting.RED);
 
-        tooltip.add(speed);*/
+        tooltip.add(speed);
     }
 
     public static final Item XPANVIL = new ItemUpgradeExpAnvil(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpanvil"));
