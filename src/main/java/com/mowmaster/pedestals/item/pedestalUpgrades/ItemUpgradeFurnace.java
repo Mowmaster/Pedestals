@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.*;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -17,6 +18,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -44,7 +46,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
 
     protected Collection<ItemStack> getProcessResults(AbstractCookingRecipe recipe, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
-        return Collections.singleton(recipe.getCraftingResult(inv));
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getCraftingResult(inv)));
     }
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
@@ -73,7 +75,6 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                 TileEntity invToPullFrom = world.getTileEntity(posInventory);
                 if(invToPullFrom instanceof TilePedestal) {
                     itemFromInv = ItemStack.EMPTY;
-
                 }
                 else {
                     if(handler != null)
@@ -83,8 +84,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                         {
                             int maxInSlot = handler.getSlotLimit(i);
                             itemFromInv = handler.getStackInSlot(i);
-                            //Should work without catch since we null check this in our GetNextSlotFunction\
-
+                            //Need to null check invalid recipes
                             Collection<ItemStack> smeltedResults = getProcessResults(getRecipe(world,itemFromInv),itemFromInv);
                             ItemStack resultSmelted = smeltedResults.iterator().next();
                             ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
@@ -143,6 +143,18 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                                 }
                                             }
                                         }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                                if(pedestalInv instanceof TilePedestal) {
+                                    TilePedestal ped = ((TilePedestal) pedestalInv);
+                                    if(ped.getItemInPedestal().isEmpty())
+                                    {
+                                        handler.extractItem(i,itemFromInv.getCount(),false);
+                                        ped.addItem(itemFromInv);
                                     }
                                 }
                             }

@@ -120,6 +120,18 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                     }
                                 }
                             }
+                            else
+                            {
+                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                                if(pedestalInv instanceof TilePedestal) {
+                                    TilePedestal ped = ((TilePedestal) pedestalInv);
+                                    if(ped.getItemInPedestal().isEmpty())
+                                    {
+                                        handler.extractItem(i,itemFromInv.getCount(),false);
+                                        ped.addItem(itemFromInv);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
