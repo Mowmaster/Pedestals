@@ -154,7 +154,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
                 s3="2x Faster";
                 break;
             case 50:
-                s3 = "46x Faster";
+                s3 = "4x Faster";
                 break;
             case 33:
                 s3 = "6x Faster";
