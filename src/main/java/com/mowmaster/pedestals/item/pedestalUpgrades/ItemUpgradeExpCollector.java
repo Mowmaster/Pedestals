@@ -1,11 +1,13 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.pedestals;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -119,6 +121,42 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
             }
             break;
         }
+
+        int widthP = 0;
+        int heightP = 1;
+        BlockPos negBlockPosP = getNegRangePosEntity(world,posOfPedestal,widthP,heightP);
+        BlockPos posBlockPosP = getPosRangePosEntity(world,posOfPedestal,widthP,heightP);
+        BlockState state = world.getBlockState(posOfPedestal);
+        if(state.getBlock() instanceof BlockPedestalTE)
+        {
+            TilePedestal pedestal = ((TilePedestal)world.getTileEntity(posOfPedestal));
+
+            AxisAlignedBB getBoxP = new AxisAlignedBB(negBlockPosP,posBlockPosP);
+
+            List<Entity> entityList = world.getEntitiesWithinAABB(Entity.class,getBoxP);
+            for(Entity getFromList : entityList)
+            {
+                if(getFromList instanceof PlayerEntity)
+                {
+                    PlayerEntity getPlayer = ((PlayerEntity)getFromList);
+                    ItemStack coin = pedestal.getCoinOnPedestal();
+                    if(!getPlayer.isCrouching())
+                    {
+                        int currentlyStoredExp = getXPStored(coin);
+                        if(currentlyStoredExp < readMaxXpFromNBT(coin))
+                        {
+                            int transferRate = getSuckiRate(coin);
+                            int value = removeXp(getPlayer, transferRate);
+                            if(value > 0)
+                            {
+                                world.playSound((PlayerEntity)null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                setXPStored(coin, currentlyStoredExp + value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -135,26 +173,6 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
                 int value = getXPFromList.getXpValue();
                 getXPFromList.remove();
                 setXPStored(coin, currentlyStoredExp + value);
-            }
-        }
-
-        if(entityIn instanceof PlayerEntity)
-        {
-            PlayerEntity getPlayer = ((PlayerEntity)entityIn);
-            ItemStack coin = tilePedestal.getCoinOnPedestal();
-            if(!getPlayer.isCrouching())
-            {
-                int currentlyStoredExp = getXPStored(coin);
-                if(currentlyStoredExp < readMaxXpFromNBT(coin))
-                {
-                    int transferRate = getSuckiRate(coin);
-                    int value = removeXp(getPlayer, transferRate);
-                    if(value > 0)
-                    {
-                        world.playSound((PlayerEntity)null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                        setXPStored(coin, currentlyStoredExp + value);
-                    }
-                }
             }
         }
     }
