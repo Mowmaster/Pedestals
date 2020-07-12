@@ -125,10 +125,11 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                                 if(pedestalInv instanceof TilePedestal) {
                                     TilePedestal ped = ((TilePedestal) pedestalInv);
-                                    if(ped.getItemInPedestal().isEmpty())
+                                    if(ped.getItemInPedestal().equals(ItemStack.EMPTY))
                                     {
+                                        ItemStack copyItemFromInv = itemFromInv.copy();
                                         handler.extractItem(i,itemFromInv.getCount(),false);
-                                        ped.addItem(itemFromInv);
+                                        ped.addItem(copyItemFromInv);
                                     }
                                 }
                             }
