@@ -12,24 +12,22 @@ public class ItemRegistry
     {
         BlockPedestalTE.onItemRegistryReady(e);
 
-        ItemColorPallet.onItemRegistryReady(e);
         ItemLinkingTool.onItemRegistryReady(e);
-        ItemDust.onItemRegistryReady(e);
+        ItemColorPallet.onItemRegistryReady(e);
         ItemPedestalUpgrades.onItemRegistryReady(e);
         ItemUpgradeDefault.onItemRegistryReady(e);
+
         ItemUpgradeDropper.onItemRegistryReady(e);
-        ItemUpgradeImport.onItemRegistryReady(e);
+        ItemUpgradePlacer.onItemRegistryReady(e);
         ItemUpgradeBreaker.onItemRegistryReady(e);
         ItemUpgradeChopper.onItemRegistryReady(e);
         ItemUpgradeChopperShrooms.onItemRegistryReady(e);
-        ItemUpgradeCobbleGen.onItemRegistryReady(e);
-        ItemUpgradeCrafter.onItemRegistryReady(e);
-        ItemCraftingPlaceholder.onItemRegistryReady(e);
-        ItemUpgradeCrusher.onItemRegistryReady(e);
+
         ItemUpgradeEffectGrower.onItemRegistryReady(e);
         ItemUpgradeEffectHarvester.onItemRegistryReady(e);
         ItemUpgradeEffectPlanter.onItemRegistryReady(e);
         ItemUpgradeEffectMagnet.onItemRegistryReady(e);
+
         ItemUpgradeExpCollector.onItemRegistryReady(e);
         ItemUpgradeExpRelay.onItemRegistryReady(e);
         ItemUpgradeExpTank.onItemRegistryReady(e);
@@ -37,8 +35,11 @@ public class ItemRegistry
         ItemUpgradeExpDropper.onItemRegistryReady(e);
         ItemUpgradeExpEnchanter.onItemRegistryReady(e);
         ItemUpgradeExpAnvil.onItemRegistryReady(e);
+
+        ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);
         ItemUpgradeRestock.onItemRegistryReady(e);
+
         ItemUpgradeFilterEnchanted.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterItem.onItemRegistryReady(e);
@@ -49,12 +50,20 @@ public class ItemRegistry
         ItemUpgradeFilterModBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterFood.onItemRegistryReady(e);
         ItemUpgradeFilterFoodBlacklist.onItemRegistryReady(e);
+
+        ItemUpgradeTeleporter.onItemRegistryReady(e);
         ItemUpgradeFurnace.onItemRegistryReady(e);
+        ItemUpgradeCrusher.onItemRegistryReady(e);
+        ItemUpgradeSawMill.onItemRegistryReady(e);
+        ItemUpgradeCrafter.onItemRegistryReady(e);
+        ItemCraftingPlaceholder.onItemRegistryReady(e);
+        ItemUpgradeCobbleGen.onItemRegistryReady(e);
+        ItemUpgradeVoid.onItemRegistryReady(e);
+
         ItemUpgradeMilker.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);
-        ItemUpgradePlacer.onItemRegistryReady(e);
-        ItemUpgradeTeleporter.onItemRegistryReady(e);
-        ItemUpgradeSawMill.onItemRegistryReady(e);
+
+        ItemDust.onItemRegistryReady(e);
     }
 
     public static void onItemColorsReady(ColorHandlerEvent.Item event)

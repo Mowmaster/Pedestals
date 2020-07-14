@@ -183,6 +183,10 @@
         "item.pedestals.coin.teleporter.tooltip_name": "Teleporter Upgrade",
         "item.pedestals.coin.teleporter.tooltip_range": "Teleporter Range: ",
         "item.pedestals.coin.teleporter.tooltip_speed": "Operational Speed: ",
+    "item.pedestals.coin.void": "Pedestal Upgrade",
+        "item.pedestals.coin.void.tooltip_name": "Void Upgrade",
+        "item.pedestals.coin.void.tooltip_rate": "Damage Delt Per Operation: ",
+        "item.pedestals.coin.void.tooltip_speed": "Operational Speed: ",
 
     "block.pedestals.pedestal.stone000": "Pedestal",
     "block.pedestals.pedestal.stone001": "Pedestal",
