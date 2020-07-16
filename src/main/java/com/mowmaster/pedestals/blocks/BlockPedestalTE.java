@@ -473,7 +473,6 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
     @Override
     public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
         return getRedstoneLevel(worldIn,pos);
-        //https://github.com/BluSunrize/ImmersiveEngineering/blob/1.16/src/main/java/blusunrize/immersiveengineering/common/util/Utils.java#L1358-L1379
     }
 
 
