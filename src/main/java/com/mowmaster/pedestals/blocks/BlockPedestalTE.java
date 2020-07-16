@@ -22,6 +22,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -435,32 +436,24 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
         builder.add(FACING,WATERLOGGED,LIT);
     }
 
+
     private int getRedstoneLevel(World worldIn, BlockPos pos)
     {
         int hasItem=0;
         TileEntity tileEntity = worldIn.getTileEntity(pos);
         if(tileEntity instanceof TilePedestal) {
             TilePedestal pedestal = (TilePedestal) tileEntity;
-            int counter = pedestal.getItemInPedestal().getCount();
-            if(counter<=0) {hasItem=0;}
-            else if(counter>0 && counter<=1) {hasItem=1;}
-            else if(counter>1 && counter<=4) {hasItem=2;}//1-4
-            else if(counter>4 && counter<=9) {hasItem=3;}//4-9
-            else if(counter>9 && counter<=14) {hasItem=4;}//9-14
-            else if(counter>14 && counter<=19) {hasItem=5;}//14-19
-            else if(counter>19 && counter<=24) {hasItem=6;}//19-24
-            else if(counter>24 && counter<=29) {hasItem=7;}//24-29
-            else if(counter>29 && counter<=34) {hasItem=8;}//29-34
-            else if(counter>34 && counter<=39) {hasItem=9;}//34-39
-            else if(counter>39 && counter<=44) {hasItem=10;}//39-44
-            else if(counter>44 && counter<=49) {hasItem=11;}//44-49
-            else if(counter>49 && counter<=54) {hasItem=12;}//49-54
-            else if(counter>54 && counter<=59) {hasItem=13;}//54-59
-            else if(counter>59 && counter<=63) {hasItem=14;}//59-63
-            else if(counter>63) {hasItem=15;}
+            ItemStack itemstack = pedestal.getItemInPedestal();
+            if(!itemstack.isEmpty())
+            {
+                float f = (float)itemstack.getCount()/(float)Math.min(64, itemstack.getMaxStackSize());
+                hasItem = MathHelper.floor(f*14.0F)+1;
+            }
         }
+
         return hasItem;
     }
+
 
     @Override
     public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
@@ -480,6 +473,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
     @Override
     public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
         return getRedstoneLevel(worldIn,pos);
+        //https://github.com/BluSunrize/ImmersiveEngineering/blob/1.16/src/main/java/blusunrize/immersiveengineering/common/util/Utils.java#L1358-L1379
     }
 
 
