@@ -455,7 +455,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public boolean addColor(ItemStack stack)
     {
-        if(!hasCoin() && !hasItem() && getNumberOfStoredLocations() <= 0)
+        if(!hasCoin() && !hasItem() && hasLight() && getNumberOfStoredLocations() <= 0)
         {
             int intColor = stack.getTag().getInt("color");
             BlockState replacestate = CraftingPedestals.instance().getResult(intColor);

@@ -299,7 +299,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                             }
                             else
                             {
-                                player.sendStatusMessage(new StringTextComponent(TextFormatting.WHITE +"Color Can't be set on Pedestals with Items, Upgrades, or Linked Pedestals"),true);
+                                player.sendStatusMessage(new StringTextComponent(TextFormatting.WHITE +"Color Can't be set on Pedestals with Items, Light, Upgrades, or Linked Pedestals"),true);
                                 //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"ColorPallet"),player.getUniqueID());
                                 return ActionResultType.FAIL;
                             }
@@ -354,7 +354,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                     }
                     else
                     {
-                        player.sendStatusMessage(new StringTextComponent(TextFormatting.WHITE +"Color Can't be set on Pedestals with Items, Upgrades, or Linked Pedestals"),true);
+                        player.sendStatusMessage(new StringTextComponent(TextFormatting.WHITE +"Color Can't be set on Pedestals with Items, Light, Upgrades, or Linked Pedestals"),true);
                         //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"ColorPallet"),player.getUniqueID());
                         return ActionResultType.FAIL;
                     }
@@ -507,26 +507,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
         if (rand.nextInt(5) == 0) {
             //worldIn.addParticle(ParticleTypes.END_ROD, d0 + (double)direction.getXOffset() * d3, d1 + (double)direction.getYOffset() * d3, d2 + (double)direction.getZOffset() * d3, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
         }
-
     }
-
-    /*private static final ResourceLocation RESLOC_PEDESTAL_STONE = new ResourceLocation(MODID, "pedestal/pedestal_stone");
-
-    public static final Block BLOCK_PEDESTAL_STONE = new BlockPedestalTE(Block.Properties.create(Material.ROCK, MaterialColor.STONE).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(RESLOC_PEDESTAL_STONE);
-
-    public static final Item ITEM_PEDESTAL_STONE = new BlockItem(BLOCK_PEDESTAL_STONE, new Item.Properties().group(pedestals.BLOCK_GROUP)) {}.setRegistryName(RESLOC_PEDESTAL_STONE);
-
-    @SubscribeEvent
-    public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
-    {
-        event.getRegistry().register(ITEM_PEDESTAL_STONE);
-    }
-
-    @SubscribeEvent
-    public static void onBlockRegistryReady(RegistryEvent.Register<Block> event)
-    {
-        event.getRegistry().register(BLOCK_PEDESTAL_STONE);
-    }*/
 
     private static final ResourceLocation R_PEDESTAL_000 = new ResourceLocation(MODID, "pedestal/stone000");
     private static final ResourceLocation R_PEDESTAL_001 = new ResourceLocation(MODID, "pedestal/stone001");
