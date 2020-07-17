@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.pedestals;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -15,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -22,8 +24,11 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.extensions.IForgeEntityMinecart;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -287,7 +292,7 @@ public class ItemUpgradeBase extends Item {
 
     public boolean doItemsMatch(ItemStack stackPedestal, ItemStack itemStackIn)
     {
-        if(!stackPedestal.equals(ItemStack.EMPTY))
+        /*if(!stackPedestal.equals(ItemStack.EMPTY))
         {
             if(itemStackIn.hasTag())
             {
@@ -299,7 +304,7 @@ public class ItemUpgradeBase extends Item {
                 }
                 else return false;
             }
-            /*else if(itemStackIn.isDamaged())
+            *//*else if(itemStackIn.isDamaged())
             {
                 if(itemStackIn.isDamaged()==stackPedestal.getDamage() && itemStackIn.getMetadata()==stackPedestal.getMetadata())
                 {
@@ -309,7 +314,7 @@ public class ItemUpgradeBase extends Item {
                 {
                     return false;
                 }
-            }*/
+            }*//*
             else
             {
                 if(itemStackIn.getItem().equals(stackPedestal.getItem()))
@@ -317,9 +322,9 @@ public class ItemUpgradeBase extends Item {
                     return true;
                 }
             }
-        }
+        }*/
 
-        return false;
+        return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
     //For Filters to return if they can or cannot allow items to pass
@@ -333,6 +338,33 @@ public class ItemUpgradeBase extends Item {
     {
         int stackabe = itemStackIncoming.getMaxStackSize();
         return stackabe;
+    }
+
+    //All credit for this goes to https://github.com/BluSunrize/ImmersiveEngineering/blob/f40a49da570c991e51dd96bba1d529e20da6caa6/src/main/java/blusunrize/immersiveengineering/api/ApiUtils.java#L338
+    //TODO: Alter later to fit style in refactoring
+    public static LazyOptional<IItemHandler> findItemHandlerAtPos(World world, BlockPos pos, Direction side, boolean allowCart)
+    {
+        TileEntity neighbourTile = world.getTileEntity(pos);
+        if(neighbourTile!=null)
+        {
+            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
+            if(cap.isPresent())
+                return cap;
+        }
+        if(allowCart)
+        {
+            if(AbstractRailBlock.isRail(world, pos))
+            {
+                List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof IForgeEntityMinecart);
+                if(!list.isEmpty())
+                {
+                    LazyOptional<IItemHandler> cap = list.get(world.rand.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                    if(cap.isPresent())
+                        return cap;
+                }
+            }
+        }
+        return LazyOptional.empty();
     }
 
     //Mainly Used in the Import, Furnace, and  Milker Upgrades

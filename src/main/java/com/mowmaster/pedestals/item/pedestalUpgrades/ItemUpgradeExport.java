@@ -154,33 +154,6 @@ public class ItemUpgradeExport extends ItemUpgradeBase
 
     }
 
-    //All credit for this goes to https://github.com/BluSunrize/ImmersiveEngineering/blob/f40a49da570c991e51dd96bba1d529e20da6caa6/src/main/java/blusunrize/immersiveengineering/api/ApiUtils.java#L338
-    //TODO: Alter later to fit style in refactoring
-    public static LazyOptional<IItemHandler> findItemHandlerAtPos(World world, BlockPos pos, Direction side, boolean allowCart)
-    {
-        TileEntity neighbourTile = world.getTileEntity(pos);
-        if(neighbourTile!=null)
-        {
-            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
-            if(cap.isPresent())
-                return cap;
-        }
-        if(allowCart)
-        {
-            if(AbstractRailBlock.isRail(world, pos))
-            {
-                List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof IForgeEntityMinecart);
-                if(!list.isEmpty())
-                {
-                    LazyOptional<IItemHandler> cap = list.get(world.rand.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-                    if(cap.isPresent())
-                        return cap;
-                }
-            }
-        }
-        return LazyOptional.empty();
-    }
-
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
