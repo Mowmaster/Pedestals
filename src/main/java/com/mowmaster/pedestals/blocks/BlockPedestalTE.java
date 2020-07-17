@@ -36,6 +36,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 
@@ -249,7 +250,8 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                     if (player.getHeldItemMainhand().isEmpty())
                     {
                         if (tilePedestal.hasCoin()) {
-                            player.inventory.addItemStackToInventory(tilePedestal.removeCoin());
+                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeCoin());
+                            //player.inventory.addItemStackToInventory(tilePedestal.removeCoin());
                         }
                     }
                 }
@@ -257,7 +259,8 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                 {
                     if (player.getHeldItemMainhand().isEmpty()) {
                         if (tilePedestal.hasItem()) {
-                            player.inventory.addItemStackToInventory(tilePedestal.removeItem());
+                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItem());
+                            //player.inventory.addItemStackToInventory(tilePedestal.removeItem());
                         }
                     }
                     else{
@@ -265,7 +268,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                         {
                             if(tilePedestal.addCoin(player.getHeldItemMainhand()))
                             {
-                                player.getHeldItemMainhand().shrink(1);
+                                if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                             }
                         }
                         else if(player.getHeldItemMainhand().getItem().equals(Items.GLOWSTONE))
@@ -273,7 +276,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                             if(!tilePedestal.hasLight())
                             {
                                 tilePedestal.addLight();
-                                player.getHeldItemMainhand().shrink(1);
+                                if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                                 return ActionResultType.SUCCESS;
                             }
                             else
@@ -294,7 +297,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                         {
                             if(tilePedestal.addColor(player.getHeldItemMainhand()))
                             {
-                                player.getHeldItemMainhand().shrink(1);
+                                if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                                 return ActionResultType.SUCCESS;
                             }
                             else
@@ -311,7 +314,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                             {
                                 if(tilePedestal.addSpeed(player.getHeldItemMainhand()))
                                 {
-                                    player.getHeldItemMainhand().shrink(1);
+                                    if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                                     return ActionResultType.SUCCESS;
                                 }
                                 else return ActionResultType.FAIL;
@@ -320,7 +323,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                             {
                                 if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
                                 {
-                                    player.getHeldItemMainhand().shrink(1);
+                                    if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                                     return ActionResultType.SUCCESS;
                                 }
                                 else return ActionResultType.FAIL;
@@ -349,7 +352,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                 {
                     if(tilePedestal.addColor(player.getHeldItemMainhand()))
                     {
-                        player.getHeldItemMainhand().shrink(1);
+                        if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                         return ActionResultType.SUCCESS;
                     }
                     else
@@ -366,7 +369,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                     if(!tilePedestal.hasLight())
                     {
                         tilePedestal.addLight();
-                        player.getHeldItemMainhand().shrink(1);
+                        if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                         return ActionResultType.SUCCESS;
                     }
                     else
@@ -389,7 +392,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                     {
                         if(tilePedestal.addSpeed(player.getHeldItemMainhand()))
                         {
-                            player.getHeldItemMainhand().shrink(1);
+                            if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                             return ActionResultType.SUCCESS;
                         }
                         else return ActionResultType.FAIL;
@@ -398,7 +401,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                     {
                         if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
                         {
-                            player.getHeldItemMainhand().shrink(1);
+                            if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                             return ActionResultType.SUCCESS;
                         }
                         else return ActionResultType.FAIL;
@@ -406,7 +409,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                 }
                 else if (player.getHeldItemMainhand().isEmpty()) {
                     if (tilePedestal.hasItem()) {
-                        player.inventory.addItemStackToInventory(tilePedestal.removeItem());
+                        ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItem());
                     }
                 }
                 else
