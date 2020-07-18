@@ -9,6 +9,10 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.BoatEntity;
+import net.minecraft.entity.passive.horse.DonkeyEntity;
+import net.minecraft.entity.passive.horse.LlamaEntity;
+import net.minecraft.entity.passive.horse.MuleEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
@@ -364,6 +368,28 @@ public class ItemUpgradeBase extends Item {
                     if(cap.isPresent())
                         return cap;
                 }
+            }
+        }
+        return LazyOptional.empty();
+    }
+
+    public static LazyOptional<IItemHandler> findItemHandlerAtPosBlockAndEntity(World world, BlockPos pos, Direction side, boolean allowCart)
+    {
+        TileEntity neighbourTile = world.getTileEntity(pos);
+        if(neighbourTile!=null)
+        {
+            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
+            if(cap.isPresent())
+                return cap;
+        }
+        if(allowCart)
+        {
+            List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof IForgeEntityMinecart || entity instanceof DonkeyEntity || entity instanceof LlamaEntity || entity instanceof MuleEntity);
+            if(!list.isEmpty())
+            {
+                LazyOptional<IItemHandler> cap = list.get(world.rand.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                if(cap.isPresent())
+                    return cap;
             }
         }
         return LazyOptional.empty();
