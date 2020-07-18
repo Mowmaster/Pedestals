@@ -20,6 +20,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -72,19 +73,21 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
 
         ItemStack itemFromInv = ItemStack.EMPTY;
 
-        if(world.getTileEntity(posInventory) !=null)
+        //if(world.getTileEntity(posInventory) !=null)
+        //{
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(cap.isPresent())
         {
-            if(world.getTileEntity(posInventory).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posOfPedestal)).isPresent())
-            {
-                IItemHandler handler = (IItemHandler) world.getTileEntity(posInventory).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posOfPedestal)).orElse(null);
-                TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if(invToPullFrom instanceof TilePedestal) {
-                    itemFromInv = ItemStack.EMPTY;
-                }
-                else {
-                    if(handler != null)
-                    {
-                        int i = getNextSlotWithItems(invToPullFrom,getPedestalFacing(world, posOfPedestal),getStackInPedestal(world,posOfPedestal));
+            IItemHandler handler = cap.orElse(null);
+            TileEntity invToPullFrom = world.getTileEntity(posInventory);
+            if(invToPullFrom instanceof TilePedestal) {
+                itemFromInv = ItemStack.EMPTY;
+
+            }
+            else {
+                if(handler != null)
+                {
+                    int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
                         if(i>=0)
                         {
                             itemFromInv = handler.getStackInSlot(i);
@@ -111,7 +114,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
                     }
                 }
             }
-        }
+        //}
     }
 
     @Override

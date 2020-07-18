@@ -21,6 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -75,8 +76,9 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 
         if(itemInPedestal.isEmpty())
         {
-            if(world.getTileEntity(posInventory) != null)
-            {
+            //if(world.getTileEntity(posInventory) != null)
+            //{
+            LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
                 //Setup new Container for our Crafting Grid Size
                 CraftingInventory craft = new CraftingInventory(new Container(null, -1) {
                     @Override
@@ -86,8 +88,8 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                 }, gridSize, gridSize);
 
                 //Get Inventory Below
-                if(world.getTileEntity(posInventory).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posOfPedestal)).isPresent()) {
-                    IItemHandler handler = (IItemHandler) world.getTileEntity(posInventory).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posOfPedestal)).orElse(null);
+                if(cap.isPresent()) {
+                    IItemHandler handler = cap.orElse(null);
                     TileEntity invToPullFrom = world.getTileEntity(posInventory);
                     int intInventorySlotCount = handler.getSlots();//normal chests return value of 1-27
                     if (invToPullFrom instanceof TilePedestal) {
@@ -203,7 +205,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                         }
                     }
                 }
-            }
+            //}
         }
     }
 

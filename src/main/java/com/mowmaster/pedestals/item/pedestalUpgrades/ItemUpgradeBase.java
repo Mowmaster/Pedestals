@@ -33,6 +33,8 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntUnaryOperator;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
@@ -371,6 +373,48 @@ public class ItemUpgradeBase extends Item {
     /*
         This Method gets the next slot with items in the given tile
      */
+
+    public int getNextSlotWithItemsCap(LazyOptional<IItemHandler> cap, ItemStack stackInPedestal)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        if(cap.isPresent()) {
+
+            cap.ifPresent(itemHandler -> {
+                int range = itemHandler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    //find a slot with items
+                    if(!stackInSlot.isEmpty())
+                    {
+                        //check if it could pull the item out or not
+                        if(!itemHandler.extractItem(i,1 ,true ).equals(ItemStack.EMPTY))
+                        {
+                            //If pedestal is empty accept any items
+                            if(stackInPedestal.isEmpty())
+                            {
+                                slot.set(i);
+                                break;
+                            }
+                            //if stack in pedestal matches items in slot
+                            else if(doItemsMatch(stackInPedestal,stackInSlot))
+                            {
+                                slot.set(i);
+                                break;
+                            }
+                        }
+                    }
+                }});
+
+
+        }
+
+        return slot.get();
+    }
+
+
+
+
     public int getNextSlotWithItems(TileEntity invBeingChecked, Direction sideSlot, ItemStack stackInPedestal)
     {
         int slot = -1;

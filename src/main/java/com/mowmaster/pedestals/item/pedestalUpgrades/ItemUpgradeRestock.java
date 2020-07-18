@@ -14,6 +14,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -94,8 +95,9 @@ public class ItemUpgradeRestock extends ItemUpgradeBase
         int upgradeTransferRate = getItemTransferRate(coinInPedestal);
         ItemStack itemFromPedestal = ItemStack.EMPTY;
         //Checks to make sure a TE exists
-        if(world.getTileEntity(posInventory) !=null)
-        {
+        //if(world.getTileEntity(posInventory) !=null)
+        //{
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
             //Gets inventory TE then makes sure its not a pedestal
             TileEntity invToPushTo = world.getTileEntity(posInventory);
             if(invToPushTo instanceof TilePedestal) {
@@ -106,9 +108,9 @@ public class ItemUpgradeRestock extends ItemUpgradeBase
                 //IF pedestal is empty and has nothing to transfer then dont do anything
                 if(!itemFromPedestal.isEmpty() && !itemFromPedestal.equals(ItemStack.EMPTY))
                 {
-                    if(invToPushTo.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posOfPedestal)).isPresent())
+                    if(cap.isPresent())
                     {
-                        IItemHandler handler = (IItemHandler) invToPushTo.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posOfPedestal)).orElse(null);
+                        IItemHandler handler = cap.orElse(null);
 
                         //gets next empty or partially filled matching slot
                         if(handler != null)
@@ -166,7 +168,7 @@ public class ItemUpgradeRestock extends ItemUpgradeBase
                     }
                 }
             }
-        }
+        //}
     }
 
     @Override

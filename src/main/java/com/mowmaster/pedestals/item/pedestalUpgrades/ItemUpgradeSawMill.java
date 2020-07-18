@@ -9,6 +9,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -39,20 +40,21 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
         int itemsPerSmelt = getItemTransferRate(coinInPedestal);
 
         ItemStack itemFromInv = ItemStack.EMPTY;
-        if(world.getTileEntity(posInventory) !=null)
+        //if(world.getTileEntity(posInventory) !=null)
+        //{
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(cap.isPresent())
         {
-            if(world.getTileEntity(posInventory).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posOfPedestal)).isPresent())
-            {
-                IItemHandler handler = (IItemHandler) world.getTileEntity(posInventory).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posOfPedestal)).orElse(null);
-                TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if(invToPullFrom instanceof TilePedestal) {
-                    itemFromInv = ItemStack.EMPTY;
+            IItemHandler handler = cap.orElse(null);
+            TileEntity invToPullFrom = world.getTileEntity(posInventory);
+            if(invToPullFrom instanceof TilePedestal) {
+                itemFromInv = ItemStack.EMPTY;
 
-                }
-                else {
-                    if(handler != null)
-                    {
-                        int i = getNextSlotWithItems(invToPullFrom,getPedestalFacing(world, posOfPedestal),getStackInPedestal(world,posOfPedestal));
+            }
+            else {
+                if(handler != null)
+                {
+                    int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
                         if(i>=0)
                         {
                             int maxInSlot = handler.getSlotLimit(i);
@@ -136,7 +138,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
                     }
                 }
             }
-        }
+        //}
     }
 
     public static final Item SAWMILL = new ItemUpgradeSawMill(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/sawmill"));

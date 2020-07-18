@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -31,11 +32,12 @@ public class ItemUpgradeFilterItem extends ItemUpgradeBaseFilter
         boolean returner = false;
         BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
 
-        if(world.getTileEntity(posInventory) !=null)
-        {
-            if(world.getTileEntity(posInventory).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posPedestal)).isPresent())
+        //if(world.getTileEntity(posInventory) !=null)
+        //{
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
+            if(cap.isPresent())
             {
-                IItemHandler handler = (IItemHandler) world.getTileEntity(posInventory).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getPedestalFacing(world, posPedestal)).orElse(null);
+                IItemHandler handler = cap.orElse(null);
                 if(handler != null)
                 {
                     int range = handler.getSlots();
@@ -52,7 +54,7 @@ public class ItemUpgradeFilterItem extends ItemUpgradeBaseFilter
                     }
                 }
             }
-        }
+        //}
 
         return returner;
     }

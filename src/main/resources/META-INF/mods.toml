@@ -24,7 +24,7 @@ displayURL="https://discord.gg/TGZSt7k" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
 logoFile="pedestals.png" #optional
 # A text field displayed in the mod UI
-credits="Thanks to everyone who has helped and encouraged me these last 4+ years" #optional
+credits="Thanks to all those who have helped me in the last 4+ years, as well as Dreamin For help With Documentation of Pedestals" #optional
 # A text field displayed in the mod UI
 authors="Mowmaster" #optional
 # The description text for the mod (multi line!) (#mandatory)
