@@ -3,6 +3,7 @@
     "itemGroup.pedestals_blocks": "Pedestals",
 
     "item.pedestals.linkingtool": "Linking Tool",
+    "item.pedestals.tagtool": "Tag Tool",
     "item.pedestals.itemcolorpallet": "Colored Pallet",
     "item.pedestals.itemcolorpalletdefault": "Color Pallet",
     "item.pedestals.upgradespeed": "Pedestal Speed Upgrade",
@@ -157,6 +158,10 @@
         "item.pedestals.coin.filterfood.tooltip_name": "Food",
     "item.pedestals.coin.filterfoodb": "Pedestal Filter",
         "item.pedestals.coin.filterfoodb.tooltip_name": "Food Blacklist",
+    "item.pedestals.coin.filtertag": "Pedestal Filter",
+        "item.pedestals.coin.filtertag.tooltip_name": "Tag",
+    "item.pedestals.coin.filtertagb": "Pedestal Filter",
+        "item.pedestals.coin.filtertagb.tooltip_name": "Tag Blacklist",
     "item.pedestals.coin.smelter": "Pedestal Upgrade",
         "item.pedestals.coin.smelter.tooltip_name": "Smelting Upgrade",
         "item.pedestals.coin.smelter.tooltip_rate": "Items Smelted Per Operation: ",

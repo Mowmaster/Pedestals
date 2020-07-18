@@ -13,6 +13,7 @@ public class ItemRegistry
         BlockPedestalTE.onItemRegistryReady(e);
 
         ItemLinkingTool.onItemRegistryReady(e);
+        ItemTagTool.onItemRegistryReady(e);
         ItemColorPallet.onItemRegistryReady(e);
         ItemPedestalUpgrades.onItemRegistryReady(e);
         ItemUpgradeDefault.onItemRegistryReady(e);
@@ -46,6 +47,8 @@ public class ItemRegistry
         ItemUpgradeFilterItemBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterItemStack.onItemRegistryReady(e);
         ItemUpgradeFilterItemStackBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFilterTag.onItemRegistryReady(e);
+        ItemUpgradeFilterTagBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterMod.onItemRegistryReady(e);
         ItemUpgradeFilterModBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterFood.onItemRegistryReady(e);
