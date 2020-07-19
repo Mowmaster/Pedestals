@@ -1,0 +1,290 @@
+package com.mowmaster.pedestals.item.pedestalUpgrades;
+
+import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.items.IItemHandler;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
+
+public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
+{
+    public ItemUpgradeQuarryBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+
+    @Override
+    public Boolean canAcceptRange() {
+        return true;
+    }
+
+    public int getRangeWidth(ItemStack stack)
+    {
+        int rangeWidth = 0;
+        int rW = getCapacityModifier(stack);
+        rangeWidth = ((rW)+1);
+        return  rangeWidth;
+    }
+
+    public int getRangeHeight(ItemStack stack)
+    {
+        return getHeight(stack);
+    }
+
+    public int getHeight(ItemStack stack)
+    {
+        int transferRate = 8;
+        switch (getRangeModifier(stack))
+        {
+            case 0:
+                transferRate = 8;
+                break;
+            case 1:
+                transferRate=16;
+                break;
+            case 2:
+                transferRate = 24;
+                break;
+            case 3:
+                transferRate = 32;
+                break;
+            case 4:
+                transferRate = 48;
+                break;
+            case 5:
+                transferRate=64;
+                break;
+            default: transferRate=8;
+        }
+
+        return  transferRate-1;
+    }
+
+    public int ticked = 0;
+
+    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    {
+        int rangeWidth = getRangeWidth(coinInPedestal);
+        int rangeHeight = getRangeHeight(coinInPedestal);
+        int speed = getOperationSpeed(coinInPedestal);
+
+        BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
+        BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);
+        if(world.isAreaLoaded(negNums,posNums))
+        {
+            if(!world.isBlockPowered(pedestalPos)) {
+
+                TileEntity pedestalInv = world.getTileEntity(pedestalPos);
+                if(pedestalInv instanceof TilePedestal) {
+                    TilePedestal ped = ((TilePedestal) pedestalInv);
+
+                    if(removeFuel(ped,200,true)>=0)
+                    {
+                        upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+
+                        for (int x = negNums.getX(); x <= posNums.getX(); x++) {
+                            for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
+                                for (int y = negNums.getY(); y <= posNums.getY(); y++) {
+                                    BlockPos blockToChopPos = new BlockPos(x, y, z);
+                                    //BlockPos blockToChopPos = this.getPos().add(x, y, z);
+                                    BlockState blockToChop = world.getBlockState(blockToChopPos);
+                                    if (tick%speed == 0) {
+                                        ticked++;
+                                    }
+
+                                    if(ticked > 84)
+                                    {
+                                        upgradeAction(world, itemInPedestal, coinInPedestal, blockToChopPos, blockToChop, pedestalPos);
+                                        ticked=0;
+                                    }
+                                    else
+                                    {
+                                        ticked++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos blockToMinePos, BlockState blockToMine, BlockPos posOfPedestal)
+    {
+        if(!blockToMine.getBlock().isAir(blockToMine,world,blockToMinePos) && !(blockToMine.getBlock() instanceof BlockPedestalTE) && canMineBlock(world, posOfPedestal, blockToMine.getBlock())
+                && !(blockToMine.getBlock() instanceof IFluidBlock || blockToMine.getBlock() instanceof FlowingFluidBlock) && blockToMine.getBlockHardness(world, blockToMinePos) != -1.0F)
+        {
+            FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+            fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+            ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE,1);
+
+            if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
+            {
+                pick.addEnchantment(Enchantments.SILK_TOUCH,1);
+                fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+            }
+            else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
+            {
+                int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
+                pick.addEnchantment(Enchantments.FORTUNE,lvl);
+                fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+            }
+            else
+            {
+                fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+            }
+            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+            if(pedestalInv instanceof TilePedestal) {
+                TilePedestal ped = ((TilePedestal) pedestalInv);
+                if(removeFuel(ped,200,true)>=0)
+                {
+                    if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true))
+                    {
+                        blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
+                        removeFuel(ped,200,false);
+                        world.setBlockState(blockToMinePos, Blocks.AIR.getDefaultState());
+                    }
+                }
+            }
+        }
+    }
+
+    public void upgradeActionMagnet(World world, ItemStack itemInPedestal, BlockPos posOfPedestal, int width, int height)
+    {
+        BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
+
+        AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+
+        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+        for(ItemEntity getItemFromList : itemList)
+        {
+            if (itemInPedestal.equals(ItemStack.EMPTY))
+            {
+                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                if(pedestalInv instanceof TilePedestal) {
+                    if(getItemFromList.getItem().getCount() <=64)
+                    {
+                        getItemFromList.remove();
+                        ((TilePedestal) pedestalInv).addItem(getItemFromList.getItem());
+                    }
+                    else
+                    {
+                        int count = getItemFromList.getItem().getCount();
+                        getItemFromList.getItem().setCount(count-64);
+                        ItemStack getItemstacked = getItemFromList.getItem().copy();
+                        getItemstacked.setCount(64);
+                        ((TilePedestal) pedestalInv).addItem(getItemstacked);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
+    {
+        boolean returner = true;
+        BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
+
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
+        if(cap.isPresent())
+        {
+            IItemHandler handler = cap.orElse(null);
+            if(handler != null)
+            {
+                int range = handler.getSlots();
+
+                ItemStack itemFromInv = ItemStack.EMPTY;
+                itemFromInv = IntStream.range(0,range)//Int Range
+                        .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
+                        .filter(itemStack -> Block.getBlockFromItem(itemStack.getItem()).equals(blockIn))
+                        .findFirst().orElse(ItemStack.EMPTY);
+
+                if(!itemFromInv.isEmpty())
+                {
+                    returner = false;
+                }
+            }
+        }
+
+        return returner;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        //super.addInformation(stack, worldIn, tooltip, flagIn);
+        int s3 = getRangeWidth(stack);
+        int s4 = getRangeHeight(stack);
+
+        String tr = "" + (s3+s3+1) + "";
+        String trr = "" + (s4+1) + "";
+
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(trr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.func_240699_a_(TextFormatting.GOLD);
+        tooltip.add(t);
+
+        area.func_240699_a_(TextFormatting.WHITE);
+        tooltip.add(area);
+
+        speed.func_240699_a_(TextFormatting.RED);
+        tooltip.add(speed);
+    }
+
+    public static final Item QUARRY = new ItemUpgradeQuarryBlacklist(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/quarryb"));
+
+    @SubscribeEvent
+    public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
+    {
+        event.getRegistry().register(QUARRY);
+    }
+
+
+}

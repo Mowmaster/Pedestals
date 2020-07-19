@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/breaker"
+    },
+    {
+      "item": "pedestals:coin/magnet"
+    },
+    {
+      "item": "pedestals:coin/smelter"
+    },
+    {
+      "tag": "pedestals:filters"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/quarry"
+  }
+}
