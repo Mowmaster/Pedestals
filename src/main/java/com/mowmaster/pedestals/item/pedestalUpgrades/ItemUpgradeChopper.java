@@ -147,9 +147,9 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.func_240702_b_(tr);
         area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
         area.func_240702_b_(trr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.func_240702_b_(getOperationSpeedString(stack));
 

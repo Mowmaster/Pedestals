@@ -293,15 +293,15 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         t.func_240699_a_(TextFormatting.GOLD);
         tooltip.add(t);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
-        tooltip.add(speed);
-
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
         range.func_240702_b_("" + getRange(stack) + "");
         range.func_240699_a_(TextFormatting.WHITE);
         tooltip.add(range);
+
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        tooltip.add(speed);
     }
 
     public static final Item TELEPORTER = new ItemUpgradeTeleporter(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/teleporter"));

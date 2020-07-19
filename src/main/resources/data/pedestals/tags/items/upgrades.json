@@ -40,6 +40,11 @@
     "pedestals:coin/teleporter",
     "pedestals:coin/filterfood",
     "pedestals:coin/filterfoodb",
+    "pedestals:coin/filtertag",
+    "pedestals:coin/filtertagb",
+    "pedestals:coin/quarry",
+    "pedestals:coin/quarryb",
+    "pedestals:coin/void",
     "pedestals:coin/sawmill"
   ]
 }

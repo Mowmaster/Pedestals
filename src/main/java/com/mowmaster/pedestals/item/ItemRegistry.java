@@ -58,6 +58,8 @@ public class ItemRegistry
         ItemUpgradeFurnace.onItemRegistryReady(e);
         ItemUpgradeCrusher.onItemRegistryReady(e);
         ItemUpgradeSawMill.onItemRegistryReady(e);
+        ItemUpgradeQuarry.onItemRegistryReady(e);
+        ItemUpgradeQuarryBlacklist.onItemRegistryReady(e);
         ItemUpgradeCrafter.onItemRegistryReady(e);
         ItemCraftingPlaceholder.onItemRegistryReady(e);
         ItemUpgradeCobbleGen.onItemRegistryReady(e);

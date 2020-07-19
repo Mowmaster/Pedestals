@@ -51,12 +51,13 @@ public class ItemTagTool extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
+        String tags = p_77659_2_.getHeldItemOffhand().getItem().getTags().toString();
         if(p_77659_1_.isRemote)
         {
-            if(p_77659_2_.getHeldItemOffhand().isEmpty())
+            if(!p_77659_2_.getHeldItemOffhand().isEmpty())
             {
                 TranslationTextComponent output = new TranslationTextComponent("Tags: ");
-                output.func_240702_b_(p_77659_2_.getHeldItemOffhand().getItem().getTags().toString());
+                output.func_240702_b_(tags);
                 output.func_240699_a_(TextFormatting.WHITE);
                 p_77659_2_.sendMessage(output,p_77659_2_.getUniqueID());
             }
