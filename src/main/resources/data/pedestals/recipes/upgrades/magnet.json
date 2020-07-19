@@ -1,19 +1,16 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "BCD"
-  ],
-  "key": {
-    "B": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "tag": "pedestals:upgrades"
     },
-    "C": {
+    {
       "item": "minecraft:iron_block"
     },
-    "D": {
+    {
       "item": "minecraft:redstone_block"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:coin/magnet"
   }

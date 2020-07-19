@@ -1,16 +1,13 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "AB"
-  ],
-  "key": {
-    "A": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "item": "pedestals:linkingtool"
     },
-    "B": {
+    {
       "item": "minecraft:paper"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:itemcolorpalletdefault"
   }

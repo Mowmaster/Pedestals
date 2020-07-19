@@ -1,20 +1,16 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "BC",
-    "CD"
-  ],
-  "key": {
-    "B": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "tag": "pedestals:upgrades"
     },
-    "C": {
+    {
       "item": "minecraft:bone_block"
     },
-    "D": {
+    {
       "item": "minecraft:bone_meal"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:coin/grower"
   }

@@ -1,16 +1,13 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "BD"
-  ],
-  "key": {
-    "B": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "tag": "pedestals:upgrades"
     },
-    "D": {
+    {
       "item": "minecraft:experience_bottle"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:coin/xpbottler"
   }

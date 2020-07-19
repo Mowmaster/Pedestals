@@ -1,16 +1,13 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "AD"
-  ],
-  "key": {
-    "A": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "item": "pedestals:linkingtool"
     },
-    "D": {
+    {
       "tag": "forge:gems/emerald"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:upgradecapacity"
   }

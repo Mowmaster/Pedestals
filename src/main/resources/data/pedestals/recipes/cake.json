@@ -13,7 +13,7 @@
       "item": "minecraft:sugar"
     },
     "C": {
-      "item": "pedestals:dustflour"
+      "tag": "forge:flour/flour"
     },
     "E": {
       "item": "minecraft:egg"

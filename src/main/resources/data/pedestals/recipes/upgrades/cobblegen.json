@@ -1,19 +1,16 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "DBC"
-  ],
-  "key": {
-    "B": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "tag": "pedestals:upgrades"
     },
-    "C": {
+    {
       "item": "minecraft:water_bucket"
     },
-    "D": {
+    {
       "item": "minecraft:lava_bucket"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:coin/cobble"
   }

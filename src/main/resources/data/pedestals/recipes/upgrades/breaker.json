@@ -1,16 +1,13 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "BC"
-  ],
-  "key": {
-    "B": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "tag": "pedestals:upgrades"
     },
-    "C": {
+    {
       "item": "minecraft:diamond_pickaxe"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:coin/breaker"
   }
