@@ -3,7 +3,7 @@
     "itemGroup.pedestals_blocks": "Pedestals",
 
     "item.pedestals.linkingtool": "Linking Tool",
-        "jei.pedestals.linkingtool.desc": "Shift-R-Click the pedestal Receiving items to select it, Shift-R-Click on the pedestal Sending Items to link the two pedestals.",
+        "jei.pedestals.linkingtool.desc": "Shift-R-Click the pedestal Receiving items to select it, Shift-R-Click on the pedestal Sending Items to link the two pedestals. Used In crafting to create most base items in the mod.",
     "item.pedestals.tagtool": "Tag Tool",
         "jei.pedestals.tagtool.desc": "With an item in your off hand, r-click the tag tool in the air. In chat the list of tags the item has will appear.",
     "item.pedestals.itemcolorpallet": "Colored Pallet",
@@ -32,7 +32,7 @@
         "item.pedestals.coin.import.tooltip_name": "Import Upgrade",
         "item.pedestals.coin.import.tooltip_rate": "Transfer Rate: ",
         "item.pedestals.coin.import.tooltip_speed": "Operational Speed: ",
-    "jei.pedestals..desc": "",
+    "jei.pedestals.import.desc": "Takes Items from a Below Inventory and Put them in the Pedestal, Will Also take items dropped on the pedestal and put them inside the pedestal.",
     "item.pedestals.coin.breaker": "Pedestal Upgrade",
         "item.pedestals.coin.breaker.tooltip_name": "Block Breaker Upgrade",
         "item.pedestals.coin.breaker.tooltip_range": "Breaker Range: ",
