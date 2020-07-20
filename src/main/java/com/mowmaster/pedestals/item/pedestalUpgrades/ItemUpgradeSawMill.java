@@ -73,7 +73,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
 
                                     //Upgrade Determins amout of items to smelt, but space count is determined by how much the item smelts into
                                     int itemInputsPerSmelt = itemsPerSmelt;
-                                    int itemsOutputWhenStackSmelted = (itemsPerSmelt*resultSmelted.getCount());
+                                    int itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                     //Checks to see if pedestal can accept as many items as will be returned on smelt, if not reduce items being smelted
                                     if(roomLeftInPedestal < itemsOutputWhenStackSmelted)
                                     {
@@ -82,7 +82,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
                                     //Checks to see how many items are left in the slot IF ITS UNDER the allowedTransferRate then sent the max rate to that.
                                     if(itemFromInv.getCount() < itemInputsPerSmelt) itemInputsPerSmelt = itemFromInv.getCount();
 
-                                    itemsOutputWhenStackSmelted = (itemsPerSmelt*resultSmelted.getCount());
+                                    itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                     ItemStack copyIncoming = resultSmelted.copy();
                                     copyIncoming.setCount(itemsOutputWhenStackSmelted);
                                     int fuelToConsume = burnTimeCostPerItemSmelted * getItemTransferRate(coinInPedestal);
@@ -109,7 +109,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
                                                 {
                                                     //System.out.println(itemInputsPerSmelt);
                                                     fuelToConsume = burnTimeCostPerItemSmelted * itemInputsPerSmelt;
-                                                    itemsOutputWhenStackSmelted = (itemsPerSmelt*resultSmelted.getCount());
+                                                    itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                                     copyIncoming.setCount(itemsOutputWhenStackSmelted);
 
                                                     handler.extractItem(i,itemInputsPerSmelt ,false );
