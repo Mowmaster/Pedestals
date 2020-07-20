@@ -150,9 +150,11 @@ public class ItemUpgradeExport extends ItemUpgradeBase
 
                                 //After all calculations for transfer rate, set stack size to transfer and transfer the items
                                 itemFromPedestal.setCount(allowedTransferRate);
-                                if(handler.insertItem(i,itemFromPedestal,true ).equals(ItemStack.EMPTY)){
+
+                                if(ItemHandlerHelper.insertItem(handler,itemFromPedestal,true).equals(ItemStack.EMPTY)){
                                     removeFromPedestal(world,posOfPedestal ,allowedTransferRate);
-                                    handler.insertItem(i,itemFromPedestal,false );
+                                    ItemHandlerHelper.insertItem(handler,itemFromPedestal,false);
+                                    //handler.insertItem(i,itemFromPedestal,false );
                                 }
                             }
                         }
