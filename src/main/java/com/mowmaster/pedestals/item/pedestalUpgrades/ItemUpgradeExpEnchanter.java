@@ -173,7 +173,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                         //This is Book Shelf Enchanting level, not enchantment level (15 bookshelfves = 30 levels of enchantability)
                                         float level = getEnchantmentPowerFromSorroundings(world,posOfPedestal,coinInPedestal);
                                         int currentlyStoredExp = getXPStored(coinInPedestal);
-                                        int expNeeded = (getExpCountByLevel(Math.round((level * 2)/10))<=20)?(20):(getExpCountByLevel(Math.round((level * 2)/10)));
+                                        int expNeeded = (getExpCountByLevel(Math.round((level * 2)/3))<=20)?(20):(getExpCountByLevel(Math.round((level * 2)/3)));
                                         if(currentlyStoredExp >= expNeeded)
                                         {
                                             //Enchanting Code Here

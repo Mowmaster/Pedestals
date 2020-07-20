@@ -276,16 +276,16 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                                     switch(enchantment.getRarity())
                                                     {
                                                         case COMMON:
-                                                            intLevelCostToCombine +=Math.round(0.5F*(integer+1));
-                                                            break;
-                                                        case UNCOMMON:
                                                             intLevelCostToCombine +=Math.round(1.0F*(integer+1));
                                                             break;
+                                                        case UNCOMMON:
+                                                            intLevelCostToCombine +=Math.round(2.0F*(integer+1));
+                                                            break;
                                                         case RARE:
-                                                            intLevelCostToCombine +=Math.round(1.5F*(integer+1));
+                                                            intLevelCostToCombine +=Math.round(3.0F*(integer+1));
                                                             break;
                                                         case VERY_RARE:
-                                                            intLevelCostToCombine +=Math.round(2.0F*(integer+1));
+                                                            intLevelCostToCombine +=Math.round(4.0F*(integer+1));
                                                             break;
                                                     }
 
