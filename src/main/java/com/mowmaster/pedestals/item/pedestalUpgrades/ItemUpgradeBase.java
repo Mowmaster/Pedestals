@@ -369,6 +369,17 @@ public class ItemUpgradeBase extends Item {
                         return cap;
                 }
             }
+            else
+            {
+                //Added for quark boats with inventories (i hope)
+                List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof BoatEntity);
+                if(!list.isEmpty())
+                {
+                    LazyOptional<IItemHandler> cap = list.get(world.rand.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                    if(cap.isPresent())
+                        return cap;
+                }
+            }
         }
         return LazyOptional.empty();
     }
