@@ -77,7 +77,7 @@
         "item.pedestals.coin.crusher.tooltip_name": "Crusher Upgrade",
         "item.pedestals.coin.crusher.tooltip_rate": "Items Crushed Per Operation: ",
         "item.pedestals.coin.crusher.tooltip_speed": "Operational Speed: ",
-    "jei.pedestals.crusher.desc": "Place an Inventory Below the Pedestal for item inputs, Drop Fuel Items on the Pedestal to fuel it, Outputs come out the top of the pedestal. Can crush Iron, Gold, Nether Gold, Stone, Cobble, Gravel, BlazeRod, SugarCane, Beetroot, P.Potato, Potato, Wheat, Bone, and Flowers",
+    "jei.pedestals.crusher.desc": "Place an Inventory Below the Pedestal for item inputs, Drop Fuel Items on the Pedestal to fuel it, Outputs come out the top of the pedestal. Can crush Iron, Gold, Nether Gold, Stone, Cobble, Gravel, BlazeRod, SugarCane, Beetroot, P.Potato, Potato, Wheat, Bone, and Vanilla Flowers",
     "item.pedestals.coin.grower": "Pedestal Upgrade",
         "item.pedestals.coin.grower.tooltip_name": "Grower Effect Upgrade",
         "item.pedestals.coin.grower.tooltip_area": "Effected Area: ",
