@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.pedestals;
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -10,6 +11,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -29,6 +31,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static com.mowmaster.pedestals.references.Reference.MODID;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -156,7 +159,6 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                     {
                         tilePedestal.removeItem(1);
                     }
-                    // ToDo:CRYSTALS HERE
                     else if(stack.getItem().equals(Items.DIAMOND))
                     {
                         if(stack.getCount() >= crystalsToRemove)
@@ -180,7 +182,6 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         int crystals = 0;
         for(int i=0;i<stackToCombine.size();i++)
         {
-            // ToDo:CRYSTALS HERE
             if(stackToCombine.get(i).getItem().equals(Items.DIAMOND))
             {
                 crystals = crystals + stackToCombine.get(i).getCount();
@@ -275,16 +276,16 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                                     switch(enchantment.getRarity())
                                                     {
                                                         case COMMON:
-                                                            intLevelCostToCombine +=(1*(integer+1));
+                                                            intLevelCostToCombine +=Math.round(0.5F*(integer+1));
                                                             break;
                                                         case UNCOMMON:
-                                                            intLevelCostToCombine +=(2*(integer+1));
+                                                            intLevelCostToCombine +=Math.round(1.0F*(integer+1));
                                                             break;
                                                         case RARE:
-                                                            intLevelCostToCombine +=(4*(integer+1));
+                                                            intLevelCostToCombine +=Math.round(1.5F*(integer+1));
                                                             break;
                                                         case VERY_RARE:
-                                                            intLevelCostToCombine +=(6*(integer+1));
+                                                            intLevelCostToCombine +=Math.round(2.0F*(integer+1));
                                                             break;
                                                     }
 
