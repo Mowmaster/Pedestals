@@ -14,6 +14,7 @@ public class ItemRegistry
 
         ItemLinkingTool.onItemRegistryReady(e);
         ItemTagTool.onItemRegistryReady(e);
+        //ItemDevTool.onItemRegistryReady(e);
         ItemColorPallet.onItemRegistryReady(e);
         ItemPedestalUpgrades.onItemRegistryReady(e);
         ItemUpgradeDefault.onItemRegistryReady(e);
