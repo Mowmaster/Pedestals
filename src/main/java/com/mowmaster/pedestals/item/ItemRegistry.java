@@ -65,6 +65,7 @@ public class ItemRegistry
         ItemUpgradeCobbleGen.onItemRegistryReady(e);
         ItemUpgradeVoid.onItemRegistryReady(e);
         ItemUpgradeAttacker.onItemRegistryReady(e);
+        ItemUpgradeEffect.onItemRegistryReady(e);
 
         ItemUpgradeMilker.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);
