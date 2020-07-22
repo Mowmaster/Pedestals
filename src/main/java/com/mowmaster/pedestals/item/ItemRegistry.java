@@ -64,6 +64,7 @@ public class ItemRegistry
         ItemCraftingPlaceholder.onItemRegistryReady(e);
         ItemUpgradeCobbleGen.onItemRegistryReady(e);
         ItemUpgradeVoid.onItemRegistryReady(e);
+        ItemUpgradeAttacker.onItemRegistryReady(e);
 
         ItemUpgradeMilker.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);

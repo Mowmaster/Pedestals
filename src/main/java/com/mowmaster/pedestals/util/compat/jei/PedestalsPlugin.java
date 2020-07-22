@@ -186,6 +186,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradePlacer.PLACER, "placer");
         addValueInfoPage(registration, ItemUpgradeTeleporter.TELEPORTER, "teleporter");
         addValueInfoPage(registration, ItemUpgradeVoid.VOID, "void");
+        addValueInfoPage(registration, ItemUpgradeAttacker.ATTACK, "attack");
     }
 
     @Override

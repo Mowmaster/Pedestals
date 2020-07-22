@@ -2,6 +2,16 @@
 
     "itemGroup.pedestals_blocks": "Pedestals",
 
+    "death.attack.pedestal1": "%1$s was Poked One to Many Times",
+    "death.attack.pedestal2": "%1$s Got the Stabby Stabby",
+    "death.attack.pedestal3": "%1$s was Sliced into Bits",
+    "death.attack.pedestal4": "%1$s is Having a Bad Day",
+    "death.attack.pedestal6": "%1$s Caught a Sword with Their Face",
+    "death.attack.pedestal7": "%1$s was Disemboweled",
+    "death.attack.pedestal8": "%1$s Wasn't Carring the Knife Properly and Slipped",
+    "death.attack.pedestal9": "%1$s was Turned into Chop Suey!",
+    "death.attack.pedestal10": "%1$s was Knifed to Death",
+
     "item.pedestals.linkingtool": "Linking Tool",
         "jei.pedestals.linkingtool.desc": "Shift-R-Click the pedestal Receiving items to select it, Shift-R-Click on the pedestal Sending Items to link the two pedestals. Used In crafting to create most base items in the mod.",
     "item.pedestals.tagtool": "Tag Tool",
@@ -254,6 +264,13 @@
         "item.pedestals.coin.void.tooltip_rate": "Damage Delt Per Operation: ",
         "item.pedestals.coin.void.tooltip_speed": "Operational Speed: ",
     "jei.pedestals.void.desc": "Will Void all items inserted or dropped on the pedestal, will also deal Void damage to any entity that touches the pedestal.",
+    "item.pedestals.coin.attack": "Pedestal Upgrade",
+        "item.pedestals.coin.attack.tooltip_name": "Auto Attacker",
+        "item.pedestals.coin.attack.tooltip_area": "Effected Area: ",
+        "item.pedestals.coin.attack.tooltip_areax": "x",
+        "item.pedestals.coin.attack.tooltip_rate": "Damage Delt Per Operation: ",
+        "item.pedestals.coin.attack.tooltip_speed": "Operational Speed: ",
+    "jei.pedestals.attack.desc": "Attacks Entities in the area around it, Placing a Block of Netherite/Emerald/Diamond/Gold/Iron Under the pedestal will change what is attacked. Putting a sword into the pedestal will increase the damage delt, Sharpness/Bane/Smite on the sword also increases attack damage.",
 
     "block.pedestals.pedestal.stone000": "Colored Pedestal",
     "jei.pedestals.stone000.desc": "R-Clicking a Pedestal with a Colored Pallet Will Make a Colored Pedestal.",
