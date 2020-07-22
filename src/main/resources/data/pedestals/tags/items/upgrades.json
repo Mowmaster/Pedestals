@@ -46,6 +46,7 @@
     "pedestals:coin/quarryb",
     "pedestals:coin/void",
     "pedestals:coin/sawmill",
-    "pedestals:coin/attack"
+    "pedestals:coin/attack",
+    "pedestals:coin/effect"
   ]
 }

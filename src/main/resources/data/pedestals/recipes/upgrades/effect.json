@@ -5,10 +5,10 @@
       "item": "pedestals:coin/default"
     },
     {
-      "item": "minecraft:milk_bucket"
+      "item": "minecraft:glass_bottle"
     }
   ],
   "result": {
-    "item": "pedestals:coin/milker"
+    "item": "pedestals:coin/effect"
   }
 }

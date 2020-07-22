@@ -84,7 +84,6 @@ public class Crusher
         this.addCrusherRecipe(, stack);
     }*/
 
-
     public void addCrusherRecipe(Item stackIn, ItemStack stackOut)
     {
         if (getResult(stackIn) != ItemStack.EMPTY) { return;}
