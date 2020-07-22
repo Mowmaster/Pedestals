@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -16,6 +17,7 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.potion.*;
+import net.minecraft.tileentity.BeaconTileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.ResourceLocation;
@@ -33,10 +35,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -71,22 +70,23 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
     public List<EffectInstance> getEffectFromPedestal(ItemStack itemInPedestal,int modifier)
     {
-        List<EffectInstance> effectInstance = new ArrayList<>();
-        if(!itemInPedestal.isEmpty() && PotionUtils.getEffectsFromStack(itemInPedestal).size() > 0)
+        List<EffectInstance> effectInstance = PotionUtils.getEffectsFromStack(itemInPedestal);
+        List<EffectInstance> effectInstanceReturner = new ArrayList<>();
+        if(!itemInPedestal.isEmpty() && effectInstance.size() > 0)
         {
-            for(int i=0; i<PotionUtils.getEffectsFromStack(itemInPedestal).size(); i++)
+            for(int i=0; i<effectInstance.size(); i++)
             {
-                if(!PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getPotion().isInstant())
+                if(!effectInstance.get(i).getPotion().isInstant())
                 {
-                    Effect getEffect = PotionUtils.getEffectsFromStack(itemInPedestal).get(0).getPotion();
-                    int getAmp = PotionUtils.getEffectsFromStack(itemInPedestal).get(0).getAmplifier() * modifier;
-                    int getDuration = PotionUtils.getEffectsFromStack(itemInPedestal).get(0).getDuration() * modifier;
+                    Effect getEffect = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getPotion();
+                    int getAmp = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getAmplifier() * modifier;
+                    int getDuration = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getDuration() * modifier;
 
-                    effectInstance.add(new EffectInstance(getEffect,getDuration,getAmp));
+                    effectInstanceReturner.add(new EffectInstance(getEffect,getDuration,getAmp,false,false));
                 }
             }
         }
-        return effectInstance;
+        return effectInstanceReturner;
     }
 
     public boolean hasPotionEffect(LivingEntity entityIn, List<EffectInstance> effectIn)
@@ -135,13 +135,12 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
-        //Before doing anything, check for a proper item
-        if(getEffectFromPedestal(itemInPedestal,1).size() > 0)
+        List<EffectInstance> instance = getEffectFromPedestal(itemInPedestal,1);
+        if(instance.size() > 0)
         {
-            List<LivingEntity> itemList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
-            for(LivingEntity getEntityFromList : itemList)
+            List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
+            for(LivingEntity getEntityFromList : entityList)
             {
-                List<EffectInstance> instance = getEffectFromPedestal(itemInPedestal,1);
 
                 if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.field_235397_ng_))
                 {
@@ -200,6 +199,37 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                 }
             }
         }
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+        int s3 = getRangeWidth(stack);
+        String tr = "" + (s3+s3+1) + "";
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+
+        area.func_240699_a_(TextFormatting.WHITE);
+        speed.func_240699_a_(TextFormatting.RED);
+
+        //player.sendMessage(area,player.getUniqueID());
+        //player.sendMessage(speed,player.getUniqueID());
+        List<EffectInstance> instance = getEffectFromPedestal(pedestal.getItemInPedestal(),1);
+        for(int i = 0; i < instance.size();i++)
+        {
+            TranslationTextComponent effect = new TranslationTextComponent("Effect "+ (i+1)+ ": " + instance.get(i).getEffectName() + "");
+            player.sendMessage(effect,player.getUniqueID());
+        }
+
     }
 
     @Override
