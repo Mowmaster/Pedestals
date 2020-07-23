@@ -152,10 +152,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
             DamageSource sourceE = new EntityDamageSource(list.get(rn.nextInt(10)),fakePlayer);
             float damage = getAttackDamage(getEntityFromList,itemInPedestal,coinInPedestal);
 
-            EffectInstance instance = new EffectInstance(Effects.SLOWNESS,100,getCapacityModifier(coinInPedestal));
-            BlockPos below = getPosOfBlockBelow(world,posOfPedestal,1);
-            BlockState state = world.getBlockState(below);
-
             if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.field_235397_ng_))
             {
                 damage *= 2.0f;
@@ -166,7 +162,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 if(getEntityFromList instanceof PlayerEntity)
                 {
                     getEntityFromList.attackEntityFrom(sourceE,damage);
-                    getEntityFromList.addPotionEffect(instance);
                 }
             }
             else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.DIAMOND_BLOCK))
@@ -174,7 +169,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 if(getEntityFromList instanceof MonsterEntity)
                 {
                     getEntityFromList.attackEntityFrom(sourceE,damage);
-                    getEntityFromList.addPotionEffect(instance);
                 }
             }
             else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.GOLD_BLOCK))
@@ -182,7 +176,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 if(getEntityFromList instanceof AnimalEntity)
                 {
                     getEntityFromList.attackEntityFrom(sourceE,damage);
-                    getEntityFromList.addPotionEffect(instance);
                 }
             }
             else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.IRON_BLOCK))
@@ -190,13 +183,11 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 if(getEntityFromList instanceof CreatureEntity)
                 {
                     getEntityFromList.attackEntityFrom(sourceE,damage);
-                    getEntityFromList.addPotionEffect(instance);
                 }
             }
             else
             {
                 getEntityFromList.attackEntityFrom(sourceE,damage);
-                getEntityFromList.addPotionEffect(instance);
             }
         }
     }
