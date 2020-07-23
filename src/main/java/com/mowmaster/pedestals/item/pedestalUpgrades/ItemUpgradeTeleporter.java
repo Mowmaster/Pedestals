@@ -287,6 +287,38 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
     @Override
     @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
+        range.func_240702_b_(""+getRange(stack)+"");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+
+        range.func_240699_a_(TextFormatting.WHITE);
+        speed.func_240699_a_(TextFormatting.RED);
+
+        player.sendMessage(range,player.getUniqueID());
+
+
+        //Display Fuel Left
+        int fuelLeft = pedestal.getStoredValueForUpgrades();
+        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
+        fuel.func_240702_b_("" + fuelLeft + "");
+        fuel.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(fuel,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        player.sendMessage(speed,player.getUniqueID());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");

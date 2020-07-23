@@ -279,11 +279,6 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         {
             int fuelValue = pedestal.getStoredValueForUpgrades();
 
-            double d0 = (double)getPosOfBlockBelow(world,pos,-1 ).getX() + 0.55D - (double)(rand.nextFloat() * 0.1F);
-            double d1 = (double)getPosOfBlockBelow(world,pos,-1 ).getY() + 0.0D - (double)(rand.nextFloat() * 0.1F);
-            double d2 = (double)getPosOfBlockBelow(world,pos,-1 ).getZ() + 0.55D - (double)(rand.nextFloat() * 0.1F);
-            double d3 = (double)(0.4F - (rand.nextFloat() + rand.nextFloat()) * 0.4F);
-
             if(fuelValue > 0)
             {
                 world.addParticle(ParticleTypes.EFFECT, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.0D, (double)pos.getZ() + 0.5D,0, 0, 0);
@@ -298,6 +293,11 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         ItemStack stack = pedestal.getCoinOnPedestal();
         int s3 = getRangeWidth(stack);
         String tr = "" + (s3+s3+1) + "";
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
         area.func_240702_b_(tr);

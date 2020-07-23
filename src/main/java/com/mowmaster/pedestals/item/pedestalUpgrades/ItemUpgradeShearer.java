@@ -1,12 +1,15 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -96,6 +99,37 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
                 }
             }
         }
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        int s3 = getRangeWidth(stack);
+        String tr = "" + (s3+s3+1) + "";
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_("2");
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+
+        area.func_240699_a_(TextFormatting.WHITE);
+        speed.func_240699_a_(TextFormatting.RED);
+
+        player.sendMessage(area,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        player.sendMessage(speed,player.getUniqueID());
     }
 
     @Override
