@@ -83,8 +83,8 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                 if(!effectInstance.get(i).getPotion().isInstant())
                 {
                     Effect getEffect = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getPotion();
-                    int getAmp = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getAmplifier() * modifier;
-                    int getDuration = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getDuration() * modifier;
+                    int getAmp = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getAmplifier() + modifier;
+                    int getDuration = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getDuration() * ((modifier==0)?(1):(modifier+1));
 
                     effectInstanceReturner.add(new EffectInstance(getEffect,getDuration,getAmp,true,true));
                 }
@@ -139,7 +139,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
-        List<EffectInstance> instance = getEffectFromPedestal(itemInPedestal,1);
+        List<EffectInstance> instance = getEffectFromPedestal(itemInPedestal,0);
         if(instance.size() > 0)
         {
             List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
@@ -147,7 +147,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
             {
                 if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.field_235397_ng_))
                 {
-                    instance = getEffectFromPedestal(itemInPedestal,2);
+                    instance = getEffectFromPedestal(itemInPedestal,1);
                 }
 
                 if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.EMERALD_BLOCK))
@@ -158,13 +158,14 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                         {
                             if(getEntityFromList.addPotionEffect(instance.get(i)))
                             {
-                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
                                 {
-                                    removeFuel(world,posOfPedestal,1,false);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                                 else
                                 {
                                     removeFromPedestal(world,posOfPedestal,1);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                             }
                         }
@@ -178,13 +179,14 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                         {
                             if(getEntityFromList.addPotionEffect(instance.get(i)))
                             {
-                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
                                 {
-                                    removeFuel(world,posOfPedestal,1,false);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                                 else
                                 {
                                     removeFromPedestal(world,posOfPedestal,1);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                             }
                         }
@@ -198,13 +200,14 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                         {
                             if(getEntityFromList.addPotionEffect(instance.get(i)))
                             {
-                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
                                 {
-                                    removeFuel(world,posOfPedestal,1,false);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                                 else
                                 {
                                     removeFromPedestal(world,posOfPedestal,1);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                             }
                         }
@@ -218,13 +221,14 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                         {
                             if(getEntityFromList.addPotionEffect(instance.get(i)))
                             {
-                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
                                 {
-                                    removeFuel(world,posOfPedestal,1,false);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                                 else
                                 {
                                     removeFromPedestal(world,posOfPedestal,1);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                             }
                         }
@@ -238,13 +242,14 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                         {
                             if(getEntityFromList.addPotionEffect(instance.get(i)))
                             {
-                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
                                 {
-                                    removeFuel(world,posOfPedestal,1,false);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                                 else
                                 {
                                     removeFromPedestal(world,posOfPedestal,1);
+                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                             }
                         }
