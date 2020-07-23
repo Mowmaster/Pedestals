@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.blocks;
 import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.item.ItemLinkingTool;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
+import com.mowmaster.pedestals.item.ItemUpgradeTool;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
@@ -307,6 +308,10 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                                 return ActionResultType.FAIL;
                             }
 
+                        }
+                        else if(player.getHeldItemMainhand().getItem().equals(ItemUpgradeTool.UPGRADE))
+                        {
+                            return ActionResultType.FAIL;
                         }
                         else if(player.getHeldItemMainhand().getItem() instanceof ItemPedestalUpgrades)
                         {

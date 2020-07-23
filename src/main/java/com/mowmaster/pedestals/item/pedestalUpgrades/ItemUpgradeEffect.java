@@ -8,7 +8,9 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.monster.SkeletonEntity;
 import net.minecraft.entity.monster.SpiderEntity;
@@ -16,8 +18,10 @@ import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.*;
 import net.minecraft.tileentity.BeaconTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.ResourceLocation;
@@ -82,7 +86,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     int getAmp = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getAmplifier() * modifier;
                     int getDuration = PotionUtils.getEffectsFromStack(itemInPedestal).get(i).getDuration() * modifier;
 
-                    effectInstanceReturner.add(new EffectInstance(getEffect,getDuration,getAmp,false,false));
+                    effectInstanceReturner.add(new EffectInstance(getEffect,getDuration,getAmp,true,true));
                 }
             }
         }
@@ -141,7 +145,6 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
             List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
             for(LivingEntity getEntityFromList : entityList)
             {
-
                 if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.field_235397_ng_))
                 {
                     instance = getEffectFromPedestal(itemInPedestal,2);
@@ -153,7 +156,17 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     {
                         for(int i=0; i<instance.size(); i++)
                         {
-                            getEntityFromList.addPotionEffect(instance.get(i));
+                            if(getEntityFromList.addPotionEffect(instance.get(i)))
+                            {
+                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                {
+                                    removeFuel(world,posOfPedestal,1,false);
+                                }
+                                else
+                                {
+                                    removeFromPedestal(world,posOfPedestal,1);
+                                }
+                            }
                         }
                     }
                 }
@@ -163,7 +176,17 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     {
                         for(int i=0; i<instance.size(); i++)
                         {
-                            getEntityFromList.addPotionEffect(instance.get(i));
+                            if(getEntityFromList.addPotionEffect(instance.get(i)))
+                            {
+                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                {
+                                    removeFuel(world,posOfPedestal,1,false);
+                                }
+                                else
+                                {
+                                    removeFromPedestal(world,posOfPedestal,1);
+                                }
+                            }
                         }
                     }
                 }
@@ -173,7 +196,17 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     {
                         for(int i=0; i<instance.size(); i++)
                         {
-                            getEntityFromList.addPotionEffect(instance.get(i));
+                            if(getEntityFromList.addPotionEffect(instance.get(i)))
+                            {
+                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                {
+                                    removeFuel(world,posOfPedestal,1,false);
+                                }
+                                else
+                                {
+                                    removeFromPedestal(world,posOfPedestal,1);
+                                }
+                            }
                         }
                     }
                 }
@@ -183,7 +216,17 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     {
                         for(int i=0; i<instance.size(); i++)
                         {
-                            getEntityFromList.addPotionEffect(instance.get(i));
+                            if(getEntityFromList.addPotionEffect(instance.get(i)))
+                            {
+                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                {
+                                    removeFuel(world,posOfPedestal,1,false);
+                                }
+                                else
+                                {
+                                    removeFromPedestal(world,posOfPedestal,1);
+                                }
+                            }
                         }
                     }
                 }
@@ -193,10 +236,57 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     {
                         for(int i=0; i<instance.size(); i++)
                         {
-                            getEntityFromList.addPotionEffect(instance.get(i));
+                            if(getEntityFromList.addPotionEffect(instance.get(i)))
+                            {
+                                if(removeFuel(world,posOfPedestal,1,true) > -1)
+                                {
+                                    removeFuel(world,posOfPedestal,1,false);
+                                }
+                                else
+                                {
+                                    removeFromPedestal(world,posOfPedestal,1);
+                                }
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    {
+        if(entityIn instanceof ItemEntity)
+        {
+            ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
+            if(getItemStack.getItem().equals(Items.BLAZE_POWDER))
+            {
+                int CurrentBurnTime = tilePedestal.getStoredValueForUpgrades();
+                int getBurnTimeForStack = 4 * getItemStack.getCount();
+                tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
+
+                entityIn.remove();
+            }
+        }
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void onRandomDisplayTick(TilePedestal pedestal, BlockState stateIn, World world, BlockPos pos, Random rand)
+    {
+        if(!world.isBlockPowered(pos))
+        {
+            int fuelValue = pedestal.getStoredValueForUpgrades();
+
+            double d0 = (double)getPosOfBlockBelow(world,pos,-1 ).getX() + 0.55D - (double)(rand.nextFloat() * 0.1F);
+            double d1 = (double)getPosOfBlockBelow(world,pos,-1 ).getY() + 0.0D - (double)(rand.nextFloat() * 0.1F);
+            double d2 = (double)getPosOfBlockBelow(world,pos,-1 ).getZ() + 0.55D - (double)(rand.nextFloat() * 0.1F);
+            double d3 = (double)(0.4F - (rand.nextFloat() + rand.nextFloat()) * 0.4F);
+
+            if(fuelValue > 0)
+            {
+                world.addParticle(ParticleTypes.EFFECT, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.0D, (double)pos.getZ() + 0.5D,0, 0, 0);
             }
         }
     }
@@ -221,15 +311,30 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         area.func_240699_a_(TextFormatting.WHITE);
         speed.func_240699_a_(TextFormatting.RED);
 
-        //player.sendMessage(area,player.getUniqueID());
-        //player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(area,player.getUniqueID());
+
+
+        //Display Fuel Left
+        int fuelLeft = pedestal.getStoredValueForUpgrades();
+        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
+        fuel.func_240702_b_("" + fuelLeft + "");
+        fuel.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(fuel,player.getUniqueID());
+
+        //Displays what effects are in pedestal
         List<EffectInstance> instance = getEffectFromPedestal(pedestal.getItemInPedestal(),1);
+        TranslationTextComponent effect = new TranslationTextComponent(getTranslationKey() + ".chat_effect");
+        effect.func_240699_a_(TextFormatting.AQUA);
+        player.sendMessage(effect,player.getUniqueID());
         for(int i = 0; i < instance.size();i++)
         {
-            TranslationTextComponent effect = new TranslationTextComponent("Effect "+ (i+1)+ ": " + instance.get(i).getEffectName() + "");
-            player.sendMessage(effect,player.getUniqueID());
+            TranslationTextComponent effects = new TranslationTextComponent(instance.get(i).getPotion().getDisplayName().getString());
+            effects.func_240699_a_(TextFormatting.GRAY);
+            player.sendMessage(effects,player.getUniqueID());
         }
 
+        //Display Speed Last Like on Tooltips
+        player.sendMessage(speed,player.getUniqueID());
     }
 
     @Override

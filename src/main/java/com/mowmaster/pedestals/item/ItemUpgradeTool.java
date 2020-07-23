@@ -14,7 +14,9 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -49,11 +51,12 @@ public class ItemUpgradeTool extends Item {
 
     @Override
     public ActionResultType onItemUse(ItemUseContext context) {
+
         World worldIn = context.getWorld();
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getPos();
 
-        if(worldIn.isRemote)
+        if(!worldIn.isRemote)
         {
             if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE) {
                 //Checks Tile at location to make sure its a TilePedestal
@@ -71,10 +74,8 @@ public class ItemUpgradeTool extends Item {
                 }
             }
         }
-
         return super.onItemUse(context);
     }
-
 
     public static final Item UPGRADE = new ItemUpgradeTool().setRegistryName(new ResourceLocation(MODID, "upgradetool"));
 

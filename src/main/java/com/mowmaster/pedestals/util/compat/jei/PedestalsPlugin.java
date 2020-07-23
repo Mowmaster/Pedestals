@@ -140,6 +140,8 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemPedestalUpgrades.SPEED, "upgradespeed");
         addValueInfoPage(registration, ItemPedestalUpgrades.CAPACITY, "upgradecapacity");
         addValueInfoPage(registration, ItemTagTool.TAG, "tagtool");
+        addValueInfoPage(registration, ItemUpgradeTool.UPGRADE, "upgradetool");
+
         //Upgrades
         addValueInfoPage(registration, ItemUpgradeBreaker.BREAKER, "breaker");
         addValueInfoPage(registration, ItemUpgradeChopper.CHOPPER, "chopper");
@@ -187,6 +189,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeTeleporter.TELEPORTER, "teleporter");
         addValueInfoPage(registration, ItemUpgradeVoid.VOID, "void");
         addValueInfoPage(registration, ItemUpgradeAttacker.ATTACK, "attack");
+        addValueInfoPage(registration, ItemUpgradeEffect.EFFECT, "effect");
     }
 
     @Override

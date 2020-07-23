@@ -9,6 +9,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -92,6 +93,26 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         }
 
         return  smeltingSpeed;
+    }
+
+    public int removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
+    {
+        int amountToSet = 0;
+        TileEntity entity = world.getTileEntity(posPedestal);
+        if(entity instanceof TilePedestal)
+        {
+            TilePedestal pedestal = (TilePedestal)entity;
+            int fuelLeft = pedestal.getStoredValueForUpgrades();
+            amountToSet = fuelLeft - amountToRemove;
+            if(amountToRemove >= fuelLeft) amountToSet = -1;
+            if(!simulate)
+            {
+                if(amountToSet == -1) amountToSet = 0;
+                pedestal.setStoredValueForUpgrades(amountToSet);
+            }
+        }
+
+        return amountToSet;
     }
 
     public int removeFuel(TilePedestal pedestal, int amountToRemove, boolean simulate)
