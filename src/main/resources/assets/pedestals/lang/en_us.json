@@ -16,9 +16,6 @@
         "jei.pedestals.upgradespeed.desc": "Use on a Pedestal to Increase the Speed at which it transfers items.",
     "item.pedestals.upgradecapacity": "Pedestal Transfer Capacity Upgrade",
         "jei.pedestals.upgradecapacity.desc": "Use on a Pedestal to Increase the Amount of Items transferred at a time.",
-    "item.pedestals.dustiron": "Iron Dust",
-    "item.pedestals.dustgold": "Gold Dust",
-    "item.pedestals.dustflour": "Flour",
 
     "item.pedestals.coin.attack": "Pedestal Upgrade",
     "item.pedestals.coin.attack.tooltip_name": "Auto Attacker",
@@ -212,6 +209,13 @@
     "item.pedestals.coin.xptank.tooltip_rate": "Exp Transfer Ammount: ",
     "item.pedestals.coin.xptank.tooltip_speed": "Operational Speed: ",
     "jei.pedestals.xptank.desc": "Used to store massive amounts of XP,  When linked to another pedestal with an XP upgrade, it will transfer Exp to the linked Pedestal.",
+
+    "item.pedestals.coin.fan": "Pedestal Upgrade",
+    "item.pedestals.coin.fan.tooltip_name": "Mob Fan",
+    "item.pedestals.coin.fan.tooltip_area": "Effected Area: ",
+    "item.pedestals.coin.fan.tooltip_areax": "x",
+    "item.pedestals.coin.fan.tooltip_speed": "Fan Speed Multiplier: ",
+    "jei.pedestals.fan.desc": "Pushes Mobs in the area around it, Placing a Block of Netherite/Diamond/Gold/Iron Under the pedestal will change what is pushed.",
 
     "item.pedestals.coin.filterenchanted": "Pedestal Filter",
     "item.pedestals.coin.filterenchanted.tooltip_name": "Enchanted",
@@ -474,6 +478,17 @@
     "block.pedestals.pedestal.stone333": "Pedestal",
     "jei.pedestals.stone333.desc": "Pedestals Can Be Placed on all 6 sides, Colored with Colored Pallets, Lit up with a Block of Glowstone, and Upgraded with Upgrades. Upgraded Pedestals Can be powered off with a Redstone Signal.",
 
+    "item.pedestals.dustiron": "Iron Dust",
+    "item.pedestals.dustgold": "Gold Dust",
+    "item.pedestals.dustflour": "Flour",
+    "item.pedestals.dustcopper": "Copper Dust",
+    "item.pedestals.dusttin": "Tin Dust",
+    "item.pedestals.dustosmium": "Osmium Dust",
+    "item.pedestals.dusturanium": "Uranium Dust",
+    "item.pedestals.dustlead": "Lead Dust",
+    "item.pedestals.dustaluminum": "Aluminum Dust",
+    "item.pedestals.dustsilver": "Silver Dust",
+    "item.pedestals.dustnickel": "Nickel Dust",
 
     "enchantment.pedestals.upgradecapacity": "Pedestal Capacity",
     "enchantment.pedestals.upgradespeed": "Pedestal Speed",

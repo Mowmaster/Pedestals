@@ -190,6 +190,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeVoid.VOID, "void");
         addValueInfoPage(registration, ItemUpgradeAttacker.ATTACK, "attack");
         addValueInfoPage(registration, ItemUpgradeEffect.EFFECT, "effect");
+        addValueInfoPage(registration, ItemUpgradeFan.FAN, "fan");
     }
 
     @Override

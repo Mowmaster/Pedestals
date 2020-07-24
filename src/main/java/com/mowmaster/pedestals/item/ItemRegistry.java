@@ -68,6 +68,7 @@ public class ItemRegistry
         ItemUpgradeVoid.onItemRegistryReady(e);
         ItemUpgradeAttacker.onItemRegistryReady(e);
         ItemUpgradeEffect.onItemRegistryReady(e);
+        ItemUpgradeFan.onItemRegistryReady(e);
 
         ItemUpgradeMilker.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);
