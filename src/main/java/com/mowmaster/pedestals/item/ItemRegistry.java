@@ -17,6 +17,7 @@ public class ItemRegistry
         ItemUpgradeTool.onItemRegistryReady(e);
         //ItemDevTool.onItemRegistryReady(e);
         ItemColorPallet.onItemRegistryReady(e);
+        ItemEnchantableBook.onItemRegistryReady(e);
         ItemPedestalUpgrades.onItemRegistryReady(e);
         ItemUpgradeDefault.onItemRegistryReady(e);
 

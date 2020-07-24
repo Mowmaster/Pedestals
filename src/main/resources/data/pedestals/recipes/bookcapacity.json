@@ -2,13 +2,13 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "pedestals:coin/default"
+      "item": "minecraft:book"
     },
     {
-      "tag": "forge:feathers"
+      "tag": "forge:gems/emerald"
     }
   ],
   "result": {
-    "item": "pedestals:coin/fan"
+    "item": "pedestals:bookcapacity"
   }
 }

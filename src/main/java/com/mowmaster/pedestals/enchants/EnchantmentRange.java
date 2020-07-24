@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.enchants;
 
+import com.mowmaster.pedestals.item.ItemEnchantableBook;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -33,8 +34,14 @@ public class EnchantmentRange extends Enchantment
         if(coin instanceof ItemUpgradeBase)
         {
             canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptRange();
+            return stack.getItem() instanceof ItemUpgradeBase && canApplyToUpgrade;
         }
-        return stack.getItem() instanceof ItemUpgradeBase && canApplyToUpgrade;
+        if(coin.equals(ItemEnchantableBook.RANGE))
+        {
+            canApplyToUpgrade = true;
+            return stack.equals(ItemEnchantableBook.RANGE) && canApplyToUpgrade;
+        }
+        return false;
     }
 
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
@@ -43,6 +50,10 @@ public class EnchantmentRange extends Enchantment
         if(coin instanceof ItemUpgradeBase)
         {
             canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptRange();
+        }
+        if(coin.equals(ItemEnchantableBook.RANGE))
+        {
+            canApplyToUpgrade = true;
         }
 
         return canApplyToUpgrade;

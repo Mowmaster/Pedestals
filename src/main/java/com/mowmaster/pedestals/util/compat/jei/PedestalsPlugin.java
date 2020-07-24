@@ -141,6 +141,9 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemPedestalUpgrades.CAPACITY, "upgradecapacity");
         addValueInfoPage(registration, ItemTagTool.TAG, "tagtool");
         addValueInfoPage(registration, ItemUpgradeTool.UPGRADE, "upgradetool");
+        addValueInfoPage(registration, ItemEnchantableBook.SPEED, "bookspeed");
+        addValueInfoPage(registration, ItemEnchantableBook.CAPACITY, "bookcapacity");
+        addValueInfoPage(registration, ItemEnchantableBook.RANGE, "bookrange");
 
         //Upgrades
         addValueInfoPage(registration, ItemUpgradeBreaker.BREAKER, "breaker");

@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.enchants;
 
+import com.mowmaster.pedestals.item.ItemEnchantableBook;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -34,8 +35,14 @@ public class EnchantmentOperationSpeed extends Enchantment
         if(coin instanceof ItemUpgradeBase)
         {
             canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptOpSpeed();
+            return stack.getItem() instanceof ItemUpgradeBase && canApplyToUpgrade;
         }
-        return stack.getItem() instanceof ItemUpgradeBase && canApplyToUpgrade;
+        if(coin.equals(ItemEnchantableBook.SPEED))
+        {
+            canApplyToUpgrade = true;
+            return stack.equals(ItemEnchantableBook.SPEED) && canApplyToUpgrade;
+        }
+        return false;
     }
 
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
@@ -44,6 +51,10 @@ public class EnchantmentOperationSpeed extends Enchantment
         if(coin instanceof ItemUpgradeBase)
         {
             canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptOpSpeed();
+        }
+        if(coin.equals(ItemEnchantableBook.SPEED))
+        {
+            canApplyToUpgrade = true;
         }
 
         return canApplyToUpgrade;
