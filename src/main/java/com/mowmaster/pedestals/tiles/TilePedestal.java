@@ -756,15 +756,18 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                         }
                     }
                 }
-                if(hasCoin())
+            }
+        }
+        if(world.isAreaLoaded(pos,1))
+        {
+            if(hasCoin())
+            {
+                Item coinInPed = getCoinOnPedestal().getItem();
+                if(coinInPed instanceof ItemUpgradeBase)
                 {
-                    Item coinInPed = getCoinOnPedestal().getItem();
-                    if(coinInPed instanceof ItemUpgradeBase)
-                    {
-                        impTicker++;
-                        ((ItemUpgradeBase) coinInPed).updateAction(impTicker,this.world,getItemInPedestal(),getCoinOnPedestal(),this.getPos());
-                        if(impTicker >=200){impTicker=0;}
-                    }
+                    impTicker++;
+                    ((ItemUpgradeBase) coinInPed).updateAction(impTicker,this.world,getItemInPedestal(),getCoinOnPedestal(),this.getPos());
+                    if(impTicker >=200){impTicker=0;}
                 }
             }
         }

@@ -91,12 +91,15 @@ public class ItemUpgradeExport extends ItemUpgradeBase
     //                          impTicker,this.world,   getItemInPedestal(),      getCoinOnPedestal(),     this.getPos()
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int speed = getOperationSpeed(coinInPedestal);
-
-        if(!world.isBlockPowered(pedestalPos))
+        if(!world.isRemote)
         {
-            if (tick%speed == 0) {
-                upgradeAction(world,pedestalPos,coinInPedestal);
+            int speed = getOperationSpeed(coinInPedestal);
+
+            if(!world.isBlockPowered(pedestalPos))
+            {
+                if (tick%speed == 0) {
+                    upgradeAction(world,pedestalPos,coinInPedestal);
+                }
             }
         }
     }

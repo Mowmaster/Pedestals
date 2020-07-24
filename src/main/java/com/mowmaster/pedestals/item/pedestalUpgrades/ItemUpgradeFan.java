@@ -1,25 +1,13 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
-import com.mowmaster.pedestals.tiles.TilePedestal;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -29,18 +17,11 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -102,8 +83,39 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return  transferRate-1;
     }
 
-    protected void addMotion(World world, BlockPos posPedestal,double speed, Entity entity) {
-        BlockState state = world.getBlockState(posPedestal);
+    protected void useFanOnEntities(World world, BlockPos posOfPedestal, double speed,AxisAlignedBB getBox) {
+        List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class, getBox);
+
+        BlockState state = world.getBlockState(posOfPedestal);
+        Direction enumfacing = state.get(FACING);
+        for (LivingEntity entity : entityList) {
+            LivingEntity getEntity = getTargetEntity(world,posOfPedestal,entity);
+            if(getEntity != null)
+            {
+                if(getEntity instanceof PlayerEntity)
+                {
+                    if(!((PlayerEntity) getEntity).abilities.isFlying && !((PlayerEntity) getEntity).isCrouching())
+                    {
+                        addMotion(world,posOfPedestal,speed,getEntity);
+                    }
+                }
+                else
+                {
+                    addMotion(world,posOfPedestal,speed,getEntity);
+                }
+                if (enumfacing == Direction.UP) {
+                    getEntity.fallDistance = 0;
+                }
+            }
+        }
+    }
+
+    protected void addMotion(World world, BlockPos posOfPedestal, double speed, LivingEntity entity) {
+        if (entity instanceof PlayerEntity && entity.func_233570_aj_()) {
+            return;
+        }
+
+        BlockState state = world.getBlockState(posOfPedestal);
         Direction enumfacing = state.get(FACING);
         switch (enumfacing) {
             case DOWN:
@@ -133,24 +145,24 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         switch (intOperationalSpeedModifier(stack))
         {
             case 0:
-                intOperationalSpeed = 0.25;//normal speed
+                intOperationalSpeed = 0.1;//normal speed
                 break;
             case 1:
-                intOperationalSpeed=0.5;//2x faster
+                intOperationalSpeed=0.2;//2x faster
                 break;
             case 2:
-                intOperationalSpeed = 1.0;//4x faster
+                intOperationalSpeed = 0.4;//4x faster
                 break;
             case 3:
-                intOperationalSpeed = 1.5;//6x faster
+                intOperationalSpeed = 0.6;//6x faster
                 break;
             case 4:
-                intOperationalSpeed = 2.0;//10x faster
+                intOperationalSpeed = 1.0;//10x faster
                 break;
             case 5:
-                intOperationalSpeed=2.5;//20x faster
+                intOperationalSpeed=2.0;//20x faster
                 break;
-            default: intOperationalSpeed=0.25;
+            default: intOperationalSpeed=0.1;
         }
 
         return  intOperationalSpeed;
@@ -175,21 +187,12 @@ public class ItemUpgradeFan extends ItemUpgradeBase
 
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
-        List<LivingEntity> itemList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
-        for(LivingEntity getEntityFromList : itemList)
+        if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.field_235397_ng_))
         {
-
-            if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.field_235397_ng_))
-            {
-                speed *= 2;
-            }
-
-            if(getTargetEntity(world,posOfPedestal,getEntityFromList) != null)
-            {
-                //Do Stuff
-                addMotion(world,posOfPedestal,speed,getTargetEntity(world,posOfPedestal,getEntityFromList));
-            }
+            speed *= 2;
         }
+
+        useFanOnEntities(world,posOfPedestal,speed,getBox);
     }
 
     @Override

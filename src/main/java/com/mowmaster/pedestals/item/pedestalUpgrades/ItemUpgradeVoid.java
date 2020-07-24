@@ -49,16 +49,19 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int speed = getOperationSpeed(coinInPedestal);
-        if(!world.isBlockPowered(pedestalPos))
+        if(!world.isRemote)
         {
-            if (tick%speed == 0) {
-                upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
-            }
-
-            if(!itemInPedestal.equals(ItemStack.EMPTY))
+            int speed = getOperationSpeed(coinInPedestal);
+            if(!world.isBlockPowered(pedestalPos))
             {
-                removeFromPedestal(world,pedestalPos,itemInPedestal.getCount());
+                if (tick%speed == 0) {
+                    upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
+                }
+
+                if(!itemInPedestal.equals(ItemStack.EMPTY))
+                {
+                    removeFromPedestal(world,pedestalPos,itemInPedestal.getCount());
+                }
             }
         }
     }

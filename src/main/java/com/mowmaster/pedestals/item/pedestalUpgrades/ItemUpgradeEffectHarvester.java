@@ -22,10 +22,12 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
@@ -55,32 +57,35 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int speed = getOperationSpeed(coinInPedestal);
+        if(!world.isRemote)
+        {
+            int speed = getOperationSpeed(coinInPedestal);
 
-        int width = getRangeWidth(coinInPedestal);
-        int height = (2*width)+1;
+            int width = getRangeWidth(coinInPedestal);
+            int height = (2*width)+1;
 
-        BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
-        BlockPos posBlockPos = getPosRangePos(world,pedestalPos,width,height);
+            BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
+            BlockPos posBlockPos = getPosRangePos(world,pedestalPos,width,height);
 
-        if(!world.isBlockPowered(pedestalPos)) {
-            for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
-                for (int z = negBlockPos.getZ(); z <= posBlockPos.getZ(); z++) {
-                    for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
-                        BlockPos posTargetBlock = new BlockPos(x, y, z);
-                        BlockState targetBlock = world.getBlockState(posTargetBlock);
-                        if (tick%speed == 0) {
-                            ticked++;
-                        }
+            if(!world.isBlockPowered(pedestalPos)) {
+                for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
+                    for (int z = negBlockPos.getZ(); z <= posBlockPos.getZ(); z++) {
+                        for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
+                            BlockPos posTargetBlock = new BlockPos(x, y, z);
+                            BlockState targetBlock = world.getBlockState(posTargetBlock);
+                            if (tick%speed == 0) {
+                                ticked++;
+                            }
 
-                        if(ticked > 84)
-                        {
-                            upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, posTargetBlock, targetBlock);
-                            ticked=0;
-                        }
-                        else
-                        {
-                            ticked++;
+                            if(ticked > 84)
+                            {
+                                upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, posTargetBlock, targetBlock);
+                                ticked=0;
+                            }
+                            else
+                            {
+                                ticked++;
+                            }
                         }
                     }
                 }
@@ -122,8 +127,19 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
                 if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                 {
-                    target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
-                    world.setBlockState(posTarget, Blocks.AIR.getDefaultState());
+                    if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true)) {
+
+                        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
+                        if (!MinecraftForge.EVENT_BUS.post(e)) {
+                            target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
+                            target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
+
+                            world.removeBlock(posTarget, false);
+                        }
+                        //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
+                    }
+                    /*target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
+                    world.setBlockState(posTarget, Blocks.AIR.getDefaultState());*/
                 }
 
                 //target.getBlock().removedByPlayer(target,world,posTarget,fakePlayer,false,null);

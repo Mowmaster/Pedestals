@@ -50,37 +50,40 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int speed = getOperationSpeed(coinInPedestal);
+        if(!world.isRemote)
+        {
+            int speed = getOperationSpeed(coinInPedestal);
+            int width = getRangeWidth(coinInPedestal);
+            int height = (2*width)+1;
 
-        int width = getRangeWidth(coinInPedestal);
-        int height = (2*width)+1;
+            BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
+            BlockPos posBlockPos = getPosRangePos(world,pedestalPos,width,height);
 
-        BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
-        BlockPos posBlockPos = getPosRangePos(world,pedestalPos,width,height);
+            if(!world.isBlockPowered(pedestalPos)) {
+                for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
+                    for (int z = negBlockPos.getZ(); z <= posBlockPos.getZ(); z++) {
+                        for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
+                            BlockPos posTargetBlock = new BlockPos(x, y, z);
+                            BlockState targetBlock = world.getBlockState(posTargetBlock);
+                            if (tick%speed == 0) {
+                                ticked++;
+                            }
 
-        if(!world.isBlockPowered(pedestalPos)) {
-            for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
-                for (int z = negBlockPos.getZ(); z <= posBlockPos.getZ(); z++) {
-                    for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
-                        BlockPos posTargetBlock = new BlockPos(x, y, z);
-                        BlockState targetBlock = world.getBlockState(posTargetBlock);
-                        if (tick%speed == 0) {
-                            ticked++;
-                        }
-
-                        if(ticked > 84)
-                        {
-                            upgradeAction(world, itemInPedestal, pedestalPos, posTargetBlock, targetBlock);
-                            ticked=0;
-                        }
-                        else
-                        {
-                            ticked++;
+                            if(ticked > 84)
+                            {
+                                upgradeAction(world, itemInPedestal, pedestalPos, posTargetBlock, targetBlock);
+                                ticked=0;
+                            }
+                            else
+                            {
+                                ticked++;
+                            }
                         }
                     }
                 }
             }
         }
+
     }
 
     public void upgradeAction(World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)

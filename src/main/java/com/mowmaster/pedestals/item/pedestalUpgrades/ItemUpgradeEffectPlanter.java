@@ -6,22 +6,21 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.item.*;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -89,24 +88,37 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 
     public void upgradeAction(World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
     {
-        Random rand = new Random();
-        Item singleItemInPedestal = itemInPedestal.getItem();
-
-        if(world.getBlockState(posTarget).getBlock().equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR))
+        if(!world.isRemote)
         {
-            if(singleItemInPedestal instanceof BlockItem)
+            Random rand = new Random();
+            Item singleItemInPedestal = itemInPedestal.getItem();
+
+            if(world.getBlockState(posTarget).getBlock().equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR))
             {
-                if(((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable)
+                if(singleItemInPedestal instanceof BlockItem)
                 {
-                    if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
-                        Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
+                    if(((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable)
+                    {
+                        if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
+                            Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
 
 
-                        if (world.getBlockState(posTarget.down()).canSustainPlant(world,posTarget.down(), Direction.UP,(IPlantable) block)) {
-                            if (world.setBlockState(posTarget, ((IPlantable) block).getPlant(world, posTarget))) {
-                                this.removeFromPedestal(world,posOfPedestal,1);
+                            if (world.getBlockState(posTarget.down()).canSustainPlant(world,posTarget.down(), Direction.UP,(IPlantable) block)) {
+                                if (world.setBlockState(posTarget, ((IPlantable) block).getPlant(world, posTarget))) {
+
+                                    FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+                                    fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+                                    BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal, new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget, false));
+
+                                    ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                    if (result == ActionResultType.SUCCESS) {
+                                        this.removeFromPedestal(world,posOfPedestal,1);
+                                        world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                    }
+                                /*this.removeFromPedestal(world,posOfPedestal,1);
                                 world.setBlockState(posTarget,((IPlantable) block).getPlant(world, posTarget));
-                                world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);*/
+                                }
                             }
                         }
                     }

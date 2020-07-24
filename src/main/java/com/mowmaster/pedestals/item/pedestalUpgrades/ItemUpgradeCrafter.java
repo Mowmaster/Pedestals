@@ -49,14 +49,18 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int speed = getOperationSpeed(coinInPedestal);
-
-        if(!world.isBlockPowered(pedestalPos))
+        if(!world.isRemote)
         {
-            if (tick%speed == 0) {
-                upgradeAction(world,itemInPedestal,coinInPedestal,pedestalPos);
+            int speed = getOperationSpeed(coinInPedestal);
+
+            if(!world.isBlockPowered(pedestalPos))
+            {
+                if (tick%speed == 0) {
+                    upgradeAction(world,itemInPedestal,coinInPedestal,pedestalPos);
+                }
             }
         }
+
     }
 
     public static IRecipe<CraftingInventory> findRecipe(CraftingInventory inv, World world) {

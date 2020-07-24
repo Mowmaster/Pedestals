@@ -82,13 +82,17 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int speed = getOperationSpeed(coinInPedestal);
-        if(!world.isBlockPowered(pedestalPos))
+        if(!world.isRemote)
         {
-            if (tick%speed == 0) {
-                upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
+            int speed = getOperationSpeed(coinInPedestal);
+            if(!world.isBlockPowered(pedestalPos))
+            {
+                if (tick%speed == 0) {
+                    upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
+                }
             }
         }
+
     }
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinOnPedestal) {

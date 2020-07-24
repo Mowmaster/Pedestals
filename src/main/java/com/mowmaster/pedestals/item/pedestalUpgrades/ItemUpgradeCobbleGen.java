@@ -84,15 +84,18 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int speed = getOperationSpeed(coinInPedestal);
-
-        if(!world.isBlockPowered(pedestalPos))
+        if(!world.isRemote)
         {
-            //Keep Pedestal Full at all times
-            fillPedestalAction(world,itemInPedestal,coinInPedestal,pedestalPos);
-            //Cobble Gen Only Works So Fast
-            if (tick%speed == 0) {
-                upgradeAction(world,itemInPedestal,coinInPedestal,pedestalPos);
+            int speed = getOperationSpeed(coinInPedestal);
+
+            if(!world.isBlockPowered(pedestalPos))
+            {
+                //Keep Pedestal Full at all times
+                fillPedestalAction(world,itemInPedestal,coinInPedestal,pedestalPos);
+                //Cobble Gen Only Works So Fast
+                if (tick%speed == 0) {
+                    upgradeAction(world,itemInPedestal,coinInPedestal,pedestalPos);
+                }
             }
         }
     }

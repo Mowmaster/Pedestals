@@ -25,12 +25,15 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int speed = getSmeltingSpeed(coinInPedestal);
-
-        if(!world.isBlockPowered(pedestalPos))
+        if(!world.isRemote)
         {
-            if (tick%speed == 0) {
-                upgradeAction(world,pedestalPos,coinInPedestal);
+            int speed = getSmeltingSpeed(coinInPedestal);
+
+            if(!world.isBlockPowered(pedestalPos))
+            {
+                if (tick%speed == 0) {
+                    upgradeAction(world,pedestalPos,coinInPedestal);
+                }
             }
         }
     }

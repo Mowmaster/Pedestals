@@ -105,42 +105,45 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        int rangeWidth = getRangeWidth(coinInPedestal);
-        int rangeHeight = getRangeHeight(coinInPedestal);
-        int speed = getOperationSpeed(coinInPedestal);
-
-        BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
-        BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);
-        if(world.isAreaLoaded(negNums,posNums))
+        if(!world.isRemote)
         {
-            if(!world.isBlockPowered(pedestalPos)) {
+            int rangeWidth = getRangeWidth(coinInPedestal);
+            int rangeHeight = getRangeHeight(coinInPedestal);
+            int speed = getOperationSpeed(coinInPedestal);
 
-                TileEntity pedestalInv = world.getTileEntity(pedestalPos);
-                if(pedestalInv instanceof TilePedestal) {
-                    TilePedestal ped = ((TilePedestal) pedestalInv);
+            BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
+            BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);
+            if(world.isAreaLoaded(negNums,posNums))
+            {
+                if(!world.isBlockPowered(pedestalPos)) {
 
-                    if(removeFuel(ped,200,true)>=0)
-                    {
-                        upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                    TileEntity pedestalInv = world.getTileEntity(pedestalPos);
+                    if(pedestalInv instanceof TilePedestal) {
+                        TilePedestal ped = ((TilePedestal) pedestalInv);
 
-                        for (int x = negNums.getX(); x <= posNums.getX(); x++) {
-                            for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
-                                for (int y = negNums.getY(); y <= posNums.getY(); y++) {
-                                    BlockPos blockToChopPos = new BlockPos(x, y, z);
-                                    //BlockPos blockToChopPos = this.getPos().add(x, y, z);
-                                    BlockState blockToChop = world.getBlockState(blockToChopPos);
-                                    if (tick%speed == 0) {
-                                        ticked++;
-                                    }
+                        if(removeFuel(ped,200,true)>=0)
+                        {
+                            upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
 
-                                    if(ticked > 84)
-                                    {
-                                        upgradeAction(world, itemInPedestal, coinInPedestal, blockToChopPos, blockToChop, pedestalPos);
-                                        ticked=0;
-                                    }
-                                    else
-                                    {
-                                        ticked++;
+                            for (int x = negNums.getX(); x <= posNums.getX(); x++) {
+                                for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
+                                    for (int y = negNums.getY(); y <= posNums.getY(); y++) {
+                                        BlockPos blockToChopPos = new BlockPos(x, y, z);
+                                        //BlockPos blockToChopPos = this.getPos().add(x, y, z);
+                                        BlockState blockToChop = world.getBlockState(blockToChopPos);
+                                        if (tick%speed == 0) {
+                                            ticked++;
+                                        }
+
+                                        if(ticked > 84)
+                                        {
+                                            upgradeAction(world, itemInPedestal, coinInPedestal, blockToChopPos, blockToChop, pedestalPos);
+                                            ticked=0;
+                                        }
+                                        else
+                                        {
+                                            ticked++;
+                                        }
                                     }
                                 }
                             }
