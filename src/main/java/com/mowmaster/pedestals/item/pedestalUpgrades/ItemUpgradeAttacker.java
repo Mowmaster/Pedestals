@@ -105,6 +105,8 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         return damage;
     }
 
+
+
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         int speed = getOperationSpeed(coinInPedestal);
@@ -114,21 +116,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
             }
         }
-    }
-
-    public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
-    {
-        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
-        ItemStack stack = new ItemStack((Item)BLOCK_TO_ITEM.getOrDefault(block, Items.AIR));
-
-        //Netherite
-        if(block.equals(Blocks.field_235397_ng_)) return Blocks.field_235397_ng_;
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/emerald")) return Blocks.EMERALD_BLOCK;//Players
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/diamond")) return Blocks.DIAMOND_BLOCK;//All Mobs
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/gold")) return Blocks.GOLD_BLOCK;//All Animals
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/iron")) return Blocks.IRON_BLOCK;//All Creatures
-
-        return block;
     }
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
@@ -157,37 +144,9 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 damage *= 2.0f;
             }
 
-            if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.EMERALD_BLOCK))
+            if(getTargetEntity(world,posOfPedestal,getEntityFromList) != null)
             {
-                if(getEntityFromList instanceof PlayerEntity)
-                {
-                    getEntityFromList.attackEntityFrom(sourceE,damage);
-                }
-            }
-            else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.DIAMOND_BLOCK))
-            {
-                if(getEntityFromList instanceof MonsterEntity)
-                {
-                    getEntityFromList.attackEntityFrom(sourceE,damage);
-                }
-            }
-            else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.GOLD_BLOCK))
-            {
-                if(getEntityFromList instanceof AnimalEntity)
-                {
-                    getEntityFromList.attackEntityFrom(sourceE,damage);
-                }
-            }
-            else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.IRON_BLOCK))
-            {
-                if(getEntityFromList instanceof CreatureEntity)
-                {
-                    getEntityFromList.attackEntityFrom(sourceE,damage);
-                }
-            }
-            else
-            {
-                getEntityFromList.attackEntityFrom(sourceE,damage);
+                getTargetEntity(world,posOfPedestal,getEntityFromList).attackEntityFrom(sourceE,damage);
             }
         }
     }

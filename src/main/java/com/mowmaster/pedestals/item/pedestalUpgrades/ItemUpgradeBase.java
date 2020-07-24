@@ -4,12 +4,18 @@ import com.mowmaster.pedestals.pedestals;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.AbstractRailBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.BoatEntity;
+import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.horse.DonkeyEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.passive.horse.MuleEntity;
@@ -18,6 +24,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -63,7 +70,7 @@ public class ItemUpgradeBase extends Item {
         int range = 0;
         if(hasEnchant(stack))
         {
-            range = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack);
+            range = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack));
         }
         return range;
     }
@@ -73,7 +80,7 @@ public class ItemUpgradeBase extends Item {
         int capacity = 0;
         if(hasEnchant(stack))
         {
-            capacity = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack);
+            capacity = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack));;
         }
         return capacity;
     }
@@ -83,7 +90,7 @@ public class ItemUpgradeBase extends Item {
         int rate = 0;
         if(hasEnchant(stack))
         {
-            rate = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack);
+            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));;
         }
         return rate;
     }
@@ -204,6 +211,57 @@ public class ItemUpgradeBase extends Item {
         return  range;
     }
 
+    public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
+    {
+        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
+        ItemStack stack = new ItemStack((Item)BLOCK_TO_ITEM.getOrDefault(block, Items.AIR));
+
+        //Netherite
+        if(block.equals(Blocks.field_235397_ng_)) return Blocks.field_235397_ng_;
+        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/emerald")) return Blocks.EMERALD_BLOCK;//Players
+        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/diamond")) return Blocks.DIAMOND_BLOCK;//All Mobs
+        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/gold")) return Blocks.GOLD_BLOCK;//All Animals
+        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/iron")) return Blocks.IRON_BLOCK;//All Creatures
+
+        return block;
+    }
+
+    public LivingEntity getTargetEntity(World world, BlockPos pedestalPos, Entity entityIn)
+    {
+        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
+        {
+            if(entityIn instanceof PlayerEntity)
+            {
+                return (PlayerEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
+        {
+            if(entityIn instanceof MonsterEntity)
+            {
+                return (MonsterEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
+        {
+            if(entityIn instanceof AnimalEntity)
+            {
+                return (AnimalEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
+        {
+            if(entityIn instanceof CreatureEntity)
+            {
+                return (CreatureEntity)entityIn;
+            }
+        }
+        else
+        {
+            return (LivingEntity)entityIn;
+        }
+        return null;
+    }
 
     public ItemStack getStackInPedestal(World world, BlockPos posOfPedestal)
     {

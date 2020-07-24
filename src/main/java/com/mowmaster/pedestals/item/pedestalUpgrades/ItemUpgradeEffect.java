@@ -115,21 +115,6 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         return false;
     }
 
-    public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
-    {
-        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
-        ItemStack stack = new ItemStack((Item)BLOCK_TO_ITEM.getOrDefault(block, Items.AIR));
-
-        //Netherite
-        if(block.equals(Blocks.field_235397_ng_)) return Blocks.field_235397_ng_;
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/emerald")) return Blocks.EMERALD_BLOCK;//Players
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/diamond")) return Blocks.DIAMOND_BLOCK;//All Mobs
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/gold")) return Blocks.GOLD_BLOCK;//All Animals
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/iron")) return Blocks.IRON_BLOCK;//All Creatures
-
-        return block;
-    }
-
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int width = getRangeWidth(coinInPedestal);
@@ -150,97 +135,13 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     instance = getEffectFromPedestal(itemInPedestal,1);
                 }
 
-                if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.EMERALD_BLOCK))
+                if(getTargetEntity(world,posOfPedestal,getEntityFromList) != null)
                 {
-                    if(getEntityFromList instanceof PlayerEntity && !hasPotionEffect(getEntityFromList,instance))
+                    if(!hasPotionEffect(getTargetEntity(world,posOfPedestal,getEntityFromList),instance))
                     {
                         for(int i=0; i<instance.size(); i++)
                         {
-                            if(getEntityFromList.addPotionEffect(instance.get(i)))
-                            {
-                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
-                                {
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
-                                else
-                                {
-                                    removeFromPedestal(world,posOfPedestal,1);
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
-                            }
-                        }
-                    }
-                }
-                else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.DIAMOND_BLOCK))
-                {
-                    if(getEntityFromList instanceof MonsterEntity && !hasPotionEffect(getEntityFromList,instance))
-                    {
-                        for(int i=0; i<instance.size(); i++)
-                        {
-                            if(getEntityFromList.addPotionEffect(instance.get(i)))
-                            {
-                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
-                                {
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
-                                else
-                                {
-                                    removeFromPedestal(world,posOfPedestal,1);
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
-                            }
-                        }
-                    }
-                }
-                else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.GOLD_BLOCK))
-                {
-                    if(getEntityFromList instanceof AnimalEntity && !hasPotionEffect(getEntityFromList,instance))
-                    {
-                        for(int i=0; i<instance.size(); i++)
-                        {
-                            if(getEntityFromList.addPotionEffect(instance.get(i)))
-                            {
-                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
-                                {
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
-                                else
-                                {
-                                    removeFromPedestal(world,posOfPedestal,1);
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
-                            }
-                        }
-                    }
-                }
-                else if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.IRON_BLOCK))
-                {
-                    if(getEntityFromList instanceof CreatureEntity && !hasPotionEffect(getEntityFromList,instance))
-                    {
-                        for(int i=0; i<instance.size(); i++)
-                        {
-                            if(getEntityFromList.addPotionEffect(instance.get(i)))
-                            {
-                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
-                                {
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
-                                else
-                                {
-                                    removeFromPedestal(world,posOfPedestal,1);
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if(!hasPotionEffect(getEntityFromList,instance))
-                    {
-                        for(int i=0; i<instance.size(); i++)
-                        {
-                            if(getEntityFromList.addPotionEffect(instance.get(i)))
+                            if(getTargetEntity(world,posOfPedestal,getEntityFromList).addPotionEffect(instance.get(i)))
                             {
                                 if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
                                 {
