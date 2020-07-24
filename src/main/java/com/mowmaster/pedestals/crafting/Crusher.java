@@ -7,7 +7,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ResourceLocation;
 
+import java.util.List;
 import java.util.Map;
 
 public class Crusher
@@ -26,8 +29,19 @@ public class Crusher
         this.addCrusherRecipe(new ItemStack(Blocks.STONE).getItem(),new ItemStack(Blocks.COBBLESTONE));
         this.addCrusherRecipe(new ItemStack(Blocks.COBBLESTONE).getItem(),new ItemStack(Blocks.GRAVEL));
         this.addCrusherRecipe(new ItemStack(Blocks.GRAVEL).getItem(),new ItemStack(Blocks.SAND));
-        this.addCrusherRecipe(new ItemStack(Blocks.IRON_ORE).getItem(),new ItemStack(ItemDust.IRON,2));
-        this.addCrusherRecipe(new ItemStack(Blocks.GOLD_ORE).getItem(),new ItemStack(ItemDust.GOLD,2));
+        //this.addCrusherRecipe(new ItemStack(Blocks.IRON_ORE).getItem(),new ItemStack(ItemDust.IRON,2));
+        //this.addCrusherRecipe(new ItemStack(Blocks.GOLD_ORE).getItem(),new ItemStack(ItemDust.GOLD,2));
+        this.addCrusherTagRecipe("forge:ores/gold",new ItemStack(ItemDust.GOLD,2));
+        this.addCrusherTagRecipe("forge:ores/iron",new ItemStack(ItemDust.IRON,2));
+        this.addCrusherTagRecipe("forge:ores/copper",new ItemStack(ItemDust.COPPER,2));
+        this.addCrusherTagRecipe("forge:ores/tin",new ItemStack(ItemDust.TIN,2));
+        this.addCrusherTagRecipe("forge:ores/osmium",new ItemStack(ItemDust.OSMIUM,2));
+        this.addCrusherTagRecipe("forge:ores/uranium",new ItemStack(ItemDust.URANIUM,2));
+        this.addCrusherTagRecipe("forge:ores/lead",new ItemStack(ItemDust.LEAD,2));
+        this.addCrusherTagRecipe("forge:ores/aluminum",new ItemStack(ItemDust.ALUMINUM,2));
+        this.addCrusherTagRecipe("forge:ores/silver",new ItemStack(ItemDust.SILVER,2));
+        this.addCrusherTagRecipe("forge:ores/nickel",new ItemStack(ItemDust.NICKEL,2));
+
         //Nether Gold Ore
         this.addCrusherRecipe(new ItemStack(Blocks.field_235334_I_).getItem(),new ItemStack(ItemDust.GOLD,2));
         this.addCrusherRecipe(new ItemStack(Items.BLAZE_ROD).getItem(),new ItemStack(Items.BLAZE_POWDER,3));
@@ -83,6 +97,16 @@ public class Crusher
     {
         this.addCrusherRecipe(, stack);
     }*/
+    public void addCrusherTagRecipe(String tagIn, ItemStack stackOut)
+    {
+        ResourceLocation grabTags = new ResourceLocation(tagIn.split(":")[0], tagIn.split(":")[1]);
+        List<Item> itemList = ItemTags.getCollection().getOrCreate(grabTags).func_230236_b_();
+        for(Item item : itemList)
+        {
+            if (getResult(item) != ItemStack.EMPTY) { return;}
+            this.crusherList.put(item, stackOut);
+        }
+    }
 
     public void addCrusherRecipe(Item stackIn, ItemStack stackOut)
     {
