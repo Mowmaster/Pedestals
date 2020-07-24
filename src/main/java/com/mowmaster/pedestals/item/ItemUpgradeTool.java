@@ -49,7 +49,7 @@ public class ItemUpgradeTool extends Item {
         return new ItemStack(this.getItem());
     }
 
-    @Override
+    /*@Override
     public ActionResultType onItemUse(ItemUseContext context) {
 
         World worldIn = context.getWorld();
@@ -74,6 +74,42 @@ public class ItemUpgradeTool extends Item {
                 }
             }
         }
+        return super.onItemUse(context);
+    }*/
+
+    @Override
+    public ActionResultType onItemUse(ItemUseContext context) {
+        World worldIn = context.getWorld();
+        PlayerEntity player = context.getPlayer();
+        BlockPos pos = context.getPos();
+
+        if(!worldIn.isRemote)
+        {
+            BlockState getBlockState = worldIn.getBlockState(pos);
+            if(player.isCrouching())
+            {
+
+            }
+            else
+            {
+                if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE) {
+                    //Checks Tile at location to make sure its a TilePedestal
+                    TileEntity tileEntity = worldIn.getTileEntity(pos);
+                    if (tileEntity instanceof TilePedestal) {
+                        TilePedestal tilePedestal = (TilePedestal) tileEntity;
+                        if(tilePedestal.hasCoin())
+                        {
+                            Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
+                            if(coinInPed instanceof ItemUpgradeBase)
+                            {
+                                ((ItemUpgradeBase) coinInPed).chatDetails(player, tilePedestal);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return super.onItemUse(context);
     }
 

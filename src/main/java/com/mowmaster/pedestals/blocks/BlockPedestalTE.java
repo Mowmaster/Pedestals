@@ -309,10 +309,6 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                             }
 
                         }
-                        else if(player.getHeldItemMainhand().getItem().equals(ItemUpgradeTool.UPGRADE))
-                        {
-                            return ActionResultType.FAIL;
-                        }
                         else if(player.getHeldItemMainhand().getItem() instanceof ItemPedestalUpgrades)
                         {
                             if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.SPEED))
@@ -350,6 +346,10 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable 
                     }
                 }
                 else if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
+                {
+                    return ActionResultType.FAIL;
+                }
+                else if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeTool)
                 {
                     return ActionResultType.FAIL;
                 }
