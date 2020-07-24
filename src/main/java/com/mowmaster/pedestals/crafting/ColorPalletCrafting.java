@@ -13,8 +13,10 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -84,9 +86,13 @@ public class ColorPalletCrafting
                             item.remove();
                         }
 
+                        //Thanks to https://www.twitch.tv/willywonka2197 for realizing i didnt have this TAGed yet;
+                        ResourceLocation grabRed = new ResourceLocation("forge", "dyes/red");
+                        ResourceLocation grabGreen = new ResourceLocation("forge", "dyes/green");
+                        ResourceLocation grabBlue = new ResourceLocation("forge", "dyes/blue");
                         if(stack.getItem() instanceof DyeItem)
                         {
-                            if(stack.getItem().equals(Items.RED_DYE))
+                            if(stack.getItem().isIn(ItemTags.getCollection().getOrCreate(grabRed)))
                             {
                                 //16711680
                                 double[] rgbColors = CalculateColor.getRGBColorFromIntCount(16711680,stack.getCount());
@@ -95,7 +101,7 @@ public class ColorPalletCrafting
                                 b+=rgbColors[2];
                                 item.remove();
                             }
-                            else if(stack.getItem().equals(Items.GREEN_DYE))
+                            else if(stack.getItem().isIn(ItemTags.getCollection().getOrCreate(grabGreen)))
                             {
                                 //65280
                                 double[] rgbColors = CalculateColor.getRGBColorFromIntCount(65280,stack.getCount());
@@ -104,7 +110,7 @@ public class ColorPalletCrafting
                                 b+=rgbColors[2];
                                 item.remove();
                             }
-                            else if(stack.getItem().equals(Items.BLUE_DYE))
+                            else if(stack.getItem().isIn(ItemTags.getCollection().getOrCreate(grabBlue)))
                             {
                                 //255
                                 double[] rgbColors = CalculateColor.getRGBColorFromIntCount(255,stack.getCount());
