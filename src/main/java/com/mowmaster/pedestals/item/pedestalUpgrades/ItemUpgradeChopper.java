@@ -19,10 +19,12 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
@@ -124,10 +126,22 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                 }
             }
 
-            if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true))
+            /*if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true))
             {
                 blockToChop.getBlock().harvestBlock(world, fakePlayer, blockToChopPos, blockToChop, null, fakePlayer.getHeldItemMainhand());
                 world.setBlockState(blockToChopPos, Blocks.AIR.getDefaultState());
+            }*/
+
+            if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true)) {
+
+                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockToChopPos, blockToChop, fakePlayer);
+                if (!MinecraftForge.EVENT_BUS.post(e)) {
+                    blockToChop.getBlock().harvestBlock(world, fakePlayer, blockToChopPos, blockToChop, null, fakePlayer.getHeldItemMainhand());
+                    blockToChop.getBlock().onBlockHarvested(world, blockToChopPos, blockToChop, fakePlayer);
+
+                    world.removeBlock(blockToChopPos, false);
+                }
+                //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
             }
             //blockToChop.getBlock().removedByPlayer(blockToChop,world,blockToChopPos,fakePlayer,false,null);
         }

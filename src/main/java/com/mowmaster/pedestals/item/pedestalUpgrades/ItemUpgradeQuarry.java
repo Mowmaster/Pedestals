@@ -30,11 +30,13 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.IItemHandler;
@@ -178,11 +180,22 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                 TilePedestal ped = ((TilePedestal) pedestalInv);
                 if(removeFuel(ped,200,true)>=0)
                 {
-                    if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true))
+                    /*if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true))
                     {
                         blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
                         removeFuel(ped,200,false);
                         world.setBlockState(blockToMinePos, Blocks.AIR.getDefaultState());
+                    }*/
+                    if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true)) {
+
+                        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockToMinePos, blockToMine, fakePlayer);
+                        if (!MinecraftForge.EVENT_BUS.post(e)) {
+                            blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
+                            blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
+
+                            world.removeBlock(blockToMinePos, false);
+                        }
+                        //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
                     }
                 }
             }
