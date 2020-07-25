@@ -74,31 +74,31 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
     public int getHeight(ItemStack stack)
     {
-        int transferRate = 8;
+        int height = 8;
         switch (getRangeModifier(stack))
         {
             case 0:
-                transferRate = 8;
+                height = 8;
                 break;
             case 1:
-                transferRate=16;
+                height=16;
                 break;
             case 2:
-                transferRate = 24;
+                height = 24;
                 break;
             case 3:
-                transferRate = 32;
+                height = 32;
                 break;
             case 4:
-                transferRate = 48;
+                height = 48;
                 break;
             case 5:
-                transferRate=64;
+                height=64;
                 break;
-            default: transferRate=8;
+            default: height=8;
         }
 
-        return  transferRate-1;
+        return  height;
     }
 
     public int ticked = 0;
@@ -108,7 +108,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
         if(!world.isRemote)
         {
             int rangeWidth = getRangeWidth(coinInPedestal);
-            int rangeHeight = getRangeHeight(coinInPedestal);
+            int rangeHeight = getRangeHeight(coinInPedestal)-1;
             int speed = getOperationSpeed(coinInPedestal);
 
             BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
@@ -278,6 +278,20 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
         name.func_240699_a_(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
+        int s3 = getRangeWidth(stack);
+        int s4 = getRangeHeight(stack);
+        String tr = "" + (s3+s3+1) + "";
+        String trr = "" + s4 + "";
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(trr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        area.func_240699_a_(TextFormatting.WHITE);
+        player.sendMessage(area,player.getUniqueID());
+
         //Display Fuel Left
         int fuelLeft = pedestal.getStoredValueForUpgrades();
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
@@ -321,7 +335,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
         int s4 = getRangeHeight(stack);
 
         String tr = "" + (s3+s3+1) + "";
-        String trr = "" + (s4+1) + "";
+        String trr = "" + s4 + "";
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");

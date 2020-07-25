@@ -215,12 +215,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         area.func_240702_b_(tr);
         area.func_240702_b_(areax.getString());
         area.func_240702_b_(tr);
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-
         area.func_240699_a_(TextFormatting.WHITE);
-        speed.func_240699_a_(TextFormatting.RED);
-
         player.sendMessage(area,player.getUniqueID());
 
 
@@ -243,14 +238,25 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
             player.sendMessage(effects,player.getUniqueID());
         }
 
+        TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
+        entityType.func_240702_b_(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        entityType.func_240699_a_(TextFormatting.YELLOW);
+        player.sendMessage(entityType,player.getUniqueID());
+
         //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        //super.addInformation(stack, worldIn, tooltip, flagIn);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.func_240699_a_(TextFormatting.GOLD);
+        tooltip.add(t);
 
         int s3 = getRangeWidth(stack);
         String tr = "" + (s3+s3+1) + "";

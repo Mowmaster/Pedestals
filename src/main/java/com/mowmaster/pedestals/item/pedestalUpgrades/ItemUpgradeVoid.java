@@ -115,15 +115,13 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.func_240702_b_("" + (int)(getDamageDelt(stack)/2) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-
         rate.func_240699_a_(TextFormatting.GRAY);
-        speed.func_240699_a_(TextFormatting.RED);
-
         player.sendMessage(rate,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 

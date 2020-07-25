@@ -1,14 +1,19 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
+import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
+import com.mowmaster.pedestals.enchants.EnchantmentRange;
 import com.mowmaster.pedestals.pedestals;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -25,6 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -176,6 +182,53 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                 }
             }
         }
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.func_240702_b_("" +  getItemTransferRate(stack) + "");
+        rate.func_240699_a_(TextFormatting.GRAY);
+        player.sendMessage(rate,player.getUniqueID());
+
+        TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
+        stored.func_240702_b_("" +  (pedestal.getStoredValueForUpgrades()+pedestal.getItemInPedestal().getCount()) + "");
+        stored.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(stored,player.getUniqueID());
+
+        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
+        if(map.size() > 0)
+        {
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
+            enchant.func_240699_a_(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,player.getUniqueID());
+
+            for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
+                Enchantment enchantment = entry.getKey();
+                Integer integer = entry.getValue();
+                if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed))
+                {
+                    TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
+                    enchants.func_240699_a_(TextFormatting.GRAY);
+                    player.sendMessage(enchants,player.getUniqueID());
+                }
+            }
+        }
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
     }
 
     @Override

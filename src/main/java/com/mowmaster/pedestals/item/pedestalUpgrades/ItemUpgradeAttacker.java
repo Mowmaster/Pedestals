@@ -105,7 +105,25 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         return damage;
     }
 
+    public float getMostlyDamage(TilePedestal pedestal)
+    {
+        ItemStack inPedestal = pedestal.getItemInPedestal();
+        float damage = getCapacityModifier(pedestal.getCoinOnPedestal())*2 + 2.0F;
+        float damage2 = 2.0f;
+        if(inPedestal.getItem() instanceof SwordItem){
+            SwordItem sword = (SwordItem)inPedestal.getItem();
+            if(sword.getAttackDamage() > damage2){
+                damage += (sword.getAttackDamage()/2);
+            }
+        }
+        if(EnchantmentHelper.getEnchantments(inPedestal).containsKey(Enchantments.SHARPNESS))
+        {
+            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS,inPedestal);
+            damage += Math.round((1+(lvl*0.5))/2);
+        }
 
+        return damage;
+    }
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
@@ -156,6 +174,45 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
     @Override
     @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+        int s3 = getRangeWidth(stack);
+        String tr = "" + (s3+s3+1) + "";
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        area.func_240699_a_(TextFormatting.WHITE);
+        player.sendMessage(area,player.getUniqueID());
+
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.func_240702_b_("" + getMostlyDamage(pedestal) + "");
+        rate.func_240699_a_(TextFormatting.GRAY);
+        player.sendMessage(rate,player.getUniqueID());
+
+        TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
+        entityType.func_240702_b_(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        entityType.func_240699_a_(TextFormatting.YELLOW);
+        player.sendMessage(entityType,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
@@ -169,7 +226,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         area.func_240702_b_(areax.getString());
         area.func_240702_b_(tr);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_("" + (int)((getCapacityModifier(stack)*2 + 2.0F)/2) + "");
+        rate.func_240702_b_("" + (int)((getCapacityModifier(stack)*2 + 2.0F)) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.func_240702_b_(getOperationSpeedString(stack));
 

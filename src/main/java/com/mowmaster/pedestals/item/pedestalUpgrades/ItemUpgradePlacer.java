@@ -141,10 +141,10 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
         name.func_240699_a_(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        rate.func_240702_b_(""+getRange(stack)+"");
-        rate.func_240699_a_(TextFormatting.WHITE);
-        player.sendMessage(rate,player.getUniqueID());
+        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
+        range.func_240702_b_(""+getRange(stack)+"");
+        range.func_240699_a_(TextFormatting.WHITE);
+        player.sendMessage(range,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
