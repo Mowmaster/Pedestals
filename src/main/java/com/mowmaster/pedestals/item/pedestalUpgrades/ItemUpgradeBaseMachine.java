@@ -205,7 +205,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
             double d2 = (double)getPosOfBlockBelow(world,pos,-1 ).getZ() + 0.55D - (double)(rand.nextFloat() * 0.1F);
             double d3 = (double)(0.4F - (rand.nextFloat() + rand.nextFloat()) * 0.4F);
 
-            if(fuelValue > 0)
+            if(fuelValue >= 200)
             {
                 world.addParticle(ParticleTypes.SMOKE, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.0D, (double)pos.getZ() + 0.5D,0, 0, 0);
             }

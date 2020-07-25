@@ -121,7 +121,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                     itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                     ItemStack copyIncoming = resultSmelted.copy();
                                     copyIncoming.setCount(itemsOutputWhenStackSmelted);
-                                    int fuelToConsume = burnTimeCostPerItemSmelted * getItemTransferRate(coinInPedestal);
+                                    int fuelToConsume = burnTimeCostPerItemSmelted * itemInputsPerSmelt;
                                     TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                                     if(pedestalInv instanceof TilePedestal) {
                                         TilePedestal ped = ((TilePedestal) pedestalInv);

@@ -171,7 +171,7 @@ public class ItemLinkingTool extends Item {
 
                             for(int i = 0; i < getLocations.size();i++)
                             {
-                                TranslationTextComponent linked = new TranslationTextComponent(" - " + getLocations.get(i).getX() + "");
+                                TranslationTextComponent linked = new TranslationTextComponent("   " + getLocations.get(i).getX() + "");
                                 TranslationTextComponent seperator = new TranslationTextComponent(getTranslationKey() + ".tool_seperator");
                                 linked.func_240702_b_(seperator.getString());
                                 linked.func_240702_b_("" + getLocations.get(i).getY() + "");
