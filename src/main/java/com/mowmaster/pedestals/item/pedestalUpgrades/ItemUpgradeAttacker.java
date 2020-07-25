@@ -108,7 +108,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     public float getMostlyDamage(TilePedestal pedestal)
     {
         ItemStack inPedestal = pedestal.getItemInPedestal();
-        float damage = getCapacityModifier(pedestal.getCoinOnPedestal())*2 + 2.0F;
+        float damage = getCapacityModifier(pedestal.getCoinOnPedestal()) + 2.0f;
         float damage2 = 2.0f;
         if(inPedestal.getItem() instanceof SwordItem){
             SwordItem sword = (SwordItem)inPedestal.getItem();
@@ -225,7 +225,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         area.func_240702_b_(areax.getString());
         area.func_240702_b_(tr);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_("" + (int)((getCapacityModifier(stack)*2 + 2.0F)) + "");
+        rate.func_240702_b_("" + (int)((getCapacityModifier(stack) + 2.0F)) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.func_240702_b_(getOperationSpeedString(stack));
 
