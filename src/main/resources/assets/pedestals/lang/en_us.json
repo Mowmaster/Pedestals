@@ -3,6 +3,10 @@
     "itemGroup.pedestals_blocks": "Pedestals",
 
     "item.pedestals.linkingtool": "Linking Tool",
+    "item.pedestals.linkingtool.tool_linked": "Sending Items to These Pedestal Locations:",
+    "item.pedestals.linkingtool.tool_seperator": ",",
+    "item.pedestals.linkingtool.tool_capacity": "Capacity Upgrades: ",
+    "item.pedestals.linkingtool.tool_speed": "Speed Upgrades: ",
         "jei.pedestals.linkingtool.desc": "Shift-R-Click the pedestal Receiving items to select it, Shift-R-Click on the pedestal Sending Items to link the two pedestals. Used In crafting to create most base items in the mod.",
     "item.pedestals.tagtool": "Tag Tool",
         "jei.pedestals.tagtool.desc": "With an item in your off hand, r-click the tag tool in the air. In chat the list of tags the item has will appear.",

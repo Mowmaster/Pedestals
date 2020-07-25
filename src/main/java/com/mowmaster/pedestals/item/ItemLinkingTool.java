@@ -161,22 +161,36 @@ public class ItemLinkingTool extends Item {
                     TileEntity tileEntity = worldIn.getTileEntity(pos);
                     if (tileEntity instanceof TilePedestal) {
                         TilePedestal tilePedestal = (TilePedestal) tileEntity;
-                        //TODO: Need to localize the chat messages when using the tool.
-                        TranslationTextComponent output = new TranslationTextComponent("Sending Items To These Pedestals: ");
-                        output.func_240702_b_(tilePedestal.debugLocationList());
-                        output.func_240699_a_(TextFormatting.WHITE);
+                        List<BlockPos> getLocations = tilePedestal.getLocationList();
 
-                        TranslationTextComponent output2 = new TranslationTextComponent("Capacity Upgrades: ");
-                        output2.func_240702_b_(""+tilePedestal.getCapacity()+"");
-                        output2.func_240699_a_(TextFormatting.GRAY);
+                        if(getLocations.size()>0)
+                        {
+                            TranslationTextComponent links = new TranslationTextComponent(getTranslationKey() + ".tool_linked");
+                            links.func_240699_a_(TextFormatting.WHITE);
+                            player.sendMessage(links,player.getUniqueID());
 
-                        TranslationTextComponent output1 = new TranslationTextComponent("Speed Upgrades: ");
-                        output1.func_240702_b_(""+tilePedestal.getSpeed()+"");
-                        output1.func_240699_a_(TextFormatting.RED);
+                            for(int i = 0; i < getLocations.size();i++)
+                            {
+                                TranslationTextComponent linked = new TranslationTextComponent(" - " + getLocations.get(i).getX() + "");
+                                TranslationTextComponent seperator = new TranslationTextComponent(getTranslationKey() + ".tool_seperator");
+                                linked.func_240702_b_(seperator.getString());
+                                linked.func_240702_b_("" + getLocations.get(i).getY() + "");
+                                linked.func_240702_b_(seperator.getString());
+                                linked.func_240702_b_("" + getLocations.get(i).getZ() + "");
+                                linked.func_240699_a_(TextFormatting.GRAY);
+                                player.sendMessage(linked,player.getUniqueID());
+                            }
+                        }
 
-                        player.sendMessage(output,player.getUniqueID());
-                        player.sendMessage(output1,player.getUniqueID());
-                        player.sendMessage(output2,player.getUniqueID());
+                        TranslationTextComponent capacity = new TranslationTextComponent(getTranslationKey() + ".tool_capacity");
+                        capacity.func_240702_b_(""+tilePedestal.getCapacity()+"");
+                        capacity.func_240699_a_(TextFormatting.BLUE);
+                        player.sendMessage(capacity,player.getUniqueID());
+
+                        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tool_speed");
+                        speed.func_240702_b_(""+tilePedestal.getSpeed()+"");
+                        speed.func_240699_a_(TextFormatting.RED);
+                        player.sendMessage(speed,player.getUniqueID());
                     }
                 }
             }

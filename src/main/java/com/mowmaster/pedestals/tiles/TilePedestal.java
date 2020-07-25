@@ -185,14 +185,9 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         return storedLocations.contains(pos);
     }
 
-    public String debugLocationList()
+    public List<BlockPos> getLocationList()
     {
-        String lists = "";
-        for(int i=0;i<getNumberOfStoredLocations();i++)
-        {
-            lists = lists + storedLocations.get(i).getX() + "," + storedLocations.get(i).getY() + "," + storedLocations.get(i).getZ() + " --- ";
-        }
-        return lists;
+        return storedLocations;
     }
 
     public int getStoredValueForUpgrades()
