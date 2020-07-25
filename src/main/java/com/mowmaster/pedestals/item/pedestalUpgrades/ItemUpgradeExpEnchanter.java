@@ -101,7 +101,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     {
 
         float enchantPower = 0;
-        int getMaxEnchantLevel = getExpBuffer(coinInPedestal);
+        //int getMaxEnchantLevel = getExpBuffer(coinInPedestal);
 
         for (int i = -2; i <= 2; ++i) {
             for (int j = -2; j <= 2; ++j) {
@@ -119,10 +119,10 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
             }
         }
 
-        if((int)(enchantPower*2) > getMaxEnchantLevel)
+        /*if((int)(enchantPower*2) > getMaxEnchantLevel)
         {
             enchantPower = (float)(getMaxEnchantLevel/2);
-        }
+        }*/
 
         return enchantPower;
     }
