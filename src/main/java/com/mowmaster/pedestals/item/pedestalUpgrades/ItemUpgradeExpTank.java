@@ -1,7 +1,9 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -80,6 +82,41 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
     {
         int maxXPLevel = getExpBuffer(coinInPedestal);
         if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != maxXPLevel) {setMaxXP(coinInPedestal, maxXPLevel);}
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(xpstored,player.getUniqueID());
+
+        /*Reduce Chat Output, info Unnecessary???
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".chat_xpcapacity");
+        TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getTranslationKey() + ".chat_xpcapacitylvl");
+        xpcapacity.func_240702_b_(""+ getExpBuffer(stack) +"");
+        xpcapacity.func_240702_b_(xpcapacitylvl.getString());
+        xpcapacity.func_240699_a_(TextFormatting.AQUA);
+        player.sendMessage(xpcapacity,player.getUniqueID());*/
+
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.func_240702_b_(getExpTransferRateString(stack));
+        rate.func_240699_a_(TextFormatting.GRAY);
+        player.sendMessage(rate,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
     }
 
     @Override

@@ -245,6 +245,34 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 
     @Override
     @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(xpstored,player.getUniqueID());
+
+        float enchanting = getEnchantmentPowerFromSorroundings(pedestal.getWorld(),pedestal.getPos(),pedestal.getCoinOnPedestal());
+        TranslationTextComponent enchantlvl = new TranslationTextComponent(getTranslationKey() + ".chat_enchant");
+        enchantlvl.func_240702_b_(""+ (int)(enchanting*2) +"");
+        enchantlvl.func_240699_a_(TextFormatting.LIGHT_PURPLE);
+        player.sendMessage(enchantlvl,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 

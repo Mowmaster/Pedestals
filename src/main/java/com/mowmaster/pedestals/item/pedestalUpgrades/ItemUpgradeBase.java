@@ -15,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.horse.DonkeyEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
@@ -261,6 +262,35 @@ public class ItemUpgradeBase extends Item {
             return (LivingEntity)entityIn;
         }
         return null;
+    }
+
+    public String getTargetEntity(World world, BlockPos pedestalPos)
+    {
+        TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
+        TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
+        TranslationTextComponent GOLD = new TranslationTextComponent(getTranslationKey() + ".entity_gold");
+        TranslationTextComponent IRON = new TranslationTextComponent(getTranslationKey() + ".entity_iron");
+        TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
+
+        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
+        {
+            return EMERALD.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
+        {
+            return DIAMOND.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
+        {
+            return GOLD.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
+        {
+            return IRON.getString();
+        }
+        else {
+            return ALL.getString();
+        }
     }
 
     public ItemStack getStackInPedestal(World world, BlockPos posOfPedestal)

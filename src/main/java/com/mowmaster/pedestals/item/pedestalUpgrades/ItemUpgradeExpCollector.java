@@ -187,6 +187,45 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
     @Override
     @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(xpstored,player.getUniqueID());
+
+        int s3 = getRangeWidth(stack);
+        String trr = "" + (s3+s3+1) + "";
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.func_240702_b_(trr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(trr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(trr);
+        area.func_240699_a_(TextFormatting.WHITE);
+        player.sendMessage(area,player.getUniqueID());
+
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.func_240702_b_(getExpTransferRateString(stack));
+        rate.func_240699_a_(TextFormatting.GRAY);
+        player.sendMessage(rate,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 

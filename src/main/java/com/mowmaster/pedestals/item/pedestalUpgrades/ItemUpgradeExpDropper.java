@@ -129,6 +129,62 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
 
     @Override
     @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+        int tr = 1;
+
+        switch (getTransferRate(stack))
+        {
+            case 7:
+                tr = 1;
+                break;
+            case 16:
+                tr=2;
+                break;
+            case 40:
+                tr = 4;
+                break;
+            case 72:
+                tr = 6;
+                break;
+            case 112:
+                tr = 8;
+                break;
+            case 160:
+                tr=10;
+                break;
+            default: tr=1;
+        }
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(xpstored,player.getUniqueID());
+
+        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
+        range.func_240702_b_("" +  getRange(stack) + "");
+        range.func_240699_a_(TextFormatting.WHITE);
+        player.sendMessage(range,player.getUniqueID());
+
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.func_240702_b_("" +  tr + "");
+        rate.func_240699_a_(TextFormatting.GRAY);
+        player.sendMessage(rate,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 

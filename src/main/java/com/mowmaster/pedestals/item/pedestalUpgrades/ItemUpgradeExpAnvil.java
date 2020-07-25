@@ -1,13 +1,16 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
+import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.pedestals;
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -103,6 +106,26 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         }
 
         return  value;
+    }
+
+    private int correctlyPlacedSorroundingPedestals(World world, BlockPos posPedestal)
+    {
+        int around = 0;
+        ArrayList<BlockPos> posSorroundingPedestals = new ArrayList<BlockPos>();
+        posSorroundingPedestals.add(posPedestal.add(2,0,0));
+        posSorroundingPedestals.add(posPedestal.add(0,0,2));
+        posSorroundingPedestals.add(posPedestal.add(-2,0,0));
+        posSorroundingPedestals.add(posPedestal.add(0,0,-2));
+        for(int i = 0;i<posSorroundingPedestals.size();i++)
+        {
+            Block pedestal = world.getBlockState(posSorroundingPedestals.get(i)).getBlock();
+            if(pedestal instanceof BlockPedestalTE)
+            {
+                around +=1;
+            }
+        }
+
+        return around;
     }
 
     private ArrayList<ItemStack> doSorroundingPedestalsHaveItemsToCombine(World world, BlockPos pedestalPos)
@@ -411,6 +434,33 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
             }
         }
     }*/
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(xpstored,player.getUniqueID());
+
+        TranslationTextComponent sorround = new TranslationTextComponent(getTranslationKey() + ".chat_sorround");
+        sorround.func_240702_b_(""+ correctlyPlacedSorroundingPedestals(pedestal.getWorld(),pedestal.getPos()) +"");
+        sorround.func_240699_a_(TextFormatting.AQUA);
+        player.sendMessage(sorround,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
+    }
 
     @Override
     @OnlyIn(Dist.CLIENT)

@@ -40,7 +40,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         return true;
     }
 
-    public int getTransferRate(ItemStack stack)
+    public int getBottlingRate(ItemStack stack)
     {
         int bottlingRate = 1;
         switch (getCapacityModifier(stack))
@@ -111,7 +111,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                             {
                                 //BottlingCodeHere
                                 //11 exp per bottle
-                                int modifier = getTransferRate(coinInPedestal);
+                                int modifier = getBottlingRate(coinInPedestal);
 
                                 //If we can extract the correct amount of bottles(If it returns empty then it CANT work)
                                 if(!(handler.extractItem(i,modifier ,true ).equals(ItemStack.EMPTY)))
@@ -145,40 +145,36 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         //}
     }
 
-    /*@Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-
-
-        if(stack.hasTagCompound())
-        {
-            if(getTransferRate(stack)>0)
-            {
-                tooltip.add("Bottled per Opperation: " + tr);
-            }
-            else
-            {
-                tooltip.add("Bottled per Opperation: 1");
-            }
-
-            if(stack.isItemEnchanted() && getOperationSpeed(stack) >0)
-            {
-
-            }
-            else
-            {
-                tooltip.add(TextFormatting.RED + "Operational Speed: Normal Speed");
-            }
-        }
-        else
-        {
-            tooltip.add("Bottled per Opperation: 1");
-            tooltip.add(TextFormatting.RED + "Operational Speed: Normal Speed");
-        }
-    }*/
-
     public int getExpBuffer(ItemStack stack)
     {
         return  15;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.func_240699_a_(TextFormatting.GREEN);
+        player.sendMessage(xpstored,player.getUniqueID());
+
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.func_240702_b_("" + getBottlingRate(stack) + "");
+        rate.func_240699_a_(TextFormatting.GRAY);
+        player.sendMessage(rate,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
     }
 
     @Override
@@ -187,7 +183,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_(getExpTransferRateString(stack));
+        rate.func_240702_b_("" + getBottlingRate(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.func_240702_b_(getOperationSpeedString(stack));
 

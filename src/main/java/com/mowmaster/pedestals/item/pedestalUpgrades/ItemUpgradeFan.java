@@ -1,8 +1,14 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
+import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
+import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,6 +28,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -47,11 +54,6 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         int rW = getCapacityModifier(stack);
         rangeWidth = (rW);
         return  rangeWidth;
-    }
-
-    public int getRangeHeight(ItemStack stack)
-    {
-        return getHeight(stack);
     }
 
     public int getHeight(ItemStack stack)
@@ -80,7 +82,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
             default: transferRate=4;
         }
 
-        return  transferRate-1;
+        return  transferRate;
     }
 
     protected void useFanOnEntities(World world, BlockPos posOfPedestal, double speed,AxisAlignedBB getBox) {
@@ -197,13 +199,48 @@ public class ItemUpgradeFan extends ItemUpgradeBase
 
     @Override
     @OnlyIn(Dist.CLIENT)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.func_240699_a_(TextFormatting.GOLD);
+        player.sendMessage(name,player.getUniqueID());
+
+        int s3 = getRangeWidth(stack);
+        int s4 = getHeight(stack);
+        String tr = "" + (s3+s3+1) + "";
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.func_240702_b_(tr);
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_("" + s4 + "");
+        area.func_240702_b_(areax.getString());
+        area.func_240702_b_(tr);
+        area.func_240699_a_(TextFormatting.WHITE);
+        player.sendMessage(area,player.getUniqueID());
+
+        TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
+        entityType.func_240702_b_(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        entityType.func_240699_a_(TextFormatting.YELLOW);
+        player.sendMessage(entityType,player.getUniqueID());
+
+        //Display Speed Last Like on Tooltips
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.func_240699_a_(TextFormatting.RED);
+        player.sendMessage(speed,player.getUniqueID());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getRangeWidth(stack);
-        int s4 = getRangeHeight(stack);
+        int s4 = getHeight(stack);
 
         String tr = "" + (s3+s3+1) + "";
-        String trr = "" + (s4+1) + "";
+        String trr = "" + (s4) + "";
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
