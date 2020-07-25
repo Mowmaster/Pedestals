@@ -113,9 +113,11 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     }
 
     protected void addMotion(World world, BlockPos posOfPedestal, double speed, LivingEntity entity) {
+        /*
+        func_233570_aj_() Must be an "on ground" method check removing since im using isCrouching
         if (entity instanceof PlayerEntity && entity.func_233570_aj_()) {
             return;
-        }
+        }*/
 
         BlockState state = world.getBlockState(posOfPedestal);
         Direction enumfacing = state.get(FACING);
