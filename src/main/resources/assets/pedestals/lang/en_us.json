@@ -11,7 +11,7 @@
     "item.pedestals.tagtool": "Tag Tool",
         "jei.pedestals.tagtool.desc": "With an item in your off hand, r-click the tag tool in the air. In chat the list of tags the item has will appear.",
     "item.pedestals.upgradetool": "Upgrade Tool",
-        "jei.pedestals.upgradetool.desc": "Shift-R-Click on an upgraded pedestal to get details about the upgrade.",
+        "jei.pedestals.upgradetool.desc": "Right Click, with this in hand, on an upgraded pedestal to get details about the upgrade.",
     "item.pedestals.itemcolorpallet": "Colored Pallet",
         "jei.pedestals.itemcolorpallet.desc": "Crafted from Color Pallets and Red/Green/Blue dyes. Can be re-colored.",
     "item.pedestals.itemcolorpalletdefault": "Color Pallet",
