@@ -178,7 +178,6 @@ public class ItemUpgradeRestock extends ItemUpgradeBase
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();

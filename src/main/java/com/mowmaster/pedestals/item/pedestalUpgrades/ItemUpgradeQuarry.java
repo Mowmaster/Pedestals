@@ -269,7 +269,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();

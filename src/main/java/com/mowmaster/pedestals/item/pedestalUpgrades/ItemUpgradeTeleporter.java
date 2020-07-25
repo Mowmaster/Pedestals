@@ -289,7 +289,6 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();

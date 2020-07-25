@@ -815,7 +815,6 @@ public class ItemUpgradeBase extends Item {
 
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
 

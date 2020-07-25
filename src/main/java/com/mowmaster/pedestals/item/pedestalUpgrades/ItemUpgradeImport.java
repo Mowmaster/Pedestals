@@ -137,7 +137,6 @@ public class ItemUpgradeImport extends ItemUpgradeBase
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
