@@ -10,6 +10,11 @@
     "#forge:dusts/lead",
     "#forge:dusts/aluminum",
     "#forge:dusts/silver",
-    "#forge:dusts/nickel"
+    "#forge:dusts/nickel",
+    "#forge:dusts/platinum",
+    "#forge:dusts/zinc",
+    "#forge:dusts/bismuth",
+    "#forge:dusts/tungsten",
+    "#forge:dusts/allthemodium"
   ]
 }

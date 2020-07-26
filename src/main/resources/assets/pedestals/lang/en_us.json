@@ -628,6 +628,11 @@
     "item.pedestals.dustaluminum": "Aluminum Dust",
     "item.pedestals.dustsilver": "Silver Dust",
     "item.pedestals.dustnickel": "Nickel Dust",
+    "item.pedestals.dustplatinum": "Platinum Dust",
+    "item.pedestals.dustzinc": "Zinc Dust",
+    "item.pedestals.dustbismuth": "Bismuth Dust",
+    "item.pedestals.dusttungsten": "Tungsten Dust",
+    "item.pedestals.dustallthemodium": "AllTheModium Dust",
 
     "enchantment.pedestals.upgradecapacity": "Pedestal Capacity",
     "enchantment.pedestals.upgradespeed": "Pedestal Speed",

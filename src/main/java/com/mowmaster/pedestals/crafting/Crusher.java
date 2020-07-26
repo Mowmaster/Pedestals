@@ -42,6 +42,12 @@ public class Crusher
         this.addCrusherTagRecipe("forge:ores/silver",new ItemStack(ItemDust.SILVER,2));
         this.addCrusherTagRecipe("forge:ores/nickel",new ItemStack(ItemDust.NICKEL,2));
 
+        this.addCrusherTagRecipe("forge:ores/platinum",new ItemStack(ItemDust.PLATINUM,2));
+        this.addCrusherTagRecipe("forge:ores/zinc",new ItemStack(ItemDust.ZINC,2));
+        this.addCrusherTagRecipe("forge:ores/bismuth",new ItemStack(ItemDust.BISMUTH,2));
+        this.addCrusherTagRecipe("forge:ores/tungsten",new ItemStack(ItemDust.TUNGSTEN,2));
+        this.addCrusherTagRecipe("forge:ores/allthemodium",new ItemStack(ItemDust.ALLTHEMODIUM,2));
+
         //Nether Gold Ore
         this.addCrusherRecipe(new ItemStack(Blocks.field_235334_I_).getItem(),new ItemStack(ItemDust.GOLD,2));
         this.addCrusherRecipe(new ItemStack(Items.BLAZE_ROD).getItem(),new ItemStack(Items.BLAZE_POWDER,3));
