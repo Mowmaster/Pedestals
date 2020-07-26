@@ -80,8 +80,8 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
 
     public void upgradeAction(ItemStack coinInPedestal)
     {
-        int maxXPLevel = getExpBuffer(coinInPedestal);
-        if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != maxXPLevel) {setMaxXP(coinInPedestal, maxXPLevel);}
+        int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+        if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
     }
 
     @Override
