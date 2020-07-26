@@ -2,25 +2,19 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
 import com.mowmaster.pedestals.tiles.TilePedestal;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.*;
-import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
@@ -53,6 +47,20 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
     protected Collection<ItemStack> getProcessResults(AbstractCookingRecipe recipe, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
         return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getCraftingResult(inv)));
+    }
+
+    protected float getProcessResultsXP(AbstractCookingRecipe recipe) {
+        return (recipe == null)?(0.0f):(recipe.getExperience());
+    }
+
+    protected void spawnXP(World world, BlockPos posOfPedestal, int xp)
+    {
+        if(xp >= 1)
+        {
+            ExperienceOrbEntity expEntity = new ExperienceOrbEntity(world,getPosOfBlockBelow(world,posOfPedestal,-1).getX() + 0.5,getPosOfBlockBelow(world,posOfPedestal,-1).getY(),getPosOfBlockBelow(world,posOfPedestal,-1).getZ() + 0.5,xp);
+            expEntity.setMotion(0D,0D,0D);
+            world.addEntity(expEntity);
+        }
     }
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
@@ -97,6 +105,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                             itemFromInv = handler.getStackInSlot(i);
                             //Need to null check invalid recipes
                             Collection<ItemStack> smeltedResults = getProcessResults(getRecipe(world,itemFromInv),itemFromInv);
+                            float xp = getProcessResultsXP(getRecipe(world,itemFromInv));
                             ItemStack resultSmelted = smeltedResults.iterator().next();
                             ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                             if(!resultSmelted.equals(ItemStack.EMPTY))
@@ -130,6 +139,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                         {
                                             handler.extractItem(i,itemInputsPerSmelt ,false );
                                             removeFuel(ped,fuelToConsume,false);
+                                            spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
                                             ped.addItem(copyIncoming);
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
@@ -150,6 +160,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
 
                                                     handler.extractItem(i,itemInputsPerSmelt ,false );
                                                     removeFuel(ped,fuelToConsume,false);
+                                                    spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
                                                     ped.addItem(copyIncoming);
                                                 }
                                             }

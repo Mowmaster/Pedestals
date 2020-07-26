@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.item;
 
-import com.mowmaster.pedestals.pedestals;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;

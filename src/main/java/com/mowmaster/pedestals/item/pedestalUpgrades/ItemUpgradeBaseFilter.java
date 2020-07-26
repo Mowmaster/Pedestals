@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.pedestals;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 

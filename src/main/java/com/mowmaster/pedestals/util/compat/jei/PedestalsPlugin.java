@@ -6,7 +6,6 @@ import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import com.mowmaster.pedestals.references.Reference;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.constants.ModIds;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
