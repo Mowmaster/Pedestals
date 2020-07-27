@@ -194,7 +194,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                         if (!MinecraftForge.EVENT_BUS.post(e)) {
                             blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
                             blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
-
+                            removeFuel(ped,200,false);
                             world.removeBlock(blockToMinePos, false);
                         }
                         //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
