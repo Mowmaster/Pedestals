@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:crusher",
+  "ingredient": {
+    "item": "minecraft:apple"
+  },
+  "result": {
+    "item": "minecraft:bread",
+    "count": 1
+  }
+}

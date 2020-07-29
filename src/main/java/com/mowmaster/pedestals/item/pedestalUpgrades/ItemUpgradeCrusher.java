@@ -1,18 +1,29 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.crafting.Crusher;
+import com.mowmaster.pedestals.recipes.CrusherRecipe;
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.crafting.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -20,6 +31,23 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
 {
     public ItemUpgradeCrusher(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+
+    @Nullable
+    protected CrusherRecipe getRecipe(World world, ItemStack stackIn) {
+        Inventory inv = new Inventory(stackIn);
+        //if (world == null) return null;
+        //RecipeManager recipeManager = world.getRecipeManager();
+        //Optional<CrusherRecipe> optional = recipeManager.getRecipe(CrusherRecipe.recipeType, inv, world);
+        System.out.println(world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null));
+        //return optional.orElse(null);
+        return world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null);
+    }
+
+    protected Collection<ItemStack> getProcessResults(CrusherRecipe recipe) {
+        System.out.println((recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult())));
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
+    }
+
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
@@ -63,7 +91,9 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                             itemFromInv = handler.getStackInSlot(i);
                             //Should work without catch since we null check this in our GetNextSlotFunction\
                             //System.out.println(Crusher.instance().getResult(itemFromInv.getItem()));
-                            ItemStack resultSmelted = Crusher.instance().getResult(itemFromInv.getItem());
+                            Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
+                            ItemStack resultSmelted = jsonResults.iterator().next();
+                            //ItemStack resultSmelted = Crusher.instance().getResult(itemFromInv.getItem());
                             ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                             if(!resultSmelted.equals(ItemStack.EMPTY))
                             {
