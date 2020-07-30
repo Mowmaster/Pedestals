@@ -106,7 +106,8 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                             //Need to null check invalid recipes
                             Collection<ItemStack> smeltedResults = getProcessResults(getRecipe(world,itemFromInv),itemFromInv);
                             float xp = getProcessResultsXP(getRecipe(world,itemFromInv));
-                            ItemStack resultSmelted = smeltedResults.iterator().next();
+                            //Make sure recipe output isnt empty
+                            ItemStack resultSmelted = (smeltedResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(smeltedResults.iterator().next());
                             ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                             if(!resultSmelted.equals(ItemStack.EMPTY))
                             {

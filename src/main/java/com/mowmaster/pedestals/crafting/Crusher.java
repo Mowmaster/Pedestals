@@ -55,7 +55,7 @@ public class Crusher
         this.addCrusherRecipe(new ItemStack(Items.BEETROOT).getItem(),new ItemStack(Items.SUGAR,1));
         this.addCrusherRecipe(new ItemStack(Items.POISONOUS_POTATO).getItem(),new ItemStack(ItemDust.FLOUR,1));
         this.addCrusherRecipe(new ItemStack(Items.POTATO).getItem(),new ItemStack(ItemDust.FLOUR,1));
-        this.addCrusherRecipe(new ItemStack(Items.WHEAT).getItem(),new ItemStack(ItemDust.FLOUR,1));
+        //this.addCrusherRecipe(new ItemStack(Items.WHEAT).getItem(),new ItemStack(ItemDust.FLOUR,1));
         this.addCrusherRecipe(new ItemStack(Items.BONE).getItem(),new ItemStack(Items.BONE_MEAL,4));
 
         //Flowers to Dye

@@ -1,10 +1,10 @@
 {
   "type": "pedestals:pedestal_crushing",
   "ingredient": {
-    "item": "minecraft:apple"
+    "tag": "forge:crops/wheat"
   },
   "result": {
-    "item": "minecraft:bread",
+    "item": "pedestals:dustflour",
     "count": 1
   }
 }

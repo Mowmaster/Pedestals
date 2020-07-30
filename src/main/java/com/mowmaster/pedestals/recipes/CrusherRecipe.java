@@ -93,7 +93,7 @@ public class CrusherRecipe implements IRecipe<IInventory> {
             }
 
             ResourceLocation itemResourceLocation = ResourceLocation.create(JSONUtils.getString(json.get("result").getAsJsonObject(), "item", "minecraft:empty"), ':');
-            int itemAmount = JSONUtils.getInt(json.get("result").getAsJsonObject(), "count", 1);
+            int itemAmount = JSONUtils.getInt(json.get("result").getAsJsonObject(), "count", 0);
             recipe.result = new ItemStack(ForgeRegistries.ITEMS.getValue(itemResourceLocation), itemAmount);
 
             return recipe;

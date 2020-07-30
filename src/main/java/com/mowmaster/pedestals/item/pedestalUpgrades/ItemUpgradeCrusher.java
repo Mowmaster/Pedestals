@@ -35,16 +35,12 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
     @Nullable
     protected CrusherRecipe getRecipe(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
-        //if (world == null) return null;
-        //RecipeManager recipeManager = world.getRecipeManager();
-        //Optional<CrusherRecipe> optional = recipeManager.getRecipe(CrusherRecipe.recipeType, inv, world);
-        System.out.println(world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null));
-        //return optional.orElse(null);
+        //System.out.println(world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null));
         return world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null);
     }
 
     protected Collection<ItemStack> getProcessResults(CrusherRecipe recipe) {
-        System.out.println((recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult())));
+        //System.out.println((recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult())));
         return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
     }
 
@@ -89,11 +85,10 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                         {
                             int maxInSlot = handler.getSlotLimit(i);
                             itemFromInv = handler.getStackInSlot(i);
-                            //Should work without catch since we null check this in our GetNextSlotFunction\
-                            //System.out.println(Crusher.instance().getResult(itemFromInv.getItem()));
+                            //Should work without catch since we null check this in our GetNextSlotFunction
                             Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
-                            ItemStack resultSmelted = jsonResults.iterator().next();
-                            //ItemStack resultSmelted = Crusher.instance().getResult(itemFromInv.getItem());
+                            //Just check to make sure our recipe output isnt air
+                            ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
                             ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                             if(!resultSmelted.equals(ItemStack.EMPTY))
                             {
