@@ -59,9 +59,10 @@ public class pedestals
         // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(addRecipes(DeferredRegister::register));
+        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus(),
+                forgeEventBus = MinecraftForge.EVENT_BUS;
 
-
+        addRecipes(eventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);

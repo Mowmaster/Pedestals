@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:crusher",
+  "type": "pedestals:pedestal_crushing",
   "ingredient": {
     "item": "minecraft:apple"
   },
