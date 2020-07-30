@@ -31,6 +31,7 @@ import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -59,10 +60,6 @@ public class pedestals
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    private void addRegistries(final IEventBus modEventBus) {
-        PedestalsSerializers.RECIPES.register(modEventBus);
     }
 
     private void setup(final FMLCommonSetupEvent event)
@@ -118,6 +115,12 @@ public class pedestals
         public static void onTileRegistryReady(RegistryEvent.Register<TileEntityType<?>> event)
         {
             TilePedestal.onTileEntityRegistry(event);
+        }
+
+        @SubscribeEvent
+        public static void onRecipeRegistryReady(IEventBus event)
+        {
+            PedestalsSerializers.RECIPES.register(event);
         }
     }
 }
