@@ -330,6 +330,33 @@
     "item.pedestals.coin.filterenchantedb.chat_name": "Filter Type: ",
     "jei.pedestals.filterenchantedb.desc": "Only accepts Items without enchantments to pass through the pedestal.",
 
+    "item.pedestals.coin.filterenchantedcount": "Pedestal Filter",
+    "item.pedestals.coin.filterenchantedcount.tooltip_name": "Enchant Count",
+    "item.pedestals.coin.filterenchantedcount.tooltip_size": "# of Enchants Required To Pass: ",
+    "item.pedestals.coin.filterenchantedcount.chat_name": "Filter Type: ",
+    "item.pedestals.coin.filterenchantedcount.chat_size": "# of Enchants Required To Pass: ",
+    "jei.pedestals.filterenchantedcount.desc": "Checks the number of enchants on the incoming item, if that number matches the Upgrade's count, it'll pass.",
+
+    "item.pedestals.coin.filterenchantedexact": "Pedestal Filter",
+    "item.pedestals.coin.filterenchantedexact.tooltip_name": "Enchant Exact",
+    "item.pedestals.coin.filterenchantedexact.chat_name": "Filter Type: ",
+    "jei.pedestals.filterenchantedexact.desc": "Compares Incoming Items to those in the inventory below. Checks if the enchants on the incoming item match exactly an enchanted item in the filter.",
+
+    "item.pedestals.coin.filterenchantedexactb": "Pedestal Filter",
+    "item.pedestals.coin.filterenchantedexactb.tooltip_name": "Enchant Exact Blacklist",
+    "item.pedestals.coin.filterenchantedexactb.chat_name": "Filter Type: ",
+    "jei.pedestals.filterenchantedexactb.desc": "Compares Incoming Items to those in the inventory below. Checks if the enchants on the incoming item does not exactly match an enchanted item in the filter.",
+
+    "item.pedestals.coin.filterenchantedfuzzy": "Pedestal Filter",
+    "item.pedestals.coin.filterenchantedfuzzy.tooltip_name": "Enchant Fuzzy",
+    "item.pedestals.coin.filterenchantedfuzzy.chat_name": "Filter Type: ",
+    "jei.pedestals.filterenchantedfuzzy.desc": "Compares Incoming Items to those in the inventory below. Checks if the enchants on the incoming item match any enchanted item, regardless of level, in the filter.",
+
+    "item.pedestals.coin.filterenchantedfuzzyb": "Pedestal Filter",
+    "item.pedestals.coin.filterenchantedfuzzyb.tooltip_name": "Enchant Fuzzy Blacklist",
+    "item.pedestals.coin.filterenchantedfuzzyb.chat_name": "Filter Type: ",
+    "jei.pedestals.filterenchantedfuzzyb.desc": "Compares Incoming Items to those in the inventory below. Checks if the enchants on the incoming item do not match any enchanted item, regardless of level, in the filter.",
+
     "item.pedestals.coin.filterfood": "Pedestal Filter",
     "item.pedestals.coin.filterfood.tooltip_name": "Food",
     "item.pedestals.coin.filterfood.chat_name": "Filter Type: ",

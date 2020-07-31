@@ -340,14 +340,12 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpstored");
         xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
         xpstored.func_240699_a_(TextFormatting.GREEN);
+        tooltip.add(xpstored);
         TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacity");
         TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacitylvl");
         xpcapacity.func_240702_b_(""+ getExpBuffer(stack) +"");
         xpcapacity.func_240702_b_(xpcapacitylvl.getString());
         xpcapacity.func_240699_a_(TextFormatting.AQUA);
-
-
-        tooltip.add(xpstored);
         tooltip.add(xpcapacity);
     }
 

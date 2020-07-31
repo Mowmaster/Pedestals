@@ -43,7 +43,7 @@ public class ItemRegistry
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);
         ItemUpgradeRestock.onItemRegistryReady(e);
-        
+
         ItemUpgradeFilterItem.onItemRegistryReady(e);
         ItemUpgradeFilterItemBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterItemStack.onItemRegistryReady(e);
@@ -58,8 +58,8 @@ public class ItemRegistry
         ItemUpgradeFilterEnchantedBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedFuzzy.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedFuzzyBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchantedSpecific.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchantedSpecificBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFilterEnchantedExact.onItemRegistryReady(e);
+        ItemUpgradeFilterEnchantedExactBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedCount.onItemRegistryReady(e);
 
         ItemUpgradeTeleporter.onItemRegistryReady(e);

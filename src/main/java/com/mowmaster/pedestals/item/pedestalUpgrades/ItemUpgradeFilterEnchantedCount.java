@@ -1,7 +1,9 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,12 +13,17 @@ import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -29,6 +36,27 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
 
     @Override
     public Boolean canAcceptCapacity() {
+        return true;
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
+    }
+
+    @Override
+    public int getItemEnchantability()
+    {
+        return 10;
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return super.isBookEnchantable(stack, book);
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
         return true;
     }
 
@@ -109,6 +137,20 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
         xpstored.func_240702_b_(""+ getSize(stack) +"");
         xpstored.func_240699_a_(TextFormatting.GREEN);
         player.sendMessage(xpstored,player.getUniqueID());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        //super.addInformation(stack, worldIn, tooltip, flagIn);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.func_240699_a_(TextFormatting.GOLD);
+        tooltip.add(t);
+
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_size");
+        xpstored.func_240702_b_(""+ getSize(stack) +"");
+        xpstored.func_240699_a_(TextFormatting.GREEN);
+        tooltip.add(xpstored);
     }
 
     public static final Item ENCHANTEDCOUNT1 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount"));

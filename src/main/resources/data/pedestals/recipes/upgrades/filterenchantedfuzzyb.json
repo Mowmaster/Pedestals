@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/filterenchantedfuzzy"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/filterenchantedfuzzyb"
+  }
+}

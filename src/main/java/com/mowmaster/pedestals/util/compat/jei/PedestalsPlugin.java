@@ -171,6 +171,11 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeRestock.RESTOCK, "restock");
         addValueInfoPage(registration, ItemUpgradeFilterEnchanted.ENCHANTED, "filterenchanted");
         addValueInfoPage(registration, ItemUpgradeFilterEnchantedBlacklist.ENCHANTED, "filterenchantedb");
+        addValueInfoPage(registration, ItemUpgradeFilterEnchantedCount.ENCHANTEDCOUNT1, "filterenchantedcount");
+        addValueInfoPage(registration, ItemUpgradeFilterEnchantedExact.ENCHANTEDSPECIFIC, "filterenchantedexact");
+        addValueInfoPage(registration, ItemUpgradeFilterEnchantedExactBlacklist.ENCHANTEDSPECIFICB, "filterenchantedexactb");
+        addValueInfoPage(registration, ItemUpgradeFilterEnchantedFuzzy.ENCHANTEDFUZZY, "filterenchantedfuzzy");
+        addValueInfoPage(registration, ItemUpgradeFilterEnchantedFuzzyBlacklist.ENCHANTEDFUZZYB, "filterenchantedfuzzyb");
         addValueInfoPage(registration, ItemUpgradeFilterItem.ITEM, "filteritem");
         addValueInfoPage(registration, ItemUpgradeFilterItemBlacklist.ITEM, "filteritemb");
         addValueInfoPage(registration, ItemUpgradeFilterItemStack.ITEMSTACK, "filteritemstack");

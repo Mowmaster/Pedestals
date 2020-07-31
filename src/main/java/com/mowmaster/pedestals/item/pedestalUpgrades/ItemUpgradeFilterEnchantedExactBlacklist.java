@@ -25,9 +25,9 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
 //Filters by number of enchants on an item
-public class ItemUpgradeFilterEnchantedSpecific extends ItemUpgradeBaseFilter
+public class ItemUpgradeFilterEnchantedExactBlacklist extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterEnchantedSpecific(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilterEnchantedExactBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
@@ -102,11 +102,11 @@ public class ItemUpgradeFilterEnchantedSpecific extends ItemUpgradeBaseFilter
         player.sendMessage(name,player.getUniqueID());
     }
 
-    public static final Item ENCHANTEDSPECIFIC= new ItemUpgradeFilterEnchantedSpecific(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedspecific"));
+    public static final Item ENCHANTEDSPECIFICB= new ItemUpgradeFilterEnchantedExactBlacklist(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedexactb"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(ENCHANTEDSPECIFIC);
+        event.getRegistry().register(ENCHANTEDSPECIFICB);
     }
 }
