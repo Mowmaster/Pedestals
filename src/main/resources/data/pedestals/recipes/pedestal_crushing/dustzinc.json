@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "tag": "forge:ores/zinc"
+  },
+  "result": {
+    "item": "pedestals:dustzinc",
+    "count": 2
+  }
+}

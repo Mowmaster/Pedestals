@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "tag": "forge:ores/tin"
+  },
+  "result": {
+    "item": "pedestals:dusttin",
+    "count": 2
+  }
+}

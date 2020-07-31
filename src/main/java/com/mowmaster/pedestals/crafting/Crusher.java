@@ -26,30 +26,31 @@ public class Crusher
 
     private Crusher()
     {
-        this.addCrusherRecipe(new ItemStack(Blocks.STONE).getItem(),new ItemStack(Blocks.COBBLESTONE));
-        this.addCrusherRecipe(new ItemStack(Blocks.COBBLESTONE).getItem(),new ItemStack(Blocks.GRAVEL));
-        this.addCrusherRecipe(new ItemStack(Blocks.GRAVEL).getItem(),new ItemStack(Blocks.SAND));
+        //this.addCrusherRecipe(new ItemStack(Blocks.STONE).getItem(),new ItemStack(Blocks.COBBLESTONE));
+        //this.addCrusherRecipe(new ItemStack(Blocks.COBBLESTONE).getItem(),new ItemStack(Blocks.GRAVEL));
+        //this.addCrusherRecipe(new ItemStack(Blocks.GRAVEL).getItem(),new ItemStack(Blocks.SAND));
         //this.addCrusherRecipe(new ItemStack(Blocks.IRON_ORE).getItem(),new ItemStack(ItemDust.IRON,2));
         //this.addCrusherRecipe(new ItemStack(Blocks.GOLD_ORE).getItem(),new ItemStack(ItemDust.GOLD,2));
-        this.addCrusherTagRecipe("forge:ores/gold",new ItemStack(ItemDust.GOLD,2));
-        this.addCrusherTagRecipe("forge:ores/iron",new ItemStack(ItemDust.IRON,2));
-        this.addCrusherTagRecipe("forge:ores/copper",new ItemStack(ItemDust.COPPER,2));
-        this.addCrusherTagRecipe("forge:ores/tin",new ItemStack(ItemDust.TIN,2));
-        this.addCrusherTagRecipe("forge:ores/osmium",new ItemStack(ItemDust.OSMIUM,2));
-        this.addCrusherTagRecipe("forge:ores/uranium",new ItemStack(ItemDust.URANIUM,2));
-        this.addCrusherTagRecipe("forge:ores/lead",new ItemStack(ItemDust.LEAD,2));
-        this.addCrusherTagRecipe("forge:ores/aluminum",new ItemStack(ItemDust.ALUMINUM,2));
-        this.addCrusherTagRecipe("forge:ores/silver",new ItemStack(ItemDust.SILVER,2));
-        this.addCrusherTagRecipe("forge:ores/nickel",new ItemStack(ItemDust.NICKEL,2));
+        //this.addCrusherTagRecipe("forge:ores/gold",new ItemStack(ItemDust.GOLD,2));
+        //this.addCrusherTagRecipe("forge:ores/iron",new ItemStack(ItemDust.IRON,2));
+        //this.addCrusherTagRecipe("forge:ores/copper",new ItemStack(ItemDust.COPPER,2));
+        //this.addCrusherTagRecipe("forge:ores/tin",new ItemStack(ItemDust.TIN,2));
+        //this.addCrusherTagRecipe("forge:ores/osmium",new ItemStack(ItemDust.OSMIUM,2));
+        //this.addCrusherTagRecipe("forge:ores/uranium",new ItemStack(ItemDust.URANIUM,2));
+        //this.addCrusherTagRecipe("forge:ores/lead",new ItemStack(ItemDust.LEAD,2));
+        //this.addCrusherTagRecipe("forge:ores/aluminum",new ItemStack(ItemDust.ALUMINUM,2));
+        //this.addCrusherTagRecipe("forge:ores/silver",new ItemStack(ItemDust.SILVER,2));
+        //this.addCrusherTagRecipe("forge:ores/nickel",new ItemStack(ItemDust.NICKEL,2));
 
-        this.addCrusherTagRecipe("forge:ores/platinum",new ItemStack(ItemDust.PLATINUM,2));
-        this.addCrusherTagRecipe("forge:ores/zinc",new ItemStack(ItemDust.ZINC,2));
-        this.addCrusherTagRecipe("forge:ores/bismuth",new ItemStack(ItemDust.BISMUTH,2));
-        this.addCrusherTagRecipe("forge:ores/tungsten",new ItemStack(ItemDust.TUNGSTEN,2));
-        this.addCrusherTagRecipe("forge:ores/allthemodium",new ItemStack(ItemDust.ALLTHEMODIUM,2));
+        ////this.addCrusherTagRecipe("forge:ores/platinum",new ItemStack(ItemDust.PLATINUM,2));
+        ////this.addCrusherTagRecipe("forge:ores/zinc",new ItemStack(ItemDust.ZINC,2));
+        ////this.addCrusherTagRecipe("forge:ores/bismuth",new ItemStack(ItemDust.BISMUTH,2));
+        ////this.addCrusherTagRecipe("forge:ores/tungsten",new ItemStack(ItemDust.TUNGSTEN,2));
+        ////this.addCrusherTagRecipe("forge:ores/allthemodium",new ItemStack(ItemDust.ALLTHEMODIUM,2));
 
         //Nether Gold Ore
-        this.addCrusherRecipe(new ItemStack(Blocks.field_235334_I_).getItem(),new ItemStack(ItemDust.GOLD,2));
+        //this.addCrusherRecipe(new ItemStack(Blocks.field_235334_I_).getItem(),new ItemStack(ItemDust.GOLD,2));
+
         this.addCrusherRecipe(new ItemStack(Items.BLAZE_ROD).getItem(),new ItemStack(Items.BLAZE_POWDER,3));
         this.addCrusherRecipe(new ItemStack(Items.SUGAR_CANE).getItem(),new ItemStack(Items.SUGAR,2));
         this.addCrusherRecipe(new ItemStack(Items.BEETROOT).getItem(),new ItemStack(Items.SUGAR,1));

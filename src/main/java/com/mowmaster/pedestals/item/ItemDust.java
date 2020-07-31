@@ -27,11 +27,11 @@ public class ItemDust extends Item {
     public static final Item ALUMINUM = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustaluminum"));
     public static final Item NICKEL = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustnickel"));
 
-    public static final Item PLATINUM = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustplatinum"));
-    public static final Item ZINC = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustzinc"));
-    public static final Item BISMUTH = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustbismuth"));
-    public static final Item TUNGSTEN = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dusttungsten"));
-    public static final Item ALLTHEMODIUM = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustallthemodium"));
+    //public static final Item PLATINUM = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustplatinum"));
+    //public static final Item ZINC = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustzinc"));
+    //public static final Item BISMUTH = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustbismuth"));
+    //public static final Item TUNGSTEN = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dusttungsten"));
+    //public static final Item ALLTHEMODIUM = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustallthemodium"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
@@ -49,11 +49,11 @@ public class ItemDust extends Item {
         event.getRegistry().register(ALUMINUM);
         event.getRegistry().register(NICKEL);
 
-        event.getRegistry().register(PLATINUM);
-        event.getRegistry().register(ZINC);
-        event.getRegistry().register(BISMUTH);
-        event.getRegistry().register(TUNGSTEN);
-        event.getRegistry().register(ALLTHEMODIUM);
+        //event.getRegistry().register(PLATINUM);
+        //event.getRegistry().register(ZINC);
+        //event.getRegistry().register(BISMUTH);
+        //event.getRegistry().register(TUNGSTEN);
+        //event.getRegistry().register(ALLTHEMODIUM);
     }
 
 

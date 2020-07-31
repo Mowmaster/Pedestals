@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "tag": "forge:cobblestone"
+  },
+  "result": {
+    "item": "minecraft:gravel",
+    "count": 1
+  }
+}

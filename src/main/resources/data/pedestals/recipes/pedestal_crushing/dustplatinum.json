@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "tag": "forge:ores/platinum"
+  },
+  "result": {
+    "item": "pedestals:dustplatinum",
+    "count": 2
+  }
+}

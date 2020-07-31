@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "tag": "forge:ores/uranium"
+  },
+  "result": {
+    "item": "pedestals:dusturanium",
+    "count": 2
+  }
+}

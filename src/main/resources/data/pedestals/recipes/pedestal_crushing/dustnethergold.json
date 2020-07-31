@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "tag": "minecraft:nether_gold_ore"
+  },
+  "result": {
+    "item": "pedestals:dustgold",
+    "count": 2
+  }
+}

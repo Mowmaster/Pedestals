@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "tag": "forge:ores/osmium"
+  },
+  "result": {
+    "item": "pedestals:dustosmium",
+    "count": 2
+  }
+}
