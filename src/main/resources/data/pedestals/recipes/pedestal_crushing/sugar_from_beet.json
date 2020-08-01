@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "item": "minecraft:beetroot"
+  },
+  "result": {
+    "item": "minecraft:sugar",
+    "count": 1
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "item": "minecraft:poppy"
+  },
+  "result": {
+    "item": "minecraft:red_dye",
+    "count": 2
+  }
+}

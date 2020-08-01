@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "item": "minecraft:potato"
+  },
+  "result": {
+    "item": "pedestals:dustflour",
+    "count": 1
+  }
+}

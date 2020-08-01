@@ -51,19 +51,19 @@ public class Crusher
         //Nether Gold Ore
         //this.addCrusherRecipe(new ItemStack(Blocks.field_235334_I_).getItem(),new ItemStack(ItemDust.GOLD,2));
 
-        this.addCrusherRecipe(new ItemStack(Items.BLAZE_ROD).getItem(),new ItemStack(Items.BLAZE_POWDER,3));
-        this.addCrusherRecipe(new ItemStack(Items.SUGAR_CANE).getItem(),new ItemStack(Items.SUGAR,2));
-        this.addCrusherRecipe(new ItemStack(Items.BEETROOT).getItem(),new ItemStack(Items.SUGAR,1));
-        this.addCrusherRecipe(new ItemStack(Items.POISONOUS_POTATO).getItem(),new ItemStack(ItemDust.FLOUR,1));
-        this.addCrusherRecipe(new ItemStack(Items.POTATO).getItem(),new ItemStack(ItemDust.FLOUR,1));
+        //this.addCrusherRecipe(new ItemStack(Items.BLAZE_ROD).getItem(),new ItemStack(Items.BLAZE_POWDER,3));
+        //this.addCrusherRecipe(new ItemStack(Items.SUGAR_CANE).getItem(),new ItemStack(Items.SUGAR,2));
+        //this.addCrusherRecipe(new ItemStack(Items.BEETROOT).getItem(),new ItemStack(Items.SUGAR,1));
+        //this.addCrusherRecipe(new ItemStack(Items.POISONOUS_POTATO).getItem(),new ItemStack(ItemDust.FLOUR,1));
+        //this.addCrusherRecipe(new ItemStack(Items.POTATO).getItem(),new ItemStack(ItemDust.FLOUR,1));
         //this.addCrusherRecipe(new ItemStack(Items.WHEAT).getItem(),new ItemStack(ItemDust.FLOUR,1));
-        this.addCrusherRecipe(new ItemStack(Items.BONE).getItem(),new ItemStack(Items.BONE_MEAL,4));
+        //this.addCrusherRecipe(new ItemStack(Items.BONE).getItem(),new ItemStack(Items.BONE_MEAL,4));
 
         //Flowers to Dye
         //Red Tulip,Poppy,RoseBush(2) = red_dye
-        this.addCrusherRecipe(new ItemStack(Items.RED_TULIP).getItem(),new ItemStack(Items.RED_DYE,2));
-        this.addCrusherRecipe(new ItemStack(Items.POPPY).getItem(),new ItemStack(Items.RED_DYE,2));
-        this.addCrusherRecipe(new ItemStack(Items.ROSE_BUSH).getItem(),new ItemStack(Items.RED_DYE,4));
+        //this.addCrusherRecipe(new ItemStack(Items.RED_TULIP).getItem(),new ItemStack(Items.RED_DYE,2));
+        //this.addCrusherRecipe(new ItemStack(Items.POPPY).getItem(),new ItemStack(Items.RED_DYE,2));
+        //this.addCrusherRecipe(new ItemStack(Items.ROSE_BUSH).getItem(),new ItemStack(Items.RED_DYE,4));
         //Cactus = green dye
         this.addCrusherRecipe(new ItemStack(Items.CACTUS).getItem(),new ItemStack(Items.GREEN_DYE,2));
         //Oxeye, Azure, white tulip = lightgrey
