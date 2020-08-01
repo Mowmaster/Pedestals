@@ -1,7 +1,9 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.crafting.SawMill;
+import com.mowmaster.pedestals.recipes.SawMillRecipe;
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -14,12 +16,29 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
 {
     public ItemUpgradeSawMill(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+
+    @Nullable
+    protected SawMillRecipe getRecipe(World world, ItemStack stackIn) {
+        Inventory inv = new Inventory(stackIn);
+        //System.out.println(world == null ? null : world.getRecipeManager().getRecipe(SawMillRecipe.recipeType, inv, world).orElse(null));
+        return world == null ? null : world.getRecipeManager().getRecipe(SawMillRecipe.recipeType, inv, world).orElse(null);
+    }
+
+    protected Collection<ItemStack> getProcessResults(SawMillRecipe recipe) {
+        //System.out.println((recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult())));
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
+    }
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
@@ -63,7 +82,10 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
                             itemFromInv = handler.getStackInSlot(i);
                             //Should work without catch since we null check this in our GetNextSlotFunction\
                             //System.out.println(SawMill.instance().getResult(itemFromInv.getItem()));
-                            ItemStack resultSmelted = SawMill.instance().getResult(itemFromInv.getItem());
+                            Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
+                            //Just check to make sure our recipe output isnt air
+                            ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+                            //ItemStack resultSmelted = SawMill.instance().getResult(itemFromInv.getItem());
                             ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                             if(!resultSmelted.equals(ItemStack.EMPTY))
                             {

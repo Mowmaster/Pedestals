@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:jungle_stairs"
+  },
+  "result": {
+    "item": "minecraft:jungle_slab",
+    "count": 2
+  }
+}

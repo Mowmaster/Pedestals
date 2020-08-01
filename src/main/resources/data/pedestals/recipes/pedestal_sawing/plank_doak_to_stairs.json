@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:dark_oak_planks"
+  },
+  "result": {
+    "item": "minecraft:dark_oak_stairs",
+    "count": 1
+  }
+}

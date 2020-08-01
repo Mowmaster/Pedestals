@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:warped_stairs"
+  },
+  "result": {
+    "item": "minecraft:warped_slab",
+    "count": 2
+  }
+}

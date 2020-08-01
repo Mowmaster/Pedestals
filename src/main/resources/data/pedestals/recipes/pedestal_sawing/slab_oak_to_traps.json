@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:oak_slab"
+  },
+  "result": {
+    "item": "minecraft:oak_trapdoor",
+    "count": 1
+  }
+}

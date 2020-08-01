@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:spruce_fence"
+  },
+  "result": {
+    "item": "minecraft:stick",
+    "count": 4
+  }
+}

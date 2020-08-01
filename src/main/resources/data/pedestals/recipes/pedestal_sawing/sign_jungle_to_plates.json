@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:jungle_sign"
+  },
+  "result": {
+    "item": "minecraft:jungle_pressure_plate",
+    "count": 1
+  }
+}

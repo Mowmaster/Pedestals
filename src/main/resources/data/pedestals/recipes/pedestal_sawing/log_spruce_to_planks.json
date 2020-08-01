@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "tag": "minecraft:spruce_logs"
+  },
+  "result": {
+    "item": "minecraft:spruce_planks",
+    "count": 6
+  }
+}

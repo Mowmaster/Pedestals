@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:crimson_trapdoor"
+  },
+  "result": {
+    "item": "minecraft:crimson_sign",
+    "count": 1
+  }
+}

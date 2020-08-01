@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:dark_oak_sign"
+  },
+  "result": {
+    "item": "minecraft:dark_oak_pressure_plate",
+    "count": 1
+  }
+}

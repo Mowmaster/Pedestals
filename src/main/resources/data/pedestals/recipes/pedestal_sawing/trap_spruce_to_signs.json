@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:spruce_trapdoor"
+  },
+  "result": {
+    "item": "minecraft:spruce_sign",
+    "count": 1
+  }
+}

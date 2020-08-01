@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing",
+  "ingredient": {
+    "item": "minecraft:birch_planks"
+  },
+  "result": {
+    "item": "minecraft:birch_stairs",
+    "count": 1
+  }
+}

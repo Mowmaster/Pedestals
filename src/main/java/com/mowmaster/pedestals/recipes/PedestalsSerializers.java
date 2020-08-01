@@ -14,6 +14,9 @@ public final class PedestalsSerializers {
     //registry name is what type should be used in json recipes
     public static final RegistryObject<IRecipeSerializer<?>> CRUSHING = RECIPES.register("pedestal_crushing", () ->
             CrusherRecipe.serializer);
+
+    public static final RegistryObject<IRecipeSerializer<?>> SAWING = RECIPES.register("pedestal_sawing", () ->
+            SawMillRecipe.serializer);
 }
 
 /*{
