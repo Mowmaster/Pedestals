@@ -1,10 +1,10 @@
 {
   "type": "pedestals:pedestal_crushing",
   "ingredient": {
-    "item": "minecraft:nether_gold_ore"
+    "item": "minecraft:dandelion"
   },
   "result": {
-    "item": "pedestals:dustgold",
+    "item": "minecraft:yellow_dye",
     "count": 2
   }
 }

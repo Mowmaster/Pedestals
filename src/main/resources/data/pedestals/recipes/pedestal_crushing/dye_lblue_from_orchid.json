@@ -1,10 +1,10 @@
 {
   "type": "pedestals:pedestal_crushing",
   "ingredient": {
-    "item": "minecraft:nether_gold_ore"
+    "item": "minecraft:blue_orchid"
   },
   "result": {
-    "item": "pedestals:dustgold",
+    "item": "minecraft:light_blue_dye",
     "count": 2
   }
 }

@@ -1,10 +1,10 @@
 {
   "type": "pedestals:pedestal_crushing",
   "ingredient": {
-    "tag": "forge:ores/zinc"
+    "item": "minecraft:bone_meal"
   },
   "result": {
-    "item": "pedestals:dustzinc",
+    "item": "minecraft:white_dye",
     "count": 2
   }
 }
