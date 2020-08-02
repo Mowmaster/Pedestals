@@ -27,6 +27,9 @@
     "jei.pedestals.bookcapacity.desc": "Will only accept the Capacity Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
     "item.pedestals.bookrange": "Enchantment Focused Book (Range Book)",
     "jei.pedestals.bookrange.desc": "Will only accept the Range Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+    "item.pedestals.bookarea": "Enchantment Focused Book (Area Book)",
+    "jei.pedestals.bookarea.desc": "Will only accept the Area Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+
 
     "item.pedestals.coin.attack": "Pedestal Upgrade",
     "item.pedestals.coin.attack.tooltip_name": "Auto Attacker",
@@ -241,7 +244,6 @@
     "item.pedestals.coin.xpmagnet.tooltip_speed": "Operational Speed: ",
     "item.pedestals.coin.xpmagnet.chat_area": "Effected Area: ",
     "item.pedestals.coin.xpmagnet.chat_areax": "x",
-    "item.pedestals.coin.xpmagnet.chat_rate": "Exp Transfer Ammount: ",
     "item.pedestals.coin.xpmagnet.chat_xp": "Exp Levels Stored: ",
     "item.pedestals.coin.xpmagnet.chat_rate": "Exp Levels Transfered at a Time: ",
     "item.pedestals.coin.xpmagnet.chat_speed": "Operational Speed: ",
@@ -271,6 +273,18 @@
     "item.pedestals.coin.xpenchanter.chat_enchant": "Enchanting Items At Level: ",
     "item.pedestals.coin.xpenchanter.chat_speed": "Operational Speed: ",
     "jei.pedestals.xpenchanter.desc": "Needs XP, Place an Inventory below the pedestal for enchanting inputs, This grabs enchanting power from up to 3 high bookshelves, Enchanting Power Determines The level this enchants at, Enchants can be applied to anything a vanilla one can do.",
+
+    "item.pedestals.coin.xpgrindstone": "Pedestal Upgrade",
+    "item.pedestals.coin.xpgrindstone.tooltip_name": "Exp Grindstone Upgrade",
+    "item.pedestals.coin.xpgrindstone.tooltip_xpstored": "Exp Levels Stored: ",
+    "item.pedestals.coin.xpgrindstone.tooltip_xpcapacity": "Exp Buffer Capacity: ",
+    "item.pedestals.coin.xpgrindstone.tooltip_xpcapacitylvl": " Levels",
+    "item.pedestals.coin.xpgrindstone.tooltip_rate": "Exp Transfer Ammount: ",
+    "item.pedestals.coin.xpgrindstone.tooltip_speed": "Operational Speed: ",
+    "item.pedestals.coin.xpgrindstone.chat_xp": "Exp Levels Stored: ",
+    "item.pedestals.coin.xpgrindstone.chat_rate": "Exp Levels Transfered at a Time: ",
+    "item.pedestals.coin.xpgrindstone.chat_speed": "Operational Speed: ",
+    "jei.pedestals.xpgrindstone.desc": "Place an Inventory below the pedestal for grinding inputs. This upgrade will Grind the enchants off of items and return the unenchanted items to the pedestal, while storing the xp from the process in its buffer, which can be transfered out.",
 
     "item.pedestals.coin.export": "Pedestal Upgrade",
     "item.pedestals.coin.export.tooltip_name": "Export Upgrade",
@@ -663,5 +677,6 @@
 
     "enchantment.pedestals.upgradecapacity": "Pedestal Capacity",
     "enchantment.pedestals.upgradespeed": "Pedestal Speed",
-    "enchantment.pedestals.upgraderange": "Pedestal Range"
+    "enchantment.pedestals.upgraderange": "Pedestal Range",
+    "enchantment.pedestals.upgradearea": "Pedestal Area"
 }

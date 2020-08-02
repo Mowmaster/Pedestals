@@ -143,6 +143,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemEnchantableBook.SPEED, "bookspeed");
         addValueInfoPage(registration, ItemEnchantableBook.CAPACITY, "bookcapacity");
         addValueInfoPage(registration, ItemEnchantableBook.RANGE, "bookrange");
+        addValueInfoPage(registration, ItemEnchantableBook.AREA, "bookarea");
 
         //Upgrades
         addValueInfoPage(registration, ItemUpgradeBreaker.BREAKER, "breaker");
@@ -165,6 +166,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeExpBottler.XPBOTTLER, "xpbottler");
         addValueInfoPage(registration, ItemUpgradeExpDropper.XPDROPPER, "xpdropper");
         addValueInfoPage(registration, ItemUpgradeExpEnchanter.XPENCHANTER, "xpenchanter");
+        addValueInfoPage(registration, ItemUpgradeExpGrindstone.XPGRINDSTONE, "xpgrindstone");
         addValueInfoPage(registration, ItemUpgradeExpAnvil.XPANVIL, "xpanvil");
         addValueInfoPage(registration, ItemUpgradeImport.IMPORT, "import");
         addValueInfoPage(registration, ItemUpgradeExport.EXPORT, "export");

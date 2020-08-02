@@ -39,6 +39,7 @@ public class ItemRegistry
         ItemUpgradeExpDropper.onItemRegistryReady(e);
         ItemUpgradeExpEnchanter.onItemRegistryReady(e);
         ItemUpgradeExpAnvil.onItemRegistryReady(e);
+        ItemUpgradeExpGrindstone.onItemRegistryReady(e);
 
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);
