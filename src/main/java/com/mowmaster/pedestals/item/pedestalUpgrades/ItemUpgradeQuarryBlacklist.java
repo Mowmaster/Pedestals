@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
@@ -123,14 +124,17 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
 
             BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
             BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);
+            //System.out.println("World Loaded: " + world.isAreaLoaded(negNums,posNums));
             if(world.isAreaLoaded(negNums,posNums))
             {
+                //System.out.println("Powered: " + (!world.isBlockPowered(pedestalPos)));
                 if(!world.isBlockPowered(pedestalPos)) {
 
                     TileEntity pedestalInv = world.getTileEntity(pedestalPos);
                     if(pedestalInv instanceof TilePedestal) {
                         TilePedestal ped = ((TilePedestal) pedestalInv);
 
+                        //System.out.println("Has Fuel: " + removeFuel(ped,200,true));
                         if(removeFuel(ped,200,true)>=0)
                         {
                             upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
@@ -144,6 +148,8 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                                             ticked++;
                                         }
 
+                                        //System.out.println("ticks: " + ticked);
+                                        //System.out.println("breakspeed: " + breakspeed);
                                         if(ticked > breakspeed)
                                         {
                                             upgradeAction(world, itemInPedestal, coinInPedestal, blockToChopPos, blockToChop, pedestalPos);
@@ -319,7 +325,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
                 Integer integer = entry.getValue();
-                if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed))
+                if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
                     enchants.func_240699_a_(TextFormatting.GRAY);

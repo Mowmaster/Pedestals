@@ -762,7 +762,8 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                 {
                     impTicker++;
                     ((ItemUpgradeBase) coinInPed).updateAction(impTicker,this.world,getItemInPedestal(),getCoinOnPedestal(),this.getPos());
-                    if(impTicker >=200){impTicker=0;}
+                    //Has to be bigger than our biggest ticker value for an upgrade, or itll reset the upgrade instance before the upgrade action can fire
+                    if(impTicker >=Integer.MAX_VALUE-100){impTicker=0;}
                 }
             }
         }

@@ -176,6 +176,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.func_240702_b_(getExpTransferRateString(stack));
         rate.func_240699_a_(TextFormatting.GRAY);
+        tooltip.add(rate);
 
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.func_240702_b_(getOperationSpeedString(stack));
