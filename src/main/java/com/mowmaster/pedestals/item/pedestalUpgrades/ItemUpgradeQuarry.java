@@ -56,12 +56,22 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
         return true;
     }
 
-    public int getRangeWidth(ItemStack stack)
+    @Override
+    public Boolean canAcceptCapacity() {
+        return false;
+    }
+
+    @Override
+    public Boolean canAcceptArea() {
+        return true;
+    }
+
+    public int getAreaWidth(ItemStack stack)
     {
-        int rangeWidth = 0;
-        int rW = getCapacityModifier(stack);
-        rangeWidth = ((rW)+1);
-        return  rangeWidth;
+        int areaWidth = 0;
+        int aW = getAreaModifier(stack);
+        areaWidth = ((aW)+1);
+        return  areaWidth;
     }
 
     public int getRangeHeight(ItemStack stack)
@@ -104,9 +114,10 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
     {
         if(!world.isRemote)
         {
-            int rangeWidth = getRangeWidth(coinInPedestal);
+            int rangeWidth = getAreaWidth(coinInPedestal);
             int rangeHeight = getRangeHeight(coinInPedestal)-1;
             int speed = getOperationSpeed(coinInPedestal);
+            int breakspeed = Math.multiplyExact(Math.multiplyExact((int)(Math.pow((Math.multiplyExact(rangeWidth,2)+1),2)/9),20),84);
 
             BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
             BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);
@@ -132,7 +143,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                                             ticked++;
                                         }
 
-                                        if(ticked > 84)
+                                        if(ticked > breakspeed)
                                         {
                                             upgradeAction(world, itemInPedestal, coinInPedestal, blockToChopPos, blockToChop, pedestalPos);
                                             ticked=0;
@@ -274,7 +285,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
         name.func_240699_a_(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         int s4 = getRangeHeight(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + s4 + "";
@@ -327,7 +338,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         int s4 = getRangeHeight(stack);
 
         String tr = "" + (s3+s3+1) + "";

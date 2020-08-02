@@ -62,6 +62,16 @@ public class ItemUpgradeBase extends Item {
         return stack.isEnchanted();
     }
 
+    public int getAreaModifier(ItemStack stack)
+    {
+        int area = 0;
+        if(hasEnchant(stack))
+        {
+            area = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.AREA,stack);
+        }
+        return area;
+    }
+
     public int getRangeModifier(ItemStack stack)
     {
         int range = 0;
@@ -791,6 +801,11 @@ public class ItemUpgradeBase extends Item {
     }
 
     public Boolean canAcceptRange()
+    {
+        return false;
+    }
+
+    public Boolean canAcceptArea()
     {
         return false;
     }

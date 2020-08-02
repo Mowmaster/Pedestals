@@ -35,21 +35,21 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     public ItemUpgradeExpCollector(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptRange() {
-        return true;
-    }
-
-    @Override
     public Boolean canAcceptCapacity() {
         return true;
     }
 
-    public int getRangeWidth(ItemStack stack)
+    @Override
+    public Boolean canAcceptArea() {
+        return true;
+    }
+
+    public int getAreaWidth(ItemStack stack)
     {
-        int rangeWidth = 0;
-        int rW = getRangeModifier(stack);
-        rangeWidth = ((rW)+1);
-        return  rangeWidth;
+        int areaWidth = 0;
+        int aW = getAreaModifier(stack);
+        areaWidth = ((aW)+1);
+        return  areaWidth;
     }
 
     public int getSuckiRate(ItemStack stack)
@@ -99,7 +99,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     public void upgradeAction(World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
-        int width = getRangeWidth(coinInPedestal);
+        int width = getAreaWidth(coinInPedestal);
         int height = (2*width)+1;
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
@@ -197,7 +197,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         xpstored.func_240699_a_(TextFormatting.GREEN);
         player.sendMessage(xpstored,player.getUniqueID());
 
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         String trr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
@@ -226,7 +226,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         String trr = "" + (s3+s3+1) + "";
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
@@ -236,12 +236,12 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         area.func_240702_b_(trr);
         area.func_240702_b_(areax.getString());
         area.func_240702_b_(trr);
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_(getExpTransferRateString(stack));
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.func_240702_b_(getOperationSpeedString(stack));
 
         area.func_240699_a_(TextFormatting.WHITE);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.func_240702_b_(getExpTransferRateString(stack));
         rate.func_240699_a_(TextFormatting.GRAY);
         speed.func_240699_a_(TextFormatting.RED);
 

@@ -38,16 +38,16 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
     public ItemUpgradeMilker(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptRange() {
+    public Boolean canAcceptArea() {
         return true;
     }
 
-    public int getRangeWidth(ItemStack stack)
+    public int getAreaWidth(ItemStack stack)
     {
-        int rangeWidth = 0;
-        int rW = getRangeModifier(stack);
-        rangeWidth = ((rW)+1);
-        return  rangeWidth;
+        int areaWidth = 0;
+        int aW = getAreaModifier(stack);
+        areaWidth = ((aW)+1);
+        return  areaWidth;
     }
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
@@ -66,7 +66,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
-        int width = getRangeWidth(coinInPedestal);
+        int width = getAreaWidth(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,rangeHeight);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,rangeHeight);
 
@@ -127,7 +127,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
         name.func_240699_a_(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
@@ -153,7 +153,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");

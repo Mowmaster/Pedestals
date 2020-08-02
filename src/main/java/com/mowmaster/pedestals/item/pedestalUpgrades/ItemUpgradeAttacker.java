@@ -35,21 +35,21 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 {
     public ItemUpgradeAttacker(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
-    @Override
-    public Boolean canAcceptRange() {
-        return true;
-    }
-
     //For damage
     @Override
     public Boolean canAcceptCapacity() {return true;}
 
-    public int getRangeWidth(ItemStack stack)
+    @Override
+    public Boolean canAcceptArea() {
+        return true;
+    }
+
+    public int getAreaWidth(ItemStack stack)
     {
-        int rangeWidth = 0;
-        int rW = getRangeModifier(stack);
-        rangeWidth = ((rW)+1);
-        return  rangeWidth;
+        int areaWidth = 0;
+        int aW = getAreaModifier(stack);
+        areaWidth = ((aW)+1);
+        return  areaWidth;
     }
 
     public float getSwordDamage(LivingEntity entityIn, ItemStack itemInPedestal)
@@ -122,7 +122,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
-        int width = getRangeWidth(coinInPedestal);
+        int width = getAreaWidth(coinInPedestal);
         int height = (2*width)+1;
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
@@ -157,7 +157,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
@@ -196,7 +196,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");

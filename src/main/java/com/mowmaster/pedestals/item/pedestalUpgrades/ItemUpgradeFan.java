@@ -37,16 +37,16 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     }
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public Boolean canAcceptArea() {
         return true;
     }
 
-    public int getRangeWidth(ItemStack stack)
+    public int getAreaWidth(ItemStack stack)
     {
-        int rangeWidth = 0;
-        int rW = getCapacityModifier(stack);
-        rangeWidth = (rW);
-        return  rangeWidth;
+        int areaWidth = 0;
+        int aW = getAreaModifier(stack);
+        areaWidth = ((aW)+1);
+        return  areaWidth;
     }
 
     public int getHeight(ItemStack stack)
@@ -176,7 +176,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
-        int width = getRangeWidth(coinInPedestal);
+        int width = getAreaWidth(coinInPedestal);
         int height = getHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
@@ -201,7 +201,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         name.func_240699_a_(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         int s4 = getHeight(stack);
         String tr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
@@ -230,7 +230,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         int s4 = getHeight(stack);
 
         String tr = "" + (s3+s3+1) + "";

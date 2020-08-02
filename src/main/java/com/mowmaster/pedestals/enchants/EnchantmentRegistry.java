@@ -22,6 +22,7 @@ public final class EnchantmentRegistry
 
     public static final Enchantment OPERATIONSPEED = new EnchantmentOperationSpeed();
     public static final Enchantment RANGE = new EnchantmentRange();
+    public static final Enchantment AREA = new EnchantmentArea();
     public static final Enchantment CAPACITY = new EnchantmentCapacity();
 
     @SubscribeEvent
@@ -31,6 +32,7 @@ public final class EnchantmentRegistry
                 // All
                 setup(OPERATIONSPEED, "upgradespeed"),
                 setup(RANGE, "upgraderange"),
+                setup(AREA, "upgradearea"),
                 setup(CAPACITY, "upgradecapacity")
         );
     }

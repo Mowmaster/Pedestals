@@ -48,12 +48,17 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         return true;
     }
 
-    public int getRangeWidth(ItemStack stack)
+    @Override
+    public Boolean canAcceptArea() {
+        return true;
+    }
+
+    public int getAreaWidth(ItemStack stack)
     {
-        int rangeWidth = 0;
-        int rW = getRangeModifier(stack);
-        rangeWidth = ((rW)+1);
-        return  rangeWidth;
+        int areaWidth = 0;
+        int aW = getAreaModifier(stack);
+        areaWidth = ((aW)+1);
+        return  areaWidth;
     }
 
     public int getRangeHeight(ItemStack stack)
@@ -70,7 +75,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
     {
         if(!world.isRemote)
         {
-            int rangeWidth = getRangeWidth(coinInPedestal);
+            int rangeWidth = getAreaWidth(coinInPedestal);
             int rangeHeight = getRangeHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
 
@@ -167,7 +172,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         name.func_240699_a_(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + (getRangeHeight(stack)+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
@@ -210,7 +215,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        int s3 = getRangeWidth(stack);
+        int s3 = getAreaWidth(stack);
         int s4 = getRangeHeight(stack);
 
         String tr = "" + (s3+s3+1) + "";
