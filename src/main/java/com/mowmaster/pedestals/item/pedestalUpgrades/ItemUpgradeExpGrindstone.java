@@ -110,6 +110,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                         //Code Here
                                         Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
                                         ItemStack stackToReturn = itemFromInv.copy();
+                                        stackToReturn.setCount(1);
                                         EnchantmentHelper.setEnchantments(enchantsNone,stackToReturn);
                                         if(!stackToReturn.isEmpty())
                                         {

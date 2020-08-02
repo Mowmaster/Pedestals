@@ -29,7 +29,7 @@ credits="Thanks to all those who have helped me in the last 4+ years, as well as
 authors="Mowmaster" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Pedestals is a feature split off the 1.12.2 mod called Dust. It can display items, Transfer items around, and other utility uses like farming and smelting.
+Pedestals can display items, Transfer items around, and other utility uses like farming, smelting, and enchant tinkering.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.pedestals]] #optional
