@@ -4,6 +4,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -70,10 +72,10 @@ public class RenderPedestal extends TileEntityRenderer<TilePedestal> {
     public static void  renderTile(World worldIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, ItemStack coin, ItemStack item, int combinedLightIn, int combinedOverlayIn)
     {
         renderItemRotating(worldIn,matrixStackIn,bufferIn,item,combinedLightIn,combinedOverlayIn);
-        renderCoin(coin,matrixStackIn,bufferIn,0.5f,0.475f,0.3125f,0,0,0,0,combinedLightIn,combinedOverlayIn);
-        renderCoin(coin,matrixStackIn,bufferIn,0.3125f,0.475f,0.5f,90,0,1f,0,combinedLightIn,combinedOverlayIn);
-        renderCoin(coin,matrixStackIn,bufferIn,0.5f,0.475f,0.6875f,180,0,1f,0,combinedLightIn,combinedOverlayIn);
-        renderCoin(coin,matrixStackIn,bufferIn,0.6875f,0.475f,0.5f,270,0,1f,0,combinedLightIn,combinedOverlayIn);
+        renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.5f,0.475f,0.3125f,0,0,0,0,combinedLightIn,combinedOverlayIn);
+        renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.3125f,0.475f,0.5f,90,0,1f,0,combinedLightIn,combinedOverlayIn);
+        renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.5f,0.475f,0.6875f,180,0,1f,0,combinedLightIn,combinedOverlayIn);
+        renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.6875f,0.475f,0.5f,270,0,1f,0,combinedLightIn,combinedOverlayIn);
 
     }
     public static void renderItemRotating(World worldIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, ItemStack itemStack, int combinedLightIn, int combinedOverlayIn)
@@ -83,19 +85,27 @@ public class RenderPedestal extends TileEntityRenderer<TilePedestal> {
             matrixStackIn.translate(0.5, 1.0, 0.5);
             //matrixStackIn.translate(0, MathHelper.sin((worldIn.getGameTime()) / 10.0F) * 0.1 + 0.1, 0); BOBBING ITEM
             matrixStackIn.scale(0.75F, 0.75F, 0.75F);
-            float angle = (worldIn.getGameTime()) / 20.0F * (180F / (float) Math.PI);
+            long time = System.currentTimeMillis();
+            float angle = (time/25) % 360;
+            //float angle = (worldIn.getGameTime()) / 20.0F * (180F / (float) Math.PI);
             matrixStackIn.rotate(Vector3f.YP.rotationDegrees(angle));
-            Minecraft.getInstance().getItemRenderer().renderItem(itemStack, ItemCameraTransforms.TransformType.GROUND, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
+            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+            IBakedModel baked = renderer.getItemModelWithOverrides(itemStack,worldIn,null);
+            renderer.renderItem(itemStack,ItemCameraTransforms.TransformType.GROUND,true,matrixStackIn,bufferIn,combinedLightIn,combinedOverlayIn,baked);
+            //Minecraft.getInstance().getItemRenderer().renderItem(itemStack, ItemCameraTransforms.TransformType.GROUND, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
             matrixStackIn.pop();
         }
     }
-    public static void renderCoin(ItemStack itemCoin, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float x, float y, float z, float angle, float xr, float yr, float zr, int combinedLightIn, int combinedOverlayIn) {
+    public static void renderCoin(World worldIn,ItemStack itemCoin, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float x, float y, float z, float angle, float xr, float yr, float zr, int combinedLightIn, int combinedOverlayIn) {
         if (!itemCoin.isEmpty()) {
             matrixStackIn.push();
             matrixStackIn.translate(x, y, z);
             matrixStackIn.scale(0.1875f, 0.1875f, 0.1875f);
             matrixStackIn.rotate(Vector3f.YP.rotationDegrees(angle));
-            Minecraft.getInstance().getItemRenderer().renderItem(itemCoin, ItemCameraTransforms.TransformType.FIXED, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
+            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+            IBakedModel baked = renderer.getItemModelWithOverrides(itemCoin,worldIn,null);
+            renderer.renderItem(itemCoin,ItemCameraTransforms.TransformType.FIXED,true,matrixStackIn,bufferIn,combinedLightIn,combinedOverlayIn,baked);
+            //Minecraft.getInstance().getItemRenderer().renderItem(itemCoin, ItemCameraTransforms.TransformType.FIXED, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
             matrixStackIn.pop();
         }
     }
