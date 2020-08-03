@@ -78,7 +78,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return  transferRate;
     }
 
-    protected void useFanOnEntities(World world, BlockPos posOfPedestal, double speed,AxisAlignedBB getBox) {
+    protected boolean useFanOnEntities(World world, BlockPos posOfPedestal, double speed,AxisAlignedBB getBox) {
         List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class, getBox);
 
         BlockState state = world.getBlockState(posOfPedestal);
@@ -92,17 +92,20 @@ public class ItemUpgradeFan extends ItemUpgradeBase
                     if(!((PlayerEntity) getEntity).abilities.isFlying && !((PlayerEntity) getEntity).isCrouching())
                     {
                         addMotion(world,posOfPedestal,speed,getEntity);
+                        return true;
                     }
                 }
                 else
                 {
                     addMotion(world,posOfPedestal,speed,getEntity);
+                    return true;
                 }
                 if (enumfacing == Direction.UP) {
                     getEntity.fallDistance = 0;
                 }
             }
         }
+        return false;
     }
 
     protected void addMotion(World world, BlockPos posOfPedestal, double speed, LivingEntity entity) {
@@ -167,14 +170,21 @@ public class ItemUpgradeFan extends ItemUpgradeBase
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
+
         if(!world.isBlockPowered(pedestalPos))
         {
-            upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
+            if(upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos))
+            {
+                int speedSound = getOperationSpeed(coinInPedestal);
+                if (tick%speedSound == 0) {
+                    world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                }
+            }
         }
     }
 
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public boolean upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
         int height = getHeight(coinInPedestal);
@@ -189,7 +199,9 @@ public class ItemUpgradeFan extends ItemUpgradeBase
             speed *= 2;
         }
 
-        useFanOnEntities(world,posOfPedestal,speed,getBox);
+        if(useFanOnEntities(world,posOfPedestal,speed,getBox))return true;
+
+        return false;
     }
 
     @Override

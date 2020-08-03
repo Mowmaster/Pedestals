@@ -14,6 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -377,6 +379,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                                 itemFromInvCopy.setDisplayName(new TranslationTextComponent(strNameToChangeTo));
                                             }
                                             handler.extractItem(i,itemFromInvCopy.getCount(),false);
+                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             tilePedestal.addItem(itemFromInvCopy);
                                         }
                                     }

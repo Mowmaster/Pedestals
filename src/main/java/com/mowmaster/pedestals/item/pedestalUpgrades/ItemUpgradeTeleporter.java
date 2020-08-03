@@ -145,6 +145,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                         {
                             if(teleportEntity(world, tilePedestal, tilePedestal.getStoredPositionAt(i), entityIn))
                             {
+                                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                 removeFuel(tilePedestal,getTeleportDistance(posPedestal,tilePedestal.getStoredPositionAt(i)),false);
                             }
                             break;
@@ -157,6 +158,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                             BlockPos randomPos = world.getBlockRandomPos((int)entityIn.getPosX(),(int)entityIn.getPosY(),(int)entityIn.getPosZ(),range*remainingFuel);
                             if(teleportEntityRandom(world, randomPos, entityIn))
                             {
+                                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                 removeFuel(tilePedestal,remainingFuel,false);
                             }
                             break;

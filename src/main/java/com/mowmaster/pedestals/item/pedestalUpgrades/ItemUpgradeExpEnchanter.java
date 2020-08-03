@@ -187,7 +187,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                                 int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
                                                 setXPStored(coinInPedestal,getExpLeftInPedestal);
                                                 handler.extractItem(i,stackToReturn.getCount() ,false );
-                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
                                                 ((TilePedestal) pedestalInv).addItem(stackToReturn);
                                             }
                                         }

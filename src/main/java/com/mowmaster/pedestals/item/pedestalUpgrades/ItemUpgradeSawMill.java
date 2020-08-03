@@ -3,12 +3,15 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.crafting.SawMill;
 import com.mowmaster.pedestals.recipes.SawMillRecipe;
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
@@ -118,6 +121,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
                                         {
                                             handler.extractItem(i,itemInputsPerSmelt ,false );
                                             removeFuel(ped,fuelToConsume,false);
+                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             ped.addItem(copyIncoming);
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
@@ -138,6 +142,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
 
                                                     handler.extractItem(i,itemInputsPerSmelt ,false );
                                                     removeFuel(ped,fuelToConsume,false);
+                                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                     ped.addItem(copyIncoming);
                                                 }
                                             }

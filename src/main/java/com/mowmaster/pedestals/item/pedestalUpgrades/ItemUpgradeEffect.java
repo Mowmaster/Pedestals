@@ -12,6 +12,8 @@ import net.minecraft.item.*;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.*;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -139,11 +141,13 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                             {
                                 if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
                                 {
+                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                                 else
                                 {
                                     removeFromPedestal(world,posOfPedestal,1);
+                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
                             }
