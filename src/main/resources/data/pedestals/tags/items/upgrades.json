@@ -23,6 +23,7 @@
     "pedestals:coin/xpdropper",
     "pedestals:coin/xpenchanter",
     "pedestals:coin/xpanvil",
+    "pedestals:coin/xpgrindstone",
     "pedestals:coin/export",
     "pedestals:coin/restock",
     "pedestals:coin/filterenchanted",
@@ -48,6 +49,15 @@
     "pedestals:coin/sawmill",
     "pedestals:coin/attack",
     "pedestals:coin/effect",
-    "pedestals:coin/fan"
+    "pedestals:coin/fan",
+    "pedestals:coin/filterenchantedcount",
+    "pedestals:coin/filterenchantedexact",
+    "pedestals:coin/filterenchantedexactb",
+    "pedestals:coin/filterenchantedfuzzy",
+    "pedestals:coin/filterenchantedfuzzyb",
+    "pedestals:coin/rfexport",
+    "pedestals:coin/rfimport",
+    "pedestals:coin/rfrelay",
+    "pedestals:coin/rftank"
   ]
 }

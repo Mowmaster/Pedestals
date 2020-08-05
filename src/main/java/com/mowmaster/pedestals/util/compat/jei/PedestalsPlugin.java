@@ -160,6 +160,10 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeEffectHarvester.HARVESTER, "harvester");
         addValueInfoPage(registration, ItemUpgradeEffectPlanter.PLANTER, "planter");
         addValueInfoPage(registration, ItemUpgradeEffectMagnet.MAGNET, "magnet");
+        addValueInfoPage(registration, ItemUpgradeEnergyExport.RFEXPORT, "rfexport");
+        addValueInfoPage(registration, ItemUpgradeEnergyImport.RFIMPORT, "rfimport");
+        addValueInfoPage(registration, ItemUpgradeEnergyRelay.RFRELAY, "rfrelay");
+        addValueInfoPage(registration, ItemUpgradeEnergyTank.RFTANK, "rftank");
         addValueInfoPage(registration, ItemUpgradeExpCollector.XPMAGNET, "xpmagnet");
         addValueInfoPage(registration, ItemUpgradeExpRelay.XPRELAY, "xprelay");
         addValueInfoPage(registration, ItemUpgradeExpTank.XPTANK, "xptank");

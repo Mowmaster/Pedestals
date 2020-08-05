@@ -12,6 +12,12 @@
     "pedestals:coin/filterfood",
     "pedestals:coin/filterfoodb",
     "pedestals:coin/filtertag",
-    "pedestals:coin/filtertagb"
+    "pedestals:coin/filtertagb",
+    "pedestals:coin/filterenchantedcount",
+    "pedestals:coin/filterenchantedexact",
+    "pedestals:coin/filterenchantedexactb",
+    "pedestals:coin/filterenchantedfuzzy",
+    "pedestals:coin/filterenchantedfuzzyb"
+
   ]
 }

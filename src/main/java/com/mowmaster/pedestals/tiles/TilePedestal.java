@@ -31,7 +31,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -108,7 +107,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     //Above this is mostly IInventory stuff needed for block drops
 
-    private void update()
+    public void update()
     {
         markDirty();
         world.notifyBlockUpdate(pos,getBlockState(),getBlockState(),1);
@@ -589,7 +588,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             Item coinInPed = getCoinOnPedestal().getItem();
             if(coinInPed instanceof ItemUpgradeBase)
             {
-                ((ItemUpgradeBase) coinInPed).canSendItem();
+                return ((ItemUpgradeBase) coinInPed).canSendItem(this);
             }
         }
 

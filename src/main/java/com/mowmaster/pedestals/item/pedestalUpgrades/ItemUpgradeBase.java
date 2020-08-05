@@ -52,6 +52,7 @@ public class ItemUpgradeBase extends Item {
 
     public ItemUpgradeBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+
     public void onRandomDisplayTick(TilePedestal pedestal, BlockState stateIn, World worldIn, BlockPos pos, Random rand)
     {
 
@@ -831,7 +832,7 @@ public class ItemUpgradeBase extends Item {
 
     }
 
-    public boolean canSendItem()
+    public boolean canSendItem(TilePedestal tile)
     {
         return true;
     }

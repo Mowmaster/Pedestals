@@ -41,6 +41,11 @@ public class ItemRegistry
         ItemUpgradeExpAnvil.onItemRegistryReady(e);
         ItemUpgradeExpGrindstone.onItemRegistryReady(e);
 
+        ItemUpgradeEnergyImport.onItemRegistryReady(e);
+        ItemUpgradeEnergyExport.onItemRegistryReady(e);
+        ItemUpgradeEnergyRelay.onItemRegistryReady(e);
+        ItemUpgradeEnergyTank.onItemRegistryReady(e);
+
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);
         ItemUpgradeRestock.onItemRegistryReady(e);
