@@ -230,7 +230,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                         //if Stored Pedestal has room for exp (will be lazy sending exp here)
                                         if(energyStoredPedestal < energyMaxStoredPedestal)
                                         {
-                                            int transferRate = getEnergyTransferRate(coinMainPedestal);
+                                            int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energyMaxStoredPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energyMaxStoredPedestal);
                                             //If we have more then X levels in the pedestal we're sending from
                                             if(xpMainPedestal >= transferRate)
                                             {
