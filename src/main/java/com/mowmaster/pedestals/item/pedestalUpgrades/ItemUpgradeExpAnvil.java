@@ -439,23 +439,23 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
-        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.func_240699_a_(TextFormatting.GREEN);
+        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(xpstored,player.getUniqueID());
 
         TranslationTextComponent sorround = new TranslationTextComponent(getTranslationKey() + ".chat_sorround");
-        sorround.func_240702_b_(""+ correctlyPlacedSorroundingPedestals(pedestal.getWorld(),pedestal.getPos()) +"");
-        sorround.func_240699_a_(TextFormatting.AQUA);
+        sorround.appendString(""+ correctlyPlacedSorroundingPedestals(pedestal.getWorld(),pedestal.getPos()) +"");
+        sorround.mergeStyle(TextFormatting.AQUA);
         player.sendMessage(sorround,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -465,9 +465,9 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(speed);
     }

@@ -340,23 +340,23 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_rfstored");
-        xpstored.func_240702_b_(""+ getEnergyStored(stack) +"");
-        xpstored.func_240699_a_(TextFormatting.GREEN);
+        xpstored.appendString(""+ getEnergyStored(stack) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(xpstored,player.getUniqueID());
 
         TranslationTextComponent energyRate = new TranslationTextComponent(getTranslationKey() + ".chat_rfrate");
-        energyRate.func_240702_b_(""+ getEnergyTransferRate(stack) +"");
-        energyRate.func_240699_a_(TextFormatting.AQUA);
+        energyRate.appendString(""+ getEnergyTransferRate(stack) +"");
+        energyRate.mergeStyle(TextFormatting.AQUA);
         player.sendMessage(energyRate,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -366,23 +366,25 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfstored");
-        xpstored.func_240702_b_(""+ getEnergyStored(stack) +"");
-        xpstored.func_240699_a_(TextFormatting.GREEN);
+        //xpstored.appendString()
+        xpstored.appendString(""+ getEnergyStored(stack) +"");
+        //xpstored.mergeStyle(TextFormatting.GREEN)
+        xpstored.mergeStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
 
         TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfcapacity");
-        xpcapacity.func_240702_b_(""+ getEnergyBuffer(stack) +"");
-        xpcapacity.func_240699_a_(TextFormatting.AQUA);
+        xpcapacity.appendString(""+ getEnergyBuffer(stack) +"");
+        xpcapacity.mergeStyle(TextFormatting.AQUA);
         tooltip.add(xpcapacity);
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_("" + getEnergyTransferRate(stack) + "");
-        rate.func_240699_a_(TextFormatting.GRAY);
+        rate.appendString("" + getEnergyTransferRate(stack) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 

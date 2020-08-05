@@ -11,7 +11,8 @@ import java.util.Map;
 
 public class SawMill
 {
-    private static final SawMill SAWMILL = new SawMill();
+    //Old class, see recipes/SawMillRecipe for updated SawMill code
+    /*private static final SawMill SAWMILL = new SawMill();
 
     private final Map<Item, ItemStack> sawList = Maps.<Item, ItemStack>newHashMap();
 
@@ -108,9 +109,9 @@ public class SawMill
         this.sawList.put(stackIn, stackOut);
     }
 
-    /**
+    *//**
      * Returns the sawing result of an item.
-     */
+     *//*
     public ItemStack getResult(Item stackIn)
     {
         for (Map.Entry<Item, ItemStack> entry : this.sawList.entrySet())
@@ -127,6 +128,6 @@ public class SawMill
     public Map<Item, ItemStack> getSawingList()
     {
         return this.sawList;
-    }
+    }*/
 
 }

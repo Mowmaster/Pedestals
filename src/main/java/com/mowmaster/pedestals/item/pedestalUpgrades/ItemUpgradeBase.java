@@ -225,7 +225,7 @@ public class ItemUpgradeBase extends Item {
         ItemStack stack = new ItemStack((Item)BLOCK_TO_ITEM.getOrDefault(block, Items.AIR));
 
         //Netherite
-        if(block.equals(Blocks.field_235397_ng_)) return Blocks.field_235397_ng_;
+        if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
         if(stack.getItem().getTags().toString().contains("forge:storage_blocks/emerald")) return Blocks.EMERALD_BLOCK;//Players
         if(stack.getItem().getTags().toString().contains("forge:storage_blocks/diamond")) return Blocks.DIAMOND_BLOCK;//All Mobs
         if(stack.getItem().getTags().toString().contains("forge:storage_blocks/gold")) return Blocks.GOLD_BLOCK;//All Animals
@@ -843,7 +843,7 @@ public class ItemUpgradeBase extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.func_240699_a_(TextFormatting.GOLD);
+        t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
     }
 

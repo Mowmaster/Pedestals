@@ -129,13 +129,13 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".chat_name");
         TranslationTextComponent name2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240702_b_(name2.getString());
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.appendString(name2.getString());
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_size");
-        xpstored.func_240702_b_(""+ getSize(stack) +"");
-        xpstored.func_240699_a_(TextFormatting.GREEN);
+        xpstored.appendString(""+ getSize(stack) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(xpstored,player.getUniqueID());
     }
 
@@ -144,12 +144,12 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.func_240699_a_(TextFormatting.GOLD);
+        t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_size");
-        xpstored.func_240702_b_(""+ getSize(stack) +"");
-        xpstored.func_240699_a_(TextFormatting.GREEN);
+        xpstored.appendString(""+ getSize(stack) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
     }
 

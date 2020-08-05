@@ -41,7 +41,7 @@ public class ItemDevTool extends Item {
             {
                 int getAmp = PotionUtils.getEffectsFromStack(p_77659_2_.getHeldItemOffhand()).get(0).getAmplifier();
                 TranslationTextComponent name = new TranslationTextComponent(""+getAmp+"");
-                name.func_240699_a_(TextFormatting.GOLD);
+                name.mergeStyle(TextFormatting.GOLD);
                 p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
             }
         }

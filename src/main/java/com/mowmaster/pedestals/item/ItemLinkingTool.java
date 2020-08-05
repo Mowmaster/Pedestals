@@ -163,30 +163,30 @@ public class ItemLinkingTool extends Item {
                         if(getLocations.size()>0)
                         {
                             TranslationTextComponent links = new TranslationTextComponent(getTranslationKey() + ".tool_linked");
-                            links.func_240699_a_(TextFormatting.WHITE);
+                            links.mergeStyle(TextFormatting.WHITE);
                             player.sendMessage(links,player.getUniqueID());
 
                             for(int i = 0; i < getLocations.size();i++)
                             {
                                 TranslationTextComponent linked = new TranslationTextComponent("   " + getLocations.get(i).getX() + "");
                                 TranslationTextComponent seperator = new TranslationTextComponent(getTranslationKey() + ".tool_seperator");
-                                linked.func_240702_b_(seperator.getString());
-                                linked.func_240702_b_("" + getLocations.get(i).getY() + "");
-                                linked.func_240702_b_(seperator.getString());
-                                linked.func_240702_b_("" + getLocations.get(i).getZ() + "");
-                                linked.func_240699_a_(TextFormatting.GRAY);
+                                linked.appendString(seperator.getString());
+                                linked.appendString("" + getLocations.get(i).getY() + "");
+                                linked.appendString(seperator.getString());
+                                linked.appendString("" + getLocations.get(i).getZ() + "");
+                                linked.mergeStyle(TextFormatting.GRAY);
                                 player.sendMessage(linked,player.getUniqueID());
                             }
                         }
 
                         TranslationTextComponent capacity = new TranslationTextComponent(getTranslationKey() + ".tool_capacity");
-                        capacity.func_240702_b_(""+tilePedestal.getCapacity()+"");
-                        capacity.func_240699_a_(TextFormatting.BLUE);
+                        capacity.appendString(""+tilePedestal.getCapacity()+"");
+                        capacity.mergeStyle(TextFormatting.BLUE);
                         player.sendMessage(capacity,player.getUniqueID());
 
                         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tool_speed");
-                        speed.func_240702_b_(""+tilePedestal.getSpeed()+"");
-                        speed.func_240699_a_(TextFormatting.RED);
+                        speed.appendString(""+tilePedestal.getSpeed()+"");
+                        speed.mergeStyle(TextFormatting.RED);
                         player.sendMessage(speed,player.getUniqueID());
                     }
                 }

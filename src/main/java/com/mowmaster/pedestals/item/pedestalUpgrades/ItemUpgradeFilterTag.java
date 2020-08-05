@@ -72,8 +72,8 @@ public class ItemUpgradeFilterTag extends ItemUpgradeBaseFilter
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".chat_name");
         TranslationTextComponent name2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240702_b_(name2.getString());
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.appendString(name2.getString());
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
     }
 

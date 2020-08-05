@@ -1,12 +1,8 @@
 package com.mowmaster.pedestals.crafting;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.pedestals.item.ItemDust;
-import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 
@@ -15,7 +11,8 @@ import java.util.Map;
 
 public class Crusher
 {
-    private static final Crusher CRUSHER = new Crusher();
+    //Old class, see recipes/CrusherRecipe for updated Crusher code
+    /*private static final Crusher CRUSHER = new Crusher();
 
     private final Map<Item, ItemStack> crusherList = Maps.<Item, ItemStack>newHashMap();
 
@@ -100,14 +97,14 @@ public class Crusher
     }
 
 
-    /*public void addCrusherBlockRecipe(Block blockIn, ItemStack stack)
+    *//*public void addCrusherBlockRecipe(Block blockIn, ItemStack stack)
     {
         this.addCrusherRecipe(, stack);
-    }*/
+    }*//*
     public void addCrusherTagRecipe(String tagIn, ItemStack stackOut)
     {
         ResourceLocation grabTags = new ResourceLocation(tagIn.split(":")[0], tagIn.split(":")[1]);
-        List<Item> itemList = ItemTags.getCollection().getOrCreate(grabTags).func_230236_b_();
+        List<Item> itemList = ItemTags.getCollection().getOrCreate(grabTags).getAllElements();
         for(Item item : itemList)
         {
             if (getResult(item) != ItemStack.EMPTY) { return;}
@@ -121,9 +118,9 @@ public class Crusher
         this.crusherList.put(stackIn, stackOut);
     }
 
-    /**
+    *//**
      * Returns the smelting result of an item.
-     */
+     *//*
     public ItemStack getResult(Item stackIn)
     {
         for (Map.Entry<Item, ItemStack> entry : this.crusherList.entrySet())
@@ -140,6 +137,6 @@ public class Crusher
     public Map<Item, ItemStack> getCrushingList()
     {
         return this.crusherList;
-    }
+    }*/
 
 }

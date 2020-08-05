@@ -131,18 +131,18 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.func_240702_b_(""+getRange(stack)+"");
-        range.func_240699_a_(TextFormatting.WHITE);
+        range.appendString(""+getRange(stack)+"");
+        range.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(range,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -152,12 +152,12 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.func_240702_b_("" + getRange(stack) + "");
+        range.appendString("" + getRange(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        range.func_240699_a_(TextFormatting.WHITE);
-        speed.func_240699_a_(TextFormatting.RED);
+        range.mergeStyle(TextFormatting.WHITE);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(range);
         tooltip.add(speed);

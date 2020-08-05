@@ -99,18 +99,18 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.func_240702_b_("" + (int)(getDamageDelt(stack)/2) + "");
-        rate.func_240699_a_(TextFormatting.GRAY);
+        rate.appendString("" + (int)(getDamageDelt(stack)/2) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -120,12 +120,12 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_("" + (int)(getDamageDelt(stack)/2) + "");
+        rate.appendString("" + (int)(getDamageDelt(stack)/2) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        rate.func_240699_a_(TextFormatting.GRAY);
-        speed.func_240699_a_(TextFormatting.RED);
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);

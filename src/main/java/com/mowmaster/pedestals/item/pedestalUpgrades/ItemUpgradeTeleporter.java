@@ -296,16 +296,16 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.func_240702_b_(""+getRange(stack)+"");
+        range.appendString(""+getRange(stack)+"");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        range.func_240699_a_(TextFormatting.WHITE);
-        speed.func_240699_a_(TextFormatting.RED);
+        range.mergeStyle(TextFormatting.WHITE);
+        speed.mergeStyle(TextFormatting.RED);
 
         player.sendMessage(range,player.getUniqueID());
 
@@ -313,8 +313,8 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         //Display Fuel Left
         int fuelLeft = pedestal.getStoredValueForUpgrades();
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.func_240702_b_("" + fuelLeft + "");
-        fuel.func_240699_a_(TextFormatting.GREEN);
+        fuel.appendString("" + fuelLeft + "");
+        fuel.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(fuel,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
@@ -326,17 +326,17 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.func_240699_a_(TextFormatting.GOLD);
+        t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.func_240702_b_("" + getRange(stack) + "");
-        range.func_240699_a_(TextFormatting.WHITE);
+        range.appendString("" + getRange(stack) + "");
+        range.mergeStyle(TextFormatting.WHITE);
         tooltip.add(range);
 
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 

@@ -39,8 +39,8 @@ public class ItemTagTool extends Item {
             if(!p_77659_2_.getHeldItemOffhand().isEmpty())
             {
                 TranslationTextComponent output = new TranslationTextComponent("Tags: ");
-                output.func_240702_b_(tags);
-                output.func_240699_a_(TextFormatting.WHITE);
+                output.appendString(tags);
+                output.mergeStyle(TextFormatting.WHITE);
                 p_77659_2_.sendMessage(output,p_77659_2_.getUniqueID());
             }
         }

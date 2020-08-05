@@ -780,20 +780,21 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         }
     }
 
-    public void func_230337_a_(BlockState p_230337_1_, CompoundNBT tag) {
-        super.func_230337_a_(p_230337_1_, tag);
-        CompoundNBT invTag = tag.getCompound("inv");
+    @Override
+    public void read(BlockState state, CompoundNBT nbt) {
+        super.read(state, nbt);
+        CompoundNBT invTag = nbt.getCompound("inv");
         handler.ifPresent(h -> ((INBTSerializable<CompoundNBT>) h).deserializeNBT(invTag));
 
-        this.storedValueForUpgrades = tag.getInt("storedUpgradeValue");
-        this.intTransferAmount = tag.getInt("intTransferAmount");
-        this.intTransferSpeed = tag.getInt("intTransferSpeed");
-        this.intTransferRange = tag.getInt("intTransferRange");
-        this.boolLight = tag.getBoolean("boollight");
+        this.storedValueForUpgrades = nbt.getInt("storedUpgradeValue");
+        this.intTransferAmount = nbt.getInt("intTransferAmount");
+        this.intTransferSpeed = nbt.getInt("intTransferSpeed");
+        this.intTransferRange = nbt.getInt("intTransferRange");
+        this.boolLight = nbt.getBoolean("boollight");
 
-        int[] storedIX = tag.getIntArray("intArrayXPos");
-        int[] storedIY = tag.getIntArray("intArrayYPos");
-        int[] storedIZ = tag.getIntArray("intArrayZPos");
+        int[] storedIX = nbt.getIntArray("intArrayXPos");
+        int[] storedIY = nbt.getIntArray("intArrayYPos");
+        int[] storedIZ = nbt.getIntArray("intArrayZPos");
 
         for(int i=0;i<storedIX.length;i++)
         {
@@ -801,8 +802,9 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             storedLocations.add(gotPos);
         }
 
-        this.lockCode = LockCode.read(tag);
+        this.lockCode = LockCode.read(nbt);
     }
+
 
     public CompoundNBT write(CompoundNBT tag) {
         super.write(tag);
@@ -867,7 +869,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     @Override
     public void handleUpdateTag(BlockState state, CompoundNBT tag)
     {
-        this.func_230337_a_(state, tag);
+        this.read(state, tag);
     }
 
     private static Block[] pedArray = new Block[]{BlockPedestalTE.PEDESTAL_000, BlockPedestalTE.PEDESTAL_001, BlockPedestalTE.PEDESTAL_002, BlockPedestalTE.PEDESTAL_003

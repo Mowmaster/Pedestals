@@ -147,19 +147,19 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.func_240702_b_(""+getRange(stack)+"");
-        range.func_240699_a_(TextFormatting.WHITE);
+        range.appendString(""+getRange(stack)+"");
+        range.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(range,player.getUniqueID());
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
-            enchant.func_240699_a_(TextFormatting.LIGHT_PURPLE);
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
             player.sendMessage(enchant,player.getUniqueID());
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
@@ -168,7 +168,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.func_240699_a_(TextFormatting.GRAY);
+                    enchants.mergeStyle(TextFormatting.GRAY);
                     player.sendMessage(enchants,player.getUniqueID());
                 }
             }
@@ -176,8 +176,8 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -186,14 +186,14 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.func_240702_b_("" + getRange(stack) + "");
+        range.appendString("" + getRange(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        range.func_240699_a_(TextFormatting.WHITE);
+        range.mergeStyle(TextFormatting.WHITE);
         tooltip.add(range);
 
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 

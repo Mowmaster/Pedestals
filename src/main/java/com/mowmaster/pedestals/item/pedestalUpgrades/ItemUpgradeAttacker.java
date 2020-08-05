@@ -141,7 +141,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
             DamageSource sourceE = new EntityDamageSource(list.get(rn.nextInt(10)),fakePlayer);
             float damage = getAttackDamage(getEntityFromList,itemInPedestal,coinInPedestal);
 
-            if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.field_235397_ng_))
+            if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
             {
                 damage *= 2.0f;
             }
@@ -161,33 +161,33 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         String tr = "" + (s3+s3+1) + "";
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240699_a_(TextFormatting.WHITE);
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,player.getUniqueID());
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.func_240702_b_("" + getMostlyDamage(pedestal) + "");
-        rate.func_240699_a_(TextFormatting.GRAY);
+        rate.appendString("" + getMostlyDamage(pedestal) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,player.getUniqueID());
 
         TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
-        entityType.func_240702_b_(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
-        entityType.func_240699_a_(TextFormatting.YELLOW);
+        entityType.appendString(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        entityType.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(entityType,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -200,19 +200,19 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         String tr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_("" + (int)((getCapacityModifier(stack) + 2.0F)) + "");
+        rate.appendString("" + (int)((getCapacityModifier(stack) + 2.0F)) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.func_240699_a_(TextFormatting.WHITE);
-        rate.func_240699_a_(TextFormatting.GRAY);
-        speed.func_240699_a_(TextFormatting.RED);
+        area.mergeStyle(TextFormatting.WHITE);
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(rate);

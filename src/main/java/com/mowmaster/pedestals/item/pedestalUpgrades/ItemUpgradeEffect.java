@@ -126,7 +126,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
             List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
             for(LivingEntity getEntityFromList : entityList)
             {
-                if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.field_235397_ng_))
+                if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
                 {
                     instance = getEffectFromPedestal(itemInPedestal,1);
                 }
@@ -198,48 +198,48 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         String tr = "" + (s3+s3+1) + "";
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240699_a_(TextFormatting.WHITE);
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,player.getUniqueID());
 
 
         //Display Fuel Left
         int fuelLeft = pedestal.getStoredValueForUpgrades();
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.func_240702_b_("" + fuelLeft + "");
-        fuel.func_240699_a_(TextFormatting.GREEN);
+        fuel.appendString("" + fuelLeft + "");
+        fuel.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(fuel,player.getUniqueID());
 
         //Displays what effects are in pedestal
         List<EffectInstance> instance = getEffectFromPedestal(pedestal.getItemInPedestal(),1);
         TranslationTextComponent effect = new TranslationTextComponent(getTranslationKey() + ".chat_effect");
-        effect.func_240699_a_(TextFormatting.AQUA);
+        effect.mergeStyle(TextFormatting.AQUA);
         player.sendMessage(effect,player.getUniqueID());
         for(int i = 0; i < instance.size();i++)
         {
             TranslationTextComponent effects = new TranslationTextComponent(instance.get(i).getPotion().getDisplayName().getString());
-            effects.func_240699_a_(TextFormatting.GRAY);
+            effects.mergeStyle(TextFormatting.GRAY);
             player.sendMessage(effects,player.getUniqueID());
         }
 
         TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
-        entityType.func_240702_b_(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
-        entityType.func_240699_a_(TextFormatting.YELLOW);
+        entityType.appendString(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        entityType.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(entityType,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -248,23 +248,23 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.func_240699_a_(TextFormatting.GOLD);
+        t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.func_240699_a_(TextFormatting.WHITE);
-        speed.func_240699_a_(TextFormatting.RED);
+        area.mergeStyle(TextFormatting.WHITE);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(speed);

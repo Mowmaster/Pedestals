@@ -221,25 +221,25 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.func_240702_b_(""+getItemTransferRate(stack)+"");
-        rate.func_240699_a_(TextFormatting.GRAY);
+        rate.appendString(""+getItemTransferRate(stack)+"");
+        rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,player.getUniqueID());
 
         //Display Fuel Left
         int fuelLeft = pedestal.getStoredValueForUpgrades();
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.func_240702_b_("" + fuelLeft/200 + "");
-        fuel.func_240699_a_(TextFormatting.GREEN);
+        fuel.appendString("" + fuelLeft/200 + "");
+        fuel.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(fuel,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getSmeltingSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getSmeltingSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -250,12 +250,12 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         int s2 = getItemTransferRate(stack);
         String trr = getSmeltingSpeedString(stack);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_(""+s2+"");
+        rate.appendString(""+s2+"");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(trr);
+        speed.appendString(trr);
 
-        rate.func_240699_a_(TextFormatting.GRAY);
-        speed.func_240699_a_(TextFormatting.RED);
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);

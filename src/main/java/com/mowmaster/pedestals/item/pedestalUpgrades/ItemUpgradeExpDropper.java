@@ -156,28 +156,28 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
         }
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
-        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.func_240699_a_(TextFormatting.GREEN);
+        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(xpstored,player.getUniqueID());
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.func_240702_b_("" +  getRange(stack) + "");
-        range.func_240699_a_(TextFormatting.WHITE);
+        range.appendString("" +  getRange(stack) + "");
+        range.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(range,player.getUniqueID());
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.func_240702_b_("" +  tr + "");
-        rate.func_240699_a_(TextFormatting.GRAY);
+        rate.appendString("" +  tr + "");
+        rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -212,16 +212,16 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
         }
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.func_240702_b_("" +  getRange(stack) + "");
+        range.appendString("" +  getRange(stack) + "");
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_("" +  tr + "");
+        rate.appendString("" +  tr + "");
 
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        range.func_240699_a_(TextFormatting.WHITE);
-        rate.func_240699_a_(TextFormatting.GRAY);
-        speed.func_240699_a_(TextFormatting.RED);
+        range.mergeStyle(TextFormatting.WHITE);
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(range);
         tooltip.add(rate);

@@ -190,25 +190,25 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.func_240702_b_("" +  getItemTransferRate(stack) + "");
-        rate.func_240699_a_(TextFormatting.GRAY);
+        rate.appendString("" +  getItemTransferRate(stack) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,player.getUniqueID());
 
         TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
-        stored.func_240702_b_("" +  (pedestal.getStoredValueForUpgrades()+pedestal.getItemInPedestal().getCount()) + "");
-        stored.func_240699_a_(TextFormatting.GREEN);
+        stored.appendString("" +  (pedestal.getStoredValueForUpgrades()+pedestal.getItemInPedestal().getCount()) + "");
+        stored.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(stored,player.getUniqueID());
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
-            enchant.func_240699_a_(TextFormatting.LIGHT_PURPLE);
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
             player.sendMessage(enchant,player.getUniqueID());
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
@@ -217,7 +217,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.func_240699_a_(TextFormatting.GRAY);
+                    enchants.mergeStyle(TextFormatting.GRAY);
                     player.sendMessage(enchants,player.getUniqueID());
                 }
             }
@@ -225,8 +225,8 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -236,14 +236,14 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_("" + getCobbleGenSpawnRate(stack) + "");
+        rate.appendString("" + getCobbleGenSpawnRate(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        rate.func_240699_a_(TextFormatting.GRAY);
+        rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 

@@ -189,35 +189,35 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
-        xpstored.func_240702_b_(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.func_240699_a_(TextFormatting.GREEN);
+        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(xpstored,player.getUniqueID());
 
         int s3 = getAreaWidth(stack);
         String trr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.func_240702_b_(trr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(trr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(trr);
-        area.func_240699_a_(TextFormatting.WHITE);
+        area.appendString(trr);
+        area.appendString(areax.getString());
+        area.appendString(trr);
+        area.appendString(areax.getString());
+        area.appendString(trr);
+        area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,player.getUniqueID());
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.func_240702_b_(getExpTransferRateString(stack));
-        rate.func_240699_a_(TextFormatting.GRAY);
+        rate.appendString(getExpTransferRateString(stack));
+        rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -231,19 +231,19 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.func_240702_b_(trr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(trr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(trr);
+        area.appendString(trr);
+        area.appendString(areax.getString());
+        area.appendString(trr);
+        area.appendString(areax.getString());
+        area.appendString(trr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.func_240699_a_(TextFormatting.WHITE);
+        area.mergeStyle(TextFormatting.WHITE);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.func_240702_b_(getExpTransferRateString(stack));
-        rate.func_240699_a_(TextFormatting.GRAY);
-        speed.func_240699_a_(TextFormatting.RED);
+        rate.appendString(getExpTransferRateString(stack));
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(rate);

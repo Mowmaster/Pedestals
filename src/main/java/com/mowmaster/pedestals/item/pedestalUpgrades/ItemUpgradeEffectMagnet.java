@@ -120,25 +120,25 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.func_240699_a_(TextFormatting.GOLD);
+        name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240699_a_(TextFormatting.WHITE);
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,player.getUniqueID());
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
-        speed.func_240699_a_(TextFormatting.RED);
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
 
@@ -151,16 +151,16 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
         String tr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
-        area.func_240702_b_(areax.getString());
-        area.func_240702_b_(tr);
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.func_240702_b_(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.func_240699_a_(TextFormatting.WHITE);
-        speed.func_240699_a_(TextFormatting.RED);
+        area.mergeStyle(TextFormatting.WHITE);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(speed);
