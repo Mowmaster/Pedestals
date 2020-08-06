@@ -104,20 +104,16 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 
 
                             if (world.getBlockState(posTarget.down()).canSustainPlant(world,posTarget.down(), Direction.UP,(IPlantable) block)) {
-                                if (world.setBlockState(posTarget, ((IPlantable) block).getPlant(world, posTarget))) {
+                                FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+                                fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
 
-                                    FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
-                                    fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-                                    BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal, new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget, false));
+                                BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget.down(), false));
 
-                                    ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                    if (result == ActionResultType.SUCCESS) {
-                                        this.removeFromPedestal(world,posOfPedestal,1);
-                                        world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                                    }
-                                /*this.removeFromPedestal(world,posOfPedestal,1);
-                                world.setBlockState(posTarget,((IPlantable) block).getPlant(world, posTarget));
-                                world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);*/
+                                ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                System.out.println(result);
+                                if (ForgeHooks.onPlaceItemIntoWorld(blockContext) == ActionResultType.CONSUME) {
+                                    this.removeFromPedestal(world,posOfPedestal,1);
+                                    world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                                 }
                             }
                         }
