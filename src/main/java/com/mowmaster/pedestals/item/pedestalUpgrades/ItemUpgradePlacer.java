@@ -96,8 +96,9 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
 
                             BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal, new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), blockPosBelow, false));
 
+
                             ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == ActionResultType.SUCCESS) {
+                            if (result == ActionResultType.CONSUME) {
                                 this.removeFromPedestal(world,posOfPedestal,1);
                                 world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             }
