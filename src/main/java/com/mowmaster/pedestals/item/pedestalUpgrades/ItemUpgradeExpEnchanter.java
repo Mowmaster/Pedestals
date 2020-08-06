@@ -208,7 +208,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void onRandomDisplayTick(TilePedestal pedestal, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         if(!world.isBlockPowered(pos))
         {

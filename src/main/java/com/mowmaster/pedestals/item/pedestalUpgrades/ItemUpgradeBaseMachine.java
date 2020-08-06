@@ -9,7 +9,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
 
@@ -197,20 +200,66 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(TilePedestal pedestal, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         if(!world.isBlockPowered(pos))
         {
             int fuelValue = pedestal.getStoredValueForUpgrades();
 
-            double d0 = (double)getPosOfBlockBelow(world,pos,-1 ).getX() + 0.55D - (double)(rand.nextFloat() * 0.1F);
-            double d1 = (double)getPosOfBlockBelow(world,pos,-1 ).getY() + 0.0D - (double)(rand.nextFloat() * 0.1F);
-            double d2 = (double)getPosOfBlockBelow(world,pos,-1 ).getZ() + 0.55D - (double)(rand.nextFloat() * 0.1F);
-            double d3 = (double)(0.4F - (rand.nextFloat() + rand.nextFloat()) * 0.4F);
+            double dx = (double)pos.getX();
+            double dy = (double)pos.getY();
+            double dz = (double)pos.getZ();
 
             if(fuelValue >= 200)
             {
-                world.addParticle(ParticleTypes.SMOKE, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.0D, (double)pos.getZ() + 0.5D,0, 0, 0);
+                BlockState state = world.getBlockState(pos);
+                Direction enumfacing = state.get(FACING);
+                BlockPos blockBelow = pos;
+                switch (enumfacing)
+                {
+                    case UP:
+                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        return;
+                    case DOWN:
+                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+.85D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+.85D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+.85D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+.85D, dz+ 0.75D,0, 0, 0);
+                        return;
+                    case NORTH:
+                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.25D, dz+.85D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.75D, dz+.85D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.25D, dz+.85D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.75D, dz+.85D,0, 0, 0);
+                        return;
+                    case SOUTH:
+                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.25D, dz+0.15D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.75D, dz+0.15D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.25D, dz+0.15D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.75D, dz+0.15D,0, 0, 0);
+                        return;
+                    case EAST:
+                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.15D, dy+ 0.25D, dz+0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.15D, dy+ 0.25D, dz+0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.15D, dy+ 0.75D, dz+0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.15D, dy+ 0.75D, dz+0.75D,0, 0, 0);
+                        return;
+                    case WEST:
+                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.85D, dy+0.25D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.85D, dy+0.25D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.85D, dy+0.75D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.85D, dy+0.75D, dz+ 0.75D,0, 0, 0);
+                        return;
+                    default:
+                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%35 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%40 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        return;
+                }
             }
         }
     }

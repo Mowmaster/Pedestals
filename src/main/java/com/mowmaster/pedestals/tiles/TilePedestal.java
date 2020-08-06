@@ -712,6 +712,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         return false;
     }
 
+    int partTicker = 0;
     int impTicker = 0;
     int pedTicker = 0;
     @Override
@@ -773,8 +774,10 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                 Item coinInPed = getCoinOnPedestal().getItem();
                 if(coinInPed instanceof ItemUpgradeBase)
                 {
+                    partTicker++;
                     Random rand = new Random();
-                    ((ItemUpgradeBase) coinInPed).onRandomDisplayTick(this, world.getBlockState(getPos()), world, getPos(), rand);
+                    ((ItemUpgradeBase) coinInPed).onRandomDisplayTick(this,partTicker, world.getBlockState(getPos()), world, getPos(), rand);
+                    if(partTicker >=Integer.MAX_VALUE-100){partTicker=0;}
                 }
             }
         }
