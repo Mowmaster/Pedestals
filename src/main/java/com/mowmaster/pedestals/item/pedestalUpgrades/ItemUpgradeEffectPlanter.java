@@ -110,8 +110,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                                 BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget.down(), false));
 
                                 ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                System.out.println(result);
-                                if (ForgeHooks.onPlaceItemIntoWorld(blockContext) == ActionResultType.CONSUME) {
+                                if (result == ActionResultType.CONSUME) {
                                     this.removeFromPedestal(world,posOfPedestal,1);
                                     world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                                 }
