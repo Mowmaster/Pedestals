@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.BoatEntity;
@@ -10,6 +11,8 @@ import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
@@ -30,8 +33,10 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
@@ -278,6 +283,11 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         stack.setTag(compound);
     }
 
+    public boolean hasEnergy(ItemStack stack)
+    {
+        return getEnergyStored(stack)>0;
+    }
+
     public int getEnergyStored(ItemStack stack)
     {
         int storedEnergy = 0;
@@ -328,10 +338,97 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         return maxenergy;
     }
 
-    public int getEnergyBuffer(ItemStack stack)
+    public int getEnergyBuffer(ItemStack stack) {
+        int energyBuffer = 10000;
+        switch (getCapacityModifier(stack))
+        {
+            case 0:
+                energyBuffer = 10000;
+                break;
+            case 1:
+                energyBuffer = 20000;
+                break;
+            case 2:
+                energyBuffer = 40000;
+                break;
+            case 3:
+                energyBuffer = 60000;
+                break;
+            case 4:
+                energyBuffer = 80000;
+                break;
+            case 5:
+                energyBuffer = 100000;
+                break;
+            default: energyBuffer = 10000;
+        }
+
+        return  energyBuffer;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        //This is default max transfer rate
-        return  20000;
+        if(!world.isBlockPowered(pos))
+        {
+            double dx = (double)pos.getX();
+            double dy = (double)pos.getY();
+            double dz = (double)pos.getZ();
+
+            if(hasEnergy(pedestal.getCoinOnPedestal()))
+            {
+                BlockState state = world.getBlockState(pos);
+                Direction enumfacing = state.get(FACING);
+                BlockPos blockBelow = pos;
+                RedstoneParticleData parti = new RedstoneParticleData(1.0F, 0.0F, 0.0F, 1.0f);
+                switch (enumfacing)
+                {
+                    case UP:
+                        if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        return;
+                    case DOWN:
+                        if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+.85D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+.85D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+.85D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+.85D, dz+ 0.75D,0, 0, 0);
+                        return;
+                    case NORTH:
+                        if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.25D, dz+.85D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.75D, dz+.85D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.25D, dz+.85D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.75D, dz+.85D,0, 0, 0);
+                        return;
+                    case SOUTH:
+                        if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.25D, dz+0.15D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.75D, dz+0.15D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.25D, dz+0.15D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.75D, dz+0.15D,0, 0, 0);
+                        return;
+                    case EAST:
+                        if (tick%20 == 0) world.addParticle(parti, dx+0.15D, dy+ 0.25D, dz+0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+0.15D, dy+ 0.25D, dz+0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+0.15D, dy+ 0.75D, dz+0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+0.15D, dy+ 0.75D, dz+0.75D,0, 0, 0);
+                        return;
+                    case WEST:
+                        if (tick%20 == 0) world.addParticle(parti, dx+0.85D, dy+0.25D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+0.85D, dy+0.25D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+0.85D, dy+0.75D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+0.85D, dy+0.75D, dz+ 0.75D,0, 0, 0);
+                        return;
+                    default:
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%35 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%40 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        return;
+                }
+            }
+        }
     }
 
     @Override

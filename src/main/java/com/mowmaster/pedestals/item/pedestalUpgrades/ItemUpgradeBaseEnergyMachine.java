@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.LeverBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
@@ -9,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
@@ -197,56 +199,57 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
                 BlockState state = world.getBlockState(pos);
                 Direction enumfacing = state.get(FACING);
                 BlockPos blockBelow = pos;
+                RedstoneParticleData parti = new RedstoneParticleData(1.0F, 0.0F, 0.0F, 1.0f);
                 switch (enumfacing)
                 {
                     case UP:
-                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
-                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
-                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
-                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
                         return;
                     case DOWN:
-                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+.85D, dz+ 0.25D,0, 0, 0);
-                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+.85D, dz+ 0.75D,0, 0, 0);
-                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+.85D, dz+ 0.25D,0, 0, 0);
-                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+.85D, dz+ 0.75D,0, 0, 0);
+                        if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+.85D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+.85D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+.85D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+.85D, dz+ 0.75D,0, 0, 0);
                         return;
                     case NORTH:
-                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.25D, dz+.85D,0, 0, 0);
-                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.75D, dz+.85D,0, 0, 0);
-                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.25D, dz+.85D,0, 0, 0);
-                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.75D, dz+.85D,0, 0, 0);
+                        if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.25D, dz+.85D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.75D, dz+.85D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.25D, dz+.85D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.75D, dz+.85D,0, 0, 0);
                         return;
                     case SOUTH:
-                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.25D, dz+0.15D,0, 0, 0);
-                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.75D, dz+0.15D,0, 0, 0);
-                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.25D, dz+0.15D,0, 0, 0);
-                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.75D, dz+0.15D,0, 0, 0);
+                        if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.25D, dz+0.15D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.75D, dz+0.15D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.25D, dz+0.15D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.75D, dz+0.15D,0, 0, 0);
                         return;
                     case EAST:
-                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.15D, dy+ 0.25D, dz+0.25D,0, 0, 0);
-                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.15D, dy+ 0.25D, dz+0.75D,0, 0, 0);
-                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.15D, dy+ 0.75D, dz+0.25D,0, 0, 0);
-                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.15D, dy+ 0.75D, dz+0.75D,0, 0, 0);
+                        if (tick%20 == 0) world.addParticle(parti, dx+0.15D, dy+ 0.25D, dz+0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+0.15D, dy+ 0.25D, dz+0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+0.15D, dy+ 0.75D, dz+0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+0.15D, dy+ 0.75D, dz+0.75D,0, 0, 0);
                         return;
                     case WEST:
-                        if (tick%20 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.85D, dy+0.25D, dz+ 0.25D,0, 0, 0);
-                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.85D, dy+0.25D, dz+ 0.75D,0, 0, 0);
-                        if (tick%15 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.85D, dy+0.75D, dz+ 0.25D,0, 0, 0);
-                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+0.85D, dy+0.75D, dz+ 0.75D,0, 0, 0);
+                        if (tick%20 == 0) world.addParticle(parti, dx+0.85D, dy+0.25D, dz+ 0.25D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+0.85D, dy+0.25D, dz+ 0.75D,0, 0, 0);
+                        if (tick%15 == 0) world.addParticle(parti, dx+0.85D, dy+0.75D, dz+ 0.25D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+0.85D, dy+0.75D, dz+ 0.75D,0, 0, 0);
                         return;
                     default:
-                        if (tick%30 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
-                        if (tick%35 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
-                        if (tick%25 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
-                        if (tick%40 == 0) world.addParticle(ParticleTypes.FLAME, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        if (tick%30 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%35 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                        if (tick%25 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
+                        if (tick%40 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
                         return;
                 }
             }
         }
     }
 
-    /*@Override
+    @Override
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
@@ -255,21 +258,21 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,player.getUniqueID());
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString(""+getItemTransferRate(stack)+"");
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,player.getUniqueID());
-
         //Display Fuel Left
-        int fuelLeft = pedestal.getStoredValueForUpgrades();
+        int fuelValue = getEnergyStored(pedestal.getCoinOnPedestal());
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.appendString("" + fuelLeft/200 + "");
+        fuel.appendString("" + fuelValue/2500 + "");
         fuel.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(fuel,player.getUniqueID());
 
+        TranslationTextComponent energyRate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        energyRate.appendString(""+ getItemTransferRate(stack) +"");
+        energyRate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(energyRate,player.getUniqueID());
+
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getSmeltingSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,player.getUniqueID());
     }
@@ -278,18 +281,26 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        int s2 = getItemTransferRate(stack);
-        String trr = getSmeltingSpeedString(stack);
+
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfstored");
+        xpstored.appendString(""+ getEnergyStored(stack) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
+        tooltip.add(xpstored);
+
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfcapacity");
+        xpcapacity.appendString(""+ getEnergyBuffer(stack) +"");
+        xpcapacity.mergeStyle(TextFormatting.AQUA);
+        tooltip.add(xpcapacity);
+
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString(""+s2+"");
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(trr);
-
+        rate.appendString("" + getItemTransferRate(stack) + "");
         rate.mergeStyle(TextFormatting.GRAY);
-        speed.mergeStyle(TextFormatting.RED);
-
         tooltip.add(rate);
+
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
-    }*/
+    }
 
 }

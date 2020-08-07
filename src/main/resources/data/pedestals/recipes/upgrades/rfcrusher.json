@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/default"
+    },
+    {
+      "item": "minecraft:redstone_block"
+    },
+    {
+      "item": "minecraft:grindstone"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/rfcrusher"
+  }
+}

@@ -58,6 +58,9 @@
     "pedestals:coin/rfexport",
     "pedestals:coin/rfimport",
     "pedestals:coin/rfrelay",
-    "pedestals:coin/rftank"
+    "pedestals:coin/rftank",
+    "pedestals:coin/rfcrusher",
+    "pedestals:coin/rfsmelter",
+    "pedestals:coin/rfsawmill"
   ]
 }

@@ -45,6 +45,9 @@ public class ItemRegistry
         ItemUpgradeEnergyExport.onItemRegistryReady(e);
         ItemUpgradeEnergyRelay.onItemRegistryReady(e);
         ItemUpgradeEnergyTank.onItemRegistryReady(e);
+        ItemUpgradeEnergyCrusher.onItemRegistryReady(e);
+        ItemUpgradeEnergyFurnace.onItemRegistryReady(e);
+        ItemUpgradeEnergySawMill.onItemRegistryReady(e);
 
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);
