@@ -54,7 +54,7 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
     {
         if(!world.isRemote)
         {
-            int speed = getOperationSpeed(coinInPedestal);
+            int speed = getSmeltingSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos))
             {

@@ -167,20 +167,26 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
     @Override
     public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
-        if(entityIn instanceof ItemEntity)
+        if(!world.isRemote)
         {
-            ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
-            ItemStack coin = tilePedestal.getCoinOnPedestal();
-            int getMaxEnergyValue = getEnergyBuffer(coin);
-            int currentEnergy = getEnergyStored(coin);
-            int chargeAmount = getItemRFChargeAmount(getItemStack);
-            int getRFForStack = chargeAmount * getItemStack.getCount();
-            if(chargeAmount>0 && getMaxEnergyValue>=(currentEnergy+getRFForStack))
+            if(!world.isBlockPowered(posPedestal))
             {
-                setEnergyStored(coin,(currentEnergy + getRFForStack));
-                tilePedestal.update();
-                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                entityIn.remove();
+                if(entityIn instanceof ItemEntity)
+                {
+                    ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
+                    ItemStack coin = tilePedestal.getCoinOnPedestal();
+                    int getMaxEnergyValue = getEnergyBuffer(coin);
+                    int currentEnergy = getEnergyStored(coin);
+                    int chargeAmount = getItemRFChargeAmount(getItemStack);
+                    int getRFForStack = chargeAmount * getItemStack.getCount();
+                    if(chargeAmount>0 && getMaxEnergyValue>=(currentEnergy+getRFForStack))
+                    {
+                        setEnergyStored(coin,(currentEnergy + getRFForStack));
+                        tilePedestal.update();
+                        world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                        entityIn.remove();
+                    }
+                }
             }
         }
     }

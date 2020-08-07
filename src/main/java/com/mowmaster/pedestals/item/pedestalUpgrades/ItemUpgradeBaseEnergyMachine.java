@@ -112,6 +112,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
         {
             if(amountToSet == -1) amountToSet = 0;
             setEnergyStored(coin,amountToSet);
+            pedestal.update();
         }
 
         return amountToSet;
