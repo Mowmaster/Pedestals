@@ -243,8 +243,11 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                                 int xpRemainingStoredPedestal = energyStoredPedestal + transferRate;
                                                 //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
+                                                tileMainPedestal.update();
                                                 //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                                tileStoredPedestal.update();
+
                                             }
                                             else
                                             {
@@ -253,8 +256,10 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                                 int xpRemainingStoredPedestal = energyStoredPedestal + xpMainPedestal;
                                                 //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
+                                                tileMainPedestal.update();
                                                 //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                                tileStoredPedestal.update();
                                             }
 
                                             break;

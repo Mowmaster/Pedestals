@@ -178,6 +178,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
             if(chargeAmount>0 && getMaxEnergyValue>=(currentEnergy+getRFForStack))
             {
                 setEnergyStored(coin,(currentEnergy + getRFForStack));
+                tilePedestal.update();
                 world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                 entityIn.remove();
             }
