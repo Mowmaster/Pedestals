@@ -72,36 +72,6 @@ public class ItemUpgradeEnergyTank extends ItemUpgradeBaseEnergy
         return  energyBuffer;
     }
 
-    public int getEnergyTransferRate(ItemStack stack)
-    {
-        int energyTransferRate = 8000;
-        switch (getCapacityModifier(stack))
-        {
-
-            case 0:
-                energyTransferRate = 8000;//1x
-                break;
-            case 1:
-                energyTransferRate=16000;//2x
-                break;
-            case 2:
-                energyTransferRate = 32000;//4x
-                break;
-            case 3:
-                energyTransferRate = 48000;//6x
-                break;
-            case 4:
-                energyTransferRate = 80000;//10x
-                break;
-            case 5:
-                energyTransferRate=160000;//20x
-                break;
-            default: energyTransferRate=8000;
-        }
-
-        return  energyTransferRate;
-    }
-
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         if(!world.isRemote)
