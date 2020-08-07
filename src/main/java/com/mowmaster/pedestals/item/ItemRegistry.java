@@ -48,6 +48,8 @@ public class ItemRegistry
         ItemUpgradeEnergyCrusher.onItemRegistryReady(e);
         ItemUpgradeEnergyFurnace.onItemRegistryReady(e);
         ItemUpgradeEnergySawMill.onItemRegistryReady(e);
+        ItemUpgradeEnergyQuarry.onItemRegistryReady(e);
+        ItemUpgradeEnergyQuarryBlacklist.onItemRegistryReady(e);
 
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);

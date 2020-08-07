@@ -107,7 +107,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
         ItemStack coin = pedestal.getCoinOnPedestal();
         int fuelLeft = getEnergyStored(coin);
         amountToSet = fuelLeft - amountToRemove;
-        if(amountToRemove >= fuelLeft) amountToSet = -1;
+        if(amountToRemove > fuelLeft) amountToSet = -1;
         if(!simulate)
         {
             if(amountToSet == -1) amountToSet = 0;
