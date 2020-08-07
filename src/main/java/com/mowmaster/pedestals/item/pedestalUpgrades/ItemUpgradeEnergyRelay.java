@@ -31,16 +31,24 @@ public class ItemUpgradeEnergyRelay extends ItemUpgradeBaseEnergy
         return true;
     }
 
+    //Since Energy Transfer is as fast as possible, speed isnt needed, just capacity
+    @Override
+    public Boolean canAcceptOpSpeed() {
+        return false;
+    }
+
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         if(!world.isRemote)
         {
+            //Still needed for capacity reasons
             int speed = getOperationSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos))
             {
+                //Always send energy, as fast as we can within the Pedestal Energy Network
+                upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                 if (tick%speed == 0) {
-                    upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                     upgradeAction(world,pedestalPos,coinInPedestal);
                 }
             }

@@ -35,6 +35,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
     {
         if(!world.isRemote)
         {
+            //Still Needed as we want to limit energy transfer from PEN to world
             int speed = getOperationSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos))

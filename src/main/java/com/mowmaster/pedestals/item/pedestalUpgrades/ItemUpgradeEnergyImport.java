@@ -1,12 +1,18 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -14,6 +20,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -46,12 +53,14 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
     {
         if(!world.isRemote)
         {
+            //Still Needed as we want to limit energy transfer from world to PEN
             int speed = getOperationSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos))
             {
+                //Always send energy, as fast as we can within the Pedestal Energy Network
+                upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                 if (tick%speed == 0) {
-                    upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                     upgradeItemAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                     upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                 }
@@ -136,6 +145,41 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
                     ped.setStoredValueForUpgrades(1);
                     ped.update();
                 }
+            }
+        }
+    }
+
+    public static int getItemRFChargeAmount(ItemStack chargeItem)
+    {
+        int charge = 0;
+        if(chargeItem.getItem().equals(Items.REDSTONE))
+        {
+            return 2500;
+        }
+        else if(chargeItem.getItem().equals(Items.REDSTONE_BLOCK))
+        {
+            return 22500;
+        }
+
+        return charge;
+    }
+
+    @Override
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    {
+        if(entityIn instanceof ItemEntity)
+        {
+            ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
+            ItemStack coin = tilePedestal.getCoinOnPedestal();
+            int getMaxEnergyValue = getEnergyBuffer(coin);
+            int currentEnergy = getEnergyStored(coin);
+            int chargeAmount = getItemRFChargeAmount(getItemStack);
+            int getRFForStack = chargeAmount * getItemStack.getCount();
+            if(chargeAmount>0 && getMaxEnergyValue>=(currentEnergy+getRFForStack))
+            {
+                setEnergyStored(coin,(currentEnergy + getRFForStack));
+                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                entityIn.remove();
             }
         }
     }

@@ -34,6 +34,13 @@ public class ItemUpgradeEnergyTank extends ItemUpgradeBaseEnergy
         return true;
     }
 
+
+    //Since Energy Transfer is as fast as possible, speed isnt needed, just capacity
+    @Override
+    public Boolean canAcceptOpSpeed() {
+        return false;
+    }
+
     @Override
     public int getEnergyBuffer(ItemStack stack) {
         //im assuming # = rf value???
@@ -103,8 +110,9 @@ public class ItemUpgradeEnergyTank extends ItemUpgradeBaseEnergy
 
             if(!world.isBlockPowered(pedestalPos))
             {
+                //Always send energy, as fast as we can within the Pedestal Energy Network
+                upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                 if (tick%speed == 0) {
-                    upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                     upgradeAction(world,pedestalPos,coinInPedestal);
                 }
             }
