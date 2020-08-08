@@ -5,11 +5,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.PhantomEntity;
-import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -77,48 +76,41 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return  transferRate;
     }
 
-    protected boolean useFanOnEntities(World world, BlockPos posOfPedestal, double speed,AxisAlignedBB getBox,Direction enumfacing) {
+    protected void useFanOnEntities(World world, BlockPos posOfPedestal,TilePedestal pedestal, double speed,AxisAlignedBB getBox) {
         List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class, getBox);
 
+        if(entityList.size()==0)pedestal.setStoredValueForUpgrades(0);
+
+        BlockState state = world.getBlockState(posOfPedestal);
+        Direction enumfacing = state.get(FACING);
         for (LivingEntity entity : entityList) {
-            addMotion(world,posOfPedestal,speed,enumfacing,entity);
-            return true;
-            /*LivingEntity getEntity = getTargetEntity(world,posOfPedestal,entity);
+            LivingEntity getEntity = getTargetEntity(world,posOfPedestal,entity);
             if(getEntity != null)
             {
                 if(getEntity instanceof PlayerEntity)
                 {
                     if(!((PlayerEntity) getEntity).abilities.isFlying && !((PlayerEntity) getEntity).isCrouching())
                     {
-                        addMotion(world,posOfPedestal,speed,getEntity);
-                        return true;
+                        addMotion(world,posOfPedestal,speed,enumfacing,getEntity);
+                        pedestal.setStoredValueForUpgrades(1);
                     }
                 }
-
-                if(!(getEntity instanceof PlayerEntity))
+                else
                 {
-                    addMotion(world,posOfPedestal,speed,getEntity);
-                    return true;
+                    addMotion(world,posOfPedestal,speed,enumfacing,getEntity);
+                    pedestal.setStoredValueForUpgrades(1);
                 }
-
                 if (enumfacing == Direction.UP) {
                     getEntity.fallDistance = 0;
                 }
-            }*/
+            }
         }
-        return false;
+
     }
 
-    protected void addMotion(World world, BlockPos posOfPedestal, double speed,Direction facing, LivingEntity entity) {
-        /*
-        func_233570_aj_() Must be an "on ground" method check removing since im using isCrouching
-        if (entity instanceof PlayerEntity && entity.func_233570_aj_()) {
-            return;
-        }*/
+    protected void addMotion(World world, BlockPos posOfPedestal, double speed, Direction enumfacing, LivingEntity entity) {
 
-        //BlockState state = world.getBlockState(posOfPedestal);
-        //Direction enumfacing = state.get(FACING);
-        switch (facing) {
+        switch (enumfacing) {
             case DOWN:
                 entity.setMotion(entity.getMotion().x, entity.getMotion().y - speed, entity.getMotion().z);
                 break;
@@ -174,26 +166,31 @@ public class ItemUpgradeFan extends ItemUpgradeBase
 
         if(!world.isBlockPowered(pedestalPos))
         {
-            if(upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos))
+            TileEntity entity = world.getTileEntity(pedestalPos);
+            if(entity instanceof TilePedestal)
             {
-                int speedSound = getOperationSpeed(coinInPedestal);
-                if (tick%speedSound == 0) {
-                    world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                TilePedestal ped = ((TilePedestal)entity);
+                upgradeAction(world, pedestalPos, ped);
+                if(ped.getStoredValueForUpgrades() > 0)
+                {
+                    int speedSound = getOperationSpeed(coinInPedestal);
+                    if (tick%speedSound == 0) {
+                        world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                    }
                 }
             }
         }
     }
 
 
-    public boolean upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(World world, BlockPos posOfPedestal, TilePedestal pedestal)
     {
-        int width = getAreaWidth(coinInPedestal);
-        int height = getHeight(coinInPedestal);
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        int width = getAreaWidth(coin);
+        int height = getHeight(coin);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
-        double speed = getFanSpeed(coinInPedestal);
-        BlockState state = world.getBlockState(posOfPedestal);
-        Direction enumfacing = state.get(FACING);
+        double speed = getFanSpeed(coin);
 
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
@@ -202,9 +199,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
             speed *= 2;
         }
 
-        if(useFanOnEntities(world,posOfPedestal,speed,getBox,enumfacing))return true;
-
-        return false;
+        useFanOnEntities(world,posOfPedestal,pedestal,speed,getBox);
     }
 
     @Override
