@@ -640,7 +640,7 @@
     "item.pedestals.coin.void.tooltip_speed": "Operational Speed: ",
     "item.pedestals.coin.void.chat_rate": "Void Damage In Hearts: ",
     "item.pedestals.coin.void.chat_speed": "Operational Speed: ",
-    "jei.pedestals.void.desc": "Will Void all items inserted or dropped on the pedestal, will also deal Void damage to any entity that touches the pedestal.",
+    "jei.pedestals.void.desc": "Will Void all Items and Energy inserted or dropped on the pedestal, will also deal Void damage to any entity that touches the pedestal.",
 
     "block.pedestals.pedestal.stone000": "Colored Pedestal",
     "jei.pedestals.stone000.desc": "R-Clicking a Pedestal with a Colored Pallet Will Make a Colored Pedestal.",

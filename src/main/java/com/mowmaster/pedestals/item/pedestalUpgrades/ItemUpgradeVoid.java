@@ -28,7 +28,7 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeVoid extends ItemUpgradeBase
+public class ItemUpgradeVoid extends ItemUpgradeBaseEnergy
 {
     public ItemUpgradeVoid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
@@ -51,6 +51,13 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
                 if(!itemInPedestal.equals(ItemStack.EMPTY))
                 {
                     removeFromPedestal(world,pedestalPos,itemInPedestal.getCount());
+                }
+
+                int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
+                if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
+                if(hasEnergy(coinInPedestal))
+                {
+                    setEnergyStored(coinInPedestal,0);
                 }
             }
         }
@@ -117,7 +124,9 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.mergeStyle(TextFormatting.GOLD);
+        tooltip.add(t);
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString("" + (int)(getDamageDelt(stack)/2) + "");

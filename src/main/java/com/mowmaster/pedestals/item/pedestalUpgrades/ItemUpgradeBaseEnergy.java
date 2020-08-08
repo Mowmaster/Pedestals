@@ -3,20 +3,15 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.particle.Particle;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.BoatEntity;
-import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -232,10 +227,11 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                     {
                                         int energyMaxStoredPedestal = ((ItemUpgradeBaseEnergy)coinStoredPedestal.getItem()).readMaxEnergyFromNBT(coinStoredPedestal);
                                         int energyStoredPedestal = getEnergyStored(coinStoredPedestal);
+                                        int energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
                                         //if Stored Pedestal has room for exp (will be lazy sending exp here)
                                         if(energyStoredPedestal < energyMaxStoredPedestal)
                                         {
-                                            int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energyMaxStoredPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energyMaxStoredPedestal);
+                                            int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
                                             //If we have more then X levels in the pedestal we're sending from
                                             if(xpMainPedestal >= transferRate)
                                             {
