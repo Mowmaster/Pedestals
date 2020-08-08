@@ -283,6 +283,27 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         return returner;
     }
 
+    public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+
+        BlockPos negNums = getNegRangePos(world,pedestalPos,width,height);
+        BlockPos posNums = getPosRangePos(world,pedestalPos,width,height);
+        for (int x = negNums.getX(); x <= posNums.getX(); x++) {
+            for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
+                for (int y = negNums.getY(); y <= posNums.getY(); y++) {
+                    BlockPos blockToChopPos = new BlockPos(x, y, z);
+                    //BlockPos blockToChopPos = this.getPos().add(x, y, z);
+                    BlockState blockToChop = world.getBlockState(blockToChopPos);
+                    if(canMineBlock(world,pedestalPos,blockToChop.getBlock()))validBlocks++;
+                }
+            }
+        }
+
+        return validBlocks;
+    }
+
+
     @Override
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
@@ -305,6 +326,12 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,player.getUniqueID());
+
+        //Display Blocks To Mine Left
+        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
+        btm.appendString("" + blocksToMineInArea(pedestal.getWorld(),pedestal.getPos(),getAreaWidth(pedestal.getCoinOnPedestal()),getRangeHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,player.getUniqueID());
 
         //Display Fuel Left
         int fuelLeft = pedestal.getStoredValueForUpgrades();
