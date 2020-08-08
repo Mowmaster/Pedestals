@@ -9,12 +9,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.item.BoatEntity;
+import net.minecraft.entity.monster.HoglinEntity;
 import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.monster.piglin.PiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.StriderEntity;
 import net.minecraft.entity.passive.horse.DonkeyEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
 import net.minecraft.entity.passive.horse.MuleEntity;
@@ -227,9 +228,11 @@ public class ItemUpgradeBase extends Item {
         //Netherite
         if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
         if(stack.getItem().getTags().toString().contains("forge:storage_blocks/emerald")) return Blocks.EMERALD_BLOCK;//Players
-        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/diamond")) return Blocks.DIAMOND_BLOCK;//All Mobs
+        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/diamond")) return Blocks.DIAMOND_BLOCK;//All Monsters
         if(stack.getItem().getTags().toString().contains("forge:storage_blocks/gold")) return Blocks.GOLD_BLOCK;//All Animals
+        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/lapis")) return Blocks.LAPIS_BLOCK;//All Flying
         if(stack.getItem().getTags().toString().contains("forge:storage_blocks/iron")) return Blocks.IRON_BLOCK;//All Creatures
+        if(stack.getItem().getTags().toString().contains("forge:storage_blocks/coal")) return Blocks.COAL_BLOCK;//All Mobs
 
         return block;
     }
@@ -257,11 +260,25 @@ public class ItemUpgradeBase extends Item {
                 return (AnimalEntity)entityIn;
             }
         }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
+        {
+            if(entityIn instanceof FlyingEntity)
+            {
+                return (FlyingEntity)entityIn;
+            }
+        }
         else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
         {
             if(entityIn instanceof CreatureEntity)
             {
                 return (CreatureEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
+        {
+            if(entityIn instanceof MobEntity)
+            {
+                return (MobEntity)entityIn;
             }
         }
         else
@@ -276,7 +293,9 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
         TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
         TranslationTextComponent GOLD = new TranslationTextComponent(getTranslationKey() + ".entity_gold");
+        TranslationTextComponent LAPIS = new TranslationTextComponent(getTranslationKey() + ".entity_lapis");
         TranslationTextComponent IRON = new TranslationTextComponent(getTranslationKey() + ".entity_iron");
+        TranslationTextComponent COAL = new TranslationTextComponent(getTranslationKey() + ".entity_coal");
         TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
 
         if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
@@ -291,9 +310,17 @@ public class ItemUpgradeBase extends Item {
         {
             return GOLD.getString();
         }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
+        {
+            return LAPIS.getString();
+        }
         else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
         {
             return IRON.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
+        {
+            return COAL.getString();
         }
         else {
             return ALL.getString();

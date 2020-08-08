@@ -45,7 +45,9 @@
     "item.pedestals.coin.attack.entity_emerald": "Players",
     "item.pedestals.coin.attack.entity_diamond": "Monsters",
     "item.pedestals.coin.attack.entity_gold": "Animals",
+    "item.pedestals.coin.attack.entity_lapis": "Flying Types",
     "item.pedestals.coin.attack.entity_iron": "Creatures",
+    "item.pedestals.coin.attack.entity_coal": "Mobs",
     "item.pedestals.coin.attack.entity_all": "All",
     "jei.pedestals.attack.desc": "Attacks Entities in the area around it, Placing a Block of Netherite/Emerald/Diamond/Gold/Iron Under the pedestal will change what is attacked. Putting a sword into the pedestal will increase the damage delt, Sharpness/Bane/Smite on the sword also increases attack damage.",
 
@@ -165,7 +167,9 @@
     "item.pedestals.coin.effect.entity_emerald": "Players",
     "item.pedestals.coin.effect.entity_diamond": "Monsters",
     "item.pedestals.coin.effect.entity_gold": "Animals",
+    "item.pedestals.coin.effect.entity_lapis": "Flying Types",
     "item.pedestals.coin.effect.entity_iron": "Creatures",
+    "item.pedestals.coin.effect.entity_coal": "Mobs",
     "item.pedestals.coin.effect.entity_all": "All",
     "jei.pedestals.effect.desc": "Diffuses a potion Placed in the pedestal to all entities in the area. The potion will be consumed, unless blaze powder has been dropped onto the pedestal to be used as fuel instead. Placing a Block of Netherite/Emerald/Diamond/Gold/Iron Under the pedestal will change what is effected",
 
@@ -440,7 +444,9 @@
     "item.pedestals.coin.fan.entity_emerald": "Players",
     "item.pedestals.coin.fan.entity_diamond": "Monsters",
     "item.pedestals.coin.fan.entity_gold": "Animals",
+    "item.pedestals.coin.fan.entity_lapis": "Flying Types",
     "item.pedestals.coin.fan.entity_iron": "Creatures",
+    "item.pedestals.coin.fan.entity_coal": "Mobs",
     "item.pedestals.coin.fan.entity_all": "All",
     "jei.pedestals.fan.desc": "Pushes Mobs in the area around it, Placing a Block of Netherite/Emerald/Diamond/Gold/Iron Under the pedestal will change what is pushed. Players can crouch to disable being pushed.",
 

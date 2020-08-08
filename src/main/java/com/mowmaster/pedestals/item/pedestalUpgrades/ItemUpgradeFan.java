@@ -5,6 +5,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.monster.PhantomEntity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -43,10 +45,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
 
     public int getAreaWidth(ItemStack stack)
     {
-        int areaWidth = 0;
-        int aW = getAreaModifier(stack);
-        areaWidth = ((aW)+1);
-        return  areaWidth;
+        return  getAreaModifier(stack);
     }
 
     public int getHeight(ItemStack stack)
@@ -78,13 +77,13 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return  transferRate;
     }
 
-    protected boolean useFanOnEntities(World world, BlockPos posOfPedestal, double speed,AxisAlignedBB getBox) {
+    protected boolean useFanOnEntities(World world, BlockPos posOfPedestal, double speed,AxisAlignedBB getBox,Direction enumfacing) {
         List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class, getBox);
 
-        BlockState state = world.getBlockState(posOfPedestal);
-        Direction enumfacing = state.get(FACING);
         for (LivingEntity entity : entityList) {
-            LivingEntity getEntity = getTargetEntity(world,posOfPedestal,entity);
+            addMotion(world,posOfPedestal,speed,enumfacing,entity);
+            return true;
+            /*LivingEntity getEntity = getTargetEntity(world,posOfPedestal,entity);
             if(getEntity != null)
             {
                 if(getEntity instanceof PlayerEntity)
@@ -95,29 +94,31 @@ public class ItemUpgradeFan extends ItemUpgradeBase
                         return true;
                     }
                 }
-                else
+
+                if(!(getEntity instanceof PlayerEntity))
                 {
                     addMotion(world,posOfPedestal,speed,getEntity);
                     return true;
                 }
+
                 if (enumfacing == Direction.UP) {
                     getEntity.fallDistance = 0;
                 }
-            }
+            }*/
         }
         return false;
     }
 
-    protected void addMotion(World world, BlockPos posOfPedestal, double speed, LivingEntity entity) {
+    protected void addMotion(World world, BlockPos posOfPedestal, double speed,Direction facing, LivingEntity entity) {
         /*
         func_233570_aj_() Must be an "on ground" method check removing since im using isCrouching
         if (entity instanceof PlayerEntity && entity.func_233570_aj_()) {
             return;
         }*/
 
-        BlockState state = world.getBlockState(posOfPedestal);
-        Direction enumfacing = state.get(FACING);
-        switch (enumfacing) {
+        //BlockState state = world.getBlockState(posOfPedestal);
+        //Direction enumfacing = state.get(FACING);
+        switch (facing) {
             case DOWN:
                 entity.setMotion(entity.getMotion().x, entity.getMotion().y - speed, entity.getMotion().z);
                 break;
@@ -191,6 +192,8 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
         double speed = getFanSpeed(coinInPedestal);
+        BlockState state = world.getBlockState(posOfPedestal);
+        Direction enumfacing = state.get(FACING);
 
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
@@ -199,7 +202,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
             speed *= 2;
         }
 
-        if(useFanOnEntities(world,posOfPedestal,speed,getBox))return true;
+        if(useFanOnEntities(world,posOfPedestal,speed,getBox,enumfacing))return true;
 
         return false;
     }
