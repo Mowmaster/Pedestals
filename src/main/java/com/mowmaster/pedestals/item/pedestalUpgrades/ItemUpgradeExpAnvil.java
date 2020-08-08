@@ -239,6 +239,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         Map<Enchantment, Integer> enchantsMap = Maps.<Enchantment, Integer>newLinkedHashMap();
         int overCombine = getCrystals(stackToCombine);
         int overCombineCopy = overCombine;
+        int crystalsToRemoveCount = 0;
 
         int intExpInCoin = getXPStored(coinInPedestal);
         int intRepairRate = getRepairRate(coinInPedestal);
@@ -324,9 +325,9 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                                             intNewValue = e2 + 1;
                                                             if(intNewValue > enchantment.getMaxLevel())
                                                             {
-                                                                if(overCombine >= intNewValue)
+                                                                if((overCombine-crystalsToRemoveCount) >= intNewValue)
                                                                 {
-                                                                    overCombine = overCombine - intNewValue;
+                                                                    crystalsToRemoveCount += intNewValue;
                                                                 }
                                                                 else
                                                                 {
@@ -371,8 +372,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                             //Charge Exp Cost
                                             setXPStored(coinInPedestal,(intExpInCoin-intExpCostToCombine));
                                             //Delete Items On Pedestals
-                                            int crystalsToRemove = overCombineCopy - overCombine;
-                                            deleteItemsOnPedestals(world,posOfPedestal,crystalsToRemove);
+                                            deleteItemsOnPedestals(world,posOfPedestal,crystalsToRemoveCount);
                                             EnchantmentHelper.setEnchantments(enchantsMap,itemFromInvCopy);
                                             if(strNameToChangeTo != "")
                                             {
