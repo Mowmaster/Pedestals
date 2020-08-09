@@ -174,6 +174,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
                 int value = getXPFromList.getXpValue();
                 getXPFromList.remove();
                 setXPStored(coin, currentlyStoredExp + value);
+                tilePedestal.update();
             }
         }
     }
