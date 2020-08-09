@@ -267,6 +267,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                 }
             }
 
+            //To show when the enchanting table has enough XP to enchant an item at the current level
             if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
             {
                 spawnParticleAbovePedestal(world,pos,0.94f,0.8f,0.95f,1.0f);
