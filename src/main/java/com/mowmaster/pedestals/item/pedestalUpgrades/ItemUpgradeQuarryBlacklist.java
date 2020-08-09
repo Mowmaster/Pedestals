@@ -8,6 +8,7 @@ import com.mowmaster.pedestals.enchants.EnchantmentRange;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -295,7 +296,10 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                     BlockPos blockToChopPos = new BlockPos(x, y, z);
                     //BlockPos blockToChopPos = this.getPos().add(x, y, z);
                     BlockState blockToChop = world.getBlockState(blockToChopPos);
-                    if(canMineBlock(world,pedestalPos,blockToChop.getBlock()))validBlocks++;
+                    if(!blockToChop.getBlock().equals(Blocks.AIR) && !(blockToChop.getBlock() instanceof BlockPedestalTE) && canMineBlock(world,pedestalPos,blockToChop.getBlock()))
+                    {
+                        validBlocks++;
+                    }
                 }
             }
         }
