@@ -302,7 +302,6 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
         return validBlocks;
     }
 
-
     @Override
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {

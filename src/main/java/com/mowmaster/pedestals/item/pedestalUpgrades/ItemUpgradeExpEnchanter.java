@@ -8,8 +8,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
@@ -31,6 +34,7 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 {
@@ -173,15 +177,21 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                     {
                                         //This is Book Shelf Enchanting level, not enchantment level (15 bookshelfves = 30 levels of enchantability)
                                         float level = getEnchantmentPowerFromSorroundings(world,posOfPedestal,coinInPedestal);
+                                        int actualEnchantingLevel = (int)(level * 2);
                                         int currentlyStoredExp = getXPStored(coinInPedestal);
-                                        int expNeeded = (getExpCountByLevel(Math.round((level * 2)/3))<=20)?(20):(getExpCountByLevel(Math.round((level * 2)/3)));
-                                        if(currentlyStoredExp >= expNeeded)
+                                        int currentLevelFromStoredXp = getExpLevelFromCount(currentlyStoredExp);
+                                        int xpLevelsNeeded = Math.round(actualEnchantingLevel/10);
+                                        int xpAtEnchantingLevel = getExpCountByLevel(actualEnchantingLevel);
+                                        int xpAtLevelsBelowRequired = getExpCountByLevel((actualEnchantingLevel-xpLevelsNeeded));
+                                        int expNeeded = xpAtEnchantingLevel-xpAtLevelsBelowRequired;
+
+                                        if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
                                         {
                                             //Enchanting Code Here
                                             Random rand = new Random();
                                             ItemStack itemToEnchant = itemFromInv.copy();
                                             itemToEnchant.setCount(1);
-                                            ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,(int)(level * 2) ,true );
+                                            ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
                                             if(!stackToReturn.isEmpty())
                                             {
                                                 int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
@@ -210,6 +220,16 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     @Override
     public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        float level = getEnchantmentPowerFromSorroundings(world,pos,coin);
+        int actualEnchantingLevel = (int)(level * 2);
+        int currentlyStoredExp = getXPStored(coin);
+        int currentLevelFromStoredXp = getExpLevelFromCount(currentlyStoredExp);
+        int xpLevelsNeeded = Math.round(actualEnchantingLevel/10);
+        int xpAtEnchantingLevel = getExpCountByLevel(actualEnchantingLevel);
+        int xpAtLevelsBelowRequired = getExpCountByLevel((actualEnchantingLevel-xpLevelsNeeded));
+        int expNeeded = xpAtEnchantingLevel-xpAtLevelsBelowRequired;
+
         if(!world.isBlockPowered(pos))
         {
             for (int i = -2; i <= 2; ++i)
@@ -237,6 +257,19 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                         }
                     }
                 }
+            }
+
+            if(!world.isBlockPowered(pos))
+            {
+                if(getXPStored(pedestal.getCoinOnPedestal())>0)
+                {
+                    spawnParticleAroundPedestalBase(world,tick,pos,0.1f,0.9f,0.1f,1.f);
+                }
+            }
+
+            if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
+            {
+                spawnParticleAbovePedestal(world,pos,0.94f,0.8f,0.95f,1.0f);
             }
         }
     }

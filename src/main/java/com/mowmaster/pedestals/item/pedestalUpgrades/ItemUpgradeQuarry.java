@@ -293,7 +293,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                 }
             }
         }
-
         return validBlocks;
     }
 

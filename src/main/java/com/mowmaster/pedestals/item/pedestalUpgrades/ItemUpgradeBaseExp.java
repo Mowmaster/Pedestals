@@ -21,6 +21,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
@@ -175,8 +176,10 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                                                 int xpRemainingStoredPedestal = xpStoredPedestal + transferRate;
                                                 world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setXPStored(coinMainPedestal,xpRemainingMainPedestal);
+                                                tileMainPedestal.update();
                                                 world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                                tileStoredPedestal.update();
                                             }
                                             else
                                             {
@@ -185,8 +188,10 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                                                 int xpRemainingStoredPedestal = xpStoredPedestal + xpMainPedestal;
                                                 world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setXPStored(coinMainPedestal,xpRemainingMainPedestal);
+                                                tileMainPedestal.update();
                                                 world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                                tileStoredPedestal.update();
                                             }
 
                                             break;
@@ -214,6 +219,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                 int value = getXPFromList.getXpValue();
                 getXPFromList.remove();
                 setXPStored(coin, currentlyStoredExp + value);
+                tilePedestal.update();
             }
         }
     }
@@ -331,6 +337,19 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
     public int getExpBuffer(ItemStack stack)
     {
         return  0;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    {
+        if(!world.isBlockPowered(pos))
+        {
+            if(getXPStored(pedestal.getCoinOnPedestal())>0)
+            {
+                spawnParticleAroundPedestalBase(world,tick,pos,0.2f,0.95f,0.2f,1.0f);
+            }
+        }
     }
 
     @Override
