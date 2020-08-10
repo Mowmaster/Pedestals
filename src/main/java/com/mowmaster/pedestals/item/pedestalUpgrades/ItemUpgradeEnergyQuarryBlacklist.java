@@ -254,6 +254,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         }
     }
 
+    @Override
     public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
     {
         boolean returner = true;
@@ -282,28 +283,6 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
 
         return returner;
     }
-
-    public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
-    {
-        int validBlocks = 0;
-
-        BlockPos negNums = getNegRangePos(world,pedestalPos,width,height);
-        BlockPos posNums = getPosRangePos(world,pedestalPos,width,height);
-        for (int x = negNums.getX(); x <= posNums.getX(); x++) {
-            for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
-                for (int y = negNums.getY(); y <= posNums.getY(); y++) {
-                    BlockPos blockToChopPos = new BlockPos(x, y, z);
-                    //BlockPos blockToChopPos = this.getPos().add(x, y, z);
-                    BlockState blockToChop = world.getBlockState(blockToChopPos);
-                    if(!blockToChop.getBlock().equals(Blocks.AIR) && !(blockToChop.getBlock() instanceof BlockPedestalTE) && canMineBlock(world,pedestalPos,blockToChop.getBlock()))validBlocks++;
-                }
-            }
-        }
-
-        return validBlocks;
-    }
-
-
 
     @Override
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)

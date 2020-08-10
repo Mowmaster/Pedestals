@@ -1,11 +1,9 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.TilePedestal;
-import net.minecraft.block.AbstractRailBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -40,6 +38,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -48,6 +47,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
@@ -797,6 +797,31 @@ public class ItemUpgradeBase extends Item {
             default:
                 return blockBelow;
         }
+    }
+
+    public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
+    {
+        return false;
+    }
+
+    public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+
+        BlockPos negNums = getNegRangePos(world,pedestalPos,width,height);
+        BlockPos posNums = getPosRangePos(world,pedestalPos,width,height);
+        for (int x = negNums.getX(); x <= posNums.getX(); x++) {
+            for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
+                for (int y = negNums.getY(); y <= posNums.getY(); y++) {
+                    BlockPos blockToMinePos = new BlockPos(x, y, z);
+                    BlockState blockToMineState = world.getBlockState(blockToMinePos);
+                    if(!blockToMineState.getBlock().isAir(blockToMineState,world,blockToMinePos) && !(blockToMineState.getBlock() instanceof BlockPedestalTE) && canMineBlock(world, pedestalPos, blockToMineState.getBlock())
+                            && !(blockToMineState.getBlock() instanceof IFluidBlock || blockToMineState.getBlock() instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)validBlocks++;
+                }
+            }
+        }
+
+        return validBlocks;
     }
 
     @Override
