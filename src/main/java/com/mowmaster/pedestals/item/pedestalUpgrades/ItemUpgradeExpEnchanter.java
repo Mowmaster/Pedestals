@@ -198,7 +198,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                             ItemStack itemToEnchant = itemFromInv.copy();
                                             itemToEnchant.setCount(1);
                                             ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
-                                            if(!stackToReturn.isEmpty())
+                                            if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted())
                                             {
                                                 int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
                                                 setXPStored(coinInPedestal,getExpLeftInPedestal);

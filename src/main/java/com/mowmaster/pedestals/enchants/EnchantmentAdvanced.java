@@ -17,7 +17,7 @@ public class EnchantmentAdvanced extends Enchantment
 
     @Override
     public int getMinEnchantability(int enchantmentLevel) {
-        return enchantmentLevel * 100;
+        return enchantmentLevel * 110;
     }
 
     @Override
@@ -38,11 +38,6 @@ public class EnchantmentAdvanced extends Enchantment
     public boolean canApply(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
-        if(coin instanceof ItemUpgradeBase)
-        {
-            canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptAdvanced();
-            return stack.getItem() instanceof ItemUpgradeBase && canApplyToUpgrade;
-        }
         if(coin.equals(ItemEnchantableBook.ADVANCED))
         {
             canApplyToUpgrade = true;
@@ -54,10 +49,6 @@ public class EnchantmentAdvanced extends Enchantment
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
-        if(coin instanceof ItemUpgradeBase)
-        {
-            canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptAdvanced();
-        }
         if(coin.equals(ItemEnchantableBook.ADVANCED))
         {
             canApplyToUpgrade = true;
@@ -67,7 +58,7 @@ public class EnchantmentAdvanced extends Enchantment
     }
 
     public boolean isAllowedOnBooks() {
-        return true;
+        return false;
     }
 }
 
