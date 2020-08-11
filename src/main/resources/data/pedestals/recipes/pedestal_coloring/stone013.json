@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:pedestal_coloring",
+  "ingredient": {
+    "item": "pedestals:itemcolorpallet",
+    "count": 22015
+  },
+  "result": {
+    "item": "pedestals:pedestal/stone013",
+    "count": 1
+  }
+}

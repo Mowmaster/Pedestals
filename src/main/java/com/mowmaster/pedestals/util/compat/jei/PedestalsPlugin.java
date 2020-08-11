@@ -4,9 +4,12 @@ import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
+import com.mowmaster.pedestals.recipes.ColoredPedestalRecipe;
 import com.mowmaster.pedestals.recipes.CrusherRecipe;
 import com.mowmaster.pedestals.recipes.SawMillRecipe;
 import com.mowmaster.pedestals.references.Reference;
+import com.mowmaster.pedestals.util.compat.jei.color_pallet.ColorPalletRecipeCategory;
+import com.mowmaster.pedestals.util.compat.jei.color_pallet.ColorPedestalRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.crusher.CrusherRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.sawmill.SawMillRecipeCategory;
 import mezz.jei.api.IModPlugin;
@@ -69,11 +72,14 @@ public class PedestalsPlugin implements IModPlugin {
 
     public static final IRecipeType<CrusherRecipe> CRUSHER_TYPE = CrusherRecipe.recipeType;
     public static final IRecipeType<SawMillRecipe> SAWING_TYPE = SawMillRecipe.recipeType;
+    public static final IRecipeType<ColoredPedestalRecipe> COLORING_TYPE = ColoredPedestalRecipe.recipeType;
+    public static final IRecipeType<ColoredPedestalRecipe> COLORINGP_TYPE = ColoredPedestalRecipe.recipeType;
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(CRUSHER_TYPE), CrusherRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(SAWING_TYPE), SawMillRecipeCategory.UID);
-
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(COLORING_TYPE), ColorPedestalRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(COLORINGP_TYPE), ColorPalletRecipeCategory.UID);
         //Pedestals
         addValueInfoPage(registration, BlockPedestalTE.I_PEDESTAL_000, "stone000");
         addValueInfoPage(registration, BlockPedestalTE.I_PEDESTAL_001, "stone001");
@@ -226,6 +232,8 @@ public class PedestalsPlugin implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registry) {
         registry.addRecipeCategories(new CrusherRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new SawMillRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new ColorPedestalRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new ColorPalletRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -244,6 +252,10 @@ public class PedestalsPlugin implements IModPlugin {
         //Smelter
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeFurnace.SMELTER), VanillaRecipeCategoryUid.FURNACE);
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeEnergyFurnace.RFSMELTER), VanillaRecipeCategoryUid.FURNACE);
+        //Colored Pedestals
+        registration.addRecipeCatalyst(new ItemStack(ItemColorPallet.COLORPALLET), ColorPedestalRecipeCategory.UID);
+        //Color Pallets
+        registration.addRecipeCatalyst(new ItemStack(ItemColorPallet.COLORPALLET_DEFAULT), ColorPalletRecipeCategory.UID);
     }
 
 

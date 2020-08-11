@@ -2,10 +2,9 @@ package com.mowmaster.pedestals.util.compat.jei.color_pallet;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.item.ItemColorPallet;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeCrusher;
 import com.mowmaster.pedestals.recipes.ColoredPedestalRecipe;
-import com.mowmaster.pedestals.recipes.CrusherRecipe;
 import com.mowmaster.pedestals.references.Reference;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -14,32 +13,35 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 
-public class ColorPedestalRecipeCategory implements IRecipeCategory<ColoredPedestalRecipe>
+public class ColorPalletRecipeCategory implements IRecipeCategory<ColoredPedestalRecipe>
 {
     private final String localizedName;
     private final IDrawable background;
     private final IDrawable icon;
     public static final ResourceLocation CRUSHER_TEXTURE = new ResourceLocation(Reference.MODID + ":textures/gui/jei/crusherprocessing.png");
-    public static final ResourceLocation UID = new ResourceLocation(Reference.MODID, "coloredpedestals");
+    public static final ResourceLocation UID = new ResourceLocation(Reference.MODID, "coloredpallets");
 
-    public ColorPedestalRecipeCategory(IGuiHelper guiHelper) {
+    public ColorPalletRecipeCategory(IGuiHelper guiHelper) {
         icon = guiHelper.createDrawableIngredient(new ItemStack(ItemColorPallet.COLORPALLET_DEFAULT.getItem()));
         background = guiHelper.createDrawable(CRUSHER_TEXTURE, 0, 0, 73, 35);
-        localizedName = I18n.format(Reference.MODID + ".recipe_category_coloredpedestals");
+        localizedName = I18n.format(Reference.MODID + ".recipe_category_coloredpallets");
     }
 
     @Override
     public ResourceLocation getUid() {
-        return new ResourceLocation(Reference.MODID, "coloredpedestals");
+        return new ResourceLocation(Reference.MODID, "coloredpallets");
     }
 
     @Override
@@ -65,24 +67,57 @@ public class ColorPedestalRecipeCategory implements IRecipeCategory<ColoredPedes
     @Override
     public void setIngredients(ColoredPedestalRecipe recipe, IIngredients ingredients) {
         ingredients.setInputIngredients(Collections.singletonList(recipe.getIngredient()));
+        /*int color = recipe.getColor();
+        ItemStack pallet = new ItemStack(ItemColorPallet.COLORPALLET);
+        CompoundNBT nbt = new CompoundNBT();
+        nbt.putInt("color",color);
+        pallet.setTag(nbt);
+        ingredients.setOutput(VanillaTypes.ITEM, pallet);*/
         ingredients.setOutput(VanillaTypes.ITEM, recipe.getResult());
     }
 
     @Override
     public void setRecipe(IRecipeLayout recipeLayout, ColoredPedestalRecipe recipe, IIngredients ingredients) {
-        recipeLayout.getItemStacks().init(0, true, 73, 60);
-        recipeLayout.getItemStacks().set(0,new ItemStack(BlockPedestalTE.I_PEDESTAL_333));
 
-        recipeLayout.getItemStacks().init(1, true, 5, 14);
+
+        int r = (CalculateColor.getRGBColorFromInt(recipe.getColor())[0]+1)/64;
+        int g = (CalculateColor.getRGBColorFromInt(recipe.getColor())[1]+1)/64;
+        int b = (CalculateColor.getRGBColorFromInt(recipe.getColor())[2]+1)/64;
+        ItemStack rDye = (r>0)?((r==4)?(new ItemStack(Items.RED_DYE,r-1)):(new ItemStack(Items.RED_DYE,r))):(ItemStack.EMPTY);
+        ItemStack gDye = (g>0)?((g==4)?(new ItemStack(Items.GREEN_DYE,g-1)):(new ItemStack(Items.GREEN_DYE,g))):(ItemStack.EMPTY);
+        ItemStack bDye = (b>0)?((b==4)?(new ItemStack(Items.BLUE_DYE,b-1)):(new ItemStack(Items.BLUE_DYE,b))):(ItemStack.EMPTY);
+
+        recipeLayout.getItemStacks().init(0, true, 0, 0);
+        if(rDye.getCount()>0)
+        {
+            recipeLayout.getItemStacks().set(0,rDye);
+        }
+
+
+        recipeLayout.getItemStacks().init(1, true, 25, 15);
+        if(gDye.getCount()>0)
+        {
+            recipeLayout.getItemStacks().set(1,gDye);
+        }
+
+
+        recipeLayout.getItemStacks().init(2, true, 0, 30);
+        if(bDye.getCount()>0)
+        {
+            recipeLayout.getItemStacks().set(2,bDye);
+        }
+
+
+        /*recipeLayout.getItemStacks().init(3, true, 5, 14);
         int color = recipe.getColor();
         ItemStack pallet = new ItemStack(ItemColorPallet.COLORPALLET);
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt("color",color);
         pallet.setTag(nbt);
-        recipeLayout.getItemStacks().set(1,pallet);
+        recipeLayout.getItemStacks().set(3,pallet);*/
 
-        recipeLayout.getItemStacks().init(2, false, 50, 14);
-        recipeLayout.getItemStacks().set(2, ingredients.getOutputs(VanillaTypes.ITEM).get(0));
+        recipeLayout.getItemStacks().init(3, false, 50, 14);
+        recipeLayout.getItemStacks().set(3, ingredients.getOutputs(VanillaTypes.ITEM).get(0));
     }
 
     @Override

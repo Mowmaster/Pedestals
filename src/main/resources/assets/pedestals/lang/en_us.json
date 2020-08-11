@@ -4,6 +4,8 @@
 
     "pedestals.recipe_category_crusher": "Crusher Upgrade",
     "pedestals.recipe_category_sawing": "SawMill Upgrade",
+    "pedestals.recipe_category_coloredpedestals": "Use On Pedestal",
+
 
     "item.pedestals.linkingtool": "Linking Tool",
     "item.pedestals.linkingtool.tool_linked": "Sending Items to These Pedestal Locations:",
