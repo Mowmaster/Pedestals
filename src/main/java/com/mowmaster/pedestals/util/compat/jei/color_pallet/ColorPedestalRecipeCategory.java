@@ -28,12 +28,12 @@ public class ColorPedestalRecipeCategory implements IRecipeCategory<ColoredPedes
     private final String localizedName;
     private final IDrawable background;
     private final IDrawable icon;
-    public static final ResourceLocation CRUSHER_TEXTURE = new ResourceLocation(Reference.MODID + ":textures/gui/jei/crusherprocessing.png");
+    public static final ResourceLocation PEDESTAL_TEXTURE = new ResourceLocation(Reference.MODID + ":textures/gui/jei/coloredpedestal.png");
     public static final ResourceLocation UID = new ResourceLocation(Reference.MODID, "coloredpedestals");
 
     public ColorPedestalRecipeCategory(IGuiHelper guiHelper) {
         icon = guiHelper.createDrawableIngredient(new ItemStack(ItemColorPallet.COLORPALLET_DEFAULT.getItem()));
-        background = guiHelper.createDrawable(CRUSHER_TEXTURE, 0, 0, 73, 35);
+        background = guiHelper.createDrawable(PEDESTAL_TEXTURE, 0, 0, 118, 35);
         localizedName = I18n.format(Reference.MODID + ".recipe_category_coloredpedestals");
     }
 
@@ -70,7 +70,7 @@ public class ColorPedestalRecipeCategory implements IRecipeCategory<ColoredPedes
 
     @Override
     public void setRecipe(IRecipeLayout recipeLayout, ColoredPedestalRecipe recipe, IIngredients ingredients) {
-        recipeLayout.getItemStacks().init(0, true, 73, 60);
+        recipeLayout.getItemStacks().init(0, true, 50, 14);
         recipeLayout.getItemStacks().set(0,new ItemStack(BlockPedestalTE.I_PEDESTAL_333));
 
         recipeLayout.getItemStacks().init(1, true, 5, 14);
@@ -81,12 +81,12 @@ public class ColorPedestalRecipeCategory implements IRecipeCategory<ColoredPedes
         pallet.setTag(nbt);
         recipeLayout.getItemStacks().set(1,pallet);
 
-        recipeLayout.getItemStacks().init(2, false, 50, 14);
+        recipeLayout.getItemStacks().init(2, false, 95, 14);
         recipeLayout.getItemStacks().set(2, ingredients.getOutputs(VanillaTypes.ITEM).get(0));
     }
 
     @Override
     public void draw(ColoredPedestalRecipe recipe, MatrixStack matrixStack, double mouseX, double mouseY) {
-        icon.draw(matrixStack, 30, 0);
+        background.draw(matrixStack);
     }
 }

@@ -255,7 +255,7 @@ public class PedestalsPlugin implements IModPlugin {
         //Colored Pedestals
         registration.addRecipeCatalyst(new ItemStack(ItemColorPallet.COLORPALLET), ColorPedestalRecipeCategory.UID);
         //Color Pallets
-        registration.addRecipeCatalyst(new ItemStack(ItemColorPallet.COLORPALLET_DEFAULT), ColorPalletRecipeCategory.UID);
+        registration.addRecipeCatalyst(new ItemStack(ItemLinkingTool.DEFAULT), ColorPalletRecipeCategory.UID);
     }
 
 
