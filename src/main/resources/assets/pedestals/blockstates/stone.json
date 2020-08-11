@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "pedestals:block/stone/stonetint" }
+    "": { "model": "pedestals:block/stone/whitestone" }
   }
 }
