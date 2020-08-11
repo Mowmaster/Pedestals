@@ -2,6 +2,9 @@
 
     "itemGroup.pedestals_blocks": "Pedestals",
 
+    "pedestals.recipe_category_crusher": "Crusher Upgrade",
+    "pedestals.recipe_category_sawing": "SawMill Upgrade",
+
     "item.pedestals.linkingtool": "Linking Tool",
     "item.pedestals.linkingtool.tool_linked": "Sending Items to These Pedestal Locations:",
     "item.pedestals.linkingtool.tool_seperator": ",",
@@ -270,7 +273,7 @@
     "jei.pedestals.rfcrusher.desc": "Place an Inventory Below the Pedestal for item inputs, Connect it to the Pedestal Energy Network to Fuel It, Outputs come out the top of the pedestal. Can crush Most Ores, Stone, Cobble, Gravel, BlazeRod, SugarCane, Beetroot, P.Potato, Potato, Wheat, Bone, and Vanilla Flowers",
 
     "item.pedestals.coin.rfsmelter": "Pedestal Upgrade",
-    "item.pedestals.coin.rfsmelter.tooltip_name": "Energy Smelter Upgrade",
+    "item.pedestals.coin.rfsmelter.tooltip_name": "Energy Smelting Upgrade",
     "item.pedestals.coin.rfsmelter.tooltip_rate": "Items Smelted Per Operation: ",
     "item.pedestals.coin.rfsmelter.tooltip_speed": "Operational Speed: ",
     "item.pedestals.coin.rfsmelter.tooltip_rfstored": "Energy Stored: ",

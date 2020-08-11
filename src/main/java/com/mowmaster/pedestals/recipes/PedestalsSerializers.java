@@ -17,11 +17,7 @@ public final class PedestalsSerializers {
 
     public static final RegistryObject<IRecipeSerializer<?>> SAWING = RECIPES.register("pedestal_sawing", () ->
             SawMillRecipe.serializer);
+
+    public static final RegistryObject<IRecipeSerializer<?>> COLORING = RECIPES.register("pedestal_coloring", () ->
+            ColoredPedestalRecipe.serializer);
 }
-
-/*{
-
-    public static final DeferredRegister<IRecipeSerializer<?>> RECIPE_SERIALIZERS = new DeferredRegister<>(ForgeRegistries.RECIPE_SERIALIZERS, Reference.MODID);
-    public static final RegistryObject<IRecipeSerializer<?>> CRUSHING = RECIPE_SERIALIZERS.register("fruit_pressing", () ->
-            CrusherRecipe.serializer);
-}*/

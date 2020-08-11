@@ -1,32 +1,38 @@
 package com.mowmaster.pedestals.util.compat.jei;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
+import com.mowmaster.pedestals.recipes.CrusherRecipe;
+import com.mowmaster.pedestals.recipes.SawMillRecipe;
 import com.mowmaster.pedestals.references.Reference;
+import com.mowmaster.pedestals.util.compat.jei.crusher.CrusherRecipeCategory;
+import com.mowmaster.pedestals.util.compat.jei.sawmill.SawMillRecipeCategory;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-/**
- * Created by KingMowmaster on 7/19/2020.
- */
 
 @JeiPlugin
 public class PedestalsPlugin implements IModPlugin {
+
     public static final ResourceLocation PLUGIN_UID = new ResourceLocation(Reference.MODID, "plugin/main");
 
     @Override
@@ -61,8 +67,13 @@ public class PedestalsPlugin implements IModPlugin {
         return ingredient.getMatchingStacks()[0].getItem();
     }
 
+    public static final IRecipeType<CrusherRecipe> CRUSHER_TYPE = CrusherRecipe.recipeType;
+    public static final IRecipeType<SawMillRecipe> SAWING_TYPE = SawMillRecipe.recipeType;
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(CRUSHER_TYPE), CrusherRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(SAWING_TYPE), SawMillRecipeCategory.UID);
+
         //Pedestals
         addValueInfoPage(registration, BlockPedestalTE.I_PEDESTAL_000, "stone000");
         addValueInfoPage(registration, BlockPedestalTE.I_PEDESTAL_001, "stone001");
@@ -212,13 +223,27 @@ public class PedestalsPlugin implements IModPlugin {
     }
 
     @Override
+    public void registerCategories(IRecipeCategoryRegistration registry) {
+        registry.addRecipeCategories(new CrusherRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new SawMillRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+    }
+
+    @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration)
     {
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeCrafter.CRAFTER_THREE), VanillaRecipeCategoryUid.CRAFTING);
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeCrafter.CRAFTER_TWO), VanillaRecipeCategoryUid.CRAFTING);
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeCrafter.CRAFTER_ONE), VanillaRecipeCategoryUid.CRAFTING);
-        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeFurnace.SMELTER), VanillaRecipeCategoryUid.FURNACE);
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeExpAnvil.XPANVIL), VanillaRecipeCategoryUid.ANVIL);
+        //Crusher
+        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeCrusher.CRUSHER), CrusherRecipeCategory.UID);
+        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeEnergyCrusher.RFCRUSHER), CrusherRecipeCategory.UID);
+        //Sawmill
+        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeSawMill.SAWMILL), SawMillRecipeCategory.UID);
+        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeEnergySawMill.RFSAWMILL), SawMillRecipeCategory.UID);
+        //Smelter
+        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeFurnace.SMELTER), VanillaRecipeCategoryUid.FURNACE);
+        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeEnergyFurnace.RFSMELTER), VanillaRecipeCategoryUid.FURNACE);
     }
 
 
