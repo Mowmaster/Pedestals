@@ -44,6 +44,11 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         if(!world.isRemote)
@@ -81,6 +86,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
         //if(world.getTileEntity(posInventory) !=null)
         //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
         if(cap.isPresent())
         {

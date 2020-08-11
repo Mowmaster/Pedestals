@@ -31,6 +31,11 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
 {
     public ItemUpgradeSawMill(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     @Nullable
     protected SawMillRecipe getRecipe(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
@@ -67,6 +72,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
         //if(world.getTileEntity(posInventory) !=null)
         //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(cap.isPresent())
         {
             IItemHandler handler = cap.orElse(null);

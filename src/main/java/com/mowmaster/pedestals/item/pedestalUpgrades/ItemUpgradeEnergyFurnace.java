@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,6 +31,11 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
 {
     public ItemUpgradeEnergyFurnace(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
 
     @Nullable
     protected AbstractCookingRecipe getRecipe(World world, ItemStack stackIn) {
@@ -95,6 +99,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
         ItemStack itemFromInv = ItemStack.EMPTY;
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(cap.isPresent())
         {
             IItemHandler handler = cap.orElse(null);

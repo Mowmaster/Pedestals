@@ -92,9 +92,24 @@ public class ItemUpgradeBase extends Item {
         int capacity = 0;
         if(hasEnchant(stack))
         {
-            capacity = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack));;
+            capacity = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack));
         }
         return capacity;
+    }
+
+    public int getAdvancedModifier(ItemStack stack)
+    {
+        int advanced = 0;
+        if(hasEnchant(stack))
+        {
+            advanced = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack) > 1)?(1):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack));
+        }
+        return advanced;
+    }
+
+    public boolean hasAdvancedInventoryTargeting(ItemStack stack)
+    {
+        return getAdvancedModifier(stack)>=1;
     }
 
     public int intOperationalSpeedModifier(ItemStack stack)
@@ -102,7 +117,7 @@ public class ItemUpgradeBase extends Item {
         int rate = 0;
         if(hasEnchant(stack))
         {
-            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));;
+            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
         }
         return rate;
     }
@@ -474,7 +489,43 @@ public class ItemUpgradeBase extends Item {
 
     //All credit for this goes to https://github.com/BluSunrize/ImmersiveEngineering/blob/f40a49da570c991e51dd96bba1d529e20da6caa6/src/main/java/blusunrize/immersiveengineering/api/ApiUtils.java#L338
     //TODO: Alter later to fit style in refactoring
-    public static LazyOptional<IItemHandler> findItemHandlerAtPos(World world, BlockPos pos, Direction side, boolean allowEntity)
+    public static LazyOptional<IItemHandler> findItemHandlerAtPos(World world, BlockPos pos, Direction side, boolean allowCart)
+    {
+        TileEntity neighbourTile = world.getTileEntity(pos);
+        if(neighbourTile!=null)
+        {
+            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
+            if(cap.isPresent())
+                return cap;
+        }
+        if(allowCart)
+        {
+            if(AbstractRailBlock.isRail(world, pos))
+            {
+                List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof IForgeEntityMinecart);
+                if(!list.isEmpty())
+                {
+                    LazyOptional<IItemHandler> cap = list.get(world.rand.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                    if(cap.isPresent())
+                        return cap;
+                }
+            }
+            else
+            {
+                //Added for quark boats with inventories (i hope)
+                List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof BoatEntity);
+                if(!list.isEmpty())
+                {
+                    LazyOptional<IItemHandler> cap = list.get(world.rand.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                    if(cap.isPresent())
+                        return cap;
+                }
+            }
+        }
+        return LazyOptional.empty();
+    }
+
+    public static LazyOptional<IItemHandler> findItemHandlerAtPosAdvanced(World world, BlockPos pos, Direction side, boolean allowEntity)
     {
         TileEntity neighbourTile = world.getTileEntity(pos);
         if(neighbourTile!=null)
@@ -488,28 +539,6 @@ public class ItemUpgradeBase extends Item {
             //Added for quark boats with inventories (i hope)
             //List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof BoatEntity);
             List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof Entity);
-            if(!list.isEmpty())
-            {
-                LazyOptional<IItemHandler> cap = list.get(world.rand.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-                if(cap.isPresent())
-                    return cap;
-            }
-        }
-        return LazyOptional.empty();
-    }
-
-    public static LazyOptional<IItemHandler> findItemHandlerAtPosBlockAndEntity(World world, BlockPos pos, Direction side, boolean allowCart)
-    {
-        TileEntity neighbourTile = world.getTileEntity(pos);
-        if(neighbourTile!=null)
-        {
-            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
-            if(cap.isPresent())
-                return cap;
-        }
-        if(allowCart)
-        {
-            List<Entity> list = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos), entity -> entity instanceof IForgeEntityMinecart || entity instanceof DonkeyEntity || entity instanceof LlamaEntity || entity instanceof MuleEntity);
             if(!list.isEmpty())
             {
                 LazyOptional<IItemHandler> cap = list.get(world.rand.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
@@ -845,6 +874,11 @@ public class ItemUpgradeBase extends Item {
     }
 
     public Boolean canAcceptRange()
+    {
+        return false;
+    }
+
+    public Boolean canAcceptAdvanced()
     {
         return false;
     }

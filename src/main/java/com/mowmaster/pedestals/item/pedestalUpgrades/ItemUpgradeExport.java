@@ -36,6 +36,8 @@ public class ItemUpgradeExport extends ItemUpgradeBase
         return true;
     }
 
+    public Boolean canAcceptAdvanced() {return true;}
+
     private int getNextSlotEmptyOrMatching(LazyOptional<IItemHandler> cap, ItemStack stackInPedestal)
     {
         AtomicInteger slot = new AtomicInteger(-1);
@@ -98,6 +100,8 @@ public class ItemUpgradeExport extends ItemUpgradeBase
         }
     }
 
+
+
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
@@ -106,7 +110,9 @@ public class ItemUpgradeExport extends ItemUpgradeBase
         //Checks to make sure a TE exists
         //if(world.getTileEntity(posInventory) !=null)
         //{
+
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
         //Gets inventory TE then makes sure its not a pedestal
         TileEntity invToPushTo = world.getTileEntity(posInventory);

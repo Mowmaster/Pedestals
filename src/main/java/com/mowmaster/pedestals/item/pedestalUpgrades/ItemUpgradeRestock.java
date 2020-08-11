@@ -35,6 +35,11 @@ public class ItemUpgradeRestock extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getSlotNumberNext(int currentSlotNumber, int range, ItemStack inPedestal, ItemStack inInventory)
     {
         int slotToReturn=-1;
@@ -101,6 +106,7 @@ public class ItemUpgradeRestock extends ItemUpgradeBase
         //if(world.getTileEntity(posInventory) !=null)
         //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
             //Gets inventory TE then makes sure its not a pedestal
             TileEntity invToPushTo = world.getTileEntity(posInventory);
             if(invToPushTo instanceof TilePedestal) {

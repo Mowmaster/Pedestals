@@ -47,6 +47,11 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     }
 
     @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
+    @Override
     public int getExpBuffer(ItemStack stack)
     {
         int value = 30;
@@ -248,6 +253,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         //if(world.getTileEntity(posInventory) !=null)
         //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
             if(cap.isPresent())
             {

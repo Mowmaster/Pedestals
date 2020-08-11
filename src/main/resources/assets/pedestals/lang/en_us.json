@@ -35,6 +35,8 @@
     "jei.pedestals.bookrange.desc": "Will only accept the Range Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
     "item.pedestals.bookarea": "Enchantment Focused Book (Area Book)",
     "jei.pedestals.bookarea.desc": "Will only accept the Area Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+    "item.pedestals.bookadvanced": "Enchantment Focused Book (Advanced Book)",
+    "jei.pedestals.bookadvanced.desc": "Will only accept the Advanced Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
 
 
     "item.pedestals.coin.attack": "Pedestal Upgrade",
@@ -804,5 +806,6 @@
     "enchantment.pedestals.upgradecapacity": "Pedestal Capacity",
     "enchantment.pedestals.upgradespeed": "Pedestal Speed",
     "enchantment.pedestals.upgraderange": "Pedestal Range",
-    "enchantment.pedestals.upgradearea": "Pedestal Area"
+    "enchantment.pedestals.upgradearea": "Pedestal Area",
+    "enchantment.pedestals.upgradeadvanced": "Pedestal Advanced"
 }

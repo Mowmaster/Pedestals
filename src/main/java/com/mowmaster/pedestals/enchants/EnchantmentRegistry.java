@@ -24,6 +24,7 @@ public final class EnchantmentRegistry
     public static final Enchantment RANGE = new EnchantmentRange();
     public static final Enchantment AREA = new EnchantmentArea();
     public static final Enchantment CAPACITY = new EnchantmentCapacity();
+    public static final Enchantment ADVANCED = new EnchantmentAdvanced();
 
     @SubscribeEvent
     public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
@@ -33,7 +34,8 @@ public final class EnchantmentRegistry
                 setup(OPERATIONSPEED, "upgradespeed"),
                 setup(RANGE, "upgraderange"),
                 setup(AREA, "upgradearea"),
-                setup(CAPACITY, "upgradecapacity")
+                setup(CAPACITY, "upgradecapacity"),
+                setup(ADVANCED, "upgradeadvanced")
         );
     }
 

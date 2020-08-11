@@ -21,6 +21,7 @@ public class ItemEnchantableBook extends Item {
     public static final Item RANGE = new ItemEnchantableBook().setRegistryName(new ResourceLocation(MODID, "bookrange"));
     public static final Item AREA = new ItemEnchantableBook().setRegistryName(new ResourceLocation(MODID, "bookarea"));
     public static final Item SPEED = new ItemEnchantableBook().setRegistryName(new ResourceLocation(MODID, "bookspeed"));
+    public static final Item ADVANCED = new ItemEnchantableBook().setRegistryName(new ResourceLocation(MODID, "bookadvanced"));
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
@@ -50,6 +51,7 @@ public class ItemEnchantableBook extends Item {
         event.getRegistry().register(RANGE);
         event.getRegistry().register(AREA);
         event.getRegistry().register(CAPACITY);
+        event.getRegistry().register(ADVANCED);
     }
 
 

@@ -38,6 +38,11 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getBottlingRate(ItemStack stack)
     {
         int bottlingRate = 1;
@@ -89,6 +94,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         //if(world.getTileEntity(posInventory) !=null)
         //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
         if(cap.isPresent())
         {

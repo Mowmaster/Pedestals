@@ -36,6 +36,11 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 {
     public ItemUpgradeCrafter(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getGridSize(ItemStack itemStack)
     {
         int gridSize = 0;
@@ -83,6 +88,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
             //if(world.getTileEntity(posInventory) != null)
             //{
             LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
                 //Setup new Container for our Crafting Grid Size
                 CraftingInventory craft = new CraftingInventory(new Container(null, -1) {
                     @Override

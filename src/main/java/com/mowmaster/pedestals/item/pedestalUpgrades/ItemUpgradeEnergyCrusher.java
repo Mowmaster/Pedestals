@@ -31,6 +31,11 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
     // public final int rfCostPerItemSmelted = 2500; (From Base Machine Energy Class)
     public ItemUpgradeEnergyCrusher(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     //Speed - Default
     //Capacity - Increase Items Smelted at once
     @Override
@@ -80,6 +85,7 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
         ItemStack itemFromInv = ItemStack.EMPTY;
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(cap.isPresent())
         {
             IItemHandler handler = cap.orElse(null);

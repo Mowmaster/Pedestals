@@ -33,6 +33,11 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
 {
     public ItemUpgradeFurnace(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     @Nullable
     protected AbstractCookingRecipe getRecipe(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
@@ -90,6 +95,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
         //if(world.getTileEntity(posInventory) !=null)
         //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(cap.isPresent())
         {
             IItemHandler handler = cap.orElse(null);
