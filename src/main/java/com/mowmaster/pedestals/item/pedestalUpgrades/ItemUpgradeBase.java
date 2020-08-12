@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
@@ -153,28 +154,34 @@ public class ItemUpgradeBase extends Item {
 
     public String getOperationSpeedString(ItemStack stack)
     {
-        String str = "Normal Speed";
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        String str = normal.getString();
         switch (intOperationalSpeedModifier(stack))
         {
             case 0:
-                str = "Normal Speed";//normal speed
+                str = normal.getString();//normal speed
                 break;
             case 1:
-                str = "2x Faster";//2x faster
+                str = twox.getString();//2x faster
                 break;
             case 2:
-                str = "4x Faster";//4x faster
+                str = fourx.getString();//4x faster
                 break;
             case 3:
-                str = "6x Faster";//6x faster
+                str = sixx.getString();//6x faster
                 break;
             case 4:
-                str = "10x Faster";//10x faster
+                str = tenx.getString();//10x faster
                 break;
             case 5:
-                str = "20x Faster";//20x faster
+                str = twentyx.getString();//20x faster
                 break;
-            default: str = "Normal Speed";;
+            default: str = normal.getString();;
         }
 
         return  str;
