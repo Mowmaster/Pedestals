@@ -8,13 +8,10 @@
       "item": "pedestals:coin/magnet"
     },
     {
-      "item": "pedestals:coin/smelter"
+      "item": "pedestals:coin/rfsmelter"
     },
     {
       "tag": "pedestals:filters"
-    },
-    {
-      "item": "minecraft:redstone_block"
     }
   ],
   "result": {
