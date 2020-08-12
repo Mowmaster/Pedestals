@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -76,28 +77,34 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
 
     public String getExpTransferRateString(ItemStack stack)
     {
-        String tr = "5 Levels";
+        TranslationTextComponent fivelevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_0");
+        TranslationTextComponent tenlevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_1");
+        TranslationTextComponent fifteenlevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_2");
+        TranslationTextComponent twentylevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_3");
+        TranslationTextComponent twentyfivelevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_4");
+        TranslationTextComponent thirtylevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_5");
+        String tr = fivelevels.getString();
         switch (getExpTransferRate(stack))
         {
             case 55:
-                tr = "5 Levels";
+                tr = fivelevels.getString();
                 break;
             case 160:
-                tr="10 Levels";
+                tr = tenlevels.getString();
                 break;
             case 315:
-                tr = "15 Levels";
+                tr = fifteenlevels.getString();
                 break;
             case 550:
-                tr = "20 Levels";
+                tr = twentylevels.getString();
                 break;
             case 910:
-                tr = "25 Levels";
+                tr = twentyfivelevels.getString();
                 break;
             case 1395:
-                tr="30 Levels";
+                tr = thirtylevels.getString();
                 break;
-            default: tr="5 Levels";
+            default: tr = fivelevels.getString();
         }
 
         return  tr;

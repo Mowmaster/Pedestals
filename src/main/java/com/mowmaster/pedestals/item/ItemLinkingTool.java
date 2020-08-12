@@ -56,6 +56,19 @@ public class ItemLinkingTool extends Item {
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getPos();
 
+        TranslationTextComponent linksucess = new TranslationTextComponent(getTranslationKey() + ".tool_link_success");
+        linksucess.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linkunsuccess = new TranslationTextComponent(getTranslationKey() + ".tool_link_unsucess");
+        linkunsuccess.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linkremoved = new TranslationTextComponent(getTranslationKey() + ".tool_link_removed");
+        linkremoved.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linkitsself = new TranslationTextComponent(getTranslationKey() + ".tool_link_itsself");
+        linkitsself.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linknetwork = new TranslationTextComponent(getTranslationKey() + ".tool_link_network");
+        linknetwork.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linkdistance = new TranslationTextComponent(getTranslationKey() + ".tool_link_distance");
+        linkdistance.mergeStyle(TextFormatting.WHITE);
+
         if(!worldIn.isRemote)
         {
             BlockState getBlockState = worldIn.getBlockState(pos);
@@ -113,29 +126,24 @@ public class ItemLinkingTool extends Item {
                                                             player.getHeldItemMainhand().removeChildTag("ench");
                                                         }
                                                     }
-                                                    player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Successful"),player.getUniqueID());
+                                                    player.sendMessage(linksucess,player.getUniqueID());
                                                 }
-                                                else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Unsuccessful - Maximum Links Reached"),player.getUniqueID());
+                                                else player.sendMessage(linkunsuccess,player.getUniqueID());
                                             }
                                             else
                                             {
                                                 tilePedestal.removeLocation(getStoredPosition(player.getHeldItemMainhand()));
-                                                player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Link Successfully Removed"),player.getUniqueID());
+                                                player.sendMessage(linkremoved,player.getUniqueID());
                                             }
                                         }
-                                        else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Cannot be Linked to Itsself"),player.getUniqueID());
+                                        else player.sendMessage(linkitsself,player.getUniqueID());
                                     }
-                                    else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Cannot Connect to this Network"),player.getUniqueID());
+                                    else player.sendMessage(linknetwork,player.getUniqueID());
                                 }
-                                else player.sendMessage(new TranslationTextComponent(TextFormatting.WHITE + "Too Far to Connect"),player.getUniqueID());
+                                else player.sendMessage(linkdistance,player.getUniqueID());
                             }
                         }
                     }
-
-                    //TODO: Need to localize the chat messages when using the tool.
-
-
-
                 }
                 else
                 {
@@ -306,13 +314,24 @@ public class ItemLinkingTool extends Item {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-//TODO: Need to localize the tooltip info.
+
+        TranslationTextComponent selected = new TranslationTextComponent(getTranslationKey() + ".tool_block_selected");
+        TranslationTextComponent unselected = new TranslationTextComponent(getTranslationKey() + ".tool_block_unselected");
+        TranslationTextComponent cordX = new TranslationTextComponent(getTranslationKey() + ".tool_X");
+        TranslationTextComponent cordY = new TranslationTextComponent(getTranslationKey() + ".tool_Y");
+        TranslationTextComponent cordZ = new TranslationTextComponent(getTranslationKey() + ".tool_Z");
         if(stack.getItem() instanceof ItemLinkingTool) {
             if (stack.hasTag()) {
                 if (stack.isEnchanted()) {
-                    tooltip.add(new TranslationTextComponent("Selected Block = X:" + this.getStoredPosition(stack).getX() + " Y:" + this.getStoredPosition(stack).getY() + " Z:" + this.getStoredPosition(stack).getZ()));
-                } else tooltip.add(new TranslationTextComponent("No Block Location Stored"));
-            } else tooltip.add(new TranslationTextComponent("No Block Location Stored"));
+                    selected.appendString(cordX.getString());
+                    selected.appendString("" + this.getStoredPosition(stack).getX() + "");
+                    selected.appendString(cordY.getString());
+                    selected.appendString("" + this.getStoredPosition(stack).getY() + "");
+                    selected.appendString(cordZ.getString());
+                    selected.appendString("" + this.getStoredPosition(stack).getZ() + "");
+                    tooltip.add(selected);
+                } else tooltip.add(unselected);
+            } else tooltip.add(unselected);
         }
     }
 
