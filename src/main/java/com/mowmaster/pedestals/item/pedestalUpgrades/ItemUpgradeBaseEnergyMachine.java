@@ -229,7 +229,10 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        //super.addInformation(stack, worldIn, tooltip, flagIn);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.mergeStyle(TextFormatting.GOLD);
+        tooltip.add(t);
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfstored");
         xpstored.appendString(""+ getEnergyStored(stack) +"");
