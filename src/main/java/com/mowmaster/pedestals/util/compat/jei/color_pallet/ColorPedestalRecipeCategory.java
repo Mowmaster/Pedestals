@@ -3,9 +3,7 @@ package com.mowmaster.pedestals.util.compat.jei.color_pallet;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.item.ItemColorPallet;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeCrusher;
 import com.mowmaster.pedestals.recipes.ColoredPedestalRecipe;
-import com.mowmaster.pedestals.recipes.CrusherRecipe;
 import com.mowmaster.pedestals.references.Reference;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -14,13 +12,11 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Collections;
-import java.util.List;
 
 
 public class ColorPedestalRecipeCategory implements IRecipeCategory<ColoredPedestalRecipe>

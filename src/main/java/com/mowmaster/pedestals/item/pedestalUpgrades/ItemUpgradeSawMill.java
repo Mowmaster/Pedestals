@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.crafting.SawMill;
 import com.mowmaster.pedestals.recipes.SawMillRecipe;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.entity.player.PlayerEntity;

@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
 
 import java.util.Map;
 

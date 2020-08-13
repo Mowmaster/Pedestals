@@ -1,7 +1,6 @@
 package com.mowmaster.pedestals.enchants;
 
 import com.mowmaster.pedestals.item.ItemEnchantableBook;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;

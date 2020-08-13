@@ -1,7 +1,6 @@
 package com.mowmaster.pedestals.util.compat.jei;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
-import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import com.mowmaster.pedestals.recipes.ColoredPedestalRecipe;
@@ -19,7 +18,6 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
@@ -30,7 +28,6 @@ import net.minecraft.util.ResourceLocation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @JeiPlugin

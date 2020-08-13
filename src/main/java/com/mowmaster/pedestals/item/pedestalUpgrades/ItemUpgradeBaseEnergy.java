@@ -9,7 +9,6 @@ import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
-import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 

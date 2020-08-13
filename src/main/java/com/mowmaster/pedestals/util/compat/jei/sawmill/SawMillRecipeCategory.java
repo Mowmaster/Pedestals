@@ -1,9 +1,7 @@
 package com.mowmaster.pedestals.util.compat.jei.sawmill;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeCrusher;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeSawMill;
-import com.mowmaster.pedestals.recipes.CrusherRecipe;
 import com.mowmaster.pedestals.recipes.SawMillRecipe;
 import com.mowmaster.pedestals.references.Reference;
 import mezz.jei.api.constants.VanillaTypes;

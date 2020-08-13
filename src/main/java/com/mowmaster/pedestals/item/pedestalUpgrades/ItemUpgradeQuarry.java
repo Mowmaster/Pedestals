@@ -8,7 +8,6 @@ import com.mowmaster.pedestals.enchants.EnchantmentRange;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -47,7 +46,6 @@ import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
-import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 {

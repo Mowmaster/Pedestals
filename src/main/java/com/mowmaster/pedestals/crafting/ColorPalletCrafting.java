@@ -12,7 +12,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
-import net.minecraft.world.IExplosionContext;
+import net.minecraft.world.ExplosionContext;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -80,7 +80,7 @@ public class ColorPalletCrafting
                         ResourceLocation grabBlue = new ResourceLocation("forge", "dyes/blue");
                         if(stack.getItem() instanceof DyeItem)
                         {
-                            if(stack.getItem().isIn(ItemTags.getCollection().getOrCreate(grabRed)))
+                            if(stack.getItem().isIn(ItemTags.getCollection().get(grabRed)))
                             {
                                 //16711680
                                 double[] rgbColors = CalculateColor.getRGBColorFromIntCount(16711680,stack.getCount());
@@ -89,7 +89,7 @@ public class ColorPalletCrafting
                                 b+=rgbColors[2];
                                 item.remove();
                             }
-                            else if(stack.getItem().isIn(ItemTags.getCollection().getOrCreate(grabGreen)))
+                            else if(stack.getItem().isIn(ItemTags.getCollection().get(grabGreen)))
                             {
                                 //65280
                                 double[] rgbColors = CalculateColor.getRGBColorFromIntCount(65280,stack.getCount());
@@ -98,7 +98,7 @@ public class ColorPalletCrafting
                                 b+=rgbColors[2];
                                 item.remove();
                             }
-                            else if(stack.getItem().isIn(ItemTags.getCollection().getOrCreate(grabBlue)))
+                            else if(stack.getItem().isIn(ItemTags.getCollection().get(grabBlue)))
                             {
                                 //255
                                 double[] rgbColors = CalculateColor.getRGBColorFromIntCount(255,stack.getCount());
@@ -128,7 +128,7 @@ public class ColorPalletCrafting
 
                         //removes fire block???
                         //worldIn.removeBlock(new BlockPos(posX, posY + 1, posZ), false);
-                        worldIn.createExplosion(new ItemEntity(worldIn, posX, posY, posZ),(DamageSource)null,(IExplosionContext)null, posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Explosion.Mode.NONE);
+                        worldIn.createExplosion(new ItemEntity(worldIn, posX, posY, posZ),(DamageSource)null,(ExplosionContext)null, posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Explosion.Mode.NONE);
 
                         if(pallet>0)
                         {

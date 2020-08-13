@@ -1,8 +1,6 @@
 package com.mowmaster.pedestals.util.compat.jei.color_pallet;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.item.ItemLinkingTool;
@@ -17,15 +15,10 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 
 public class ColorPalletRecipeCategory implements IRecipeCategory<ColoredPedestalRecipe>
