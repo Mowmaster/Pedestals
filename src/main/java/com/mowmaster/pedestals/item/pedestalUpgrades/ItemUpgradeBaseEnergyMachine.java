@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeverBlock;
@@ -156,28 +157,34 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
 
     public String getSmeltingSpeedString(ItemStack stack)
     {
-        String s3 = "Normal Speed";
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        String s3 = normal.getString();
         switch (getSmeltingSpeed(stack))
         {
             case 200:
-                s3 = "Normal Speed";
+                s3 = normal.getString();
                 break;
             case 100:
-                s3="2x Faster";
+                s3 = twox.getString();
                 break;
             case 50:
-                s3 = "4x Faster";
+                s3 = fourx.getString();
                 break;
             case 33:
-                s3 = "6x Faster";
+                s3 = sixx.getString();
                 break;
             case 20:
-                s3 = "10x Faster";
+                s3 = tenx.getString();
                 break;
             case 10:
-                s3="20x Faster";
+                s3 = twentyx.getString();
                 break;
-            default: s3= "Normal Speed";
+            default: s3 = normal.getString();
         }
         return s3;
     }

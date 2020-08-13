@@ -16,7 +16,7 @@
     "item.pedestals.linkingtool.tool_link_network": "无法连接这个网络",
     "item.pedestals.linkingtool.tool_link_distance": "连接距离过远",
     "item.pedestals.linkingtool.tool_block_selected": "选择方块 = ",
-    "item.pedestals.linkingtool.tool_block_unselected": "未存储任何方块坐标",
+    "item.pedestals.linkingtool.tool_block_unselected": "未存储任何方块的坐标",
     "item.pedestals.linkingtool.tool_X": "X:",
     "item.pedestals.linkingtool.tool_Y": " Y:",
     "item.pedestals.linkingtool.tool_Z": " Z:",
@@ -24,7 +24,7 @@
     "item.pedestals.linkingtool.tool_seperator": ",",
     "item.pedestals.linkingtool.tool_capacity": "容量升级: ",
     "item.pedestals.linkingtool.tool_speed": "速度升级: ",
-    "jei.pedestals.linkingtool.desc": "按住shift右键基座用于接收物品，再按住shift右键另一个基座用于接收物品. Used In crafting to create most base items in the mod.",
+    "jei.pedestals.linkingtool.desc": "按住shift右键基座用于接收物品，再按住shift右键另一个基座用于接收物品.用于合成这个mod的大部分物品。",
     "item.pedestals.tagtool": "标签工具",
     "jei.pedestals.tagtool.desc": "把一个物品拿在你的另一只手上, 对着空气右键标签工具. 聊天栏内会出现物品的标签。",
     "item.pedestals.upgradetool": "升级工具",
@@ -116,7 +116,7 @@
     "jei.pedestals.chopper.desc": "这个升级可以破坏基座附近的木头方块，如果把斧子放进基座内，基座将使用该斧子来砍伐。",
 
     "item.pedestals.coin.choppershrooms": "基座升级",
-    "item.pedestals.coin.choppershrooms.tooltip_name": "摘蘑菇升级 ",
+    "item.pedestals.coin.choppershrooms.tooltip_name": "采蘑菇升级 ",
     "item.pedestals.coin.choppershrooms.tooltip_area": "影响范围: ",
     "item.pedestals.coin.choppershrooms.tooltip_areax": "x",
     "item.pedestals.coin.choppershrooms.tooltip_speed": "运行速度: ",
@@ -811,6 +811,8 @@
     "jei.pedestals.stone332.desc": "用染色托盘右键基座制造染色基座。",
     "block.pedestals.pedestal.stone333": "基座",
     "jei.pedestals.stone333.desc": "基座的六个面都可以放置，用彩色托盘可以染色，用萤石可以点亮基座并且可以用“升级”进行升级。升级后的基座可以用红石信号进行开关。",
+
+    "pedestals.pedestal_block.cant_color": "不能给带有物品/被点亮/被升级/被连接的基座染色。",
 
     "item.pedestals.dustiron": "铁粉",
     "item.pedestals.dustgold": "金粉",

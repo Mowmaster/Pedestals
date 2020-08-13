@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.item.ItemLinkingTool;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.ItemUpgradeTool;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -29,13 +30,13 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -304,7 +305,9 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
                             }
                             else
                             {
-                                player.sendStatusMessage(new StringTextComponent(TextFormatting.WHITE +"Color Can't be set on Pedestals with Items, Light, Upgrades, or Linked Pedestals"),true);
+                                TranslationTextComponent cantsetcolor = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".cant_color");
+                                cantsetcolor.mergeStyle(TextFormatting.WHITE);
+                                player.sendStatusMessage(cantsetcolor,true);
                                 //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"ColorPallet"),player.getUniqueID());
                                 return ActionResultType.FAIL;
                             }
@@ -363,7 +366,9 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
                     }
                     else
                     {
-                        player.sendStatusMessage(new StringTextComponent(TextFormatting.WHITE +"Color Can't be set on Pedestals with Items, Light, Upgrades, or Linked Pedestals"),true);
+                        TranslationTextComponent cantsetcolor = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".cant_color");
+                        cantsetcolor.mergeStyle(TextFormatting.WHITE);
+                        player.sendStatusMessage(cantsetcolor,true);
                         //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"ColorPallet"),player.getUniqueID());
                         return ActionResultType.FAIL;
                     }
