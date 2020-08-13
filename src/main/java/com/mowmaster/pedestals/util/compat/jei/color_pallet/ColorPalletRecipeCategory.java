@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Array;
@@ -68,13 +69,18 @@ public class ColorPalletRecipeCategory implements IRecipeCategory<ColoredPedesta
 
     @Override
     public void setIngredients(ColoredPedestalRecipe recipe, IIngredients ingredients) {
-        ingredients.setInputIngredients(Collections.singletonList(recipe.getIngredient()));
+
         /*int color = recipe.getColor();
         ItemStack pallet = new ItemStack(ItemColorPallet.COLORPALLET);
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt("color",color);
         pallet.setTag(nbt);
-        ingredients.setOutput(VanillaTypes.ITEM, pallet);*/
+        //ingredients.setOutput(VanillaTypes.ITEM, );
+        Ingredient newish = Ingredient.fromStacks(pallet);
+        List<Ingredient> ingredList = new ArrayList<Ingredient>();
+        ingredList.add(newish);
+        ingredients.setInputIngredients(ingredList);*/
+        ingredients.setInputIngredients(Collections.singletonList(recipe.getIngredient()));
         ingredients.setOutput(VanillaTypes.ITEM, recipe.getResult());
     }
 
