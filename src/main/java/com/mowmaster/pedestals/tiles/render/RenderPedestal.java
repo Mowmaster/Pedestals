@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -110,7 +111,8 @@ public class RenderPedestal extends TileEntityRenderer<TilePedestal> {
         }
     }
 
-    public static void init(final FMLClientSetupEvent event)
+    //Old event was FMLClientSetupEvent
+    public static void init(final ModelRegistryEvent event)
     {
         ClientRegistry.bindTileEntityRenderer(TilePedestal.PEDESTALTYPE, RenderPedestal::new);
     }
