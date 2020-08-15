@@ -1,5 +1,10 @@
 {
-  "name": "A Guide to Pedestals",
-  "landing_text": "[WIP] A short Guide to help you along as you use pedestals, and their upgrades",
-  "version": 1
+  "name": "item.guide.pedestals",
+  "landing_text": "guide.pedestals.landing",
+  "version": 1,
+  "book_texture": "pedestals:textures/gui/patchouli/bookpedestals.png",
+  "model": "pedestals:guide",
+  "show_progress": false,
+  "use_blocky_font": true,
+  "creative_tab": "pedestals"
 }
