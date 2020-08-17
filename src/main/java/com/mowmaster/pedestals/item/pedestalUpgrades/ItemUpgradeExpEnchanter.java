@@ -193,6 +193,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                             Random rand = new Random();
                                             ItemStack itemToEnchant = itemFromInv.copy();
                                             itemToEnchant.setCount(1);
+                                            //the boolean at the end controls if treasure enchants are allowed.
                                             ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
                                             if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted())
                                             {

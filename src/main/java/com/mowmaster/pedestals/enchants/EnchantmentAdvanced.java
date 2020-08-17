@@ -56,6 +56,7 @@ public class EnchantmentAdvanced extends Enchantment
         return canApplyToUpgrade;
     }
 
+
     public boolean isAllowedOnBooks() {
         return false;
     }
