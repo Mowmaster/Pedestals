@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -107,16 +108,28 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                     }
                     else
                     {
-                        target.tick(sworld,posTarget,rand);
+                        target.randomTick((ServerWorld) world, posTarget, rand);
+                        world.notifyBlockUpdate(posTarget, target, target, 2);
                     }
                 }
             }
             else
             {
-                target.getBlock().tick(target,sworld,posTarget,rand);
+                target.randomTick((ServerWorld) world, posTarget, rand);
+                world.notifyBlockUpdate(posTarget, target, target, 2);
             }
         }
     }
+
+    /*@Override
+    @OnlyIn(Dist.CLIENT)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    {
+        if(!world.isBlockPowered(pos))
+        {
+            spawnParticleAroundPedestalBase(world,tick,pos, ParticleTypes.HAPPY_VILLAGER);
+        }
+    }*/
 
     @Override
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
