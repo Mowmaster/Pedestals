@@ -180,14 +180,15 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                     {
                                         //This is Book Shelf Enchanting level, not enchantment level (15 bookshelfves = 30 levels of enchantability)
                                         float level = getEnchantmentPowerFromSorroundings(world,posOfPedestal,coinInPedestal);
-                                        int actualEnchantingLevel = (int)(level * 2);
+                                        //Need to charge at min 1 level for an enchant
+                                        int actualEnchantingLevel = ((level * 2)<1)?(1):((int)(level * 2));
                                         int currentlyStoredExp = getXPStored(coinInPedestal);
                                         int currentLevelFromStoredXp = getExpLevelFromCount(currentlyStoredExp);
-                                        int xpLevelsNeeded = Math.round(actualEnchantingLevel/10);
+                                        int xpLevelsNeeded = (actualEnchantingLevel/10);
                                         int xpAtEnchantingLevel = getExpCountByLevel(actualEnchantingLevel);
-                                        int xpAtLevelsBelowRequired = getExpCountByLevel((actualEnchantingLevel-xpLevelsNeeded));
-                                        int expNeeded = xpAtEnchantingLevel-xpAtLevelsBelowRequired;
-
+                                        //since this is the number we subtract, if we need at least 1 level then make this 0
+                                        int xpAtLevelsBelowRequired = getExpCountByLevel(((actualEnchantingLevel-xpLevelsNeeded)<1)?(0):((actualEnchantingLevel-xpLevelsNeeded)));
+                                        int expNeeded = (xpAtEnchantingLevel-xpAtLevelsBelowRequired<7)?(7):(xpAtEnchantingLevel-xpAtLevelsBelowRequired);
                                         if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
                                         {
                                             //Enchanting Code Here
@@ -226,13 +227,16 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         float level = getEnchantmentPowerFromSorroundings(world,pos,coin);
-        int actualEnchantingLevel = (int)(level * 2);
+        //Need to charge at min 1 level for an enchant
+        int actualEnchantingLevel = ((level * 2)<1)?(1):((int)(level * 2));
         int currentlyStoredExp = getXPStored(coin);
         int currentLevelFromStoredXp = getExpLevelFromCount(currentlyStoredExp);
-        int xpLevelsNeeded = Math.round(actualEnchantingLevel/10);
+        int xpLevelsNeeded = (actualEnchantingLevel/10);
         int xpAtEnchantingLevel = getExpCountByLevel(actualEnchantingLevel);
-        int xpAtLevelsBelowRequired = getExpCountByLevel((actualEnchantingLevel-xpLevelsNeeded));
-        int expNeeded = xpAtEnchantingLevel-xpAtLevelsBelowRequired;
+        //since this is the number we subtract, if we need at least 1 level then make this 0
+        int xpAtLevelsBelowRequired = getExpCountByLevel(((actualEnchantingLevel-xpLevelsNeeded)<1)?(0):((actualEnchantingLevel-xpLevelsNeeded)));
+        int expNeeded = (xpAtEnchantingLevel-xpAtLevelsBelowRequired<7)?(7):(xpAtEnchantingLevel-xpAtLevelsBelowRequired);
+
 
         if(!world.isBlockPowered(pos))
         {
@@ -263,12 +267,9 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                 }
             }
 
-            if(!world.isBlockPowered(pos))
+            if(getXPStored(pedestal.getCoinOnPedestal())>0)
             {
-                if(getXPStored(pedestal.getCoinOnPedestal())>0)
-                {
-                    spawnParticleAroundPedestalBase(world,tick,pos,0.1f,0.9f,0.1f,1.f);
-                }
+                spawnParticleAroundPedestalBase(world,tick,pos,0.1f,0.9f,0.1f,1.f);
             }
 
             //To show when the enchanting table has enough XP to enchant an item at the current level
