@@ -15,6 +15,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -125,21 +126,21 @@ public class ItemLinkingTool extends Item {
                                                             player.getHeldItemMainhand().removeChildTag("ench");
                                                         }
                                                     }
-                                                    player.sendMessage(linksucess,player.getUniqueID());
+                                                    player.sendMessage(linksucess,Util.DUMMY_UUID);
                                                 }
-                                                else player.sendMessage(linkunsuccess,player.getUniqueID());
+                                                else player.sendMessage(linkunsuccess,Util.DUMMY_UUID);
                                             }
                                             else
                                             {
                                                 tilePedestal.removeLocation(getStoredPosition(player.getHeldItemMainhand()));
-                                                player.sendMessage(linkremoved,player.getUniqueID());
+                                                player.sendMessage(linkremoved,Util.DUMMY_UUID);
                                             }
                                         }
-                                        else player.sendMessage(linkitsself,player.getUniqueID());
+                                        else player.sendMessage(linkitsself,Util.DUMMY_UUID);
                                     }
-                                    else player.sendMessage(linknetwork,player.getUniqueID());
+                                    else player.sendMessage(linknetwork,Util.DUMMY_UUID);
                                 }
-                                else player.sendMessage(linkdistance,player.getUniqueID());
+                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);
                             }
                         }
                     }
@@ -171,7 +172,7 @@ public class ItemLinkingTool extends Item {
                         {
                             TranslationTextComponent links = new TranslationTextComponent(getTranslationKey() + ".tool_linked");
                             links.mergeStyle(TextFormatting.WHITE);
-                            player.sendMessage(links,player.getUniqueID());
+                            player.sendMessage(links,Util.DUMMY_UUID);
 
                             for(int i = 0; i < getLocations.size();i++)
                             {
@@ -182,19 +183,19 @@ public class ItemLinkingTool extends Item {
                                 linked.appendString(seperator.getString());
                                 linked.appendString("" + getLocations.get(i).getZ() + "");
                                 linked.mergeStyle(TextFormatting.GRAY);
-                                player.sendMessage(linked,player.getUniqueID());
+                                player.sendMessage(linked,Util.DUMMY_UUID);
                             }
                         }
 
                         TranslationTextComponent capacity = new TranslationTextComponent(getTranslationKey() + ".tool_capacity");
                         capacity.appendString(""+tilePedestal.getCapacity()+"");
                         capacity.mergeStyle(TextFormatting.BLUE);
-                        player.sendMessage(capacity,player.getUniqueID());
+                        player.sendMessage(capacity,Util.DUMMY_UUID);
 
                         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tool_speed");
                         speed.appendString(""+tilePedestal.getSpeed()+"");
                         speed.mergeStyle(TextFormatting.RED);
-                        player.sendMessage(speed,player.getUniqueID());
+                        player.sendMessage(speed,Util.DUMMY_UUID);
                     }
                 }
             }
@@ -314,6 +315,7 @@ public class ItemLinkingTool extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
+        //new TranslationTextComponent(getTranslationKey() + ".tool_speed", tilePedestal.getSpeed()).mergeStyle(TextFormatting.RED)
         TranslationTextComponent selected = new TranslationTextComponent(getTranslationKey() + ".tool_block_selected");
         TranslationTextComponent unselected = new TranslationTextComponent(getTranslationKey() + ".tool_block_unselected");
         TranslationTextComponent cordX = new TranslationTextComponent(getTranslationKey() + ".tool_X");

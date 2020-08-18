@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -91,12 +92,12 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
         xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
         xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,player.getUniqueID());
+        player.sendMessage(xpstored, Util.DUMMY_UUID);
 
         /*Reduce Chat Output, info Unnecessary???
         TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".chat_xpcapacity");
@@ -104,18 +105,18 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
         xpcapacity.appendString(""+ getExpBuffer(stack) +"");
         xpcapacity.appendString(xpcapacitylvl.getString());
         xpcapacity.mergeStyle(TextFormatting.AQUA);
-        player.sendMessage(xpcapacity,player.getUniqueID());*/
+        player.sendMessage(xpcapacity,Util.DUMMY_UUID);*/
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString(getExpTransferRateString(stack));
         rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,player.getUniqueID());
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override

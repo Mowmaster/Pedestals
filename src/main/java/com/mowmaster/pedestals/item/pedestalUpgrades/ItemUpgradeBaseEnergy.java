@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -385,23 +386,23 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_rfstored");
         xpstored.appendString(""+ getEnergyStored(stack) +"");
         xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,player.getUniqueID());
+        player.sendMessage(xpstored,Util.DUMMY_UUID);
 
         TranslationTextComponent energyRate = new TranslationTextComponent(getTranslationKey() + ".chat_rfrate");
         energyRate.appendString(""+ getEnergyTransferRate(stack) +"");
         energyRate.mergeStyle(TextFormatting.AQUA);
-        player.sendMessage(energyRate,player.getUniqueID());
+        player.sendMessage(energyRate,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override

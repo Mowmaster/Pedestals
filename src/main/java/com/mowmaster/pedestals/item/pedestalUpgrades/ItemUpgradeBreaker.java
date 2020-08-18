@@ -18,6 +18,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -148,19 +149,20 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
+        //Util.DUMMY_UUID
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
         range.appendString(""+getRange(stack)+"");
         range.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(range,player.getUniqueID());
+        player.sendMessage(range,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
             enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,player.getUniqueID());
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -169,7 +171,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
                     enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,player.getUniqueID());
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }
@@ -178,7 +180,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override

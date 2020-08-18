@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -131,12 +132,12 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
         TranslationTextComponent name2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.appendString(name2.getString());
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_size");
-        xpstored.appendString(""+ getSize(stack) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,player.getUniqueID());
+        TranslationTextComponent enchantsize = new TranslationTextComponent(getTranslationKey() + ".chat_size");
+        enchantsize.appendString(""+ getSize(stack) +"");
+        enchantsize.mergeStyle(TextFormatting.GREEN);
+        player.sendMessage(enchantsize, Util.DUMMY_UUID);
     }
 
     @Override

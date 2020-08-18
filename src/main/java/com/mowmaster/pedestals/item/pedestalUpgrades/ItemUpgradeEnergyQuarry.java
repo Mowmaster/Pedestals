@@ -288,7 +288,7 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         int s3 = getAreaWidth(stack);
         int s4 = getRangeHeight(stack);
@@ -302,27 +302,27 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
         area.appendString(areax.getString());
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area,player.getUniqueID());
+        player.sendMessage(area,Util.DUMMY_UUID);
 
         //Display Blocks To Mine Left
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
         btm.appendString("" + blocksToMineInArea(pedestal.getWorld(),pedestal.getPos(),getAreaWidth(pedestal.getCoinOnPedestal()),getRangeHeight(pedestal.getCoinOnPedestal())) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
-        player.sendMessage(btm,player.getUniqueID());
+        player.sendMessage(btm,Util.DUMMY_UUID);
 
         //Display Fuel Left
         int fuelValue = getEnergyStored(pedestal.getCoinOnPedestal());
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
         fuel.appendString("" + fuelValue/2500 + "");
         fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,player.getUniqueID());
+        player.sendMessage(fuel,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
             enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,player.getUniqueID());
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -331,7 +331,7 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
                     enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,player.getUniqueID());
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }
@@ -340,7 +340,7 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getSmeltingSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override

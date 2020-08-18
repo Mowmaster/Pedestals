@@ -1,7 +1,12 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Util;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
@@ -33,5 +38,17 @@ public class ItemUpgradeBaseFilter extends ItemUpgradeBase {
     @Override
     public Boolean canAcceptOpSpeed() {
         return false;
+    }
+
+    @Override
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    {
+        ItemStack stack = pedestal.getCoinOnPedestal();
+
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".chat_name");
+        TranslationTextComponent name2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.appendString(name2.getString());
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.DUMMY_UUID);
     }
 }

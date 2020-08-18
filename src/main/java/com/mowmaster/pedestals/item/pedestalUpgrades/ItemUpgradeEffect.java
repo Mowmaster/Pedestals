@@ -14,6 +14,7 @@ import net.minecraft.potion.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -199,7 +200,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name, Util.DUMMY_UUID);
 
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
@@ -209,7 +210,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         area.appendString(areax.getString());
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area,player.getUniqueID());
+        player.sendMessage(area,Util.DUMMY_UUID);
 
 
         //Display Fuel Left
@@ -217,30 +218,30 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
         fuel.appendString("" + fuelLeft + "");
         fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,player.getUniqueID());
+        player.sendMessage(fuel,Util.DUMMY_UUID);
 
         //Displays what effects are in pedestal
         List<EffectInstance> instance = getEffectFromPedestal(pedestal.getItemInPedestal(),1);
         TranslationTextComponent effect = new TranslationTextComponent(getTranslationKey() + ".chat_effect");
         effect.mergeStyle(TextFormatting.AQUA);
-        player.sendMessage(effect,player.getUniqueID());
+        player.sendMessage(effect,Util.DUMMY_UUID);
         for(int i = 0; i < instance.size();i++)
         {
             TranslationTextComponent effects = new TranslationTextComponent(instance.get(i).getPotion().getDisplayName().getString());
             effects.mergeStyle(TextFormatting.GRAY);
-            player.sendMessage(effects,player.getUniqueID());
+            player.sendMessage(effects,Util.DUMMY_UUID);
         }
 
         TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
         entityType.appendString(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
         entityType.mergeStyle(TextFormatting.YELLOW);
-        player.sendMessage(entityType,player.getUniqueID());
+        player.sendMessage(entityType,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override

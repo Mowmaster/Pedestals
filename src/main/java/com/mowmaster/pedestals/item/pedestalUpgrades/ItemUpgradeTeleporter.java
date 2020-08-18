@@ -17,6 +17,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -293,7 +294,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
         range.appendString(""+getRange(stack)+"");
@@ -303,7 +304,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         range.mergeStyle(TextFormatting.WHITE);
         speed.mergeStyle(TextFormatting.RED);
 
-        player.sendMessage(range,player.getUniqueID());
+        player.sendMessage(range,Util.DUMMY_UUID);
 
 
         //Display Fuel Left
@@ -311,10 +312,10 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
         fuel.appendString("" + fuelLeft + "");
         fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,player.getUniqueID());
+        player.sendMessage(fuel,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override

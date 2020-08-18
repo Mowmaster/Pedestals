@@ -10,6 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -161,23 +162,23 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
         xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
         xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,player.getUniqueID());
+        player.sendMessage(xpstored,Util.DUMMY_UUID);
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString("" + getBottlingRate(stack) + "");
         rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,player.getUniqueID());
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override

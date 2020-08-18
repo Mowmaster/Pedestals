@@ -11,6 +11,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -113,7 +114,7 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
@@ -130,10 +131,10 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
         area.mergeStyle(TextFormatting.WHITE);
         speed.mergeStyle(TextFormatting.RED);
 
-        player.sendMessage(area,player.getUniqueID());
+        player.sendMessage(area,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override

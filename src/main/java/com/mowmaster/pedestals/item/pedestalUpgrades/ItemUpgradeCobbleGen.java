@@ -18,6 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -191,25 +192,25 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name,Util.DUMMY_UUID);
 
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString("" +  getItemTransferRate(stack) + "");
         rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,player.getUniqueID());
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
         stored.appendString("" +  (pedestal.getStoredValueForUpgrades()+pedestal.getItemInPedestal().getCount()) + "");
         stored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(stored,player.getUniqueID());
+        player.sendMessage(stored, Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
             enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,player.getUniqueID());
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -218,7 +219,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
                     enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,player.getUniqueID());
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }
@@ -227,7 +228,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override

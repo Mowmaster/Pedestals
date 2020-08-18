@@ -129,9 +129,6 @@ public class ColorPalletCrafting
 
                         int color = CalculateColor.getColorFromRGB(rgbRed,rgbGreen,rgbBlue);
 
-                        //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"Color: "+color),player.getUniqueID());
-                        //System.out.println(color);
-
                         //removes fire block???
                         //worldIn.removeBlock(new BlockPos(posX, posY + 1, posZ), false);
                         worldIn.createExplosion(new ItemEntity(worldIn, posX, posY, posZ),(DamageSource)null,(ExplosionContext)null, posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Explosion.Mode.NONE);

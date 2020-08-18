@@ -13,6 +13,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -226,25 +227,25 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,player.getUniqueID());
+        player.sendMessage(name, Util.DUMMY_UUID);
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString(""+getItemTransferRate(stack)+"");
         rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,player.getUniqueID());
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         //Display Fuel Left
         int fuelLeft = pedestal.getStoredValueForUpgrades();
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
         fuel.appendString("" + fuelLeft/200 + "");
         fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,player.getUniqueID());
+        player.sendMessage(fuel,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getSmeltingSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,player.getUniqueID());
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
