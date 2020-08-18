@@ -56,6 +56,7 @@ public class ItemLinkingTool extends Item {
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getPos();
 
+        //new TranslationTextComponent(getTranslationKey() + ".tool_speed", tilePedestal.getSpeed()).mergeStyle(TextFormatting.RED)
         TranslationTextComponent linksucess = new TranslationTextComponent(getTranslationKey() + ".tool_link_success");
         linksucess.mergeStyle(TextFormatting.WHITE);
         TranslationTextComponent linkunsuccess = new TranslationTextComponent(getTranslationKey() + ".tool_link_unsucess");

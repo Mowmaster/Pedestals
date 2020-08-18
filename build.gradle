@@ -97,9 +97,9 @@ repositories {
         url = "https://modmaven.k-4u.nl"
     }
     // maven {
-    //     name = "Patchouli"
-    //     url 'https://maven.blamejared.com'
-    // }
+        //      name = "Patchouli"
+        //      url 'https://maven.blamejared.com'
+        // }
 }
 
 
@@ -107,7 +107,8 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.16.2-33.0.5'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.108'
+    //minecraft 'net.minecraftforge:forge:1.16.2-33.0.5'
     /* minecraft dependency is here */
 
     // compile against the JEI API but do not include it at runtime
@@ -116,8 +117,8 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 
     // Patchouli
-    // compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
-    // runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
+    //  compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
+    //  runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"

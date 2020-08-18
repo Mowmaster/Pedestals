@@ -202,7 +202,6 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                 }
             }
         }
-
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));

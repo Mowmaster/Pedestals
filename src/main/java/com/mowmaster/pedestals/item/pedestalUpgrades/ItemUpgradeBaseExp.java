@@ -261,7 +261,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         if(value > 0 && value <= 352)
         {
             maths = (long)Math.sqrt(Math.addExact((long)36, Math.addExact((long)4,(long)value )));
-            i = (int)(Math.addExact((long)-6 , maths) / 2);
+            i = (int)(Math.round(Math.addExact((long)-6 , maths) / 2));
         }
         if(value > 352 && value <= 1507)
         {

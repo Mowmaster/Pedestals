@@ -13,7 +13,8 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
-import net.minecraft.world.ExplosionContext;
+//import net.minecraft.world.ExplosionContext;
+import net.minecraft.world.IExplosionContext;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -79,9 +80,12 @@ public class ColorPalletCrafting
                         ResourceLocation grabRed = new ResourceLocation("forge", "dyes/red");
                         ResourceLocation grabGreen = new ResourceLocation("forge", "dyes/green");
                         ResourceLocation grabBlue = new ResourceLocation("forge", "dyes/blue");
-                        ITag.INamedTag<Item> RED_DYE = ItemTags.createOptional(grabRed);
+                        /*ITag.INamedTag<Item> RED_DYE = ItemTags.createOptional(grabRed);
                         ITag.INamedTag<Item> GREEN_DYE = ItemTags.createOptional(grabGreen);
-                        ITag.INamedTag<Item> BLUE_DYE = ItemTags.createOptional(grabBlue);
+                        ITag.INamedTag<Item> BLUE_DYE = ItemTags.createOptional(grabBlue);*/
+                        ITag<Item> RED_DYE = ItemTags.getCollection().get(grabRed);
+                        ITag<Item> GREEN_DYE = ItemTags.getCollection().get(grabGreen);
+                        ITag<Item> BLUE_DYE = ItemTags.getCollection().get(grabBlue);
 
                         if(stack.getItem() instanceof DyeItem)
                         {
@@ -131,7 +135,7 @@ public class ColorPalletCrafting
 
                         //removes fire block???
                         //worldIn.removeBlock(new BlockPos(posX, posY + 1, posZ), false);
-                        worldIn.createExplosion(new ItemEntity(worldIn, posX, posY, posZ),(DamageSource)null,(ExplosionContext)null, posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Explosion.Mode.NONE);
+                        worldIn.createExplosion(new ItemEntity(worldIn, posX, posY, posZ),(DamageSource)null,(IExplosionContext)null, posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Explosion.Mode.NONE);
 
                         if(pallet>0)
                         {
