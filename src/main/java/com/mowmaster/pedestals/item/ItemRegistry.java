@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item;
 import com.mowmaster.pedestals.blocks.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.event.RegistryEvent;
 
@@ -10,6 +11,7 @@ public class ItemRegistry
 {
     public static void onItemRegistryReady(RegistryEvent.Register<Item> e)
     {
+        //ItemGuideBook.onItemRegistryReady(e);
         BlockPedestalTE.onItemRegistryReady(e);
 
         ItemLinkingTool.onItemRegistryReady(e);

@@ -1,0 +1,19 @@
+{
+  "category": "tools",
+  "name": "Linking Tool",
+  "icon": "pedestals:linkingtool",
+  "sortnum": 0,
+  "priority": true,
+  "read_by_default": "false",
+  "pages": [
+    {
+      "type": "text",
+      "title": "Linking Tool",
+      "text": "The $(l:https://github.com/Mowmaster/Pedestals/wiki/Linking-Tool)Linking Tool/$ is a multipurpose item required to craft a lot of the basic items in the mod, get details about agumented pedestals, and Link pedestals together."
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:linkingtool"
+    }
+  ]
+}
