@@ -111,7 +111,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
                 int getExpLeftInPedestal = currentlyStoredExp - rate;
                 world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                 setXPStored(coinInPedestal,getExpLeftInPedestal);
-                world.playSound((PlayerEntity)null, expEntity.getPosX(), expEntity.getPosY(), expEntity.getPosZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                //world.playSound((PlayerEntity)null, expEntity.getPosX(), expEntity.getPosY(), expEntity.getPosZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
                 world.addEntity(expEntity);
             }
         }
