@@ -114,9 +114,10 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
             if(pedestalInv instanceof TilePedestal) {
                 int currentlyStoredExp = getXPStored(coinInPedestal);
-                if(currentlyStoredExp < readMaxXpFromNBT(coinInPedestal))
+                int value = getXPFromList.getXpValue();
+                if(value > 0 && currentlyStoredExp < readMaxXpFromNBT(coinInPedestal))
                 {
-                    int value = getXPFromList.getXpValue();
+                    getXPFromList.xpValue=0;
                     getXPFromList.remove();
                     setXPStored(coinInPedestal, currentlyStoredExp + value);
                 }
