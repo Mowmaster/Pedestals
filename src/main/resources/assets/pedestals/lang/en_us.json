@@ -832,8 +832,13 @@
 
     "enchantment.level.-1": "",
     "enchantment.pedestals.upgradecapacity": "Pedestal Capacity",
+    "enchantment.pedestals.upgradecapacity.desc": "Upgrades the transfer rate and/or buffer capacity of upgrades.",
     "enchantment.pedestals.upgradespeed": "Pedestal Speed",
+    "enchantment.pedestals.upgradespeed.desc": "Modifies the upgrades base speed up to 20 times faster",
     "enchantment.pedestals.upgraderange": "Pedestal Range",
+    "enchantment.pedestals.upgraderange.desc": "Modifies the 'vertical' / 'Y' range of an upgrades work area",
     "enchantment.pedestals.upgradearea": "Pedestal Area",
-    "enchantment.pedestals.upgradeadvanced": "Pedestal Advanced"
+    "enchantment.pedestals.upgradearea.desc": "Modifies the AOE area of a pedestals 'work' area",
+    "enchantment.pedestals.upgradeadvanced": "Pedestal Advanced",
+    "enchantment.pedestals.upgradeadvanced.desc": "Can be applied to pedestals that can use an inventory below for inputs or outputs, will allow ANY entities inventory to use used"
 }
