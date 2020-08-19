@@ -1,0 +1,20 @@
+{
+  "category": "tools",
+  "name": "Upgrade Tool",
+  "subtitle": "",
+  "icon": "pedestals:upgradetool",
+  "sortnum": 1,
+  "priority": true,
+  "read_by_default": "false",
+  "pages": [
+    {
+      "type": "text",
+      "title": "Upgrade Tool",
+      "text": "The $(l:https://github.com/Mowmaster/Pedestals/wiki/Upgrade-Tool)Upgrade Tool/$ when right clicked on an upgraded pedestal, will display details about the upgrade in your chat."
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:upgradetool"
+    }
+  ]
+}

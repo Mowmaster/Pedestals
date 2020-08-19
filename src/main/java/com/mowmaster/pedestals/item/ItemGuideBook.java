@@ -27,7 +27,7 @@ public class ItemGuideBook extends Item {
 
     public static final Item DEFAULT = new ItemGuideBook().setRegistryName(new ResourceLocation(MODID, "bookguide"));
 
-    @Override
+    /*@Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
 
         if(worldIn.isRemote)
@@ -38,7 +38,7 @@ public class ItemGuideBook extends Item {
         }
 
         return super.onItemRightClick(worldIn, playerIn, handIn);
-    }
+    }*/
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

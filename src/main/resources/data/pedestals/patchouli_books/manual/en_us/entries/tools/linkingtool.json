@@ -1,6 +1,7 @@
 {
   "category": "tools",
   "name": "Linking Tool",
+  "subtitle": "",
   "icon": "pedestals:linkingtool",
   "sortnum": 0,
   "priority": true,

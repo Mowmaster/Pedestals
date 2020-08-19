@@ -1,6 +1,8 @@
 {
 
     "itemGroup.pedestals_blocks": "Pedestals",
+    "pedestals.patch_book": "Pedestals",
+    "pedestals.patch_book_landing": "A Guide to Pedestals",
 
     "pedestals.recipe_category_crusher": "Crusher Upgrade",
     "pedestals.recipe_category_sawing": "SawMill Upgrade",
