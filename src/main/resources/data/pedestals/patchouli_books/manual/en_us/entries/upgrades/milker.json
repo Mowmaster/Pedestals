@@ -1,19 +1,19 @@
 {
   "category": "upgrades",
-  "name": "Dropper Upgrade",
+  "name": "Auto Milker Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/dropper",
-  "sortnum": 0,
+  "icon": "pedestals:coin/milker",
+  "sortnum": 35,
   "priority": true,
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/dropper",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$"
+      "recipe": "pedestals:coin/milker",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Milker)Wiki Link/$"
     },
     {
       "type": "text",
-      "text": "Acts like vanilla dropper except it drops the item from the top side of the pedestal, although you can arrange the way the item drops by placing the pedestal in different angle."
+      "text": "Needs an inventory below the pedestal for empty bucket inputs. This upgrade looks for cows in the area and will milk them, filling any buckts in the input chest, and putting the full buckets in the pedestal to be transferred out.$(br)The upgrades range can be extended for dairy farms with large pastures, but due to how vanilla cows can be milked indefinitely, 1 cow near the pedestal at default range is all thats necessary."
     }
   ]
 }

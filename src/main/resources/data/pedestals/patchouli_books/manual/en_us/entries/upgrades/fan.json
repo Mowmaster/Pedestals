@@ -1,19 +1,19 @@
 {
   "category": "upgrades",
-  "name": "Dropper Upgrade",
+  "name": "Mob Fan Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/dropper",
-  "sortnum": 0,
+  "icon": "pedestals:coin/fan",
+  "sortnum": 38,
   "priority": true,
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/dropper",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$"
+      "recipe": "pedestals:coin/fan",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Fan)Wiki Link/$ $(br)This Upgrade Pushes Mobs all living entities (Players/Mobs/Animals) in front of it.$(li)A player who is Crouching, will not be effected by the fan."
     },
     {
       "type": "text",
-      "text": "Acts like vanilla dropper except it drops the item from the top side of the pedestal, although you can arrange the way the item drops by placing the pedestal in different angle."
+      "text": "This Upgrade Is effected by Entity Filtering Blocks placed below it.$)br)This upgrade can accept these Enchantments:$(li)Range - Increases fan push height$(li)Capacity - Increases Fan Range (AOE)$(li)Speed - Increases Fan Push Speed"
     }
   ]
 }

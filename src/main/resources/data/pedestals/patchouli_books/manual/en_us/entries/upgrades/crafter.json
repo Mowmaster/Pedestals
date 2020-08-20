@@ -3,7 +3,7 @@
   "name": "Crafter Upgrade",
   "subtitle": "",
   "icon": "pedestals:coin/crafter3",
-  "sortnum": 0,
+  "sortnum": 32,
   "priority": true,
   "pages": [
     {

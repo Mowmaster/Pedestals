@@ -1,19 +1,19 @@
 {
   "category": "upgrades",
-  "name": "Dropper Upgrade",
+  "name": "Energy Relay Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/dropper",
-  "sortnum": 0,
+  "icon": "pedestals:coin/rfrelay",
+  "sortnum": 42,
   "priority": true,
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/dropper",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$"
+      "recipe": "pedestals:coin/rfrelay",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Energy-Relay)Wiki Link/$"
     },
     {
       "type": "text",
-      "text": "Acts like vanilla dropper except it drops the item from the top side of the pedestal, although you can arrange the way the item drops by placing the pedestal in different angle."
+      "text": "Relays Energy in the PEN to other Energy Upgraded Pedestals. Can Send Energy To Other Connected Pedestals In the PEN."
     }
   ]
 }

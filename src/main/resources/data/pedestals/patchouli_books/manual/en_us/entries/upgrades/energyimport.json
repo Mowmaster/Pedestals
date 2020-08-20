@@ -1,19 +1,19 @@
 {
   "category": "upgrades",
-  "name": "Dropper Upgrade",
+  "name": "Energy Import Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/dropper",
-  "sortnum": 0,
+  "icon": "pedestals:coin/rfimport",
+  "sortnum": 40,
   "priority": true,
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/dropper",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$"
+      "recipe": "pedestals:coin/rfimport",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Energy-Import)Wiki Link/$"
     },
     {
       "type": "text",
-      "text": "Acts like vanilla dropper except it drops the item from the top side of the pedestal, although you can arrange the way the item drops by placing the pedestal in different angle."
+      "text": "Imports Energy from Blocks/Machines or Inserted Items, into the Pedestal Energy Network (PEN). Can Send Energy To Other Connected Pedestals In the PEN."
     }
   ]
 }

@@ -1,19 +1,19 @@
 {
   "category": "upgrades",
-  "name": "Dropper Upgrade",
+  "name": "Auto Shearer Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/dropper",
-  "sortnum": 0,
+  "icon": "pedestals:coin/shearer",
+  "sortnum": 36,
   "priority": true,
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/dropper",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$"
+      "recipe": "pedestals:coin/shearer",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Shearer)Wiki Link/$"
     },
     {
       "type": "text",
-      "text": "Acts like vanilla dropper except it drops the item from the top side of the pedestal, although you can arrange the way the item drops by placing the pedestal in different angle."
+      "text": "This upgrade checks for sheep in the area, it will shear them, and the wool will be picked up by the pedestal and will need transported out before another sheep can be sheared."
     }
   ]
 }

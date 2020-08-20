@@ -1,19 +1,19 @@
 {
   "category": "upgrades",
-  "name": "Dropper Upgrade",
+  "name": "Energy Tank Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/dropper",
-  "sortnum": 0,
+  "icon": "pedestals:coin/rftank",
+  "sortnum": 43,
   "priority": true,
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/dropper",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$"
+      "recipe": "pedestals:coin/rftank",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Energy-Tank)Wiki Link/$"
     },
     {
       "type": "text",
-      "text": "Acts like vanilla dropper except it drops the item from the top side of the pedestal, although you can arrange the way the item drops by placing the pedestal in different angle."
+      "text": "Can store a very large amount of energy. Capacity Enchant also increases Energy Storage Size. Can Send Energy To Other Connected Pedestals In the PEN."
     }
   ]
 }

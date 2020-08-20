@@ -1,19 +1,19 @@
 {
   "category": "upgrades",
-  "name": "Dropper Upgrade",
+  "name": "Potion Difffuser Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/dropper",
-  "sortnum": 0,
+  "icon": "pedestals:coin/diffuser",
+  "sortnum": 39,
   "priority": true,
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/dropper",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$"
+      "recipe": "pedestals:coin/diffuser",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Potion-Diffuser)Wiki Link/$"
     },
     {
       "type": "text",
-      "text": "Acts like vanilla dropper except it drops the item from the top side of the pedestal, although you can arrange the way the item drops by placing the pedestal in different angle."
+      "text": "Place a potion or any item with 'potion effects' in the pedestal, the upgrade will effect any matching entity in the area and apply its effects, which consumes the item.$(br)If you drop blaze powder on the pedestal, the upgrade will consume the powder instead of the item.$(br)This upgrade can accept:$(li)Range - Increases Effective Area$(li)Speed - Increases Detection Speed for applying effects."
     }
   ]
 }

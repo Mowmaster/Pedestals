@@ -1,19 +1,23 @@
 {
   "category": "upgrades",
-  "name": "Dropper Upgrade",
+  "name": "Auto Attacker Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/dropper",
-  "sortnum": 0,
+  "icon": "pedestals:coin/attacker",
+  "sortnum": 37,
   "priority": true,
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/dropper",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$"
+      "recipe": "pedestals:coin/attacker",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Auto-Attacker)Wiki Link/$"
     },
     {
       "type": "text",
-      "text": "Acts like vanilla dropper except it drops the item from the top side of the pedestal, although you can arrange the way the item drops by placing the pedestal in different angle."
+      "text": "A pedestal upgraded with this will deal damage in the effected area around it.$(li)Slotting a sword into the pedestal will add its damage to the amount being dealt by the upgrade.$(li)If the sword has sharpness, bane of spiders, or smite, that will further increase the damage being dealt.$(br)This Upgrade Is effected by Entity Filtering Blocks placed below it."
+    },
+    {
+      "type": "text",
+      "text": "This upgrade can accept these Enchantments:$(li)Capacity - Increases Base Damage Dealt$(li)Range - Increases Effective Area$(li)Speed - Increases Attack Speed"
     }
   ]
 }
