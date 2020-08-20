@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/quarry",
+      "recipe": "pedestals:upgrades/quarry",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Item-Dropper)Wiki Link/$ $(br) This Includes these upgrades: $(li)Quarry$(li)Quarry Blacklist$(li)Energy Quarry$(li)Energy Quarry Blacklist"
     },
     {

@@ -53,6 +53,7 @@ public class ItemRegistry
         ItemUpgradeEnergyQuarryBlacklist.onItemRegistryReady(e);
 
         ItemUpgradeImport.onItemRegistryReady(e);
+        ItemUpgradeFilteredImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);
         ItemUpgradeRestock.onItemRegistryReady(e);
 

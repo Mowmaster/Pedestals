@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/placer",
+      "recipe": "pedestals:upgrades/placer",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Block-Placer)Wiki Link/$"
     },
     {

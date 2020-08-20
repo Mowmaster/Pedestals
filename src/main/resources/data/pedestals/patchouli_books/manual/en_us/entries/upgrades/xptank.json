@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/xptank",
+      "recipe": "pedestals:upgrades/xptank",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Exp-Tank)Wiki Link/$"
     },
     {

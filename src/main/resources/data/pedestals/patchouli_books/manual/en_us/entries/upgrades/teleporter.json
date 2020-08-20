@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/teleporter",
+      "recipe": "pedestals:upgrades/teleporter",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Teleporter)Wiki Link/$"
     },
     {

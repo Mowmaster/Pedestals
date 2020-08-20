@@ -2,7 +2,7 @@
   "category": "gettingstarted",
   "name": "Enchantments",
   "subtitle": "",
-  "icon": "minecraft:enchantedbook",
+  "icon": "minecraft:bookshelf",
   "sortnum": 3,
   "priority": false,
   "pages": [

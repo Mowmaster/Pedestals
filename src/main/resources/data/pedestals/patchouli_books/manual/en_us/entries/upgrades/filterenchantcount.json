@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/filterenchantedcount",
+      "recipe": "pedestals:upgrades/filterenchantedcount",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-Enchant-Count)Wiki Link/$"
     },
     {

@@ -12,13 +12,13 @@
     },
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/crafter1",
-      "recipe2": "pedestals:coin/crafter2"
+      "recipe": "pedestals:upgrades/crafter1",
+      "recipe2": "pedestals:upgrades/crafter2"
 
     },
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/crafter3",
+      "recipe": "pedestals:upgrades/crafter3",
       "text":"They all work on the same simple principle. The upgrade will check every (1), (4), (9) slots in the inventory below the pedestal for a valid recipe. If a valid recipe exists, the crafter will craft the recipe outputting the result to the pedestal."
     },
     {

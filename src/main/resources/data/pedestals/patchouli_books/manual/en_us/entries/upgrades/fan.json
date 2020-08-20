@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/fan",
+      "recipe": "pedestals:upgrades/fan",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Fan)Wiki Link/$ $(br)This Upgrade Pushes Mobs all living entities (Players/Mobs/Animals) in front of it.$(li)A player who is Crouching, will not be effected by the fan."
     },
     {

@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/export",
+      "recipe": "pedestals:upgrades/export",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Export)Wiki Link/$"
     },
     {

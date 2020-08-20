@@ -7,13 +7,14 @@
   "priority": true,
   "pages": [
     {
-      "type": "crafting",
-      "recipe": "pedestals:coin/attacker",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Auto-Attacker)Wiki Link/$"
-    },
-    {
       "type": "text",
       "text": "A pedestal upgraded with this will deal damage in the effected area around it.$(li)Slotting a sword into the pedestal will add its damage to the amount being dealt by the upgrade.$(li)If the sword has sharpness, bane of spiders, or smite, that will further increase the damage being dealt.$(br)This Upgrade Is effected by Entity Filtering Blocks placed below it."
+    },
+    {
+      "type": "crafting",
+      "title": "",
+      "recipe": "pedestals:upgrades/attack",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Auto-Attacker)Wiki Link/$"
     },
     {
       "type": "text",

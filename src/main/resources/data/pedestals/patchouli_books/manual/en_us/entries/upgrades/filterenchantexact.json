@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/filterenchantedexact",
+      "recipe": "pedestals:upgrades/filterenchantedexact",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-Enchant-Exact)Wiki Link/$"
     },
     {

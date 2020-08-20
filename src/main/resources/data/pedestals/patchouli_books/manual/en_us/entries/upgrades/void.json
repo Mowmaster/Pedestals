@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/void",
+      "recipe": "pedestals:upgrades/void",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Void)Wiki Link/$"
     },
     {

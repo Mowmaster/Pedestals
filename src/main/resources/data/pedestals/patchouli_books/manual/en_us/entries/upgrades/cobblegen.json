@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/cobblegen",
+      "recipe": "pedestals:upgrades/cobblegen",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Cobble-Generator)Wiki Link/$"
     },
     {

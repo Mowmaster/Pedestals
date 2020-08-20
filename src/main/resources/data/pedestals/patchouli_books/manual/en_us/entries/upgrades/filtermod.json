@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/filtermod",
+      "recipe": "pedestals:upgrades/filtermod",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-Mod)Wiki Link/$"
     },
     {

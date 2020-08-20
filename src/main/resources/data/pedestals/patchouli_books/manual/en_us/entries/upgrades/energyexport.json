@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/rfexport",
+      "recipe": "pedestals:upgrades/rfexport",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Energy-Export)Wiki Link/$"
     },
     {

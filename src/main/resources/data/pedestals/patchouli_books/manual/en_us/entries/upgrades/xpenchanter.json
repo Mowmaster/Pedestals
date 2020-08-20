@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/xpenchanter",
+      "recipe": "pedestals:upgrades/xpenchanter",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Exp-Enchanter)Wiki Link/$"
     },
     {

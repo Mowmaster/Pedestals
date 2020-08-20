@@ -1,18 +1,18 @@
 {
   "category": "gettingstarted",
-  "name": "Enchantment Focused Book",
+  "name": "Entity Filtering",
   "subtitle": "",
-  "icon": "pedestals:bookspeed",
+  "icon": "minecraft:netherite_block",
   "sortnum": 6,
   "priority": false,
   "pages": [
     {
       "type": "text",
-      "text": "There are a few $(l:https://github.com/Mowmaster/Pedestals/wiki/Filtering-By-Entity)Upgrades/$ that determine their targets based on a block below them.$(li)Auto Attacker Upgrade$(li)Mob Fan Upgrade$(li)Potion Diffuser"
+      "text": "There are a few $(l:https://github.com/Mowmaster/Pedestals/wiki/Filtering-By-Entity)Upgrades/$ that determine their targets based on a block below them.$(li)Auto Attacker Upgrade$(li)Mob Fan Upgrade$(li)Potion Diffuser&(br)These Below Blocks are Supported:$(li)Netherite - Usually has special amplified effects.$(li)Emerald - Targets Players"
     },
     {
       "type": "text",
-      "text":"These Below Blocks are Supported:$(li)Netherite - Usually has special amplified effects.$(li)Emerald - Targets Players$(li)Diamond - Targets Monsters (Zombies, Creepers, Skellies, Blaze, Most of your Hostile Mobs [But Not Slimes])$(li)Gold - Targets Animals (Horses, Pigs, Cows, Sheep, Most of your Passive Mobs)$(li)Lapis - Targets Flying Mobs (Bats, Phantoms)$(li)Iron - Targets Creatures (Monsters + Animals)$(li)Coal - Targets Mobs (Monsters + Animals + Flying)"
+      "text":"$(li)Diamond - Targets Monsters (Zombies, Creepers, Skellies, Blaze, Most of your Hostile Mobs [But Not Slimes])$(li)Gold - Targets Animals (Horses, Pigs, Cows, Sheep, Most of your Passive Mobs)$(li)Lapis - Targets Flying Mobs (Bats, Phantoms)$(li)Iron - Targets Creatures (Monsters + Animals)$(li)Coal - Targets Mobs (Monsters + Animals + Flying)"
     }
   ]
 }

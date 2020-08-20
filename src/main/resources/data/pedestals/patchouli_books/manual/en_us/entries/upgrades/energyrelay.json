@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/rfrelay",
+      "recipe": "pedestals:upgrades/rfrelay",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Energy-Relay)Wiki Link/$"
     },
     {

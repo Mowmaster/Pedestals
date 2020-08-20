@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/planter",
+      "recipe": "pedestals:upgrades/planter",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Planter)Wiki Link/$"
     },
     {

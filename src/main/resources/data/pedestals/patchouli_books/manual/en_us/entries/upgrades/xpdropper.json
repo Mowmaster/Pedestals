@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/xpdropper",
+      "recipe": "pedestals:upgrades/xpdropper",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Exp-Dropper)Wiki Link/$"
     },
     {

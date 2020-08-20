@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/restock",
+      "recipe": "pedestals:upgrades/restock",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Restock)Wiki Link/$"
     },
     {

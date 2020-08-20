@@ -581,6 +581,15 @@
     "item.pedestals.coin.smelter.chat_speed": "Operational Speed: ",
     "jei.pedestals.smelter.desc": "Place an Inventory Below the Pedestal for item inputs, Drop Fuel Items on the Pedestal to fuel it, Outputs come out the top of the pedestal. Can Smelt anything a Vanila Furnace can",
 
+    "item.pedestals.coin.fimport": "Pedestal Upgrade",
+    "item.pedestals.coin.fimport.tooltip_name": "Filtered Import Upgrade",
+    "item.pedestals.coin.fimport.tooltip_rate": "Transfer Rate: ",
+    "item.pedestals.coin.fimport.tooltip_speed": "Operational Speed: ",
+    "item.pedestals.coin.fimport.chat_rate": "Items Removed at a Time: ",
+    "item.pedestals.coin.fimport.chat_speed": "Operational Speed: ",
+    "jei.pedestals.import.fdesc": "Takes Items from a Below Inventory and Put them in the Pedestal, Will Also take items dropped on the pedestal and put them inside the pedestal.",
+
+
     "item.pedestals.coin.import": "Pedestal Upgrade",
     "item.pedestals.coin.import.tooltip_name": "Import Upgrade",
     "item.pedestals.coin.import.tooltip_rate": "Transfer Rate: ",

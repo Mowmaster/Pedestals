@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:coin/filterenchantedfuzzy",
+      "recipe": "pedestals:upgrades/filterenchantedfuzzy",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-Enchant-Fuzzy)Wiki Link/$"
     },
     {

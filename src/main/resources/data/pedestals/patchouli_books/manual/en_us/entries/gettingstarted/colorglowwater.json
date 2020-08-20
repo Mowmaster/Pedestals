@@ -1,6 +1,6 @@
 {
   "category": "gettingstarted",
-  "name": "Colors, Light, and Waterlogging",
+  "name": "Pedestal Aesthetics",
   "subtitle": "",
   "icon": "pedestals:itemcolorpalletdefault",
   "sortnum": 4,
@@ -20,7 +20,7 @@
     },
     {
       "type": "text",
-      "text": "$(li)To make a Pedestal Light Up, R-Click on it with a block of Glowstone.(You'll get the glowstone back when you break the pedestal)$(li)To submerge a Pedestal in water, Place it in water, Or Place a water bucket in the same block space as the pedestal.(This is really useful for farms as it is a water source block to keep your field moist)"
+      "text": "$(li)To make a Pedestal Light Up, R-Click on it with a block of Glowstone.(You'll get the glowstone back when you break the pedestal)$(li)To Waterlog a Pedestal in water, Place it in water, Or Place a water bucket in the same block space as the pedestal.(This is really useful for farms as it is a water source block to keep your field moist)"
     }
   ]
 }
