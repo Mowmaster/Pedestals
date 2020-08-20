@@ -1,0 +1,27 @@
+{
+  "category": "gettingstarted",
+  "name": "Pedestal Augments",
+  "subtitle": "",
+  "icon": "pedestals:upgradespeed",
+  "sortnum": 2,
+  "priority": false,
+  "pages": [
+    {
+      "type": "text",
+      "text": "These $(l:https://github.com/Mowmaster/Pedestals/wiki/Linking-Pedestals%2C-and-Advanced-Uses)Augments/$ only effect the rate at which a pedestal SENDS items, so there is no need to upgrade both a sender and receiver unless the receiver sends its items to a chained receiver."
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:upgradespeed",
+      "text": "Pedestal Speed Augment$(li)Crafted with the Linking Tool and a diamond.$(li)5 Upgrades can be used on a pedestal as a time.$(li)The Speed Upgrade decreases the delay when sending items from 20ticks(default), 10t, 5t, 3t, 2t, 1t."
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:upgradecapacity"
+    },
+    {
+      "type": "text",
+      "text": "Pedestal Transfer Capacity Augment$(li)Crafted with the Linking Tool and an emerald.$(li)5 Upgrades can be used on a pedestal as a time.$(li)The Capacity Upgrade Increases the amount of items sent per interval, from 4items(default), 8i, 16i, 32i, 48i, 64i."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "category": "gettingstarted",
+  "name": "Pedestal Redstone Control",
+  "subtitle": "",
+  "icon": "minecraft:redstone_torch",
+  "sortnum": 1,
+  "priority": false,
+  "pages": [
+    {
+      "type": "text",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Linking-Pedestals%2C-and-Advanced-Uses)A pedestal powered by redstone/$ $(li)Cannot be sent Items, Exp, Energy, or Fluids.$(li)Will prevent its Upgrade from functioning.$(li)Will prevent being teleported to (if connected to a Teleporter upgraded pedestal)"
+    },
+    {
+      "type": "text",
+      "text": "Pedestals Emit Redstone when a comparator has been set to read its inventory. (Like any other inventory)$(li)You can create some custom routing situations with pedestals just using the redstone control."
+    }
+  ]
+}

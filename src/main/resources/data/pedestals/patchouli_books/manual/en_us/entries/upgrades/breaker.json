@@ -1,0 +1,23 @@
+{
+  "category": "upgrades",
+  "name": "Block Breaker Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/breaker",
+  "sortnum": 2,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/breaker",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Block-Breaker)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Mines a block from the bottom side of the pedestal (it can insta-mine obsidian)$(br)Like any other upgrade you can change the way it places by utilizing the placement angle$(br)Can be enchanted using the fortune and silk touch enchant$(br)Inserting a pickaxe into the pedestal will have it switch to using that tool instead."
+    },
+    {
+      "type": "text",
+      "text": "The block breaker can be enchanted using the range enchant and the speed enchant$(br)The range enchant will make it that the block breaker will only break block in it's specified range, for an example in the default upgrade the block breaker will break the block in the front of it but with range enchant I it'll break the block in the 2 block away from it and every level will increase the range which it can break block with max range of 16 and with each level it'll increase the range by 1,2,4,4,4$(br)The speed enchant will speed up the delay between it's operation,for further information please check the Enchantments tab"
+    }
+  ]
+}

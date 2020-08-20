@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Import Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/import",
+  "sortnum": 17,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/import",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Import)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Imports items from the 'below' inventory into the Pedestal Item Network. Default speed is 1 item transferred per second, but can be increased to 64 items per tick (1280 items per second at 20tps)."
+    }
+  ]
+}

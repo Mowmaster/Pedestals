@@ -4,8 +4,7 @@
   "subtitle": "",
   "icon": "pedestals:upgradetool",
   "sortnum": 1,
-  "priority": true,
-  "read_by_default": "false",
+  "priority": false,
   "pages": [
     {
       "type": "text",

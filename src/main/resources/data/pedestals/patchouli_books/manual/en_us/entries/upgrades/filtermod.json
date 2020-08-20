@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filter Mod Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/filtermod",
+  "sortnum": 23,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/filtermod",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-Mod)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Only allows matching items from the 'below' inventory with the same mod to pass through.$(br)For example if you have a vanilla minecraft stick in the 'below' inventory, any vanilla minecraft item will pass through the pedestal."
+    }
+  ]
+}

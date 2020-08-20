@@ -5,7 +5,6 @@
   "icon": "pedestals:linkingtool",
   "sortnum": 0,
   "priority": true,
-  "read_by_default": "false",
   "pages": [
     {
       "type": "text",

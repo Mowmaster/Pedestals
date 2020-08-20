@@ -1,0 +1,45 @@
+{
+  "category": "upgrades",
+  "name": "Crafter Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/crafter3",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Crafter)Wiki Link/$ $(br) There are 3 crafter upgrades, (1x1), (2x2), and (3x3)."
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/crafter1",
+      "recipe2": "pedestals:coin/crafter2"
+
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/crafter3",
+      "text":"They all work on the same simple principle. The upgrade will check every (1), (4), (9) slots in the inventory below the pedestal for a valid recipe. If a valid recipe exists, the crafter will craft the recipe outputting the result to the pedestal."
+    },
+    {
+      "type": "text",
+      "text": "If a recipe contains a container item, like a bucket of milk, after the craft process, that item will be ejected out the top of the crafter. Like other machines, the crafter will not process if items already exist in the pedestal. The crafter will craft until there is 1 of each stackable item in a slot, it leaves 1 item as a way to 'remember' the set recipe. Crafting Placeholder is an item that the crafter 'sees' as a blank slot, these are good for filling blank holes in recipes but its also optional."
+    },
+    {
+      "type": "text",
+      "text": "For example, a 3x3 crafter upgrade on a pedestal above a vanilla chest. First, the crafter, (3x3) will check every (9) slots for a recipe. Second, the chest, is 3 rows of 9 slots each which actually works out perfect for 3 recipes.$(br)For starters, 3 recipes, a chest, dispenser, and a cake.$(br)For starters, we'll list off the slots with numbers for how our recipes will work.$(br)A crafting table has 9 slots, numbered like this: 123 456 789 And a chest has slots numbered like this 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27"
+    },
+    {
+      "type": "text",
+      "text": "So to make our first recipe, the chest needs wood planks placed in 123,46,789 in a crafting table usually.$(br) So when setting the recipe in the chest below the pedestal we would put planks in slots 1234, im going to put a Crafting Placeholder in slot 5 since its an empty slot, and planks in 6789 to make the chest recipe.$(br)The next recipe to set is the dispenser, it uses cobble in 123,46,79, a bow in 5, and a redstone dust in 8. In the chest below the pedestal, since our first recipe is in the first row, we'll put these items in the second row.$(br)Cobble goes in 10 11 12 13 15 16 18 Bow in 14 Redstone in 17 $(br)The last recipe is cake, milk in rows 123, sugar in 46, egg in 5, and wheat in 789 Since our first two rows of the chest under the pedestal are full we'll put the milk buckets in 19 20 21 Sugar in 22 and 24 Egg in 23 Wheat in 25 26 27"
+    },
+    {
+      "type": "text",
+      "text": "We now have 3 recipes set for our crafter. For the chest, as long as each stack of planks has more than 2 planks, itll craft a chest.$(br)For the dispenser we'll need at least 2 cobble and redstone in each stack and a bow, since bows don't stack itll get consumed and we'll have to hopper one back in to craft another dispenser.$(br)For cake, the milk buckets don't stack, so when a cake is crafted, the crafter will eject 3 empty buckets out the top and into the world, you'll have to somehow catch those and refill them before hoppering them back in the chest.$(br)There you go!"
+    },
+    {
+      "type": "text",
+      "text": "Now this should work with any size of chest, just remember, it checks every X number of slots, so the bigger the chest, the longer it takes to check every set of slots for a recipe.$(br)The perfect inventory for the 3x3 crafter is a dispenser or dropper since it has the same number of slots as the crafting table does, for players who can't easily setup recipes in a chest, this is the easiest way to go about it."
+    }
+  ]
+}

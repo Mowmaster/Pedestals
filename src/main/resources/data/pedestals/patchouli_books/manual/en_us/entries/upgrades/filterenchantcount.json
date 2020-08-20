@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filter Enchant Count Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/filterenchantedcount",
+  "sortnum": 26,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/filterenchantedcount",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-Enchant-Count)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "This will allow any item with a specific number of enchant to pass through it. Default is 1 enchant, enchanting the upgrade with Capacity will allow for it to allow items with up to 6 enchants to pass through."
+    }
+  ]
+}

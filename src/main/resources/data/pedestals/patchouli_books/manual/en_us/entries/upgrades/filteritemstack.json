@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filter ItemStack Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/filteritemstack",
+  "sortnum": 22,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/filteritemstack",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-ItemStack)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Only allows items that match exactly the item in the 'below' inventory.$(br)For example, if a drained energy cell is in the below inventory, only energy cells of the same type with the same amount of drain will be allowed to pass through."
+    }
+  ]
+}

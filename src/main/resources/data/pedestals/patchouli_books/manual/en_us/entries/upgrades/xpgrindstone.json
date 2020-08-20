@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Exp Grindstone Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/xpgrindstone",
+  "sortnum": 16,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/xpgrindstone",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Exp-Grindstone)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "This upgrade requires an inventory below it, this upgrade will pull enchanted items out of the inventory below it and grind the enchant off leaving the unenchanted item in the pedestal to be removed. The enchants that got 'ground' off are converted into xp and will be stored in the upgrades internal buffer, which can be extracted by connecting it to another exp upgrade that consumes or stores xp."
+    }
+  ]
+}

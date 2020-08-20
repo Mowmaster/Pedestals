@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filter Enchanted Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/filterenchanted",
+  "sortnum": 20,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/filterenchanted",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-Enchanted)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Only Allows Incoming items that are Enchanted, to pass through."
+    }
+  ]
+}

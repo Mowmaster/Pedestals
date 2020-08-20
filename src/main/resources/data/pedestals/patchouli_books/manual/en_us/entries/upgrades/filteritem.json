@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filter Item Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/filteritem",
+  "sortnum": 21,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/filteritem",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filter-Item)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Checks incoming items to see if they are similar to the one in the 'below' inventory.$(br)For example if a bow with durability damage is in the 'below' inventory then the pedestal will allow ANY bow to pass through."
+    }
+  ]
+}

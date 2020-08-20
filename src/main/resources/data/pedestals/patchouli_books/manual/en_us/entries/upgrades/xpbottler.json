@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Exp Bottler Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/xpbottler",
+  "sortnum": 12,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/xpbottler",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Exp-Bottler)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "This upgrade consumes exp, it cannot transfer exp out.$(br)The bottler will pull empty bottles from the inventory 'below' the pedestal, fill them, outputting the bottle of experience to the pedestal."
+    }
+  ]
+}

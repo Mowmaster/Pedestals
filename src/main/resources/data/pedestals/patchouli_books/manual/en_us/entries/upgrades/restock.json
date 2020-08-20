@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Restock Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/restock",
+  "sortnum": 19,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/restock",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Restock)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Similar to the Export Upgrade, except it only exports items that already exist in the 'below' inventory.$(br)It iterates though each stack in the inventory only adding the amount of its item transfer rate to each stack at a time.$(br)This is perfect for spreading a stack of materials evenly in an inventory which is especially good when used along side the Crafter upgrades."
+    }
+  ]
+}

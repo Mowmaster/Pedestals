@@ -1,0 +1,24 @@
+{
+  "category": "upgrades",
+  "name": "Sawmill Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/sawmill",
+  "sortnum": 31,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "text": "These Upgrades Function Similarly:$(li)Sawmill Upgrade$(li)Energy Sawmill Upgrade$(br)Put an inventory (like a chest) under the pedestal for the inputs.$(br)Processed Outputs will come out the top of the pedestal, the machine will not saw any items while it already has an item in it.$(br)Connect another pedestal to the sawmill one to automate the outputs."
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/sawmill",
+      "text":"$(l:https://github.com/Mowmaster/Pedestals/wiki/Crusher)Wiki Link/$ $(br)Drop Fuel items (Coal, Wood, Lava Buckets) on the pedestal (with 'Q' by default) to fuel it."
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/rfsawmill",
+      "text":"$(l:https://github.com/Mowmaster/Pedestals/wiki/Energy-Crusher)Wiki Link/$ $(br)You need to connect it to the Pedestal Energy Network as it'll consume energy and not require solid fuel to be used."
+    }
+  ]
+}

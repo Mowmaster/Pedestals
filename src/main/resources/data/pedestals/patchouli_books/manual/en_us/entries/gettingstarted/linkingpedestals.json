@@ -1,0 +1,22 @@
+{
+  "category": "gettingstarted",
+  "name": "Linking Pedestals",
+  "subtitle": "",
+  "icon": "pedestals:linkingtool",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Linking-Pedestals%2C-and-Advanced-Uses)LINKING/$ IS BACKWARDS COMPARED TO HOW MOST MODS DO IT.$(li)To start, Shift + R-Click with the Linking Tool on the pedestal that will be RECEIVING items.$(li)The Linking Tool will now glow, the tooltip will also show you the cords for the selected block."
+    },
+    {
+      "type": "text",
+      "text": "$(li)With the wand in hand, an area of particles will appear, showing you within what area around the receiver you can connect to.$(li)Shift + R-Click with the Linking Tool (That has a a stored location to link to) on a pedestal that will be SENDING items.$(li)You should get a chat message that tells you if it was successful or not."
+    },
+    {
+      "type": "text",
+      "text": "Sender Pedestals can send to a MAX of 8 Receiver Pedestals.$(br)Receiver Pedestals can receive from ANY number of Sender Pedestals."
+    }
+  ]
+}

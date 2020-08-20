@@ -34,9 +34,9 @@
         "jei.pedestals.itemcolorpallet.desc": "Crafted from Color Pallets and Red/Green/Blue dyes. Can be re-colored.",
     "item.pedestals.itemcolorpalletdefault": "Color Pallet",
         "jei.pedestals.itemcolorpalletdefault.desc": "To make Colored Pallets: Throw Red/Green/Blue Dye on the ground, then throw as many Color Pallets as you want colored down, r-click on the ground with the Linking Tool and the Colored Pallets will be created. ",
-    "item.pedestals.upgradespeed": "Pedestal Speed Upgrade",
+    "item.pedestals.upgradespeed": "Pedestal Speed Augment",
         "jei.pedestals.upgradespeed.desc": "Use on a Pedestal to Increase the Speed at which it transfers items.",
-    "item.pedestals.upgradecapacity": "Pedestal Transfer Capacity Upgrade",
+    "item.pedestals.upgradecapacity": "Pedestal Transfer Capacity Augment",
         "jei.pedestals.upgradecapacity.desc": "Use on a Pedestal to Increase the Amount of Items transferred at a time.",
 
     "item.pedestals.bookspeed": "Enchantment Focused Book (Speed)",

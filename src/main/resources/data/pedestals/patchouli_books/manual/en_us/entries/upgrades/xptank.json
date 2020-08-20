@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Exp Tank Upgrade",
+  "subtitle": "",
+  "icon": "pedestals:coin/xptank",
+  "sortnum": 11,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:coin/xptank",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Exp-Tank)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "This upgrade can store a large amount of levels when upgraded with the capacity enchantment. It is best to have this upgrade connected between the source of your exp, and the pedestal upgrades that consume exp to create other items."
+    }
+  ]
+}
