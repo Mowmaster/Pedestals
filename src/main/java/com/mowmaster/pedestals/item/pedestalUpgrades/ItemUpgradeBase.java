@@ -606,6 +606,34 @@ public class ItemUpgradeBase extends Item {
         return slot.get();
     }
 
+    public int getSlotWithMatchingStack(LazyOptional<IItemHandler> cap, ItemStack stackToFind)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        if(cap.isPresent()) {
+
+            cap.ifPresent(itemHandler -> {
+                int range = itemHandler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    //find a slot with items
+                    if(!stackInSlot.isEmpty())
+                    {
+                        //check if it could pull the item out or not
+                        if(stackInSlot.isItemEqual(stackToFind))
+                        {
+                            slot.set(i);
+                            break;
+                        }
+                    }
+                }});
+
+
+        }
+
+        return slot.get();
+    }
+
 
 
 
