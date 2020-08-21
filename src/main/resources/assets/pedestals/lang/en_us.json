@@ -13,7 +13,7 @@
     "item.pedestals.linkingtool.tool_link_success": "Link Successful",
     "item.pedestals.linkingtool.tool_link_unsucess": "Link Unsuccessful - Maximum Links Reached",
     "item.pedestals.linkingtool.tool_link_removed": "Link Successfully Removed",
-    "item.pedestals.linkingtool.tool_link_itsself": "Cannot be Linked to Itsself",
+    "item.pedestals.linkingtool.tool_link_itsself": "Cannot be Linked to Itself",
     "item.pedestals.linkingtool.tool_link_network": "Cannot Connect to this Network",
     "item.pedestals.linkingtool.tool_link_distance": "Too Far to Connect",
     "item.pedestals.linkingtool.tool_block_selected": "Selected Block = ",
@@ -443,7 +443,7 @@
     "item.pedestals.coin.export.chat_speed": "Operational Speed: ",
     "jei.pedestals.export.desc": "Takes Items from the pedestal and inserts them into a below inventory.",
 
-    "item.pedestals.coin.fexportitem": "Pedestal Upgrade",
+    "item.pedestals.coin.fexportitem": "Combination Upgrade",
     "item.pedestals.coin.fexportitem.tooltip_name": "Filtered Export (Item)",
     "item.pedestals.coin.fexportitem.tooltip_rate": "Transfer Rate: ",
     "item.pedestals.coin.fexportitem.tooltip_speed": "Operational Speed: ",
@@ -451,7 +451,7 @@
     "item.pedestals.coin.fexportitem.chat_speed": "Operational Speed: ",
     "jei.pedestals.fexportitem.desc": "Compares Incoming Items to those in the inventory below. Will only accept and insert matching items.",
 
-    "item.pedestals.coin.fexportitemstack": "Pedestal Upgrade",
+    "item.pedestals.coin.fexportitemstack": "Combination Upgrade",
     "item.pedestals.coin.fexportitemstack.tooltip_name": "Filtered Export (ItemStack)",
     "item.pedestals.coin.fexportitemstack.tooltip_rate": "Transfer Rate: ",
     "item.pedestals.coin.fexportitemstack.tooltip_speed": "Operational Speed: ",
@@ -459,7 +459,7 @@
     "item.pedestals.coin.fexportitemstack.chat_speed": "Operational Speed: ",
     "jei.pedestals.fexportitemstack.desc": "Compares Incoming ItemStacks to those in the inventory below. Will only accept and insert matching ItemStacks.",
 
-    "item.pedestals.coin.fexportmod": "Pedestal Upgrade",
+    "item.pedestals.coin.fexportmod": "Combination Upgrade",
     "item.pedestals.coin.fexportmod.tooltip_name": "Filtered Export (Mod)",
     "item.pedestals.coin.fexportmod.tooltip_rate": "Transfer Rate: ",
     "item.pedestals.coin.fexportmod.tooltip_speed": "Operational Speed: ",
@@ -467,7 +467,7 @@
     "item.pedestals.coin.fexportmod.chat_speed": "Operational Speed: ",
     "jei.pedestals.fexportmod.desc": "Compares Incoming Items to those in the inventory below. Will only accept and insert items from the same Mod.",
 
-    "item.pedestals.coin.fexportfood": "Pedestal Upgrade",
+    "item.pedestals.coin.fexportfood": "Combination Upgrade",
     "item.pedestals.coin.fexportfood.tooltip_name": "Filtered Export (Food)",
     "item.pedestals.coin.fexportfood.tooltip_rate": "Transfer Rate: ",
     "item.pedestals.coin.fexportfood.tooltip_speed": "Operational Speed: ",
@@ -475,7 +475,7 @@
     "item.pedestals.coin.fexportfood.chat_speed": "Operational Speed: ",
     "jei.pedestals.fexportfood.desc": "Will only accept and insert food items.",
 
-    "item.pedestals.coin.fexportenchanted": "Pedestal Upgrade",
+    "item.pedestals.coin.fexportenchanted": "Combination Upgrade",
     "item.pedestals.coin.fexportenchanted.tooltip_name": "Filtered Export (Enchanted)",
     "item.pedestals.coin.fexportenchanted.tooltip_rate": "Transfer Rate: ",
     "item.pedestals.coin.fexportenchanted.tooltip_speed": "Operational Speed: ",
@@ -621,7 +621,7 @@
     "item.pedestals.coin.smelter.chat_speed": "Operational Speed: ",
     "jei.pedestals.smelter.desc": "Place an Inventory Below the Pedestal for item inputs, Drop Fuel Items on the Pedestal to fuel it, Outputs come out the top of the pedestal. Can Smelt anything a Vanila Furnace can",
 
-    "item.pedestals.coin.fimport": "Pedestal Upgrade",
+    "item.pedestals.coin.fimport": "Combination Upgrade",
     "item.pedestals.coin.fimport.tooltip_name": "Filtered Import Upgrade",
     "item.pedestals.coin.fimport.tooltip_rate": "Transfer Rate: ",
     "item.pedestals.coin.fimport.tooltip_speed": "Operational Speed: ",
