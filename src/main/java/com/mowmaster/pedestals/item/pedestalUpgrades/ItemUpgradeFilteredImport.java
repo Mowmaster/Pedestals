@@ -93,13 +93,13 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                             {
                                 for(AtomicInteger slot = new AtomicInteger(0); slot.get()<getRecievers.size();slot.set(slot.get()+1))
                                 {
-                                    System.out.println(getRecievers.get(slot.get()));
+                                    //System.out.println(getRecievers.get(slot.get()));
                                     TileEntity pedestalRec = world.getTileEntity(getRecievers.get(slot.get()));
                                     if(pedestalRec instanceof TilePedestal) {
                                         //Check if it has filter, if not return true
                                         if(((TilePedestal) pedestalRec).hasFilter(((TilePedestal) pedestalRec)))
                                         {
-                                            System.out.println("HAS FILTER");
+                                            //System.out.println("HAS FILTER");
                                             Item coinInPed = ((TilePedestal) pedestalRec).getCoinOnPedestal().getItem();
                                             if(coinInPed instanceof ItemUpgradeBaseFilter)
                                             {
@@ -127,7 +127,7 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                                         }
                                         else
                                         {
-                                            System.out.println("NO FILTER");
+                                            //System.out.println("NO FILTER");
                                             Item coinInPed = ((TilePedestal) pedestalRec).getCoinOnPedestal().getItem();
                                             //Already checked if its a filter, so now check if it can accept items.
                                             if(cap.isPresent())
@@ -155,9 +155,9 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                                 }
                             }
 
-                            System.out.println(toImport.getDisplayName());
+                            //System.out.println(toImport.getDisplayName());
                             int i = getSlotWithMatchingStack(cap,toImport);
-                            System.out.println(i);
+                            //System.out.println(i);
                             if(i>=0)
                             {
                                 int maxStackSizeAllowedInPedestal = 0;
@@ -195,24 +195,6 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
             }
         //}
 
-    }
-
-    @Override
-    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
-    {
-        if(entityIn instanceof ItemEntity)
-        {
-            ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
-            ItemStack itemFromPedestal = getStackInPedestal(world,posPedestal);
-            if(itemFromPedestal.isEmpty())
-            {
-                TileEntity pedestalInv = world.getTileEntity(posPedestal);
-                if(pedestalInv instanceof TilePedestal) {
-                    entityIn.remove();
-                    ((TilePedestal) pedestalInv).addItem(getItemStack);
-                }
-            }
-        }
     }
 
     @Override

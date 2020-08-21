@@ -17,7 +17,13 @@
     "pedestals:coin/filterenchantedexact",
     "pedestals:coin/filterenchantedexactb",
     "pedestals:coin/filterenchantedfuzzy",
-    "pedestals:coin/filterenchantedfuzzyb"
+    "pedestals:coin/filterenchantedfuzzyb",
+    "pedestals:coin/fimport",
+    "pedestals:coin/fexportitem",
+    "pedestals:coin/fexportitemstack",
+    "pedestals:coin/fexportmod",
+    "pedestals:coin/fexportfood",
+    "pedestals:coin/fexportenchanted"
 
   ]
 }

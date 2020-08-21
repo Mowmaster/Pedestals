@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filtered Export (Mod)",
+  "subtitle": "",
+  "icon": "pedestals:coin/fexportmod",
+  "sortnum": 18,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:upgrades/fexportmod",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filtered-Export-Mod)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Compares Incoming Items to those in the inventory below. Will only accept and insert items from the same Mod.$(br)Default speed is 1 item transferred per second, but can be increased to 64 items per tick (1280 items per second at 20tps)."
+    }
+  ]
+}

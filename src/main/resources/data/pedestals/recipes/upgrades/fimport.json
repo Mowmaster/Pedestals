@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/import"
+    },
+    {
+      "tag": "pedestals:filters"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/fimport"
+  }
+}

@@ -192,8 +192,14 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeExpEnchanter.XPENCHANTER, "xpenchanter");
         addValueInfoPage(registration, ItemUpgradeExpGrindstone.XPGRINDSTONE, "xpgrindstone");
         addValueInfoPage(registration, ItemUpgradeExpAnvil.XPANVIL, "xpanvil");
+        addValueInfoPage(registration, ItemUpgradeFilteredImport.FIMPORT, "fimport");
         addValueInfoPage(registration, ItemUpgradeImport.IMPORT, "import");
         addValueInfoPage(registration, ItemUpgradeExport.EXPORT, "export");
+        addValueInfoPage(registration, ItemUpgradeFilteredExportItem.FEXPORTITEM, "fexportitem");
+        addValueInfoPage(registration, ItemUpgradeFilteredExportItemStack.FEXPORTITEMSTACK, "fexportitemstack");
+        addValueInfoPage(registration, ItemUpgradeFilteredExportMod.FEXPORTMOD, "fexportmod");
+        addValueInfoPage(registration, ItemUpgradeFilteredExportFood.FEXPORTFOOD, "fexportfood");
+        addValueInfoPage(registration, ItemUpgradeFilteredExportEnchanted.FEXPORTENCHANTED, "fexportenchanted");
         addValueInfoPage(registration, ItemUpgradeRestock.RESTOCK, "restock");
         addValueInfoPage(registration, ItemUpgradeFilterEnchanted.ENCHANTED, "filterenchanted");
         addValueInfoPage(registration, ItemUpgradeFilterEnchantedBlacklist.ENCHANTED, "filterenchantedb");

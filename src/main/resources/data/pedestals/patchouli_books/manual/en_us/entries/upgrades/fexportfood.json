@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filtered Export (Food)",
+  "subtitle": "",
+  "icon": "pedestals:coin/fexportfood",
+  "sortnum": 18,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:upgrades/fexportfood",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filtered-Export-Food)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Will only accept and insert food items.$(br)Default speed is 1 item transferred per second, but can be increased to 64 items per tick (1280 items per second at 20tps)."
+    }
+  ]
+}

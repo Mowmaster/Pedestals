@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/export"
+    },
+    {
+      "item": "pedestals:coin/filteritem"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/fexportitem"
+  }
+}

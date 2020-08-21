@@ -55,6 +55,11 @@ public class ItemRegistry
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeFilteredImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportItem.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportItemStack.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportMod.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportFood.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportEnchanted.onItemRegistryReady(e);
         ItemUpgradeRestock.onItemRegistryReady(e);
 
         ItemUpgradeFilterItem.onItemRegistryReady(e);
