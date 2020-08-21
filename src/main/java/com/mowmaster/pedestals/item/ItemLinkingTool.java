@@ -1,9 +1,12 @@
 package com.mowmaster.pedestals.item;
 
+import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,8 +15,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -26,10 +31,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemLinkingTool extends Item {
 
@@ -120,11 +127,13 @@ public class ItemLinkingTool extends Item {
                                                     this.storedPosition = defaultPos;
                                                     writePosToNBT(player.getHeldItemMainhand());
                                                     worldIn.notifyBlockUpdate(pos,worldIn.getBlockState(pos),worldIn.getBlockState(pos),2);
+
                                                     if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
                                                     {
                                                         if(player.getHeldItemMainhand().isEnchanted())
                                                         {
-                                                            player.getHeldItemMainhand().removeChildTag("ench");
+                                                            Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
+                                                            EnchantmentHelper.setEnchantments(enchantsNone,player.getHeldItemMainhand());
                                                         }
                                                     }
                                                     player.sendMessage(linksucess,Util.DUMMY_UUID);
@@ -235,32 +244,42 @@ public class ItemLinkingTool extends Item {
                     xmax = range;
                     ymin = -range;
                     ymax = range;
-                }
-            }
 
-            if(storedPosition!=defaultPos)
-            {
-                if(isSelected)
-                {
-                    if(worldIn.isRemote)
+                    int locationsNum = pedestal.getNumberOfStoredLocations();
+                    List<BlockPos> storedRecievers = pedestal.getLocationList();
+
+                    if(storedPosition!=defaultPos)
                     {
-                        ticker++;
-                        if(ticker>30)
+                        if(isSelected)
                         {
-                            //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
-                            for (int c = zmin; c <= zmax; c++) {
-                                for (int a = xmin; a <= xmax; a++) {
-                                    for (int b = ymin; b <= ymax; b++) {
-                                        worldIn.addParticle(ParticleTypes.ENCHANT,true,pos.add(a,b,c).getX()+0.5f,pos.add(a,b,c).getY()+0.5f,pos.add(a,b,c).getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
+                            if(worldIn.isRemote)
+                            {
+                                ticker++;
+
+                                for(int i=0;i<locationsNum;i++)
+                                {
+                                    float val = i*0.125f;
+                                    spawnParticleAroundPedestalBase(worldIn,ticker,storedRecievers.get(i),val,val,val,1.0f);
+                                }
+
+                                if(ticker>30)
+                                {
+                                    //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
+                                    for (int c = zmin; c <= zmax; c++) {
+                                        for (int a = xmin; a <= xmax; a++) {
+                                            for (int b = ymin; b <= ymax; b++) {
+                                                worldIn.addParticle(ParticleTypes.WHITE_ASH,true,pos.add(a,b,c).getX()+0.5f,pos.add(a,b,c).getY()+0.5f,pos.add(a,b,c).getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
+                                            }
+                                        }
                                     }
+
+                                    ticker=0;
                                 }
                             }
-                            ticker=0;
                         }
                     }
                 }
             }
-
         }
     }
 
@@ -310,6 +329,66 @@ public class ItemLinkingTool extends Item {
             this.storedPosition = new BlockPos(x,y,z);
         }
 
+    }
+
+    public void spawnParticleAroundPedestalBase(World world,int tick, BlockPos pos, float r, float g, float b, float alpha)
+    {
+        double dx = (double)pos.getX();
+        double dy = (double)pos.getY();
+        double dz = (double)pos.getZ();
+
+        BlockState state = world.getBlockState(pos);
+        Direction enumfacing = Direction.UP;
+        if(state.getBlock() instanceof BlockPedestalTE)
+        {
+            enumfacing = state.get(FACING);
+        }
+        RedstoneParticleData parti = new RedstoneParticleData(r, g, b, alpha);
+        switch (enumfacing)
+        {
+            case UP:
+                if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.5D, dz+ 0.25D,0, 0, 0);
+                if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.5D, dz+ 0.75D,0, 0, 0);
+                if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.5D, dz+ 0.25D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.5D, dz+ 0.75D,0, 0, 0);
+                return;
+            case DOWN:
+                if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.5D, dz+ 0.25D,0, 0, 0);
+                if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.5D, dz+ 0.75D,0, 0, 0);
+                if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.5D, dz+ 0.25D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.5D, dz+ 0.75D,0, 0, 0);
+                return;
+            case NORTH:
+                if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.25D, dz+0.5D,0, 0, 0);
+                if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.75D, dz+0.5D,0, 0, 0);
+                if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.25D, dz+0.5D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.75D, dz+0.5D,0, 0, 0);
+                return;
+            case SOUTH:
+                if (tick%20 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.25D, dz+0.5D,0, 0, 0);
+                if (tick%25 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.75D, dz+0.5D,0, 0, 0);
+                if (tick%15 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.25D, dz+0.5D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.75D, dz+0.5D,0, 0, 0);
+                return;
+            case EAST:
+                if (tick%20 == 0) world.addParticle(parti, dx+0.5D, dy+ 0.25D, dz+0.25D,0, 0, 0);
+                if (tick%25 == 0) world.addParticle(parti, dx+0.5D, dy+ 0.25D, dz+0.75D,0, 0, 0);
+                if (tick%15 == 0) world.addParticle(parti, dx+0.5D, dy+ 0.75D, dz+0.25D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+0.5D, dy+ 0.75D, dz+0.75D,0, 0, 0);
+                return;
+            case WEST:
+                if (tick%20 == 0) world.addParticle(parti, dx+0.5D, dy+0.25D, dz+ 0.25D,0, 0, 0);
+                if (tick%25 == 0) world.addParticle(parti, dx+0.5D, dy+0.25D, dz+ 0.75D,0, 0, 0);
+                if (tick%15 == 0) world.addParticle(parti, dx+0.5D, dy+0.75D, dz+ 0.25D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+0.5D, dy+0.75D, dz+ 0.75D,0, 0, 0);
+                return;
+            default:
+                if (tick%30 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.5D, dz+ 0.25D,0, 0, 0);
+                if (tick%35 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.5D, dz+ 0.75D,0, 0, 0);
+                if (tick%25 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.5D, dz+ 0.25D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.5D, dz+ 0.75D,0, 0, 0);
+                return;
+        }
     }
 
     @Override
