@@ -76,6 +76,24 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return  transferRate;
     }
 
+    @Override
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
+    {
+        return getAreaWidth(coin);
+    }
+
+    @Override
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
+    {
+        return new int[]{getHeight(coin),0};
+    }
+
+    @Override
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
+    {
+        return getAreaWidth(coin);
+    }
+
     protected void useFanOnEntities(World world, BlockPos posOfPedestal,TilePedestal pedestal, double speed,AxisAlignedBB getBox) {
         List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class, getBox);
 

@@ -241,6 +241,21 @@ public class ItemUpgradeBase extends Item {
         return  range;
     }
 
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
+    {
+        return 0;
+    }
+
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
+    {
+        return new int[]{0,0};
+    }
+
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
+    {
+        return 0;
+    }
+
     public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
     {
         Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
@@ -760,8 +775,6 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-
-
     public BlockPos getNegRangePos(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
     {
         BlockState state = world.getBlockState(posOfPedestal);
@@ -958,7 +971,11 @@ public class ItemUpgradeBase extends Item {
         double dz = (double)pos.getZ();
 
         BlockState state = world.getBlockState(pos);
-        Direction enumfacing = state.get(FACING);
+        Direction enumfacing = Direction.UP;
+        if(state.getBlock() instanceof BlockPedestalTE)
+        {
+            enumfacing = state.get(FACING);
+        }
         switch (enumfacing)
         {
             case UP:
@@ -1001,7 +1018,7 @@ public class ItemUpgradeBase extends Item {
                 if (tick%30 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
                 if (tick%35 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
                 if (tick%25 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
-                if (tick%40 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
                 return;
         }
     }
@@ -1058,7 +1075,7 @@ public class ItemUpgradeBase extends Item {
                 if (tick%30 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.25D,0, 0, 0);
                 if (tick%35 == 0) world.addParticle(parti, dx+ 0.25D, dy+0.15D, dz+ 0.75D,0, 0, 0);
                 if (tick%25 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.25D,0, 0, 0);
-                if (tick%40 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
+                if (tick%30 == 0) world.addParticle(parti, dx+ 0.75D, dy+0.15D, dz+ 0.75D,0, 0, 0);
                 return;
         }
     }

@@ -71,6 +71,24 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         return rangeHeight;
     }
 
+    @Override
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
+    {
+        return getAreaWidth(coin);
+    }
+
+    @Override
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
+    {
+        return new int[]{getRangeHeight(coin),0};
+    }
+
+    @Override
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
+    {
+        return getAreaWidth(coin);
+    }
+
     public int ticked = 0;
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)

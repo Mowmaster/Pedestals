@@ -52,6 +52,24 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         return  areaWidth;
     }
 
+    @Override
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
+    {
+        return getAreaWidth(coin);
+    }
+
+    @Override
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
+    {
+        return new int[]{(2*getAreaWidth(coin)),0};
+    }
+
+    @Override
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
+    {
+        return getAreaWidth(coin);
+    }
+
     public float getSwordDamage(LivingEntity entityIn, ItemStack itemInPedestal)
     {
         float damage = 2.0f;

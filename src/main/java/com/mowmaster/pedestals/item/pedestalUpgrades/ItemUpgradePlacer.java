@@ -56,6 +56,30 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
         return stated;
     }
 
+    @Override
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
+    {
+        int range = getRange(coin);
+        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
+        return posOfBlock.getX();
+    }
+
+    @Override
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
+    {
+        int range = getRange(coin);
+        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
+        return new int[]{posOfBlock.getY(),1};
+    }
+
+    @Override
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
+    {
+        int range = getRange(coin);
+        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
+        return posOfBlock.getZ();
+    }
+
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         if(!world.isRemote)

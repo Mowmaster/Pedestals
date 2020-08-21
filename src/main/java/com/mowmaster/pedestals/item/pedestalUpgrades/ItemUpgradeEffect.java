@@ -54,6 +54,24 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         return  areaWidth;
     }
 
+    @Override
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
+    {
+        return getAreaWidth(coin);
+    }
+
+    @Override
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
+    {
+        return new int[]{((2*getAreaWidth(coin))+1),0};
+    }
+
+    @Override
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
+    {
+        return getAreaWidth(coin);
+    }
+
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         if(!world.isRemote)
@@ -184,7 +202,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         {
             int fuelValue = pedestal.getStoredValueForUpgrades();
 
-            if(fuelValue >= 0)
+            if(fuelValue > 0)
             {
                 spawnParticleAroundPedestalBase(world,tick,pos, ParticleTypes.EFFECT);
             }

@@ -14,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
@@ -48,6 +49,64 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     @Override
     public Boolean canAcceptCapacity() {
         return false;
+    }
+
+    @Override
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
+    {
+        int range = getRange(coin);
+        BlockPos posOfBlock = pos;
+        TileEntity tile = world.getTileEntity(pos);
+        if(tile instanceof TilePedestal)
+        {
+            if(((TilePedestal)tile).getNumberOfStoredLocations()>0)
+            {
+                BlockPos posBlock = ((TilePedestal)tile).getStoredPositionAt(0);
+
+                posOfBlock = getPosOfBlockBelow(world, posBlock, range);
+
+            }
+        }
+
+        return posOfBlock.getX();
+    }
+
+    @Override
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
+    {
+        int range = getRange(coin);
+        BlockPos posOfBlock = pos;
+        TileEntity tile = world.getTileEntity(pos);
+        if(tile instanceof TilePedestal)
+        {
+            if(((TilePedestal)tile).getNumberOfStoredLocations()>0)
+            {
+                BlockPos posBlock = ((TilePedestal)tile).getStoredPositionAt(0);
+
+                posOfBlock = getPosOfBlockBelow(world, posBlock, range);
+
+            }
+        }
+
+        return new int[]{posOfBlock.getY(),1};
+    }
+
+    @Override
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
+    {
+        int range = getRange(coin);
+        BlockPos posOfBlock = pos;
+        TileEntity tile = world.getTileEntity(pos);
+        if(tile instanceof TilePedestal)
+        {
+            if(((TilePedestal)tile).getNumberOfStoredLocations()>0)
+            {
+                BlockPos posBlock = ((TilePedestal)tile).getStoredPositionAt(0);
+                posOfBlock = getPosOfBlockBelow(world, posBlock, range);
+            }
+        }
+
+        return posOfBlock.getZ();
     }
 
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
@@ -280,7 +339,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
             int fuelValue = pedestal.getStoredValueForUpgrades();
 
             //More than 1 smelt worth
-            if(fuelValue >= 0)
+            if(fuelValue > 0)
             {
                 spawnParticleAroundPedestalBase(world,tick,pos, ParticleTypes.PORTAL);
             }
