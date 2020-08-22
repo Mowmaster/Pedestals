@@ -9,11 +9,12 @@
     {
       "type": "crafting",
       "recipe": "pedestals:upgrades/harvester",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Harvester)Wiki Link/$"
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Harvester)Wiki Link/$ $(br)The harvester upgrade will check any grown crops on the radius of the top side from the pedestal then it will harvest those grown crops randomly."
     },
     {
       "type": "text",
-      "text": "The harvester upgrade will check any grown crops on the radius of the top side from the pedestal then it will harvest those grown crops randomly.$(br)Note:$(li)The upgrade can be enchanted with pedestal range and pedestal speed enchantment to increase it's range and speed respectively$(li)The harvester can be equipped with hoe for utilizing it's enchant, the hoe won't take durability damage when it's in the pedestal$(li)The pedestal will use the tool enchantment if it's equipped with hoe otherwise it will use the upgrade enchantment"
+      "title": "Notes",
+      "text": "$(li)The upgrade can be enchanted with pedestal range and pedestal speed enchantment to increase it's range and speed respectively$(li)The harvester can be equipped with hoe for utilizing it's enchant, the hoe won't take durability damage when it's in the pedestal$(li)The pedestal will use the tool enchantment if it's equipped with hoe otherwise it will use the upgrade enchantment"
     }
   ]
 }

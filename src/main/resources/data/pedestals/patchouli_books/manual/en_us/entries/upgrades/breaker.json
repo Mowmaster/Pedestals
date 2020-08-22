@@ -18,7 +18,11 @@
     },
     {
       "type": "text",
-      "text": "The block breaker can be enchanted using the range enchant and the speed enchant$(br)The range enchant will make it that the block breaker will only break block in it's specified range, for an example in the default upgrade the block breaker will break the block in the front of it but with range enchant I it'll break the block in the 2 block away from it and every level will increase the range which it can break block with max range of 16 and with each level it'll increase the range by 1,2,4,4,4$(br)The speed enchant will speed up the delay between it's operation,for further information please check the Enchantments tab"
+      "text": "The block breaker can be enchanted using the range enchant and the speed enchant$(br)The range enchant will make it that the block breaker will only break block in it's specified range, for an example in the default upgrade the block breaker will break the block in the front of it but with range enchant it'll break the block in the 2 block away from it and every level will increase the range which it can break block with max range of 16."
+    },
+    {
+      "type": "text",
+      "text": "With each level it'll increase the range by 1,2,4,4,4$(br)The speed enchant will speed up the delay between it's operation,for further information please check the Enchantments tab"
     }
   ]
 }

@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": " $(l:https://github.com/Mowmaster/Pedestals/wiki/Enchantments)Enchanting Pedestal Upgrades/$ $(br)This is a general Overview of the enchants available, more detailed info will be included in the individual upgrades documentation"
+      "text": " $(l:https://github.com/Mowmaster/Pedestals/wiki/Enchantments)Enchanting Pedestal Upgrades/$ This is a general Overview of the enchants available, more detailed info will be included in the individual upgrades documentation"
     },
     {
       "type": "text",
@@ -20,7 +20,8 @@
     },
     {
       "type": "text",
-      "text": "Pedestal Capacity (Light Grey or Aqua Tooltip Text)$(li)Generally this will increase the amount of items being handled by an upgrade, with XP upgrades it will increase the amount of xp the upgrade can handle and store.$(li)Tooltip Examples:$(li2)Dropped Stack Size$(li2)Transfer Rate$(li2)Items Smelted/Crushed/Sawn Per Operation$(li2)Recipes Crafted Per Operation"
+      "title":"Pedestal Capacity",
+      "text": "(Light Grey or Aqua Tooltip Text)$(li)Generally this will increase the amount of items being handled by an upgrade, with XP upgrades it will increase the amount of xp the upgrade can handle and store.$(li)Tooltip Examples:$(li2)Dropped Stack Size$(li2)Transfer Rate$(li2)Items Smelted/Crushed/Sawn Per Operation$(li2)Recipes Crafted Per Operation"
     },
     {
       "type": "text",
@@ -28,7 +29,8 @@
     },
     {
       "type": "text",
-      "text": "Pedestal Range (White Tooltip Text)$(li)This Enchant increases the range or area of effect of upgrades$(li)Tooltip Examples Include:$(li2)Dropper/Breaker/Placer Range$(li2)Teleporter Range$(li)Range usually is a height/depth distance(Above or below the pedestal respective to its placement)."
+      "title":"Pedestal Range",
+      "text": "(White Tooltip Text)$(li)This Enchant increases the range or area of effect of upgrades$(li)Tooltip Examples Include:$(li2)Dropper/Breaker/Placer Range$(li2)Teleporter Range$(li)Range usually is a height/depth distance(Above or below the pedestal respective to its placement)."
     },
     {
       "type": "text",
@@ -36,7 +38,8 @@
     },
     {
       "type": "text",
-      "text": "Pedestal Area$(li)This Enchant Controls The Effected Area or AOE of specific upgrades.$(li)The Soft Cap to an upgrades 'AOE' is enchant level 5, but this can be 'OverCombined' in the Exp Anvil Upgrade to get increased 'AOE' beyond the Soft Cap."
+      "title":"Pedestal Area",
+      "text": "$(li)This Enchant Controls The Effected Area or AOE of specific upgrades.$(li)The Soft Cap to an upgrades 'AOE' is enchant level 5, but this can be 'OverCombined' in the Exp Anvil Upgrade to get increased 'AOE' beyond the Soft Cap."
     },
     {
       "type": "text",
@@ -44,11 +47,13 @@
     },
     {
       "type": "text",
-      "text": "Pedestal Advanced$(br)This Enchant Allows for Upgrades that use an 'inventory below' them to be able to the inventory of any entity as well.$(li)There is only 1 Level of this Enchantment$(li2)This Enchantment can only be gotten by enchanting the Focused Enchantable Books (Advanced) at level 92 or above, the Exp Enchanter can be used for this."
+      "title":"Pedestal Advanced",
+      "text": "This Enchant Allows for Upgrades that use an 'inventory below' them to be able to the inventory of any entity as well.$(li)There is only 1 Level of this Enchantment$(li2)This Enchantment can only be gotten by enchanting the Focused Enchantable Books (Advanced) at level 92 or above, the Exp Enchanter can be used for this."
     },
     {
       "type": "text",
-      "text": "Vanilla Enchants$(br)Fortune and Silktouch HAVE to be added using the Anvil Upgrade.$(li)Fortune can be applied to any upgrade that breaks blocks.$(li)Silk touch can also be applied to any upgrade that breaks blocks, as well as the cobble stone generator upgrade."
+      "title":"Vanilla Enchants",
+      "text": "Fortune and Silktouch HAVE to be added using the Anvil Upgrade.$(li)Fortune can be applied to any upgrade that breaks blocks.$(li)Silk touch can also be applied to any upgrade that breaks blocks, as well as the cobble stone generator upgrade."
     }
   ]
 }

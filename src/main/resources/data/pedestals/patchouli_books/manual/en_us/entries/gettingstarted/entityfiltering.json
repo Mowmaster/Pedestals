@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "There are a few $(l:https://github.com/Mowmaster/Pedestals/wiki/Filtering-By-Entity)Upgrades/$ that determine their targets based on a block below them.$(li)Auto Attacker Upgrade$(li)Mob Fan Upgrade$(li)Potion Diffuser&(br)These Below Blocks are Supported:$(li)Netherite - Usually has special amplified effects.$(li)Emerald - Targets Players"
+      "text": "There are a few $(l:https://github.com/Mowmaster/Pedestals/wiki/Filtering-By-Entity)Upgrades/$ that determine their targets based on a block below them.$(li)Auto Attacker Upgrade$(li)Mob Fan Upgrade$(li)Potion Diffuser $(br)These Below Blocks are Supported:$(li)Netherite - Usually has special amplified effects.$(li)Emerald - Targets Players"
     },
     {
       "type": "text",

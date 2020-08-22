@@ -13,7 +13,7 @@
     },
     {
       "type": "text",
-      "text": "The upgrades will check any not fully grown above the top side of pedestal and then it will use the bone meal from the pedestal onto the crops in radius which isn't fully grown yet (also works on sapling).$(br)If bone meal isnt available, it will randomly tick the farmland block causeing crops to grow slightly faster then normal.$(br)The upgrade can be enchanted with pedestal range and pedestal speed enchantment to increase it's range and speed respectively."
+      "text": "The upgrades will check any not fully grown above the top side of pedestal and then it will use the bone meal from the pedestal onto the crops in radius which isn't fully grown yet (also works on sapling).$(br2)If bone meal isnt available, it will randomly tick the farmland block causeing crops to grow slightly faster then normal.$(br)The upgrade can be enchanted with pedestal range and pedestal speed enchantment to increase it's range and speed respectively."
     }
   ]
 }
