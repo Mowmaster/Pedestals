@@ -98,6 +98,7 @@ public class ItemLinkingTool extends Item {
                         this.storedPosition = pos;
                         //Writes to NBT
                         writePosToNBT(player.getHeldItemMainhand());
+                        writePosListToNBT(player.getHeldItemMainhand());
                         //Applies effect to wrench in hand
                         if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
                         {
@@ -133,7 +134,9 @@ public class ItemLinkingTool extends Item {
                                                 {
                                                     //If slots are available then set wrench properties back to a default value
                                                     this.storedPosition = defaultPos;
+                                                    this.storedPositionList = new ArrayList<>();
                                                     writePosToNBT(player.getHeldItemMainhand());
+                                                    writePosListToNBT(player.getHeldItemMainhand());
                                                     worldIn.notifyBlockUpdate(pos,worldIn.getBlockState(pos),worldIn.getBlockState(pos),2);
 
                                                     if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
@@ -166,13 +169,16 @@ public class ItemLinkingTool extends Item {
                 else
                 {
                     this.storedPosition = defaultPos;
+                    this.storedPositionList = new ArrayList<>();
                     writePosToNBT(player.getHeldItemMainhand());
+                    writePosListToNBT(player.getHeldItemMainhand());
                     worldIn.notifyBlockUpdate(pos,worldIn.getBlockState(pos),worldIn.getBlockState(pos),2);
                     if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
                     {
                         if(player.getHeldItemMainhand().isEnchanted())
                         {
-                            player.getHeldItemMainhand().removeChildTag("ench");
+                            Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
+                            EnchantmentHelper.setEnchantments(enchantsNone,player.getHeldItemMainhand());
                         }
                     }
                 }
@@ -255,9 +261,9 @@ public class ItemLinkingTool extends Item {
                         ymin = -range;
                         ymax = range;
 
-                        //ToDo: Being lazy and not storing these values on the item in nbt, if people complain, then do it... i guess
-                        int locationsNum = storedPositionList.size();
-                        List<BlockPos> storedRecievers = storedPositionList;
+
+                        List<BlockPos> storedRecievers = getStoredPositionList(stack);
+                        int locationsNum = storedRecievers.size();
 
                         if(storedPosition!=defaultPos)
                         {
@@ -270,7 +276,7 @@ public class ItemLinkingTool extends Item {
                                     for(int i=0;i<locationsNum;i++)
                                     {
                                         float val = i*0.125f;
-                                        spawnParticleAroundPedestalBase(worldIn,ticker,storedRecievers.get(i),val,val,val,1.0f);
+                                        spawnParticleAroundPedestalBase(worldIn,ticker,storedPositionList.get(i),val,val,val,1.0f);
                                     }
 
                                     if(ticker>30)
@@ -321,12 +327,44 @@ public class ItemLinkingTool extends Item {
         return storedPosition;
     }
 
+    public List<BlockPos> getStoredPositionList(ItemStack getWrenchItem)
+    {
+        getPosListFromNBT(getWrenchItem);
+        return storedPositionList;
+    }
+
     public void writePosToNBT(ItemStack stack)
     {
         CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
         compound.putInt("stored_x",this.storedPosition.getX());
         compound.putInt("stored_y",this.storedPosition.getY());
         compound.putInt("stored_z",this.storedPosition.getZ());
+        stack.setTag(compound);
+    }
+
+    public void writePosListToNBT(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+        List<Integer> xval = new ArrayList<Integer>();
+        List<Integer> yval = new ArrayList<Integer>();
+        List<Integer> zval = new ArrayList<Integer>();
+        for(int i=0;i<storedPositionList.size();i++)
+        {
+            xval.add(i,storedPositionList.get(i).getX());
+            yval.add(i,storedPositionList.get(i).getY());
+            zval.add(i,storedPositionList.get(i).getZ());
+        }
+        compound.putIntArray("storedlist_x",xval);
+        compound.putIntArray("storedlist_y",yval);
+        compound.putIntArray("storedlist_z",zval);
         stack.setTag(compound);
     }
 
@@ -340,7 +378,24 @@ public class ItemLinkingTool extends Item {
             int z = getCompound.getInt("stored_z");
             this.storedPosition = new BlockPos(x,y,z);
         }
+    }
 
+    public void getPosListFromNBT(ItemStack stack)
+    {
+        List<BlockPos> posStored = new ArrayList<>();
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            int[] xval = getCompound.getIntArray("storedlist_x");
+            int[] yval = getCompound.getIntArray("storedlist_y");
+            int[] zval = getCompound.getIntArray("storedlist_z");
+
+            for(int i = 0;i<xval.length;i++)
+            {
+                posStored.add(i,new BlockPos(xval[i],yval[i],zval[i]));
+            }
+            this.storedPositionList = posStored;
+        }
     }
 
     public void spawnParticleAroundPedestalBase(World world,int tick, BlockPos pos, float r, float g, float b, float alpha)
