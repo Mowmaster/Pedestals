@@ -15,6 +15,7 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -40,6 +41,7 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -636,6 +638,34 @@ public class ItemUpgradeBase extends Item {
                     {
                         //check if it could pull the item out or not
                         if(stackInSlot.isItemEqual(stackToFind))
+                        {
+                            slot.set(i);
+                            break;
+                        }
+                    }
+                }});
+
+
+        }
+
+        return slot.get();
+    }
+
+    public int getSlotWithMatchingStackExact(LazyOptional<IItemHandler> cap, ItemStack stackToFind)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        if(cap.isPresent()) {
+
+            cap.ifPresent(itemHandler -> {
+                int range = itemHandler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    //find a slot with items
+                    if(!stackInSlot.isEmpty())
+                    {
+                        //check if it could pull the item out or not
+                        if(ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToFind))//stackInSlot.isItemEqual(stackToFind)
                         {
                             slot.set(i);
                             break;

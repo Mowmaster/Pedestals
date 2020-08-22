@@ -113,6 +113,7 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                                                         ItemStack itemInInv = ItemStack.EMPTY;
                                                         itemInInv = IntStream.range(0,range)//Int Range
                                                                 .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
+                                                                .filter(itemStack -> !itemStack.isEmpty())
                                                                 .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptCount(world,getRecievers.get(slot.get()),((TilePedestal)world.getTileEntity(getRecievers.get(slot.get()))).getItemInPedestal(),itemStack)>0)
                                                                 .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,getRecievers.get(slot.get()),itemStack))
                                                             .findFirst().orElse(ItemStack.EMPTY);
@@ -157,7 +158,7 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                             }
 
                             //System.out.println(toImport.getDisplayName());
-                            int i = getSlotWithMatchingStack(cap,toImport);
+                            int i = getSlotWithMatchingStackExact(cap,toImport);
                             //System.out.println(i);
                             if(i>=0)
                             {
