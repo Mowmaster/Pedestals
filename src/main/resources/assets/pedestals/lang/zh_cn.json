@@ -1,5 +1,4 @@
 {
-
     "itemGroup.pedestals_blocks": "基座",
     "pedestals.patch_book": "基座",
     "pedestals.patch_book_landing": "A Guide to Pedestals",
@@ -422,7 +421,6 @@
     "item.pedestals.coin.rfquarryb.chat_rate": "每次采矿物品: ",
     "item.pedestals.coin.rfquarryb.chat_speed": "运行速度: ",
     "jei.pedestals.rfquarryb.desc": "在基座下面放置存储空间（例如箱子）用于输入物品，将其连接到基座能量网络补充燃料，从基座顶部输出物品。只挖掘与下方存储空间不匹配的方块。",
-
 
     "item.pedestals.coin.xpanvil": "基座升级",
     "item.pedestals.coin.xpanvil.tooltip_name": "经验铁砧升级",

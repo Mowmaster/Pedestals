@@ -2,7 +2,7 @@
 "parent": "pedestals:item/coin",
 "textures": {
 "coin": "pedestals:items/models/coins/coin",
-"letter": "pedestals:items/models/coins/coinrestock",
+"letter": "pedestals:items/models/coins/coinfrestock",
 "part": "pedestals:items/models/coins/coin"
 }
 }

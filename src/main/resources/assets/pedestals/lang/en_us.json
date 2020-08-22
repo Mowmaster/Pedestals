@@ -1,5 +1,4 @@
 {
-
     "itemGroup.pedestals_blocks": "Pedestals",
     "pedestals.patch_book": "Pedestals",
     "pedestals.patch_book_landing": "A Guide to Pedestals",
@@ -422,7 +421,6 @@
     "item.pedestals.coin.rfquarryb.chat_rate": "Items Crushed per Operation: ",
     "item.pedestals.coin.rfquarryb.chat_speed": "Operational Speed: ",
     "jei.pedestals.rfquarryb.desc": "Place an Inventory Below the Pedestal for item inputs, Connect it to the Pedestal Energy Network to Fuel It, Outputs come out the top of the pedestal. Will Only Mine Blocks that DO NOT Match what is in the below inventory.",
-
 
     "item.pedestals.coin.xpanvil": "Pedestal Upgrade",
     "item.pedestals.coin.xpanvil.tooltip_name": "Exp Anvil Upgrade",
