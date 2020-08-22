@@ -56,7 +56,13 @@ public class EnchantmentAdvanced extends Enchantment
         return canApplyToUpgrade;
     }
 
+    //Added because wyld found a villager with it...
+    @Override
+    public boolean canVillagerTrade() {
+        return false;
+    }
 
+    @Override
     public boolean isAllowedOnBooks() {
         return false;
     }
