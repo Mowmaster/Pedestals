@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.*;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
@@ -130,6 +131,27 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         return false;
     }
 
+    @Override
+    public int removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
+    {
+        int amountToSet = 0;
+        TileEntity entity = world.getTileEntity(posPedestal);
+        if(entity instanceof TilePedestal)
+        {
+            TilePedestal pedestal = (TilePedestal)entity;
+            int fuelLeft = pedestal.getStoredValueForUpgrades();
+            amountToSet = fuelLeft - amountToRemove;
+            if(amountToRemove > fuelLeft) amountToSet = -1;
+            if(!simulate)
+            {
+                if(amountToSet == -1) amountToSet = 0;
+                pedestal.setStoredValueForUpgrades(amountToSet);
+            }
+        }
+
+        return amountToSet;
+    }
+
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
@@ -156,19 +178,20 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     {
                         for(int i=0; i<instance.size(); i++)
                         {
-                            if(getTargetEntity(world,posOfPedestal,getEntityFromList).addPotionEffect(instance.get(i)))
+                            if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) >= 0)
                             {
-                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) > -1)
+                                if(getTargetEntity(world,posOfPedestal,getEntityFromList).addPotionEffect(instance.get(i)))
                                 {
                                     world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }
+                                /*Removed due to a suggestion in a stream #BlameSoaryn (I want to make it clear, i was on the fence about this anyway but left it in for "balance" reasons)
                                 else
                                 {
                                     removeFromPedestal(world,posOfPedestal,1);
                                     world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
+                                }*/
                             }
                         }
                     }
