@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/fmagnetitemstack"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/fmagnetitemstackb"
+  }
+}

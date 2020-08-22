@@ -25,6 +25,7 @@ import net.minecraft.world.LockCode;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
@@ -110,8 +111,16 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     public void update()
     {
         markDirty();
-        world.notifyBlockUpdate(pos,getBlockState(),getBlockState(),1);
         world.notifyBlockUpdate(pos,getBlockState(),getBlockState(),2);
+        /*public static final int NOTIFY_NEIGHBORS = 1;
+        public static final int BLOCK_UPDATE = 2;
+        public static final int NO_RERENDER = 4;
+        public static final int RERENDER_MAIN_THREAD = 8;
+        public static final int UPDATE_NEIGHBORS = 16;
+        public static final int NO_NEIGHBOR_DROPS = 32;
+        public static final int IS_MOVING = 64;
+        public static final int DEFAULT = 3;
+        public static final int DEFAULT_AND_RERENDER = 11;*/
     }
 
     private IItemHandler createHandler() {
@@ -523,7 +532,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     }
 
     //Returns items available to be insert, 0 if false
-    public int canAcceptItems(ItemStack itemsIncoming)
+    public int canAcceptItems(World worldIn, BlockPos posPedestal, ItemStack itemsIncoming)
     {
         int canAccept = 0;
         int pedestalAccept = 0;
@@ -533,7 +542,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             Item coinInPed = this.getCoinOnPedestal().getItem();
             if(coinInPed instanceof ItemUpgradeBase)
             {
-                pedestalAccept = ((ItemUpgradeBase) coinInPed).canAcceptCount(getItemInPedestal(), itemsIncoming);
+                pedestalAccept = ((ItemUpgradeBase) coinInPed).canAcceptCount(worldIn, posPedestal, getItemInPedestal(), itemsIncoming);
             }
         }
 
@@ -620,7 +629,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                                 TilePedestal tilePedestalToSendTo = (TilePedestal)world.getTileEntity(pedestalToSendTo);
 
                                 //Checks if pedestal is empty or if not then checks if items match and how many can be insert
-                                if(tilePedestalToSendTo.canAcceptItems(getItemInPedestal()) > 0)
+                                if(tilePedestalToSendTo.canAcceptItems(world,pedestalToSendTo,getItemInPedestal()) > 0)
                                 {
                                     //Check if it has filter, if not return true
                                     if(hasFilter(tilePedestalToSendTo))
@@ -675,7 +684,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                                 TilePedestal tilePedestalToSendTo = (TilePedestal)world.getTileEntity(pedestalToSendTo);
 
                                 //Checks if pedestal is empty or if not then checks if items match and how many can be insert
-                                if(tilePedestalToSendTo.canAcceptItems(itemStackIncoming) > 0)
+                                if(tilePedestalToSendTo.canAcceptItems(world,pedestalToSendTo,itemStackIncoming) > 0)
                                 {
                                     //Check if it has filter, if not return true
                                     if(hasFilter(tilePedestalToSendTo))
@@ -712,7 +721,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             TilePedestal tileToSendTo = ((TilePedestal)world.getTileEntity(pedestalToSendTo));
 
             //Max that can be recieved
-            int countToSend = tileToSendTo.canAcceptItems(getItemInPedestal());
+            int countToSend = tileToSendTo.canAcceptItems(world,pedestalToSendTo,getItemInPedestal());
             ItemStack copyStackToSend = getItemInPedestal().copy();
             //Max that is available to send
             if(copyStackToSend.getCount()<countToSend)

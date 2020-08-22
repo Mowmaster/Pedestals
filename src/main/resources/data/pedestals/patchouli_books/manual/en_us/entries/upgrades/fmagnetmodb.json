@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filtered Magnet (Mod Blacklist)",
+  "subtitle": "",
+  "icon": "pedestals:coin/fmagnetmodb",
+  "sortnum": 8,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:upgrades/fmagnetmodb",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filtered-Magnet-Mod-Blacklist)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Will Gather up Items in the area around it, and if they match the mod of the items in the below inventory, it will put them in the pedestal."
+    }
+  ]
+}

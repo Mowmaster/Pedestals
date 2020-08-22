@@ -1,0 +1,19 @@
+{
+  "category": "upgrades",
+  "name": "Filtered Magnet (ItemStack Blacklist)",
+  "subtitle": "",
+  "icon": "pedestals:coin/fmagnetitemstackb",
+  "sortnum": 8,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:upgrades/fmagnetitemstackb",
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Filtered-Magnet-ItemStack-Blacklist)Wiki Link/$"
+    },
+    {
+      "type": "text",
+      "text": "Will Gather up Items in the area around it, if they dont match the itemstack in the below inventory, it will put them in the pedestal."
+    }
+  ]
+}

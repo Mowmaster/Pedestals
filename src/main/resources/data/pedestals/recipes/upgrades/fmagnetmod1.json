@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/fmagnetmodb"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/fmagnetmod"
+  }
+}

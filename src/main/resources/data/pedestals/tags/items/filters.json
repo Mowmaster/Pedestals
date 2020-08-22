@@ -23,7 +23,14 @@
     "pedestals:coin/fexportitemstack",
     "pedestals:coin/fexportmod",
     "pedestals:coin/fexportfood",
-    "pedestals:coin/fexportenchanted"
+    "pedestals:coin/fexportenchanted",
+    "pedestals:coin/frestock",
+    "pedestals:coin/fmagnetitem",
+    "pedestals:coin/fmagnetitemb",
+    "pedestals:coin/fmagnetitemstack",
+    "pedestals:coin/fmagnetitemstackb",
+    "pedestals:coin/fmagnetmod",
+    "pedestals:coin/fmagnetmodb"
 
   ]
 }

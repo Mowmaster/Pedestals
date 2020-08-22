@@ -38,6 +38,11 @@ public class ItemUpgradeFilteredExportItem extends ItemUpgradeBaseFilter
         return true;
     }
 
+    @Override
+    public Boolean canAcceptOpSpeed() {
+        return true;
+    }
+
     public Boolean canAcceptAdvanced() {return true;}
 
     @Override

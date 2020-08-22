@@ -401,7 +401,7 @@ public class ItemUpgradeBase extends Item {
         int returner = 0;
         TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
         if(pedestalInventory instanceof TilePedestal) {
-            returner =  ((TilePedestal) pedestalInventory).canAcceptItems(itemStackToAdd);
+            returner =  ((TilePedestal) pedestalInventory).canAcceptItems(world,posOfPedestal,itemStackToAdd);
         }
 
         return returner;
@@ -511,7 +511,7 @@ public class ItemUpgradeBase extends Item {
         return false;
     }
 
-    public int canAcceptCount(ItemStack inPedestal, ItemStack itemStackIncoming)
+    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
         int stackabe = itemStackIncoming.getMaxStackSize();
         return stackabe;

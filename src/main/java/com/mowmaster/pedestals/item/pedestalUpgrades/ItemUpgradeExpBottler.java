@@ -125,7 +125,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                     ItemStack getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
                                     TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                                     if(pedestalInv instanceof TilePedestal) {
-                                        if(((TilePedestal) pedestalInv).canAcceptItems(getBottle)>=rate)
+                                        if(((TilePedestal) pedestalInv).canAcceptItems(world,posOfPedestal,getBottle)>=rate)
                                         {
                                             int currentlyStoredExp = getXPStored(coinInPedestal);
                                             if(currentlyStoredExp > 0)

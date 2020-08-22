@@ -175,6 +175,12 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeEffectHarvester.HARVESTER, "harvester");
         addValueInfoPage(registration, ItemUpgradeEffectPlanter.PLANTER, "planter");
         addValueInfoPage(registration, ItemUpgradeEffectMagnet.MAGNET, "magnet");
+        addValueInfoPage(registration, ItemUpgradeFilteredMagnetItem.FMAGNETITEM, "fmagnetitem");
+        addValueInfoPage(registration, ItemUpgradeFilteredMagnetItemBlacklist.FMAGNETITEMB, "fmagnetitemb");
+        addValueInfoPage(registration, ItemUpgradeFilteredMagnetItemStack.FMAGNETITEMSTACK, "fmagnetitemstack");
+        addValueInfoPage(registration, ItemUpgradeFilteredMagnetItemStackBlacklist.FMAGNETITEMSTACKB, "fmagnetitemstackb");
+        addValueInfoPage(registration, ItemUpgradeFilteredMagnetMod.FMAGNETMOD, "fmagnetmod");
+        addValueInfoPage(registration, ItemUpgradeFilteredMagnetModBlacklist.FMAGNETMODB, "fmagnetmodb");
         addValueInfoPage(registration, ItemUpgradeEnergyExport.RFEXPORT, "rfexport");
         addValueInfoPage(registration, ItemUpgradeEnergyImport.RFIMPORT, "rfimport");
         addValueInfoPage(registration, ItemUpgradeEnergyRelay.RFRELAY, "rfrelay");
@@ -201,6 +207,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeFilteredExportFood.FEXPORTFOOD, "fexportfood");
         addValueInfoPage(registration, ItemUpgradeFilteredExportEnchanted.FEXPORTENCHANTED, "fexportenchanted");
         addValueInfoPage(registration, ItemUpgradeRestock.RESTOCK, "restock");
+        addValueInfoPage(registration, ItemUpgradeFilteredRestock.FRESTOCK, "frestock");
         addValueInfoPage(registration, ItemUpgradeFilterEnchanted.ENCHANTED, "filterenchanted");
         addValueInfoPage(registration, ItemUpgradeFilterEnchantedBlacklist.ENCHANTED, "filterenchantedb");
         addValueInfoPage(registration, ItemUpgradeFilterEnchantedCount.ENCHANTEDCOUNT1, "filterenchantedcount");

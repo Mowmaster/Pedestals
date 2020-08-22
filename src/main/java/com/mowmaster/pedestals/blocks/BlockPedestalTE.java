@@ -284,7 +284,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
                             }
                             else
                             {
-                                int availableSpace = tilePedestal.canAcceptItems(player.getHeldItemMainhand());
+                                int availableSpace = tilePedestal.canAcceptItems(worldIn,pos,player.getHeldItemMainhand());
                                 if(availableSpace>0)
                                 {
                                     if (tilePedestal.addItem(player.getHeldItemMainhand()))
@@ -336,7 +336,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
                         }
                         else
                         {
-                            int availableSpace = tilePedestal.canAcceptItems(player.getHeldItemMainhand());
+                            int availableSpace = tilePedestal.canAcceptItems(worldIn,pos,player.getHeldItemMainhand());
                             if(availableSpace>0)
                             {
                                 if (tilePedestal.addItem(player.getHeldItemMainhand()))
@@ -385,7 +385,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
                     }
                     else
                     {
-                        int availableSpace = tilePedestal.canAcceptItems(player.getHeldItemMainhand());
+                        int availableSpace = tilePedestal.canAcceptItems(worldIn,pos,player.getHeldItemMainhand());
                         if(availableSpace>0)
                         {
                             if (tilePedestal.addItem(player.getHeldItemMainhand()))
@@ -425,7 +425,7 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
                 }
                 else
                 {
-                    int availableSpace = tilePedestal.canAcceptItems(player.getHeldItemMainhand());
+                    int availableSpace = tilePedestal.canAcceptItems(worldIn,pos,player.getHeldItemMainhand());
                     if(availableSpace>0)
                     {
                         if (tilePedestal.addItem(player.getHeldItemMainhand()))

@@ -56,13 +56,13 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
             if(!world.isBlockPowered(pedestalPos))
             {
                 if (tick%speed == 0) {
-                    upgradeAction(world,pedestalPos,coinInPedestal);
+                    upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int transferRate = getItemTransferRate(coinInPedestal);
@@ -113,6 +113,7 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                                                         ItemStack itemInInv = ItemStack.EMPTY;
                                                         itemInInv = IntStream.range(0,range)//Int Range
                                                                 .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
+                                                                .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptCount(world,getRecievers.get(slot.get()),((TilePedestal)world.getTileEntity(getRecievers.get(slot.get()))).getItemInPedestal(),itemStack)>0)
                                                                 .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,getRecievers.get(slot.get()),itemStack))
                                                             .findFirst().orElse(ItemStack.EMPTY);
 

@@ -16,7 +16,7 @@ public class ItemUpgradeDefault extends ItemUpgradeBase
     public ItemUpgradeDefault(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public int canAcceptCount(ItemStack inPedestal, ItemStack itemStackIncoming) {
+    public int canAcceptCount(World world, BlockPos pos,ItemStack inPedestal, ItemStack itemStackIncoming) {
         /*int allow = 1;
         if(inPedestal.getCount() > 0)
         {

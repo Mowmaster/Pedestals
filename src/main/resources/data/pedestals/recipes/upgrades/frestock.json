@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/restock"
+    },
+    {
+      "tag": "pedestals:filters"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/frestock"
+  }
+}

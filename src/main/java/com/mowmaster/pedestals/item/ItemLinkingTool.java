@@ -30,6 +30,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -42,6 +43,7 @@ public class ItemLinkingTool extends Item {
 
     private static final BlockPos defaultPos = new BlockPos(0,-2000,0);
     public BlockPos storedPosition = defaultPos;
+    public List<BlockPos> storedPositionList = new ArrayList<>();
 
     public ItemLinkingTool() {
         super(new Item.Properties().maxStackSize(1).containerItem(DEFAULT).group(PEDESTALS_TAB));
@@ -86,6 +88,12 @@ public class ItemLinkingTool extends Item {
                 {
                     if(player.getHeldItemMainhand().isEnchanted()==false)
                     {
+                        TileEntity tile = worldIn.getTileEntity(pos);
+                        if(tile instanceof TilePedestal)
+                        {
+                            TilePedestal ped = ((TilePedestal)tile);
+                            this.storedPositionList = ped.getLocationList();
+                        }
                         //Gets Pedestal Clicked on Pos
                         this.storedPosition = pos;
                         //Writes to NBT
@@ -220,60 +228,64 @@ public class ItemLinkingTool extends Item {
     public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         //super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 
-        if (stack.hasTag()) {
-            this.getPosFromNBT(stack);
-            BlockPos pos = this.getStoredPosition(stack);
-            Random rand = new Random();
+        if(stack.isEnchanted() && isSelected)
+        {
+            if (stack.hasTag()) {
+                this.getPosFromNBT(stack);
+                BlockPos pos = this.getStoredPosition(stack);
+                Random rand = new Random();
 
-            int zmin = -8;
-            int zmax = 8+1;
-            int xmin = -8;
-            int xmax = 8+1;
-            int ymin = -8;
-            int ymax = 8+1;
+                int zmin = -8;
+                int zmax = 8+1;
+                int xmin = -8;
+                int xmax = 8+1;
+                int ymin = -8;
+                int ymax = 8+1;
 
-            if(worldIn.isAreaLoaded(pos,1))
-            {
-                if(worldIn.getTileEntity(pos) instanceof TilePedestal)
+                if(worldIn.isAreaLoaded(pos,1))
                 {
-                    TilePedestal pedestal = (TilePedestal)worldIn.getTileEntity(pos);
-                    int range = pedestal.getPedestalTransferRange();
-                    zmin = -range;
-                    zmax = range;
-                    xmin = -range;
-                    xmax = range;
-                    ymin = -range;
-                    ymax = range;
-
-                    int locationsNum = pedestal.getNumberOfStoredLocations();
-                    List<BlockPos> storedRecievers = pedestal.getLocationList();
-
-                    if(storedPosition!=defaultPos)
+                    if(worldIn.getTileEntity(pos) instanceof TilePedestal)
                     {
-                        if(isSelected)
+                        TilePedestal pedestal = ((TilePedestal)worldIn.getTileEntity(pos));
+                        int range = pedestal.getPedestalTransferRange();
+                        zmin = -range;
+                        zmax = range;
+                        xmin = -range;
+                        xmax = range;
+                        ymin = -range;
+                        ymax = range;
+
+                        //ToDo: Being lazy and not storing these values on the item in nbt, if people complain, then do it... i guess
+                        int locationsNum = storedPositionList.size();
+                        List<BlockPos> storedRecievers = storedPositionList;
+
+                        if(storedPosition!=defaultPos)
                         {
-                            if(worldIn.isRemote)
+                            if(isSelected)
                             {
-                                ticker++;
-
-                                for(int i=0;i<locationsNum;i++)
+                                if(worldIn.isRemote)
                                 {
-                                    float val = i*0.125f;
-                                    spawnParticleAroundPedestalBase(worldIn,ticker,storedRecievers.get(i),val,val,val,1.0f);
-                                }
+                                    ticker++;
 
-                                if(ticker>30)
-                                {
-                                    //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
-                                    for (int c = zmin; c <= zmax; c++) {
-                                        for (int a = xmin; a <= xmax; a++) {
-                                            for (int b = ymin; b <= ymax; b++) {
-                                                worldIn.addParticle(ParticleTypes.WHITE_ASH,true,pos.add(a,b,c).getX()+0.5f,pos.add(a,b,c).getY()+0.5f,pos.add(a,b,c).getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
-                                            }
-                                        }
+                                    for(int i=0;i<locationsNum;i++)
+                                    {
+                                        float val = i*0.125f;
+                                        spawnParticleAroundPedestalBase(worldIn,ticker,storedRecievers.get(i),val,val,val,1.0f);
                                     }
 
-                                    ticker=0;
+                                    if(ticker>30)
+                                    {
+                                        //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
+                                        for (int c = zmin; c <= zmax; c++) {
+                                            for (int a = xmin; a <= xmax; a++) {
+                                                for (int b = ymin; b <= ymax; b++) {
+                                                    worldIn.addParticle(ParticleTypes.WHITE_ASH,true,pos.add(a,b,c).getX()+0.5f,pos.add(a,b,c).getY()+0.5f,pos.add(a,b,c).getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
+                                                }
+                                            }
+                                        }
+
+                                        ticker=0;
+                                    }
                                 }
                             }
                         }

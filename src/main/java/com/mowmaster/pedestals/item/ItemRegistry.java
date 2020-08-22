@@ -32,6 +32,12 @@ public class ItemRegistry
         ItemUpgradeEffectHarvester.onItemRegistryReady(e);
         ItemUpgradeEffectPlanter.onItemRegistryReady(e);
         ItemUpgradeEffectMagnet.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetItem.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetItemBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetItemStack.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetItemStackBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetMod.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetModBlacklist.onItemRegistryReady(e);
 
         ItemUpgradeExpCollector.onItemRegistryReady(e);
         ItemUpgradeExpRelay.onItemRegistryReady(e);
@@ -61,6 +67,7 @@ public class ItemRegistry
         ItemUpgradeFilteredExportFood.onItemRegistryReady(e);
         ItemUpgradeFilteredExportEnchanted.onItemRegistryReady(e);
         ItemUpgradeRestock.onItemRegistryReady(e);
+        ItemUpgradeFilteredRestock.onItemRegistryReady(e);
 
         ItemUpgradeFilterItem.onItemRegistryReady(e);
         ItemUpgradeFilterItemBlacklist.onItemRegistryReady(e);
