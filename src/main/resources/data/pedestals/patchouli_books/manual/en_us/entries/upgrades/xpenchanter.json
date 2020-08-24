@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:upgrades/xpenchanter",
+      "recipe": "pedestals:upgrades/enchanter",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Exp-Enchanter)Wiki Link/$"
     },
     {
@@ -17,7 +17,11 @@
     },
     {
       "type": "text",
-      "text": "The enchanter will always try to enchant items at the maximum level it can, so some system to move bookshelves out of range would be needed if one wants to enchant below their maximum enchanting setup. Due to this enchanter working under water, torches between the enchanter and bookshelves do not decrease the enchantment level.$(br)This pedestal will pull items to be enchanted out from an inventory below it, enchant the item if enough levels are available (light purple particles will appear when it has enough xp to enchant at the current level, and then output the item to the pedestal.$(br)This enchanter currently allows for treasure enchants to be applied, there is currently no config for this, although one is planned."
+      "text": "The enchanter will always try to enchant items at the maximum level it can, so some system to move bookshelves out of range would be needed if one wants to enchant below their maximum enchanting setup. Due to this enchanter working under water, torches between the enchanter and bookshelves do not decrease the enchantment level."
+    },
+    {
+      "type": "text",
+      "text": "This pedestal will pull items to be enchanted out from an inventory below it, enchant the item if enough levels are available (light purple particles will appear when it has enough xp to enchant at the current level, and then output the item to the pedestal.$(br)This enchanter currently allows for treasure enchants to be applied, there is currently no config for this, although one is planned."
     }
   ]
 }

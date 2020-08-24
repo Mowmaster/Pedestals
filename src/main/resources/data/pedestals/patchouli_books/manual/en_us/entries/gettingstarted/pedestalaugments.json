@@ -14,13 +14,13 @@
       "title": "Pedestal Speed",
       "type": "crafting",
       "recipe": "pedestals:upgradespeed",
-      "text": "$(#00FFFF)Pedestal Speed Augment$()$(li)The Speed Upgrade decreases the delay when sending items from 20ticks(default), 10t, 5t, 3t, 2t, 1t."
+      "text": "$(#FF0000)Pedestal Speed Augment$()$(li)The Speed Upgrade decreases the delay when sending items from 20ticks(default), 10t, 5t, 3t, 2t, 1t."
     },
     {
       "title": "Pedestal Capacity",
       "type": "crafting",
       "recipe": "pedestals:upgradecapacity",
-      "text": "$(#00FFFF)Pedestal Transfer Capacity Augment$() $(li)The Capacity Upgrade Increases the amount of items sent per interval, from 4items(default), 8i, 16i, 32i, 48i, 64i."
+      "text": "$(#FF0000)Pedestal Transfer Capacity Augment$() $(li)The Capacity Upgrade Increases the amount of items sent per interval, from 4items(default), 8i, 16i, 32i, 48i, 64i."
     }
   ]
 }

@@ -13,15 +13,15 @@
     },
     {
       "type": "text",
-      "text": "Crafted with the Breaker, Magnet, Filter(any), and Smelter Upgrades.$(br)Functions similar to the tree chopper, except it breaks blocks.$(br)$(#00FFFF)Like the Breaker Upgrade it was crafted with,$() It breaks blocks dropping the items, Enchanting this upgrade with silktouch or fortune will apply those effects to the mining."
+      "text": "Crafted with the Breaker, Magnet, Filter(any), and Smelter Upgrades.$(br)Functions similar to the tree chopper, except it breaks blocks.$(br)$(#FF0000)Like the Breaker Upgrade it was crafted with,$() It breaks blocks dropping the items, Enchanting this upgrade with silktouch or fortune will apply those effects to the mining."
     },
     {
       "type": "text",
-      "text": "$(#00FFFF)Like the Magnet Upgrade it was crafted with,$() it will magnet up items within the range of operation, putting those items in the pedestal to be transferred out.$(#00FFFF)Like the Filter Upgrade it was crafted with,$() it uses an inventory 'below' as a whitelist of blocks to break, the blacklist version will skip the blocks when mining."
+      "text": "$(#FF0000)Like the Magnet Upgrade it was crafted with,$() it will magnet up items within the range of operation, putting those items in the pedestal to be transferred out.$(#FF0000)Like the Filter Upgrade it was crafted with,$() it uses an inventory 'below' as a whitelist of blocks to break, the blacklist version will skip the blocks when mining."
     },
     {
       "type": "text",
-      "text": "$(br)$(#00FFFF)Like the Smelter Upgrade it was crafted with,$() it requires fuel to run. $(br)Powering the pedestal off will halt all its functions except fuel absorption.$(br)It can be enchanted with Speed, Range(Effects Height), and Capacity (Effects AOE) Enchantments.$(br)It can also be enchanted with Silktouch and Fortune vanilla enchants using the anvil upgrade."
+      "text": "$(br)$(#FF0000)Like the Smelter Upgrade it was crafted with,$() it requires fuel to run. $(br)Powering the pedestal off will halt all its functions except fuel absorption.$(br)It can be enchanted with Speed, Range(Effects Height), and Capacity (Effects AOE) Enchantments.$(br)It can also be enchanted with Silktouch and Fortune vanilla enchants using the anvil upgrade."
     }
   ]
 }

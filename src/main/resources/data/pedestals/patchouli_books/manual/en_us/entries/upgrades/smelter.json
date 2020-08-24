@@ -1,14 +1,14 @@
 {
   "category": "upgrades",
-  "name": "Crushing Upgrade",
+  "name": "Smelter Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/crusher",
+  "icon": "pedestals:coin/smelter",
   "sortnum": 30,
   "priority": true,
   "pages": [
     {
       "type": "text",
-      "text": "These Upgrades Function Similarly:$(li)Smelting Upgrade$(li)Energy Smelting Upgrade$(br)Put an inventory (like a chest) under the pedestal for the inputs.$(br)Processed Outputs will come out the top of the pedestal, the machine will not smelt any items while it already has an item in it.$(br)Connect another pedestal to the furnace one to automate the outputs."
+      "text": "Similar Upgrades:$(li)Smelting Upgrade$(li)Energy Smelting Upgrade$(br)Put an inventory (like a chest) under the pedestal for the inputs.$(br)Processed Outputs will come out the top of the pedestal, the machine will not smelt any items while it already has an item in it.$(br)Connect another pedestal to the furnace one to automate the outputs."
     },
     {
       "type": "crafting",

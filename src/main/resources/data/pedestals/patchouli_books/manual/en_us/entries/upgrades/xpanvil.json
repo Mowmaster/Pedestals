@@ -8,20 +8,35 @@
   "pages": [
     {
       "type": "crafting",
-      "recipe": "pedestals:upgrades/xpanvil",
+      "recipe": "pedestals:upgrades/anvil",
       "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Exp-Anvil)Wiki Link/$"
     },
     {
       "type": "text",
-      "text": "This upgrade consumes exp, it cannot transfer exp out.$(br)The exp anvil can repair items in the inventory 'below' using its stored xp, the repair cost is similar to the mending enchantment.$(br)For combing enchantments or renaming tools, an infusion style structure is required.$(br)In relation to the pedestal with the anvil upgrade, a pedestal needs to be placed with a 1 block space in between, to the north, east, south, and west. You are not required to have these 4 additional pedestals, it just increases the amount of items that can be combined at once."
+      "text": "This upgrade consumes exp, it cannot transfer exp out.$(br)The exp anvil can repair items in the inventory 'below' using its stored xp, the repair cost is similar to the mending enchantment.$(br)For combing enchantments or renaming tools, an infusion style structure is required.$(br)In relation to the pedestal with the anvil upgrade, a pedestal needs to be placed with a 1 block space in between, to the north, east, south, and west."
     },
     {
       "type": "text",
-      "text": "Items in the below inventory will be repaired first, and then the anvil pedestal will check if there is anything to be combined, if nothing exists it will output the item into the pedestal.$(li)A renamed nametag in a sorrounding pedestal will be consumed and apply its name to the tool.$(li)Books or even other enchanted items can also be added to the sorrounding pedestals their enchants will be transferred to the item being combined.$(li)When combining, if the resulting enchantment will be above the normal vanilla limit, diamonds equaling the total of all enchant levels over max on the resulting item is needed, for example: fortune 3, unbreaking 3 combined with eff 5, fort, 3, unbr 3 would result in eff 5, fort 4, unbr 4, this would require 8 diamonds to be in one of the sorrounding pedestals in order to perform that combination, otherwise the result would be eff 5, fort 3, unbr 3."
+      "text": "You are not required to have these 4 additional pedestals, it just increases the amount of items that can be combined at once.$(br)Items in the below inventory will be repaired first, and then the anvil pedestal will check if there is anything to be combined, if nothing exists it will output the item into the pedestal.$(li)A renamed nametag in a sorrounding pedestal will be consumed and apply its name to the tool."
     },
     {
       "type": "text",
-      "text": "$(li)Failing to accurately provide enough diamonds when over combining will revert the enchantments on the item back to vanilla maximums.$(li)When combining, the Exp cost is equal to the resulting enchantment level of each enchant, multiplied by a value corresponding with their enchantment rarity(1-4), since the anvil can only hold a maximum of 100 levels, some enchants are capped at lower levels then others do to their exp cost to combine.$(li)While being able to combine enchantments over the max, and even some enchants that cant normally be applied together, on items that normally cant accept enchants. May appear to be powerful, an example of say fortune 16, would require over 8k fortune 3 books and 40k diamonds to make, not counting the levels required."
+      "text": "$(li)Books or even other enchanted items can also be added to the sorrounding pedestals their enchants will be transferred to the item being combined."
+    },
+    {
+      "type": "text",
+      "title":"Over Combining",
+      "text": "$(li)When combining, if the resulting enchantment will be above the normal vanilla limit, diamonds equaling the total of all enchant levels over max on the resulting item is needed, for example: fortune 3, unbreaking 3 combined with eff 5, fort, 3, unbr 3 would result in eff 5, fort 4, unbr 4, this would require 8 diamonds to be in one of the sorrounding pedestals in order to perform that combination, otherwise the result would be eff 5, fort 3, unbr 3."
+    },
+    {
+      "type": "text",
+      "text": "$(li)Failing to accurately provide enough diamonds when over combining will revert the enchantments on the item back to vanilla maximums.$(li)When combining, the Exp cost is equal to the resulting enchantment level of each enchant, multiplied by a value corresponding with their enchantment rarity(1-4), since the anvil can only hold a maximum of 100 levels, some enchants are capped at lower levels then others do to their exp cost to combine."
+    },
+    {
+      "type": "text",
+      "text": "$(li)While being able to combine enchantments over the max, and even some enchants that cant normally be applied together, on items that normally cant accept enchants. May appear to be powerful, an example of say fortune 16, would require over 8k fortune 3 books and 40k diamonds to make, not counting the levels required."
     }
+
+
   ]
 }

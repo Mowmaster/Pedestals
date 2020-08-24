@@ -2,7 +2,7 @@
   "category": "upgrades",
   "name": "Auto Attacker Upgrade",
   "subtitle": "",
-  "icon": "pedestals:coin/attacker",
+  "icon": "pedestals:coin/attack",
   "sortnum": 37,
   "priority": true,
   "pages": [

@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Pedestal-Basic-Use)Pedestal Aesthetics/$ $(li)To color a pedestal, right click any pedestal with a Colored Pallet right after you've just placed it down.(Once Colored it will Keep its color when broken). $(l:https://github.com/Mowmaster/Pedestals/wiki/Colored-Pedestals#making-colored-pedestals)Making Colored Pedestals/$ $(li)To start you'll need a normal Pedestal, or if you already have a Colored Pedestal, that will work as well."
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Pedestal-Basic-Use)Pedestal Aesthetics/$ $(li)To color a pedestal, right click any pedestal with a Colored Pallet right after you've just placed it down.(Once Colored it will Keep its color when broken).$(br) $(l:https://github.com/Mowmaster/Pedestals/wiki/Colored-Pedestals#making-colored-pedestals)Making Colored Pedestals/$ $(li)To start you'll need a normal Pedestal, or if you already have a Colored Pedestal, that will work as well."
     },
     {
       "type": "text",
@@ -16,11 +16,7 @@
     },
     {
       "type": "text",
-      "text": "$(li)Lastly, use Colored Pallets on Pedestals by using right click.(Once Colored it will Keep its color when broken) $(li)To make a Pedestal Light Up, R-Click on it with a block of Glowstone.(You'll get the glowstone back when you break the pedestal)"
-    },
-    {
-      "type": "text",
-      "text": "$(li)To Waterlog a Pedestal in water, Place it in water, Or Place a water bucket in the same block space as the pedestal.(This is really useful for farms as it is a water source block to keep your field moist)"
+      "text": "$(li)Lastly, use Colored Pallets on Pedestals by using right click.(Once Colored it will Keep its color when broken) $(li)To make a Pedestal Light Up, R-Click on it with a block of Glowstone.(You'll get the glowstone back when you break the pedestal)$(li)To Waterlog a Pedestal in water, Place it in water, Or Place a water bucket in the same block space as the pedestal.(This is really useful for farms as it is a water source block to keep your field moist)"
     }
   ]
 }
