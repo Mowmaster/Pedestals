@@ -41,7 +41,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemLinkingTool extends Item {
 
-    private static final BlockPos defaultPos = new BlockPos(0,-2000,0);
+    public static final BlockPos defaultPos = new BlockPos(0,-2000,0);
     public BlockPos storedPosition = defaultPos;
     public List<BlockPos> storedPositionList = new ArrayList<>();
 
@@ -234,63 +234,67 @@ public class ItemLinkingTool extends Item {
     public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         //super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 
-        if(stack.isEnchanted() && isSelected)
+        if(entityIn instanceof PlayerEntity)
         {
-            if (stack.hasTag()) {
-                this.getPosFromNBT(stack);
-                BlockPos pos = this.getStoredPosition(stack);
-                Random rand = new Random();
+            PlayerEntity player = ((PlayerEntity)entityIn);
+            if(stack.isEnchanted() && isSelected || player.getHeldItemOffhand().getItem() instanceof ItemLinkingTool)
+            {
+                if (stack.hasTag()) {
+                    this.getPosFromNBT(stack);
+                    BlockPos pos = this.getStoredPosition(stack);
+                    Random rand = new Random();
 
-                int zmin = -8;
-                int zmax = 8+1;
-                int xmin = -8;
-                int xmax = 8+1;
-                int ymin = -8;
-                int ymax = 8+1;
+                    int zmin = -8;
+                    int zmax = 8+1;
+                    int xmin = -8;
+                    int xmax = 8+1;
+                    int ymin = -8;
+                    int ymax = 8+1;
 
-                if(worldIn.isAreaLoaded(pos,1))
-                {
-                    if(worldIn.getTileEntity(pos) instanceof TilePedestal)
+                    if(worldIn.isAreaLoaded(pos,1))
                     {
-                        TilePedestal pedestal = ((TilePedestal)worldIn.getTileEntity(pos));
-                        int range = pedestal.getPedestalTransferRange();
-                        zmin = -range;
-                        zmax = range;
-                        xmin = -range;
-                        xmax = range;
-                        ymin = -range;
-                        ymax = range;
-
-
-                        List<BlockPos> storedRecievers = getStoredPositionList(stack);
-                        int locationsNum = storedRecievers.size();
-
-                        if(storedPosition!=defaultPos)
+                        if(worldIn.getTileEntity(pos) instanceof TilePedestal)
                         {
-                            if(isSelected)
+                            TilePedestal pedestal = ((TilePedestal)worldIn.getTileEntity(pos));
+                            int range = pedestal.getPedestalTransferRange();
+                            zmin = -range;
+                            zmax = range;
+                            xmin = -range;
+                            xmax = range;
+                            ymin = -range;
+                            ymax = range;
+
+
+                            List<BlockPos> storedRecievers = getStoredPositionList(stack);
+                            int locationsNum = storedRecievers.size();
+
+                            if(storedPosition!=defaultPos)
                             {
-                                if(worldIn.isRemote)
+                                if(isSelected)
                                 {
-                                    ticker++;
-
-                                    for(int i=0;i<locationsNum;i++)
+                                    if(worldIn.isRemote)
                                     {
-                                        float val = i*0.125f;
-                                        spawnParticleAroundPedestalBase(worldIn,ticker,storedPositionList.get(i),val,val,val,1.0f);
-                                    }
+                                        ticker++;
 
-                                    if(ticker>30)
-                                    {
-                                        //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
-                                        for (int c = zmin; c <= zmax; c++) {
-                                            for (int a = xmin; a <= xmax; a++) {
-                                                for (int b = ymin; b <= ymax; b++) {
-                                                    worldIn.addParticle(ParticleTypes.WHITE_ASH,true,pos.add(a,b,c).getX()+0.5f,pos.add(a,b,c).getY()+0.5f,pos.add(a,b,c).getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
-                                                }
-                                            }
+                                        for(int i=0;i<locationsNum;i++)
+                                        {
+                                            float val = i*0.125f;
+                                            spawnParticleAroundPedestalBase(worldIn,ticker,storedPositionList.get(i),val,val,val,1.0f);
                                         }
 
-                                        ticker=0;
+                                        if(ticker>30)
+                                        {
+                                            //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
+                                            for (int c = zmin; c <= zmax; c++) {
+                                                for (int a = xmin; a <= xmax; a++) {
+                                                    for (int b = ymin; b <= ymax; b++) {
+                                                        worldIn.addParticle(ParticleTypes.WHITE_ASH,true,pos.add(a,b,c).getX()+0.5f,pos.add(a,b,c).getY()+0.5f,pos.add(a,b,c).getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
+                                                    }
+                                                }
+                                            }
+
+                                            ticker=0;
+                                        }
                                     }
                                 }
                             }

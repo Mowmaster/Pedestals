@@ -152,61 +152,65 @@ public class ItemUpgradeTool extends Item {
     public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         //super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 
-        if(stack.isEnchanted() && isSelected)
-        {
-            if (stack.hasTag()) {
-                this.getPosFromNBT(stack);
-                BlockPos pos = this.getStoredPosition(stack);
-                int[] getWorkArea = this.getWorkPosFromNBT(stack);
-                Random rand = new Random();
+        if(entityIn instanceof PlayerEntity) {
 
-                BlockPos negNums = pos;
-                BlockPos posNums = pos;
+            PlayerEntity player = ((PlayerEntity) entityIn);
+            if (stack.isEnchanted() && isSelected || player.getHeldItemOffhand().getItem() instanceof ItemUpgradeTool)
+            {
+                if (stack.hasTag()) {
+                    this.getPosFromNBT(stack);
+                    BlockPos pos = this.getStoredPosition(stack);
+                    int[] getWorkArea = this.getWorkPosFromNBT(stack);
+                    Random rand = new Random();
 
-                if(worldIn.isAreaLoaded(pos,1))
-                {
-                    if(worldIn.getTileEntity(pos) instanceof TilePedestal)
+                    BlockPos negNums = pos;
+                    BlockPos posNums = pos;
+
+                    if(worldIn.isAreaLoaded(pos,1))
                     {
-                        negNums = getNegRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);
-                        posNums = getPosRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);
-                    }
-                }
-
-                if(storedPosition!=defaultPos)
-                {
-                    if(isSelected)
-                    {
-                        //System.out.println("Tick: "+pos);
-                        if(worldIn.isRemote)
+                        if(worldIn.getTileEntity(pos) instanceof TilePedestal)
                         {
-                            ticker++;
-
-                            if(getWorkArea[3]<=0)
-                            {
-                                if(ticker>30)
-                                {
-                                    //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
-                                    for (int x = negNums.getX(); x <= posNums.getX(); x++) {
-                                        for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
-                                            for (int y = negNums.getY(); y <= posNums.getY(); y++) {
-                                                BlockPos blockToParti = new BlockPos(x, y, z);
-                                                worldIn.addParticle(ParticleTypes.ASH,true,blockToParti.getX()+0.5f,blockToParti.getY()+0.5f,blockToParti.getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
-                                            }
-                                        }
-                                    }
-                                    ticker=0;
-                                }
-                            }
-                            else
-                            {
-                                BlockPos blockToParti = new BlockPos(getWorkArea[0], getWorkArea[1], getWorkArea[2]);
-                                spawnParticleAroundPedestalBase(worldIn,ticker,blockToParti,0.0f,0.0f,0.0f,1.0f);
-                            }
-
+                            negNums = getNegRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);
+                            posNums = getPosRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);
                         }
                     }
-                }
 
+                    if(storedPosition!=defaultPos)
+                    {
+                        if(isSelected)
+                        {
+                            //System.out.println("Tick: "+pos);
+                            if(worldIn.isRemote)
+                            {
+                                ticker++;
+
+                                if(getWorkArea[3]<=0)
+                                {
+                                    if(ticker>30)
+                                    {
+                                        //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
+                                        for (int x = negNums.getX(); x <= posNums.getX(); x++) {
+                                            for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
+                                                for (int y = negNums.getY(); y <= posNums.getY(); y++) {
+                                                    BlockPos blockToParti = new BlockPos(x, y, z);
+                                                    worldIn.addParticle(ParticleTypes.ASH,true,blockToParti.getX()+0.5f,blockToParti.getY()+0.5f,blockToParti.getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
+                                                }
+                                            }
+                                        }
+                                        ticker=0;
+                                    }
+                                }
+                                else
+                                {
+                                    BlockPos blockToParti = new BlockPos(getWorkArea[0], getWorkArea[1], getWorkArea[2]);
+                                    spawnParticleAroundPedestalBase(worldIn,ticker,blockToParti,0.0f,0.0f,0.0f,1.0f);
+                                }
+
+                            }
+                        }
+                    }
+
+                }
             }
         }
     }
