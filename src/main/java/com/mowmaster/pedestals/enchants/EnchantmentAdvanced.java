@@ -66,5 +66,10 @@ public class EnchantmentAdvanced extends Enchantment
     public boolean isAllowedOnBooks() {
         return false;
     }
+
+    @Override
+    public boolean canGenerateInLoot() {
+        return false;
+    }
 }
 
