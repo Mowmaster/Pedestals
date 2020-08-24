@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.blocks;
 
+import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.item.ItemLinkingTool;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
@@ -10,7 +11,10 @@ import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -43,6 +47,8 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -248,6 +254,15 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
             if (tileEntity instanceof TilePedestal) {
                 TilePedestal tilePedestal = (TilePedestal) tileEntity;
 
+                if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
+                {
+                    return ActionResultType.FAIL;
+                }
+                if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeTool)
+                {
+                    return ActionResultType.FAIL;
+                }
+
                 if(player.isCrouching())
                 {
                     if (player.getHeldItemMainhand().isEmpty())
@@ -349,14 +364,6 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
                         }
                     }
                 }
-                else if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
-                {
-                    return ActionResultType.FAIL;
-                }
-                else if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeTool)
-                {
-                    return ActionResultType.FAIL;
-                }
                 else if(player.getHeldItemMainhand().getItem().equals(ItemColorPallet.COLORPALLET))
                 {
                     if(tilePedestal.addColor(player.getHeldItemMainhand()))
@@ -439,6 +446,73 @@ public class BlockPedestalTE extends DirectionalBlock implements IWaterLoggable{
             }
         }
         return ActionResultType.SUCCESS;
+    }
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        //super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+
+        if(!worldIn.isRemote)
+        {
+            if(placer instanceof PlayerEntity)
+            {
+                PlayerEntity player = ((PlayerEntity)placer);
+                ItemStack offhand = placer.getHeldItemOffhand();
+                if(offhand.getItem() instanceof ItemLinkingTool)
+                {
+                    ItemLinkingTool linkingTool = ((ItemLinkingTool)offhand.getItem());
+                    TranslationTextComponent linksucess = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_success");
+                    linksucess.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkunsuccess = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_unsucess");
+                    linkunsuccess.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkremoved = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_removed");
+                    linkremoved.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkitsself = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_itsself");
+                    linkitsself.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linknetwork = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_network");
+                    linknetwork.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkdistance = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_distance");
+                    linkdistance.mergeStyle(TextFormatting.WHITE);
+                    if(offhand.hasTag() && offhand.isEnchanted())
+                    {
+                        //Checks if clicked blocks is a Pedestal
+                        if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE)
+                        {
+                            //Checks Tile at location to make sure its a TilePedestal
+                            TileEntity tileEntity = worldIn.getTileEntity(pos);
+                            if (tileEntity instanceof TilePedestal) {
+                                TilePedestal tilePedestal = (TilePedestal) tileEntity;
+
+                                //checks if connecting pedestal is out of range of the senderPedestal
+                                if(linkingTool.isPedestalInRange(tilePedestal,linkingTool.getStoredPosition(offhand)))
+                                {
+                                    //Checks if pedestals to be linked are on same networks or if one is neutral
+                                    if(tilePedestal.canLinkToPedestalNetwork(linkingTool.getStoredPosition(offhand)))
+                                    {
+                                        //If stored location isnt the same as the connecting pedestal
+                                        if(!tilePedestal.isSamePedestal(linkingTool.getStoredPosition(offhand)))
+                                        {
+                                            //Checks if the conenction hasnt been made once already yet
+                                            if(!tilePedestal.isAlreadyLinked(linkingTool.getStoredPosition(offhand)))
+                                            {
+                                                //Checks if senderPedestal has locationSlots available
+                                                //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
+                                                if(tilePedestal.storeNewLocation(linkingTool.getStoredPosition(offhand)))
+                                                {
+                                                    player.sendMessage(linksucess,Util.DUMMY_UUID);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else player.sendMessage(linknetwork,Util.DUMMY_UUID);
+                                }
+                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
