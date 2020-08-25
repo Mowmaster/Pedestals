@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.tiles.TilePedestal;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -25,6 +26,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -153,6 +155,22 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
     public int getExpBuffer(ItemStack stack)
     {
         return  15;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void onRandomDisplayTick(TilePedestal pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        int modifier = getBottlingRate(coin);
+        int rate = (modifier * 11);
+        if(!world.isBlockPowered(pos))
+        {
+            if(getXPStored(coin)>=rate)
+            {
+                spawnParticleAroundPedestalBase(world,tick,pos,0.2f,0.95f,0.2f,1.0f);
+            }
+        }
     }
 
     @Override
