@@ -44,7 +44,14 @@ public class ItemUpgradeFilteredExportEnchanted extends ItemUpgradeBaseFilter
         return true;
     }
 
+    @Override
     public Boolean canAcceptAdvanced() {return true;}
+
+    @Override
+    public int getItemEnchantability()
+    {
+        return 10;
+    }
 
     @Override
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)

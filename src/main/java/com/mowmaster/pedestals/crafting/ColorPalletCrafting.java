@@ -80,12 +80,12 @@ public class ColorPalletCrafting
                         ResourceLocation grabRed = new ResourceLocation("forge", "dyes/red");
                         ResourceLocation grabGreen = new ResourceLocation("forge", "dyes/green");
                         ResourceLocation grabBlue = new ResourceLocation("forge", "dyes/blue");
-                        /*ITag.INamedTag<Item> RED_DYE = ItemTags.createOptional(grabRed);
+                        ITag.INamedTag<Item> RED_DYE = ItemTags.createOptional(grabRed);
                         ITag.INamedTag<Item> GREEN_DYE = ItemTags.createOptional(grabGreen);
-                        ITag.INamedTag<Item> BLUE_DYE = ItemTags.createOptional(grabBlue);*/
-                        ITag<Item> RED_DYE = ItemTags.getCollection().get(grabRed);
+                        ITag.INamedTag<Item> BLUE_DYE = ItemTags.createOptional(grabBlue);
+                        /*ITag<Item> RED_DYE = ItemTags.getCollection().get(grabRed);
                         ITag<Item> GREEN_DYE = ItemTags.getCollection().get(grabGreen);
-                        ITag<Item> BLUE_DYE = ItemTags.getCollection().get(grabBlue);
+                        ITag<Item> BLUE_DYE = ItemTags.getCollection().get(grabBlue);*/
 
                         if(stack.getItem() instanceof DyeItem)
                         {

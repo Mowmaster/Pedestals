@@ -373,7 +373,7 @@
     "item.pedestals.coin.rfsmelter.tooltip_rfstored": "Energy Stored: ",
     "item.pedestals.coin.rfsmelter.tooltip_rfcapacity": "Energy Capacity: ",
     "item.pedestals.coin.rfsmelter.chat_fuel": "Fuel Left: ",
-    "item.pedestals.coin.rfsmelter.chat_rate": "Items Crushed per Operation: ",
+    "item.pedestals.coin.rfsmelter.chat_rate": "Items Smelted per Operation: ",
     "item.pedestals.coin.rfsmelter.chat_speed": "Operational Speed: ",
     "jei.pedestals.rfsmelter.desc": "Place an Inventory Below the Pedestal for item inputs, Connect it to the Pedestal Energy Network to Fuel It, Outputs come out the top of the pedestal. Can Smelt anything a Vanila Furnace can.",
 
@@ -384,7 +384,7 @@
     "item.pedestals.coin.rfsawmill.tooltip_rfstored": "Energy Stored: ",
     "item.pedestals.coin.rfsawmill.tooltip_rfcapacity": "Energy Capacity: ",
     "item.pedestals.coin.rfsawmill.chat_fuel": "Fuel Left: ",
-    "item.pedestals.coin.rfsawmill.chat_rate": "Items Crushed per Operation: ",
+    "item.pedestals.coin.rfsawmill.chat_rate": "Items Sawn per Operation: ",
     "item.pedestals.coin.rfsawmill.chat_speed": "Operational Speed: ",
     "jei.pedestals.rfsawmill.desc": "Place an Inventory Below the Pedestal for item inputs, Connect it to the Pedestal Energy Network to Fuel It, Outputs come out the top of the pedestal. Saws Vanilla Wood Blocks Into other wood blocks, or sticks.",
 

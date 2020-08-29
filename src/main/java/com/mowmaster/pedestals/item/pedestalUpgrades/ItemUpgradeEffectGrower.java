@@ -140,16 +140,6 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         }
     }
 
-    /*@Override
-    @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
-    {
-        if(!world.isBlockPowered(pos))
-        {
-            spawnParticleAroundPedestalBase(world,tick,pos, ParticleTypes.HAPPY_VILLAGER);
-        }
-    }*/
-
     @Override
     public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {

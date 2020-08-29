@@ -43,8 +43,12 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
     }
 
     @Override
-    public Boolean canAcceptAdvanced() {
-        return true;
+    public Boolean canAcceptAdvanced() {return true;}
+
+    @Override
+    public int getItemEnchantability()
+    {
+        return 10;
     }
 
     @Override
