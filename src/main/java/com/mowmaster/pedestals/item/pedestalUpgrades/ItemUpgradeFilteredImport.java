@@ -2,10 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
 import com.mowmaster.pedestals.tiles.TilePedestal;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -64,139 +61,112 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos senderBelowInvPos = getPosOfBlockBelow(world,posOfPedestal,1);
         int transferRate = getItemTransferRate(coinInPedestal);
-        //int i = -1;
+        ItemStack senderBelowInvStack = ItemStack.EMPTY;
 
-        ItemStack itemFromInv = ItemStack.EMPTY;
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
-        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        TileEntity senderBelowInv = world.getTileEntity(senderBelowInvPos);
+        //Make sure this Inv isnt a pedestal
+        if(senderBelowInv instanceof TilePedestal) {
+            senderBelowInvStack = ItemStack.EMPTY;
+        }
+        else {
+            //Get Cap of Inv to pull items out of
+            LazyOptional<IItemHandler> senderBelowInvCap = findItemHandlerAtPos(world,senderBelowInvPos,getPedestalFacing(world, posOfPedestal),true);
+            if(hasAdvancedInventoryTargeting(coinInPedestal))senderBelowInvCap = findItemHandlerAtPosAdvanced(world,senderBelowInvPos,getPedestalFacing(world, posOfPedestal),true);
 
-            if(cap.isPresent())
+            //If Inv Is Valid
+            if(senderBelowInvCap.isPresent())
             {
-                IItemHandler handler = cap.orElse(null);
-                TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if(invToPullFrom instanceof TilePedestal) {
-                    itemFromInv = ItemStack.EMPTY;
-
-                }
-                else {
-                    if(handler != null)
-                    {
-                        ItemStack toImport = ItemStack.EMPTY;
-                        TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                        if(pedestalInv instanceof TilePedestal) {
-                            List<BlockPos> getRecievers = ((TilePedestal) pedestalInv).getLocationList();
-                            if(getRecievers.size()>0)
+                //Get Handler of present Inv
+                IItemHandler senderBelowInvHandler = senderBelowInvCap.orElse(null);
+                //Null Check it since we use the .orElse(null)
+                if(senderBelowInvHandler != null)
+                {
+                    ItemStack toImport = ItemStack.EMPTY;
+                    //Check for our pedestal
+                    TileEntity senderPedestalCheck = world.getTileEntity(posOfPedestal);
+                    if(senderPedestalCheck instanceof TilePedestal) {
+                        //Create a var for our Pedestal
+                        TilePedestal senderPedestal = ((TilePedestal) senderPedestalCheck);
+                        List<BlockPos> getRecievers = senderPedestal.getLocationList();
+                        if(getRecievers.size()>0)
+                        {
+                            for(AtomicInteger slot = new AtomicInteger(0); slot.get()<getRecievers.size();slot.set(slot.get()+1))
                             {
-                                for(AtomicInteger slot = new AtomicInteger(0); slot.get()<getRecievers.size();slot.set(slot.get()+1))
-                                {
-                                    //System.out.println(getRecievers.get(slot.get()));
-                                    TileEntity pedestalRec = world.getTileEntity(getRecievers.get(slot.get()));
-                                    if(pedestalRec instanceof TilePedestal) {
-                                        //Check if it has filter, if not return true
-                                        if(((TilePedestal) pedestalRec).hasFilter(((TilePedestal) pedestalRec)))
+                                BlockPos receiverConnection = getRecievers.get(slot.get());
+                                TileEntity pedestalRec = world.getTileEntity(receiverConnection);
+                                if(pedestalRec instanceof TilePedestal) {
+                                    TilePedestal receiverPedestal = ((TilePedestal) pedestalRec);
+                                    if(receiverPedestal.hasFilter(senderPedestal))
+                                    {
+                                        Item coinInPed = receiverPedestal.getCoinOnPedestal().getItem();
+                                        if(coinInPed instanceof ItemUpgradeBaseFilter)
                                         {
-                                            //System.out.println("HAS FILTER");
-                                            Item coinInPed = ((TilePedestal) pedestalRec).getCoinOnPedestal().getItem();
-                                            if(coinInPed instanceof ItemUpgradeBaseFilter)
+                                            int range = senderBelowInvHandler.getSlots();
+                                            ItemStack itemInInv = ItemStack.EMPTY;
+                                            itemInInv = IntStream.range(0,range)
+                                                    .mapToObj((senderBelowInvHandler)::getStackInSlot)
+                                                    .filter(itemStack -> !itemStack.isEmpty())
+                                                    .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,receiverConnection,itemStack))
+                                                    .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptCount(world,receiverConnection,((TilePedestal)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
+                                                    .findFirst().orElse(ItemStack.EMPTY);
+                                            if(!itemInInv.isEmpty())
                                             {
-                                                //Already checked if its a filter, so now check if it can accept items.
-                                                if(cap.isPresent())
-                                                {
-                                                    if(handler != null)
-                                                    {
-                                                        int range = handler.getSlots();
-
-                                                        ItemStack itemInInv = ItemStack.EMPTY;
-                                                        itemInInv = IntStream.range(0,range)//Int Range
-                                                                .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                                                                .filter(itemStack -> !itemStack.isEmpty())
-                                                                .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptCount(world,getRecievers.get(slot.get()),((TilePedestal)world.getTileEntity(getRecievers.get(slot.get()))).getItemInPedestal(),itemStack)>0)
-                                                                .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,getRecievers.get(slot.get()),itemStack))
-                                                            .findFirst().orElse(ItemStack.EMPTY);
-
-                                                        if(!itemInInv.isEmpty())
-                                                        {
-                                                            toImport = itemInInv.copy();
-                                                            break;
-                                                        }
-                                                    }
-                                                }
+                                                toImport = itemInInv.copy();
+                                                break;
                                             }
                                         }
-                                        else
+                                    }
+                                    else
+                                    {
+                                        int range = senderBelowInvHandler.getSlots();
+                                        ItemStack itemInInv = ItemStack.EMPTY;
+                                        itemInInv = IntStream.range(0,range)//Int Range
+                                                .mapToObj((senderBelowInvHandler)::getStackInSlot)//Function being applied to each interval
+                                                .filter(itemStack -> !itemStack.isEmpty())
+                                                .filter(itemStack -> senderPedestal.canSendToPedestal(receiverConnection,itemStack))
+                                                .findFirst().orElse(ItemStack.EMPTY);
+                                        if(!itemInInv.isEmpty())
                                         {
-                                            //System.out.println("NO FILTER");
-                                            Item coinInPed = ((TilePedestal) pedestalRec).getCoinOnPedestal().getItem();
-                                            //Already checked if its a filter, so now check if it can accept items.
-                                            if(cap.isPresent())
-                                            {
-                                                if(handler != null)
-                                                {
-                                                    int range = handler.getSlots();
-
-                                                    ItemStack itemInInv = ItemStack.EMPTY;
-                                                    itemInInv = IntStream.range(0,range)//Int Range
-                                                            .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                                                            .filter(itemStack -> !itemStack.isEmpty())
-                                                            .filter(itemStack -> ((TilePedestal) pedestalInv).canSendToPedestal(getRecievers.get(slot.get()),itemStack))
-                                                            .findFirst().orElse(ItemStack.EMPTY);
-
-                                                    if(!itemInInv.isEmpty())
-                                                    {
-                                                        toImport = itemInInv.copy();
-                                                        break;
-                                                    }
-                                                }
-                                            }
+                                            toImport = itemInInv.copy();
+                                            break;
                                         }
                                     }
                                 }
                             }
+                        }
 
-                            //System.out.println(toImport.getDisplayName());
-                            int i = getSlotWithMatchingStackExact(cap,toImport);
-                            //System.out.println(i);
-                            if(i>=0)
+
+                        //After an Item Allowed to be sent is found.
+                        int i = getSlotWithMatchingStackExact(senderBelowInvCap,toImport);
+                        if(i>=0)
+                        {
+                            int maxStackSizeAllowedInPedestal = 0;
+                            int roomLeftInPedestal = 0;
+                            senderBelowInvStack = senderBelowInvHandler.getStackInSlot(i);
+                            ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
+                            if(senderBelowInvStack != null && !senderBelowInvStack.isEmpty() && senderBelowInvStack.getItem() != Items.AIR)
                             {
-                                int maxStackSizeAllowedInPedestal = 0;
-                                int roomLeftInPedestal = 0;
-                                itemFromInv = handler.getStackInSlot(i);
-                                ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
-                                //if there IS a valid item in the inventory to pull out
-                                if(itemFromInv != null && !itemFromInv.isEmpty() && itemFromInv.getItem() != Items.AIR)
-                                {
-                                    //If pedestal is empty, if not then set max possible stack size for pedestal itemstack(64)
-                                    if(itemFromPedestal.isEmpty() || itemFromPedestal.equals(ItemStack.EMPTY))
-                                    {maxStackSizeAllowedInPedestal = 64;}
-                                    else
-                                    {maxStackSizeAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
-                                    //Get Room left in pedestal
-                                    roomLeftInPedestal = maxStackSizeAllowedInPedestal-itemFromPedestal.getCount();
-                                    //Get items stack count(from inventory)
-                                    int itemCountInInv = itemFromInv.getCount();
-                                    //Allowed transfer rate (from coin)
-                                    int allowedTransferRate = transferRate;
-                                    //Checks to see if pedestal can accept as many items as transferRate IF NOT it sets the new rate to what it can accept
-                                    if(roomLeftInPedestal < transferRate) allowedTransferRate = roomLeftInPedestal;
-                                    //Checks to see how many items are left in the slot IF ITS UNDER the allowedTransferRate then sent the max rate to that.
-                                    if(itemCountInInv < allowedTransferRate) allowedTransferRate = itemCountInInv;
-
-                                    ItemStack copyIncoming = itemFromInv.copy();
-                                    copyIncoming.setCount(allowedTransferRate);
-                                    handler.extractItem(i,allowedTransferRate ,false );
-                                    ((TilePedestal) pedestalInv).addItem(copyIncoming);
-                                }
+                                if(itemFromPedestal.isEmpty() || itemFromPedestal.equals(ItemStack.EMPTY))
+                                {maxStackSizeAllowedInPedestal = 64;}
+                                else
+                                {maxStackSizeAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
+                                roomLeftInPedestal = maxStackSizeAllowedInPedestal-itemFromPedestal.getCount();
+                                int itemCountInInv = senderBelowInvStack.getCount();
+                                int allowedTransferRate = transferRate;
+                                if(roomLeftInPedestal < transferRate) allowedTransferRate = roomLeftInPedestal;
+                                if(itemCountInInv < allowedTransferRate) allowedTransferRate = itemCountInInv;
+                                ItemStack copyIncoming = senderBelowInvStack.copy();
+                                copyIncoming.setCount(allowedTransferRate);
+                                senderBelowInvHandler.extractItem(i,allowedTransferRate ,false );
+                                senderPedestal.addItem(copyIncoming);
                             }
                         }
                     }
                 }
             }
-        //}
-
+        }
     }
 
     @Override
