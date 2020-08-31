@@ -156,17 +156,19 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
             List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10");
             Random rn = new Random();
 
-            DamageSource sourceE = new EntityDamageSource(list.get(rn.nextInt(10)),fakePlayer);
-            float damage = getAttackDamage(getEntityFromList,itemInPedestal,coinInPedestal);
+            LivingEntity selectedEntity = getTargetEntity(world,posOfPedestal,getEntityFromList);
 
-            if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
+            if(selectedEntity != null)
             {
-                damage *= 2.0f;
-            }
+                DamageSource sourceE = (selectedEntity instanceof AbstractRaiderEntity && ((AbstractRaiderEntity) selectedEntity).isLeader())?(new EntityDamageSource(list.get(rn.nextInt(10)),null)):(new EntityDamageSource(list.get(rn.nextInt(10)),fakePlayer));
+                float damage = getAttackDamage(getEntityFromList,itemInPedestal,coinInPedestal);
 
-            if(getTargetEntity(world,posOfPedestal,getEntityFromList) != null)
-            {
-                getTargetEntity(world,posOfPedestal,getEntityFromList).attackEntityFrom(sourceE,damage);
+                if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
+                {
+                    damage *= 2.0f;
+                }
+
+                selectedEntity.attackEntityFrom(sourceE,damage);
             }
         }
     }
