@@ -256,8 +256,6 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                                 setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
                                                 tileStoredPedestal.update();
                                             }
-
-                                            break;
                                         }
                                     }
                                 }
