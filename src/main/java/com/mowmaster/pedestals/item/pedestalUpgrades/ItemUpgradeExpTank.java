@@ -56,7 +56,7 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
                 value = 10000;//
                 break;
             case 5:
-                value=100000;//
+                value=20000;//~21862 levels seems to overflow the int.max
                 break;
             default: value=100;
         }
