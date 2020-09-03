@@ -12,9 +12,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -27,6 +25,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -137,9 +136,8 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
             //FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(Util.DUMMY_UUID,"fakeplayer"));
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack choppingAxe = new ItemStack(Items.DIAMOND_AXE,1);
-            if(!itemInPedestal.isEmpty())
-            {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND,itemInPedestal);
+            if (itemInPedestal.getItem() instanceof AxeItem || itemInPedestal.getToolTypes().contains(ToolType.AXE)) {
+                fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
             }
             else
             {

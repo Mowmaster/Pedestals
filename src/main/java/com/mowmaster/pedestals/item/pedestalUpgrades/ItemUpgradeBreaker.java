@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -135,9 +136,10 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
          */
 
         if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
-            if (itemInPedestal.getItem() instanceof PickaxeItem) {
+            if (itemInPedestal.getItem() instanceof PickaxeItem || itemInPedestal.getToolTypes().contains(ToolType.PICKAXE)) {
                 fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
-            } else {
+            }
+            else {
                 if (EnchantmentHelper.getEnchantments(coinOnPedestal).containsKey(Enchantments.SILK_TOUCH)) {
                     pickaxe.addEnchantment(Enchantments.SILK_TOUCH, 1);
                     fakePlayer.setHeldItem(Hand.MAIN_HAND, pickaxe);

@@ -12,9 +12,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -26,6 +24,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -123,27 +122,26 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             {
                 FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                 fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-                ItemStack choppingAxe = new ItemStack(Items.DIAMOND_AXE,1);
-                if(!itemInPedestal.isEmpty())
-                {
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND,itemInPedestal);
+                ItemStack harvestingHoe = new ItemStack(Items.DIAMOND_HOE,1);
+                if (itemInPedestal.getItem() instanceof HoeItem || itemInPedestal.getToolTypes().contains(ToolType.HOE)) {
+                    fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
                 }
                 else
                 {
                     if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
                     {
-                        choppingAxe.addEnchantment(Enchantments.SILK_TOUCH,1);
-                        fakePlayer.setHeldItem(Hand.MAIN_HAND,choppingAxe);
+                        harvestingHoe.addEnchantment(Enchantments.SILK_TOUCH,1);
+                        fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
                     }
                     else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
                     {
                         int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
-                        choppingAxe.addEnchantment(Enchantments.FORTUNE,lvl);
-                        fakePlayer.setHeldItem(Hand.MAIN_HAND,choppingAxe);
+                        harvestingHoe.addEnchantment(Enchantments.FORTUNE,lvl);
+                        fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
                     }
                     else
                     {
-                        fakePlayer.setHeldItem(Hand.MAIN_HAND,choppingAxe);
+                        fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
                     }
                 }
 
