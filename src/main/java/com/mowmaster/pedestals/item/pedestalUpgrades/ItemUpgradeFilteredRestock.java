@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -56,9 +56,9 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
         BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
 
         TileEntity tile = world.getTileEntity(posPedestal);
-        if(tile instanceof TilePedestal)
+        if(tile instanceof PedestalTileEntity)
         {
-            TilePedestal ped = ((TilePedestal)tile);
+            PedestalTileEntity ped = ((PedestalTileEntity)tile);
             ItemStack coin = ped.getCoinOnPedestal();
             int upgradeTransferRate = getItemTransferRate(coin);
             LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
@@ -96,9 +96,9 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
         BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
 
         TileEntity tile = world.getTileEntity(posPedestal);
-        if(tile instanceof TilePedestal)
+        if(tile instanceof PedestalTileEntity)
         {
-            TilePedestal ped = ((TilePedestal)tile);
+            PedestalTileEntity ped = ((PedestalTileEntity)tile);
             ItemStack coin = ped.getCoinOnPedestal();
             int upgradeTransferRate = getItemTransferRate(coin);
             LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
@@ -197,7 +197,7 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
             //Gets inventory TE then makes sure its not a pedestal
             TileEntity invToPushTo = world.getTileEntity(posInventory);
-            if(invToPushTo instanceof TilePedestal) {
+            if(invToPushTo instanceof PedestalTileEntity) {
                 itemFromPedestal = ItemStack.EMPTY;
             }
             else {
@@ -270,7 +270,7 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

@@ -1,51 +1,7 @@
 {
-	"parent": "block/cube_all",
+	"parent": "pedestals:block/pedestal_block",
 	"textures": {
-      "1": "#type",
-      "particle": "#typepart"
-	},
-	"elements": [
-		{
-			"from": [3, 0, 3],
-			"to": [13, 2, 13],
-			"faces": {
-				"north": {"uv": [0, 0, 10, 2], "texture": "#1", "tintindex": 1},
-				"east": {"uv": [0, 0, 10, 2], "texture": "#1", "tintindex": 1},
-				"south": {"uv": [0, 0, 10, 2], "texture": "#1", "tintindex": 1},
-				"west": {"uv": [0, 0, 10, 2], "texture": "#1", "tintindex": 1},
-				"up": {"uv": [3, 3, 13, 13], "texture": "#1", "tintindex": 1},
-				"down": {"uv": [3, 3, 13, 13], "texture": "#1", "tintindex": 1}
-			}
-		},
-		{
-			"from": [5, 2, 5],
-			"to": [11, 10, 11],
-			"faces": {
-				"north": {"uv": [5, 5, 11, 10], "texture": "#1", "tintindex": 1},
-				"east": {"uv": [4, 5, 10, 10], "texture": "#1", "tintindex": 1},
-				"south": {"uv": [5, 5, 11, 10], "texture": "#1", "tintindex": 1},
-				"west": {"uv": [5, 5, 11, 10], "texture": "#1", "tintindex": 1},
-				"up": {"uv": [0, 0, 6, 6], "texture": "#1", "tintindex": 1},
-				"down": {"uv": [0, 0, 6, 6], "texture": "#1", "tintindex": 1}
-			}
-		},
-        {
-          "from": [4, 10, 4],
-          "to": [12, 12, 12],
-          "faces": {
-            "north": {"uv": [0, 0, 8, 2], "texture": "#1", "tintindex": 1},
-            "east": {"uv": [0, 0, 8, 2], "texture": "#1", "tintindex": 1},
-            "south": {"uv": [0, 0, 8, 2], "texture": "#1", "tintindex": 1},
-            "west": {"uv": [0, 0, 8, 2], "texture": "#1", "tintindex": 1},
-            "up": {"uv": [2, 2, 14, 14], "texture": "#1", "tintindex": 1},
-            "down": {"uv": [4, 4, 12, 12], "texture": "#1", "tintindex": 1}
-          }
-        }
-	],
-	"groups": [
-		{
-			"name": "pedestal",
-			"children": [0, 1, 2]
-		}
-	]
+		"type": "pedestals:blocks/whitestone",
+		"typepart":"pedestals:blocks/whitestone"
+	}
 }

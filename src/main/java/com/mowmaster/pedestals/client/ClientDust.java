@@ -1,8 +1,10 @@
 package com.mowmaster.pedestals.client;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.item.ItemRegistry;
 import com.mowmaster.pedestals.references.Reference;
+import com.mowmaster.pedestals.tiles.render.PedestalRender;
 import com.mowmaster.pedestals.tiles.render.RenderPedestal;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -16,12 +18,14 @@ public class ClientDust {
     @SubscribeEvent
     public static void setup(ModelRegistryEvent e) {
         RenderPedestal.init(e);
+        PedestalRender.init(e);
     }
 
     @SubscribeEvent
     public static void onBlockColorsReady(ColorHandlerEvent.Block event)
     {
         BlockPedestalTE.handleBlockColors(event);
+        PedestalBlock.handleBlockColors(event);
     }
 
     @SubscribeEvent

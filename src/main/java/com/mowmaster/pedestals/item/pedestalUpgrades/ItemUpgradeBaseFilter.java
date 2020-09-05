@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -41,7 +41,7 @@ public class ItemUpgradeBaseFilter extends ItemUpgradeBase {
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

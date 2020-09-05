@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -67,7 +67,7 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
 
         TileEntity senderBelowInv = world.getTileEntity(senderBelowInvPos);
         //Make sure this Inv isnt a pedestal
-        if(senderBelowInv instanceof TilePedestal) {
+        if(senderBelowInv instanceof PedestalTileEntity) {
             senderBelowInvStack = ItemStack.EMPTY;
         }
         else {
@@ -86,9 +86,9 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                     ItemStack toImport = ItemStack.EMPTY;
                     //Check for our pedestal
                     TileEntity senderPedestalCheck = world.getTileEntity(posOfPedestal);
-                    if(senderPedestalCheck instanceof TilePedestal) {
+                    if(senderPedestalCheck instanceof PedestalTileEntity) {
                         //Create a var for our Pedestal
-                        TilePedestal senderPedestal = ((TilePedestal) senderPedestalCheck);
+                        PedestalTileEntity senderPedestal = ((PedestalTileEntity) senderPedestalCheck);
                         List<BlockPos> getRecievers = senderPedestal.getLocationList();
                         if(getRecievers.size()>0)
                         {
@@ -96,8 +96,8 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                             {
                                 BlockPos receiverConnection = getRecievers.get(slot.get());
                                 TileEntity pedestalRec = world.getTileEntity(receiverConnection);
-                                if(pedestalRec instanceof TilePedestal) {
-                                    TilePedestal receiverPedestal = ((TilePedestal) pedestalRec);
+                                if(pedestalRec instanceof PedestalTileEntity) {
+                                    PedestalTileEntity receiverPedestal = ((PedestalTileEntity) pedestalRec);
                                     if(receiverPedestal.hasFilter(senderPedestal))
                                     {
                                         Item coinInPed = receiverPedestal.getCoinOnPedestal().getItem();
@@ -109,7 +109,7 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                                                     .mapToObj((senderBelowInvHandler)::getStackInSlot)
                                                     .filter(itemStack -> !itemStack.isEmpty())
                                                     .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,receiverConnection,itemStack))
-                                                    .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptCount(world,receiverConnection,((TilePedestal)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
+                                                    .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptCount(world,receiverConnection,((PedestalTileEntity)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
                                                     .findFirst().orElse(ItemStack.EMPTY);
                                             if(!itemInInv.isEmpty())
                                             {
@@ -170,7 +170,7 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -163,7 +163,7 @@ public class ItemUpgradeFilteredExportItem extends ItemUpgradeBaseFilter
 
         //Gets inventory TE then makes sure its not a pedestal
         TileEntity invToPushTo = world.getTileEntity(posInventory);
-        if(invToPushTo instanceof TilePedestal) {
+        if(invToPushTo instanceof PedestalTileEntity) {
             itemFromPedestal = ItemStack.EMPTY;
         }
         else {
@@ -218,7 +218,7 @@ public class ItemUpgradeFilteredExportItem extends ItemUpgradeBaseFilter
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

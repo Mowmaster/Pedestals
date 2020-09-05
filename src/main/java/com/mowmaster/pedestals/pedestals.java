@@ -1,10 +1,12 @@
 package com.mowmaster.pedestals;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.creativeTab.CreativeTabBlock;
 import com.mowmaster.pedestals.item.ItemRegistry;
 import com.mowmaster.pedestals.recipes.PedestalsSerializers;
 import com.mowmaster.pedestals.references.Reference;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -100,6 +102,7 @@ public class pedestals
             // register a new block here
             //LOGGER.info("HELLO from Register Block");
             BlockPedestalTE.onBlockRegistryReady(blockRegistryEvent);
+            PedestalBlock.onBlockRegistryReady(blockRegistryEvent);
         }
 
         @SubscribeEvent
@@ -112,6 +115,7 @@ public class pedestals
         public static void onTileRegistryReady(RegistryEvent.Register<TileEntityType<?>> event)
         {
             TilePedestal.onTileEntityRegistry(event);
+            PedestalTileEntity.onTileEntityRegistry(event);
         }
     }
 }

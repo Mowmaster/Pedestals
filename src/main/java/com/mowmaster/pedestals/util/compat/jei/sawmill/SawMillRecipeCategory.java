@@ -72,6 +72,6 @@ public class SawMillRecipeCategory implements IRecipeCategory<SawMillRecipe>
 
     @Override
     public void draw(SawMillRecipe recipe, MatrixStack matrixStack, double mouseX, double mouseY) {
-        icon.draw(matrixStack, 30, 0);
+        //icon.draw(matrixStack, 30, 0);
     }
 }

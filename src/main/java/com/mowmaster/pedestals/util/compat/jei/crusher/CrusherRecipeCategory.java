@@ -71,6 +71,6 @@ public class CrusherRecipeCategory implements IRecipeCategory<CrusherRecipe>
 
     @Override
     public void draw(CrusherRecipe recipe, MatrixStack matrixStack, double mouseX, double mouseY) {
-        icon.draw(matrixStack, 30, 0);
+        //icon.draw(matrixStack, 30, 0);
     }
 }

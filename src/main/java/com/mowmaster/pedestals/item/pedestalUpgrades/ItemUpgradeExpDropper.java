@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -117,7 +117,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
 
 
         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-        if(pedestalInv instanceof TilePedestal) {
+        if(pedestalInv instanceof PedestalTileEntity) {
             int currentlyStoredExp = getXPStored(coinInPedestal);
             if(currentlyStoredExp > 0)
             {
@@ -139,7 +139,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn) {
+    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn) {
 
     }
 
@@ -149,7 +149,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
         int tr = 1;

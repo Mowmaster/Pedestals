@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -102,7 +102,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
         {
             IItemHandler handler = cap.orElse(null);
             TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof TilePedestal) {
+            if(invToPullFrom instanceof PedestalTileEntity) {
                 itemFromInv = ItemStack.EMPTY;
 
             }
@@ -124,9 +124,9 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
                                     {
                                         world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
                                         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                        if(pedestalInv instanceof TilePedestal) {
+                                        if(pedestalInv instanceof PedestalTileEntity) {
                                             handler.extractItem(i,1 ,false );
-                                            ((TilePedestal) pedestalInv).addItem(milkBucket);
+                                            ((PedestalTileEntity) pedestalInv).addItem(milkBucket);
                                         }
                                         break;
                                     }
@@ -139,7 +139,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
         //}
     }
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

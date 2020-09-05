@@ -3,7 +3,7 @@ package com.mowmaster.pedestals.item;
 import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -70,9 +70,9 @@ public class ItemUpgradeTool extends Item {
             {
                 if(getBlockState.getBlock() instanceof BlockPedestalTE) {
                     TileEntity tile = worldIn.getTileEntity(pos);
-                    if(tile instanceof TilePedestal)
+                    if(tile instanceof PedestalTileEntity)
                     {
-                        TilePedestal ped = ((TilePedestal)worldIn.getTileEntity(pos));
+                        PedestalTileEntity ped = ((PedestalTileEntity)worldIn.getTileEntity(pos));
                         if(ped.hasCoin())
                         {
                             ItemStack coin = ped.getCoinOnPedestal();
@@ -126,10 +126,10 @@ public class ItemUpgradeTool extends Item {
             else
             {
                 if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE) {
-                    //Checks Tile at location to make sure its a TilePedestal
+                    //Checks Tile at location to make sure its a PedestalTileEntity
                     TileEntity tileEntity = worldIn.getTileEntity(pos);
-                    if (tileEntity instanceof TilePedestal) {
-                        TilePedestal tilePedestal = (TilePedestal) tileEntity;
+                    if (tileEntity instanceof PedestalTileEntity) {
+                        PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
                         if(tilePedestal.hasCoin())
                         {
                             Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
@@ -168,7 +168,7 @@ public class ItemUpgradeTool extends Item {
 
                     if(worldIn.isAreaLoaded(pos,1))
                     {
-                        if(worldIn.getTileEntity(pos) instanceof TilePedestal)
+                        if(worldIn.getTileEntity(pos) instanceof PedestalTileEntity)
                         {
                             negNums = getNegRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);
                             posNums = getPosRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);

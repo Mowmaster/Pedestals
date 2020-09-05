@@ -960,8 +960,10 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         }
     }
 
-    /*//https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
-    */
+//*
+//https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
+
+
 
     // TODO: When syncing data to the client, only update the two itemsstacks that get updated, not everything.
 
@@ -970,7 +972,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTagCompound = new CompoundNBT();
         write(nbtTagCompound);
-        int tileEntityType = 42;  // arbitrary number; only used for vanilla TileEntities.  You can use it, or not, as you want.
+        int tileEntityType = 43;  // arbitrary number; only used for vanilla TileEntities.  You can use it, or not, as you want.
         return new SUpdateTileEntityPacket(this.pos, tileEntityType, nbtTagCompound);
     }
 

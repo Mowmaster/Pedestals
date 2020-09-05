@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IGrowable;
 import net.minecraft.client.util.ITooltipFlag;
@@ -121,8 +121,8 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                     {
                         ((IGrowable) target.getBlock()).grow(sworld,rand,posTarget,target);
                         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                        if(pedestalInv instanceof TilePedestal) {
-                            ((TilePedestal) pedestalInv).removeItem(1);
+                        if(pedestalInv instanceof PedestalTileEntity) {
+                            ((PedestalTileEntity) pedestalInv).removeItem(1);
                         }
                     }
                     else
@@ -141,7 +141,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

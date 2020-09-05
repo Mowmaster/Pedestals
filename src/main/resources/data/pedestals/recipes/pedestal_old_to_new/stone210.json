@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:pedestal/stone210"
+    }
+  ],
+  "result": {
+    "item": "pedestals:pedestal210"
+  }
+}

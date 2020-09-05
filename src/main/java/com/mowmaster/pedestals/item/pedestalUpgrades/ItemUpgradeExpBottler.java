@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -103,7 +103,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         {
             IItemHandler handler = cap.orElse(null);
             TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof TilePedestal) {
+            if(invToPullFrom instanceof PedestalTileEntity) {
                 itemFromInv = ItemStack.EMPTY;
             }
             else {
@@ -126,8 +126,8 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                     int rate = (modifier * 11);
                                     ItemStack getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
                                     TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                    if(pedestalInv instanceof TilePedestal) {
-                                        if(((TilePedestal) pedestalInv).canAcceptItems(world,posOfPedestal,getBottle)>=rate)
+                                    if(pedestalInv instanceof PedestalTileEntity) {
+                                        if(((PedestalTileEntity) pedestalInv).canAcceptItems(world,posOfPedestal,getBottle)>=rate)
                                         {
                                             int currentlyStoredExp = getXPStored(coinInPedestal);
                                             if(currentlyStoredExp > 0)
@@ -138,7 +138,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                                     world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                     setXPStored(coinInPedestal,getExpLeftInPedestal);
                                                     handler.extractItem(i,modifier ,false );
-                                                    ((TilePedestal) pedestalInv).addItem(getBottle);
+                                                    ((PedestalTileEntity) pedestalInv).addItem(getBottle);
                                                 }
                                             }
                                         }
@@ -159,7 +159,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(TilePedestal pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         int modifier = getBottlingRate(coin);
@@ -174,7 +174,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

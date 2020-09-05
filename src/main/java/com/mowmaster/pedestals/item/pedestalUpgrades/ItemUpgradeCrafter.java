@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
@@ -103,7 +103,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                     IItemHandler handler = cap.orElse(null);
                     TileEntity invToPullFrom = world.getTileEntity(posInventory);
                     int intInventorySlotCount = handler.getSlots();//normal chests return value of 1-27
-                    if (invToPullFrom instanceof TilePedestal) {
+                    if (invToPullFrom instanceof PedestalTileEntity) {
                         itemFromInv = ItemStack.EMPTY;
                     }
                     else
@@ -223,20 +223,20 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
 
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(TilePedestal pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
 
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.references.Reference;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -97,7 +97,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
         return  smeltingSpeed;
     }
 
-    public int removeEnergyFuel(TilePedestal pedestal, int amountToRemove, boolean simulate)
+    public int removeEnergyFuel(PedestalTileEntity pedestal, int amountToRemove, boolean simulate)
     {
         int amountToSet = 0;
         ItemStack coin = pedestal.getCoinOnPedestal();
@@ -125,7 +125,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(entityIn instanceof ItemEntity)
         {
@@ -186,7 +186,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(PedestalTileEntity pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         if(!world.isBlockPowered(pos))
         {
@@ -201,7 +201,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

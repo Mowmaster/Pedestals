@@ -118,7 +118,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)));
     }
 
-    /*https://github.com/progwml6/ironchest/blob/1.15/src/main/java/com/progwml6/ironchest/common/block/GenericIronChestBlock.java#L120-L133*/
+//https://github.com/progwml6/ironchest/blob/1.15/src/main/java/com/progwml6/ironchest/common/block/GenericIronChestBlock.java#L120-L133
+
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.getBlock() != newState.getBlock()) {
@@ -189,21 +190,23 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         }
     }
 
-    /**
+/**
      * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
      * blockstate.
      * @deprecated call via IBlockState#withRotation(Rotation) whenever possible. Implementing/overriding is
      * fine.
      */
+
     public BlockState rotate(BlockState state, Rotation rot) {
         return state.with(FACING, rot.rotate(state.get(FACING)));
     }
 
-    /**
+/**
      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
      * blockstate.
      * @deprecated call via IBlockState#withMirror(Mirror) whenever possible. Implementing/overriding is fine.
      */
+
     public BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state.with(FACING, mirrorIn.mirror(state.get(FACING)));
     }
@@ -475,9 +478,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                             TileEntity tileEntity = worldIn.getTileEntity(pos);
                             if (tileEntity instanceof PedestalTileEntity) {
                                 PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
-
                                 //checks if connecting pedestal is out of range of the senderPedestal
-                                /*if(linkingTool.isPedestalInRange(tilePedestal,linkingTool.getStoredPosition(offhand)))
+                                if(linkingTool.isPedestalInRange(tilePedestal,linkingTool.getStoredPosition(offhand)))
                                 {
                                     //Checks if pedestals to be linked are on same networks or if one is neutral
                                     if(tilePedestal.canLinkToPedestalNetwork(linkingTool.getStoredPosition(offhand)))
@@ -499,7 +501,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                     }
                                     else player.sendMessage(linknetwork,Util.DUMMY_UUID);
                                 }
-                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);*/
+                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);
+
                             }
                         }
                     }
@@ -567,11 +570,12 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return new PedestalTileEntity();
     }
-    /**
+/**
      * The type of render function called. MODEL for mixed tesr and static model, MODELBLOCK_ANIMATED for TESR-only,
      * LIQUID for vanilla liquids, INVISIBLE to skip all rendering
      * @deprecated call via IBlockState...getRenderType() whenever possible. Implementing/overriding is fine.
-     */
+   */
+
     @Deprecated
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
