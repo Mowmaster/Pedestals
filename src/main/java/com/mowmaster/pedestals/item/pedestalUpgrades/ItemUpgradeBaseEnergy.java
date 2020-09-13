@@ -82,9 +82,25 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         return  energyTransferRate;
     }
 
-    public static boolean isEnergyItemInsert(ICapabilityProvider tile)
+    public static boolean isEnergyItem(ItemStack itemToCheck)
     {
-        return isEnergyItemInsert(tile, null);
+        LazyOptional<IEnergyStorage> cap = itemToCheck.getCapability(CapabilityEnergy.ENERGY);
+        if(cap.isPresent())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isEnergyItemInsert(ItemStack stack)
+    {
+        if(isEnergyItem(stack))
+        {
+            return isEnergyItemInsert(stack, null);
+        }
+
+        return false;
     }
 
     public static boolean isEnergyItemInsert(ICapabilityProvider tile, @Nullable Direction facing)
@@ -96,9 +112,14 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                 .orElse(false);
     }
 
-    public static boolean isEnergyItemExtract(ICapabilityProvider tile)
+    public static boolean isEnergyItemExtract(ItemStack stack)
     {
-        return isEnergyItemExtract(tile, null);
+        if(isEnergyItem(stack))
+        {
+            return isEnergyItemExtract(stack, null);
+        }
+
+        return false;
     }
 
     public static boolean isEnergyItemExtract(ICapabilityProvider tile, @Nullable Direction facing)
