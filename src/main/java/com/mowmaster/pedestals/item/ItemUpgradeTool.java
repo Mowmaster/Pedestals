@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
@@ -68,7 +68,7 @@ public class ItemUpgradeTool extends Item {
             BlockState getBlockState = worldIn.getBlockState(pos);
             if(player.isCrouching())
             {
-                if(getBlockState.getBlock() instanceof BlockPedestalTE) {
+                if(getBlockState.getBlock() instanceof PedestalBlock) {
                     TileEntity tile = worldIn.getTileEntity(pos);
                     if(tile instanceof PedestalTileEntity)
                     {
@@ -125,7 +125,7 @@ public class ItemUpgradeTool extends Item {
             }
             else
             {
-                if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE) {
+                if(worldIn.getBlockState(pos).getBlock() instanceof PedestalBlock) {
                     //Checks Tile at location to make sure its a PedestalTileEntity
                     TileEntity tileEntity = worldIn.getTileEntity(pos);
                     if (tileEntity instanceof PedestalTileEntity) {
@@ -333,7 +333,7 @@ public class ItemUpgradeTool extends Item {
 
         BlockState state = world.getBlockState(pos);
         Direction enumfacing = Direction.UP;
-        if(state.getBlock() instanceof BlockPedestalTE)
+        if(state.getBlock() instanceof PedestalBlock)
         {
             enumfacing = state.get(FACING);
         }
