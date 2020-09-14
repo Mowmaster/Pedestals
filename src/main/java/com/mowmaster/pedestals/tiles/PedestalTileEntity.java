@@ -787,7 +787,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                     Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
                     if(coinInPed instanceof ItemUpgradeBase)
                     {
-                        //((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(world, tilePedestal, pos, state, entityIn);
+                        ((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(world, tilePedestal, pos, state, entityIn);
                     }
                 }
             }
@@ -869,7 +869,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 {
                     partTicker++;
                     Random rand = new Random();
-                    //((ItemUpgradeBase) coinInPed).onRandomDisplayTick(this,partTicker, world.getBlockState(getPos()), world, getPos(), rand);
+                    ((ItemUpgradeBase) coinInPed).onRandomDisplayTick(this,partTicker, world.getBlockState(getPos()), world, getPos(), rand);
                     if(partTicker >=Integer.MAX_VALUE-100){partTicker=0;}
                 }
             }

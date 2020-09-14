@@ -103,13 +103,16 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         return false;
     }
 
-    public static boolean isEnergyItemInsert(ICapabilityProvider tile, @Nullable Direction facing)
+    public static boolean isEnergyItemInsert(ItemStack itemToCheck, @Nullable Direction facing)
     {
-        if(tile==null)
-            return false;
-        return tile.getCapability(CapabilityEnergy.ENERGY, facing)
-                .map(IEnergyStorage::canReceive)
-                .orElse(false);
+        LazyOptional<IEnergyStorage> cap = itemToCheck.getCapability(CapabilityEnergy.ENERGY);
+        if(cap.isPresent())
+        {
+            return cap.map(IEnergyStorage::canReceive)
+                    .orElse(false);
+        }
+
+        return false;
     }
 
     public static boolean isEnergyItemExtract(ItemStack stack)
@@ -122,64 +125,80 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         return false;
     }
 
-    public static boolean isEnergyItemExtract(ICapabilityProvider tile, @Nullable Direction facing)
+    public static boolean isEnergyItemExtract(ItemStack itemToCheck, @Nullable Direction facing)
     {
-        if(tile==null)
-            return false;
-        return tile.getCapability(CapabilityEnergy.ENERGY, facing)
-                .map(IEnergyStorage::canExtract)
-                .orElse(false);
+        LazyOptional<IEnergyStorage> cap = itemToCheck.getCapability(CapabilityEnergy.ENERGY);
+        if(cap.isPresent())
+        {
+            return cap.map(IEnergyStorage::canExtract)
+                    .orElse(false);
+        }
+
+        return false;
     }
 
-    public static int getMaxEnergyInStack(ICapabilityProvider stack, @Nullable Direction side)
+    public static int getMaxEnergyInStack(ItemStack itemToCheck, @Nullable Direction side)
     {
-        if(stack==null)
-            return 0;
-        return stack.getCapability(CapabilityEnergy.ENERGY, side)
-                .map(IEnergyStorage::getMaxEnergyStored)
+        LazyOptional<IEnergyStorage> cap = itemToCheck.getCapability(CapabilityEnergy.ENERGY);
+        if(cap.isPresent())
+        {
+            return cap.map(IEnergyStorage::getMaxEnergyStored)
                 .orElse(0);
+        }
+
+        return 0;
     }
 
-    public static int getEnergyInStack(ICapabilityProvider stack)
+    public static int getEnergyInStack(ItemStack itemToCheck)
     {
-        return getEnergyInStack(stack, null);
+        return getEnergyInStack(itemToCheck, null);
     }
 
-    public static int getEnergyInStack(ICapabilityProvider stack, @Nullable Direction side)
+    public static int getEnergyInStack(ItemStack itemToCheck, @Nullable Direction side)
     {
-        if(stack==null)
-            return 0;
-        return stack.getCapability(CapabilityEnergy.ENERGY, side)
-                .map(IEnergyStorage::getEnergyStored)
-                .orElse(0);
+        LazyOptional<IEnergyStorage> cap = itemToCheck.getCapability(CapabilityEnergy.ENERGY);
+        if(cap.isPresent())
+        {
+            return cap.map(IEnergyStorage::getEnergyStored)
+                    .orElse(0);
+        }
+
+        return 0;
     }
 
-    public static int insertEnergyIntoStack(ICapabilityProvider stack, int energy, boolean simulate)
+    public static int insertEnergyIntoStack(ItemStack itemToCheck, int energy, boolean simulate)
     {
-        return insertEnergyIntoStack(stack, null, energy, simulate);
+        return insertEnergyIntoStack(itemToCheck, null, energy, simulate);
     }
 
-    public static int insertEnergyIntoStack(ICapabilityProvider stack, @Nullable Direction facing, int energy, boolean simulate)
+    public static int insertEnergyIntoStack(ItemStack itemToCheck, @Nullable Direction facing, int energy, boolean simulate)
     {
-        if(stack==null)
-            return 0;
-        return stack.getCapability(CapabilityEnergy.ENERGY, facing)
-                .map(storage -> storage.receiveEnergy(energy, simulate))
-                .orElse(0);
+
+        LazyOptional<IEnergyStorage> cap = itemToCheck.getCapability(CapabilityEnergy.ENERGY);
+        if(cap.isPresent())
+        {
+            return cap.map(storage -> storage.receiveEnergy(energy, simulate))
+                    .orElse(0);
+        }
+
+        return 0;
     }
 
-    public static int extractEnergyFromStack(ICapabilityProvider stack, int energy, boolean simulate)
+    public static int extractEnergyFromStack(ItemStack itemToCheck, int energy, boolean simulate)
     {
-        return extractEnergyFromStack(stack, null, energy, simulate);
+        return extractEnergyFromStack(itemToCheck, null, energy, simulate);
     }
 
-    public static int extractEnergyFromStack(ICapabilityProvider stack, @Nullable Direction facing, int energy, boolean simulate)
+    public static int extractEnergyFromStack(ItemStack itemToCheck, @Nullable Direction facing, int energy, boolean simulate)
     {
-        if(stack==null)
-            return 0;
-        return stack.getCapability(CapabilityEnergy.ENERGY, facing)
-                .map(storage -> storage.extractEnergy(energy, simulate))
-                .orElse(0);
+        LazyOptional<IEnergyStorage> cap = itemToCheck.getCapability(CapabilityEnergy.ENERGY);
+        if(cap.isPresent())
+        {
+            return cap.map(storage -> storage.extractEnergy(energy, simulate))
+                    .orElse(0);
+        }
+
+        return 0;
     }
 
     public static LazyOptional<IEnergyStorage> findEnergyHandlerAtPos(World world, BlockPos pos, Direction side, boolean allowCart)
