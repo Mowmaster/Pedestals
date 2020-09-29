@@ -2,7 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -146,9 +146,9 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
             if(!world.getBlockState(posSorroundingPedestals.get(i)).getBlock().equals(Blocks.AIR))
             {
                 TileEntity tile = world.getTileEntity(posSorroundingPedestals.get(i));
-                if(tile instanceof PedestalTileEntity)
+                if(tile instanceof TilePedestal)
                 {
-                    PedestalTileEntity tilePedestal = (PedestalTileEntity)tile;
+                    TilePedestal tilePedestal = (TilePedestal)tile;
                     ItemStack stack = tilePedestal.getItemInPedestal();
                     // ToDo:CRYSTALS HERE
                     //  || stack.getItem().equals(Items.DIAMOND) we only need to combine if we have an enchanted item, book or nametag, crystals are not needed necessarily
@@ -177,9 +177,9 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
             if(!world.getBlockState(posSorroundingPedestals.get(i)).getBlock().equals(Blocks.AIR))
             {
                 TileEntity tile = world.getTileEntity(posSorroundingPedestals.get(i));
-                if(tile instanceof PedestalTileEntity)
+                if(tile instanceof TilePedestal)
                 {
-                    PedestalTileEntity tilePedestal = (PedestalTileEntity)tile;
+                    TilePedestal tilePedestal = (TilePedestal)tile;
                     ItemStack stack = tilePedestal.getItemInPedestal();
                     if(stack.isEnchanted() || stack.getItem().equals(Items.ENCHANTED_BOOK) || stack.getItem().equals(Items.NAME_TAG))
                     {
@@ -260,7 +260,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
             {
                 IItemHandler handler = cap.orElse(null);
                 TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if(invToPullFrom instanceof PedestalTileEntity) {
+                if(invToPullFrom instanceof TilePedestal) {
                     itemFromInv = ItemStack.EMPTY;
                 }
                 else {
@@ -272,8 +272,8 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                             itemFromInv = handler.getStackInSlot(i);
                             int slotCount = itemFromInv.getCount();
                             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                            if(pedestalInv instanceof PedestalTileEntity) {
-                                PedestalTileEntity tilePedestal = (PedestalTileEntity) pedestalInv;
+                            if(pedestalInv instanceof TilePedestal) {
+                                TilePedestal tilePedestal = (TilePedestal) pedestalInv;
 
                                 if(!tilePedestal.hasItem())
                                 {
@@ -407,7 +407,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
 
     //Particles come in from correctly placed pedestals???
     /*@Override
-    public void onRandomDisplayTick(PedestalTileEntity pedestal, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(TilePedestal pedestal, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         if(!world.isBlockPowered(pos))
         {
@@ -441,7 +441,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     }*/
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

@@ -1,3 +1,4 @@
+/*
 package com.mowmaster.pedestals.blocks;
 
 import com.mowmaster.pedestals.item.ItemColorPallet;
@@ -190,22 +191,26 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         }
     }
 
+*/
 /**
      * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
      * blockstate.
      * @deprecated call via IBlockState#withRotation(Rotation) whenever possible. Implementing/overriding is
      * fine.
-     */
+     *//*
+
 
     public BlockState rotate(BlockState state, Rotation rot) {
         return state.with(FACING, rot.rotate(state.get(FACING)));
     }
 
+*/
 /**
      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
      * blockstate.
      * @deprecated call via IBlockState#withMirror(Mirror) whenever possible. Implementing/overriding is fine.
-     */
+     *//*
+
 
     public BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state.with(FACING, mirrorIn.mirror(state.get(FACING)));
@@ -570,11 +575,13 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return new PedestalTileEntity();
     }
+*/
 /**
      * The type of render function called. MODEL for mixed tesr and static model, MODELBLOCK_ANIMATED for TESR-only,
      * LIQUID for vanilla liquids, INVISIBLE to skip all rendering
      * @deprecated call via IBlockState...getRenderType() whenever possible. Implementing/overriding is fine.
-   */
+   *//*
+
 
     @Deprecated
     public BlockRenderType getRenderType(BlockState state) {
@@ -1086,3 +1093,4 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public static final Item I_PEDESTAL_332 = new BlockItem(PEDESTAL_332, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_332);
     public static final Item I_PEDESTAL_333 = new BlockItem(PEDESTAL_333, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_333);
 }
+*/

@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -130,7 +130,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         {
             world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-            if(pedestalInv instanceof PedestalTileEntity) {
+            if(pedestalInv instanceof TilePedestal) {
                 int currentlyStoredExp = getXPStored(coinInPedestal);
                 int value = getXPFromList.getXpValue();
                 if(value > 0 && currentlyStoredExp < readMaxXpFromNBT(coinInPedestal))
@@ -150,7 +150,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         BlockState state = world.getBlockState(posOfPedestal);
         if(state.getBlock() instanceof BlockPedestalTE)
         {
-            PedestalTileEntity pedestal = ((PedestalTileEntity)world.getTileEntity(posOfPedestal));
+            TilePedestal pedestal = ((TilePedestal)world.getTileEntity(posOfPedestal));
 
             AxisAlignedBB getBoxP = new AxisAlignedBB(negBlockPosP,posBlockPosP);
 
@@ -181,7 +181,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(entityIn instanceof ExperienceOrbEntity)
         {
@@ -205,7 +205,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

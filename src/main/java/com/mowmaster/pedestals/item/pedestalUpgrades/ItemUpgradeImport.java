@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -75,7 +75,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
             {
                 IItemHandler handler = cap.orElse(null);
                 TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if(invToPullFrom instanceof PedestalTileEntity) {
+                if(invToPullFrom instanceof TilePedestal) {
                     itemFromInv = ItemStack.EMPTY;
 
                 }
@@ -111,9 +111,9 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                                 ItemStack copyIncoming = itemFromInv.copy();
                                 copyIncoming.setCount(allowedTransferRate);
                                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                if(pedestalInv instanceof PedestalTileEntity) {
+                                if(pedestalInv instanceof TilePedestal) {
                                     handler.extractItem(i,allowedTransferRate ,false );
-                                    ((PedestalTileEntity) pedestalInv).addItem(copyIncoming);
+                                    ((TilePedestal) pedestalInv).addItem(copyIncoming);
                                 }
                             }
                         }
@@ -125,7 +125,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(entityIn instanceof ItemEntity)
         {
@@ -134,16 +134,16 @@ public class ItemUpgradeImport extends ItemUpgradeBase
             if(itemFromPedestal.isEmpty())
             {
                 TileEntity pedestalInv = world.getTileEntity(posPedestal);
-                if(pedestalInv instanceof PedestalTileEntity) {
+                if(pedestalInv instanceof TilePedestal) {
                     entityIn.remove();
-                    ((PedestalTileEntity) pedestalInv).addItem(getItemStack);
+                    ((TilePedestal) pedestalInv).addItem(getItemStack);
                 }
             }
         }
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
@@ -33,7 +33,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
     }
 
     @Override
-    public boolean canSendItem(PedestalTileEntity tile)
+    public boolean canSendItem(TilePedestal tile)
     {
         return tile.getStoredValueForUpgrades()>0;
     }
@@ -69,7 +69,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
 
         //Gets inventory TE then makes sure its not a pedestal
         TileEntity invToPushTo = world.getTileEntity(posInventory);
-        if(invToPushTo instanceof PedestalTileEntity) {
+        if(invToPushTo instanceof TilePedestal) {
             itemFromPedestal = ItemStack.EMPTY;
         }
         else {
@@ -104,9 +104,9 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
     public void upgradeItemAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
         TileEntity tile = world.getTileEntity(posOfPedestal);
-        if(tile instanceof PedestalTileEntity)
+        if(tile instanceof TilePedestal)
         {
-            PedestalTileEntity ped = ((PedestalTileEntity)tile);
+            TilePedestal ped = ((TilePedestal)tile);
             int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
 
             if(ped.hasItem())
@@ -154,7 +154,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(!world.isRemote)
         {

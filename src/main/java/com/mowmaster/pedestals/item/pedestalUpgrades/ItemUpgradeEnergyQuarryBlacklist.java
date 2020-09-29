@@ -5,7 +5,7 @@ import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
@@ -145,8 +145,8 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                 if(!world.isBlockPowered(pedestalPos)) {
 
                     TileEntity pedestalInv = world.getTileEntity(pedestalPos);
-                    if(pedestalInv instanceof PedestalTileEntity) {
-                        PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
+                    if(pedestalInv instanceof TilePedestal) {
+                        TilePedestal ped = ((TilePedestal) pedestalInv);
                         //Cost To Mine 1 Block
                         int fuelToConsume = rfCostPerItemSmelted;
                         if(hasEnergy(coinInPedestal) && removeEnergyFuel(ped,fuelToConsume,true)>=0)
@@ -208,8 +208,8 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                 fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
             }
             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-            if(pedestalInv instanceof PedestalTileEntity) {
-                PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
+            if(pedestalInv instanceof TilePedestal) {
+                TilePedestal ped = ((TilePedestal) pedestalInv);
                 if(removeEnergyFuel(ped,fuelToConsume,true)>=0)
                 {
                     /*if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true))
@@ -248,11 +248,11 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
             {
                 world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                if(pedestalInv instanceof PedestalTileEntity) {
+                if(pedestalInv instanceof TilePedestal) {
                     if(getItemFromList.getItem().getCount() <=64)
                     {
                         getItemFromList.remove();
-                        ((PedestalTileEntity) pedestalInv).addItem(getItemFromList.getItem());
+                        ((TilePedestal) pedestalInv).addItem(getItemFromList.getItem());
                     }
                     else
                     {
@@ -260,7 +260,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                         getItemFromList.getItem().setCount(count-64);
                         ItemStack getItemstacked = getItemFromList.getItem().copy();
                         getItemstacked.setCount(64);
-                        ((PedestalTileEntity) pedestalInv).addItem(getItemstacked);
+                        ((TilePedestal) pedestalInv).addItem(getItemstacked);
                     }
                 }
                 break;
@@ -299,7 +299,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

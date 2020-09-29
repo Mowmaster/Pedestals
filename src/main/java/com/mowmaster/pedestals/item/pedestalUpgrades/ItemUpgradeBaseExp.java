@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.references.Reference;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -146,8 +146,8 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
     public void upgradeActionSendExp(World world, ItemStack coinMainPedestal, BlockPos posMainPedestal)
     {
         TileEntity pedestalInv = world.getTileEntity(posMainPedestal);
-        if(pedestalInv instanceof PedestalTileEntity) {
-            PedestalTileEntity tileMainPedestal = ((PedestalTileEntity) pedestalInv);
+        if(pedestalInv instanceof TilePedestal) {
+            TilePedestal tileMainPedestal = ((TilePedestal) pedestalInv);
             //If this Pedestal has any Exp
             int xpMainPedestal = getXPStored(coinMainPedestal);
             if(xpMainPedestal>0)
@@ -164,8 +164,8 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                             if(posStoredPedestal != posMainPedestal)
                             {
                                 TileEntity storedPedestal = world.getTileEntity(posStoredPedestal);
-                                if(storedPedestal instanceof PedestalTileEntity) {
-                                    PedestalTileEntity tileStoredPedestal = ((PedestalTileEntity) storedPedestal);
+                                if(storedPedestal instanceof TilePedestal) {
+                                    TilePedestal tileStoredPedestal = ((TilePedestal) storedPedestal);
                                     ItemStack coinStoredPedestal = tileStoredPedestal.getCoinOnPedestal();
                                     //Check if pedestal to send to can even be sent exp
                                     if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseExp)
@@ -213,7 +213,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         }
     }
 
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(entityIn instanceof ExperienceOrbEntity)
         {
@@ -348,7 +348,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(PedestalTileEntity pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         if(!world.isBlockPowered(pos))
         {

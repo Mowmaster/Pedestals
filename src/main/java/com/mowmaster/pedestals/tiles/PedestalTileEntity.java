@@ -1,3 +1,4 @@
+/*
 package com.mowmaster.pedestals.tiles;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
@@ -960,7 +961,8 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         }
     }
 
-//*
+/*/
+/*
 //https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
 
 
@@ -1033,3 +1035,4 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         }
     }
 }
+*/

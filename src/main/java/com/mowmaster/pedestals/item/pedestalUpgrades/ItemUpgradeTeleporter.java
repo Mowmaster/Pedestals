@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
@@ -57,11 +57,11 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         int range = getRange(coin);
         BlockPos posOfBlock = pos;
         TileEntity tile = world.getTileEntity(pos);
-        if(tile instanceof PedestalTileEntity)
+        if(tile instanceof TilePedestal)
         {
-            if(((PedestalTileEntity)tile).getNumberOfStoredLocations()>0)
+            if(((TilePedestal)tile).getNumberOfStoredLocations()>0)
             {
-                BlockPos posBlock = ((PedestalTileEntity)tile).getStoredPositionAt(0);
+                BlockPos posBlock = ((TilePedestal)tile).getStoredPositionAt(0);
 
                 posOfBlock = getPosOfBlockBelow(world, posBlock, range);
 
@@ -77,11 +77,11 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         int range = getRange(coin);
         BlockPos posOfBlock = pos;
         TileEntity tile = world.getTileEntity(pos);
-        if(tile instanceof PedestalTileEntity)
+        if(tile instanceof TilePedestal)
         {
-            if(((PedestalTileEntity)tile).getNumberOfStoredLocations()>0)
+            if(((TilePedestal)tile).getNumberOfStoredLocations()>0)
             {
-                BlockPos posBlock = ((PedestalTileEntity)tile).getStoredPositionAt(0);
+                BlockPos posBlock = ((TilePedestal)tile).getStoredPositionAt(0);
 
                 posOfBlock = getPosOfBlockBelow(world, posBlock, range);
 
@@ -97,11 +97,11 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         int range = getRange(coin);
         BlockPos posOfBlock = pos;
         TileEntity tile = world.getTileEntity(pos);
-        if(tile instanceof PedestalTileEntity)
+        if(tile instanceof TilePedestal)
         {
-            if(((PedestalTileEntity)tile).getNumberOfStoredLocations()>0)
+            if(((TilePedestal)tile).getNumberOfStoredLocations()>0)
             {
-                BlockPos posBlock = ((PedestalTileEntity)tile).getStoredPositionAt(0);
+                BlockPos posBlock = ((TilePedestal)tile).getStoredPositionAt(0);
                 posOfBlock = getPosOfBlockBelow(world, posBlock, range);
             }
         }
@@ -132,7 +132,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         BlockState state = world.getBlockState(posOfPedestal);
         if(state.getBlock() instanceof BlockPedestalTE)
         {
-            PedestalTileEntity pedestal = ((PedestalTileEntity)world.getTileEntity(posOfPedestal));
+            TilePedestal pedestal = ((TilePedestal)world.getTileEntity(posOfPedestal));
 
             AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
@@ -148,7 +148,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(entityIn instanceof ItemEntity)
         {
@@ -191,7 +191,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         return xF+yF+zF;
     }
 
-    public boolean doTeleport(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn, boolean isItemEntity)
+    public boolean doTeleport(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn, boolean isItemEntity)
     {
         if(!world.isBlockPowered(posPedestal))
         {
@@ -230,7 +230,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         return false;
     }
 
-    public int canTeleportTo(World world, PedestalTileEntity tilePedestal, BlockPos posOrigPedestal, BlockPos posDestPedestal, boolean isItemEntity)
+    public int canTeleportTo(World world, TilePedestal tilePedestal, BlockPos posOrigPedestal, BlockPos posDestPedestal, boolean isItemEntity)
     {
         if(world.isAreaLoaded(posDestPedestal,1))
         {
@@ -241,7 +241,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                 if(world.getBlockState(posDestPedestal).getBlock() instanceof BlockPedestalTE)
                 {
                     //Get the tile before checking other things
-                    if(world.getTileEntity(posDestPedestal) instanceof PedestalTileEntity)
+                    if(world.getTileEntity(posDestPedestal) instanceof TilePedestal)
                     {
                         if(getTeleportDistance(posOrigPedestal,posDestPedestal) <= tilePedestal.getStoredValueForUpgrades())
                         {
@@ -274,7 +274,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         return 0;
     }
 
-    public boolean teleportEntity(World world, PedestalTileEntity tilePedestal, BlockPos posPedestalDest, Entity entityIn)
+    public boolean teleportEntity(World world, TilePedestal tilePedestal, BlockPos posPedestalDest, Entity entityIn)
     {
         int range = getRange(tilePedestal.getCoinOnPedestal());
         BlockPos pos = getPosOfBlockBelow(world,posPedestalDest,range);
@@ -332,7 +332,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(PedestalTileEntity pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         if(!world.isBlockPowered(pos))
         {
@@ -347,7 +347,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

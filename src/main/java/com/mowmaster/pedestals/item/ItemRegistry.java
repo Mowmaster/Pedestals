@@ -12,7 +12,7 @@ public class ItemRegistry
     {
         //ItemGuideBook.onItemRegistryReady(e);
         BlockPedestalTE.onItemRegistryReady(e);
-        PedestalBlock.onItemRegistryReady(e);
+        //PedestalBlock.onItemRegistryReady(e);
 
         ItemLinkingTool.onItemRegistryReady(e);
         ItemTagTool.onItemRegistryReady(e);
@@ -111,7 +111,7 @@ public class ItemRegistry
     public static void onItemColorsReady(ColorHandlerEvent.Item event)
     {
         BlockPedestalTE.handleItemColors(event);
-        PedestalBlock.handleItemColors(event);
+        //PedestalBlock.handleItemColors(event);
         ItemColorPallet.handleItemColors(event);
     }
 }

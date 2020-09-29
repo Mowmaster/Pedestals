@@ -1,3 +1,4 @@
+/*
 package com.mowmaster.pedestals.tiles.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -116,3 +117,4 @@ public class PedestalRender extends TileEntityRenderer<PedestalTileEntity> {
         ClientRegistry.bindTileEntityRenderer(PedestalTileEntity.PEDESTAL, PedestalRender::new);
     }
 }
+*/

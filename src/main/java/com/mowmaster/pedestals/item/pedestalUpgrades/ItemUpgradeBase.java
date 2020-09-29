@@ -3,7 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.references.Reference;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -56,7 +56,7 @@ public class ItemUpgradeBase extends Item {
     public ItemUpgradeBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
 
-    public void onRandomDisplayTick(PedestalTileEntity pedestal,int tick, BlockState stateIn, World worldIn, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World worldIn, BlockPos pos, Random rand)
     {
 
     }
@@ -381,8 +381,8 @@ public class ItemUpgradeBase extends Item {
     {
         ItemStack stackInPedestal = ItemStack.EMPTY;
         TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
-        if(pedestalInventory instanceof PedestalTileEntity) {
-            stackInPedestal = ((PedestalTileEntity) pedestalInventory).getItemInPedestal();
+        if(pedestalInventory instanceof TilePedestal) {
+            stackInPedestal = ((TilePedestal) pedestalInventory).getItemInPedestal();
         }
 
         return stackInPedestal;
@@ -392,8 +392,8 @@ public class ItemUpgradeBase extends Item {
     {
         ItemStack stackInPedestal = ItemStack.EMPTY;
         TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
-        if(pedestalInventory instanceof PedestalTileEntity) {
-            ((PedestalTileEntity) pedestalInventory).removeItem(count);
+        if(pedestalInventory instanceof TilePedestal) {
+            ((TilePedestal) pedestalInventory).removeItem(count);
         }
     }
 
@@ -402,8 +402,8 @@ public class ItemUpgradeBase extends Item {
         ItemStack stackInPedestal = ItemStack.EMPTY;
         int returner = 0;
         TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
-        if(pedestalInventory instanceof PedestalTileEntity) {
-            returner =  ((PedestalTileEntity) pedestalInventory).canAcceptItems(world,posOfPedestal,itemStackToAdd);
+        if(pedestalInventory instanceof TilePedestal) {
+            returner =  ((TilePedestal) pedestalInventory).canAcceptItems(world,posOfPedestal,itemStackToAdd);
         }
 
         return returner;
@@ -413,31 +413,31 @@ public class ItemUpgradeBase extends Item {
     {
         ItemStack stackInPedestal = ItemStack.EMPTY;
         TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
-        if(pedestalInventory instanceof PedestalTileEntity) {
-            ((PedestalTileEntity) pedestalInventory).addItem(itemStackToAdd);
+        if(pedestalInventory instanceof TilePedestal) {
+            ((TilePedestal) pedestalInventory).addItem(itemStackToAdd);
         }
     }
 
     /*public void addExpToPedestal(World world, BlockPos posOfPedestal,int expToAdd)
     {
         TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
-        if(pedestalInventory instanceof PedestalTileEntity) {
-            ((PedestalTileEntity) pedestalInventory).addExpToPedestal(expToAdd);
+        if(pedestalInventory instanceof TilePedestal) {
+            ((TilePedestal) pedestalInventory).addExpToPedestal(expToAdd);
         }
     }
     public void removeExpFromPedestal(World world, BlockPos posOfPedestal,int expToRemove)
     {
         TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
-        if(pedestalInventory instanceof PedestalTileEntity) {
-            ((PedestalTileEntity) pedestalInventory).removeExpFromPedestal(expToRemove);
+        if(pedestalInventory instanceof TilePedestal) {
+            ((TilePedestal) pedestalInventory).removeExpFromPedestal(expToRemove);
         }
     }*/
 
     public void setIntValueToPedestal(World world, BlockPos posOfPedestal, int value)
     {
         TileEntity pedestal = world.getTileEntity(posOfPedestal);
-        if(pedestal instanceof PedestalTileEntity) {
-            ((PedestalTileEntity) pedestal).setStoredValueForUpgrades(value);
+        if(pedestal instanceof TilePedestal) {
+            ((TilePedestal) pedestal).setStoredValueForUpgrades(value);
         }
     }
 
@@ -445,8 +445,8 @@ public class ItemUpgradeBase extends Item {
     {
         int value = 0;
         TileEntity pedestal = world.getTileEntity(posOfPedestal);
-        if(pedestal instanceof PedestalTileEntity) {
-            value = ((PedestalTileEntity) pedestal).getStoredValueForUpgrades();
+        if(pedestal instanceof TilePedestal) {
+            value = ((TilePedestal) pedestal).getStoredValueForUpgrades();
         }
 
         return value;
@@ -984,12 +984,12 @@ public class ItemUpgradeBase extends Item {
 
     }
 
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
 
     }
 
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
 
     }
@@ -1144,7 +1144,7 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-    public boolean canSendItem(PedestalTileEntity tile)
+    public boolean canSendItem(TilePedestal tile)
     {
         return true;
     }

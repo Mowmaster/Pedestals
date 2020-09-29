@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -25,7 +25,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
     }
 
     @Override
-    public boolean canSendItem(PedestalTileEntity tile)
+    public boolean canSendItem(TilePedestal tile)
     {
         return tile.getStoredValueForUpgrades()>0;
     }
@@ -61,7 +61,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
 
         //Gets inventory TE then makes sure its not a pedestal
         TileEntity invToPushTo = world.getTileEntity(posInventory);
-        if(invToPushTo instanceof PedestalTileEntity) {
+        if(invToPushTo instanceof TilePedestal) {
             itemFromPedestal = ItemStack.EMPTY;
         }
         else {
@@ -96,9 +96,9 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
     public void upgradeItemAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
         TileEntity tile = world.getTileEntity(posOfPedestal);
-        if(tile instanceof PedestalTileEntity)
+        if(tile instanceof TilePedestal)
         {
-            PedestalTileEntity ped = ((PedestalTileEntity)tile);
+            TilePedestal ped = ((TilePedestal)tile);
             if(ped.hasItem())
             {
                 if(isEnergyItemInsert(itemInPedestal))

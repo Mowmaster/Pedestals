@@ -2,7 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -100,9 +100,9 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
     {
         boolean returner = false;
         TileEntity tile = world.getTileEntity(posPedestal);
-        if(tile instanceof PedestalTileEntity)
+        if(tile instanceof TilePedestal)
         {
-            PedestalTileEntity ped = (PedestalTileEntity)tile;
+            TilePedestal ped = (TilePedestal)tile;
             int count = getSize(ped.getCoinOnPedestal());
             if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
             {
@@ -124,7 +124,7 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

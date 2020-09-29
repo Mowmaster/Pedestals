@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -240,8 +240,8 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     public void upgradeActionSendEnergy(World world, ItemStack coinMainPedestal, BlockPos posMainPedestal)
     {
         TileEntity pedestalInv = world.getTileEntity(posMainPedestal);
-        if(pedestalInv instanceof PedestalTileEntity) {
-            PedestalTileEntity tileMainPedestal = ((PedestalTileEntity) pedestalInv);
+        if(pedestalInv instanceof TilePedestal) {
+            TilePedestal tileMainPedestal = ((TilePedestal) pedestalInv);
             //If this Pedestal has any Exp
             int xpMainPedestal = getEnergyStored(coinMainPedestal);
             if(xpMainPedestal>0)
@@ -258,8 +258,8 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                             if(posStoredPedestal != posMainPedestal)
                             {
                                 TileEntity storedPedestal = world.getTileEntity(posStoredPedestal);
-                                if(storedPedestal instanceof PedestalTileEntity) {
-                                    PedestalTileEntity tileStoredPedestal = ((PedestalTileEntity) storedPedestal);
+                                if(storedPedestal instanceof TilePedestal) {
+                                    TilePedestal tileStoredPedestal = ((TilePedestal) storedPedestal);
                                     ItemStack coinStoredPedestal = tileStoredPedestal.getCoinOnPedestal();
                                     //Check if pedestal to send to can even be sent exp
                                     if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseEnergy)
@@ -406,7 +406,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(PedestalTileEntity pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         if(!world.isBlockPowered(pos))
         {
@@ -418,7 +418,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

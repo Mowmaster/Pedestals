@@ -4,7 +4,7 @@ import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -113,9 +113,9 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         TileEntity tileCheckForPedestal = world.getTileEntity(pedestalPos);
         ItemStack stackSpawnedItem = new ItemStack(getItemToSpawn(coinInPedestal));
         stackSpawnedItem.setCount(intSpace);
-        if(tileCheckForPedestal instanceof PedestalTileEntity)
+        if(tileCheckForPedestal instanceof TilePedestal)
         {
-            PedestalTileEntity tilePedestal = ((PedestalTileEntity)tileCheckForPedestal);
+            TilePedestal tilePedestal = ((TilePedestal)tileCheckForPedestal);
             int intGetStored = tilePedestal.getStoredValueForUpgrades();
             if(intSpace>0)
             {
@@ -140,9 +140,9 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     {
         TileEntity tileCheckForPedestal = world.getTileEntity(pedestalPos);
         int intSpawnRate = getCobbleGenSpawnRate(coinInPedestal);
-        if(tileCheckForPedestal instanceof PedestalTileEntity)
+        if(tileCheckForPedestal instanceof TilePedestal)
         {
-            PedestalTileEntity tilePedestal = ((PedestalTileEntity)tileCheckForPedestal);
+            TilePedestal tilePedestal = ((TilePedestal)tileCheckForPedestal);
             int intGetStored = tilePedestal.getStoredValueForUpgrades();
             int intNewStored = intGetStored + intSpawnRate;
             if(intGetStored <= (maxStored - intSpawnRate))
@@ -154,7 +154,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
 
     @Override
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(entityIn instanceof ItemEntity)
         {
@@ -186,7 +186,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

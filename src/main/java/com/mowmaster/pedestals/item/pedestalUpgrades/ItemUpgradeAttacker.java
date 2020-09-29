@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -104,7 +104,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         return damage;
     }
 
-    public float getMostlyDamage(PedestalTileEntity pedestal)
+    public float getMostlyDamage(TilePedestal pedestal)
     {
         ItemStack inPedestal = pedestal.getItemInPedestal();
         float damage = getCapacityModifier(pedestal.getCoinOnPedestal()) + 2.0f;
@@ -174,7 +174,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
         int s3 = getAreaWidth(stack);
