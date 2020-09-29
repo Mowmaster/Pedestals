@@ -74,6 +74,36 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         return  bottlingRate;
     }
 
+    @Override
+    public int getExpBuffer(ItemStack stack)
+    {
+        int value = 30;
+        switch (getCapacityModifier(stack))
+        {
+            case 0:
+                value = 5;//
+                break;
+            case 1:
+                value=10;//
+                break;
+            case 2:
+                value = 15;//
+                break;
+            case 3:
+                value = 20;//
+                break;
+            case 4:
+                value = 25;//
+                break;
+            case 5:
+                value=30;//
+                break;
+            default: value=5;
+        }
+
+        return  value;
+    }
+
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         if(!world.isRemote)
@@ -90,7 +120,8 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
 
     public void upgradeAction(World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
-        if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(15));}
+        int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+        if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         ItemStack itemFromInv = ItemStack.EMPTY;
 
@@ -150,11 +181,6 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                 }
             }
         //}
-    }
-
-    public int getExpBuffer(ItemStack stack)
-    {
-        return  15;
     }
 
     @Override
