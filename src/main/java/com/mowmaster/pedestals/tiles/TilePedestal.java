@@ -597,8 +597,8 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             Item coinInPed = getCoinOnPedestal().getItem();
             if(coinInPed instanceof ItemUpgradeBase)
             {
-                //return ((ItemUpgradeBase) coinInPed).canSendItem(this);
-                return false;
+                return ((ItemUpgradeBase) coinInPed).canSendItem(this);
+                //return false;
             }
         }
 
@@ -759,7 +759,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                     Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
                     if(coinInPed instanceof ItemUpgradeBase)
                     {
-                        //((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(world, tilePedestal, pos, state, entityIn);
+                        ((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(world, tilePedestal, pos, state, entityIn);
                     }
                 }
             }
@@ -783,7 +783,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     @Override
     public void tick() {
 
-        /*if(!world.isRemote)
+        if(!world.isRemote)
         {
             if(world.isAreaLoaded(pos,1))
             {
@@ -839,13 +839,13 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                 Item coinInPed = getCoinOnPedestal().getItem();
                 if(coinInPed instanceof ItemUpgradeBase)
                 {
-                    *//*partTicker++;
+                    partTicker++;
                     Random rand = new Random();
                     ((ItemUpgradeBase) coinInPed).onRandomDisplayTick(this,partTicker, world.getBlockState(getPos()), world, getPos(), rand);
-                    if(partTicker >=Integer.MAX_VALUE-100){partTicker=0;}*//*
+                    if(partTicker >=Integer.MAX_VALUE-100){partTicker=0;}
                 }
             }
-        }*/
+        }
     }
 
     @Override

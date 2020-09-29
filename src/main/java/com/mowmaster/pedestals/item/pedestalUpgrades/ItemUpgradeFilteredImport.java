@@ -157,10 +157,13 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                                 int allowedTransferRate = transferRate;
                                 if(roomLeftInPedestal < transferRate) allowedTransferRate = roomLeftInPedestal;
                                 if(itemCountInInv < allowedTransferRate) allowedTransferRate = itemCountInInv;
-                                ItemStack copyIncoming = senderBelowInvStack.copy();
-                                copyIncoming.setCount(allowedTransferRate);
-                                senderBelowInvHandler.extractItem(i,allowedTransferRate ,false );
-                                senderPedestal.addItem(copyIncoming);
+                                if(senderBelowInvHandler.extractItem(i,allowedTransferRate,true).getCount()>0)
+                                {
+                                    ItemStack copyIncoming = senderBelowInvStack.copy();
+                                    copyIncoming.setCount(allowedTransferRate);
+                                    senderBelowInvHandler.extractItem(i,allowedTransferRate,false);
+                                    senderPedestal.addItem(copyIncoming);
+                                }
                             }
                         }
                     }
