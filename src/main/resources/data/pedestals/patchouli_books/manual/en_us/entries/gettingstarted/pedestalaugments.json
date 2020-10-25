@@ -21,6 +21,12 @@
       "type": "crafting",
       "recipe": "pedestals:upgradecapacity",
       "text": "$(#FF0000)Pedestal Transfer Capacity Augment$() $(li)The Capacity Upgrade Increases the amount of items sent per interval, from 4items(default), 8i, 16i, 32i, 48i, 64i."
+    },
+    {
+      "title": "Pedestal Range",
+      "type": "crafting",
+      "recipe": "pedestals:upgraderange",
+      "text": "$(#FF0000)Pedestal Range Augment$() $(li)The Range Upgrade Increases the range at which a pedestal can send items. Default is 8 blocks, 12b,16b,32b,48b,64b"
     }
   ]
 }

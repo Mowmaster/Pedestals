@@ -24,6 +24,7 @@
     "item.pedestals.linkingtool.tool_seperator": ",",
     "item.pedestals.linkingtool.tool_capacity": "容量升级: ",
     "item.pedestals.linkingtool.tool_speed": "速度升级: ",
+    "item.pedestals.linkingtool.tool_range": "Range Upgrades: ",
     "jei.pedestals.linkingtool.desc": "按住shift右键基座用于接收物品，再按住shift右键另一个基座用于接收物品.用于合成这个模组的大部分物品。",
     "item.pedestals.tagtool": "标签工具",
     "jei.pedestals.tagtool.desc": "把一个物品拿在你的另一只手上, 对着空气右键标签工具. 聊天栏内会出现物品的标签。",
@@ -42,6 +43,8 @@
     "jei.pedestals.upgradespeed.desc": "在基座上使用以提高其传输物品的速度",
     "item.pedestals.upgradecapacity": "基座传输容量升级",
     "jei.pedestals.upgradecapacity.desc": "在基座上使用以增加一个每次传输物品的数量。",
+    "item.pedestals.upgraderange": "Pedestal Range Augment",
+    "jei.pedestals.upgraderange.desc": "Use on a Pedestal to Increase the Range it can send items to.",
 
     "item.pedestals.bookspeed": "专一附魔书 (速度)",
     "jei.pedestals.bookspeed.desc": "只允许被附魔速度附魔。只能把附魔书放在铁砧里进行升级。",

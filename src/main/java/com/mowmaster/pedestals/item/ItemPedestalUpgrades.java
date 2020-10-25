@@ -16,12 +16,14 @@ public class ItemPedestalUpgrades extends Item {
 
     public static final Item SPEED = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradespeed"));
     public static final Item CAPACITY = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradecapacity"));
+    public static final Item RANGE = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgraderange"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(SPEED);
         event.getRegistry().register(CAPACITY);
+        event.getRegistry().register(RANGE);
     }
 
 

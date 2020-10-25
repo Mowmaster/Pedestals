@@ -24,6 +24,7 @@
     "item.pedestals.linkingtool.tool_seperator": ",",
     "item.pedestals.linkingtool.tool_capacity": "Capacity Upgrades: ",
     "item.pedestals.linkingtool.tool_speed": "Speed Upgrades: ",
+    "item.pedestals.linkingtool.tool_range": "Range Upgrades: ",
     "jei.pedestals.linkingtool.desc": "Shift-R-Click the pedestal Receiving items to select it, Shift-R-Click on the pedestal Sending Items to link the two pedestals. Used In crafting to create most base items in the mod.",
     "item.pedestals.tagtool": "Tag Tool",
     "jei.pedestals.tagtool.desc": "With an item in your off hand, r-click the tag tool in the air. In chat the list of tags the item has will appear.",
@@ -42,6 +43,9 @@
         "jei.pedestals.upgradespeed.desc": "Use on a Pedestal to Increase the Speed at which it transfers items.",
     "item.pedestals.upgradecapacity": "Pedestal Transfer Capacity Augment",
         "jei.pedestals.upgradecapacity.desc": "Use on a Pedestal to Increase the Amount of Items transferred at a time.",
+    "item.pedestals.upgraderange": "Pedestal Range Augment",
+        "jei.pedestals.upgraderange.desc": "Use on a Pedestal to Increase the Range it can send items to.",
+
 
     "item.pedestals.bookspeed": "Enchantment Focused Book (Speed)",
     "jei.pedestals.bookspeed.desc": "Will only accept the Speed Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",

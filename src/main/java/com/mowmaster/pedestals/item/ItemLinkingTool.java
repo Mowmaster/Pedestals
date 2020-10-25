@@ -220,6 +220,11 @@ public class ItemLinkingTool extends Item {
                         speed.appendString(""+tilePedestal.getSpeed()+"");
                         speed.mergeStyle(TextFormatting.RED);
                         player.sendMessage(speed,Util.DUMMY_UUID);
+
+                        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_range");
+                        range.appendString(""+tilePedestal.getRange()+"");
+                        range.mergeStyle(TextFormatting.GREEN);
+                        player.sendMessage(range,Util.DUMMY_UUID);
                     }
                 }
             }
@@ -256,7 +261,7 @@ public class ItemLinkingTool extends Item {
                         if(worldIn.getTileEntity(pos) instanceof PedestalTileEntity)
                         {
                             PedestalTileEntity pedestal = ((PedestalTileEntity)worldIn.getTileEntity(pos));
-                            int range = pedestal.getPedestalTransferRange();
+                            int range = pedestal.getLinkingRange();
                             zmin = -range;
                             zmax = range;
                             xmin = -range;
@@ -307,7 +312,7 @@ public class ItemLinkingTool extends Item {
 
     public boolean isPedestalInRange(PedestalTileEntity pedestal, BlockPos pedestalToBeLinked)
     {
-        int range = pedestal.getPedestalTransferRange();
+        int range = pedestal.getLinkingRange();
         int x = pedestalToBeLinked.getX();
         int y = pedestalToBeLinked.getY();
         int z = pedestalToBeLinked.getZ();

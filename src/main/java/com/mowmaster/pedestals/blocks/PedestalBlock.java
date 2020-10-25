@@ -127,7 +127,12 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
             TileEntity tileentity = worldIn.getTileEntity(pos);
 
             if (tileentity instanceof PedestalTileEntity) {
-                InventoryHelper.dropInventoryItems(worldIn, pos, (PedestalTileEntity) tileentity);
+                PedestalTileEntity tile = (PedestalTileEntity) tileentity;
+                //InventoryHelper.dropInventoryItems(worldIn, pos, tile);
+                //Custome Drop Inv below
+                tile.dropInventoryItems(worldIn,pos);
+                tile.dropInventoryItemsPrivate(worldIn,pos);
+
                 worldIn.updateComparatorOutputLevel(pos, this);
             }
 
@@ -333,9 +338,18 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                 }
                                 else return ActionResultType.FAIL;
                             }
-                            else
+                            else if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.CAPACITY))
                             {
                                 if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
+                                {
+                                    if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
+                                    return ActionResultType.SUCCESS;
+                                }
+                                else return ActionResultType.FAIL;
+                            }
+                            else if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.RANGE))
+                            {
+                                if(tilePedestal.addRange(player.getHeldItemMainhand()))
                                 {
                                     if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                                     return ActionResultType.SUCCESS;
@@ -409,9 +423,18 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                         }
                         else return ActionResultType.FAIL;
                     }
-                    else
+                    else if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.CAPACITY))
                     {
                         if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
+                        {
+                            if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
+                            return ActionResultType.SUCCESS;
+                        }
+                        else return ActionResultType.FAIL;
+                    }
+                    else if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.RANGE))
+                    {
+                        if(tilePedestal.addRange(player.getHeldItemMainhand()))
                         {
                             if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                             return ActionResultType.SUCCESS;
