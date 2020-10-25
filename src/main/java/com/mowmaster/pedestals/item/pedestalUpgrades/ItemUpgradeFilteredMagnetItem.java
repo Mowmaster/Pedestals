@@ -94,6 +94,7 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
         List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
         for(ItemEntity getItemFromList : itemList)
         {
+            ItemStack copyStack = getItemFromList.getItem().copy();
             if (itemInPedestal.equals(ItemStack.EMPTY))
             {
                 BlockPos posInventory = getPosOfBlockBelow(world, posOfPedestal, 1);
@@ -109,7 +110,7 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
                         ItemStack itemFromInv = ItemStack.EMPTY;
                         itemFromInv = IntStream.range(0,range)//Int Range
                                 .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                                .filter(itemStack -> itemStack.getItem().equals(getItemFromList.getItem().getItem()))
+                                .filter(itemStack -> itemStack.getItem().equals(copyStack.getItem()))
                                 .findFirst().orElse(ItemStack.EMPTY);
 
                         if(!itemFromInv.isEmpty())
@@ -117,18 +118,19 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
                             world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                             if(pedestalInv instanceof TilePedestal) {
-                                if(getItemFromList.getItem().getCount() <=64)
+                                if(copyStack.getCount() <=64)
                                 {
+                                    getItemFromList.setItem(ItemStack.EMPTY);
                                     getItemFromList.remove();
-                                    ((TilePedestal) pedestalInv).addItem(getItemFromList.getItem());
+                                    ((TilePedestal) pedestalInv).addItem(copyStack);
                                 }
                                 else
                                 {
+                                    //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
                                     int count = getItemFromList.getItem().getCount();
                                     getItemFromList.getItem().setCount(count-64);
-                                    ItemStack getItemstacked = getItemFromList.getItem().copy();
-                                    getItemstacked.setCount(64);
-                                    ((TilePedestal) pedestalInv).addItem(getItemstacked);
+                                    copyStack.setCount(64);
+                                    ((TilePedestal) pedestalInv).addItem(copyStack);
                                 }
                             }
                             break;
