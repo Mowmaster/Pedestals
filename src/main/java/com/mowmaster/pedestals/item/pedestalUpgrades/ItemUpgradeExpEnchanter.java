@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -161,7 +161,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
         {
             IItemHandler handler = cap.orElse(null);
             TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof TilePedestal) {
+            if(invToPullFrom instanceof PedestalTileEntity) {
                 itemFromInv = ItemStack.EMPTY;
             }
             else {
@@ -173,8 +173,8 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                             itemFromInv = handler.getStackInSlot(i);
                             int slotCount = itemFromInv.getCount();
                             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                            if(pedestalInv instanceof TilePedestal) {
-                                if(!((TilePedestal) pedestalInv).hasItem())
+                            if(pedestalInv instanceof PedestalTileEntity) {
+                                if(!((PedestalTileEntity) pedestalInv).hasItem())
                                 {
                                     if(itemFromInv.isEnchantable() || itemFromInv.getItem().equals(Items.BOOK))
                                     {
@@ -203,7 +203,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                                 setXPStored(coinInPedestal,getExpLeftInPedestal);
                                                 handler.extractItem(i,stackToReturn.getCount() ,false );
                                                 world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
-                                                ((TilePedestal) pedestalInv).addItem(stackToReturn);
+                                                ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
                                             }
                                         }
                                     }
@@ -211,7 +211,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                     {
                                         ItemStack toReturn = itemFromInv.copy();
                                         handler.extractItem(i,toReturn.getCount() ,false );
-                                        ((TilePedestal) pedestalInv).addItem(toReturn);
+                                        ((PedestalTileEntity) pedestalInv).addItem(toReturn);
                                     }
                                 }
                             }
@@ -223,7 +223,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         float level = getEnchantmentPowerFromSorroundings(world,pos,coin);
@@ -281,7 +281,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

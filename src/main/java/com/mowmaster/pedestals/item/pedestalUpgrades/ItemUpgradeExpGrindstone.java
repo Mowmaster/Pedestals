@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -90,7 +90,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
         {
             IItemHandler handler = cap.orElse(null);
             TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof TilePedestal) {
+            if(invToPullFrom instanceof PedestalTileEntity) {
                 itemFromInv = ItemStack.EMPTY;
             }
             else {
@@ -101,8 +101,8 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                     {
                         itemFromInv = handler.getStackInSlot(i);
                         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                        if(pedestalInv instanceof TilePedestal) {
-                            if(!((TilePedestal) pedestalInv).hasItem())
+                        if(pedestalInv instanceof PedestalTileEntity) {
+                            if(!((PedestalTileEntity) pedestalInv).hasItem())
                             {
                                 if(itemFromInv.isEnchanted())
                                 {
@@ -122,7 +122,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                             setXPStored(coinInPedestal,getExpLeftInPedestal);
                                             handler.extractItem(i,stackToReturn.getCount() ,false );
                                             world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            ((TilePedestal) pedestalInv).addItem(stackToReturn);
+                                            ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
                                         }
                                     }
                                 }
@@ -130,7 +130,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                 {
                                     ItemStack toReturn = itemFromInv.copy();
                                     handler.extractItem(i,toReturn.getCount() ,false );
-                                    ((TilePedestal) pedestalInv).addItem(toReturn);
+                                    ((PedestalTileEntity) pedestalInv).addItem(toReturn);
                                 }
                             }
                         }
@@ -147,7 +147,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

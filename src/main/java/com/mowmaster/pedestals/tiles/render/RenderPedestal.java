@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.tiles.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -15,13 +15,12 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import javax.annotation.Nonnull;
 
 import static net.minecraft.block.DirectionalBlock.FACING;
 
-public class RenderPedestal extends TileEntityRenderer<TilePedestal> {
+public class RenderPedestal extends TileEntityRenderer<PedestalTileEntity> {
 
     public RenderPedestal(TileEntityRendererDispatcher rendererDispatcher)
     {
@@ -29,7 +28,7 @@ public class RenderPedestal extends TileEntityRenderer<TilePedestal> {
     }
 
     @Override
-    public void render(@Nonnull TilePedestal tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+    public void render(@Nonnull PedestalTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
         if (!tileEntityIn.isRemoved()) {
             Direction facing = tileEntityIn.getBlockState().get(FACING);
@@ -114,6 +113,6 @@ public class RenderPedestal extends TileEntityRenderer<TilePedestal> {
     //Old event was FMLClientSetupEvent
     public static void init(final ModelRegistryEvent event)
     {
-        ClientRegistry.bindTileEntityRenderer(TilePedestal.PEDESTALTYPE, RenderPedestal::new);
+        ClientRegistry.bindTileEntityRenderer(PedestalTileEntity.PEDESTALTYPE, RenderPedestal::new);
     }
 }

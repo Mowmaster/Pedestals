@@ -5,7 +5,7 @@ import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
@@ -146,8 +146,8 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                 if(!world.isBlockPowered(pedestalPos)) {
 
                     TileEntity pedestalInv = world.getTileEntity(pedestalPos);
-                    if(pedestalInv instanceof TilePedestal) {
-                        TilePedestal ped = ((TilePedestal) pedestalInv);
+                    if(pedestalInv instanceof PedestalTileEntity) {
+                        PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
 
                         //System.out.println("Has Fuel: " + removeFuel(ped,200,true));
                         if(removeFuel(ped,200,true)>=0)
@@ -209,8 +209,8 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                 fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
             }
             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-            if(pedestalInv instanceof TilePedestal) {
-                TilePedestal ped = ((TilePedestal) pedestalInv);
+            if(pedestalInv instanceof PedestalTileEntity) {
+                PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
                 if(removeFuel(ped,200,true)>=0)
                 {
                     /*if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true))
@@ -250,12 +250,12 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
             {
                 world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                if(pedestalInv instanceof TilePedestal) {
+                if(pedestalInv instanceof PedestalTileEntity) {
                     if(copyStack.getCount() <=64)
                     {
                         getItemFromList.setItem(ItemStack.EMPTY);
                         getItemFromList.remove();
-                        ((TilePedestal) pedestalInv).addItem(copyStack);
+                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
                     }
                     else
                     {
@@ -263,7 +263,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                         int count = getItemFromList.getItem().getCount();
                         getItemFromList.getItem().setCount(count-64);
                         copyStack.setCount(64);
-                        ((TilePedestal) pedestalInv).addItem(copyStack);
+                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
                     }
                 }
                 break;
@@ -303,7 +303,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
 
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.references.Reference;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -103,9 +103,9 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     {
         int amountToSet = 0;
         TileEntity entity = world.getTileEntity(posPedestal);
-        if(entity instanceof TilePedestal)
+        if(entity instanceof PedestalTileEntity)
         {
-            TilePedestal pedestal = (TilePedestal)entity;
+            PedestalTileEntity pedestal = (PedestalTileEntity)entity;
             int fuelLeft = pedestal.getStoredValueForUpgrades();
             amountToSet = fuelLeft - amountToRemove;
             if(amountToRemove >= fuelLeft) amountToSet = -1;
@@ -119,7 +119,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         return amountToSet;
     }
 
-    public int removeFuel(TilePedestal pedestal, int amountToRemove, boolean simulate)
+    public int removeFuel(PedestalTileEntity pedestal, int amountToRemove, boolean simulate)
     {
         int fuelLeft = pedestal.getStoredValueForUpgrades();
         int amountToSet = fuelLeft - amountToRemove;
@@ -144,7 +144,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(entityIn instanceof ItemEntity)
         {
@@ -205,7 +205,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void onRandomDisplayTick(TilePedestal pedestal,int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
         if(!world.isBlockPowered(pos))
         {
@@ -221,7 +221,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

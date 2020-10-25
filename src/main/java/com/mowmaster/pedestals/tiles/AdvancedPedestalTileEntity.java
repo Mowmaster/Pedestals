@@ -1,5 +1,7 @@
+/*
 package com.mowmaster.pedestals.tiles;
 
+import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
@@ -8,6 +10,7 @@ import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFilter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
@@ -17,7 +20,9 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.*;
+import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -43,9 +48,10 @@ import java.util.Random;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
 
-public class TilePedestal extends TileEntity implements IInventory, ITickableTileEntity {
+public class PedestalTileEntity extends TileEntity implements IInventory, ITickableTileEntity {
 
-    private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandler);
+    private LazyOptional<IItemHandler> tilehandler = LazyOptional.of(this::createHandlerPedestal);
+    private LazyOptional<IItemHandler> privateHandler = LazyOptional.of(this::createHandlerPedestalPrivate);
 
     private static final int[] SLOTS_ALLSIDES = new int[] {0};
 
@@ -57,9 +63,9 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     private final List<BlockPos> storedLocations = new ArrayList<BlockPos>();
     private LockCode lockCode;
 
-    public TilePedestal()
+    public PedestalTileEntity()
     {
-        super(PEDESTALTYPE);
+        super(PEDESTAL);
         this.lockCode = LockCode.EMPTY_CODE;
     }
 
@@ -75,7 +81,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     @Override
     public ItemStack getStackInSlot(int i) {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler h = tilehandler.orElse(null);
         return h.getStackInSlot(i);
     }
 
@@ -101,7 +107,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     @Override
     public void setInventorySlotContents(int i, ItemStack itemStack) {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler h = tilehandler.orElse(null);
         h.insertItem(i,itemStack,false);
     }
 
@@ -111,19 +117,10 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     {
         markDirty();
         world.notifyBlockUpdate(pos,getBlockState(),getBlockState(),2);
-        /*public static final int NOTIFY_NEIGHBORS = 1;
-        public static final int BLOCK_UPDATE = 2;
-        public static final int NO_RERENDER = 4;
-        public static final int RERENDER_MAIN_THREAD = 8;
-        public static final int UPDATE_NEIGHBORS = 16;
-        public static final int NO_NEIGHBOR_DROPS = 32;
-        public static final int IS_MOVING = 64;
-        public static final int DEFAULT = 3;
-        public static final int DEFAULT_AND_RERENDER = 11;*/
     }
 
-    private IItemHandler createHandler() {
-        return new ItemStackHandler(5) {
+    public IItemHandler createHandlerPedestal() {
+        return new ItemStackHandler(1) {
             @Override
             protected void onContentsChanged(int slot) {
                 update();
@@ -132,10 +129,24 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
                 if (slot == 0) return true;
-                if (slot == 1 && stack.getItem() instanceof ItemUpgradeBase) return true;
-                if (slot == 2 && stack.getItem().equals(Items.GLOWSTONE) && !hasLight()) return true;
-                if (slot == 3 && stack.getItem().equals(ItemPedestalUpgrades.SPEED) && getSpeed()<5) return true;
-                if (slot == 4 && stack.getItem().equals(ItemPedestalUpgrades.CAPACITY) && getCapacity()<5) return true;
+                return false;
+            }
+        };
+    }
+
+    private IItemHandler createHandlerPedestalPrivate() {
+        return new ItemStackHandler(4) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                update();
+            }
+
+            @Override
+            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                if (slot == 0 && stack.getItem() instanceof ItemUpgradeBase) return true;
+                if (slot == 1 && stack.getItem().equals(Items.GLOWSTONE) && !hasLight()) return true;
+                if (slot == 2 && stack.getItem().equals(ItemPedestalUpgrades.SPEED) && getSpeed()<5) return true;
+                if (slot == 3 && stack.getItem().equals(ItemPedestalUpgrades.CAPACITY) && getCapacity()<5) return true;
                 return false;
             }
         };
@@ -145,7 +156,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return handler.cast();
+            return tilehandler.cast();
         }
         return super.getCapability(cap, side);
     }
@@ -215,44 +226,48 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public boolean hasItem()
     {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler h = tilehandler.orElse(null);
         if(h.getStackInSlot(0).isEmpty())
         {
             return false;
         }
         else  return true;
     }
+
     public boolean hasCoin()
     {
-        IItemHandler h = handler.orElse(null);
-        if(h.getStackInSlot(1).isEmpty())
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(0).isEmpty())
         {
             return false;
         }
         else  return true;
     }
+
     public boolean hasLight()
     {
-        IItemHandler h = handler.orElse(null);
-        if(h.getStackInSlot(2).isEmpty())
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(1).isEmpty())
         {
             return false;
         }
         else  return true;
     }
+
     public boolean hasSpeed()
     {
-        IItemHandler h = handler.orElse(null);
-        if(h.getStackInSlot(3).isEmpty())
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(2).isEmpty())
         {
             return false;
         }
         else  return true;
     }
+
     public boolean hasCapacity()
     {
-        IItemHandler h = handler.orElse(null);
-        if(h.getStackInSlot(4).isEmpty())
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(3).isEmpty())
         {
             return false;
         }
@@ -261,7 +276,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public ItemStack getItemInPedestal()
     {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler h = tilehandler.orElse(null);
         if(hasItem())
         {
             return h.getStackInSlot(0);
@@ -269,30 +284,31 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         else return ItemStack.EMPTY;
 
     }
+
     public ItemStack getCoinOnPedestal()
     {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler ph = privateHandler.orElse(null);
         if(hasCoin())
         {
-            return h.getStackInSlot(1);
+            return ph.getStackInSlot(0);
         }
         else return ItemStack.EMPTY;
     }
 
     public int getSpeed()
     {
-        IItemHandler h = handler.orElse(null);
-        return h.getStackInSlot(3).getCount();
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(2).getCount();
     }
 
     public int getCapacity()
     {
-        IItemHandler h = handler.orElse(null);
-        return h.getStackInSlot(4).getCount();
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(3).getCount();
     }
 
     public ItemStack removeItem(int numToRemove) {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler h = tilehandler.orElse(null);
         ItemStack stack = h.extractItem(0,numToRemove,false);
         update();
 
@@ -300,7 +316,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     }
 
     public ItemStack removeItem() {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler h = tilehandler.orElse(null);
         ItemStack stack = h.extractItem(0,h.getStackInSlot(0).getCount(),false);
         update();
 
@@ -308,12 +324,26 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     }
 
     public ItemStack removeCoin() {
-        IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.extractItem(1,h.getStackInSlot(1).getCount(),false);
+        IItemHandler ph = privateHandler.orElse(null);
+        ItemStack stack = ph.extractItem(0,ph.getStackInSlot(0).getCount(),false);
         setStoredValueForUpgrades(0);
         update();
 
         return stack;
+    }
+
+    public void dropInventoryItems(World worldIn, BlockPos pos) {
+        IItemHandler h = tilehandler.orElse(null);
+        for(int i = 0; i < h.getSlots(); ++i) {
+            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
+        }
+    }
+
+    public void dropInventoryItemsPrivate(World worldIn, BlockPos pos) {
+        IItemHandler h = privateHandler.orElse(null);
+        for(int i = 0; i < h.getSlots(); ++i) {
+            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
+        }
     }
 
     public int getItemTransferRate()
@@ -378,7 +408,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public boolean addItem(ItemStack itemFromBlock)
     {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler h = tilehandler.orElse(null);
         if(hasItem())
         {
             if(doItemsMatch(itemFromBlock))
@@ -394,10 +424,10 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public boolean addCoin(ItemStack coinFromBlock)
     {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler ph = privateHandler.orElse(null);
         ItemStack itemFromBlock = coinFromBlock.copy();
         itemFromBlock.setCount(1);
-        if(hasCoin()){} else h.insertItem(1,itemFromBlock,false);
+        if(hasCoin()){} else ph.insertItem(0,itemFromBlock,false);
         setStoredValueForUpgrades(0);
         update();
 
@@ -406,12 +436,12 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public boolean addSpeed(ItemStack speedUpgrade)
     {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler ph = privateHandler.orElse(null);
         ItemStack itemFromBlock = speedUpgrade.copy();
         itemFromBlock.setCount(1);
         if(getSpeed() < 5)
         {
-            h.insertItem(3,itemFromBlock,false);
+            ph.insertItem(2,itemFromBlock,false);
             update();
             return true;
         }
@@ -420,12 +450,12 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public boolean addCapacity(ItemStack capacityUpgrade)
     {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler ph = privateHandler.orElse(null);
         ItemStack itemFromBlock = capacityUpgrade.copy();
         itemFromBlock.setCount(1);
         if(getCapacity() < 5)
         {
-            h.insertItem(4,itemFromBlock,false);
+            ph.insertItem(3,itemFromBlock,false);
             update();
             return true;
         }
@@ -442,11 +472,11 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         {
             boolLight = true;
             BlockState state = world.getBlockState(pos);
-            boolean watered = state.get(PedestalBlock.WATERLOGGED);
-            Direction dir = state.get(PedestalBlock.FACING);
-            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,true);
-            IItemHandler h = handler.orElse(null);
-            h.insertItem(2,new ItemStack(Items.GLOWSTONE,1),false);
+            boolean watered = state.get(BlockPedestalTE.WATERLOGGED);
+            Direction dir = state.get(BlockPedestalTE.FACING);
+            BlockState newstate = state.with(BlockPedestalTE.FACING,dir).with(BlockPedestalTE.WATERLOGGED,watered).with(BlockPedestalTE.LIT,true);
+            IItemHandler ph = privateHandler.orElse(null);
+            ph.insertItem(1,new ItemStack(Items.GLOWSTONE,1),false);
             world.notifyBlockUpdate(pos,state,newstate,3);
             world.setBlockState(pos,newstate,3);
             //world.markBlockRangeForRenderUpdate(pos,state,newstate);
@@ -479,7 +509,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public boolean doItemsMatch(ItemStack itemStackIn)
     {
-        IItemHandler h = handler.orElse(null);
+        IItemHandler h = tilehandler.orElse(null);
         if(hasItem())
         {
             if(itemStackIn.hasTag())
@@ -572,7 +602,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         return canAccept;
     }
 
-    public boolean hasFilter(TilePedestal pedestalSendingTo)
+    public boolean hasFilter(PedestalTileEntity pedestalSendingTo)
     {
         boolean returner = false;
         if(pedestalSendingTo.hasCoin())
@@ -596,15 +626,15 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             Item coinInPed = getCoinOnPedestal().getItem();
             if(coinInPed instanceof ItemUpgradeBase)
             {
-                return ((ItemUpgradeBase) coinInPed).canSendItem(this);
-                //return false;
+                //return ((ItemUpgradeBase) coinInPed).canSendItem(this);
+                return true;
             }
         }
 
         return returner;
     }
 
-    private boolean canSendToPedestal(BlockPos pedestalToSendTo)
+    public boolean canSendToPedestal(BlockPos pedestalToSendTo)
     {
         boolean returner = false;
 
@@ -624,9 +654,9 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                         if(canLinkToPedestalNetwork(pedestalToSendTo))
                         {
                             //Get the tile before checking other things
-                            if(world.getTileEntity(pedestalToSendTo) instanceof TilePedestal)
+                            if(world.getTileEntity(pedestalToSendTo) instanceof PedestalTileEntity)
                             {
-                                TilePedestal tilePedestalToSendTo = (TilePedestal)world.getTileEntity(pedestalToSendTo);
+                                PedestalTileEntity tilePedestalToSendTo = (PedestalTileEntity)world.getTileEntity(pedestalToSendTo);
 
                                 //Checks if pedestal is empty or if not then checks if items match and how many can be insert
                                 if(tilePedestalToSendTo.canAcceptItems(world,pedestalToSendTo,getItemInPedestal()) > 0)
@@ -679,9 +709,9 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                         if(canLinkToPedestalNetwork(pedestalToSendTo))
                         {
                             //Get the tile before checking other things
-                            if(world.getTileEntity(pedestalToSendTo) instanceof TilePedestal)
+                            if(world.getTileEntity(pedestalToSendTo) instanceof PedestalTileEntity)
                             {
-                                TilePedestal tilePedestalToSendTo = (TilePedestal)world.getTileEntity(pedestalToSendTo);
+                                PedestalTileEntity tilePedestalToSendTo = (PedestalTileEntity)world.getTileEntity(pedestalToSendTo);
 
                                 //Checks if pedestal is empty or if not then checks if items match and how many can be insert
                                 if(tilePedestalToSendTo.canAcceptItems(world,pedestalToSendTo,itemStackIncoming) > 0)
@@ -716,9 +746,9 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
 
     public void sendItemsToPedestal(BlockPos pedestalToSendTo)
     {
-        if(world.getTileEntity(pedestalToSendTo) instanceof TilePedestal)
+        if(world.getTileEntity(pedestalToSendTo) instanceof PedestalTileEntity)
         {
-            TilePedestal tileToSendTo = ((TilePedestal)world.getTileEntity(pedestalToSendTo));
+            PedestalTileEntity tileToSendTo = ((PedestalTileEntity)world.getTileEntity(pedestalToSendTo));
 
             //Max that can be recieved
             int countToSend = tileToSendTo.canAcceptItems(world,pedestalToSendTo,getItemInPedestal());
@@ -748,12 +778,12 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         }
     }
 
-    public void collideWithPedestal(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void collideWithPedestal(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(!world.isRemote) {
             if(entityIn instanceof ItemEntity)
             {
-               if(tilePedestal.hasCoin())
+                if(tilePedestal.hasCoin())
                 {
                     Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
                     if(coinInPed instanceof ItemUpgradeBase)
@@ -851,7 +881,10 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     public void read(BlockState state, CompoundNBT nbt) {
         super.read(state, nbt);
         CompoundNBT invTag = nbt.getCompound("inv");
-        handler.ifPresent(h -> ((INBTSerializable<CompoundNBT>) h).deserializeNBT(invTag));
+        CompoundNBT invTagP = nbt.getCompound("invp");
+        tilehandler.ifPresent(h -> ((INBTSerializable<CompoundNBT>) h).deserializeNBT(invTag));
+
+        privateHandler.ifPresent(ph -> ((INBTSerializable<CompoundNBT>) ph).deserializeNBT(invTagP));
 
         this.storedValueForUpgrades = nbt.getInt("storedUpgradeValue");
         this.intTransferAmount = nbt.getInt("intTransferAmount");
@@ -872,12 +905,17 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         this.lockCode = LockCode.read(nbt);
     }
 
-
+    @Override
     public CompoundNBT write(CompoundNBT tag) {
         super.write(tag);
-        handler.ifPresent(h -> {
+        tilehandler.ifPresent(h -> {
             CompoundNBT compound = ((INBTSerializable<CompoundNBT>) h).serializeNBT();
             tag.put("inv", compound);
+        });
+
+        privateHandler.ifPresent(ph -> {
+            CompoundNBT compound = ((INBTSerializable<CompoundNBT>) ph).serializeNBT();
+            tag.put("invp", compound);
         });
 
         tag.putInt("storedUpgradeValue",storedValueForUpgrades);
@@ -906,8 +944,28 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         return tag;
     }
 
-    /*//https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
-    */
+    public void spawnItemStack(World worldIn, double x, double y, double z, ItemStack stack) {
+        Random RANDOM = new Random();
+        double d0 = (double) EntityType.ITEM.getWidth();
+        double d1 = 1.0D - d0;
+        double d2 = d0 / 2.0D;
+        double d3 = Math.floor(x) + RANDOM.nextDouble() * d1 + d2;
+        double d4 = Math.floor(y) + RANDOM.nextDouble() * d1;
+        double d5 = Math.floor(z) + RANDOM.nextDouble() * d1 + d2;
+
+        while(!stack.isEmpty()) {
+            ItemEntity itementity = new ItemEntity(worldIn, d3, d4, d5, stack.split(RANDOM.nextInt(21) + 10));
+            float f = 0.05F;
+            itementity.setMotion(RANDOM.nextGaussian() * 0.05000000074505806D, RANDOM.nextGaussian() * 0.05000000074505806D + 0.20000000298023224D, RANDOM.nextGaussian() * 0.05000000074505806D);
+            worldIn.addEntity(itementity);
+        }
+    }
+
+/*/
+/*
+//https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
+
+
 
     // TODO: When syncing data to the client, only update the two itemsstacks that get updated, not everything.
 
@@ -916,7 +974,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTagCompound = new CompoundNBT();
         write(nbtTagCompound);
-        int tileEntityType = 42;  // arbitrary number; only used for vanilla TileEntities.  You can use it, or not, as you want.
+        int tileEntityType = 43;  // arbitrary number; only used for vanilla TileEntities.  You can use it, or not, as you want.
         return new SUpdateTileEntityPacket(this.pos, tileEntityType, nbtTagCompound);
     }
 
@@ -939,7 +997,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         this.read(state, tag);
     }
 
-    private static Block[] pedArray = new Block[]{PedestalBlock.PEDESTAL_000, PedestalBlock.PEDESTAL_001, PedestalBlock.PEDESTAL_002, PedestalBlock.PEDESTAL_003
+    public static Block[] pedestalList = new Block[]{PedestalBlock.PEDESTAL_000, PedestalBlock.PEDESTAL_001, PedestalBlock.PEDESTAL_002, PedestalBlock.PEDESTAL_003
             , PedestalBlock.PEDESTAL_010, PedestalBlock.PEDESTAL_011, PedestalBlock.PEDESTAL_012, PedestalBlock.PEDESTAL_013
             , PedestalBlock.PEDESTAL_020, PedestalBlock.PEDESTAL_021, PedestalBlock.PEDESTAL_022, PedestalBlock.PEDESTAL_023
             , PedestalBlock.PEDESTAL_030, PedestalBlock.PEDESTAL_031, PedestalBlock.PEDESTAL_032, PedestalBlock.PEDESTAL_033
@@ -956,21 +1014,25 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             , PedestalBlock.PEDESTAL_320, PedestalBlock.PEDESTAL_321, PedestalBlock.PEDESTAL_322, PedestalBlock.PEDESTAL_323
             , PedestalBlock.PEDESTAL_330, PedestalBlock.PEDESTAL_331, PedestalBlock.PEDESTAL_332, PedestalBlock.PEDESTAL_333};
 
-    private static final ResourceLocation RESLOC_TILE_PEDESTAL = new ResourceLocation(MODID, "tile/pedestal");
+    private static final ResourceLocation RESLOC_TILE_PEDESTAL = new ResourceLocation(MODID, "tile/pedestal_tile");
 
-    public static TileEntityType<TilePedestal> PEDESTALTYPE = TileEntityType.Builder.create(TilePedestal::new, pedArray).build(null);
+    public static TileEntityType<PedestalTileEntity> PEDESTAL = TileEntityType.Builder.create(PedestalTileEntity::new, pedestalList).build(null);
 
     @SubscribeEvent
     public static void onTileEntityRegistry(final RegistryEvent.Register<TileEntityType<?>> event) {
         IForgeRegistry<TileEntityType<?>> r = event.getRegistry();
-        r.register(PEDESTALTYPE.setRegistryName(RESLOC_TILE_PEDESTAL));
+        r.register(PEDESTAL.setRegistryName(RESLOC_TILE_PEDESTAL));
     }
 
     @Override
     public void remove() {
         super.remove();
-        if(this.handler != null) {
-            this.handler.invalidate();
+        if(this.tilehandler != null) {
+            this.tilehandler.invalidate();
+        }
+        if(this.privateHandler != null) {
+            this.privateHandler.invalidate();
         }
     }
 }
+*/

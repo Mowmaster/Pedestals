@@ -7,7 +7,7 @@ import com.mowmaster.pedestals.item.ItemRegistry;
 import com.mowmaster.pedestals.recipes.PedestalsSerializers;
 import com.mowmaster.pedestals.references.Reference;
 //import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -114,7 +114,7 @@ public class pedestals
         @SubscribeEvent
         public static void onTileRegistryReady(RegistryEvent.Register<TileEntityType<?>> event)
         {
-            TilePedestal.onTileEntityRegistry(event);
+            PedestalTileEntity.onTileEntityRegistry(event);
             //PedestalTileEntity.onTileEntityRegistry(event);
         }
     }

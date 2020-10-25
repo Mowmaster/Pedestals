@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -117,12 +117,12 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
                         {
                             world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                            if(pedestalInv instanceof TilePedestal) {
+                            if(pedestalInv instanceof PedestalTileEntity) {
                                 if(copyStack.getCount() <=64)
                                 {
                                     getItemFromList.setItem(ItemStack.EMPTY);
                                     getItemFromList.remove();
-                                    ((TilePedestal) pedestalInv).addItem(copyStack);
+                                    ((PedestalTileEntity) pedestalInv).addItem(copyStack);
                                 }
                                 else
                                 {
@@ -130,7 +130,7 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
                                     int count = getItemFromList.getItem().getCount();
                                     getItemFromList.getItem().setCount(count-64);
                                     copyStack.setCount(64);
-                                    ((TilePedestal) pedestalInv).addItem(copyStack);
+                                    ((PedestalTileEntity) pedestalInv).addItem(copyStack);
                                 }
                             }
                             break;
@@ -142,7 +142,7 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, TilePedestal tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(entityIn instanceof ItemEntity)
         {
@@ -169,9 +169,9 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
                         if(!itemFromInv.isEmpty())
                         {
                             TileEntity pedestalInv = world.getTileEntity(posPedestal);
-                            if(pedestalInv instanceof TilePedestal) {
+                            if(pedestalInv instanceof PedestalTileEntity) {
                                 entityIn.remove();
-                                ((TilePedestal) pedestalInv).addItem(getItemStack);
+                                ((PedestalTileEntity) pedestalInv).addItem(getItemStack);
                             }
                         }
                     }
@@ -181,7 +181,7 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

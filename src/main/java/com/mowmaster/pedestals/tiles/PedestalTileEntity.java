@@ -1,7 +1,5 @@
-/*
 package com.mowmaster.pedestals.tiles;
 
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
@@ -10,7 +8,6 @@ import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFilter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
@@ -20,9 +17,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -50,8 +45,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class PedestalTileEntity extends TileEntity implements IInventory, ITickableTileEntity {
 
-    private LazyOptional<IItemHandler> tilehandler = LazyOptional.of(this::createHandlerPedestal);
-    private LazyOptional<IItemHandler> privateHandler = LazyOptional.of(this::createHandlerPedestalPrivate);
+    private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandler);
 
     private static final int[] SLOTS_ALLSIDES = new int[] {0};
 
@@ -65,7 +59,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     public PedestalTileEntity()
     {
-        super(PEDESTAL);
+        super(PEDESTALTYPE);
         this.lockCode = LockCode.EMPTY_CODE;
     }
 
@@ -81,7 +75,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     @Override
     public ItemStack getStackInSlot(int i) {
-        IItemHandler h = tilehandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         return h.getStackInSlot(i);
     }
 
@@ -107,7 +101,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     @Override
     public void setInventorySlotContents(int i, ItemStack itemStack) {
-        IItemHandler h = tilehandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         h.insertItem(i,itemStack,false);
     }
 
@@ -117,10 +111,19 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     {
         markDirty();
         world.notifyBlockUpdate(pos,getBlockState(),getBlockState(),2);
+        /*public static final int NOTIFY_NEIGHBORS = 1;
+        public static final int BLOCK_UPDATE = 2;
+        public static final int NO_RERENDER = 4;
+        public static final int RERENDER_MAIN_THREAD = 8;
+        public static final int UPDATE_NEIGHBORS = 16;
+        public static final int NO_NEIGHBOR_DROPS = 32;
+        public static final int IS_MOVING = 64;
+        public static final int DEFAULT = 3;
+        public static final int DEFAULT_AND_RERENDER = 11;*/
     }
 
-    public IItemHandler createHandlerPedestal() {
-        return new ItemStackHandler(1) {
+    private IItemHandler createHandler() {
+        return new ItemStackHandler(5) {
             @Override
             protected void onContentsChanged(int slot) {
                 update();
@@ -129,24 +132,10 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
                 if (slot == 0) return true;
-                return false;
-            }
-        };
-    }
-
-    private IItemHandler createHandlerPedestalPrivate() {
-        return new ItemStackHandler(4) {
-            @Override
-            protected void onContentsChanged(int slot) {
-                update();
-            }
-
-            @Override
-            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                if (slot == 0 && stack.getItem() instanceof ItemUpgradeBase) return true;
-                if (slot == 1 && stack.getItem().equals(Items.GLOWSTONE) && !hasLight()) return true;
-                if (slot == 2 && stack.getItem().equals(ItemPedestalUpgrades.SPEED) && getSpeed()<5) return true;
-                if (slot == 3 && stack.getItem().equals(ItemPedestalUpgrades.CAPACITY) && getCapacity()<5) return true;
+                if (slot == 1 && stack.getItem() instanceof ItemUpgradeBase) return true;
+                if (slot == 2 && stack.getItem().equals(Items.GLOWSTONE) && !hasLight()) return true;
+                if (slot == 3 && stack.getItem().equals(ItemPedestalUpgrades.SPEED) && getSpeed()<5) return true;
+                if (slot == 4 && stack.getItem().equals(ItemPedestalUpgrades.CAPACITY) && getCapacity()<5) return true;
                 return false;
             }
         };
@@ -156,7 +145,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return tilehandler.cast();
+            return handler.cast();
         }
         return super.getCapability(cap, side);
     }
@@ -226,48 +215,44 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     public boolean hasItem()
     {
-        IItemHandler h = tilehandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         if(h.getStackInSlot(0).isEmpty())
         {
             return false;
         }
         else  return true;
     }
-
     public boolean hasCoin()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(0).isEmpty())
+        IItemHandler h = handler.orElse(null);
+        if(h.getStackInSlot(1).isEmpty())
         {
             return false;
         }
         else  return true;
     }
-
     public boolean hasLight()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(1).isEmpty())
+        IItemHandler h = handler.orElse(null);
+        if(h.getStackInSlot(2).isEmpty())
         {
             return false;
         }
         else  return true;
     }
-
     public boolean hasSpeed()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(2).isEmpty())
+        IItemHandler h = handler.orElse(null);
+        if(h.getStackInSlot(3).isEmpty())
         {
             return false;
         }
         else  return true;
     }
-
     public boolean hasCapacity()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(3).isEmpty())
+        IItemHandler h = handler.orElse(null);
+        if(h.getStackInSlot(4).isEmpty())
         {
             return false;
         }
@@ -276,7 +261,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     public ItemStack getItemInPedestal()
     {
-        IItemHandler h = tilehandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         if(hasItem())
         {
             return h.getStackInSlot(0);
@@ -284,31 +269,30 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         else return ItemStack.EMPTY;
 
     }
-
     public ItemStack getCoinOnPedestal()
     {
-        IItemHandler ph = privateHandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         if(hasCoin())
         {
-            return ph.getStackInSlot(0);
+            return h.getStackInSlot(1);
         }
         else return ItemStack.EMPTY;
     }
 
     public int getSpeed()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(2).getCount();
+        IItemHandler h = handler.orElse(null);
+        return h.getStackInSlot(3).getCount();
     }
 
     public int getCapacity()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(3).getCount();
+        IItemHandler h = handler.orElse(null);
+        return h.getStackInSlot(4).getCount();
     }
 
     public ItemStack removeItem(int numToRemove) {
-        IItemHandler h = tilehandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         ItemStack stack = h.extractItem(0,numToRemove,false);
         update();
 
@@ -316,7 +300,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     }
 
     public ItemStack removeItem() {
-        IItemHandler h = tilehandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         ItemStack stack = h.extractItem(0,h.getStackInSlot(0).getCount(),false);
         update();
 
@@ -324,26 +308,12 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     }
 
     public ItemStack removeCoin() {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack stack = ph.extractItem(0,ph.getStackInSlot(0).getCount(),false);
+        IItemHandler h = handler.orElse(null);
+        ItemStack stack = h.extractItem(1,h.getStackInSlot(1).getCount(),false);
         setStoredValueForUpgrades(0);
         update();
 
         return stack;
-    }
-
-    public void dropInventoryItems(World worldIn, BlockPos pos) {
-        IItemHandler h = tilehandler.orElse(null);
-        for(int i = 0; i < h.getSlots(); ++i) {
-            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
-        }
-    }
-
-    public void dropInventoryItemsPrivate(World worldIn, BlockPos pos) {
-        IItemHandler h = privateHandler.orElse(null);
-        for(int i = 0; i < h.getSlots(); ++i) {
-            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
-        }
     }
 
     public int getItemTransferRate()
@@ -408,7 +378,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     public boolean addItem(ItemStack itemFromBlock)
     {
-        IItemHandler h = tilehandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         if(hasItem())
         {
             if(doItemsMatch(itemFromBlock))
@@ -424,10 +394,10 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     public boolean addCoin(ItemStack coinFromBlock)
     {
-        IItemHandler ph = privateHandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         ItemStack itemFromBlock = coinFromBlock.copy();
         itemFromBlock.setCount(1);
-        if(hasCoin()){} else ph.insertItem(0,itemFromBlock,false);
+        if(hasCoin()){} else h.insertItem(1,itemFromBlock,false);
         setStoredValueForUpgrades(0);
         update();
 
@@ -436,12 +406,12 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     public boolean addSpeed(ItemStack speedUpgrade)
     {
-        IItemHandler ph = privateHandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         ItemStack itemFromBlock = speedUpgrade.copy();
         itemFromBlock.setCount(1);
         if(getSpeed() < 5)
         {
-            ph.insertItem(2,itemFromBlock,false);
+            h.insertItem(3,itemFromBlock,false);
             update();
             return true;
         }
@@ -450,12 +420,12 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     public boolean addCapacity(ItemStack capacityUpgrade)
     {
-        IItemHandler ph = privateHandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         ItemStack itemFromBlock = capacityUpgrade.copy();
         itemFromBlock.setCount(1);
         if(getCapacity() < 5)
         {
-            ph.insertItem(3,itemFromBlock,false);
+            h.insertItem(4,itemFromBlock,false);
             update();
             return true;
         }
@@ -472,11 +442,11 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         {
             boolLight = true;
             BlockState state = world.getBlockState(pos);
-            boolean watered = state.get(BlockPedestalTE.WATERLOGGED);
-            Direction dir = state.get(BlockPedestalTE.FACING);
-            BlockState newstate = state.with(BlockPedestalTE.FACING,dir).with(BlockPedestalTE.WATERLOGGED,watered).with(BlockPedestalTE.LIT,true);
-            IItemHandler ph = privateHandler.orElse(null);
-            ph.insertItem(1,new ItemStack(Items.GLOWSTONE,1),false);
+            boolean watered = state.get(PedestalBlock.WATERLOGGED);
+            Direction dir = state.get(PedestalBlock.FACING);
+            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,true);
+            IItemHandler h = handler.orElse(null);
+            h.insertItem(2,new ItemStack(Items.GLOWSTONE,1),false);
             world.notifyBlockUpdate(pos,state,newstate,3);
             world.setBlockState(pos,newstate,3);
             //world.markBlockRangeForRenderUpdate(pos,state,newstate);
@@ -509,7 +479,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
     public boolean doItemsMatch(ItemStack itemStackIn)
     {
-        IItemHandler h = tilehandler.orElse(null);
+        IItemHandler h = handler.orElse(null);
         if(hasItem())
         {
             if(itemStackIn.hasTag())
@@ -626,15 +596,15 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
             Item coinInPed = getCoinOnPedestal().getItem();
             if(coinInPed instanceof ItemUpgradeBase)
             {
-                //return ((ItemUpgradeBase) coinInPed).canSendItem(this);
-                return true;
+                return ((ItemUpgradeBase) coinInPed).canSendItem(this);
+                //return false;
             }
         }
 
         return returner;
     }
 
-    public boolean canSendToPedestal(BlockPos pedestalToSendTo)
+    private boolean canSendToPedestal(BlockPos pedestalToSendTo)
     {
         boolean returner = false;
 
@@ -783,7 +753,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         if(!world.isRemote) {
             if(entityIn instanceof ItemEntity)
             {
-                if(tilePedestal.hasCoin())
+               if(tilePedestal.hasCoin())
                 {
                     Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
                     if(coinInPed instanceof ItemUpgradeBase)
@@ -881,10 +851,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     public void read(BlockState state, CompoundNBT nbt) {
         super.read(state, nbt);
         CompoundNBT invTag = nbt.getCompound("inv");
-        CompoundNBT invTagP = nbt.getCompound("invp");
-        tilehandler.ifPresent(h -> ((INBTSerializable<CompoundNBT>) h).deserializeNBT(invTag));
-
-        privateHandler.ifPresent(ph -> ((INBTSerializable<CompoundNBT>) ph).deserializeNBT(invTagP));
+        handler.ifPresent(h -> ((INBTSerializable<CompoundNBT>) h).deserializeNBT(invTag));
 
         this.storedValueForUpgrades = nbt.getInt("storedUpgradeValue");
         this.intTransferAmount = nbt.getInt("intTransferAmount");
@@ -905,17 +872,12 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         this.lockCode = LockCode.read(nbt);
     }
 
-    @Override
+
     public CompoundNBT write(CompoundNBT tag) {
         super.write(tag);
-        tilehandler.ifPresent(h -> {
+        handler.ifPresent(h -> {
             CompoundNBT compound = ((INBTSerializable<CompoundNBT>) h).serializeNBT();
             tag.put("inv", compound);
-        });
-
-        privateHandler.ifPresent(ph -> {
-            CompoundNBT compound = ((INBTSerializable<CompoundNBT>) ph).serializeNBT();
-            tag.put("invp", compound);
         });
 
         tag.putInt("storedUpgradeValue",storedValueForUpgrades);
@@ -944,28 +906,8 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         return tag;
     }
 
-    public void spawnItemStack(World worldIn, double x, double y, double z, ItemStack stack) {
-        Random RANDOM = new Random();
-        double d0 = (double) EntityType.ITEM.getWidth();
-        double d1 = 1.0D - d0;
-        double d2 = d0 / 2.0D;
-        double d3 = Math.floor(x) + RANDOM.nextDouble() * d1 + d2;
-        double d4 = Math.floor(y) + RANDOM.nextDouble() * d1;
-        double d5 = Math.floor(z) + RANDOM.nextDouble() * d1 + d2;
-
-        while(!stack.isEmpty()) {
-            ItemEntity itementity = new ItemEntity(worldIn, d3, d4, d5, stack.split(RANDOM.nextInt(21) + 10));
-            float f = 0.05F;
-            itementity.setMotion(RANDOM.nextGaussian() * 0.05000000074505806D, RANDOM.nextGaussian() * 0.05000000074505806D + 0.20000000298023224D, RANDOM.nextGaussian() * 0.05000000074505806D);
-            worldIn.addEntity(itementity);
-        }
-    }
-
-/*/
-/*
-//https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
-
-
+    /*//https://github.com/TheGreyGhost/MinecraftByExample/blob/1-15-2-working-latestMCP/src/main/java/minecraftbyexample/mbe21_tileentityrenderer/TileEntityMBE21.java
+    */
 
     // TODO: When syncing data to the client, only update the two itemsstacks that get updated, not everything.
 
@@ -974,7 +916,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTagCompound = new CompoundNBT();
         write(nbtTagCompound);
-        int tileEntityType = 43;  // arbitrary number; only used for vanilla TileEntities.  You can use it, or not, as you want.
+        int tileEntityType = 42;  // arbitrary number; only used for vanilla TileEntities.  You can use it, or not, as you want.
         return new SUpdateTileEntityPacket(this.pos, tileEntityType, nbtTagCompound);
     }
 
@@ -997,7 +939,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         this.read(state, tag);
     }
 
-    public static Block[] pedestalList = new Block[]{PedestalBlock.PEDESTAL_000, PedestalBlock.PEDESTAL_001, PedestalBlock.PEDESTAL_002, PedestalBlock.PEDESTAL_003
+    private static Block[] pedArray = new Block[]{PedestalBlock.PEDESTAL_000, PedestalBlock.PEDESTAL_001, PedestalBlock.PEDESTAL_002, PedestalBlock.PEDESTAL_003
             , PedestalBlock.PEDESTAL_010, PedestalBlock.PEDESTAL_011, PedestalBlock.PEDESTAL_012, PedestalBlock.PEDESTAL_013
             , PedestalBlock.PEDESTAL_020, PedestalBlock.PEDESTAL_021, PedestalBlock.PEDESTAL_022, PedestalBlock.PEDESTAL_023
             , PedestalBlock.PEDESTAL_030, PedestalBlock.PEDESTAL_031, PedestalBlock.PEDESTAL_032, PedestalBlock.PEDESTAL_033
@@ -1014,25 +956,21 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
             , PedestalBlock.PEDESTAL_320, PedestalBlock.PEDESTAL_321, PedestalBlock.PEDESTAL_322, PedestalBlock.PEDESTAL_323
             , PedestalBlock.PEDESTAL_330, PedestalBlock.PEDESTAL_331, PedestalBlock.PEDESTAL_332, PedestalBlock.PEDESTAL_333};
 
-    private static final ResourceLocation RESLOC_TILE_PEDESTAL = new ResourceLocation(MODID, "tile/pedestal_tile");
+    private static final ResourceLocation RESLOC_TILE_PEDESTAL = new ResourceLocation(MODID, "tile/pedestal");
 
-    public static TileEntityType<PedestalTileEntity> PEDESTAL = TileEntityType.Builder.create(PedestalTileEntity::new, pedestalList).build(null);
+    public static TileEntityType<PedestalTileEntity> PEDESTALTYPE = TileEntityType.Builder.create(PedestalTileEntity::new, pedArray).build(null);
 
     @SubscribeEvent
     public static void onTileEntityRegistry(final RegistryEvent.Register<TileEntityType<?>> event) {
         IForgeRegistry<TileEntityType<?>> r = event.getRegistry();
-        r.register(PEDESTAL.setRegistryName(RESLOC_TILE_PEDESTAL));
+        r.register(PEDESTALTYPE.setRegistryName(RESLOC_TILE_PEDESTAL));
     }
 
     @Override
     public void remove() {
         super.remove();
-        if(this.tilehandler != null) {
-            this.tilehandler.invalidate();
-        }
-        if(this.privateHandler != null) {
-            this.privateHandler.invalidate();
+        if(this.handler != null) {
+            this.handler.invalidate();
         }
     }
 }
-*/

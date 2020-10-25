@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -94,7 +94,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return getAreaWidth(coin);
     }
 
-    protected void useFanOnEntities(World world, BlockPos posOfPedestal,TilePedestal pedestal, double speed,AxisAlignedBB getBox) {
+    protected void useFanOnEntities(World world, BlockPos posOfPedestal, PedestalTileEntity pedestal, double speed, AxisAlignedBB getBox) {
         List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class, getBox);
 
         if(entityList.size()==0)pedestal.setStoredValueForUpgrades(0);
@@ -185,9 +185,9 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         if(!world.isBlockPowered(pedestalPos))
         {
             TileEntity entity = world.getTileEntity(pedestalPos);
-            if(entity instanceof TilePedestal)
+            if(entity instanceof PedestalTileEntity)
             {
-                TilePedestal ped = ((TilePedestal)entity);
+                PedestalTileEntity ped = ((PedestalTileEntity)entity);
                 upgradeAction(world, pedestalPos, ped);
                 if(ped.getStoredValueForUpgrades() > 0)
                 {
@@ -201,7 +201,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     }
 
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, TilePedestal pedestal)
+    public void upgradeAction(World world, BlockPos posOfPedestal, PedestalTileEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         int width = getAreaWidth(coin);
@@ -221,7 +221,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, TilePedestal pedestal)
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 

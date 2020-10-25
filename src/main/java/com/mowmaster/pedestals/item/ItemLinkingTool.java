@@ -2,7 +2,7 @@ package com.mowmaster.pedestals.item;
 
 import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -89,9 +89,9 @@ public class ItemLinkingTool extends Item {
                     if(player.getHeldItemMainhand().isEnchanted()==false)
                     {
                         TileEntity tile = worldIn.getTileEntity(pos);
-                        if(tile instanceof TilePedestal)
+                        if(tile instanceof PedestalTileEntity)
                         {
-                            TilePedestal ped = ((TilePedestal)tile);
+                            PedestalTileEntity ped = ((PedestalTileEntity)tile);
                             this.storedPositionList = ped.getLocationList();
                         }
                         //Gets Pedestal Clicked on Pos
@@ -113,8 +113,8 @@ public class ItemLinkingTool extends Item {
                         {
                             //Checks Tile at location to make sure its a TilePedestal
                             TileEntity tileEntity = worldIn.getTileEntity(pos);
-                            if (tileEntity instanceof TilePedestal) {
-                                TilePedestal tilePedestal = (TilePedestal) tileEntity;
+                            if (tileEntity instanceof PedestalTileEntity) {
+                                PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
 
                                 //checks if connecting pedestal is out of range of the senderPedestal
                                 if(isPedestalInRange(tilePedestal,getStoredPosition(player.getHeldItemMainhand())))
@@ -188,8 +188,8 @@ public class ItemLinkingTool extends Item {
                 if(worldIn.getBlockState(pos).getBlock() instanceof PedestalBlock) {
                     //Checks Tile at location to make sure its a TilePedestal
                     TileEntity tileEntity = worldIn.getTileEntity(pos);
-                    if (tileEntity instanceof TilePedestal) {
-                        TilePedestal tilePedestal = (TilePedestal) tileEntity;
+                    if (tileEntity instanceof PedestalTileEntity) {
+                        PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
                         List<BlockPos> getLocations = tilePedestal.getLocationList();
 
                         if(getLocations.size()>0)
@@ -253,9 +253,9 @@ public class ItemLinkingTool extends Item {
 
                     if(worldIn.isAreaLoaded(pos,1))
                     {
-                        if(worldIn.getTileEntity(pos) instanceof TilePedestal)
+                        if(worldIn.getTileEntity(pos) instanceof PedestalTileEntity)
                         {
-                            TilePedestal pedestal = ((TilePedestal)worldIn.getTileEntity(pos));
+                            PedestalTileEntity pedestal = ((PedestalTileEntity)worldIn.getTileEntity(pos));
                             int range = pedestal.getPedestalTransferRange();
                             zmin = -range;
                             zmax = range;
@@ -305,7 +305,7 @@ public class ItemLinkingTool extends Item {
         }
     }
 
-    public boolean isPedestalInRange(TilePedestal pedestal, BlockPos pedestalToBeLinked)
+    public boolean isPedestalInRange(PedestalTileEntity pedestal, BlockPos pedestalToBeLinked)
     {
         int range = pedestal.getPedestalTransferRange();
         int x = pedestalToBeLinked.getX();

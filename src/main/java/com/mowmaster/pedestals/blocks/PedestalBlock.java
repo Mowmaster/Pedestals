@@ -6,7 +6,7 @@ import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.ItemUpgradeTool;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.references.Reference;
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -126,8 +126,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         if (state.getBlock() != newState.getBlock()) {
             TileEntity tileentity = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TilePedestal) {
-                InventoryHelper.dropInventoryItems(worldIn, pos, (TilePedestal) tileentity);
+            if (tileentity instanceof PedestalTileEntity) {
+                InventoryHelper.dropInventoryItems(worldIn, pos, (PedestalTileEntity) tileentity);
                 worldIn.updateComparatorOutputLevel(pos, this);
             }
 
@@ -221,9 +221,9 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
         TileEntity tileentity = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TilePedestal)
+        if (tileentity instanceof PedestalTileEntity)
         {
-            TilePedestal tilePedestal = (TilePedestal) tileentity;
+            PedestalTileEntity tilePedestal = (PedestalTileEntity) tileentity;
 
             if(!worldIn.isRemote)
             {
@@ -245,8 +245,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {
         if(!worldIn.isRemote) {
             TileEntity tileEntity = worldIn.getTileEntity(pos);
-            if (tileEntity instanceof TilePedestal) {
-                TilePedestal tilePedestal = (TilePedestal) tileEntity;
+            if (tileEntity instanceof PedestalTileEntity) {
+                PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
 
                 if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
                 {
@@ -474,8 +474,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                         {
                             //Checks Tile at location to make sure its a TilePedestal
                             TileEntity tileEntity = worldIn.getTileEntity(pos);
-                            if (tileEntity instanceof TilePedestal) {
-                                TilePedestal tilePedestal = (TilePedestal) tileEntity;
+                            if (tileEntity instanceof PedestalTileEntity) {
+                                PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
 
                                 //checks if connecting pedestal is out of range of the senderPedestal
                                 /*if(linkingTool.isPedestalInRange(tilePedestal,linkingTool.getStoredPosition(offhand)))
@@ -523,8 +523,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     {
         int hasItem=0;
         TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if(tileEntity instanceof TilePedestal) {
-            TilePedestal pedestal = (TilePedestal) tileEntity;
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack itemstack = pedestal.getItemInPedestal();
             if(!itemstack.isEmpty())
             {
@@ -566,7 +566,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new TilePedestal();
+        return new PedestalTileEntity();
     }
 
     /**

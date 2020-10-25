@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
-import com.mowmaster.pedestals.tiles.TilePedestal;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -100,7 +100,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
         {
             IItemHandler handler = cap.orElse(null);
             TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof TilePedestal) {
+            if(invToPullFrom instanceof PedestalTileEntity) {
                 itemFromInv = ItemStack.EMPTY;
 
             }
@@ -142,8 +142,8 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                     copyIncoming.setCount(itemsOutputWhenStackSmelted);
                                     int fuelToConsume = burnTimeCostPerItemSmelted * itemInputsPerSmelt;
                                     TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                    if(pedestalInv instanceof TilePedestal) {
-                                        TilePedestal ped = ((TilePedestal) pedestalInv);
+                                    if(pedestalInv instanceof PedestalTileEntity) {
+                                        PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
                                         //Checks to make sure we have fuel to smelt everything
                                         if(removeFuel(ped,fuelToConsume,true)>=0)
                                         {
@@ -183,8 +183,8 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                             else
                             {
                                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                if(pedestalInv instanceof TilePedestal) {
-                                    TilePedestal ped = ((TilePedestal) pedestalInv);
+                                if(pedestalInv instanceof PedestalTileEntity) {
+                                    PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
                                     if(ped.getItemInPedestal().equals(ItemStack.EMPTY))
                                     {
                                         ItemStack copyItemFromInv = itemFromInv.copy();
