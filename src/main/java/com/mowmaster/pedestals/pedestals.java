@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals;
 
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 //import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.creativeTab.CreativeTabBlock;
 import com.mowmaster.pedestals.item.ItemRegistry;
@@ -101,7 +101,7 @@ public class pedestals
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here
             //LOGGER.info("HELLO from Register Block");
-            BlockPedestalTE.onBlockRegistryReady(blockRegistryEvent);
+            PedestalBlock.onBlockRegistryReady(blockRegistryEvent);
             //PedestalBlock.onBlockRegistryReady(blockRegistryEvent);
         }
 

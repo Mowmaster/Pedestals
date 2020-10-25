@@ -1,4 +1,3 @@
-/*
 package com.mowmaster.pedestals.blocks;
 
 import com.mowmaster.pedestals.item.ItemColorPallet;
@@ -7,7 +6,7 @@ import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.ItemUpgradeTool;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.references.Reference;
-import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -15,8 +14,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.*;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
@@ -42,6 +42,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
+
 import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -119,16 +120,14 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)));
     }
 
-//https://github.com/progwml6/ironchest/blob/1.15/src/main/java/com/progwml6/ironchest/common/block/GenericIronChestBlock.java#L120-L133
-
+    /*https://github.com/progwml6/ironchest/blob/1.15/src/main/java/com/progwml6/ironchest/common/block/GenericIronChestBlock.java#L120-L133*/
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.getBlock() != newState.getBlock()) {
             TileEntity tileentity = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof PedestalTileEntity) {
-                ((PedestalTileEntity) tileentity).dropInventoryItems(worldIn,pos);
-                ((PedestalTileEntity) tileentity).dropInventoryItemsPrivate(worldIn,pos);
+            if (tileentity instanceof TilePedestal) {
+                InventoryHelper.dropInventoryItems(worldIn, pos, (TilePedestal) tileentity);
                 worldIn.updateComparatorOutputLevel(pos, this);
             }
 
@@ -191,27 +190,21 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         }
     }
 
-*/
-/**
+    /**
      * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
      * blockstate.
      * @deprecated call via IBlockState#withRotation(Rotation) whenever possible. Implementing/overriding is
      * fine.
-     *//*
-
-
+     */
     public BlockState rotate(BlockState state, Rotation rot) {
         return state.with(FACING, rot.rotate(state.get(FACING)));
     }
 
-*/
-/**
+    /**
      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
      * blockstate.
      * @deprecated call via IBlockState#withMirror(Mirror) whenever possible. Implementing/overriding is fine.
-     *//*
-
-
+     */
     public BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state.with(FACING, mirrorIn.mirror(state.get(FACING)));
     }
@@ -228,9 +221,9 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
         TileEntity tileentity = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof PedestalTileEntity)
+        if (tileentity instanceof TilePedestal)
         {
-            PedestalTileEntity tilePedestal = (PedestalTileEntity) tileentity;
+            TilePedestal tilePedestal = (TilePedestal) tileentity;
 
             if(!worldIn.isRemote)
             {
@@ -252,8 +245,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {
         if(!worldIn.isRemote) {
             TileEntity tileEntity = worldIn.getTileEntity(pos);
-            if (tileEntity instanceof PedestalTileEntity) {
-                PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
+            if (tileEntity instanceof TilePedestal) {
+                TilePedestal tilePedestal = (TilePedestal) tileEntity;
 
                 if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
                 {
@@ -481,10 +474,11 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                         {
                             //Checks Tile at location to make sure its a TilePedestal
                             TileEntity tileEntity = worldIn.getTileEntity(pos);
-                            if (tileEntity instanceof PedestalTileEntity) {
-                                PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
+                            if (tileEntity instanceof TilePedestal) {
+                                TilePedestal tilePedestal = (TilePedestal) tileEntity;
+
                                 //checks if connecting pedestal is out of range of the senderPedestal
-                                if(linkingTool.isPedestalInRange(tilePedestal,linkingTool.getStoredPosition(offhand)))
+                                /*if(linkingTool.isPedestalInRange(tilePedestal,linkingTool.getStoredPosition(offhand)))
                                 {
                                     //Checks if pedestals to be linked are on same networks or if one is neutral
                                     if(tilePedestal.canLinkToPedestalNetwork(linkingTool.getStoredPosition(offhand)))
@@ -506,8 +500,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                     }
                                     else player.sendMessage(linknetwork,Util.DUMMY_UUID);
                                 }
-                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);
-
+                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);*/
                             }
                         }
                     }
@@ -530,8 +523,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     {
         int hasItem=0;
         TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if(tileEntity instanceof PedestalTileEntity) {
-            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+        if(tileEntity instanceof TilePedestal) {
+            TilePedestal pedestal = (TilePedestal) tileEntity;
             ItemStack itemstack = pedestal.getItemInPedestal();
             if(!itemstack.isEmpty())
             {
@@ -573,16 +566,14 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new PedestalTileEntity();
+        return new TilePedestal();
     }
-*/
-/**
+
+    /**
      * The type of render function called. MODEL for mixed tesr and static model, MODELBLOCK_ANIMATED for TESR-only,
      * LIQUID for vanilla liquids, INVISIBLE to skip all rendering
      * @deprecated call via IBlockState...getRenderType() whenever possible. Implementing/overriding is fine.
-   *//*
-
-
+     */
     @Deprecated
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
@@ -600,73 +591,73 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         }
     }
 
-    private static final ResourceLocation R_PEDESTAL_000 = new ResourceLocation(MODID, "pedestal000");
-    private static final ResourceLocation R_PEDESTAL_001 = new ResourceLocation(MODID, "pedestal001");
-    private static final ResourceLocation R_PEDESTAL_002 = new ResourceLocation(MODID, "pedestal002");
-    private static final ResourceLocation R_PEDESTAL_003 = new ResourceLocation(MODID, "pedestal003");
-    private static final ResourceLocation R_PEDESTAL_010 = new ResourceLocation(MODID, "pedestal010");
-    private static final ResourceLocation R_PEDESTAL_011 = new ResourceLocation(MODID, "pedestal011");
-    private static final ResourceLocation R_PEDESTAL_012 = new ResourceLocation(MODID, "pedestal012");
-    private static final ResourceLocation R_PEDESTAL_013 = new ResourceLocation(MODID, "pedestal013");
-    private static final ResourceLocation R_PEDESTAL_020 = new ResourceLocation(MODID, "pedestal020");
-    private static final ResourceLocation R_PEDESTAL_021 = new ResourceLocation(MODID, "pedestal021");
-    private static final ResourceLocation R_PEDESTAL_022 = new ResourceLocation(MODID, "pedestal022");
-    private static final ResourceLocation R_PEDESTAL_023 = new ResourceLocation(MODID, "pedestal023");
-    private static final ResourceLocation R_PEDESTAL_030 = new ResourceLocation(MODID, "pedestal030");
-    private static final ResourceLocation R_PEDESTAL_031 = new ResourceLocation(MODID, "pedestal031");
-    private static final ResourceLocation R_PEDESTAL_032 = new ResourceLocation(MODID, "pedestal032");
-    private static final ResourceLocation R_PEDESTAL_033 = new ResourceLocation(MODID, "pedestal033");
+    private static final ResourceLocation R_PEDESTAL_000 = new ResourceLocation(MODID, "pedestal/stone000");
+    private static final ResourceLocation R_PEDESTAL_001 = new ResourceLocation(MODID, "pedestal/stone001");
+    private static final ResourceLocation R_PEDESTAL_002 = new ResourceLocation(MODID, "pedestal/stone002");
+    private static final ResourceLocation R_PEDESTAL_003 = new ResourceLocation(MODID, "pedestal/stone003");
+    private static final ResourceLocation R_PEDESTAL_010 = new ResourceLocation(MODID, "pedestal/stone010");
+    private static final ResourceLocation R_PEDESTAL_011 = new ResourceLocation(MODID, "pedestal/stone011");
+    private static final ResourceLocation R_PEDESTAL_012 = new ResourceLocation(MODID, "pedestal/stone012");
+    private static final ResourceLocation R_PEDESTAL_013 = new ResourceLocation(MODID, "pedestal/stone013");
+    private static final ResourceLocation R_PEDESTAL_020 = new ResourceLocation(MODID, "pedestal/stone020");
+    private static final ResourceLocation R_PEDESTAL_021 = new ResourceLocation(MODID, "pedestal/stone021");
+    private static final ResourceLocation R_PEDESTAL_022 = new ResourceLocation(MODID, "pedestal/stone022");
+    private static final ResourceLocation R_PEDESTAL_023 = new ResourceLocation(MODID, "pedestal/stone023");
+    private static final ResourceLocation R_PEDESTAL_030 = new ResourceLocation(MODID, "pedestal/stone030");
+    private static final ResourceLocation R_PEDESTAL_031 = new ResourceLocation(MODID, "pedestal/stone031");
+    private static final ResourceLocation R_PEDESTAL_032 = new ResourceLocation(MODID, "pedestal/stone032");
+    private static final ResourceLocation R_PEDESTAL_033 = new ResourceLocation(MODID, "pedestal/stone033");
 
-    private static final ResourceLocation R_PEDESTAL_100 = new ResourceLocation(MODID, "pedestal100");
-    private static final ResourceLocation R_PEDESTAL_101 = new ResourceLocation(MODID, "pedestal101");
-    private static final ResourceLocation R_PEDESTAL_102 = new ResourceLocation(MODID, "pedestal102");
-    private static final ResourceLocation R_PEDESTAL_103 = new ResourceLocation(MODID, "pedestal103");
-    private static final ResourceLocation R_PEDESTAL_110 = new ResourceLocation(MODID, "pedestal110");
-    private static final ResourceLocation R_PEDESTAL_111 = new ResourceLocation(MODID, "pedestal111");
-    private static final ResourceLocation R_PEDESTAL_112 = new ResourceLocation(MODID, "pedestal112");
-    private static final ResourceLocation R_PEDESTAL_113 = new ResourceLocation(MODID, "pedestal113");
-    private static final ResourceLocation R_PEDESTAL_120 = new ResourceLocation(MODID, "pedestal120");
-    private static final ResourceLocation R_PEDESTAL_121 = new ResourceLocation(MODID, "pedestal121");
-    private static final ResourceLocation R_PEDESTAL_122 = new ResourceLocation(MODID, "pedestal122");
-    private static final ResourceLocation R_PEDESTAL_123 = new ResourceLocation(MODID, "pedestal123");
-    private static final ResourceLocation R_PEDESTAL_130 = new ResourceLocation(MODID, "pedestal130");
-    private static final ResourceLocation R_PEDESTAL_131 = new ResourceLocation(MODID, "pedestal131");
-    private static final ResourceLocation R_PEDESTAL_132 = new ResourceLocation(MODID, "pedestal132");
-    private static final ResourceLocation R_PEDESTAL_133 = new ResourceLocation(MODID, "pedestal133");
+    private static final ResourceLocation R_PEDESTAL_100 = new ResourceLocation(MODID, "pedestal/stone100");
+    private static final ResourceLocation R_PEDESTAL_101 = new ResourceLocation(MODID, "pedestal/stone101");
+    private static final ResourceLocation R_PEDESTAL_102 = new ResourceLocation(MODID, "pedestal/stone102");
+    private static final ResourceLocation R_PEDESTAL_103 = new ResourceLocation(MODID, "pedestal/stone103");
+    private static final ResourceLocation R_PEDESTAL_110 = new ResourceLocation(MODID, "pedestal/stone110");
+    private static final ResourceLocation R_PEDESTAL_111 = new ResourceLocation(MODID, "pedestal/stone111");
+    private static final ResourceLocation R_PEDESTAL_112 = new ResourceLocation(MODID, "pedestal/stone112");
+    private static final ResourceLocation R_PEDESTAL_113 = new ResourceLocation(MODID, "pedestal/stone113");
+    private static final ResourceLocation R_PEDESTAL_120 = new ResourceLocation(MODID, "pedestal/stone120");
+    private static final ResourceLocation R_PEDESTAL_121 = new ResourceLocation(MODID, "pedestal/stone121");
+    private static final ResourceLocation R_PEDESTAL_122 = new ResourceLocation(MODID, "pedestal/stone122");
+    private static final ResourceLocation R_PEDESTAL_123 = new ResourceLocation(MODID, "pedestal/stone123");
+    private static final ResourceLocation R_PEDESTAL_130 = new ResourceLocation(MODID, "pedestal/stone130");
+    private static final ResourceLocation R_PEDESTAL_131 = new ResourceLocation(MODID, "pedestal/stone131");
+    private static final ResourceLocation R_PEDESTAL_132 = new ResourceLocation(MODID, "pedestal/stone132");
+    private static final ResourceLocation R_PEDESTAL_133 = new ResourceLocation(MODID, "pedestal/stone133");
 
-    private static final ResourceLocation R_PEDESTAL_200 = new ResourceLocation(MODID, "pedestal200");
-    private static final ResourceLocation R_PEDESTAL_201 = new ResourceLocation(MODID, "pedestal201");
-    private static final ResourceLocation R_PEDESTAL_202 = new ResourceLocation(MODID, "pedestal202");
-    private static final ResourceLocation R_PEDESTAL_203 = new ResourceLocation(MODID, "pedestal203");
-    private static final ResourceLocation R_PEDESTAL_210 = new ResourceLocation(MODID, "pedestal210");
-    private static final ResourceLocation R_PEDESTAL_211 = new ResourceLocation(MODID, "pedestal211");
-    private static final ResourceLocation R_PEDESTAL_212 = new ResourceLocation(MODID, "pedestal212");
-    private static final ResourceLocation R_PEDESTAL_213 = new ResourceLocation(MODID, "pedestal213");
-    private static final ResourceLocation R_PEDESTAL_220 = new ResourceLocation(MODID, "pedestal220");
-    private static final ResourceLocation R_PEDESTAL_221 = new ResourceLocation(MODID, "pedestal221");
-    private static final ResourceLocation R_PEDESTAL_222 = new ResourceLocation(MODID, "pedestal222");
-    private static final ResourceLocation R_PEDESTAL_223 = new ResourceLocation(MODID, "pedestal223");
-    private static final ResourceLocation R_PEDESTAL_230 = new ResourceLocation(MODID, "pedestal230");
-    private static final ResourceLocation R_PEDESTAL_231 = new ResourceLocation(MODID, "pedestal231");
-    private static final ResourceLocation R_PEDESTAL_232 = new ResourceLocation(MODID, "pedestal232");
-    private static final ResourceLocation R_PEDESTAL_233 = new ResourceLocation(MODID, "pedestal233");
+    private static final ResourceLocation R_PEDESTAL_200 = new ResourceLocation(MODID, "pedestal/stone200");
+    private static final ResourceLocation R_PEDESTAL_201 = new ResourceLocation(MODID, "pedestal/stone201");
+    private static final ResourceLocation R_PEDESTAL_202 = new ResourceLocation(MODID, "pedestal/stone202");
+    private static final ResourceLocation R_PEDESTAL_203 = new ResourceLocation(MODID, "pedestal/stone203");
+    private static final ResourceLocation R_PEDESTAL_210 = new ResourceLocation(MODID, "pedestal/stone210");
+    private static final ResourceLocation R_PEDESTAL_211 = new ResourceLocation(MODID, "pedestal/stone211");
+    private static final ResourceLocation R_PEDESTAL_212 = new ResourceLocation(MODID, "pedestal/stone212");
+    private static final ResourceLocation R_PEDESTAL_213 = new ResourceLocation(MODID, "pedestal/stone213");
+    private static final ResourceLocation R_PEDESTAL_220 = new ResourceLocation(MODID, "pedestal/stone220");
+    private static final ResourceLocation R_PEDESTAL_221 = new ResourceLocation(MODID, "pedestal/stone221");
+    private static final ResourceLocation R_PEDESTAL_222 = new ResourceLocation(MODID, "pedestal/stone222");
+    private static final ResourceLocation R_PEDESTAL_223 = new ResourceLocation(MODID, "pedestal/stone223");
+    private static final ResourceLocation R_PEDESTAL_230 = new ResourceLocation(MODID, "pedestal/stone230");
+    private static final ResourceLocation R_PEDESTAL_231 = new ResourceLocation(MODID, "pedestal/stone231");
+    private static final ResourceLocation R_PEDESTAL_232 = new ResourceLocation(MODID, "pedestal/stone232");
+    private static final ResourceLocation R_PEDESTAL_233 = new ResourceLocation(MODID, "pedestal/stone233");
 
-    private static final ResourceLocation R_PEDESTAL_300 = new ResourceLocation(MODID, "pedestal300");
-    private static final ResourceLocation R_PEDESTAL_301 = new ResourceLocation(MODID, "pedestal301");
-    private static final ResourceLocation R_PEDESTAL_302 = new ResourceLocation(MODID, "pedestal302");
-    private static final ResourceLocation R_PEDESTAL_303 = new ResourceLocation(MODID, "pedestal303");
-    private static final ResourceLocation R_PEDESTAL_310 = new ResourceLocation(MODID, "pedestal310");
-    private static final ResourceLocation R_PEDESTAL_311 = new ResourceLocation(MODID, "pedestal311");
-    private static final ResourceLocation R_PEDESTAL_312 = new ResourceLocation(MODID, "pedestal312");
-    private static final ResourceLocation R_PEDESTAL_313 = new ResourceLocation(MODID, "pedestal313");
-    private static final ResourceLocation R_PEDESTAL_320 = new ResourceLocation(MODID, "pedestal320");
-    private static final ResourceLocation R_PEDESTAL_321 = new ResourceLocation(MODID, "pedestal321");
-    private static final ResourceLocation R_PEDESTAL_322 = new ResourceLocation(MODID, "pedestal322");
-    private static final ResourceLocation R_PEDESTAL_323 = new ResourceLocation(MODID, "pedestal323");
-    private static final ResourceLocation R_PEDESTAL_330 = new ResourceLocation(MODID, "pedestal330");
-    private static final ResourceLocation R_PEDESTAL_331 = new ResourceLocation(MODID, "pedestal331");
-    private static final ResourceLocation R_PEDESTAL_332 = new ResourceLocation(MODID, "pedestal332");
-    private static final ResourceLocation R_PEDESTAL_333 = new ResourceLocation(MODID, "pedestal333");
+    private static final ResourceLocation R_PEDESTAL_300 = new ResourceLocation(MODID, "pedestal/stone300");
+    private static final ResourceLocation R_PEDESTAL_301 = new ResourceLocation(MODID, "pedestal/stone301");
+    private static final ResourceLocation R_PEDESTAL_302 = new ResourceLocation(MODID, "pedestal/stone302");
+    private static final ResourceLocation R_PEDESTAL_303 = new ResourceLocation(MODID, "pedestal/stone303");
+    private static final ResourceLocation R_PEDESTAL_310 = new ResourceLocation(MODID, "pedestal/stone310");
+    private static final ResourceLocation R_PEDESTAL_311 = new ResourceLocation(MODID, "pedestal/stone311");
+    private static final ResourceLocation R_PEDESTAL_312 = new ResourceLocation(MODID, "pedestal/stone312");
+    private static final ResourceLocation R_PEDESTAL_313 = new ResourceLocation(MODID, "pedestal/stone313");
+    private static final ResourceLocation R_PEDESTAL_320 = new ResourceLocation(MODID, "pedestal/stone320");
+    private static final ResourceLocation R_PEDESTAL_321 = new ResourceLocation(MODID, "pedestal/stone321");
+    private static final ResourceLocation R_PEDESTAL_322 = new ResourceLocation(MODID, "pedestal/stone322");
+    private static final ResourceLocation R_PEDESTAL_323 = new ResourceLocation(MODID, "pedestal/stone323");
+    private static final ResourceLocation R_PEDESTAL_330 = new ResourceLocation(MODID, "pedestal/stone330");
+    private static final ResourceLocation R_PEDESTAL_331 = new ResourceLocation(MODID, "pedestal/stone331");
+    private static final ResourceLocation R_PEDESTAL_332 = new ResourceLocation(MODID, "pedestal/stone332");
+    private static final ResourceLocation R_PEDESTAL_333 = new ResourceLocation(MODID, "pedestal/stone333");
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
@@ -957,73 +948,73 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         event.getItemColors().register((itemstack, tintIndex) -> {if (tintIndex == 1){return 16777215;} else {return -1;}},I_PEDESTAL_333);
     }
 
-    public static final Block PEDESTAL_000 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_000);
-    public static final Block PEDESTAL_001 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_001);
-    public static final Block PEDESTAL_002 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_002);
-    public static final Block PEDESTAL_003 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_003);
-    public static final Block PEDESTAL_010 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_010);
-    public static final Block PEDESTAL_011 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_011);
-    public static final Block PEDESTAL_012 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_012);
-    public static final Block PEDESTAL_013 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_013);
-    public static final Block PEDESTAL_020 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_020);
-    public static final Block PEDESTAL_021 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_021);
-    public static final Block PEDESTAL_022 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_022);
-    public static final Block PEDESTAL_023 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_023);
-    public static final Block PEDESTAL_030 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_030);
-    public static final Block PEDESTAL_031 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_031);
-    public static final Block PEDESTAL_032 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_032);
-    public static final Block PEDESTAL_033 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_033);
+    public static final Block PEDESTAL_000 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_000);
+    public static final Block PEDESTAL_001 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_001);
+    public static final Block PEDESTAL_002 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_002);
+    public static final Block PEDESTAL_003 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_003);
+    public static final Block PEDESTAL_010 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_010);
+    public static final Block PEDESTAL_011 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_011);
+    public static final Block PEDESTAL_012 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_012);
+    public static final Block PEDESTAL_013 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_013);
+    public static final Block PEDESTAL_020 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_020);
+    public static final Block PEDESTAL_021 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_021);
+    public static final Block PEDESTAL_022 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_022);
+    public static final Block PEDESTAL_023 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_023);
+    public static final Block PEDESTAL_030 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_030);
+    public static final Block PEDESTAL_031 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_031);
+    public static final Block PEDESTAL_032 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_032);
+    public static final Block PEDESTAL_033 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_033);
 
-    public static final Block PEDESTAL_100 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_100);
-    public static final Block PEDESTAL_101 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_101);
-    public static final Block PEDESTAL_102 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_102);
-    public static final Block PEDESTAL_103 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_103);
-    public static final Block PEDESTAL_110 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_110);
-    public static final Block PEDESTAL_111 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_111);
-    public static final Block PEDESTAL_112 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_112);
-    public static final Block PEDESTAL_113 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_113);
-    public static final Block PEDESTAL_120 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_120);
-    public static final Block PEDESTAL_121 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_121);
-    public static final Block PEDESTAL_122 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_122);
-    public static final Block PEDESTAL_123 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_123);
-    public static final Block PEDESTAL_130 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_130);
-    public static final Block PEDESTAL_131 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_131);
-    public static final Block PEDESTAL_132 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_132);
-    public static final Block PEDESTAL_133 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_133);
+    public static final Block PEDESTAL_100 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_100);
+    public static final Block PEDESTAL_101 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_101);
+    public static final Block PEDESTAL_102 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_102);
+    public static final Block PEDESTAL_103 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_103);
+    public static final Block PEDESTAL_110 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_110);
+    public static final Block PEDESTAL_111 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_111);
+    public static final Block PEDESTAL_112 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_112);
+    public static final Block PEDESTAL_113 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_113);
+    public static final Block PEDESTAL_120 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_120);
+    public static final Block PEDESTAL_121 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_121);
+    public static final Block PEDESTAL_122 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_122);
+    public static final Block PEDESTAL_123 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_123);
+    public static final Block PEDESTAL_130 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_130);
+    public static final Block PEDESTAL_131 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_131);
+    public static final Block PEDESTAL_132 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_132);
+    public static final Block PEDESTAL_133 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_133);
 
-    public static final Block PEDESTAL_200 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_200);
-    public static final Block PEDESTAL_201 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_201);
-    public static final Block PEDESTAL_202 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_202);
-    public static final Block PEDESTAL_203 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_203);
-    public static final Block PEDESTAL_210 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_210);
-    public static final Block PEDESTAL_211 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_211);
-    public static final Block PEDESTAL_212 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_212);
-    public static final Block PEDESTAL_213 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_213);
-    public static final Block PEDESTAL_220 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_220);
-    public static final Block PEDESTAL_221 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_221);
-    public static final Block PEDESTAL_222 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_222);
-    public static final Block PEDESTAL_223 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_223);
-    public static final Block PEDESTAL_230 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_230);
-    public static final Block PEDESTAL_231 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_231);
-    public static final Block PEDESTAL_232 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_232);
-    public static final Block PEDESTAL_233 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_233);
+    public static final Block PEDESTAL_200 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_200);
+    public static final Block PEDESTAL_201 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_201);
+    public static final Block PEDESTAL_202 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_202);
+    public static final Block PEDESTAL_203 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_203);
+    public static final Block PEDESTAL_210 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_210);
+    public static final Block PEDESTAL_211 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_211);
+    public static final Block PEDESTAL_212 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_212);
+    public static final Block PEDESTAL_213 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_213);
+    public static final Block PEDESTAL_220 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_220);
+    public static final Block PEDESTAL_221 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_221);
+    public static final Block PEDESTAL_222 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_222);
+    public static final Block PEDESTAL_223 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_223);
+    public static final Block PEDESTAL_230 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_230);
+    public static final Block PEDESTAL_231 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_231);
+    public static final Block PEDESTAL_232 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_232);
+    public static final Block PEDESTAL_233 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_233);
 
-    public static final Block PEDESTAL_300 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_300);
-    public static final Block PEDESTAL_301 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_301);
-    public static final Block PEDESTAL_302 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_302);
-    public static final Block PEDESTAL_303 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_303);
-    public static final Block PEDESTAL_310 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_310);
-    public static final Block PEDESTAL_311 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_311);
-    public static final Block PEDESTAL_312 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_312);
-    public static final Block PEDESTAL_313 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_313);
-    public static final Block PEDESTAL_320 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_320);
-    public static final Block PEDESTAL_321 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_321);
-    public static final Block PEDESTAL_322 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_322);
-    public static final Block PEDESTAL_323 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_323);
-    public static final Block PEDESTAL_330 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_330);
-    public static final Block PEDESTAL_331 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_331);
-    public static final Block PEDESTAL_332 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_332);
-    public static final Block PEDESTAL_333 = new PedestalBlock(Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_333);
+    public static final Block PEDESTAL_300 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_300);
+    public static final Block PEDESTAL_301 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_301);
+    public static final Block PEDESTAL_302 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_302);
+    public static final Block PEDESTAL_303 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_303);
+    public static final Block PEDESTAL_310 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_310);
+    public static final Block PEDESTAL_311 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_311);
+    public static final Block PEDESTAL_312 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_312);
+    public static final Block PEDESTAL_313 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_313);
+    public static final Block PEDESTAL_320 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_320);
+    public static final Block PEDESTAL_321 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_321);
+    public static final Block PEDESTAL_322 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_322);
+    public static final Block PEDESTAL_323 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_323);
+    public static final Block PEDESTAL_330 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_330);
+    public static final Block PEDESTAL_331 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_331);
+    public static final Block PEDESTAL_332 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_332);
+    public static final Block PEDESTAL_333 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_333);
 
     public static final Item I_PEDESTAL_000 = new BlockItem(PEDESTAL_000, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_000);
     public static final Item I_PEDESTAL_001 = new BlockItem(PEDESTAL_001, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_001);
@@ -1093,4 +1084,3 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public static final Item I_PEDESTAL_332 = new BlockItem(PEDESTAL_332, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_332);
     public static final Item I_PEDESTAL_333 = new BlockItem(PEDESTAL_333, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_333);
 }
-*/

@@ -1,8 +1,7 @@
 package com.mowmaster.pedestals.util.compat.jei.color_pallet;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.recipes.ColoredPedestalRecipe;
 import com.mowmaster.pedestals.references.Reference;
@@ -68,7 +67,7 @@ public class ColorPedestalRecipeCategory implements IRecipeCategory<ColoredPedes
     @Override
     public void setRecipe(IRecipeLayout recipeLayout, ColoredPedestalRecipe recipe, IIngredients ingredients) {
         recipeLayout.getItemStacks().init(0, true, 50, 14);
-        recipeLayout.getItemStacks().set(0,new ItemStack(BlockPedestalTE.I_PEDESTAL_333));
+        recipeLayout.getItemStacks().set(0,new ItemStack(PedestalBlock.I_PEDESTAL_333));
 
         recipeLayout.getItemStacks().init(1, true, 5, 14);
         int color = recipe.getColor();

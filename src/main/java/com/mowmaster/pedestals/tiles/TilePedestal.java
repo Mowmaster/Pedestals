@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.tiles;
 
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
@@ -25,7 +25,6 @@ import net.minecraft.world.LockCode;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
@@ -443,9 +442,9 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         {
             boolLight = true;
             BlockState state = world.getBlockState(pos);
-            boolean watered = state.get(BlockPedestalTE.WATERLOGGED);
-            Direction dir = state.get(BlockPedestalTE.FACING);
-            BlockState newstate = state.with(BlockPedestalTE.FACING,dir).with(BlockPedestalTE.WATERLOGGED,watered).with(BlockPedestalTE.LIT,true);
+            boolean watered = state.get(PedestalBlock.WATERLOGGED);
+            Direction dir = state.get(PedestalBlock.FACING);
+            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,true);
             IItemHandler h = handler.orElse(null);
             h.insertItem(2,new ItemStack(Items.GLOWSTONE,1),false);
             world.notifyBlockUpdate(pos,state,newstate,3);
@@ -463,10 +462,10 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
             int intColor = stack.getTag().getInt("color");
             BlockState replacestate = CraftingPedestals.instance().getResult(intColor);
             BlockState state = world.getBlockState(pos);
-            boolean watered = state.get(BlockPedestalTE.WATERLOGGED);
-            Direction dir = state.get(BlockPedestalTE.FACING);
-            boolean lit = state.get(BlockPedestalTE.LIT);
-            BlockState newstate = replacestate.with(BlockPedestalTE.FACING,dir).with(BlockPedestalTE.WATERLOGGED,watered).with(BlockPedestalTE.LIT,lit);
+            boolean watered = state.get(PedestalBlock.WATERLOGGED);
+            Direction dir = state.get(PedestalBlock.FACING);
+            boolean lit = state.get(PedestalBlock.LIT);
+            BlockState newstate = replacestate.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit);
             world.notifyBlockUpdate(pos,state,newstate,3);
             world.setBlockState(pos,newstate,3);
             update();
@@ -523,7 +522,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
     public boolean canLinkToPedestalNetwork(BlockPos pedestalToBeLinked)
     {
         //Check to see if pedestal to be linked is a block pedestal
-        if(world.getBlockState(pedestalToBeLinked).getBlock() instanceof BlockPedestalTE)
+        if(world.getBlockState(pedestalToBeLinked).getBlock() instanceof PedestalBlock)
         {
             return true;
         }
@@ -619,7 +618,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                 if(!world.isBlockPowered(pedestalToSendTo))
                 {
                     //Make sure its a pedestal before getting the tile
-                    if(world.getBlockState(pedestalToSendTo).getBlock() instanceof BlockPedestalTE)
+                    if(world.getBlockState(pedestalToSendTo).getBlock() instanceof PedestalBlock)
                     {
                         //Make sure it is still part of the right network
                         if(canLinkToPedestalNetwork(pedestalToSendTo))
@@ -674,7 +673,7 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
                 if(!world.isBlockPowered(pedestalToSendTo))
                 {
                     //Make sure its a pedestal before getting the tile
-                    if(world.getBlockState(pedestalToSendTo).getBlock() instanceof BlockPedestalTE)
+                    if(world.getBlockState(pedestalToSendTo).getBlock() instanceof PedestalBlock)
                     {
                         //Make sure it is still part of the right network
                         if(canLinkToPedestalNetwork(pedestalToSendTo))
@@ -940,22 +939,22 @@ public class TilePedestal extends TileEntity implements IInventory, ITickableTil
         this.read(state, tag);
     }
 
-    private static Block[] pedArray = new Block[]{BlockPedestalTE.PEDESTAL_000, BlockPedestalTE.PEDESTAL_001, BlockPedestalTE.PEDESTAL_002, BlockPedestalTE.PEDESTAL_003
-            , BlockPedestalTE.PEDESTAL_010, BlockPedestalTE.PEDESTAL_011, BlockPedestalTE.PEDESTAL_012, BlockPedestalTE.PEDESTAL_013
-            , BlockPedestalTE.PEDESTAL_020, BlockPedestalTE.PEDESTAL_021, BlockPedestalTE.PEDESTAL_022, BlockPedestalTE.PEDESTAL_023
-            , BlockPedestalTE.PEDESTAL_030, BlockPedestalTE.PEDESTAL_031, BlockPedestalTE.PEDESTAL_032, BlockPedestalTE.PEDESTAL_033
-            , BlockPedestalTE.PEDESTAL_100, BlockPedestalTE.PEDESTAL_101, BlockPedestalTE.PEDESTAL_102, BlockPedestalTE.PEDESTAL_103
-            , BlockPedestalTE.PEDESTAL_110, BlockPedestalTE.PEDESTAL_111, BlockPedestalTE.PEDESTAL_112, BlockPedestalTE.PEDESTAL_113
-            , BlockPedestalTE.PEDESTAL_120, BlockPedestalTE.PEDESTAL_121, BlockPedestalTE.PEDESTAL_122, BlockPedestalTE.PEDESTAL_123
-            , BlockPedestalTE.PEDESTAL_130, BlockPedestalTE.PEDESTAL_131, BlockPedestalTE.PEDESTAL_132, BlockPedestalTE.PEDESTAL_133
-            , BlockPedestalTE.PEDESTAL_200, BlockPedestalTE.PEDESTAL_201, BlockPedestalTE.PEDESTAL_202, BlockPedestalTE.PEDESTAL_203
-            , BlockPedestalTE.PEDESTAL_210, BlockPedestalTE.PEDESTAL_211, BlockPedestalTE.PEDESTAL_212, BlockPedestalTE.PEDESTAL_213
-            , BlockPedestalTE.PEDESTAL_220, BlockPedestalTE.PEDESTAL_221, BlockPedestalTE.PEDESTAL_222, BlockPedestalTE.PEDESTAL_223
-            , BlockPedestalTE.PEDESTAL_230, BlockPedestalTE.PEDESTAL_231, BlockPedestalTE.PEDESTAL_232, BlockPedestalTE.PEDESTAL_233
-            , BlockPedestalTE.PEDESTAL_300, BlockPedestalTE.PEDESTAL_301, BlockPedestalTE.PEDESTAL_302, BlockPedestalTE.PEDESTAL_303
-            , BlockPedestalTE.PEDESTAL_310, BlockPedestalTE.PEDESTAL_311, BlockPedestalTE.PEDESTAL_312, BlockPedestalTE.PEDESTAL_313
-            , BlockPedestalTE.PEDESTAL_320, BlockPedestalTE.PEDESTAL_321, BlockPedestalTE.PEDESTAL_322, BlockPedestalTE.PEDESTAL_323
-            , BlockPedestalTE.PEDESTAL_330, BlockPedestalTE.PEDESTAL_331, BlockPedestalTE.PEDESTAL_332, BlockPedestalTE.PEDESTAL_333};
+    private static Block[] pedArray = new Block[]{PedestalBlock.PEDESTAL_000, PedestalBlock.PEDESTAL_001, PedestalBlock.PEDESTAL_002, PedestalBlock.PEDESTAL_003
+            , PedestalBlock.PEDESTAL_010, PedestalBlock.PEDESTAL_011, PedestalBlock.PEDESTAL_012, PedestalBlock.PEDESTAL_013
+            , PedestalBlock.PEDESTAL_020, PedestalBlock.PEDESTAL_021, PedestalBlock.PEDESTAL_022, PedestalBlock.PEDESTAL_023
+            , PedestalBlock.PEDESTAL_030, PedestalBlock.PEDESTAL_031, PedestalBlock.PEDESTAL_032, PedestalBlock.PEDESTAL_033
+            , PedestalBlock.PEDESTAL_100, PedestalBlock.PEDESTAL_101, PedestalBlock.PEDESTAL_102, PedestalBlock.PEDESTAL_103
+            , PedestalBlock.PEDESTAL_110, PedestalBlock.PEDESTAL_111, PedestalBlock.PEDESTAL_112, PedestalBlock.PEDESTAL_113
+            , PedestalBlock.PEDESTAL_120, PedestalBlock.PEDESTAL_121, PedestalBlock.PEDESTAL_122, PedestalBlock.PEDESTAL_123
+            , PedestalBlock.PEDESTAL_130, PedestalBlock.PEDESTAL_131, PedestalBlock.PEDESTAL_132, PedestalBlock.PEDESTAL_133
+            , PedestalBlock.PEDESTAL_200, PedestalBlock.PEDESTAL_201, PedestalBlock.PEDESTAL_202, PedestalBlock.PEDESTAL_203
+            , PedestalBlock.PEDESTAL_210, PedestalBlock.PEDESTAL_211, PedestalBlock.PEDESTAL_212, PedestalBlock.PEDESTAL_213
+            , PedestalBlock.PEDESTAL_220, PedestalBlock.PEDESTAL_221, PedestalBlock.PEDESTAL_222, PedestalBlock.PEDESTAL_223
+            , PedestalBlock.PEDESTAL_230, PedestalBlock.PEDESTAL_231, PedestalBlock.PEDESTAL_232, PedestalBlock.PEDESTAL_233
+            , PedestalBlock.PEDESTAL_300, PedestalBlock.PEDESTAL_301, PedestalBlock.PEDESTAL_302, PedestalBlock.PEDESTAL_303
+            , PedestalBlock.PEDESTAL_310, PedestalBlock.PEDESTAL_311, PedestalBlock.PEDESTAL_312, PedestalBlock.PEDESTAL_313
+            , PedestalBlock.PEDESTAL_320, PedestalBlock.PEDESTAL_321, PedestalBlock.PEDESTAL_322, PedestalBlock.PEDESTAL_323
+            , PedestalBlock.PEDESTAL_330, PedestalBlock.PEDESTAL_331, PedestalBlock.PEDESTAL_332, PedestalBlock.PEDESTAL_333};
 
     private static final ResourceLocation RESLOC_TILE_PEDESTAL = new ResourceLocation(MODID, "tile/pedestal");
 

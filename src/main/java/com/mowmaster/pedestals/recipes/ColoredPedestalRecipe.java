@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.recipes;
 
 import com.google.gson.JsonObject;
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.references.Reference;
@@ -78,7 +78,7 @@ public class ColoredPedestalRecipe implements IRecipe<IInventory> {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return new ItemStack(BlockPedestalTE.I_PEDESTAL_333);
+        return new ItemStack(PedestalBlock.I_PEDESTAL_333);
     }
 
     @Override

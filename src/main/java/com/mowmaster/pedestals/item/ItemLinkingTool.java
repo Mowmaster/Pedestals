@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -84,7 +84,7 @@ public class ItemLinkingTool extends Item {
             BlockState getBlockState = worldIn.getBlockState(pos);
             if(player.isCrouching())
             {
-                if(getBlockState.getBlock() instanceof BlockPedestalTE)
+                if(getBlockState.getBlock() instanceof PedestalBlock)
                 {
                     if(player.getHeldItemMainhand().isEnchanted()==false)
                     {
@@ -109,7 +109,7 @@ public class ItemLinkingTool extends Item {
                     else if(player.getHeldItemMainhand().hasTag() && player.getHeldItemMainhand().isEnchanted())
                     {
                         //Checks if clicked blocks is a Pedestal
-                        if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE)
+                        if(worldIn.getBlockState(pos).getBlock() instanceof PedestalBlock)
                         {
                             //Checks Tile at location to make sure its a TilePedestal
                             TileEntity tileEntity = worldIn.getTileEntity(pos);
@@ -185,7 +185,7 @@ public class ItemLinkingTool extends Item {
             }
             else
             {
-                if(worldIn.getBlockState(pos).getBlock() instanceof BlockPedestalTE) {
+                if(worldIn.getBlockState(pos).getBlock() instanceof PedestalBlock) {
                     //Checks Tile at location to make sure its a TilePedestal
                     TileEntity tileEntity = worldIn.getTileEntity(pos);
                     if (tileEntity instanceof TilePedestal) {
@@ -410,7 +410,7 @@ public class ItemLinkingTool extends Item {
 
         BlockState state = world.getBlockState(pos);
         Direction enumfacing = Direction.UP;
-        if(state.getBlock() instanceof BlockPedestalTE)
+        if(state.getBlock() instanceof PedestalBlock)
         {
             enumfacing = state.get(FACING);
         }

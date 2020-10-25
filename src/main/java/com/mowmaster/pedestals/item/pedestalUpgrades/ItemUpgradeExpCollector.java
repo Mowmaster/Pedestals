@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -148,7 +148,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         BlockPos negBlockPosP = getNegRangePosEntity(world,posOfPedestal,widthP,heightP);
         BlockPos posBlockPosP = getPosRangePosEntity(world,posOfPedestal,widthP,heightP);
         BlockState state = world.getBlockState(posOfPedestal);
-        if(state.getBlock() instanceof BlockPedestalTE)
+        if(state.getBlock() instanceof PedestalBlock)
         {
             TilePedestal pedestal = ((TilePedestal)world.getTileEntity(posOfPedestal));
 

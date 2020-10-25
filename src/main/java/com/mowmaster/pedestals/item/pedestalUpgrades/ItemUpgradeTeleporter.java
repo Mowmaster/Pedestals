@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
@@ -130,7 +130,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
         BlockState state = world.getBlockState(posOfPedestal);
-        if(state.getBlock() instanceof BlockPedestalTE)
+        if(state.getBlock() instanceof PedestalBlock)
         {
             TilePedestal pedestal = ((TilePedestal)world.getTileEntity(posOfPedestal));
 
@@ -238,7 +238,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
             if(!world.isBlockPowered(posDestPedestal))
             {
                 //Make sure its a pedestal before getting the tile
-                if(world.getBlockState(posDestPedestal).getBlock() instanceof BlockPedestalTE)
+                if(world.getBlockState(posDestPedestal).getBlock() instanceof PedestalBlock)
                 {
                     //Get the tile before checking other things
                     if(world.getTileEntity(posDestPedestal) instanceof TilePedestal)

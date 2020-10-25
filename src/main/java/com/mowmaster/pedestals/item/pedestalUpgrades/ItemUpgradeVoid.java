@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -72,7 +72,7 @@ public class ItemUpgradeVoid extends ItemUpgradeBaseEnergy
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
         BlockState state = world.getBlockState(posOfPedestal);
         float damage = getDamageDelt(coinInPedestal);
-        if(state.getBlock() instanceof BlockPedestalTE)
+        if(state.getBlock() instanceof PedestalBlock)
         {
             AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 

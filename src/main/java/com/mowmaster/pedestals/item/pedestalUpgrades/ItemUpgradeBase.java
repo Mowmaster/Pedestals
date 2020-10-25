@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.TilePedestal;
@@ -15,15 +15,12 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -41,7 +38,6 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -917,7 +913,7 @@ public class ItemUpgradeBase extends Item {
                 for (int y = negNums.getY(); y <= posNums.getY(); y++) {
                     BlockPos blockToMinePos = new BlockPos(x, y, z);
                     BlockState blockToMineState = world.getBlockState(blockToMinePos);
-                    if(!blockToMineState.getBlock().isAir(blockToMineState,world,blockToMinePos) && !(blockToMineState.getBlock() instanceof BlockPedestalTE) && canMineBlock(world, pedestalPos, blockToMineState.getBlock())
+                    if(!blockToMineState.getBlock().isAir(blockToMineState,world,blockToMinePos) && !(blockToMineState.getBlock() instanceof PedestalBlock) && canMineBlock(world, pedestalPos, blockToMineState.getBlock())
                             && !(blockToMineState.getBlock() instanceof IFluidBlock || blockToMineState.getBlock() instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)validBlocks++;
                 }
             }
@@ -1002,7 +998,7 @@ public class ItemUpgradeBase extends Item {
 
         BlockState state = world.getBlockState(pos);
         Direction enumfacing = Direction.UP;
-        if(state.getBlock() instanceof BlockPedestalTE)
+        if(state.getBlock() instanceof PedestalBlock)
         {
             enumfacing = state.get(FACING);
         }

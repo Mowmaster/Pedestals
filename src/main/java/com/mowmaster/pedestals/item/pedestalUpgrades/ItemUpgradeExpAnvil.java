@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.pedestals.blocks.BlockPedestalTE;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.TilePedestal;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -122,7 +122,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         for(int i = 0;i<posSorroundingPedestals.size();i++)
         {
             Block pedestal = world.getBlockState(posSorroundingPedestals.get(i)).getBlock();
-            if(pedestal instanceof BlockPedestalTE)
+            if(pedestal instanceof PedestalBlock)
             {
                 around +=1;
             }
