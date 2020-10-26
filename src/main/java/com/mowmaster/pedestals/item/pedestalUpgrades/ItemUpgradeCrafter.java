@@ -98,6 +98,13 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                     }
                 }, gridSize, gridSize);
 
+            CraftingInventory craftAvailable = new CraftingInventory(new Container(null, -1) {
+                @Override
+                public boolean canInteractWith(PlayerEntity playerIn) {
+                    return false;
+                }
+            }, gridSize, gridSize);
+
                 //Get Inventory Below
                 if(cap.isPresent()) {
                     IItemHandler handler = cap.orElse(null);
@@ -140,6 +147,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                     if(stackItemInSlot.isEmpty() ||stackItemInSlot.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER))
                                     {
                                         craft.setInventorySlotContents(intCraftingSlot, ItemStack.EMPTY);
+                                        craftAvailable.setInventorySlotContents(intCraftingSlot, ItemStack.EMPTY);
                                         intCraftingSlot++;
                                     }
                                     else if(stackItemInSlot.getMaxStackSize()==1 || stackItemInSlot.isDamageable())
@@ -147,12 +155,18 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                         //Since recipe has a container item we have to limit it to 1 craft
                                         intBatchCraftingSize = 1;
                                         craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                        craftAvailable.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
                                         intCraftingSlot++;
                                     }
-                                    //the +1 makes sure to leave 1 item in the inv as a placeholder
-                                    else if(stackItemInSlot.getCount() > (intBatchCraftingSize))
+                                    //first check if an item is in the slot
+                                    else if(stackItemInSlot.getCount() > 0)
                                     {
-                                        craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                        //next check to make sure we have more than enough to craft the recipe
+                                        if(stackItemInSlot.getCount() > (intBatchCraftingSize))
+                                        {
+                                            craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                        }
+                                        craftAvailable.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
                                         intCraftingSlot++;
                                     }
                                 }
@@ -163,11 +177,13 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                 {
 
                                     IRecipe recipe = findRecipe(craft,world);
+                                    //This is the set recipe, which might differ from the recipe given current available inputs
+                                    IRecipe setRecipe = findRecipe(craftAvailable,world);
                                     //for(IRecipe recipes : ForgeRegistries.RECIPE)
                                     //{
                                         //If recipe is valid and we can craft recipe and stick it in pedestal
 
-                                        if(recipe  != null &&  recipe.matches(craft, world)) {
+                                        if(recipe  != null &&  recipe.matches(craft, world) && recipe.matches(craftAvailable,world)) {
                                             //Set ItemStack with recipe result
                                             ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
                                             int intRecipeResultCount = stackRecipeResult.getCount();
