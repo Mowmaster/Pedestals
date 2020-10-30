@@ -15,6 +15,7 @@ import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -126,7 +127,29 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             int width = getAreaWidth(coinInPedestal);
             int height = (2*width)+1;
 
-            BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
+            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
+            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
+
+            if(!world.isBlockPowered(pedestalPos)) {
+                if (world.getGameTime() % speed == 0) {
+                    TileEntity tile = world.getTileEntity(pedestalPos);
+                    if(tile instanceof PedestalTileEntity)
+                    {
+                        PedestalTileEntity pedestal = (PedestalTileEntity) tile;
+                        int currentPosition = pedestal.getStoredValueForUpgrades();
+                        BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
+                        BlockState targetBlock = world.getBlockState(targetPos);
+                        upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
+                        pedestal.setStoredValueForUpgrades(currentPosition+1);
+                        if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
+                        {
+                            pedestal.setStoredValueForUpgrades(0);
+                        }
+                    }
+                }
+            }
+
+            /*BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
             BlockPos posBlockPos = getPosRangePos(world,pedestalPos,width,height);
 
             if(!world.isBlockPowered(pedestalPos)) {
@@ -151,7 +174,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 

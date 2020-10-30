@@ -897,6 +897,49 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
+    //Trying to work on a way to do better block checks
+    public BlockPos getPosOfNextBlock(int currentPosition, BlockPos negCorner, BlockPos posCorner)
+    {
+        int xRange = Math.abs(posCorner.getX() - negCorner.getX());
+        int yRange = Math.abs(posCorner.getY() - negCorner.getY());
+        int zRange = Math.abs(posCorner.getZ() - negCorner.getZ());
+        int layerVolume = xRange*zRange;
+        int addY = (int)Math.floor(currentPosition/layerVolume);
+        int layerCurrentPosition = currentPosition - addY*layerVolume;
+        int addZ = (int)Math.floor(layerCurrentPosition/xRange);
+        int addX = layerCurrentPosition - addZ*xRange;
+
+        return negCorner.add(addX,addY,addZ);
+    }
+    /*
+    if we have a range of 3x3x3
+    layer = x val * z val
+    cube = layer * y val
+    layer #1-3,4-6,7-9
+    x val = 1-3,1-3,1-3
+    zval = 1,2,3
+
+    Y_Value = (int) total count / layer value : should give us which layer we're on
+
+    LAYER_COUNT = total count - Y_Value*layer value
+
+    Z_Value = (int) LAYER_COUNT / xRange
+
+    X_Value = LAYER_COUNT - Z_Value*xRange
+
+    */
+    public boolean resetCurrentPosInt(int currentPosition, BlockPos negCorner, BlockPos posCorner)
+    {
+        int xRange = Math.abs(posCorner.getX() - negCorner.getX());
+        int yRange = Math.abs(posCorner.getY() - negCorner.getY());
+        int zRange = Math.abs(posCorner.getZ() - negCorner.getZ());
+        int layerVolume = xRange*zRange;
+
+        int addY = (int)Math.floor(currentPosition/layerVolume);
+
+        return addY >= yRange;
+    }
+
     public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
     {
         return false;

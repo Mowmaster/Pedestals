@@ -1,5 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.network.PacketHandler;
+import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IGrowable;
@@ -65,8 +67,6 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         return getAreaWidth(coin);
     }
 
-    public int ticked = 0;
-
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         if(!world.isRemote)
@@ -75,11 +75,29 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             int width = getAreaWidth(coinInPedestal);
             int height = (2*width)+1;
 
-            BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
-            BlockPos posBlockPos = getPosRangePos(world,pedestalPos,width,height);
+            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
+            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
 
             if(!world.isBlockPowered(pedestalPos)) {
-                for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
+                if (world.getGameTime() % speed == 0) {
+                    TileEntity tile = world.getTileEntity(pedestalPos);
+                    if(tile instanceof PedestalTileEntity)
+                    {
+                        PedestalTileEntity pedestal = (PedestalTileEntity) tile;
+                        int currentPosition = pedestal.getStoredValueForUpgrades();
+                        BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
+                        BlockState targetBlock = world.getBlockState(targetPos);
+                        upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                        pedestal.setStoredValueForUpgrades(currentPosition+1);
+                        if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
+                        {
+                            pedestal.setStoredValueForUpgrades(0);
+                        }
+                    }
+                }
+
+
+                /*for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
                     for (int z = negBlockPos.getZ(); z <= posBlockPos.getZ(); z++) {
                         for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
                             BlockPos posTargetBlock = new BlockPos(x, y, z);
@@ -99,7 +117,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                             }
                         }
                     }
-                }
+                }*/
             }
         }
 
@@ -122,10 +140,12 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                         if(pedestalInv instanceof PedestalTileEntity) {
                             ((PedestalTileEntity) pedestalInv).removeItem(1);
+                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.BONEMEAL,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                         }
                     }
                     else
                     {
+                        PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.TICKED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                         target.randomTick((ServerWorld) world, posTarget, rand);
                         world.notifyBlockUpdate(posTarget, target, target, 2);
                     }
@@ -133,6 +153,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             }
             else
             {
+                PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.TICKED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                 target.randomTick((ServerWorld) world, posTarget, rand);
                 world.notifyBlockUpdate(posTarget, target, target, 2);
             }

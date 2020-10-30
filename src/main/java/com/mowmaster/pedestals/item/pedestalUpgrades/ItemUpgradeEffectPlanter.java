@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -66,8 +67,6 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         return getAreaWidth(coin);
     }
 
-    public int ticked = 0;
-
     public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
         int speed = getOperationSpeed(coinInPedestal);
@@ -75,10 +74,29 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         int width = getAreaWidth(coinInPedestal);
         int height = (2*width)+1;
 
-        BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
-        BlockPos posBlockPos = getPosRangePos(world,pedestalPos,width,height);
+        BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
+        BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
 
         if(!world.isBlockPowered(pedestalPos)) {
+            if (world.getGameTime() % speed == 0) {
+                TileEntity tile = world.getTileEntity(pedestalPos);
+                if(tile instanceof PedestalTileEntity)
+                {
+                    PedestalTileEntity pedestal = (PedestalTileEntity) tile;
+                    int currentPosition = pedestal.getStoredValueForUpgrades();
+                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
+                    BlockState targetBlock = world.getBlockState(targetPos);
+                    upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                    pedestal.setStoredValueForUpgrades(currentPosition+1);
+                    if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
+                    {
+                        pedestal.setStoredValueForUpgrades(0);
+                    }
+                }
+            }
+        }
+
+        /*if(!world.isBlockPowered(pedestalPos)) {
             for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
                 for (int z = negBlockPos.getZ(); z <= posBlockPos.getZ(); z++) {
                     for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
@@ -100,7 +118,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                     }
                 }
             }
-        }
+        }*/
     }
 
     public void upgradeAction(World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
