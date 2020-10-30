@@ -99,9 +99,26 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 //Keep Pedestal Full at all times
                 fillPedestalAction(world,itemInPedestal,coinInPedestal,pedestalPos);
-                //Cobble Gen Only Works So Fast
-                if (tick%speed == 0) {
-                    upgradeAction(world,itemInPedestal,coinInPedestal,pedestalPos);
+                //Cobble Gen Updates once per 20 ticks (to help prevent lag)
+                if (tick%20 == 0) {
+                    TileEntity tileCheckForPedestal = world.getTileEntity(pedestalPos);
+                    int intSpawnRate = getCobbleGenSpawnRate(coinInPedestal);
+                    int speedMultiplier = (int)(20/speed);
+                    int addAmount = intSpawnRate * speedMultiplier;
+                    if(tileCheckForPedestal instanceof PedestalTileEntity)
+                    {
+                        PedestalTileEntity tilePedestal = ((PedestalTileEntity)tileCheckForPedestal);
+                        int intGetStored = tilePedestal.getStoredValueForUpgrades();
+                        int intNewStored = intGetStored + addAmount;
+                        if(intGetStored < (maxStored - addAmount))
+                        {
+                            tilePedestal.setStoredValueForUpgrades(intNewStored);
+                        }
+                        else
+                        {
+                            tilePedestal.setStoredValueForUpgrades(maxStored-1);
+                        }
+                    }
                 }
             }
         }
@@ -138,18 +155,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
-        TileEntity tileCheckForPedestal = world.getTileEntity(pedestalPos);
-        int intSpawnRate = getCobbleGenSpawnRate(coinInPedestal);
-        if(tileCheckForPedestal instanceof PedestalTileEntity)
-        {
-            PedestalTileEntity tilePedestal = ((PedestalTileEntity)tileCheckForPedestal);
-            int intGetStored = tilePedestal.getStoredValueForUpgrades();
-            int intNewStored = intGetStored + intSpawnRate;
-            if(intGetStored <= (maxStored - intSpawnRate))
-            {
-                tilePedestal.setStoredValueForUpgrades(intNewStored);
-            }
-        }
+
     }
 
 
