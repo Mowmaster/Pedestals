@@ -114,40 +114,10 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
         return amountToSet;
     }
 
-    public static int getItemFuelBurnTime(ItemStack fuel)
-    {
-        if (fuel.isEmpty()) return 0;
-        else
-        {
-            int burnTime = ForgeHooks.getBurnTime(fuel);
-            return burnTime;
-        }
-    }
-
     @Override
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
-        if(entityIn instanceof ItemEntity)
-        {
-            ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
-            if(getItemFuelBurnTime(getItemStack)>0)
-            {
-                int CurrentBurnTime = tilePedestal.getStoredValueForUpgrades();
-                int getBurnTimeForStack = getItemFuelBurnTime(getItemStack) * getItemStack.getCount();
-                tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
-                if(getItemStack.getItem().equals(Items.LAVA_BUCKET))
-                {
-                    ItemStack getReturned = new ItemStack(Items.BUCKET,getItemStack.getCount());
-                    ItemEntity items1 = new ItemEntity(world, posPedestal.getX() + 0.5, posPedestal.getY() + 1.0, posPedestal.getZ() + 0.5, getReturned);
-                    world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                    entityIn.remove();
-                    world.addEntity(items1);
-                }
-
-                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_FIRE_AMBIENT, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                entityIn.remove();
-            }
-        }
+        //do nothing
     }
 
     public String getSmeltingSpeedString(ItemStack stack)
