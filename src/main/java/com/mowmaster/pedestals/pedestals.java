@@ -4,6 +4,7 @@ import com.mowmaster.pedestals.blocks.PedestalBlock;
 //import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.creativeTab.CreativeTabBlock;
 import com.mowmaster.pedestals.item.ItemRegistry;
+import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.recipes.PedestalsSerializers;
 import com.mowmaster.pedestals.references.Reference;
 //import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -66,6 +67,7 @@ public class pedestals
         // some preinit code
         //LOGGER.info("HELLO FROM PREINIT");
         //LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        PacketHandler.registerMessages();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
