@@ -9,6 +9,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
@@ -99,6 +100,99 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         return  smeltingSpeed;
     }
 
+    public void setFuelStored(ItemStack stack, int fuel)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putInt("fuel",fuel);
+        stack.setTag(compound);
+    }
+
+    public boolean hasFuel(ItemStack stack)
+    {
+        return getFuelStored(stack)>0;
+    }
+
+    public int getFuelStored(ItemStack stack)
+    {
+        int storedFuel = 0;
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            storedFuel = getCompound.getInt("fuel");
+        }
+        return storedFuel;
+    }
+
+    public void setMaxFuel(ItemStack stack, int amountMax)
+    {
+        writeMaxFuelToNBT(stack,amountMax);
+    }
+
+    public boolean hasMaxFuelSet(ItemStack stack)
+    {
+        boolean returner = false;
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("maxfuel"))
+            {
+                returner = true;
+            }
+        }
+        return returner;
+    }
+
+    public void writeMaxFuelToNBT(ItemStack stack, int value)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putInt("maxfuel",value);
+        stack.setTag(compound);
+    }
+
+    public int readMaxFuelFromNBT(ItemStack stack)
+    {
+        int maxfuel = 0;
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            maxfuel = getCompound.getInt("maxfuel");
+        }
+        return maxfuel;
+    }
+
+    public boolean addFuel(PedestalTileEntity pedestal, int amountToAdd, boolean simulate)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        if(hasMaxFuelSet(coin))
+        {
+            int maxFuel = readMaxFuelFromNBT(coin);
+            int currentFuel = getFuelStored(coin);
+            int addAmount = currentFuel + amountToAdd;
+            if(maxFuel > addAmount)
+            {
+                if(!simulate)
+                {
+                    setFuelStored(coin,addAmount);
+                    return true;
+                }
+                //return true if fuel could be added for simulation requests
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
     {
         int amountToSet = 0;
@@ -106,14 +200,15 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         if(entity instanceof PedestalTileEntity)
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)entity;
-            int fuelLeft = pedestal.getStoredValueForUpgrades();
+            return removeFuel(pedestal,amountToRemove,simulate);
+            /*int fuelLeft = pedestal.getStoredValueForUpgrades();
             amountToSet = fuelLeft - amountToRemove;
             if(amountToRemove >= fuelLeft) amountToSet = -1;
             if(!simulate)
             {
                 if(amountToSet == -1) amountToSet = 0;
                 pedestal.setStoredValueForUpgrades(amountToSet);
-            }
+            }*/
         }
 
         return amountToSet;
@@ -121,13 +216,19 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
 
     public int removeFuel(PedestalTileEntity pedestal, int amountToRemove, boolean simulate)
     {
-        int fuelLeft = pedestal.getStoredValueForUpgrades();
-        int amountToSet = fuelLeft - amountToRemove;
-        if(amountToRemove >= fuelLeft) amountToSet = -1;
-        if(!simulate)
+        int amountToSet = 0;
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        if(hasFuel(coin))
         {
-            if(amountToSet == -1) amountToSet = 0;
-            pedestal.setStoredValueForUpgrades(amountToSet);
+            int fuelLeft = getFuelStored(coin);
+            amountToSet = fuelLeft - amountToRemove;
+            if(amountToRemove >= fuelLeft) amountToSet = -1;
+            if(!simulate)
+            {
+                if(amountToSet == -1) amountToSet = 0;
+                setFuelStored(coin,amountToSet);
+                //pedestal.setStoredValueForUpgrades(amountToSet);
+            }
         }
 
         return amountToSet;
@@ -151,20 +252,22 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
             ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
             if(getItemFuelBurnTime(getItemStack)>0)
             {
-                int CurrentBurnTime = tilePedestal.getStoredValueForUpgrades();
                 int getBurnTimeForStack = getItemFuelBurnTime(getItemStack) * getItemStack.getCount();
-                tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
-                if(getItemStack.getItem().equals(Items.LAVA_BUCKET))
+                if(addFuel(tilePedestal,getBurnTimeForStack,true))
                 {
-                    ItemStack getReturned = new ItemStack(Items.BUCKET,getItemStack.getCount());
-                    ItemEntity items1 = new ItemEntity(world, posPedestal.getX() + 0.5, posPedestal.getY() + 1.0, posPedestal.getZ() + 0.5, getReturned);
-                    world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                    entityIn.remove();
-                    world.addEntity(items1);
-                }
+                    addFuel(tilePedestal,getBurnTimeForStack,false);
+                    if(getItemStack.getItem().equals(Items.LAVA_BUCKET))
+                    {
+                        ItemStack getReturned = new ItemStack(Items.BUCKET,getItemStack.getCount());
+                        ItemEntity items1 = new ItemEntity(world, posPedestal.getX() + 0.5, posPedestal.getY() + 1.0, posPedestal.getZ() + 0.5, getReturned);
+                        world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                        entityIn.remove();
+                        world.addEntity(items1);
+                    }
 
-                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_FIRE_AMBIENT, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                entityIn.remove();
+                    world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_FIRE_AMBIENT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                    entityIn.remove();
+                }
             }
         }
     }
@@ -210,9 +313,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         if(!world.isBlockPowered(pos))
         {
             int fuelValue = pedestal.getStoredValueForUpgrades();
-
-
-
+            
             if(fuelValue >= 200)
             {
                 spawnParticleAroundPedestalBase(world,tick,pos, ParticleTypes.FLAME);
