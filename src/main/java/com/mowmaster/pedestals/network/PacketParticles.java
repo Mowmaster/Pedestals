@@ -87,6 +87,15 @@ public class PacketParticles
                             }
                             break;
                         }
+                        case HARVESTED:{
+                            for(int i =0; i < 10; i++){
+                                double d0 = message.x +0.5; //+ world.rand.nextFloat();
+                                double d1 = message.y +1.2;//+ world.rand.nextFloat() ;
+                                double d2 = message.z +.5 ; //+ world.rand.nextFloat();
+                                world.addParticle(new RedstoneParticleData(1.0f,0.64f,0.0f,1.0f),d0, d1, d2, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3);
+                            }
+                            break;
+                        }
                     }
 
                 };
@@ -97,7 +106,8 @@ public class PacketParticles
     }
     public enum EffectType {
         BONEMEAL(0),
-        TICKED(0)
+        TICKED(0),
+        HARVESTED(0)
         ;
 
         private final int argCount;
