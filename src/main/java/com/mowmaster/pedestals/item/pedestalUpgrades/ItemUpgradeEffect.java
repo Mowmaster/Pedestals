@@ -132,28 +132,38 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     }
 
     @Override
-    public int removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
+    public boolean removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
     {
         int amountToSet = 0;
         TileEntity entity = world.getTileEntity(posPedestal);
         if(entity instanceof PedestalTileEntity)
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)entity;
-            int fuelLeft = pedestal.getStoredValueForUpgrades();
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            int fuelLeft = getFuelStored(coin);
             amountToSet = fuelLeft - amountToRemove;
             if(amountToRemove > fuelLeft) amountToSet = -1;
             if(!simulate)
             {
                 if(amountToSet == -1) amountToSet = 0;
-                pedestal.setStoredValueForUpgrades(amountToSet);
+                removeFuel(pedestal,amountToSet,simulate);
+                return true;
+                //pedestal.setStoredValueForUpgrades(amountToSet);
             }
+
+            return true;
         }
 
-        return amountToSet;
+        return false;
     }
+
+
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
+        int getMaxFuelValue = Integer.MAX_VALUE;
+        if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
+
         int width = getAreaWidth(coinInPedestal);
         int height = (2*width)+1;
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
@@ -178,7 +188,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     {
                         for(int i=0; i<instance.size(); i++)
                         {
-                            if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true) >= 0)
+                            if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true))
                             {
                                 if(getTargetEntity(world,posOfPedestal,getEntityFromList).addPotionEffect(instance.get(i)))
                                 {
@@ -208,11 +218,12 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
             ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
             if(getItemStack.getItem().equals(Items.BLAZE_POWDER))
             {
-                int CurrentBurnTime = tilePedestal.getStoredValueForUpgrades();
                 int getBurnTimeForStack = 4 * getItemStack.getCount();
-                tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
-
-                entityIn.remove();
+                if(addFuel(tilePedestal,getBurnTimeForStack,true))
+                {
+                    addFuel(tilePedestal,getBurnTimeForStack,false);
+                    entityIn.remove();
+                }
             }
         }
     }
@@ -223,7 +234,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     {
         if(!world.isBlockPowered(pos))
         {
-            int fuelValue = pedestal.getStoredValueForUpgrades();
+            int fuelValue = getFuelStored(pedestal.getCoinOnPedestal());
 
             if(fuelValue > 0)
             {
@@ -255,7 +266,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
 
         //Display Fuel Left
-        int fuelLeft = pedestal.getStoredValueForUpgrades();
+        int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
         fuel.appendString("" + fuelLeft + "");
         fuel.mergeStyle(TextFormatting.GREEN);

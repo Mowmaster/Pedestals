@@ -65,6 +65,9 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
+        int getMaxFuelValue = Integer.MAX_VALUE;
+        if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
+
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int itemsPerSmelt = getItemTransferRate(coinInPedestal);
 
@@ -121,7 +124,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                     if(pedestalInv instanceof PedestalTileEntity) {
                                         PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
                                         //Checks to make sure we have fuel to smelt everything
-                                        if(removeFuel(ped,fuelToConsume,true)>=0)
+                                        if(removeFuel(ped,fuelToConsume,true))
                                         {
                                             handler.extractItem(i,itemInputsPerSmelt ,false );
                                             removeFuel(ped,fuelToConsume,false);
@@ -132,7 +135,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                         else
                                         {
                                             //gets fuel left
-                                            int fuelLeft = ped.getStoredValueForUpgrades();
+                                            int fuelLeft = getFuelStored(coinInPedestal);
                                             if(fuelLeft>0)
                                             {
                                                 //this = a number over 1 unless fuelleft < burnTimeCostPeritemSmelted

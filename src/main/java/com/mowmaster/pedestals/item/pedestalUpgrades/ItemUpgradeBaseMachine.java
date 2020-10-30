@@ -193,9 +193,9 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         return false;
     }
 
-    public int removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
+    public boolean removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
     {
-        int amountToSet = 0;
+        //int amountToSet = 0;
         TileEntity entity = world.getTileEntity(posPedestal);
         if(entity instanceof PedestalTileEntity)
         {
@@ -211,27 +211,32 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
             }*/
         }
 
-        return amountToSet;
+        return false;
     }
 
-    public int removeFuel(PedestalTileEntity pedestal, int amountToRemove, boolean simulate)
+    public boolean removeFuel(PedestalTileEntity pedestal, int amountToRemove, boolean simulate)
     {
-        int amountToSet = 0;
+
         ItemStack coin = pedestal.getCoinOnPedestal();
         if(hasFuel(coin))
         {
             int fuelLeft = getFuelStored(coin);
-            amountToSet = fuelLeft - amountToRemove;
-            if(amountToRemove >= fuelLeft) amountToSet = -1;
-            if(!simulate)
+            int amountToSet = fuelLeft - amountToRemove;
+            if(fuelLeft >= amountToRemove)
             {
-                if(amountToSet == -1) amountToSet = 0;
-                setFuelStored(coin,amountToSet);
-                //pedestal.setStoredValueForUpgrades(amountToSet);
+                if(!simulate)
+                {
+                    if(amountToSet == -1) amountToSet = 0;
+                    setFuelStored(coin,amountToSet);
+                    return true;
+                    //pedestal.setStoredValueForUpgrades(amountToSet);
+                }
+                return true;
             }
+
         }
 
-        return amountToSet;
+        return false;
     }
 
     public static int getItemFuelBurnTime(ItemStack fuel)
@@ -312,8 +317,8 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     {
         if(!world.isBlockPowered(pos))
         {
-            int fuelValue = pedestal.getStoredValueForUpgrades();
-            
+            int fuelValue = getFuelStored(pedestal.getCoinOnPedestal());
+
             if(fuelValue >= 200)
             {
                 spawnParticleAroundPedestalBase(world,tick,pos, ParticleTypes.FLAME);
@@ -336,7 +341,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         player.sendMessage(rate,Util.DUMMY_UUID);
 
         //Display Fuel Left
-        int fuelLeft = pedestal.getStoredValueForUpgrades();
+        int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
         fuel.appendString("" + fuelLeft/200 + "");
         fuel.mergeStyle(TextFormatting.GREEN);

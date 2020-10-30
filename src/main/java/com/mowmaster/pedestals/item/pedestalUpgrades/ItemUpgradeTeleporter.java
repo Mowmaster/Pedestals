@@ -125,6 +125,9 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
+        int getMaxFuelValue = Integer.MAX_VALUE;
+        if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
+
         int width = 0;
         int height = 1;
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
@@ -155,19 +158,25 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
             ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
             if(getItemStack.getItem().equals(Items.ENDER_PEARL))
             {
-                int CurrentBurnTime = tilePedestal.getStoredValueForUpgrades();
                 int getBurnTimeForStack = 16 * getItemStack.getCount();
-                tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
+                if(addFuel(tilePedestal,getBurnTimeForStack,true))
+                {
+                    addFuel(tilePedestal,getBurnTimeForStack,false);
+                    //tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
 
-                entityIn.remove();
+                    entityIn.remove();
+                }
             }
             else if(getItemStack.getItem().equals(Items.CHORUS_FRUIT))
             {
-                int CurrentBurnTime = tilePedestal.getStoredValueForUpgrades();
+                //int CurrentBurnTime = tilePedestal.getStoredValueForUpgrades();
                 int getBurnTimeForStack = 4 * getItemStack.getCount();
-                tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
-
-                entityIn.remove();
+                if(addFuel(tilePedestal,getBurnTimeForStack,true))
+                {
+                    addFuel(tilePedestal,getBurnTimeForStack,false);
+                    //tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
+                    entityIn.remove();
+                }
             }
             else
             {
@@ -211,10 +220,10 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                             break;
                         }
                         //Random teleport to use up remaining fuel???
-                        else if (canTeleportTo(world,tilePedestal,posPedestal,tilePedestal.getStoredPositionAt(i),isItemEntity) == 2 && removeFuel(tilePedestal,0,true) > 0)
+                        else if (canTeleportTo(world,tilePedestal,posPedestal,tilePedestal.getStoredPositionAt(i),isItemEntity) == 2 && hasFuel(tilePedestal.getCoinOnPedestal()))
                         {
                             int range = getRange(tilePedestal.getCoinOnPedestal());
-                            int remainingFuel = removeFuel(tilePedestal,0,true);
+                            int remainingFuel = getFuelStored(tilePedestal.getCoinOnPedestal());
                             BlockPos randomPos = world.getBlockRandomPos((int)entityIn.getPosX(),(int)entityIn.getPosY(),(int)entityIn.getPosZ(),range*remainingFuel);
                             if(teleportEntityRandom(world, randomPos, entityIn))
                             {
@@ -336,7 +345,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     {
         if(!world.isBlockPowered(pos))
         {
-            int fuelValue = pedestal.getStoredValueForUpgrades();
+            int fuelValue = getFuelStored(pedestal.getCoinOnPedestal());
 
             //More than 1 smelt worth
             if(fuelValue > 0)
@@ -367,7 +376,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
 
         //Display Fuel Left
-        int fuelLeft = pedestal.getStoredValueForUpgrades();
+        int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
         fuel.appendString("" + fuelLeft + "");
         fuel.mergeStyle(TextFormatting.GREEN);

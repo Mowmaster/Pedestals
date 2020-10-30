@@ -150,7 +150,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                         PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
 
                         //System.out.println("Has Fuel: " + removeFuel(ped,200,true));
-                        if(removeFuel(ped,200,true)>=0)
+                        if(removeFuel(ped,200,true))
                         {
                             upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
                             for (int x = negNums.getX(); x <= posNums.getX(); x++) {
@@ -211,7 +211,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
             if(pedestalInv instanceof PedestalTileEntity) {
                 PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
-                if(removeFuel(ped,200,true)>=0)
+                if(removeFuel(ped,200,true))
                 {
                     /*if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true))
                     {

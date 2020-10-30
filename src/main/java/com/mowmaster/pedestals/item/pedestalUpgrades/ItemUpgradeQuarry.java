@@ -147,7 +147,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                     if(pedestalInv instanceof PedestalTileEntity) {
                         PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
 
-                        if(removeFuel(ped,200,true)>=0)
+                        if(removeFuel(ped,200,true))
                         {
                             upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
 
@@ -207,7 +207,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
             if(pedestalInv instanceof PedestalTileEntity) {
                 PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
-                if(removeFuel(ped,200,true)>=0)
+                if(removeFuel(ped,200,true))
                 {
                     /*if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true))
                     {
