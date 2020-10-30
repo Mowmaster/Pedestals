@@ -4,6 +4,8 @@ import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.network.PacketHandler;
+import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -14,6 +16,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -98,7 +101,29 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
             int rangeHeight = getRangeHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
 
-            BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
+            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
+            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
+
+            if(!world.isBlockPowered(pedestalPos)) {
+                if (world.getGameTime() % speed == 0) {
+                    TileEntity tile = world.getTileEntity(pedestalPos);
+                    if(tile instanceof PedestalTileEntity)
+                    {
+                        PedestalTileEntity pedestal = (PedestalTileEntity) tile;
+                        int currentPosition = pedestal.getStoredValueForUpgrades();
+                        BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
+                        BlockState targetBlock = world.getBlockState(targetPos);
+                        upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                        pedestal.setStoredValueForUpgrades(currentPosition+1);
+                        if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
+                        {
+                            pedestal.setStoredValueForUpgrades(0);
+                        }
+                    }
+                }
+            }
+
+            /*BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
             BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);
 
             if(!world.isBlockPowered(pedestalPos)) {
@@ -124,7 +149,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -172,7 +197,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 if (!MinecraftForge.EVENT_BUS.post(e)) {
                     blockToChop.getBlock().harvestBlock(world, fakePlayer, blockToChopPos, blockToChop, null, fakePlayer.getHeldItemMainhand());
                     blockToChop.getBlock().onBlockHarvested(world, blockToChopPos, blockToChop, fakePlayer);
-
+                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,blockToChopPos.getX(),blockToChopPos.getY()-0.5f,blockToChopPos.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                     world.removeBlock(blockToChopPos, false);
                 }
                 //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());

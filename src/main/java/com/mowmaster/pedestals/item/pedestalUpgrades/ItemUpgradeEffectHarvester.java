@@ -4,6 +4,8 @@ import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.network.PacketHandler;
+import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
@@ -220,7 +222,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                         if (!MinecraftForge.EVENT_BUS.post(e)) {
                             target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
                             target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
-
+                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                             world.removeBlock(posTarget, false);
                         }
                         //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
