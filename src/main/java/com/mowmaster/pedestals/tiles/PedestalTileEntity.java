@@ -740,16 +740,22 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         return true;
     }
 
-    public boolean addCoin(ItemStack coinFromBlock)
+    public boolean addCoin(ItemStack coinFromBlock,boolean simulate)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack itemFromBlock = coinFromBlock.copy();
-        itemFromBlock.setCount(1);
-        if(hasCoin()){} else ph.insertItem(0,itemFromBlock,false);
-        setStoredValueForUpgrades(0);
-        update();
-
-        return true;
+        if(!hasCoin())
+        {
+            if(!simulate)
+            {
+                IItemHandler ph = privateHandler.orElse(null);
+                ItemStack itemFromBlock = coinFromBlock.copy();
+                itemFromBlock.setCount(1);
+                if(hasCoin()){} else ph.insertItem(0,itemFromBlock,false);
+                setStoredValueForUpgrades(0);
+                update();
+            }
+            return true;
+        }
+        return false;
     }
 
     public boolean addSpeed(ItemStack speedUpgrade)
