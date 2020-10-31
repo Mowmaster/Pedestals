@@ -17,6 +17,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tags.BlockTags;
@@ -24,6 +25,7 @@ import net.minecraft.tags.ITag;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -42,6 +44,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -1026,6 +1029,65 @@ public class ItemUpgradeBase extends Item {
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
 
+    }
+
+    public UUID getPlayerFromCoin(ItemStack stack)
+    {
+        if(hasPlayerSet(stack))
+        {
+            UUID playerID = readUUIDFromNBT(stack);
+            if(playerID !=null)
+            {
+                return playerID;
+            }
+        }
+        return Util.DUMMY_UUID;
+    }
+
+    public void setPlayerOnCoin(ItemStack stack, PlayerEntity player)
+    {
+        writeUUIDToNBT(stack,player.getUniqueID());
+    }
+
+    public boolean hasPlayerSet(ItemStack stack)
+    {
+        boolean returner = false;
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("player"))
+            {
+                if(readUUIDFromNBT(stack) !=null)
+                {
+                    returner = true;
+                }
+            }
+        }
+        return returner;
+    }
+
+    public void writeUUIDToNBT(ItemStack stack, UUID uuidIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putUniqueId("player",uuidIn);
+        stack.setTag(compound);
+    }
+
+    public UUID readUUIDFromNBT(ItemStack stack)
+    {
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            return getCompound.getUniqueId("player");
+        }
+
+        return null;
     }
 
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
