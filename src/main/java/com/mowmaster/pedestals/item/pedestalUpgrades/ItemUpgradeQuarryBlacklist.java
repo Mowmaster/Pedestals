@@ -5,6 +5,8 @@ import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.network.PacketHandler;
+import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -132,13 +134,18 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
     {
         if(!world.isRemote)
         {
+            int getMaxFuelValue = Integer.MAX_VALUE;
+            if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
+
             int rangeWidth = getAreaWidth(coinInPedestal);
             int rangeHeight = getRangeHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
-            int breakspeed = Math.multiplyExact(Math.multiplyExact((int)(Math.pow((Math.multiplyExact(rangeWidth,2)+1),2)/9),20),84);
+            //int breakspeed = Math.multiplyExact(Math.multiplyExact((int)(Math.pow((Math.multiplyExact(rangeWidth,2)+1),2)/9),20),84);
 
-            BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
-            BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);
+            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
+            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
+            /*BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
+            BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);*/
             //System.out.println("World Loaded: " + world.isAreaLoaded(negNums,posNums));
             if(world.isAreaLoaded(negNums,posNums))
             {
@@ -153,7 +160,26 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                         if(removeFuel(ped,200,true))
                         {
                             upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
-                            for (int x = negNums.getX(); x <= posNums.getX(); x++) {
+
+                            if(!world.isBlockPowered(pedestalPos)) {
+                                if (world.getGameTime() % speed == 0) {
+                                    TileEntity tile = world.getTileEntity(pedestalPos);
+                                    if(tile instanceof PedestalTileEntity)
+                                    {
+                                        PedestalTileEntity pedestal = (PedestalTileEntity) tile;
+                                        int currentPosition = pedestal.getStoredValueForUpgrades();
+                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,negNums,posNums);
+                                        BlockState targetBlock = world.getBlockState(targetPos);
+                                        upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                        pedestal.setStoredValueForUpgrades(currentPosition+1);
+                                        if(resetCurrentPosInt(currentPosition,negNums,posNums))
+                                        {
+                                            pedestal.setStoredValueForUpgrades(0);
+                                        }
+                                    }
+                                }
+                            }
+                            /*for (int x = negNums.getX(); x <= posNums.getX(); x++) {
                                 for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
                                     for (int y = negNums.getY(); y <= posNums.getY(); y++) {
                                         BlockPos blockToChopPos = new BlockPos(x, y, z);
@@ -176,7 +202,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                                         }
                                     }
                                 }
-                            }
+                            }*/
                         }
                     }
                 }
@@ -227,6 +253,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                             blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
                             removeFuel(ped,200,false);
                             world.removeBlock(blockToMinePos, false);
+                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,blockToMinePos.getX(),blockToMinePos.getY()-0.5f,blockToMinePos.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                         }
                         //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
                     }
@@ -332,7 +359,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         player.sendMessage(btm,Util.DUMMY_UUID);
 
         //Display Fuel Left
-        int fuelLeft = pedestal.getStoredValueForUpgrades();
+        int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
         TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
         TranslationTextComponent fuel2 = new TranslationTextComponent(getTranslationKey() + ".chat_fuel2");
         fuel.appendString("" + fuelLeft/200 + "");
