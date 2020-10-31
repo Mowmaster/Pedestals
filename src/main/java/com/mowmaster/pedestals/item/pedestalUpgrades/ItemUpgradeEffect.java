@@ -134,24 +134,24 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     @Override
     public boolean removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
     {
-        int amountToSet = 0;
+
         TileEntity entity = world.getTileEntity(posPedestal);
         if(entity instanceof PedestalTileEntity)
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)entity;
             ItemStack coin = pedestal.getCoinOnPedestal();
             int fuelLeft = getFuelStored(coin);
-            amountToSet = fuelLeft - amountToRemove;
-            if(amountToRemove > fuelLeft) amountToSet = -1;
-            if(!simulate)
+            if(amountToRemove <= fuelLeft)
             {
-                if(amountToSet == -1) amountToSet = 0;
-                removeFuel(pedestal,amountToSet,simulate);
-                return true;
-                //pedestal.setStoredValueForUpgrades(amountToSet);
-            }
+                if(!simulate)
+                {
+                    removeFuel(pedestal,amountToRemove,simulate);
+                    return true;
+                    //pedestal.setStoredValueForUpgrades(amountToSet);
+                }
 
-            return true;
+                return true;
+            }
         }
 
         return false;

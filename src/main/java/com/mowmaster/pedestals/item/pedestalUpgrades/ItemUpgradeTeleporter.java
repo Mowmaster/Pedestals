@@ -252,7 +252,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                     //Get the tile before checking other things
                     if(world.getTileEntity(posDestPedestal) instanceof PedestalTileEntity)
                     {
-                        if(getTeleportDistance(posOrigPedestal,posDestPedestal) <= tilePedestal.getStoredValueForUpgrades())
+                        if(getTeleportDistance(posOrigPedestal,posDestPedestal) <= getFuelStored(tilePedestal.getCoinOnPedestal()))
                         {
                             int range = getRange(tilePedestal.getCoinOnPedestal());
                             BlockPos posDestBlock = getPosOfBlockBelow(world,posDestPedestal,range);

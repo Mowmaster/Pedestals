@@ -184,6 +184,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
                 if(!simulate)
                 {
                     setFuelStored(coin,addAmount);
+                    pedestal.update();
                     return true;
                 }
                 //return true if fuel could be added for simulation requests
@@ -228,6 +229,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
                 {
                     if(amountToSet == -1) amountToSet = 0;
                     setFuelStored(coin,amountToSet);
+                    pedestal.update();
                     return true;
                     //pedestal.setStoredValueForUpgrades(amountToSet);
                 }
