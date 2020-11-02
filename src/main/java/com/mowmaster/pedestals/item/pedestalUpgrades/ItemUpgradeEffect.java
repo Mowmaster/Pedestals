@@ -77,6 +77,9 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     {
         if(!world.isRemote)
         {
+            int getMaxFuelValue = Integer.MAX_VALUE;
+            if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
+
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
@@ -161,9 +164,6 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
-        int getMaxFuelValue = Integer.MAX_VALUE;
-        if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
-
         int width = getAreaWidth(coinInPedestal);
         int height = (2*width)+1;
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
@@ -320,6 +320,12 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
+
+        TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
+        fuelStored.appendString(""+ getFuelStored(stack) +"");
+        fuelStored.mergeStyle(TextFormatting.GREEN);
+        tooltip.add(fuelStored);
+
         tooltip.add(speed);
     }
 

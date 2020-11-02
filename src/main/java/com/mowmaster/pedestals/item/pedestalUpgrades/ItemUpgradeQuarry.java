@@ -417,6 +417,11 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
         area.mergeStyle(TextFormatting.WHITE);
         tooltip.add(area);
 
+        TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
+        fuelStored.appendString(""+ getFuelStored(stack) +"");
+        fuelStored.mergeStyle(TextFormatting.GREEN);
+        tooltip.add(fuelStored);
+
         speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }

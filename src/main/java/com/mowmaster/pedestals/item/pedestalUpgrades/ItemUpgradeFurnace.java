@@ -75,6 +75,9 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
     {
         if(!world.isRemote)
         {
+            int getMaxFuelValue = Integer.MAX_VALUE;
+            if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
+
             int speed = getSmeltingSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos))
@@ -88,9 +91,6 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        int getMaxFuelValue = Integer.MAX_VALUE;
-        if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
-
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int itemsPerSmelt = getItemTransferRate(coinInPedestal);
 

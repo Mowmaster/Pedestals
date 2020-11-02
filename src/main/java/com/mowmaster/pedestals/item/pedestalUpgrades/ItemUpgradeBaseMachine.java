@@ -191,6 +191,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -368,6 +369,12 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         speed.appendString(trr);
 
         rate.mergeStyle(TextFormatting.GRAY);
+
+        TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
+        fuelStored.appendString(""+ getFuelStored(stack) +"");
+        fuelStored.mergeStyle(TextFormatting.GREEN);
+        tooltip.add(fuelStored);
+
         speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(rate);
