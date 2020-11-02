@@ -513,7 +513,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     public void dropInventoryItemsPrivate(World worldIn, BlockPos pos) {
         IItemHandler ph = privateHandler.orElse(null);
         for(int i = 0; i < ph.getSlots(); ++i) {
-            if(i==0)((ItemUpgradeBase)ph.getStackInSlot(i).getItem()).removePlayerFromCoin(ph.getStackInSlot(i));
+            if(i==0 && hasCoin())((ItemUpgradeBase)ph.getStackInSlot(i).getItem()).removePlayerFromCoin(ph.getStackInSlot(i));
             spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
         }
     }
