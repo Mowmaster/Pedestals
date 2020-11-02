@@ -126,8 +126,8 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinOnPedestal) {
         int range = getRange(coinOnPedestal);
 
-        //FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
-        FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+        FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
+        //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
         fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
         ItemStack pickaxe = new ItemStack(Items.DIAMOND_PICKAXE, 1);
         BlockPos posOfBlock = getPosOfBlockBelow(world, posOfPedestal, range);

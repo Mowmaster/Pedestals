@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -150,7 +151,8 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         List<LivingEntity> itemList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
         for(LivingEntity getEntityFromList : itemList)
         {
-            FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+            FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
             fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
 
             List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10");

@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
@@ -187,7 +188,8 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         {
             //if(!((IGrowable) target.getBlock()).canGrow(world,posTarget,target,false))
             //{
-                FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+                FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                 fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
                 ItemStack harvestingHoe = new ItemStack(Items.DIAMOND_HOE,1);
                 if (itemInPedestal.getItem() instanceof HoeItem || itemInPedestal.getToolTypes().contains(ToolType.HOE)) {

@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -86,7 +87,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                     int currentPosition = pedestal.getStoredValueForUpgrades();
                     BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
                     BlockState targetBlock = world.getBlockState(targetPos);
-                    upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                    upgradeAction(world, pedestal, itemInPedestal, pedestalPos, targetPos, targetBlock);
                     pedestal.setStoredValueForUpgrades(currentPosition+1);
                     if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
                     {
@@ -121,7 +122,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         }*/
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
+    public void upgradeAction(World world, PedestalTileEntity pedestal, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
     {
         if(!world.isRemote)
         {
@@ -139,7 +140,8 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 
 
                             if (world.getBlockState(posTarget.down()).canSustainPlant(world,posTarget.down(), Direction.UP,(IPlantable) block)) {
-                                FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+                                FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(pedestal.getCoinOnPedestal()),"[Pedestals]"));
+                                //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                                 fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
 
                                 BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget.down(), false));

@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
@@ -160,7 +161,8 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 || blockToChop.getBlock().equals(Blocks.SHROOMLIGHT) || blockToChop.getBlock().equals(Blocks.MUSHROOM_STEM) || blockToChop.getBlock().equals(Blocks.BROWN_MUSHROOM_BLOCK) || blockToChop.getBlock().equals(Blocks.RED_MUSHROOM_BLOCK))
         {
 
-            FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+            FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack choppingAxe = new ItemStack(Items.DIAMOND_AXE,1);
             if (itemInPedestal.getItem() instanceof AxeItem || itemInPedestal.getToolTypes().contains(ToolType.AXE)) {
