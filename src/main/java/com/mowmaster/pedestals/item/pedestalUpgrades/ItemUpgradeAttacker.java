@@ -19,6 +19,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegistryEvent;
@@ -151,9 +152,13 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         List<LivingEntity> itemList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
         for(LivingEntity getEntityFromList : itemList)
         {
+
             FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
             fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
+            if (itemInPedestal.getItem() instanceof SwordItem) {
+                fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
+            }
 
             List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10");
             Random rn = new Random();
