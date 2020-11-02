@@ -283,12 +283,10 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                     else{
                         if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeBase)
                         {
-                            if(tilePedestal.addCoin(player.getHeldItemMainhand(),true))
+                            if(tilePedestal.addCoin(player,player.getHeldItemMainhand(),true))
                             {
                                 ItemStack coinToBePlaced = player.getHeldItemMainhand().copy();
-                                coinToBePlaced.setCount(1);
-                                ((ItemUpgradeBase) player.getHeldItemMainhand().getItem()).setPlayerOnCoin(coinToBePlaced,player);
-                                if(tilePedestal.addCoin(coinToBePlaced,false))
+                                if(tilePedestal.addCoin(player,coinToBePlaced,false))
                                 {
                                     if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
                                 }

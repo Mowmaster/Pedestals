@@ -1031,6 +1031,23 @@ public class ItemUpgradeBase extends Item {
 
     }
 
+    public void removePlayerFromCoin(ItemStack stack)
+    {
+        if(hasPlayerSet(stack))
+        {
+            CompoundNBT compound = new CompoundNBT();
+            if(stack.hasTag())
+            {
+                compound = stack.getTag();
+                if(compound.contains("player"))
+                {
+                    compound.remove("player");
+                    stack.setTag(compound);
+                }
+            }
+        }
+    }
+
     public UUID getPlayerFromCoin(ItemStack stack)
     {
         if(hasPlayerSet(stack))

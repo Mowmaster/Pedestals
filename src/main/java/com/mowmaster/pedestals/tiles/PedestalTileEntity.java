@@ -479,6 +479,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     public ItemStack removeCoin() {
         IItemHandler ph = privateHandler.orElse(null);
         ItemStack stack = ph.extractItem(0,ph.getStackInSlot(0).getCount(),false);
+        ((ItemUpgradeBase)stack.getItem()).removePlayerFromCoin(stack);
         setStoredValueForUpgrades(0);
         update();
 
@@ -510,9 +511,10 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     }
 
     public void dropInventoryItemsPrivate(World worldIn, BlockPos pos) {
-        IItemHandler h = privateHandler.orElse(null);
-        for(int i = 0; i < h.getSlots(); ++i) {
-            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
+        IItemHandler ph = privateHandler.orElse(null);
+        for(int i = 0; i < ph.getSlots(); ++i) {
+            if(i==0)((ItemUpgradeBase)ph.getStackInSlot(i).getItem()).removePlayerFromCoin(ph.getStackInSlot(i));
+            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
         }
     }
 
@@ -740,7 +742,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         return true;
     }
 
-    public boolean addCoin(ItemStack coinFromBlock,boolean simulate)
+    public boolean addCoin(PlayerEntity player, ItemStack coinFromBlock,boolean simulate)
     {
         if(!hasCoin())
         {
@@ -749,7 +751,9 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 IItemHandler ph = privateHandler.orElse(null);
                 ItemStack itemFromBlock = coinFromBlock.copy();
                 itemFromBlock.setCount(1);
-                if(hasCoin()){} else ph.insertItem(0,itemFromBlock,false);
+                //We know this is what the item is because of the pedestal block check
+                ((ItemUpgradeBase)itemFromBlock.getItem()).setPlayerOnCoin(itemFromBlock,player);
+                if(!hasCoin())ph.insertItem(0,itemFromBlock,false);
                 setStoredValueForUpgrades(0);
                 update();
             }
