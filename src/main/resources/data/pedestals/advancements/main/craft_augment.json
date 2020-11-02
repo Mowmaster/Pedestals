@@ -1,0 +1,55 @@
+{
+  "parent": "pedestals:main/root",
+  "display": {
+    "icon": {
+      "item": "pedestals:upgraderange"
+    },
+    "title": {
+      "translate": "advancements.main.craft_augment.title"
+    },
+    "description": {
+      "translate": "advancements.main.craft_augment.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "requirement1": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:upgradespeed"
+          }
+        ]
+      }
+    },
+    "requirement2": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:upgradecapacity"
+          }
+        ]
+      }
+    },
+    "requirement3": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:upgraderange"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "requirement1","requirement2","requirement3"
+    ]
+  ]
+}

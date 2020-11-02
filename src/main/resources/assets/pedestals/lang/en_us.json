@@ -1103,5 +1103,22 @@
     "enchantment.pedestals.upgradearea": "Pedestal Area",
     "enchantment.pedestals.upgradearea.desc": "Modifies the AOE area of a pedestals 'work' area",
     "enchantment.pedestals.upgradeadvanced": "Pedestal Advanced",
-    "enchantment.pedestals.upgradeadvanced.desc": "Can be applied to pedestals that can use an inventory below for inputs or outputs, will allow ANY entities inventory to use used"
+    "enchantment.pedestals.upgradeadvanced.desc": "Can be applied to pedestals that can use an inventory below for inputs or outputs, will allow ANY entities inventory to use used",
+
+
+  "advancements.main.root.title": "Pedestals", "advancements.main.root.description":"The Start to Everything Pedestals!",
+  "advancements.main.craft_pedestal.title": "My First Pedestal", "advancements.main.craft_pedestal.description":"Its not just for Displaying!",
+  "advancements.main.craft_upgrade.title": "Getting Yet Another Upgrade", "advancements.main.craft_upgrade.description":"The basis of all 'Upgraded' things!",
+  "advancements.main.craft_focusedbook.title": "Focused Enchanting", "advancements.main.craft_focusedbook.description":"Books designed to only get 1 type of enchantment. Downside: must be combined with Upgrades on the Exp Anvil",
+  "advancements.main.craft_augment.title": "Augmented Transferring", "advancements.main.craft_augment.description":"Used to augment pedestals tranferring capabilities",
+  "advancements.main.craft_pallet.title": "All da Colors!", "advancements.main.craft_pallet.description":"Tossing Color Pallets, and RGB dye on the ground, then smacking it with the linking tool will make colored ones. Colored ones can be applied to newly placed pedestals.",
+  "advancements.main.craft_filter.title": "Getting Organized", "advancements.main.craft_filter.description":"My recommendation is a Filtered Import sending items to Filtered Exports. Best earlygame sorting in my opinion",
+  "advancements.main.root.title": "Pedestals", "advancements.main.root.description":"The Start to Everything Pedestals!",
+  "advancements.main.root.title": "Pedestals", "advancements.main.root.description":"The Start to Everything Pedestals!",
+  "advancements.main.root.title": "Pedestals", "advancements.main.root.description":"The Start to Everything Pedestals!",
+  "advancements.main.root.title": "Pedestals", "advancements.main.root.description":"The Start to Everything Pedestals!",
+
+
+
+  "not.actually.a.thing": "ignore me"
 }

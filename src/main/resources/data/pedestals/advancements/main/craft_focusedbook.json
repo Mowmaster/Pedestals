@@ -1,0 +1,75 @@
+{
+  "parent": "pedestals:main/root",
+  "display": {
+    "icon": {
+      "item": "pedestals:bookadvanced"
+    },
+    "title": {
+      "translate": "advancements.main.craft_focusedbook.title"
+    },
+    "description": {
+      "translate": "advancements.main.craft_focusedbook.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "requirement1": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:bookspeed"
+          }
+        ]
+      }
+    },
+    "requirement2": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:bookrange"
+          }
+        ]
+      }
+    },
+    "requirement3": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:bookcapacity"
+          }
+        ]
+      }
+    },
+    "requirement4": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:bookarea"
+          }
+        ]
+      }
+    },
+    "requirement5": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:bookadvanced"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "requirement1","requirement2","requirement3","requirement4","requirement5"
+    ]
+  ]
+}
