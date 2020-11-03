@@ -236,6 +236,16 @@
     "item.pedestals.coin.harvester.chat_speed": "收货速度: ",
     "jei.pedestals.harvester.desc": "将会收获周围区域内完全生长好的农作物。如果把锄子放进基座内，基座将使用该锄子来使用。",
 
+    "item.pedestals.coin.harvesterhives": "Pedestal Upgrade",
+    "item.pedestals.coin.harvesterhives.tooltip_name": "Bee Hive Harvester Upgrade",
+    "item.pedestals.coin.harvesterhives.tooltip_area": "Effected Area: ",
+    "item.pedestals.coin.harvesterhives.tooltip_areax": "x",
+    "item.pedestals.coin.harvesterhives.tooltip_speed": "Operational Speed: ",
+    "item.pedestals.coin.harvesterhives.chat_area": "Harvesting Area: ",
+    "item.pedestals.coin.harvesterhives.chat_areax": "x",
+    "item.pedestals.coin.harvesterhives.chat_speed": "Harvesting Speed: ",
+    "jei.pedestals.harvesterhives.desc": "Will Harvest Combs from Hives in the work area, or when bottles are in the pedestal, it will use those to bottle honey.",
+
     "item.pedestals.coin.magnet": "基座升级",
     "item.pedestals.coin.magnet.tooltip_name": "物品磁铁升级",
     "item.pedestals.coin.magnet.tooltip_area": "有效区域: ",

@@ -237,7 +237,17 @@
     "item.pedestals.coin.harvester.chat_speed": "Harvesting Speed: ",
     "jei.pedestals.harvester.desc": "Will Break Fully Grown Crops in the area around it. If a Hoe tool is placed in the pedestal above, it'll use that when breaking crops.",
 
-    "item.pedestals.coin.magnet": "Pedestal Upgrade",
+    "item.pedestals.coin.harvesterhives": "Pedestal Upgrade",
+    "item.pedestals.coin.harvesterhives.tooltip_name": "Bee Hive Harvester Upgrade",
+    "item.pedestals.coin.harvesterhives.tooltip_area": "Effected Area: ",
+    "item.pedestals.coin.harvesterhives.tooltip_areax": "x",
+    "item.pedestals.coin.harvesterhives.tooltip_speed": "Operational Speed: ",
+    "item.pedestals.coin.harvesterhives.chat_area": "Harvesting Area: ",
+    "item.pedestals.coin.harvesterhives.chat_areax": "x",
+    "item.pedestals.coin.harvesterhives.chat_speed": "Harvesting Speed: ",
+    "jei.pedestals.harvesterhives.desc": "Will Harvest Combs from Hives in the work area, or when bottles are in the pedestal, it will use those to bottle honey.",
+
+  "item.pedestals.coin.magnet": "Pedestal Upgrade",
     "item.pedestals.coin.magnet.tooltip_name": "Item Magnet Upgrade",
     "item.pedestals.coin.magnet.tooltip_area": "Effected Area: ",
     "item.pedestals.coin.magnet.tooltip_areax": "x",

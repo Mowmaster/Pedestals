@@ -31,6 +31,7 @@ public class ItemRegistry
 
         ItemUpgradeEffectGrower.onItemRegistryReady(e);
         ItemUpgradeEffectHarvester.onItemRegistryReady(e);
+        ItemUpgradeHarvesterBeeHives.onItemRegistryReady(e);
         ItemUpgradeEffectPlanter.onItemRegistryReady(e);
         ItemUpgradeEffectMagnet.onItemRegistryReady(e);
         ItemUpgradeFilteredMagnetItem.onItemRegistryReady(e);

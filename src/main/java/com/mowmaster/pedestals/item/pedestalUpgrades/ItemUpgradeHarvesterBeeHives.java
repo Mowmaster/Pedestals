@@ -16,18 +16,15 @@ import net.minecraft.dispenser.BeehiveDispenseBehavior;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.HoeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tileentity.BeehiveTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -40,10 +37,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -168,44 +168,84 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
 
             FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-            ItemStack harvestingHoe = new ItemStack(Items.DIAMOND_HOE,1);
-            if (itemInPedestal.getItem() instanceof HoeItem || itemInPedestal.getToolTypes().contains(ToolType.HOE)) {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
+            ItemStack harvestingShears = new ItemStack(Items.SHEARS,1);
+            fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);
+            BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+            ItemStack itemFromInv = ItemStack.EMPTY;
+            LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            if(cap.isPresent())
+            {
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if(invToPullFrom instanceof PedestalTileEntity) {
+                    itemFromInv = ItemStack.EMPTY;
+
+                }
+                else {
+                    if(handler != null)
+                    {
+                        int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
+                        if(i>=0)
+                        {
+                            itemFromInv = handler.getStackInSlot(i);
+                            if(itemFromInv.getItem().equals(Items.GLASS_BOTTLE))
+                            {
+                                fakePlayer.setHeldItem(Hand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
+                                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
+                                if (!MinecraftForge.EVENT_BUS.post(e)) {
+                                    TileEntity tile = world.getTileEntity(posOfPedestal);
+                                    if(tile instanceof PedestalTileEntity)
+                                    {
+                                        PedestalTileEntity pedestal = ((PedestalTileEntity) tile);
+                                        if(pedestal.addItem(new ItemStack(Items.HONEY_BOTTLE)))
+                                        {
+                                            handler.extractItem(i,1 ,false);
+                                            ((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
+                                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY(),posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
+                                            world.playSound((PlayerEntity)null, posTarget, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
+                                if (!MinecraftForge.EVENT_BUS.post(e)) {
+                                    TileEntity tile = world.getTileEntity(posOfPedestal);
+                                    if(tile instanceof PedestalTileEntity)
+                                    {
+                                        PedestalTileEntity pedestal = ((PedestalTileEntity) tile);
+                                        if(pedestal.addItem(new ItemStack(Items.HONEYCOMB,3)))
+                                        {
+                                            ((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
+                                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY(),posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
+                                            world.playSound((PlayerEntity)null, posTarget, SoundEvents.BLOCK_BEEHIVE_SHEAR, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
+            //Is it needed? idk
             else
             {
-                if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
-                {
-                    harvestingHoe.addEnchantment(Enchantments.SILK_TOUCH,1);
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
-                }
-                else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
-                {
-                    int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
-                    harvestingHoe.addEnchantment(Enchantments.FORTUNE,lvl);
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
-                }
-                else
-                {
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
-                }
-            }
-
-            if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
-            {
-                //if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true)) {
-
-                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
+                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
                 if (!MinecraftForge.EVENT_BUS.post(e)) {
-                    target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
-                    target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
-                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
-                    world.removeBlock(posTarget, false);
+                    TileEntity tile = world.getTileEntity(posOfPedestal);
+                    if(tile instanceof PedestalTileEntity)
+                    {
+                        PedestalTileEntity pedestal = ((PedestalTileEntity) tile);
+                        if(pedestal.addItem(new ItemStack(Items.HONEYCOMB,3)))
+                        {
+                            ((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
+                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY(),posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
+                            world.playSound((PlayerEntity)null, posTarget, SoundEvents.BLOCK_BEEHIVE_SHEAR, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                        }
+                    }
                 }
-                //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
-                //}
-                    /*target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
-                    world.setBlockState(posTarget, Blocks.AIR.getDefaultState());*/
             }
         }
     }
@@ -230,25 +270,6 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,Util.DUMMY_UUID);
-
-        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
-        if(map.size() > 0)
-        {
-            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.DUMMY_UUID);
-
-            for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
-                Enchantment enchantment = entry.getKey();
-                Integer integer = entry.getValue();
-                if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
-                {
-                    TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants, Util.DUMMY_UUID);
-                }
-            }
-        }
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
@@ -281,12 +302,12 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         tooltip.add(speed);
     }
 
-    public static final Item HARVESTER = new ItemUpgradeHarvesterBeeHives(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvester"));
+    public static final Item HARVESTERHIVES = new ItemUpgradeHarvesterBeeHives(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvesterhives"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(HARVESTER);
+        event.getRegistry().register(HARVESTERHIVES);
     }
 
 

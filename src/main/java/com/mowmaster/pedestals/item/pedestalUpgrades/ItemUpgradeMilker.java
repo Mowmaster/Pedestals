@@ -133,9 +133,9 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
                                 }
                             }
                         }
-                    }
                 }
             }
+        }
         //}
     }
     @Override
