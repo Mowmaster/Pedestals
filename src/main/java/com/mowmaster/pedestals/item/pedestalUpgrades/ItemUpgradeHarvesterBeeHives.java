@@ -98,7 +98,6 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         return null;
     }
 
-
     //https://github.com/Lothrazar/Cyclic/blob/trunk/1.16/src/main/java/com/lothrazar/cyclic/block/harvester/TileHarvester.java#L113
     public boolean canHarvest(World world, BlockState state)
     {
