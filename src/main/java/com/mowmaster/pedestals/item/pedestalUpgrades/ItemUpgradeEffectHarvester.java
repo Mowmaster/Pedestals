@@ -57,12 +57,51 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptRange() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
         int aW = getAreaModifier(stack);
         areaWidth = ((aW)+1);
         return  areaWidth;
+    }
+
+    public int getRangeHeight(ItemStack stack)
+    {
+        return getHeight(stack);
+    }
+
+    public int getHeight(ItemStack stack)
+    {
+        int height = 3;
+        switch (getRangeModifier(stack))
+        {
+            case 0:
+                height = 3;
+                break;
+            case 1:
+                height=5;
+                break;
+            case 2:
+                height = 7;
+                break;
+            case 3:
+                height = 9;
+                break;
+            case 4:
+                height = 11;
+                break;
+            case 5:
+                height=13;
+                break;
+            default: height=3;
+        }
+
+        return  height;
     }
 
     @Override
@@ -74,7 +113,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
-        return new int[]{((2*getAreaWidth(coin))+1),0};
+        return new int[]{getRangeHeight(coin),0};
     }
 
     @Override
@@ -128,7 +167,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             int speed = getOperationSpeed(coinInPedestal);
 
             int width = getAreaWidth(coinInPedestal);
-            int height = (2*width)+1;
+            int height = getRangeHeight(coinInPedestal);
 
             BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
             BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
@@ -249,11 +288,12 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
+        String trr = "" + getRangeHeight(stack) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString(tr);
+        area.appendString(trr);
         area.appendString(areax.getString());
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
@@ -292,11 +332,12 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
+        String trr = "" + getRangeHeight(stack) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString(tr);
+        area.appendString(trr);
         area.appendString(areax.getString());
         area.appendString(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
