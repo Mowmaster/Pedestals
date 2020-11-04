@@ -131,8 +131,12 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
     public int ticked = 0;
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
             int getMaxFuelValue = Integer.MAX_VALUE;
@@ -161,19 +165,14 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
                             if(!world.isBlockPowered(pedestalPos)) {
                                 if (world.getGameTime() % speed == 0) {
-                                    TileEntity tile = world.getTileEntity(pedestalPos);
-                                    if(tile instanceof PedestalTileEntity)
+                                    int currentPosition = pedestal.getStoredValueForUpgrades();
+                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negNums,posNums);
+                                    BlockState targetBlock = world.getBlockState(targetPos);
+                                    upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                    pedestal.setStoredValueForUpgrades(currentPosition+1);
+                                    if(resetCurrentPosInt(currentPosition,negNums,posNums))
                                     {
-                                        PedestalTileEntity pedestal = (PedestalTileEntity) tile;
-                                        int currentPosition = pedestal.getStoredValueForUpgrades();
-                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,negNums,posNums);
-                                        BlockState targetBlock = world.getBlockState(targetPos);
-                                        upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                        pedestal.setStoredValueForUpgrades(currentPosition+1);
-                                        if(resetCurrentPosInt(currentPosition,negNums,posNums))
-                                        {
-                                            pedestal.setStoredValueForUpgrades(0);
-                                        }
+                                        pedestal.setStoredValueForUpgrades(0);
                                     }
                                 }
                             }
@@ -183,7 +182,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                                         BlockPos blockToChopPos = new BlockPos(x, y, z);
                                         //BlockPos blockToChopPos = this.getPos().add(x, y, z);
                                         BlockState blockToChop = world.getBlockState(blockToChopPos);
-                                        if (tick%speed == 0) {
+                                        if (world.getGameTime()%speed == 0) {
                                             ticked++;
                                         }
 

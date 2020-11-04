@@ -38,8 +38,13 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
         return tile.getStoredValueForUpgrades()>0;
     }
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
+
         if(!world.isRemote)
         {
             //Still Needed as we want to limit energy transfer from world to PEN
@@ -49,7 +54,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
-                if (tick%speed == 0) {
+                if (world.getGameTime()%speed == 0) {
                     upgradeItemAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                     upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                 }

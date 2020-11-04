@@ -160,8 +160,13 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
     public int ticked = 0;
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
+
         if(!world.isRemote)
         {
             int speed = getOperationSpeed(coinInPedestal);
@@ -174,19 +179,14 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
             if(!world.isBlockPowered(pedestalPos)) {
                 if (world.getGameTime() % speed == 0) {
-                    TileEntity tile = world.getTileEntity(pedestalPos);
-                    if(tile instanceof PedestalTileEntity)
+                    int currentPosition = pedestal.getStoredValueForUpgrades();
+                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
+                    BlockState targetBlock = world.getBlockState(targetPos);
+                    upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
+                    pedestal.setStoredValueForUpgrades(currentPosition+1);
+                    if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
                     {
-                        PedestalTileEntity pedestal = (PedestalTileEntity) tile;
-                        int currentPosition = pedestal.getStoredValueForUpgrades();
-                        BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
-                        BlockState targetBlock = world.getBlockState(targetPos);
-                        upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
-                        pedestal.setStoredValueForUpgrades(currentPosition+1);
-                        if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
-                        {
-                            pedestal.setStoredValueForUpgrades(0);
-                        }
+                        pedestal.setStoredValueForUpgrades(0);
                     }
                 }
             }
@@ -200,7 +200,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                         for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
                             BlockPos posTargetBlock = new BlockPos(x, y, z);
                             BlockState targetBlock = world.getBlockState(posTargetBlock);
-                            if (tick%speed == 0) {
+                            if (world.getGameTime()%speed == 0) {
                                 ticked++;
                             }
 

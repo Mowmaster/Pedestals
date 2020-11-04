@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -58,8 +59,12 @@ public class ItemUpgradeEnergyTank extends ItemUpgradeBaseEnergy
         return  energyBuffer;
     }
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
             int speed = getOperationSpeed(coinInPedestal);
@@ -68,7 +73,7 @@ public class ItemUpgradeEnergyTank extends ItemUpgradeBaseEnergy
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
-                if (tick%speed == 0) {
+                if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,coinInPedestal);
                 }
             }

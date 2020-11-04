@@ -89,8 +89,13 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         return getItem;
     }
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
+
         if(!world.isRemote)
         {
             int speed = getOperationSpeed(coinInPedestal);
@@ -100,7 +105,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                 //Keep Pedestal Full at all times
                 fillPedestalAction(world,itemInPedestal,coinInPedestal,pedestalPos);
                 //Cobble Gen Updates once per 20 ticks (to help prevent lag)
-                if (tick%20 == 0) {
+                if (world.getGameTime()%20 == 0) {
                     TileEntity tileCheckForPedestal = world.getTileEntity(pedestalPos);
                     int intSpawnRate = getCobbleGenSpawnRate(coinInPedestal);
                     int speedMultiplier = (int)(20/speed);

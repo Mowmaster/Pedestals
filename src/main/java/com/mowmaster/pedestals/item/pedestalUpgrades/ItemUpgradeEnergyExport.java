@@ -30,8 +30,13 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
         return tile.getStoredValueForUpgrades()>0;
     }
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
+
         if(!world.isRemote)
         {
             //Still Needed as we want to limit energy transfer from PEN to world
@@ -39,7 +44,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
 
             if(!world.isBlockPowered(pedestalPos))
             {
-                if (tick%speed == 0) {
+                if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals
                     //upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                     upgradeItemAction(world,pedestalPos,itemInPedestal,coinInPedestal);

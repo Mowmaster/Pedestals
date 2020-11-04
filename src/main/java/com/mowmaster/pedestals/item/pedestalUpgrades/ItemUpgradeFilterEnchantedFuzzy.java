@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Item;
@@ -25,7 +26,7 @@ public class ItemUpgradeFilterEnchantedFuzzy extends ItemUpgradeBaseFilter
 {
     public ItemUpgradeFilterEnchantedFuzzy(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
 
     }

@@ -11,7 +11,7 @@
       "item": "minecraft:potato"
     },
     {
-      "item": "minecraft:beetroot"
+      "tag": "minecraft:saplings"
     }
   ],
   "result": {

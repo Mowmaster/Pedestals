@@ -48,8 +48,13 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
     }
 
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
+
         if(!world.isRemote)
         {
             int getMaxFuelValue = Integer.MAX_VALUE;
@@ -59,7 +64,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
 
             if(!world.isBlockPowered(pedestalPos))
             {
-                if (tick%speed == 0) {
+                if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,coinInPedestal);
                 }
             }

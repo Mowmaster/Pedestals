@@ -179,9 +179,13 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return  intOperationalSpeed;
     }
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
 
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
         if(!world.isBlockPowered(pedestalPos))
         {
             TileEntity entity = world.getTileEntity(pedestalPos);
@@ -192,7 +196,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
                 if(ped.getStoredValueForUpgrades() > 0)
                 {
                     int speedSound = getOperationSpeed(coinInPedestal);
-                    if (tick%speedSound == 0) {
+                    if (world.getGameTime()%speedSound == 0) {
                         world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.BLOCKS, 0.25F, 1.0F);
                     }
                 }

@@ -61,7 +61,7 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
         return true;
     }
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
 
     }

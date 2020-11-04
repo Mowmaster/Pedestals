@@ -1021,7 +1021,7 @@ public class ItemUpgradeBase extends Item {
         return state.get(FACING);
     }
 
-    public void updateAction(int tick, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
+    public void updateAction(PedestalTileEntity pedestal)
     {
 
     }
