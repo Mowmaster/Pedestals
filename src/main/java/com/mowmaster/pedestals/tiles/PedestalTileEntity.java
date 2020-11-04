@@ -5,6 +5,8 @@ import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFilter;
+import com.mowmaster.pedestals.network.PacketHandler;
+import com.mowmaster.pedestals.network.PacketParticles;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -1114,7 +1116,10 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 copyStackToSend.setCount(countToSend);
                 removeItem(copyStackToSend.getCount());
                 tileToSendTo.addItem(copyStackToSend);
-                tileToSendTo.update();
+                //PacketHandler.sendToNearby(world, pos, new PacketParticles(PacketParticles.EffectType.PARTICLE_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),pos.getX(),pos.getY(),pos.getZ(),5));
+                //PacketHandler.sendToNearby(world, pos, new PacketParticles(PacketParticles.EffectType.PARTICLE_BEAM, pedestalToSendTo.getX(), pedestalToSendTo.getY(), pedestalToSendTo.getZ(), pos.getX(), pos.getY(), pos.getZ(),1));
+                //Updating other tile not needed since adding items should update it already
+                //tileToSendTo.update();
                 //remove item will mark dirty this pedestan
                 //addItem mark dirties the reciever pedestal
             }

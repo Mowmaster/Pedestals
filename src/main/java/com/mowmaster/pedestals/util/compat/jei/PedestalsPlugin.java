@@ -174,6 +174,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeDropper.DROPPER, "dropper");
         addValueInfoPage(registration, ItemUpgradeEffectGrower.GROWER, "grower");
         addValueInfoPage(registration, ItemUpgradeEffectHarvester.HARVESTER, "harvester");
+        addValueInfoPage(registration, ItemUpgradeHarvesterBeeHives.HARVESTERHIVES, "harvesterhives");
         addValueInfoPage(registration, ItemUpgradeEffectPlanter.PLANTER, "planter");
         addValueInfoPage(registration, ItemUpgradeEffectMagnet.MAGNET, "magnet");
         addValueInfoPage(registration, ItemUpgradeFilteredMagnetItem.FMAGNETITEM, "fmagnetitem");
