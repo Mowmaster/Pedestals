@@ -117,7 +117,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
 
-        if(!world.isBlockPowered(pedestalPos)) {
+        if(!world.isBlockPowered(pedestalPos) && !itemInPedestal.isEmpty()) {
             if (world.getGameTime() % speed == 0) {
                 TileEntity tile = world.getTileEntity(pedestalPos);
                 if(tile instanceof PedestalTileEntity)
