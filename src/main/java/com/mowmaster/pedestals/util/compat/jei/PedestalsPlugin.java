@@ -73,10 +73,10 @@ public class PedestalsPlugin implements IModPlugin {
     public static final IRecipeType<ColoredPedestalRecipe> COLORINGP_TYPE = ColoredPedestalRecipe.recipeType;
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(CRUSHER_TYPE), CrusherRecipeCategory.UID);
-        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(SAWING_TYPE), SawMillRecipeCategory.UID);
-        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(COLORING_TYPE), ColorPedestalRecipeCategory.UID);
-        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().func_241447_a_(COLORINGP_TYPE), ColorPalletRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(CRUSHER_TYPE), CrusherRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(SAWING_TYPE), SawMillRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COLORING_TYPE), ColorPedestalRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COLORINGP_TYPE), ColorPalletRecipeCategory.UID);
         //Pedestals
         addValueInfoPage(registration, PedestalBlock.I_PEDESTAL_000, "pedestal000");
         addValueInfoPage(registration, PedestalBlock.I_PEDESTAL_001, "pedestal001");
