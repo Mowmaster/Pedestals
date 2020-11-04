@@ -34,6 +34,7 @@ public class PacketParticles
         this(type, pos.getX(), pos.getY(), pos.getZ(), args);
     }
 
+
     public static PacketParticles decode(PacketBuffer buf) {
         EffectType type = EffectType.values()[buf.readByte()];
         double x = buf.readDouble();
@@ -78,30 +79,16 @@ public class PacketParticles
                             ParticleEngine.getInstance().addEffect(new ParticleBeam(fromPos, destPos, delay, world));
                             break;
                         }
-                        case BONEMEAL:{
+                        case ANY_COLOR:{
                             for(int i =0; i < 10; i++){
                                 double d0 = message.x +0.5; //+ world.rand.nextFloat();
-                                double d1 = message.y +1.2;//+ world.rand.nextFloat() ;
-                                double d2 = message.z +.5 ; //+ world.rand.nextFloat();
-                                world.addParticle(new RedstoneParticleData(0.0f,1.0f,0.0f,1.0f),d0, d1, d2, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3);
-                            }
-                            break;
-                        }
-                        case TICKED:{
-                            for(int i =0; i < 10; i++){
-                                double d0 = message.x +0.5; //+ world.rand.nextFloat();
-                                double d1 = message.y +1.2;//+ world.rand.nextFloat() ;
-                                double d2 = message.z +.5 ; //+ world.rand.nextFloat();
-                                world.addParticle(new RedstoneParticleData(1.0f,1.0f,1.0f,1.0f),d0, d1, d2, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3);
-                            }
-                            break;
-                        }
-                        case HARVESTED:{
-                            for(int i =0; i < 10; i++){
-                                double d0 = message.x +0.5; //+ world.rand.nextFloat();
-                                double d1 = message.y +1.2;//+ world.rand.nextFloat() ;
-                                double d2 = message.z +.5 ; //+ world.rand.nextFloat();
-                                world.addParticle(new RedstoneParticleData(1.0f,0.64f,0.0f,1.0f),d0, d1, d2, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3);
+                                double d1 = message.y +1.0;//+ world.rand.nextFloat() ;
+                                double d2 = message.z +0.5 ; //+ world.rand.nextFloat();
+                                float red = (float)message.args[0]/255;
+                                float green = (float)message.args[1]/255;
+                                float blue = (float)message.args[2]/255;
+                                world.addParticle(new RedstoneParticleData(red,green,blue,1.0f),d0, d1, d2, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3);
+                                //new PacketParticles(EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),0.0f,1.0f,0.0f));
                             }
                             break;
                         }
@@ -114,9 +101,7 @@ public class PacketParticles
         }
     }
     public enum EffectType {
-        BONEMEAL(0),
-        TICKED(0),
-        HARVESTED(0),
+        ANY_COLOR(3),
         PARTICLE_BEAM(4)
         ;
 

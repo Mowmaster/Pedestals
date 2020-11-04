@@ -198,7 +198,8 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 if (!MinecraftForge.EVENT_BUS.post(e)) {
                     blockToChop.getBlock().harvestBlock(world, fakePlayer, blockToChopPos, blockToChop, null, fakePlayer.getHeldItemMainhand());
                     blockToChop.getBlock().onBlockHarvested(world, blockToChopPos, blockToChop, fakePlayer);
-                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,blockToChopPos.getX(),blockToChopPos.getY()-0.5f,blockToChopPos.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
+                    //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,blockToChopPos.getX(),blockToChopPos.getY()-0.5f,blockToChopPos.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
+                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,blockToChopPos.getX(),blockToChopPos.getY(),blockToChopPos.getZ(),255,164,0));
                     world.removeBlock(blockToChopPos, false);
                 }
                 //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());

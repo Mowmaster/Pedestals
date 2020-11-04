@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.mowmaster.pedestals.network.PacketHandler;
+import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.passive.CowEntity;
@@ -126,6 +128,8 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
                                 {
                                     if (!moomoo.isChild() && itemInPedestal.equals(ItemStack.EMPTY))
                                     {
+                                        BlockPos mooie = moomoo.getPosition();
+                                        PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
                                         world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
                                         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                                         if(pedestalInv instanceof PedestalTileEntity) {
