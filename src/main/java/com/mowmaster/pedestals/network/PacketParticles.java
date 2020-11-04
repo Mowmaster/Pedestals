@@ -1,7 +1,5 @@
 package com.mowmaster.pedestals.network;
 
-import com.mowmaster.pedestals.particles.ParticleBeam;
-import com.mowmaster.pedestals.particles.ParticleEngine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.RedstoneParticleData;
@@ -72,13 +70,6 @@ public class PacketParticles
                     Minecraft mc = Minecraft.getInstance();
                     ClientWorld world = mc.world;
                     switch (message.type){
-                        case PARTICLE_BEAM:{
-                            BlockPos fromPos = new BlockPos(message.x + 0.5, message.y + 0.5, message.z + 0.5);
-                            BlockPos destPos = new BlockPos(message.args[0], message.args[1],message.args[2]);
-                            int delay = message.args[3];
-                            ParticleEngine.getInstance().addEffect(new ParticleBeam(fromPos, destPos, delay, world));
-                            break;
-                        }
                         case ANY_COLOR:{
                             for(int i =0; i < 10; i++){
                                 double d0 = message.x +0.5; //+ world.rand.nextFloat();
@@ -101,8 +92,7 @@ public class PacketParticles
         }
     }
     public enum EffectType {
-        ANY_COLOR(3),
-        PARTICLE_BEAM(4)
+        ANY_COLOR(3)
         ;
 
         private final int argCount;
