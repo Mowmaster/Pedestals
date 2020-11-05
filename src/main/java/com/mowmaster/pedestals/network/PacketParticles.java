@@ -1,12 +1,18 @@
 package com.mowmaster.pedestals.network;
 
+import net.minecraft.block.EnchantingTableBlock;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EnchantmentTableParticle;
+import net.minecraft.client.renderer.entity.EnderCrystalRenderer;
+import net.minecraft.entity.item.EnderCrystalEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraft.client.world.ClientWorld;
 
+import java.util.Random;
 import java.util.function.Supplier;
 
 //To learn how this works and for testing purposes:
@@ -83,6 +89,29 @@ public class PacketParticles
                             }
                             break;
                         }
+                        case ANY_COLOR_BEAM:{
+                            for(int z =0; z < 10; z++){
+                                //args are destination pos xyz then pedestal xyz
+                                double d0 = message.x +0.5; //+ world.rand.nextFloat();
+                                double d1 = message.y +1.0;//+ world.rand.nextFloat() ;
+                                double d2 = message.z +0.5 ; //+ world.rand.nextFloat();
+                                double x2 = message.args[0];
+                                double y2 = message.args[1];
+                                double z2 = message.args[2];
+
+                                //distance from pedestal to block being ticked
+                                double x3 = x2 - d0;
+                                double y3 = y2 - d1;
+                                double z3 = z2 - d2;
+
+                                //Currently particles go from the block being ticked(in grower) to the pedestal [this needs reversed somehow]
+                                BlockPos pos = new BlockPos(x2,y2,z2);
+                                Random rand = new Random();
+                                world.addParticle(ParticleTypes.ENCHANT, (double)pos.getX() + 0.5D, (double)pos.getY() + 2.0D, (double)pos.getZ() + 0.5D, (double)((float)x3 + rand.nextFloat()) - 0.5D, (double)((float)y3 - rand.nextFloat() - 1.0F), (double)((float)z3 + rand.nextFloat()) - 0.5D);
+                                //EnchantmentTableParticle
+                            }
+                            break;
+                        }
                     }
 
                 };
@@ -92,7 +121,8 @@ public class PacketParticles
         }
     }
     public enum EffectType {
-        ANY_COLOR(3)
+        ANY_COLOR(3),
+        ANY_COLOR_BEAM(3)
         ;
 
         private final int argCount;

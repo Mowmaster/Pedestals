@@ -11,7 +11,7 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-//Fr learning and testing:
+//For learning and testing:
 //https://github.com/baileyholl/Ars-Nouveau/blob/0cdb8fbb483ca0f945de26c633955cfb1c05c925/src/main/java/com/hollingsworth/arsnouveau/common/network/Networking.java#L87
 public class PacketHandler {
     public static SimpleChannel INSTANCE;
@@ -19,7 +19,7 @@ public class PacketHandler {
     private static int ID = 0;
     public static int nextID(){return ID++;}
     public static void registerMessages(){
-        System.out.println("Registering packets!!");
+        //System.out.println("Registering packets!!");
         INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(Reference.MODID, "network"), () -> "1.0", s->true, s->true);
 
         INSTANCE.registerMessage(nextID(),
