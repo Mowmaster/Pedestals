@@ -1144,6 +1144,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 copyStackToSend.setCount(countToSend);
                 removeItem(copyStackToSend.getCount());
                 tileToSendTo.addItem(copyStackToSend);
+                PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),pos.getX(),pos.getY(),pos.getZ()));
                 //PacketHandler.sendToNearby(world, pos, new PacketParticles(PacketParticles.EffectType.PARTICLE_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),pos.getX(),pos.getY(),pos.getZ(),5));
                 //PacketHandler.sendToNearby(world, pos, new PacketParticles(PacketParticles.EffectType.PARTICLE_BEAM, pedestalToSendTo.getX(), pedestalToSendTo.getY(), pedestalToSendTo.getZ(), pos.getX(), pos.getY(), pos.getZ(),1));
                 //Updating other tile not needed since adding items should update it already

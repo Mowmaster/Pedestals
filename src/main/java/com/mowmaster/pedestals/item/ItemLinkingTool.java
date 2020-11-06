@@ -242,14 +242,14 @@ public class ItemLinkingTool extends Item {
         if(entityIn instanceof PlayerEntity)
         {
             PlayerEntity player = ((PlayerEntity)entityIn);
-            if(stack.isEnchanted() && isSelected || player.getHeldItemOffhand().getItem() instanceof ItemLinkingTool)
+            if(stack.isEnchanted() && isSelected)
             {
                 if (stack.hasTag()) {
                     this.getPosFromNBT(stack);
-                    BlockPos pos = this.getStoredPosition(stack);
-                    Random rand = new Random();
+                    /*BlockPos pos = this.getStoredPosition(stack);
+                    Random rand = new Random();*/
 
-                    int zmin = -8;
+                    /*int zmin = -8;
                     int zmax = 8+1;
                     int xmin = -8;
                     int xmax = 8+1;
@@ -260,48 +260,50 @@ public class ItemLinkingTool extends Item {
                     {
                         if(worldIn.getTileEntity(pos) instanceof PedestalTileEntity)
                         {
-                            PedestalTileEntity pedestal = ((PedestalTileEntity)worldIn.getTileEntity(pos));
+                            *//*PedestalTileEntity pedestal = ((PedestalTileEntity)worldIn.getTileEntity(pos));
                             int range = pedestal.getLinkingRange();
                             zmin = -range;
                             zmax = range;
                             xmin = -range;
                             xmax = range;
                             ymin = -range;
-                            ymax = range;
+                            ymax = range;*//*
 
 
-                            List<BlockPos> storedRecievers = getStoredPositionList(stack);
-                            int locationsNum = storedRecievers.size();
 
-                            if(storedPosition!=defaultPos)
+                        }
+                    }*/
+
+                    List<BlockPos> storedRecievers = getStoredPositionList(stack);
+                    int locationsNum = storedRecievers.size();
+
+                    if(storedPosition!=defaultPos)
+                    {
+                        if(isSelected)
+                        {
+                            if(worldIn.isRemote)
                             {
-                                if(isSelected)
+                                ticker++;
+
+                                for(int i=0;i<locationsNum;i++)
                                 {
-                                    if(worldIn.isRemote)
-                                    {
-                                        ticker++;
+                                    float val = i*0.125f;
+                                    if(storedPositionList.size()>i){spawnParticleAroundPedestalBase(worldIn,ticker,storedPositionList.get(i),val,val,val,1.0f);}
+                                }
 
-                                        for(int i=0;i<locationsNum;i++)
-                                        {
-                                            float val = i*0.125f;
-                                            spawnParticleAroundPedestalBase(worldIn,ticker,storedPositionList.get(i),val,val,val,1.0f);
-                                        }
-
-                                        if(ticker>30)
+                                        /*if(ticker>30)
                                         {
                                             //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
                                             for (int c = zmin; c <= zmax; c++) {
                                                 for (int a = xmin; a <= xmax; a++) {
                                                     for (int b = ymin; b <= ymax; b++) {
-                                                        worldIn.addParticle(ParticleTypes.WHITE_ASH,true,pos.add(a,b,c).getX()+0.5f,pos.add(a,b,c).getY()+0.5f,pos.add(a,b,c).getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
+                                                        worldIn.addParticle(ParticleTypes.ENCHANT,true,pos.add(a,b,c).getX()+0.5f,pos.add(a,b,c).getY()+0.5f,pos.add(a,b,c).getZ()+0.5f, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
                                                     }
                                                 }
                                             }
 
                                             ticker=0;
-                                        }
-                                    }
-                                }
+                                        }*/
                             }
                         }
                     }

@@ -2,6 +2,7 @@ package com.mowmaster.pedestals;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 //import com.mowmaster.pedestals.blocks.PedestalBlock;
+import com.mowmaster.pedestals.client.ClientPedestals;
 import com.mowmaster.pedestals.creativeTab.CreativeTabBlock;
 import com.mowmaster.pedestals.item.ItemRegistry;
 import com.mowmaster.pedestals.network.PacketHandler;
@@ -46,7 +47,8 @@ public class pedestals
         // Register the processIMC method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         // Register the doClientStuff method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
+        //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientPedestals::init);
 
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus(),
                 forgeEventBus = MinecraftForge.EVENT_BUS;
