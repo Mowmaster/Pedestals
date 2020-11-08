@@ -241,9 +241,9 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         TileEntity pedestalInv = world.getTileEntity(posMainPedestal);
         if(pedestalInv instanceof PedestalTileEntity) {
             PedestalTileEntity tileMainPedestal = ((PedestalTileEntity) pedestalInv);
-            //If this Pedestal has any Exp
-            int xpMainPedestal = getEnergyStored(coinMainPedestal);
-            if(xpMainPedestal>0)
+            //If this Pedestal has any Energy
+            int energyMainPedestal = getEnergyStored(coinMainPedestal);
+            if(energyMainPedestal>0)
             {
                 //Grab the connected pedestals to send to
                 if(tileMainPedestal.getNumberOfStoredLocations()>0)
@@ -271,9 +271,9 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                         {
                                             int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
                                             //If we have more then X levels in the pedestal we're sending from
-                                            if(xpMainPedestal >= transferRate)
+                                            if(energyMainPedestal >= transferRate)
                                             {
-                                                int xpRemainingMainPedestal = xpMainPedestal - transferRate;
+                                                int xpRemainingMainPedestal = energyMainPedestal - transferRate;
                                                 int xpRemainingStoredPedestal = energyStoredPedestal + transferRate;
                                                 //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
@@ -287,7 +287,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                             {
                                                 //If we have less then X levels, just send them all.
                                                 int xpRemainingMainPedestal = 0;
-                                                int xpRemainingStoredPedestal = energyStoredPedestal + xpMainPedestal;
+                                                int xpRemainingStoredPedestal = energyStoredPedestal + energyMainPedestal;
                                                 //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
                                                 tileMainPedestal.update();
@@ -307,6 +307,37 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     }
 
 
+    public boolean addEnergy(ItemStack coin, int energyIn, boolean simulate)
+    {
+        int getMaxEnergyValue = getEnergyBuffer(coin);
+        int currentEnergy = getEnergyStored(coin);
+        int newEnergyValue = currentEnergy + energyIn;
+        if(getMaxEnergyValue>=newEnergyValue)
+        {
+            if(!simulate)
+            {
+                setEnergyStored(coin,newEnergyValue);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeEnergy(ItemStack coin, int energyOut, boolean simulate)
+    {
+        int getMaxEnergyValue = getEnergyBuffer(coin);
+        int currentEnergy = getEnergyStored(coin);
+        int newEnergyValue = currentEnergy + energyOut;
+        if(newEnergyValue>=0)
+        {
+            if(!simulate)
+            {
+                setEnergyStored(coin,newEnergyValue);
+            }
+            return true;
+        }
+        return false;
+    }
 
     public void setEnergyStored(ItemStack stack, int energy)
     {
