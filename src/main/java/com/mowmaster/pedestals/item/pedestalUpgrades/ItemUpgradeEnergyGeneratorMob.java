@@ -103,6 +103,11 @@ public class ItemUpgradeEnergyGeneratorMob extends ItemUpgradeBaseEnergy
         if the correct item was received it will damage the corrosponding entity for 1 heart, and then start to generate power. Once all the 'fuel' has been exhausted it will repeat the list and request process all over again.
 
         Mobs connected could die, as long as a mob is available before the generator runs its initial check for the cycle, it will be okay.
+        {Should i make an additional bonus if the generator kills the mob??? this might give people a choice, to try to keep the mobs alive, or to make a system to refill when mobs die???)
+
+        I want to do fancy effects with this, like making the selected mob glow, the item for fuel being displayed, showing the generator sending particles to 'hurt' the mob, and maybe particles showing the life force being consumed.
+        Effects on the generator that maybe shows the diversity or difficulty.
+        Generator running effects???
          */
     }
 
