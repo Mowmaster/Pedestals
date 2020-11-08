@@ -143,21 +143,6 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
         }
     }
 
-    public static int getItemRFChargeAmount(ItemStack chargeItem)
-    {
-        int charge = 0;
-        if(chargeItem.getItem().equals(Items.REDSTONE))
-        {
-            return 2500;
-        }
-        else if(chargeItem.getItem().equals(Items.REDSTONE_BLOCK))
-        {
-            return 22500;
-        }
-
-        return charge;
-    }
-
     @Override
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
@@ -167,17 +152,12 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
             {
                 if(entityIn instanceof ItemEntity)
                 {
-                    ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
-                    ItemStack coin = tilePedestal.getCoinOnPedestal();
-                    int getMaxEnergyValue = getEnergyBuffer(coin);
-                    int currentEnergy = getEnergyStored(coin);
-                    int chargeAmount = getItemRFChargeAmount(getItemStack);
-                    int getRFForStack = chargeAmount * getItemStack.getCount();
-                    if(chargeAmount>0 && getMaxEnergyValue>=(currentEnergy+getRFForStack))
+                    if(!tilePedestal.hasItem())
                     {
-                        setEnergyStored(coin,(currentEnergy + getRFForStack));
+                        ItemStack itemCollided = ((ItemEntity) entityIn).getItem();
+                        tilePedestal.addItem(itemCollided);
                         tilePedestal.update();
-                        world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                        world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
                         entityIn.remove();
                     }
                 }
