@@ -45,12 +45,49 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         return true;
     }
 
+    @Override
+    public Boolean canAcceptRange() {return true;}
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
         int aW = getAreaModifier(stack);
         areaWidth = ((aW)+1);
         return  areaWidth;
+    }
+
+    public int getRangeHeight(ItemStack stack)
+    {
+        return getHeight(stack);
+    }
+
+    public int getHeight(ItemStack stack)
+    {
+        int height = 3;
+        switch (getRangeModifier(stack))
+        {
+            case 0:
+                height = 3;
+                break;
+            case 1:
+                height=5;
+                break;
+            case 2:
+                height = 7;
+                break;
+            case 3:
+                height = 9;
+                break;
+            case 4:
+                height = 11;
+                break;
+            case 5:
+                height=13;
+                break;
+            default: height=3;
+        }
+
+        return  height;
     }
 
     @Override
@@ -62,7 +99,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
-        return new int[]{((2*getAreaWidth(coin))+1),0};
+        return new int[]{getRangeHeight(coin),0};
     }
 
     @Override
@@ -123,7 +160,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     {
         if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
         int width = getAreaWidth(coinInPedestal);
-        int height = (2*width)+1;
+        int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
 
@@ -224,11 +261,12 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
         int s3 = getAreaWidth(stack);
         String trr = "" + (s3+s3+1) + "";
+        String trrr = "" + getRangeHeight(stack) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
         area.appendString(trr);
         area.appendString(areax.getString());
-        area.appendString(trr);
+        area.appendString(trrr);
         area.appendString(areax.getString());
         area.appendString(trr);
         area.mergeStyle(TextFormatting.WHITE);
@@ -253,12 +291,12 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
         int s3 = getAreaWidth(stack);
         String trr = "" + (s3+s3+1) + "";
-
+        String trrr = "" + getRangeHeight(stack) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.appendString(trr);
         area.appendString(areax.getString());
-        area.appendString(trr);
+        area.appendString(trrr);
         area.appendString(areax.getString());
         area.appendString(trr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
