@@ -142,17 +142,17 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
 
     public void doEnergyProcess(World world, ItemStack coinInPedestal, BlockPos posOfPedestal, int baseFuel, double capacityRate)
     {
-        System.out.println("Base: " + baseFuel);
-        System.out.println("Rate: " + capacityRate);
+        //System.out.println("Base: " + baseFuel);
+        //System.out.println("Rate: " + capacityRate);
         int fuelConsumed = (int) Math.round(baseFuel * capacityRate);
         int energyMax = getEnergyBuffer(coinInPedestal);
         int energyCurrent = getEnergyStored(coinInPedestal);
         int estEnergyProduced = (int) Math.round(baseFuel * 12.5);
         if(addEnergy(coinInPedestal,estEnergyProduced,true))
         {
-            System.out.println("Consumed: " + fuelConsumed);
+            //System.out.println("Consumed: " + fuelConsumed);
             removeFuel(world,posOfPedestal,fuelConsumed,false);
-            System.out.println("Energy: " + estEnergyProduced);
+            //System.out.println("Energy: " + estEnergyProduced);
             addEnergy(coinInPedestal,estEnergyProduced,false);
         }
         else {
@@ -160,9 +160,9 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
             int fuelCanConsume = (int)Math.floor(energyCanProduce/12.5);
             estEnergyProduced = (int) Math.round(fuelCanConsume * 12.5);
             int actualFuelConsumed = (int)Math.round(fuelCanConsume * capacityRate);
-            System.out.println("Actual Consumed: " + actualFuelConsumed);
+            //System.out.println("Actual Consumed: " + actualFuelConsumed);
             removeFuel(world,posOfPedestal,actualFuelConsumed,false);
-            System.out.println("Energy: " + estEnergyProduced);
+            //System.out.println("Energy: " + estEnergyProduced);
             addEnergy(coinInPedestal,estEnergyProduced,false);
         }
     }
