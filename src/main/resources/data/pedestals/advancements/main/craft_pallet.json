@@ -2,7 +2,7 @@
   "parent": "pedestals:main/root",
   "display": {
     "icon": {
-      "item": "pedestals:itemcollorpalletdefault"
+      "item": "pedestals:itemcolorpalletdefault"
     },
     "title": {
       "translate": "advancements.main.craft_pallet.title"
@@ -21,7 +21,7 @@
       "conditions": {
         "items": [
           {
-            "item": "pedestals:pedestal/stone333"
+            "item": "pedestals:itemcolorpalletdefault"
           }
         ]
       }
