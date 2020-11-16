@@ -96,11 +96,15 @@
     "death.attack.pedestal2": "%1$s got the stabby stabby",
     "death.attack.pedestal3": "%1$s was sliced into bits",
     "death.attack.pedestal4": "%1$s is having a bad day",
+    "death.attack.pedestal5": "%1$s life was taken by a mysterious force",
     "death.attack.pedestal6": "%1$s caught a sword with their face",
     "death.attack.pedestal7": "%1$s was disemboweled",
     "death.attack.pedestal8": "%1$s wasn't carring the knife properly and slipped",
     "death.attack.pedestal9": "%1$s was turned into chop suey!",
     "death.attack.pedestal10": "%1$s was pricked to death",
+
+    "death.attack.pedestal11": "%1$s has kicked the bucket",
+    "death.attack.pedestal12": "%1$s, We told you not to play around with sharp things!",
 
     "item.pedestals.coin.breaker": "Pedestal Upgrade",
     "item.pedestals.coin.breaker.tooltip_name": "Block Breaker Upgrade",

@@ -171,7 +171,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
             if(selectedEntity != null)
             {
-                DamageSource sourceE = (selectedEntity instanceof AbstractRaiderEntity && ((AbstractRaiderEntity) selectedEntity).isLeader())?(new EntityDamageSource(list.get(rn.nextInt(10)),null)):(new EntityDamageSource(list.get(rn.nextInt(10)),fakePlayer));
+                DamageSource sourceE = (selectedEntity instanceof AbstractRaiderEntity && ((AbstractRaiderEntity) selectedEntity).isLeader())?(new EntityDamageSource(list.get(rn.nextInt(12)),null)):(new EntityDamageSource(list.get(rn.nextInt(12)),fakePlayer));
                 float damage = getAttackDamage(getEntityFromList,itemInPedestal,coinInPedestal);
 
                 if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
