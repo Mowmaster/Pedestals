@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,6 +19,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -28,6 +30,8 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -275,6 +279,25 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
         speed.appendString(getSmeltingSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,Util.DUMMY_UUID);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        int s2 = getItemTransferRate(stack);
+        String trr = getSmeltingSpeedString(stack);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString(""+s2+"");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(trr);
+
+        rate.mergeStyle(TextFormatting.GRAY);
+
+        speed.mergeStyle(TextFormatting.RED);
+
+        tooltip.add(rate);
+        tooltip.add(speed);
     }
 
     public static final Item CRAFTER_ONE = new ItemUpgradeCrafter(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter1"));
