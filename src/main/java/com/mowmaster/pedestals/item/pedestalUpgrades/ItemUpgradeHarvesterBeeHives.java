@@ -340,8 +340,14 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         area.mergeStyle(TextFormatting.WHITE);
         speed.mergeStyle(TextFormatting.RED);
 
+
         tooltip.add(area);
         tooltip.add(speed);
+
+        //TODO: REMOVE THIS LATER ONCE FIXED FOR MODDED HIVES
+        TranslationTextComponent wip = new TranslationTextComponent("Works On Vanilla Hives Only");
+        wip.mergeStyle(TextFormatting.BLUE);
+        tooltip.add(wip);
     }
 
     public static final Item HARVESTERHIVES = new ItemUpgradeHarvesterBeeHives(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvesterhives"));
