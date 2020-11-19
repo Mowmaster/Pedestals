@@ -72,20 +72,22 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
             if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,coinInPedestal);
+                    upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinOnPedestal)
+    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinOnPedestal)
     {
         int rate = getItemTransferRate(coinOnPedestal);
+        int actualRate = (itemInPedestal.getCount() < rate)?(itemInPedestal.getCount()):(rate);
+
         int range = getRange(coinOnPedestal);
         if(!getStackInPedestal(world,posOfPedestal).isEmpty())//hasItem
         {
             ItemStack itemToSummon = getStackInPedestal(world,posOfPedestal).copy();
-            itemToSummon.setCount(rate);
+            itemToSummon.setCount(actualRate);
             ItemEntity itemEntity = new ItemEntity(world,getPosOfBlockBelow(world,posOfPedestal,-range).getX() + 0.5,getPosOfBlockBelow(world,posOfPedestal,-range).getY(),getPosOfBlockBelow(world,posOfPedestal,-range).getZ() + 0.5,itemToSummon);
             itemEntity.setMotion(0,0,0);
             world.addEntity(itemEntity);
