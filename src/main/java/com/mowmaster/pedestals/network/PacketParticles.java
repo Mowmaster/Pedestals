@@ -85,6 +85,19 @@ public class PacketParticles
                             }
                             break;
                         }
+                        case ANY_COLOR_CENTERED:{
+                            for(int i =0; i < 10; i++){
+                                double d0 = message.x +0.5; //+ world.rand.nextFloat();
+                                double d1 = message.y +0.5;//+ world.rand.nextFloat() ;
+                                double d2 = message.z +0.5 ; //+ world.rand.nextFloat();
+                                float red = (float)message.args[0]/255;
+                                float green = (float)message.args[1]/255;
+                                float blue = (float)message.args[2]/255;
+                                world.addParticle(new RedstoneParticleData(red,green,blue,1.0f),d0, d1, d2, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3, (world.rand.nextFloat() * 1 - 0.5)/3);
+                                //new PacketParticles(EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),0.0f,1.0f,0.0f));
+                            }
+                            break;
+                        }
                         case ANY_COLOR_BEAM:{
                             for(int z =0; z < 10; z++){
                                 //args are destination pos xyz then pedestal xyz
@@ -128,6 +141,7 @@ public class PacketParticles
     }
     public enum EffectType {
         ANY_COLOR(3),
+        ANY_COLOR_CENTERED(3),
         ANY_COLOR_BEAM(3)
         ;
 
