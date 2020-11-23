@@ -943,7 +943,7 @@
     "jei.pedestals.void.desc": "Will Void all Items inserted or dropped on the pedestal, will also deal Void damage to any entity that touches the pedestal.",
 
   "item.pedestals.coin.voidenergy": "Pedestal Upgrade",
-  "item.pedestals.coin.voidenergy.tooltip_name": "Void Energy Upgrade",
+  "item.pedestals.coin.voidenergy.tooltip_name": "Energy Void Upgrade",
   "item.pedestals.coin.voidenergy.tooltip_rate": "Damage Dealt Per Operation: ",
   "item.pedestals.coin.voidenergy.tooltip_speed": "Operational Speed: ",
   "item.pedestals.coin.voidenergy.chat_rate": "Void Damage In Hearts: ",
@@ -951,7 +951,7 @@
   "jei.pedestals.voidenergy.desc": "Will Void all Items and Energy inserted or dropped on the pedestal, will also deal Void damage to any entity that touches the pedestal.",
 
   "item.pedestals.coin.voidfluid": "Pedestal Upgrade",
-  "item.pedestals.coin.voidfluid.tooltip_name": "Void Fluid Upgrade",
+  "item.pedestals.coin.voidfluid.tooltip_name": "Fluid Void Upgrade",
   "item.pedestals.coin.voidfluid.tooltip_rate": "Damage Dealt Per Operation: ",
   "item.pedestals.coin.voidfluid.tooltip_speed": "Operational Speed: ",
   "item.pedestals.coin.voidfluid.chat_rate": "Void Damage In Hearts: ",
