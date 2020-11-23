@@ -561,7 +561,6 @@
   "item.pedestals.coin.fluiddrain.chat_speed": "Operational Speed: ",
   "jei.pedestals.fluidpump.desc": "Drains Fluids from its internal tank, and places it in the world. This only receives fluids from the Pedestal Fluid Network, it cannot send fluids.",
 
-
   "item.pedestals.coin.fluidtank": "Pedestal Upgrade",
   "item.pedestals.coin.fluidtank.tooltip_name": "Fluid Tank Upgrade",
   "item.pedestals.coin.fluidtank.tooltip_fluidcapacity": "Fluid Buffer Size: ",
@@ -573,6 +572,18 @@
   "item.pedestals.coin.fluidtank.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidtank.chat_speed": "Operational Speed: ",
   "jei.pedestals.fluidtank.desc": "Stores a large amount of 1 fluid. This can transfer or receive liquids from the Pedestal Fluid Network",
+
+  "item.pedestals.coin.fluidrelay": "Pedestal Upgrade",
+  "item.pedestals.coin.fluidrelay.tooltip_name": "Fluid Relay Upgrade",
+  "item.pedestals.coin.fluidrelay.tooltip_fluidcapacity": "Fluid Buffer Size: ",
+  "item.pedestals.coin.fluidrelay.tooltip_rate": "Fluid Transfer Rate: ",
+  "item.pedestals.coin.fluidrelay.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.fluidrelay.chat_fluid": "Fluid Stored: ",
+  "item.pedestals.coin.fluidrelay.chat_fluidseperator": " - ",
+  "item.pedestals.coin.fluidrelay.chat_fluidlabel": "mb",
+  "item.pedestals.coin.fluidrelay.chat_rate": "Fluid Transfer Rate: ",
+  "item.pedestals.coin.fluidrelay.chat_speed": "Operational Speed: ",
+  "jei.pedestals.fluidrelay.desc": "Mainly used to transfer liquids Within the Pedestal Fluid Network over long distances. This can transfer or receive liquids from the Pedestal Fluid Network",
 
   "item.pedestals.coin.export": "Pedestal Upgrade",
     "item.pedestals.coin.export.tooltip_name": "Export Upgrade",
