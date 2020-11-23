@@ -559,7 +559,7 @@
   "item.pedestals.coin.fluiddrain.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluiddrain.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluiddrain.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidpump.desc": "Drains Fluids from its internal tank, and places them in the world. This only receives fluids from the Pedestal Fluid Network, it cannot send fluids.",
+  "jei.pedestals.fluidpump.desc": "Drains Fluids from its internal tank, and places it in the world. This only receives fluids from the Pedestal Fluid Network, it cannot send fluids.",
 
 
   "item.pedestals.coin.fluidtank": "Pedestal Upgrade",

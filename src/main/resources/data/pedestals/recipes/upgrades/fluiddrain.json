@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/fluidpump"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/fluiddrain"
+  }
+}
