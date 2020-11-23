@@ -33,6 +33,7 @@
     "pedestals:coin/xpanvil",
     "pedestals:coin/xpgrindstone",
     "pedestals:coin/fluidpump",
+    "pedestals:coin/fluidtank",
     "pedestals:coin/export",
     "pedestals:coin/fexportitem",
     "pedestals:coin/fexportitemstack",
