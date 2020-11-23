@@ -251,6 +251,11 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         return LazyOptional.empty();
     }
 
+    public boolean canRecieveFluid(World world, BlockPos posPedestal, FluidStack fluidIncoming)
+    {
+        return true;
+    }
+
     public void upgradeActionSendFluid(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
@@ -285,7 +290,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                     FluidStack storedCoinFluid = storedCoinItem.getFluidStored(storedPedestalCoin);
 
                                     //Make Sure Fluids Match or destination is empty
-                                    if(storedCoinFluid.isFluidEqual(mainPedestalFluid) || storedCoinFluid.isEmpty())
+                                    if(storedCoinFluid.isFluidEqual(mainPedestalFluid) || storedCoinFluid.isEmpty() && storedCoinItem.canRecieveFluid(world, posStoredPedestal, mainPedestalFluid))
                                     {
                                         int storedCoinFluidSpace = storedCoinItem.availableFluidSpaceInCoin(storedPedestalCoin);
                                         int storedCoinFluidAmount = storedCoinFluid.getAmount();

@@ -6,9 +6,12 @@
     },
     {
       "item": "minecraft:glass_bottle"
+    },
+    {
+      "item": "minecraft:iron_bars"
     }
   ],
   "result": {
-    "item": "pedestals:coin/fluidrelay"
+    "item": "pedestals:coin/fluidfilter"
   }
 }

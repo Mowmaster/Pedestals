@@ -36,6 +36,8 @@
     "pedestals:coin/fluiddrain",
     "pedestals:coin/fluidtank",
     "pedestals:coin/fluidrelay",
+    "pedestals:coin/fluidfilter",
+    "pedestals:coin/fluidfilterblacklist",
     "pedestals:coin/export",
     "pedestals:coin/fexportitem",
     "pedestals:coin/fexportitemstack",

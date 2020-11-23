@@ -30,7 +30,9 @@
     "pedestals:coin/fmagnetitemstack",
     "pedestals:coin/fmagnetitemstackb",
     "pedestals:coin/fmagnetmod",
-    "pedestals:coin/fmagnetmodb"
+    "pedestals:coin/fmagnetmodb",
+    "pedestals:coin/fluidfilter",
+    "pedestals:coin/fluidfilterblacklist"
 
   ]
 }
