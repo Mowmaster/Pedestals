@@ -227,7 +227,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         {
             //if(!((IGrowable) target.getBlock()).canGrow(world,posTarget,target,false))
             //{
-                FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
                 //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                 fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
                 ItemStack harvestingHoe = new ItemStack(Items.DIAMOND_HOE,1);

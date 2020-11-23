@@ -207,7 +207,7 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
 
-            FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack harvestingShears = new ItemStack(Items.SHEARS,1);
             fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);
