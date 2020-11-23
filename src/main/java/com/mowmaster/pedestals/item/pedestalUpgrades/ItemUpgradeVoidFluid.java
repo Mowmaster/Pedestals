@@ -22,6 +22,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -29,9 +30,9 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeVoid extends ItemUpgradeBase
+public class ItemUpgradeVoidFluid extends ItemUpgradeBaseFluid
 {
-    public ItemUpgradeVoid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeVoidFluid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -56,6 +57,13 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
                 if(!itemInPedestal.equals(ItemStack.EMPTY))
                 {
                     removeFromPedestal(world,pedestalPos,itemInPedestal.getCount());
+                }
+
+                int getMaxFluidValue = getFluidbuffer(coinInPedestal);
+                if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
+                if(hasFluidInCoin(coinInPedestal))
+                {
+                    setFluidStored(coinInPedestal, FluidStack.EMPTY);
                 }
             }
         }
@@ -138,11 +146,11 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
         tooltip.add(speed);
     }
 
-    public static final Item VOID = new ItemUpgradeVoid(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/void"));
+    public static final Item VOIDFLUID = new ItemUpgradeVoidFluid(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/voidfluid"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(VOID);
+        event.getRegistry().register(VOIDFLUID);
     }
 }

@@ -243,6 +243,8 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradePlacer.PLACER, "placer");
         addValueInfoPage(registration, ItemUpgradeTeleporter.TELEPORTER, "teleporter");
         addValueInfoPage(registration, ItemUpgradeVoid.VOID, "void");
+        addValueInfoPage(registration, ItemUpgradeVoidEnergy.VOIDENERGY, "voidenergy");
+        addValueInfoPage(registration, ItemUpgradeVoidFluid.VOIDFLUID, "voidfluid");
         addValueInfoPage(registration, ItemUpgradeAttacker.ATTACK, "attack");
         addValueInfoPage(registration, ItemUpgradeEffect.EFFECT, "effect");
         addValueInfoPage(registration, ItemUpgradeFan.FAN, "fan");

@@ -66,6 +66,8 @@
     "pedestals:coin/quarry",
     "pedestals:coin/quarryb",
     "pedestals:coin/void",
+    "pedestals:coin/voidenergy",
+    "pedestals:coin/voidfluid",
     "pedestals:coin/sawmill",
     "pedestals:coin/attack",
     "pedestals:coin/effect",

@@ -107,6 +107,8 @@ public class ItemRegistry
         ItemCraftingPlaceholder.onItemRegistryReady(e);
         ItemUpgradeCobbleGen.onItemRegistryReady(e);
         ItemUpgradeVoid.onItemRegistryReady(e);
+        ItemUpgradeVoidEnergy.onItemRegistryReady(e);
+        ItemUpgradeVoidFluid.onItemRegistryReady(e);
         ItemUpgradeAttacker.onItemRegistryReady(e);
         ItemUpgradeEffect.onItemRegistryReady(e);
         ItemUpgradeFan.onItemRegistryReady(e);

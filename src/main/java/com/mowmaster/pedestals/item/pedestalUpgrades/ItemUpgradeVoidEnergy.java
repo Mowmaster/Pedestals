@@ -29,9 +29,9 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeVoid extends ItemUpgradeBase
+public class ItemUpgradeVoidEnergy extends ItemUpgradeBaseEnergy
 {
-    public ItemUpgradeVoid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeVoidEnergy(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -56,6 +56,13 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
                 if(!itemInPedestal.equals(ItemStack.EMPTY))
                 {
                     removeFromPedestal(world,pedestalPos,itemInPedestal.getCount());
+                }
+
+                int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
+                if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
+                if(hasEnergy(coinInPedestal))
+                {
+                    setEnergyStored(coinInPedestal,0);
                 }
             }
         }
@@ -138,11 +145,11 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
         tooltip.add(speed);
     }
 
-    public static final Item VOID = new ItemUpgradeVoid(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/void"));
+    public static final Item VOIDENERGY = new ItemUpgradeVoidEnergy(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/voidenergy"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(VOID);
+        event.getRegistry().register(VOIDENERGY);
     }
 }
