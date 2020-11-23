@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
@@ -12,18 +13,22 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidAttributes;
@@ -84,6 +89,50 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         return  height;
     }
 
+    //Riped Straight from ItemUpgradePlacer
+    public void placeBlock(World world, BlockPos pedPos, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinOnPedestal)
+    {
+        if(!itemInPedestal.isEmpty())
+        {
+            Block blockBelow = world.getBlockState(targetPos).getBlock();
+            Item singleItemInPedestal = itemInPedestal.getItem();
+
+            if(blockBelow.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
+                if(singleItemInPedestal instanceof BlockItem)
+                {
+                    if (((BlockItem) singleItemInPedestal).getBlock() instanceof Block)
+                    {
+                        if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof Block) {
+                            Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
+
+                            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
+                            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
+                            fakePlayer.setPosition(pedPos.getX(),pedPos.getY(),pedPos.getZ());
+
+                            //BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal, new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), blockPosBelow, false));
+                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));
+
+                            /*ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                            if (result == ActionResultType.CONSUME) {
+                                this.removeFromPedestal(world,posOfPedestal,1);
+                                world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                            }*/
+
+                            ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                            if (result == ActionResultType.CONSUME) {
+                                this.removeFromPedestal(world,pedPos,1);
+                                world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                            }
+                            /*world.setBlockState(blockPosBelow,block.getDefaultState());
+                            this.removeFromPedestal(world,posOfPedestal,1);
+                            world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);*/
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public int getWidth(ItemStack stack)
     {
         return  getAreaModifier(stack);
@@ -120,11 +169,12 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
-            if (world.getGameTime() % speed == 0) {
-                if(hasFluidInCoin(coinInPedestal))
-                {
-                    //TODO: not working atm...
-                    upgradeActionSendFluid(pedestal);
+            if(!world.isBlockPowered(pedestalPos)) {
+                if (world.getGameTime() % speed == 0) {
+                    if(hasFluidInCoin(coinInPedestal))
+                    {
+                        upgradeActionSendFluid(pedestal);
+                    }
                 }
             }
 
@@ -149,7 +199,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                             //PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),255,164,0));
                             BlockState targetBlock = world.getBlockState(targetPos);
 
-                            upgradeAction(world, pedestalPos, targetPos, coinInPedestal);
+                            upgradeAction(world, pedestalPos, targetPos, itemInPedestal, coinInPedestal);
 
                             pedestal.setStoredValueForUpgrades(currentPosition+1);
                             if(resetCurrentPosInt(currentPosition+1,negNums,posNums))
@@ -163,7 +213,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         }
     }
 
-    public void upgradeAction(World world, BlockPos pedestalPos, BlockPos targetPos, ItemStack coinInPedestal)
+    public void upgradeAction(World world, BlockPos pedestalPos, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
         BlockState targetFluidState = world.getBlockState(targetPos);
         Block targetFluidBlock = targetFluidState.getBlock();
@@ -191,8 +241,13 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         if(!fluidToStore.isEmpty() && addFluid(coinInPedestal,fluidToStore,true))
         {
             addFluid(coinInPedestal,fluidToStore,false);
-            int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
-            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
+            if(itemInPedestal.isEmpty())
+            {
+                int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
+                PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
+
+            }
+            else {placeBlock(world,pedestalPos,targetPos,itemInPedestal,coinInPedestal);}
         }
     }
 
