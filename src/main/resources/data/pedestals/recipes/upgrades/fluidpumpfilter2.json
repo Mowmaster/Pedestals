@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/fluidpumpfilterblacklist"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/fluidpumpfilter"
+  }
+}

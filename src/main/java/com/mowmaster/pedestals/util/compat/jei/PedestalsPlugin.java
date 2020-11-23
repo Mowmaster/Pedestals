@@ -207,6 +207,8 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeFluidRelay.FLUIDRELAY, "fluidrelay");
         addValueInfoPage(registration, ItemUpgradeFluidFilter.FLUIDFILTER, "fluidfilter");
         addValueInfoPage(registration, ItemUpgradeFluidFilterBlacklist.FLUIDFILTERBLACKLIST, "fluidfilterblacklist");
+        addValueInfoPage(registration, ItemUpgradeFluidPumpFilter.FLUIDPUMPFILTER, "fluidpumpfilter");
+        addValueInfoPage(registration, ItemUpgradeFluidPumpFilterBlacklist.FLUIDPUMPFILTERBLACKLIST, "fluidpumpfilterblacklist");
         addValueInfoPage(registration, ItemUpgradeFilteredImport.FIMPORT, "fimport");
         addValueInfoPage(registration, ItemUpgradeImport.IMPORT, "import");
         addValueInfoPage(registration, ItemUpgradeExport.EXPORT, "export");
