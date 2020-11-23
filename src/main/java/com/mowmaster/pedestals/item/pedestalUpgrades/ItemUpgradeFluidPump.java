@@ -226,7 +226,18 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                 if(canAddFluidToCoin(coinInPedestal,fluidToPickup))
                 {
                     fluidToStore = fluidToPickup.copy();
-                    world.setBlockState(targetPos, Blocks.AIR.getDefaultState(), 11);
+                    if(!fluidToStore.isEmpty() && addFluid(coinInPedestal,fluidToStore,true))
+                    {
+                        world.setBlockState(targetPos, Blocks.AIR.getDefaultState(), 11);
+                        addFluid(coinInPedestal,fluidToStore,false);
+                        if(itemInPedestal.isEmpty())
+                        {
+                            int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
+                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
+
+                        }
+                        else {placeBlock(world,pedestalPos,targetPos,itemInPedestal,coinInPedestal);}
+                    }
                 }
             }
         }
@@ -234,20 +245,20 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
             IFluidBlock fluidBlock = (IFluidBlock) targetFluidBlock;
 
             if (fluidBlock.canDrain(world, targetPos)) {
-                fluidToStore =  fluidBlock.drain(world, targetPos, IFluidHandler.FluidAction.EXECUTE);
-            }
-        }
+                fluidToStore =  fluidBlock.drain(world, targetPos, IFluidHandler.FluidAction.SIMULATE);
+                if(!fluidToStore.isEmpty() && addFluid(coinInPedestal,fluidToStore,true))
+                {
+                    fluidToStore =  fluidBlock.drain(world, targetPos, IFluidHandler.FluidAction.EXECUTE);
+                    addFluid(coinInPedestal,fluidToStore,false);
+                    if(itemInPedestal.isEmpty())
+                    {
+                        int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
+                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
 
-        if(!fluidToStore.isEmpty() && addFluid(coinInPedestal,fluidToStore,true))
-        {
-            addFluid(coinInPedestal,fluidToStore,false);
-            if(itemInPedestal.isEmpty())
-            {
-                int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
-                PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
-
+                    }
+                    else {placeBlock(world,pedestalPos,targetPos,itemInPedestal,coinInPedestal);}
+                }
             }
-            else {placeBlock(world,pedestalPos,targetPos,itemInPedestal,coinInPedestal);}
         }
     }
 
