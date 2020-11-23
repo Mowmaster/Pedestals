@@ -295,28 +295,53 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                             int getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
                                             int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
                                             //IF main pedestal has more fluid then transfer rate
-                                            if(mainPedestalFluidAmount >= transferRate)
-                                            {
-                                                int mainFluidRemaining = mainPedestalFluidAmount - transferRate;
-                                                int storedFluidRemaining = storedCoinFluidAmount + transferRate;
+                                            //if(mainPedestalFluidAmount >= transferRate)
+                                            //{
+                                                //int mainFluidRemaining = mainPedestalFluidAmount - transferRate;
+                                                //int storedFluidRemaining = storedCoinFluidAmount + transferRate;
+                                                FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate);
                                                 //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                removeFluid(mainPedestalCoin,transferRate,false);
-                                                //setFluidStored(mainPedestalCoin,new FluidStack(mainPedestalFluid,mainFluidRemaining));
-                                                mainPedestalTile.update();
-                                                //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setFluidStored(storedPedestalCoin,new FluidStack(storedCoinFluid,storedFluidRemaining));
-                                                storedPedestalTile.update();
-                                            }
-                                            else
-                                            {
-                                                //IF transfer rate is greater then main pedestal (then empty main pedestal)
-                                                int storedFluidRemaining = storedCoinFluidAmount + transferRate;
-                                                setFluidStored(mainPedestalCoin,FluidStack.EMPTY);
-                                                mainPedestalTile.update();
-                                                //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setFluidStored(storedPedestalCoin,new FluidStack(storedCoinFluid,storedFluidRemaining));
-                                                storedPedestalTile.update();
-                                            }
+                                                //System.out.println(fluidToStore.getDisplayName().getString() + " - " + fluidToStore.getAmount());
+                                                if(addFluid(storedPedestalCoin,fluidToStore,true) && removeFluid(mainPedestalCoin,transferRate,true))
+                                                {
+                                                    removeFluid(mainPedestalCoin,transferRate,false);
+                                                    //System.out.println("Removed Fluid");
+                                                    //setFluidStored(mainPedestalCoin,new FluidStack(mainPedestalFluid,mainFluidRemaining));
+                                                    mainPedestalTile.update();
+                                                    //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                                    //setFluidStored(storedPedestalCoin,fluidToStore);
+                                                    addFluid(storedPedestalCoin,fluidToStore,false);
+                                                    storedPedestalTile.update();
+                                                }
+                                                else
+                                                {
+                                                    mainPedestalFluid = getFluidStored(mainPedestalCoin);
+                                                    mainPedestalFluidAmount = mainPedestalFluid.getAmount();
+                                                    storedCoinFluid = storedCoinItem.getFluidStored(storedPedestalCoin);
+                                                    storedCoinFluidSpace = storedCoinItem.availableFluidSpaceInCoin(storedPedestalCoin);
+                                                    storedCoinFluidAmount = storedCoinFluid.getAmount();
+                                                    getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
+                                                    transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
+                                                    //IF transfer rate is greater then main pedestal (then empty main pedestal)
+                                                    int storedFluidRemaining = storedCoinFluidAmount + transferRate;
+                                                    int fluidLeftToSend = (mainPedestalFluidAmount<=transferRate)?(mainPedestalFluidAmount):(transferRate);
+                                                    fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend);
+                                                    //System.out.println(fluidToStore.getDisplayName().getString() + " - " + fluidToStore.getAmount());
+                                                    if(addFluid(storedPedestalCoin,fluidToStore,true) && removeFluid(mainPedestalCoin,fluidLeftToSend,true))
+                                                    {
+                                                        removeFluid(mainPedestalCoin,fluidLeftToSend,false);
+                                                        //setFluidStored(mainPedestalCoin,FluidStack.EMPTY);
+                                                        //System.out.println("Removed Fluid");
+                                                        mainPedestalTile.update();
+                                                        //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                                        //setFluidStored(storedPedestalCoin,fluidToStore);
+                                                        addFluid(storedPedestalCoin,fluidToStore,false);
+                                                        storedPedestalTile.update();
+                                                    }
+                                                }
+                                            //}
+
+                                            continue;
                                         }
                                     }
                                 }
@@ -331,13 +356,16 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
     public int availableFluidSpaceInCoin(ItemStack coin)
     {
         FluidStack currentFluid = getFluidStored(coin);
-        if(!currentFluid.isEmpty())
+        if(currentFluid.isEmpty())
+        {
+            return getFluidbuffer(coin);
+        }
+        else
         {
             int currentlyStored = currentFluid.getAmount();
             int max = readMaxFluidFromNBT(coin);
             return max - currentlyStored;
         }
-        return 0;
     }
 
     public boolean canAddFluidToCoin(ItemStack coin, FluidStack fluidIn)
@@ -520,31 +548,31 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
     }
 
     public int getFluidbuffer(ItemStack stack) {
-        int energyBuffer = 10000;
+        int fluidBuffer = 10000;
         switch (getCapacityModifier(stack))
         {
             case 0:
-                energyBuffer = 10000;
+                fluidBuffer = 10000;
                 break;
             case 1:
-                energyBuffer = 20000;
+                fluidBuffer = 20000;
                 break;
             case 2:
-                energyBuffer = 40000;
+                fluidBuffer = 40000;
                 break;
             case 3:
-                energyBuffer = 60000;
+                fluidBuffer = 60000;
                 break;
             case 4:
-                energyBuffer = 80000;
+                fluidBuffer = 80000;
                 break;
             case 5:
-                energyBuffer = 100000;
+                fluidBuffer = 100000;
                 break;
-            default: energyBuffer = 10000;
+            default: fluidBuffer = 10000;
         }
 
-        return  energyBuffer;
+        return  fluidBuffer;
     }
 
     @Override

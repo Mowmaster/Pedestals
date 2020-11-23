@@ -271,30 +271,49 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                         {
                                             int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
                                             //If we have more then X levels in the pedestal we're sending from
-                                            if(energyMainPedestal >= transferRate)
-                                            {
-                                                int xpRemainingMainPedestal = energyMainPedestal - transferRate;
-                                                int xpRemainingStoredPedestal = energyStoredPedestal + transferRate;
-                                                //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
-                                                tileMainPedestal.update();
-                                                //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
-                                                tileStoredPedestal.update();
 
+                                            if(addEnergy(coinStoredPedestal,transferRate,true) && removeEnergy(coinMainPedestal,transferRate,true))
+                                            {
+                                                //if(energyMainPedestal >= transferRate)
+                                                //{
+                                                    //int xpRemainingMainPedestal = energyMainPedestal - transferRate;
+                                                    //int xpRemainingStoredPedestal = energyStoredPedestal + transferRate;
+                                                    //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                                    removeEnergy(coinMainPedestal,transferRate,false);
+                                                    //setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
+                                                    tileMainPedestal.update();
+                                                    //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                                    addEnergy(coinStoredPedestal,transferRate,false);
+                                                    //setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                                    tileStoredPedestal.update();
+                                                //}
                                             }
                                             else
                                             {
-                                                //If we have less then X levels, just send them all.
-                                                int xpRemainingMainPedestal = 0;
-                                                int xpRemainingStoredPedestal = energyStoredPedestal + energyMainPedestal;
-                                                //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
-                                                tileMainPedestal.update();
-                                                //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
-                                                tileStoredPedestal.update();
+                                                int energyLeft = getEnergyStored(coinMainPedestal);
+                                                energyMaxStoredPedestal = readMaxEnergyFromNBT(coinStoredPedestal);
+                                                energyStoredPedestal = getEnergyStored(coinStoredPedestal);
+                                                energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
+                                                transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
+                                                int energyLeftToSend = (energyLeft<=transferRate)?(energyLeft):(transferRate);
+
+                                                if(addEnergy(coinStoredPedestal,energyLeftToSend,true) && removeEnergy(coinMainPedestal,energyLeftToSend,true))
+                                                {
+                                                    //If we have less then X levels, just send them all.
+                                                    //int xpRemainingMainPedestal = 0;
+                                                    //int xpRemainingStoredPedestal = energyStoredPedestal + energyMainPedestal;
+                                                    //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                                    removeEnergy(coinMainPedestal,energyLeftToSend,false);
+                                                    //setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
+                                                    tileMainPedestal.update();
+                                                    //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                                    addEnergy(coinStoredPedestal,energyLeftToSend,false);
+                                                    //setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                                    tileStoredPedestal.update();
+                                                }
                                             }
+
+                                            continue;
                                         }
                                     }
                                 }
@@ -327,8 +346,10 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     {
         int getMaxEnergyValue = getEnergyBuffer(coin);
         int currentEnergy = getEnergyStored(coin);
-        int newEnergyValue = currentEnergy + energyOut;
-        if(newEnergyValue>=0)
+        int energyDiff = currentEnergy - energyOut;
+        int newEnergyValue = ((energyDiff)>0)?(energyDiff):(0);
+        //Dont use newEnergy here unless we want to be lazy about pulling out more energy then inside
+        if(energyDiff>=0)
         {
             if(!simulate)
             {
