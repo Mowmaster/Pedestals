@@ -31,7 +31,7 @@ public class ItemUpgradeEnergyTank extends ItemUpgradeBaseEnergy
     @Override
     public int getEnergyBuffer(ItemStack stack) {
         //im assuming # = rf value???
-        int energyBuffer = 1000;
+        int energyBuffer = 100000;
         switch (getCapacityModifier(stack))
         {
 
