@@ -263,16 +263,16 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                     //Check if pedestal to send to can even be sent exp
                                     if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseEnergy)
                                     {
-                                        int energyMaxStoredPedestal = ((ItemUpgradeBaseEnergy)coinStoredPedestal.getItem()).readMaxEnergyFromNBT(coinStoredPedestal);
-                                        int energyStoredPedestal = getEnergyStored(coinStoredPedestal);
+                                        ItemUpgradeBaseEnergy itemEB = ((ItemUpgradeBaseEnergy)coinStoredPedestal.getItem());
+                                        int energyMaxStoredPedestal = itemEB.readMaxEnergyFromNBT(coinStoredPedestal);
+                                        int energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
                                         int energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
-                                        //if Stored Pedestal has room for exp (will be lazy sending exp here)
-                                        if(energyStoredPedestal < energyMaxStoredPedestal)
+
+                                        if(energySpaceInTargetPedestal > 0)
                                         {
                                             int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
-                                            //If we have more then X levels in the pedestal we're sending from
 
-                                            if(addEnergy(coinStoredPedestal,transferRate,true) && removeEnergy(coinMainPedestal,transferRate,true))
+                                            if(itemEB.addEnergy(coinStoredPedestal,transferRate,true) && removeEnergy(coinMainPedestal,transferRate,true))
                                             {
                                                 //if(energyMainPedestal >= transferRate)
                                                 //{
@@ -290,14 +290,13 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                             }
                                             else
                                             {
-                                                int energyLeft = getEnergyStored(coinMainPedestal);
-                                                energyMaxStoredPedestal = readMaxEnergyFromNBT(coinStoredPedestal);
-                                                energyStoredPedestal = getEnergyStored(coinStoredPedestal);
+                                                int energyLeftInMain = (getEnergyStored(coinMainPedestal) < getEnergyTransferRate(coinMainPedestal))?(getEnergyStored(coinMainPedestal)):(getEnergyTransferRate(coinMainPedestal));
+                                                energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
                                                 energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
-                                                transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
-                                                int energyLeftToSend = (energyLeft<=transferRate)?(energyLeft):(transferRate);
+                                                transferRate = (energyLeftInMain <= energySpaceInTargetPedestal)?(energyLeftInMain):(energySpaceInTargetPedestal);
+                                                int energyLeftToSend = (energyLeftInMain<=transferRate)?(energyLeftInMain):(transferRate);
 
-                                                if(addEnergy(coinStoredPedestal,energyLeftToSend,true) && removeEnergy(coinMainPedestal,energyLeftToSend,true))
+                                                if(itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,true) && removeEnergy(coinMainPedestal,energyLeftToSend,true))
                                                 {
                                                     //If we have less then X levels, just send them all.
                                                     //int xpRemainingMainPedestal = 0;
@@ -307,7 +306,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                                                     //setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
                                                     tileMainPedestal.update();
                                                     //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                    addEnergy(coinStoredPedestal,energyLeftToSend,false);
+                                                    itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,false);
                                                     //setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
                                                     tileStoredPedestal.update();
                                                 }
@@ -328,7 +327,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
     public boolean addEnergy(ItemStack coin, int energyIn, boolean simulate)
     {
-        int getMaxEnergyValue = getEnergyBuffer(coin);
+        int getMaxEnergyValue = readMaxEnergyFromNBT(coin);
         int currentEnergy = getEnergyStored(coin);
         int newEnergyValue = currentEnergy + energyIn;
         if(getMaxEnergyValue>=newEnergyValue)
@@ -344,7 +343,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
     public boolean removeEnergy(ItemStack coin, int energyOut, boolean simulate)
     {
-        int getMaxEnergyValue = getEnergyBuffer(coin);
+        int getMaxEnergyValue = readMaxEnergyFromNBT(coin);
         int currentEnergy = getEnergyStored(coin);
         int energyDiff = currentEnergy - energyOut;
         int newEnergyValue = ((energyDiff)>0)?(energyDiff):(0);
