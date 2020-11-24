@@ -3,8 +3,7 @@ package com.mowmaster.pedestals.tiles;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFilter;
+import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import net.minecraft.block.Block;
@@ -30,6 +29,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -45,11 +47,12 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-
-public class PedestalTileEntity extends TileEntity implements IInventory, ITickableTileEntity {
+//
+public class PedestalTileEntity extends TileEntity implements IInventory, ITickableTileEntity, IEnergyStorage {
 
     private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandler);
     private LazyOptional<IItemHandler> privateHandler = LazyOptional.of(this::createHandlerPedestalPrivate);
+    private LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(this::createHandlerEnergy);
 
     private static final int[] SLOTS_ALLSIDES = new int[] {0};
 
@@ -112,6 +115,154 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     }
 
     //Above this is mostly IInventory stuff needed for block drops
+
+
+    /**********************************
+     **********************************
+     **  ENERGY IMPLIMENTION START  ***
+     **********************************
+     *********************************/
+
+    public IEnergyStorage createHandlerEnergy() {
+        return new IEnergyStorage() {
+            @Override
+            public int receiveEnergy(int maxReceive, boolean simulate) {
+
+                if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyImport))
+                {
+                    ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+                    if(itemE.addEnergy(getCoinOnPedestal(),maxReceive,simulate))
+                    {
+                        //Return input power if it can be insert???
+                        return maxReceive;
+                    }
+                }
+
+                return 0;
+            }
+
+            @Override
+            public int extractEnergy(int maxExtract, boolean simulate) {
+                if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyExport))
+                {
+                    ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+                    if(itemE.removeEnergy(getCoinOnPedestal(),maxExtract,simulate))
+                    {
+                        //Return output power if it can be taken???
+                        return maxExtract;
+                    }
+                }
+                return 0;
+            }
+
+            @Override
+            public int getEnergyStored() {
+                if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergy)
+                {
+                    ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+                    return itemE.getEnergyStored(getCoinOnPedestal());
+                }
+                else return 0;
+            }
+
+            @Override
+            public int getMaxEnergyStored() {
+                if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergy)
+                {
+                    ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+                    return itemE.getEnergyBuffer(getCoinOnPedestal());
+                }
+                else return 0;
+            }
+
+            @Override
+            public boolean canExtract() {
+                return (hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyExport);
+            }
+
+            @Override
+            public boolean canReceive() {
+                return (hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyImport);
+            }
+        };
+    }
+
+    @Override
+    public int receiveEnergy(int maxReceive, boolean simulate) {
+
+        if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyImport))
+        {
+            ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+            if(itemE.addEnergy(getCoinOnPedestal(),maxReceive,simulate))
+            {
+                //Return input power if it can be insert???
+                return maxReceive;
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int extractEnergy(int maxExtract, boolean simulate) {
+        if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyExport))
+        {
+            ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+            if(itemE.removeEnergy(getCoinOnPedestal(),maxExtract,simulate))
+            {
+                //Return output power if it can be taken???
+                return maxExtract;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int getEnergyStored() {
+        if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergy)
+        {
+            ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+            return itemE.getEnergyStored(getCoinOnPedestal());
+        }
+        else return 0;
+    }
+
+    @Override
+    public int getMaxEnergyStored() {
+        if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergy)
+        {
+            ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+            return itemE.getEnergyBuffer(getCoinOnPedestal());
+        }
+        else return 0;
+    }
+
+    @Override
+    public boolean canExtract() {
+        return (hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyExport);
+    }
+
+    @Override
+    public boolean canReceive() {
+        return (hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyImport);
+    }
+
+    public int getMaxEnergyReceive()
+    {
+        int est = this.getMaxEnergyStored() - this.getEnergyStored();
+        return (est > 0)?(est):(0);
+    }
+
+    public int getMaxEnergyExtract()
+    {
+        return this.getEnergyStored();
+    }
+
+    /**********************************
+     **********************************
+     ***  ENERGY IMPLIMENTION END   ***
+     **********************************
+     *********************************/
 
     public void update()
     {
@@ -195,6 +346,9 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return handler.cast();
+        }
+        if (cap == CapabilityEnergy.ENERGY) {
+            return energyHandler.cast();
         }
         return super.getCapability(cap, side);
     }
