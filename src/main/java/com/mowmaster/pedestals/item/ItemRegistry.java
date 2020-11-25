@@ -61,6 +61,7 @@ public class ItemRegistry
         ItemUpgradeEnergyQuarry.onItemRegistryReady(e);
         ItemUpgradeEnergyQuarryBlacklist.onItemRegistryReady(e);
 
+        ItemUpgradeFluidImport.onItemRegistryReady(e);
         ItemUpgradeFluidPump.onItemRegistryReady(e);
         ItemUpgradeFluidDrain.onItemRegistryReady(e);
         ItemUpgradeFluidTank.onItemRegistryReady(e);
