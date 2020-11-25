@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.*;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
@@ -276,7 +275,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 {
                     if (player.getHeldItemMainhand().isEmpty()) {
                         if (tilePedestal.hasItem()) {
-                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItem());
+                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItemOverRide());
                             //player.inventory.addItemStackToInventory(tilePedestal.removeItem());
                         }
                     }
@@ -449,7 +448,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 }
                 else if (player.getHeldItemMainhand().isEmpty()) {
                     if (tilePedestal.hasItem()) {
-                        ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItem());
+                        ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItemOverRide());
                     }
                 }
                 else
