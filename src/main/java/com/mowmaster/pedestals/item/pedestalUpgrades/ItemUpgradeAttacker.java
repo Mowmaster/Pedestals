@@ -165,7 +165,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
             }
 
-            List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10");
+            List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10", "pedestal11", "pedestal12");
             Random rn = new Random();
 
             LivingEntity selectedEntity = getTargetEntity(world,posOfPedestal,getEntityFromList);
