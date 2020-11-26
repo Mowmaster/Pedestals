@@ -13,6 +13,9 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.*;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionUtils;
+import net.minecraft.potion.Potions;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -27,16 +30,16 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.fluids.*;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -55,15 +58,9 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
     {
         if(tile !=null)
         {
-            //System.out.println("IS EMPTY: "+ getFluidInItem(tile.getItemInPedestal()).getDisplayName());
             return getFluidInItem(tile.getItemInPedestal()).isEmpty();
         }
         return true;
-    }
-
-    @Override
-    public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn) {
-        return super.canAcceptItem(world, posPedestal, itemStackIn);
     }
 
     @Override
@@ -71,16 +68,6 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
 
         //If incoming item has a fluid then set max stack to 1, if the pedestal has an item then 0, else allow normal transferring
         return (!getFluidInItem(itemStackIncoming).isEmpty())?(1):((inPedestal.isEmpty())?(itemStackIncoming.getMaxStackSize()):(0));
-    }
-
-    public FluidStack getFluidInItem(ItemStack itemInPedestal)
-    {
-        if(FluidUtil.getFluidHandler(itemInPedestal).isPresent())
-        {
-            FluidStack fluidInItem = FluidUtil.getFluidContained(itemInPedestal).get();
-            return fluidInItem;
-        }
-        return FluidStack.EMPTY;
     }
 
     @Override
@@ -119,19 +106,72 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
                     {
                         upgradeActionSendFluid(pedestal);
                     }
+
+                    upgradeAction(pedestal);
                 }
             }
 
         }
     }
 
-    public void upgradeAction(World world, BlockPos pedestalPos, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinInPedestal)
+    public FluidStack getFluidInItem(ItemStack itemInPedestal)
     {
-        BlockState targetFluidState = world.getBlockState(targetPos);
-        Block targetFluidBlock = targetFluidState.getBlock();
-        FluidStack fluidToStore = FluidStack.EMPTY;
+        //TODO: Maybe have a fluid recipe thingy for people to add other tiems that 'contain' fluids??? have an input, fluid, amount, and output for the recipe???
+        if(FluidUtil.getFluidHandler(itemInPedestal).isPresent())
+        {
+            FluidStack fluidInItem = FluidUtil.getFluidContained(itemInPedestal).get();
+            return fluidInItem;
+        }
+        return FluidStack.EMPTY;
+    }
 
+//https://github.com/mekanism/Mekanism/blob/be11c0df7d6ffece12da666b3100fc5e6d8ce0ab/src/main/java/mekanism/common/inventory/slot/IFluidHandlerSlot.java#L137
+    public void upgradeAction(PedestalTileEntity pedestal)
+    {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
 
+        if(!itemInPedestal.isEmpty())
+        {
+            FluidStack fluidIn = getFluidInItem(itemInPedestal);
+            if(!fluidIn.isEmpty())
+            {
+
+                //Need to combine this and that stuff below into 1 thing..
+                int amountIn = fluidIn.getAmount();
+                int rate = getFluidTransferRate(coinInPedestal);
+                //If it can set amount to transfer rate, otherwise check if it has enough for a bucket, if all fails, then check to see what it can transfer
+                int transferRate = (amountIn>=rate)?(rate):((amountIn>=FluidAttributes.BUCKET_VOLUME)?(FluidAttributes.BUCKET_VOLUME):(amountIn));
+
+                if(availableFluidSpaceInCoin(coinInPedestal) >= transferRate || getFluidStored(coinInPedestal).isEmpty())
+                {
+                    FluidStack fluidToInsert = new FluidStack(fluidIn,transferRate);
+
+                    if(!fluidIn.isEmpty() && addFluid(coinInPedestal,fluidToInsert,true))
+                    {
+                        addFluid(coinInPedestal,fluidIn,false);
+                    }
+                }
+
+                //Technically already checked for in fluidIn
+                //https://github.com/mekanism/Mekanism/blob/be11c0df7d6ffece12da666b3100fc5e6d8ce0ab/src/main/java/mekanism/common/inventory/slot/IFluidHandlerSlot.java#L44
+                Optional<IFluidHandlerItem> fluidContainerItemIn = FluidUtil.getFluidHandler(itemInPedestal).resolve();
+                if(fluidContainerItemIn.isPresent())
+                {
+                    IFluidHandlerItem fluidHandlerItem = fluidContainerItemIn.get();
+                    FluidStack fluidInActualDrain = fluidHandlerItem.drain(fluidIn,IFluidHandler.FluidAction.EXECUTE);
+                    if(!fluidInActualDrain.isEmpty())
+                    {
+                        //only return the item IF its empty
+                        ItemStack returnerStack = fluidHandlerItem.getContainer();
+                        addFluid(coinInPedestal,fluidInActualDrain,false);
+                        pedestal.setItemInPedestal(returnerStack);
+                    }
+                }
+            }
+        }
     }
 
     @Override

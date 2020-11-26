@@ -518,6 +518,13 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         return ph.getStackInSlot(4).getCount();
     }
 
+    public ItemStack setItemInPedestal(ItemStack itemToSet)
+    {
+        IItemHandler h = handler.orElse(null);
+        ItemStack stack = h.insertItem(0,itemToSet,false);
+        return stack;
+    }
+
     public ItemStack removeItem(int numToRemove) {
         IItemHandler h = handler.orElse(null);
         ItemStack stack = h.extractItem(0,numToRemove,false);
