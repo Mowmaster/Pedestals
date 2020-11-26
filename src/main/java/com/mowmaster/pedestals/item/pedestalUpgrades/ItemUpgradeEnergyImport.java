@@ -85,7 +85,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
             {
                 IEnergyStorage handler = cap.orElse(null);
 
-                System.out.println("Handler NOT NULL??? "+ handler != null);
+                //System.out.println("Handler NOT NULL??? "+ handler != null);
                 if(handler != null)
                 {
 
