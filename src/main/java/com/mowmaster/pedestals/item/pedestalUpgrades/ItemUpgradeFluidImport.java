@@ -1,36 +1,17 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.crafting.CalculateColor;
-import com.mowmaster.pedestals.network.PacketHandler;
-import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.*;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.potion.Potions;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.*;
@@ -40,6 +21,7 @@ import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -58,7 +40,8 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
     {
         if(tile !=null)
         {
-            return getFluidInItem(tile.getItemInPedestal()).isEmpty();
+            FluidStack fluidInItem = getFluidInItem(tile.getItemInPedestal());
+            return fluidInItem.isEmpty() || !getFluidStored(tile.getCoinOnPedestal()).isFluidEqual(fluidInItem);
         }
         return true;
     }
@@ -107,10 +90,9 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
                         upgradeActionSendFluid(pedestal);
                     }
 
-                    upgradeAction(pedestal);
+                    upgradeActionItem(pedestal);
                 }
             }
-
         }
     }
 
@@ -126,48 +108,109 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
     }
 
 //https://github.com/mekanism/Mekanism/blob/be11c0df7d6ffece12da666b3100fc5e6d8ce0ab/src/main/java/mekanism/common/inventory/slot/IFluidHandlerSlot.java#L137
-    public void upgradeAction(PedestalTileEntity pedestal)
+    public void upgradeActionItem(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
-        BlockPos pedestalPos = pedestal.getPos();
 
         if(!itemInPedestal.isEmpty())
         {
             FluidStack fluidIn = getFluidInItem(itemInPedestal);
             if(!fluidIn.isEmpty())
             {
+                FluidStack fluidInCoin = getFluidInItem(coinInPedestal);
 
-                //Need to combine this and that stuff below into 1 thing..
-                int amountIn = fluidIn.getAmount();
-                int rate = getFluidTransferRate(coinInPedestal);
-                //If it can set amount to transfer rate, otherwise check if it has enough for a bucket, if all fails, then check to see what it can transfer
-                int transferRate = (amountIn>=rate)?(rate):((amountIn>=FluidAttributes.BUCKET_VOLUME)?(FluidAttributes.BUCKET_VOLUME):(amountIn));
-
-                if(availableFluidSpaceInCoin(coinInPedestal) >= transferRate || getFluidStored(coinInPedestal).isEmpty())
-                {
-                    FluidStack fluidToInsert = new FluidStack(fluidIn,transferRate);
-
-                    if(!fluidIn.isEmpty() && addFluid(coinInPedestal,fluidToInsert,true))
-                    {
-                        addFluid(coinInPedestal,fluidIn,false);
-                    }
-                }
-
-                //Technically already checked for in fluidIn
                 //https://github.com/mekanism/Mekanism/blob/be11c0df7d6ffece12da666b3100fc5e6d8ce0ab/src/main/java/mekanism/common/inventory/slot/IFluidHandlerSlot.java#L44
                 Optional<IFluidHandlerItem> fluidContainerItemIn = FluidUtil.getFluidHandler(itemInPedestal).resolve();
                 if(fluidContainerItemIn.isPresent())
                 {
                     IFluidHandlerItem fluidHandlerItem = fluidContainerItemIn.get();
-                    FluidStack fluidInActualDrain = fluidHandlerItem.drain(fluidIn,IFluidHandler.FluidAction.EXECUTE);
-                    if(!fluidInActualDrain.isEmpty())
+                    int tanks = fluidContainerItemIn.get().getTanks();
+
+                    if(tanks > 1)
                     {
-                        //only return the item IF its empty
-                        ItemStack returnerStack = fluidHandlerItem.getContainer();
-                        addFluid(coinInPedestal,fluidInActualDrain,false);
-                        pedestal.setItemInPedestal(returnerStack);
+                        if(!fluidInCoin.isEmpty())
+                        {
+                            //Default grab from first tank
+                            FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(0);
+                            int amountIn = fluidInTank.getAmount();
+                            int spaceInCoin = availableFluidSpaceInCoin(coinInPedestal);
+                            int rate = getFluidTransferRate(coinInPedestal);
+                            int actualCoinRate = (spaceInCoin>=rate)?(rate):(spaceInCoin);
+                            int transferRate = (amountIn>=actualCoinRate)?(actualCoinRate):(amountIn);
+
+                            if(spaceInCoin >= transferRate || getFluidStored(coinInPedestal).isEmpty())
+                            {
+                                FluidStack estFluidToDrain = new FluidStack(fluidInTank,transferRate);
+                                FluidStack fluidToActuallyDrain = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.SIMULATE);
+                                if(!fluidInTank.isEmpty() && addFluid(coinInPedestal,fluidToActuallyDrain,true))
+                                {
+                                    FluidStack fluidDrained = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.EXECUTE);
+                                    addFluid(coinInPedestal,fluidDrained,false);
+                                    ItemStack returnerStack = fluidHandlerItem.getContainer();
+                                    pedestal.setItemInPedestal(returnerStack);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            FluidStack fluidMatching = FluidStack.EMPTY;
+                            fluidMatching = IntStream.range(0,tanks)//Int Range
+                                    .mapToObj((fluidHandlerItem)::getFluidInTank)//Function being applied to each interval
+                                    .filter(fluidStack -> fluidInCoin.isFluidEqual(fluidStack))
+                                    .findFirst().orElse(FluidStack.EMPTY);
+
+                            if(!fluidMatching.isEmpty())
+                            {
+                                int amountIn = fluidMatching.getAmount();
+                                int spaceInCoin = availableFluidSpaceInCoin(coinInPedestal);
+                                int rate = getFluidTransferRate(coinInPedestal);
+                                int actualCoinRate = (spaceInCoin>=rate)?(rate):(spaceInCoin);
+                                int transferRate = (amountIn>=actualCoinRate)?(actualCoinRate):(amountIn);
+
+                                if(spaceInCoin >= transferRate || getFluidStored(coinInPedestal).isEmpty())
+                                {
+                                    FluidStack estFluidToDrain = new FluidStack(fluidMatching,transferRate);
+                                    FluidStack fluidToActuallyDrain = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.SIMULATE);
+                                    if(!fluidMatching.isEmpty() && addFluid(coinInPedestal,fluidToActuallyDrain,true))
+                                    {
+                                        FluidStack fluidDrained = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.EXECUTE);
+                                        addFluid(coinInPedestal,fluidDrained,false);
+                                        ItemStack returnerStack = fluidHandlerItem.getContainer();
+                                        pedestal.setItemInPedestal(returnerStack);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //should i just set this to zero???
+                        FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tanks-1);
+                        //System.out.println("GetTanksFluid: "+ fluidInTank.getDisplayName().getString());
+                        if(fluidInCoin.isEmpty() || fluidInCoin.isFluidEqual(fluidInTank))
+                        {
+                            int amountIn = fluidInTank.getAmount();
+                            int spaceInCoin = availableFluidSpaceInCoin(coinInPedestal);
+                            int rate = getFluidTransferRate(coinInPedestal);
+                            int actualCoinRate = (spaceInCoin>=rate)?(rate):(spaceInCoin);
+                            int transferRate = (amountIn>=actualCoinRate)?(actualCoinRate):(amountIn);
+
+                            if(spaceInCoin >= transferRate || getFluidStored(coinInPedestal).isEmpty())
+                            {
+                                FluidStack estFluidToDrain = new FluidStack(fluidInTank,transferRate);
+                                FluidStack fluidToActuallyDrain = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.SIMULATE);
+                                if(!fluidInTank.isEmpty() && addFluid(coinInPedestal,fluidToActuallyDrain,true))
+                                {
+                                    FluidStack fluidDrained = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.EXECUTE);
+                                    addFluid(coinInPedestal,fluidDrained,false);
+                                    ItemStack returnerStack = fluidHandlerItem.getContainer();
+                                    //System.out.println(returnerStack.getDisplayName().getString());
+                                    pedestal.removeItemOverRide();
+                                    pedestal.addItem(returnerStack);
+                                }
+                            }
+                        }
                     }
                 }
             }

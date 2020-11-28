@@ -332,7 +332,7 @@
     "jei.pedestals.planter.desc": "Using seeds from the pedestal, this will plant crops in the area around it.",
 
     "item.pedestals.coin.rfexport": "Pedestal Upgrade",
-    "item.pedestals.coin.rfexport.tooltip_name": "Energy Extractor Upgrade",
+    "item.pedestals.coin.rfexport.tooltip_name": "Energy Exporter Upgrade",
     "item.pedestals.coin.rfexport.tooltip_rate": "Transfer Rate: ",
     "item.pedestals.coin.rfexport.tooltip_speed": "Operational Speed: ",
     "item.pedestals.coin.rfexport.tooltip_rfstored": "Energy Stored: ",
@@ -532,6 +532,18 @@
     "item.pedestals.coin.xpgrindstone.chat_rate": "Exp Levels Transfered at a Time: ",
     "item.pedestals.coin.xpgrindstone.chat_speed": "Operational Speed: ",
     "jei.pedestals.xpgrindstone.desc": "Place an Inventory below the pedestal for grinding inputs. This upgrade will Grind the enchants off of items and return the unenchanted items to the pedestal, while storing the xp from the process in its buffer, which can be transfered out.",
+
+  "item.pedestals.coin.fluidimport": "Pedestal Upgrade",
+  "item.pedestals.coin.fluidimport.tooltip_name": "Fluid Import Upgrade",
+  "item.pedestals.coin.fluidimport.tooltip_fluidcapacity": "Fluid Buffer Size: ",
+  "item.pedestals.coin.fluidimport.tooltip_rate": "Fluid Transfer Rate: ",
+  "item.pedestals.coin.fluidimport.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.fluidimport.chat_fluid": "Fluid Stored: ",
+  "item.pedestals.coin.fluidimport.chat_fluidseperator": " - ",
+  "item.pedestals.coin.fluidimport.chat_fluidlabel": "mb",
+  "item.pedestals.coin.fluidimport.chat_rate": "Fluid Transfer Rate: ",
+  "item.pedestals.coin.fluidimport.chat_speed": "Operational Speed: ",
+  "jei.pedestals.fluidpump.desc": "Imports Fluids from items in the pedestal, or tanks below the pedestal, into the Pedestal Fluid Network. This can transfer liquid into the Pedestal Fluid Network",
 
   "item.pedestals.coin.fluidpump": "Pedestal Upgrade",
   "item.pedestals.coin.fluidpump.tooltip_name": "Fluid Pump Upgrade",
