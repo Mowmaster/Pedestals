@@ -6,8 +6,10 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -108,7 +110,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                         if(pedestalInv instanceof PedestalTileEntity) {
                             if(!((PedestalTileEntity) pedestalInv).hasItem())
                             {
-                                if(itemFromInv.isEnchanted())
+                                if(itemFromInv.isEnchanted() || itemFromInv.getItem() instanceof EnchantedBookItem)
                                 {
                                     int maxXp = readMaxXpFromNBT(coinInPedestal);
                                     int currentlyStoredExp = getXPStored(coinInPedestal);
@@ -117,7 +119,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                     {
                                         //Code Here
                                         Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
-                                        ItemStack stackToReturn = itemFromInv.copy();
+                                        ItemStack stackToReturn = (itemFromInv.getItem() instanceof EnchantedBookItem)?(new ItemStack(Items.BOOK,1)):(itemFromInv.copy());
                                         stackToReturn.setCount(1);
                                         EnchantmentHelper.setEnchantments(enchantsNone,stackToReturn);
                                         if(!stackToReturn.isEmpty())
