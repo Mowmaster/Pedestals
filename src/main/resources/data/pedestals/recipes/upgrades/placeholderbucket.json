@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "A A",
+    " A "
+  ],
+  "key": {
+    "A": {
+      "item": "pedestals:coin/placeholder"
+    }
+  },
+  "result": {
+    "item": "pedestals:coin/placeholderbucket",
+    "count": 3
+  }
+}

@@ -149,6 +149,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemColorPallet.COLORPALLET_DEFAULT, "itemcolorpalletdefault");
         addValueInfoPage(registration, ItemColorPallet.COLORPALLET, "itemcolorpallet");
         addValueInfoPage(registration, ItemCraftingPlaceholder.PLACEHOLDER, "placeholder");
+        addValueInfoPage(registration, ItemCraftingPlaceholder.PLACEHOLDER_BUCKET, "placeholderbucket");
         addValueInfoPage(registration, ItemLinkingTool.DEFAULT, "linkingtool");
         addValueInfoPage(registration, ItemPedestalUpgrades.SPEED, "upgradespeed");
         addValueInfoPage(registration, ItemPedestalUpgrades.CAPACITY, "upgradecapacity");
@@ -207,10 +208,14 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeFluidDrain.FLUIDDRAIN, "fluiddrain");
         addValueInfoPage(registration, ItemUpgradeFluidTank.FLUIDTANK, "fluidtank");
         addValueInfoPage(registration, ItemUpgradeFluidRelay.FLUIDRELAY, "fluidrelay");
+        addValueInfoPage(registration, ItemUpgradeFluidFilteredImport.FLUIDFILTEREDIMPORT, "fluidfilteredimport");
         addValueInfoPage(registration, ItemUpgradeFluidFilter.FLUIDFILTER, "fluidfilter");
         addValueInfoPage(registration, ItemUpgradeFluidFilterBlacklist.FLUIDFILTERBLACKLIST, "fluidfilterblacklist");
         addValueInfoPage(registration, ItemUpgradeFluidPumpFilter.FLUIDPUMPFILTER, "fluidpumpfilter");
         addValueInfoPage(registration, ItemUpgradeFluidPumpFilterBlacklist.FLUIDPUMPFILTERBLACKLIST, "fluidpumpfilterblacklist");
+        addValueInfoPage(registration, ItemUpgradeFluidCrafter.FLUIDCRAFTER_ONE, "fluidcrafter1");
+        addValueInfoPage(registration, ItemUpgradeFluidCrafter.FLUIDCRAFTER_TWO, "fluidcrafter2");
+        addValueInfoPage(registration, ItemUpgradeFluidCrafter.FLUIDCRAFTER_THREE, "fluidcrafter3");
         addValueInfoPage(registration, ItemUpgradeFilteredImport.FIMPORT, "fimport");
         addValueInfoPage(registration, ItemUpgradeImport.IMPORT, "import");
         addValueInfoPage(registration, ItemUpgradeExport.EXPORT, "export");
