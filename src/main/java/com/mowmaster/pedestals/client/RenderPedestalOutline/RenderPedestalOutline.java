@@ -40,7 +40,7 @@ public class RenderPedestalOutline
 
         }
 
-        ItemStack stackUpgrade = (player.getHeldItemOffhand().getItem() instanceof ItemUpgradeTool)?(player.getHeldItemOffhand()):(player.getHeldItemMainhand());
+        /*ItemStack stackUpgrade = (player.getHeldItemOffhand().getItem() instanceof ItemUpgradeTool)?(player.getHeldItemOffhand()):(player.getHeldItemMainhand());
         if (stackUpgrade.isEnchanted() && stackUpgrade.getItem() instanceof ItemUpgradeTool) {
             ItemUpgradeTool UT = (ItemUpgradeTool) stackUpgrade.getItem();
             if(stackUpgrade.hasTag())
@@ -51,7 +51,7 @@ public class RenderPedestalOutline
                 showWorkArea(player, event.getMatrixStack(),pos,getWorkArea);
             }
 
-        }
+        }*/
     }
 
     private static void blueLine(IVertexBuilder builder, Matrix4f positionMatrix, BlockPos pos, float dx1, float dy1, float dz1, float dx2, float dy2, float dz2) {
