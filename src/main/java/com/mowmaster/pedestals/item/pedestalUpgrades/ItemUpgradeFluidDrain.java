@@ -184,7 +184,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
 
         if(removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
         {
-            FluidStack fluidToBucket = new FluidStack(fluidIn.getFluid(),FluidAttributes.BUCKET_VOLUME);
+            FluidStack fluidToBucket = new FluidStack(fluidIn.getFluid(),FluidAttributes.BUCKET_VOLUME,fluidIn.getTag());
             Item bucket = fluidToBucket.getFluid().getFilledBucket();
 
             if(bucket instanceof BucketItem)
@@ -208,7 +208,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
     {
         if(!fluidIn.isEmpty())
         {
-            FluidStack fluidForBucket = new FluidStack(fluidIn.getFluid(),FluidAttributes.BUCKET_VOLUME);
+            FluidStack fluidForBucket = new FluidStack(fluidIn.getFluid(),FluidAttributes.BUCKET_VOLUME,fluidIn.getTag());
             Item bucketItem = fluidForBucket.getFluid().getFilledBucket();
             if(bucketItem instanceof BucketItem)
             {

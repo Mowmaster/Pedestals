@@ -137,7 +137,8 @@ public class ItemUpgradeFluidPumpFilterBlacklist extends ItemUpgradeBaseFluid
     {
         if(bucketIn.getItem() instanceof BucketItem)
         {
-            FluidStack fluidFromBucket = new FluidStack(((BucketItem) bucketIn.getItem()).getFluid(), FluidAttributes.BUCKET_VOLUME);
+            BucketItem bI = (BucketItem) bucketIn.getItem();
+            FluidStack fluidFromBucket = new FluidStack(bI.getFluid(), FluidAttributes.BUCKET_VOLUME,bI.getShareTag(bucketIn));
             if(fluidFromBucket.isFluidEqual(fluidIn))
             {
                 return true;

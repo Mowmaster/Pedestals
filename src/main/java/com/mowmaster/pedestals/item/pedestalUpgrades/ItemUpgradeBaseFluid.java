@@ -12,6 +12,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -30,6 +31,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.DispenseFluidContainer;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -304,7 +306,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                             //{
                                                 //int mainFluidRemaining = mainPedestalFluidAmount - transferRate;
                                                 //int storedFluidRemaining = storedCoinFluidAmount + transferRate;
-                                                FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate);
+                                                FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate,mainPedestalFluid.getTag());
                                                 //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 //System.out.println(fluidToStore.getDisplayName().getString() + " - " + fluidToStore.getAmount());
                                                 if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,transferRate,true))
@@ -330,7 +332,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                                     //IF transfer rate is greater then main pedestal (then empty main pedestal)
                                                     int storedFluidRemaining = storedCoinFluidAmount + transferRate;
                                                     int fluidLeftToSend = (mainPedestalFluidAmount<=transferRate)?(mainPedestalFluidAmount):(transferRate);
-                                                    fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend);
+                                                    fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend,mainPedestalFluid.getTag());
                                                     //System.out.println(fluidToStore.getDisplayName().getString() + " - " + fluidToStore.getAmount());
                                                     if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,true))
                                                     {
@@ -401,7 +403,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         {
             if(!simulate)
             {
-                FluidStack newStack = new FluidStack(old.getFluid(),newAmount);
+                FluidStack newStack = new FluidStack(old.getFluid(),newAmount,old.getTag());
                 if(newAmount == 0)
                 {
                     newStack = FluidStack.EMPTY;
@@ -469,12 +471,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
             compound = stack.getTag();
         }
 
-        compound.putString("FluidName", fluid.getFluid().getRegistryName().toString());
-        compound.putInt("Amount", fluid.getAmount());
-        if(fluid.getTag() != null) {
-            compound.put("Tag", fluid.getTag());
-        }
-
+        compound = fluid.writeToNBT(compound);
         stack.setTag(compound);
         pedestal.update();
     }
@@ -489,26 +486,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         if(stack.hasTag())
         {
             CompoundNBT getCompound = stack.getTag();
-            CompoundNBT tag = new CompoundNBT();
-
-            if(getCompound == null) {
-                return FluidStack.EMPTY;
-            } else if(!getCompound.contains("FluidName", 8)) {
-                return FluidStack.EMPTY;
-            } else {
-                ResourceLocation fluidName = new ResourceLocation(getCompound.getString("FluidName"));
-                Fluid fluid = (Fluid) ForgeRegistries.FLUIDS.getValue(fluidName);
-                if(fluid == null) {
-                    return FluidStack.EMPTY;
-                } else {
-                    FluidStack newFluid = new FluidStack(fluid, getCompound.getInt("Amount"));
-                    if(getCompound.contains("Tag", 10)) {
-                        newFluid.setTag(getCompound.getCompound("Tag"));
-                    }
-
-                    return newFluid;
-                }
-            }
+            return FluidStack.loadFluidStackFromNBT(getCompound);
         }
 
         return FluidStack.EMPTY;
@@ -587,10 +565,10 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
     {
         if(!world.isBlockPowered(pos))
         {
-            int color = getFluidStored(pedestal.getCoinOnPedestal()).getFluid().getAttributes().getColor();
-            int[] rgb = CalculateColor.getRGBColorFromInt(color);
             if(hasFluidInCoin(pedestal.getCoinOnPedestal()))
             {
+                int color = getFluidStored(pedestal.getCoinOnPedestal()).getFluid().getAttributes().getColor();
+                int[] rgb = CalculateColor.getRGBColorFromInt(color);
                 spawnParticleAroundPedestalBase(world,tick,pos,(float)rgb[0]/255,(float)rgb[1]/255,(float)rgb[2]/255,1.0f);
             }
         }
