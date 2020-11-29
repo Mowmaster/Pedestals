@@ -307,15 +307,15 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                                 FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate);
                                                 //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                 //System.out.println(fluidToStore.getDisplayName().getString() + " - " + fluidToStore.getAmount());
-                                                if(addFluid(storedPedestalCoin,fluidToStore,true) && removeFluid(mainPedestalCoin,transferRate,true))
+                                                if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,transferRate,true))
                                                 {
-                                                    removeFluid(mainPedestalCoin,transferRate,false);
+                                                    removeFluid(pedestal, mainPedestalCoin,transferRate,false);
                                                     //System.out.println("Removed Fluid");
                                                     //setFluidStored(mainPedestalCoin,new FluidStack(mainPedestalFluid,mainFluidRemaining));
                                                     mainPedestalTile.update();
                                                     //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                     //setFluidStored(storedPedestalCoin,fluidToStore);
-                                                    addFluid(storedPedestalCoin,fluidToStore,false);
+                                                    addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                     storedPedestalTile.update();
                                                 }
                                                 else
@@ -332,15 +332,15 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                                     int fluidLeftToSend = (mainPedestalFluidAmount<=transferRate)?(mainPedestalFluidAmount):(transferRate);
                                                     fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend);
                                                     //System.out.println(fluidToStore.getDisplayName().getString() + " - " + fluidToStore.getAmount());
-                                                    if(addFluid(storedPedestalCoin,fluidToStore,true) && removeFluid(mainPedestalCoin,fluidLeftToSend,true))
+                                                    if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,true))
                                                     {
-                                                        removeFluid(mainPedestalCoin,fluidLeftToSend,false);
+                                                        removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,false);
                                                         //setFluidStored(mainPedestalCoin,FluidStack.EMPTY);
                                                         //System.out.println("Removed Fluid");
                                                         mainPedestalTile.update();
                                                         //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                         //setFluidStored(storedPedestalCoin,fluidToStore);
-                                                        addFluid(storedPedestalCoin,fluidToStore,false);
+                                                        addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                         storedPedestalTile.update();
                                                     }
                                                 }
@@ -373,19 +373,19 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         }
     }
 
-    public boolean canAddFluidToCoin(ItemStack coin, FluidStack fluidIn)
+    public boolean canAddFluidToCoin(PedestalTileEntity pedestal, ItemStack coin, FluidStack fluidIn)
     {
         FluidStack currentFluid = getFluidStored(coin);
         if(currentFluid.isEmpty() || currentFluid.isFluidEqual(fluidIn))
         {
 
-            return addFluid(coin,fluidIn,true);
+            return addFluid(pedestal,coin,fluidIn,true);
         }
 
         return false;
     }
 
-    public boolean removeFluid(ItemStack stack, int amount, boolean simulate)
+    public boolean removeFluid(PedestalTileEntity pedestal, ItemStack stack, int amount, boolean simulate)
     {
         CompoundNBT compound = new CompoundNBT();
         if(stack.hasTag())
@@ -406,7 +406,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                 {
                     newStack = FluidStack.EMPTY;
                 }
-                setFluidStored(stack,newStack);
+                setFluidStored(pedestal,stack,newStack);
             }
             return true;
         }
@@ -414,7 +414,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         return false;
     }
 
-    public boolean removeFluid(ItemStack stack, FluidStack fluid, boolean simulate)
+    public boolean removeFluid(PedestalTileEntity pedestal, ItemStack stack, FluidStack fluid, boolean simulate)
     {
         CompoundNBT compound = new CompoundNBT();
         if(stack.hasTag())
@@ -430,14 +430,14 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                 int currentAmount = old.getAmount();
                 int newAmount = fluid.getAmount() + currentAmount;
                 FluidStack newStack = new FluidStack(fluid,newAmount);
-                setFluidStored(stack,newStack);
+                setFluidStored(pedestal,stack,newStack);
             }
             return true;
         }
         return false;
     }
 
-    public boolean addFluid(ItemStack stack, FluidStack fluid, boolean simulate)
+    public boolean addFluid(PedestalTileEntity pedestal, ItemStack stack, FluidStack fluid, boolean simulate)
     {
         CompoundNBT compound = new CompoundNBT();
         if(stack.hasTag())
@@ -453,7 +453,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                 int currentAmount = old.getAmount();
                 int newAmount = fluid.getAmount() + currentAmount;
                 FluidStack newStack = new FluidStack(fluid,newAmount);
-                setFluidStored(stack,newStack);
+                setFluidStored(pedestal,stack,newStack);
             }
             return true;
         }
@@ -461,7 +461,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         return false;
     }
 
-    public void setFluidStored(ItemStack stack, FluidStack fluid)
+    public void setFluidStored(PedestalTileEntity pedestal, ItemStack stack, FluidStack fluid)
     {
         CompoundNBT compound = new CompoundNBT();
         if(stack.hasTag())
@@ -476,6 +476,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         }
 
         stack.setTag(compound);
+        pedestal.update();
     }
 
     public boolean hasFluidInCoin(ItemStack stack)

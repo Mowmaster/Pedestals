@@ -142,7 +142,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                             //PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),255,164,0));
                             BlockState targetBlock = world.getBlockState(targetPos);
 
-                            upgradeAction(world, pedestalPos, targetPos, itemInPedestal, coinInPedestal);
+                            upgradeAction(pedestal, targetPos, itemInPedestal, coinInPedestal);
 
                             pedestal.setStoredValueForUpgrades(currentPosition+1);
                             if(resetCurrentPosInt(currentPosition+1,negNums,posNums))
@@ -177,9 +177,12 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
     }
 
     //https://github.com/BluSunrize/ImmersiveEngineering/blob/1.16/src/main/java/blusunrize/immersiveengineering/common/blocks/metal/FluidPlacerTileEntity.java#L102
-    public boolean placeFluid(World world, FakePlayer player, BlockPos targetBlock, FluidStack fluidIn, ItemStack coinInPedestal, boolean simulate)
+    public boolean placeFluid(PedestalTileEntity pedestal, FakePlayer player, BlockPos targetBlock, FluidStack fluidIn, boolean simulate)
     {
-        if(removeFluid(coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+
+        if(removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
         {
             FluidStack fluidToBucket = new FluidStack(fluidIn.getFluid(),FluidAttributes.BUCKET_VOLUME);
             Item bucket = fluidToBucket.getFluid().getFilledBucket();
@@ -219,14 +222,16 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
         return ItemStack.EMPTY;
     }
 
-    public void upgradeAction(World world, BlockPos pedestalPos, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
         FluidStack fluidInCoin = getFluidStored(coinInPedestal);
 
         if(!fluidInCoin.isEmpty())
         {
             if(canPlaceFluidBlock(world,targetPos)) {
-                if(removeFluid(coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
+                if(removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
                 {
                     //fluidInCoin.getFluid().getAttributes().canBePlacedInWorld(world,targetPos,fluidInCoin)
                     FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
@@ -236,10 +241,10 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
 
                     if(world.isBlockModifiable(fakePlayer,targetPos))
                     {
-                        if(placeFluid(world,fakePlayer,targetPos,fluidInCoin,coinInPedestal,true))
+                        if(placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,true))
                         {
-                            removeFluid(coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
-                            placeFluid(world,fakePlayer,targetPos,fluidInCoin,coinInPedestal,false);
+                            removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
+                            placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,false);
                             world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
                         }
                     }

@@ -199,7 +199,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                             //PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),255,164,0));
                             BlockState targetBlock = world.getBlockState(targetPos);
 
-                            upgradeAction(world, pedestalPos, targetPos, itemInPedestal, coinInPedestal);
+                            upgradeAction(pedestal,targetPos, itemInPedestal, coinInPedestal);
 
                             pedestal.setStoredValueForUpgrades(currentPosition+1);
                             if(resetCurrentPosInt(currentPosition+1,negNums,posNums))
@@ -213,8 +213,10 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         }
     }
 
-    public void upgradeAction(World world, BlockPos pedestalPos, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
         BlockState targetFluidState = world.getBlockState(targetPos);
         Block targetFluidBlock = targetFluidState.getBlock();
         FluidStack fluidToStore = FluidStack.EMPTY;
@@ -223,13 +225,13 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
             if (targetFluidState.get(FlowingFluidBlock.LEVEL) == 0) {
                 Fluid fluid = ((FlowingFluidBlock) targetFluidBlock).getFluid();
                 FluidStack fluidToPickup = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
-                if(canAddFluidToCoin(coinInPedestal,fluidToPickup))
+                if(canAddFluidToCoin(pedestal,coinInPedestal,fluidToPickup))
                 {
                     fluidToStore = fluidToPickup.copy();
-                    if(!fluidToStore.isEmpty() && addFluid(coinInPedestal,fluidToStore,true))
+                    if(!fluidToStore.isEmpty() && addFluid(pedestal,coinInPedestal,fluidToStore,true))
                     {
                         world.setBlockState(targetPos, Blocks.AIR.getDefaultState(), 11);
-                        addFluid(coinInPedestal,fluidToStore,false);
+                        addFluid(pedestal,coinInPedestal,fluidToStore,false);
                         if(itemInPedestal.isEmpty())
                         {
                             int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
@@ -245,10 +247,10 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
 
             if (fluidBlock.canDrain(world, targetPos)) {
                 fluidToStore =  fluidBlock.drain(world, targetPos, IFluidHandler.FluidAction.SIMULATE);
-                if(!fluidToStore.isEmpty() && addFluid(coinInPedestal,fluidToStore,true))
+                if(!fluidToStore.isEmpty() && addFluid(pedestal,coinInPedestal,fluidToStore,true))
                 {
                     fluidToStore =  fluidBlock.drain(world, targetPos, IFluidHandler.FluidAction.EXECUTE);
-                    addFluid(coinInPedestal,fluidToStore,false);
+                    addFluid(pedestal,coinInPedestal,fluidToStore,false);
                     if(itemInPedestal.isEmpty())
                     {
                         int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());

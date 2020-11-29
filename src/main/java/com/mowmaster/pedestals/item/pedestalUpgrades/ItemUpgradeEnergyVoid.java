@@ -29,9 +29,9 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeVoidEnergy extends ItemUpgradeBaseEnergy
+public class ItemUpgradeEnergyVoid extends ItemUpgradeBaseEnergy
 {
-    public ItemUpgradeVoidEnergy(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeEnergyVoid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -145,7 +145,7 @@ public class ItemUpgradeVoidEnergy extends ItemUpgradeBaseEnergy
         tooltip.add(speed);
     }
 
-    public static final Item VOIDENERGY = new ItemUpgradeVoidEnergy(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/voidenergy"));
+    public static final Item VOIDENERGY = new ItemUpgradeEnergyVoid(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/voidenergy"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -51,7 +51,7 @@ public class ItemUpgradeFilterModBlacklist extends ItemUpgradeBaseFilter
                                 .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
                                 .filter(itemStack -> itemStack.getItem().getRegistryName().getNamespace()==itemStackIn.getItem().getRegistryName().getNamespace())
                                 .findFirst().orElse(ItemStack.EMPTY);
-                        System.out.println(itemFromInv.getDisplayName());
+                        //System.out.println(itemFromInv.getDisplayName());
 
                         if(!itemFromInv.isEmpty())
                         {

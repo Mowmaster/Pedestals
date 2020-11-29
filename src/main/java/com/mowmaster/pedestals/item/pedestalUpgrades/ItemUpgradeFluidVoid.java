@@ -30,9 +30,9 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeVoidFluid extends ItemUpgradeBaseFluid
+public class ItemUpgradeFluidVoid extends ItemUpgradeBaseFluid
 {
-    public ItemUpgradeVoidFluid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFluidVoid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -63,7 +63,7 @@ public class ItemUpgradeVoidFluid extends ItemUpgradeBaseFluid
                 if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
                 if(hasFluidInCoin(coinInPedestal))
                 {
-                    setFluidStored(coinInPedestal, FluidStack.EMPTY);
+                    setFluidStored(pedestal,coinInPedestal, FluidStack.EMPTY);
                 }
             }
         }
@@ -146,7 +146,7 @@ public class ItemUpgradeVoidFluid extends ItemUpgradeBaseFluid
         tooltip.add(speed);
     }
 
-    public static final Item VOIDFLUID = new ItemUpgradeVoidFluid(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/voidfluid"));
+    public static final Item VOIDFLUID = new ItemUpgradeFluidVoid(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/voidfluid"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
