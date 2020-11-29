@@ -543,7 +543,19 @@
   "item.pedestals.coin.fluidimport.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidimport.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidimport.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidpump.desc": "Imports Fluids from items in the pedestal, or tanks below the pedestal, into the Pedestal Fluid Network. This can transfer liquid into the Pedestal Fluid Network",
+  "jei.pedestals.fluidpump.desc": "Imports Fluids from items in the pedestal, or tanks below the pedestal, into the Pedestal Fluid Network. This can transfer fluid into the Pedestal Fluid Network",
+
+  "item.pedestals.coin.fluidexport": "Pedestal Upgrade",
+  "item.pedestals.coin.fluidexport.tooltip_name": "Fluid Export Upgrade",
+  "item.pedestals.coin.fluidexport.tooltip_fluidcapacity": "Fluid Buffer Size: ",
+  "item.pedestals.coin.fluidexport.tooltip_rate": "Fluid Transfer Rate: ",
+  "item.pedestals.coin.fluidexport.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.fluidexport.chat_fluid": "Fluid Stored: ",
+  "item.pedestals.coin.fluidexport.chat_fluidseperator": " - ",
+  "item.pedestals.coin.fluidexport.chat_fluidlabel": "mb",
+  "item.pedestals.coin.fluidexport.chat_rate": "Fluid Transfer Rate: ",
+  "item.pedestals.coin.fluidexport.chat_speed": "Operational Speed: ",
+  "jei.pedestals.fluidexport.desc": "Exports Fluids from the pedestal and into items or tanks below the pedestal. This can only receive fluid from the Pedestal Fluid Network, it cannot send fluids.",
 
   "item.pedestals.coin.fluidpump": "Pedestal Upgrade",
   "item.pedestals.coin.fluidpump.tooltip_name": "Fluid Pump Upgrade",
@@ -557,7 +569,7 @@
   "item.pedestals.coin.fluidpump.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidpump.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidpump.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidpump.desc": "Pumps Fluids from its Work Area into an internal tank. Blocks in the pedestal will be used to fill the spaces where fluid is pumped from. This can transfer liquid into the Pedestal Fluid Network",
+  "jei.pedestals.fluidpump.desc": "Pumps Fluids from its Work Area into an internal tank. Blocks in the pedestal will be used to fill the spaces where fluid is pumped from. This can transfer fluid into the Pedestal Fluid Network",
 
   "item.pedestals.coin.fluiddrain": "Pedestal Upgrade",
   "item.pedestals.coin.fluiddrain.tooltip_name": "Fluid Drain Upgrade",
@@ -583,7 +595,7 @@
   "item.pedestals.coin.fluidtank.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidtank.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidtank.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidtank.desc": "Stores a large amount of 1 fluid. This can transfer or receive liquids from the Pedestal Fluid Network",
+  "jei.pedestals.fluidtank.desc": "Stores a large amount of 1 fluid. This can transfer or receive fluids from the Pedestal Fluid Network",
 
   "item.pedestals.coin.fluidrelay": "Pedestal Upgrade",
   "item.pedestals.coin.fluidrelay.tooltip_name": "Fluid Relay Upgrade",
@@ -595,7 +607,7 @@
   "item.pedestals.coin.fluidrelay.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidrelay.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidrelay.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidrelay.desc": "Mainly used to transfer liquids Within the Pedestal Fluid Network over long distances. This can transfer or receive liquids from the Pedestal Fluid Network",
+  "jei.pedestals.fluidrelay.desc": "Mainly used to transfer liquids Within the Pedestal Fluid Network over long distances. This can transfer or receive fluids from the Pedestal Fluid Network",
 
   "item.pedestals.coin.fluidfilter": "Pedestal Upgrade",
   "item.pedestals.coin.fluidfilter.tooltip_name": "Fluid Filter Upgrade",
@@ -607,7 +619,7 @@
   "item.pedestals.coin.fluidfilter.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidfilter.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidfilter.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidfilter.desc": "Checks an Inventory Below for buckets of fluid, will only allow matching fluids to be transferred to this pedestal. This can transfer or receive liquids from the Pedestal Fluid Network",
+  "jei.pedestals.fluidfilter.desc": "Checks an Inventory Below for buckets of fluid, will only allow matching fluids to be transferred to this pedestal. This can transfer or receive fluids from the Pedestal Fluid Network",
 
   "item.pedestals.coin.fluidfilterblacklist": "Pedestal Upgrade",
   "item.pedestals.coin.fluidfilterblacklist.tooltip_name": "Fluid Filter Blacklist Upgrade",
@@ -619,7 +631,7 @@
   "item.pedestals.coin.fluidfilterblacklist.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidfilterblacklist.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidfilterblacklist.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidfilterblacklist.desc": "Checks an Inventory Below for buckets of fluid, will only allow non matching fluids to be transferred to this pedestal. This can transfer or receive liquids from the Pedestal Fluid Network",
+  "jei.pedestals.fluidfilterblacklist.desc": "Checks an Inventory Below for buckets of fluid, will only allow non matching fluids to be transferred to this pedestal. This can transfer or receive fluids from the Pedestal Fluid Network",
 
   "item.pedestals.coin.fluidpumpfilter": "Pedestal Upgrade",
   "item.pedestals.coin.fluidpumpfilter.tooltip_name": "Fluid Pump Filter Upgrade",
@@ -633,7 +645,7 @@
   "item.pedestals.coin.fluidpumpfilter.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidpumpfilter.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidpumpfilter.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidpumpfilter.desc": "Pumps Fluids from its Work Area into an internal tank. Checks an Inventory Below for buckets of fluid, will only allow matching fluids to be transferred or pumped into this pedestal. Blocks in the pedestal will be used to fill the spaces where fluid is pumped from. This can transfer liquid into the Pedestal Fluid Network",
+  "jei.pedestals.fluidpumpfilter.desc": "Pumps Fluids from its Work Area into an internal tank. Checks an Inventory Below for buckets of fluid, will only allow matching fluids to be transferred or pumped into this pedestal. Blocks in the pedestal will be used to fill the spaces where fluid is pumped from. This can transfer fluids into the Pedestal Fluid Network",
 
   "item.pedestals.coin.fluidpumpfilterblacklist": "Pedestal Upgrade",
   "item.pedestals.coin.fluidpumpfilterblacklist.tooltip_name": "Fluid Pump Filter Blacklist Upgrade",
@@ -647,7 +659,7 @@
   "item.pedestals.coin.fluidpumpfilterblacklist.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidpumpfilterblacklist.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidpumpfilterblacklist.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidpumpfilterblacklist.desc": "Pumps Fluids from its Work Area into an internal tank. Checks an Inventory Below for buckets of fluid, will only allow non matching fluids to be transferred or pumped into this pedestal. Blocks in the pedestal will be used to fill the spaces where fluid is pumped from. This can transfer liquid into the Pedestal Fluid Network",
+  "jei.pedestals.fluidpumpfilterblacklist.desc": "Pumps Fluids from its Work Area into an internal tank. Checks an Inventory Below for buckets of fluid, will only allow non matching fluids to be transferred or pumped into this pedestal. Blocks in the pedestal will be used to fill the spaces where fluid is pumped from. This can transfer fluids into the Pedestal Fluid Network",
 
   "item.pedestals.coin.export": "Pedestal Upgrade",
     "item.pedestals.coin.export.tooltip_name": "Export Upgrade",

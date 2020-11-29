@@ -62,6 +62,7 @@ public class ItemRegistry
         ItemUpgradeEnergyQuarryBlacklist.onItemRegistryReady(e);
 
         ItemUpgradeFluidImport.onItemRegistryReady(e);
+        ItemUpgradeFluidExport.onItemRegistryReady(e);
         ItemUpgradeFluidPump.onItemRegistryReady(e);
         ItemUpgradeFluidDrain.onItemRegistryReady(e);
         ItemUpgradeFluidTank.onItemRegistryReady(e);
@@ -110,8 +111,8 @@ public class ItemRegistry
         ItemCraftingPlaceholder.onItemRegistryReady(e);
         ItemUpgradeCobbleGen.onItemRegistryReady(e);
         ItemUpgradeVoid.onItemRegistryReady(e);
-        ItemUpgradeVoidEnergy.onItemRegistryReady(e);
-        ItemUpgradeVoidFluid.onItemRegistryReady(e);
+        ItemUpgradeEnergyVoid.onItemRegistryReady(e);
+        ItemUpgradeFluidVoid.onItemRegistryReady(e);
         ItemUpgradeAttacker.onItemRegistryReady(e);
         ItemUpgradeEffect.onItemRegistryReady(e);
         ItemUpgradeFan.onItemRegistryReady(e);

@@ -201,6 +201,8 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeExpEnchanter.XPENCHANTER, "xpenchanter");
         addValueInfoPage(registration, ItemUpgradeExpGrindstone.XPGRINDSTONE, "xpgrindstone");
         addValueInfoPage(registration, ItemUpgradeExpAnvil.XPANVIL, "xpanvil");
+        addValueInfoPage(registration, ItemUpgradeFluidImport.FLUIDIMPORT, "fluidimport");
+        addValueInfoPage(registration, ItemUpgradeFluidExport.FLUIDEXPORT, "fluidexport");
         addValueInfoPage(registration, ItemUpgradeFluidPump.FLUIDPUMP, "fluidpump");
         addValueInfoPage(registration, ItemUpgradeFluidDrain.FLUIDDRAIN, "fluiddrain");
         addValueInfoPage(registration, ItemUpgradeFluidTank.FLUIDTANK, "fluidtank");
@@ -245,8 +247,8 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradePlacer.PLACER, "placer");
         addValueInfoPage(registration, ItemUpgradeTeleporter.TELEPORTER, "teleporter");
         addValueInfoPage(registration, ItemUpgradeVoid.VOID, "void");
-        addValueInfoPage(registration, ItemUpgradeVoidEnergy.VOIDENERGY, "voidenergy");
-        addValueInfoPage(registration, ItemUpgradeVoidFluid.VOIDFLUID, "voidfluid");
+        addValueInfoPage(registration, ItemUpgradeEnergyVoid.VOIDENERGY, "voidenergy");
+        addValueInfoPage(registration, ItemUpgradeFluidVoid.VOIDFLUID, "voidfluid");
         addValueInfoPage(registration, ItemUpgradeAttacker.ATTACK, "attack");
         addValueInfoPage(registration, ItemUpgradeEffect.EFFECT, "effect");
         addValueInfoPage(registration, ItemUpgradeFan.FAN, "fan");

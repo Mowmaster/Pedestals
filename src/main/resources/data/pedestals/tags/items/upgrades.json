@@ -33,6 +33,7 @@
     "pedestals:coin/xpanvil",
     "pedestals:coin/xpgrindstone",
     "pedestals:coin/fluidimport",
+    "pedestals:coin/fluidexport",
     "pedestals:coin/fluidpump",
     "pedestals:coin/fluiddrain",
     "pedestals:coin/fluidtank",

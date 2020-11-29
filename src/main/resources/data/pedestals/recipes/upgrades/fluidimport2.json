@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/fluidexport"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/fluidimport"
+  }
+}
