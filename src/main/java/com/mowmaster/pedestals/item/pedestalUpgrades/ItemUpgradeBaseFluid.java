@@ -1,6 +1,9 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.crafting.CalculateColor;
+import com.mowmaster.pedestals.item.ItemUpgradeTool;
+import com.mowmaster.pedestals.network.PacketHandler;
+import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
@@ -14,9 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -360,6 +361,34 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         }
     }
 
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
+        if(!p_77659_1_.isRemote)
+        {
+            ItemStack wand = p_77659_2_.getHeldItemOffhand();
+            ItemStack coin = p_77659_2_.getHeldItemMainhand();
+            if(wand.getItem() instanceof ItemUpgradeTool)
+            {
+                if(hasFluidInCoin(coin))
+                {
+                    FluidStack fluidIn = getFluidStored(coin);
+                    if(removeFluidFromItem(coin,fluidIn.getAmount(),true))
+                    {
+                        removeFluidFromItem(coin,fluidIn.getAmount(),false);
+                        p_77659_1_.playSound(p_77659_2_,p_77659_2_.getPosition().getX(), p_77659_2_.getPosition().getY(), p_77659_2_.getPosition().getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.25F, 1.0F);
+
+                        //TODO: localize this text
+                        TranslationTextComponent output = new TranslationTextComponent("Fluid Cleared");
+                        output.mergeStyle(TextFormatting.WHITE);
+                        p_77659_2_.sendMessage(output,p_77659_2_.getUniqueID());
+                    }
+                }
+            }
+        }
+
+        return super.onItemRightClick(p_77659_1_, p_77659_2_, p_77659_3_);
+    }
+
     public int availableFluidSpaceInCoin(ItemStack coin)
     {
         FluidStack currentFluid = getFluidStored(coin);
@@ -382,6 +411,35 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         {
 
             return addFluid(pedestal,coin,fluidIn,true);
+        }
+
+        return false;
+    }
+
+    public boolean removeFluidFromItem(ItemStack stack, int amount, boolean simulate)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        FluidStack old = FluidStack.loadFluidStackFromNBT(compound);
+        int currentAmount = old.getAmount();
+        int newAmount = currentAmount - amount;
+
+        if(newAmount >=0)
+        {
+            if(!simulate)
+            {
+                FluidStack newStack = new FluidStack(old.getFluid(),newAmount,old.getTag());
+                if(newAmount == 0)
+                {
+                    newStack = FluidStack.EMPTY;
+                }
+                setFluidStoredItem(stack,newStack);
+            }
+            return true;
         }
 
         return false;
@@ -461,6 +519,18 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         }
 
         return false;
+    }
+
+    public void setFluidStoredItem(ItemStack stack, FluidStack fluid)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound = fluid.writeToNBT(compound);
+        stack.setTag(compound);
     }
 
     public void setFluidStored(PedestalTileEntity pedestal, ItemStack stack, FluidStack fluid)
