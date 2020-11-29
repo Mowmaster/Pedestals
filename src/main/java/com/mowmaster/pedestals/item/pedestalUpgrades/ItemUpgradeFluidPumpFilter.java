@@ -32,8 +32,10 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
@@ -145,6 +147,14 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
             BucketItem bI = (BucketItem) bucketIn.getItem();
             FluidStack fluidFromBucket = new FluidStack(bI.getFluid(), FluidAttributes.BUCKET_VOLUME,bI.getShareTag(bucketIn));
             if(fluidFromBucket.isFluidEqual(fluidIn))
+            {
+                return true;
+            }
+        }
+        else if (FluidUtil.getFluidHandler(bucketIn).isPresent())
+        {
+            LazyOptional<IFluidHandlerItem> handler = FluidUtil.getFluidHandler(bucketIn);
+            if(handler.resolve().get().getFluidInTank(0).isFluidEqual(fluidIn))
             {
                 return true;
             }

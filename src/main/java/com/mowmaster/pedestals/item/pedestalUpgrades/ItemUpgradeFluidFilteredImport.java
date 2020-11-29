@@ -116,6 +116,7 @@ public class ItemUpgradeFluidFilteredImport extends ItemUpgradeBaseFluid
     {
         boolean returner = false;
         BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
+        //System.out.println("Incoming luid : "+fluidIncoming.getDisplayName().getString());
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
         if(cap.isPresent())
@@ -148,6 +149,14 @@ public class ItemUpgradeFluidFilteredImport extends ItemUpgradeBaseFluid
             BucketItem bI = (BucketItem) bucketIn.getItem();
             FluidStack fluidFromBucket = new FluidStack(bI.getFluid(), FluidAttributes.BUCKET_VOLUME,bI.getShareTag(bucketIn));
             if(fluidFromBucket.isFluidEqual(fluidIn))
+            {
+                return true;
+            }
+        }
+        else if (FluidUtil.getFluidHandler(bucketIn).isPresent())
+        {
+            LazyOptional<IFluidHandlerItem> handler = FluidUtil.getFluidHandler(bucketIn);
+            if(handler.resolve().get().getFluidInTank(0).isFluidEqual(fluidIn))
             {
                 return true;
             }

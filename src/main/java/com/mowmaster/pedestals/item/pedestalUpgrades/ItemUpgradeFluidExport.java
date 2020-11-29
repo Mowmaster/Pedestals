@@ -174,10 +174,13 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                                 {
                                     estFluidToFill = new FluidStack(fluidMatching,fluidToActuallyFill);
                                     int fluidDrained = fluidHandlerItem.fill(estFluidToFill,IFluidHandler.FluidAction.SIMULATE);
-                                    removeFluid(pedestal,coinInPedestal,fluidDrained,false);
                                     ItemStack returnerStack = fluidHandlerItem.getContainer();
-                                    pedestal.removeItemOverRide();
-                                    pedestal.addItem(returnerStack);
+                                    if(!returnerStack.isEmpty())
+                                    {
+                                        removeFluid(pedestal,coinInPedestal,fluidDrained,false);
+                                        pedestal.removeItemOverRide();
+                                        pedestal.addItem(returnerStack);
+                                    }
                                 }
                             }
                         }
@@ -206,10 +209,13 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                                 {
                                     estFluidToFill = new FluidStack(fluidInCoin,fluidToActuallyFill);
                                     int fluidDrained = fluidHandlerItem.fill(estFluidToFill,IFluidHandler.FluidAction.EXECUTE);
-                                    removeFluid(pedestal,coinInPedestal,fluidDrained,false);
                                     ItemStack returnerStack = fluidHandlerItem.getContainer();
-                                    pedestal.removeItemOverRide();
-                                    pedestal.addItem(returnerStack);
+                                    if(!returnerStack.isEmpty())
+                                    {
+                                        removeFluid(pedestal,coinInPedestal,fluidDrained,false);
+                                        pedestal.removeItemOverRide();
+                                        pedestal.addItem(returnerStack);
+                                    }
                                 }
                             }
                         }
