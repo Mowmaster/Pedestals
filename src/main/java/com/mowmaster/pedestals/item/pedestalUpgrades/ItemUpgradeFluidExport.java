@@ -41,6 +41,11 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
     }
 
     @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
+    @Override
     public boolean canSendItem(PedestalTileEntity tile)
     {
         if(tile !=null)

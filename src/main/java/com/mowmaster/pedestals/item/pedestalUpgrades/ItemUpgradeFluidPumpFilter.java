@@ -60,6 +60,11 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getHeight(ItemStack stack)
     {
         int height = 1;

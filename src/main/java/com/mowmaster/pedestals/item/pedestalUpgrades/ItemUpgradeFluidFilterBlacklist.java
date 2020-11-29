@@ -39,6 +39,11 @@ public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
     }
 
     @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
+    @Override
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
         return 0;
