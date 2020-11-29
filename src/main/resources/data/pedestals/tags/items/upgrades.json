@@ -40,6 +40,7 @@
     "pedestals:coin/fluidrelay",
     "pedestals:coin/fluidfilter",
     "pedestals:coin/fluidfilterblacklist",
+    "pedestals:coin/fluidfilteredimport",
     "pedestals:coin/fluidpumpfilter",
     "pedestals:coin/fluidpumpfilterblacklist",
     "pedestals:coin/export",

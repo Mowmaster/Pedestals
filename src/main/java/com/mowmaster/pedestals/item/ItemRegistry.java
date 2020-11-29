@@ -69,6 +69,7 @@ public class ItemRegistry
         ItemUpgradeFluidRelay.onItemRegistryReady(e);
         ItemUpgradeFluidFilter.onItemRegistryReady(e);
         ItemUpgradeFluidFilterBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFluidFilteredImport.onItemRegistryReady(e);
         ItemUpgradeFluidPumpFilter.onItemRegistryReady(e);
         ItemUpgradeFluidPumpFilterBlacklist.onItemRegistryReady(e);
 
