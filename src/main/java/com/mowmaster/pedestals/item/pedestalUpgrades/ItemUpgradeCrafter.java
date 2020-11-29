@@ -284,7 +284,10 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.mergeStyle(TextFormatting.GOLD);
+        tooltip.add(t);
+
         int s2 = getItemTransferRate(stack);
         String trr = getSmeltingSpeedString(stack);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
