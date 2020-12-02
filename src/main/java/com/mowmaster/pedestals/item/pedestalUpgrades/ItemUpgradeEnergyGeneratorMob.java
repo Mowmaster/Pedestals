@@ -1,35 +1,48 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FlowerBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.SwordItem;
+import net.minecraft.loot.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -66,16 +79,9 @@ public class ItemUpgradeEnergyGeneratorMob extends ItemUpgradeBaseEnergy
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                 //only run 1 per second
-                    if(getFuelStored(coinInPedestal)>0 && getEnergyStored(coinInPedestal) < getEnergyBuffer(coinInPedestal))
-                    {
-                        if (world.getGameTime()%5 == 0) {
-                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ(),145,145,145));
-                        }
-
-                        if (world.getGameTime()%20 == 0) {
-                            upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
-                        }
-                    }
+                if (world.getGameTime()%20 == 0) {
+                    upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
+                }
             }
         }
     }
@@ -109,6 +115,55 @@ public class ItemUpgradeEnergyGeneratorMob extends ItemUpgradeBaseEnergy
         Effects on the generator that maybe shows the diversity or difficulty.
         Generator running effects???
          */
+
+
+        /*
+        With this first test of getting mobs in the area, we can get attributes and the loot table, which is awesome.
+        Basically with this since for whatever reason the loot tabel thing likes to return ItemStack.EMPTY we could just
+        Have the generator run the code until it gets a result, and maybe have a counter so if it doesnt get a result after ~5-10 runs then default it to something.
+        In theory if we just went with a custom recipe handler based off the mobs registry info (somehow) then packs could specify the specific drops of any entity, and if they didnt
+        then i could just assume the drops based off the loot table.
+        The generator maybe needs to store a list of the mobs at which location, so we can then randomly pick a location, check if the mob is still alive(attach a custom attribute???), and if so we could just store the drop item so we dont have to request it each time.
+
+        To get a drop to display i might need to make a custom renderer,
+
+        BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,1,3);
+        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,1,3);
+
+        AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+        List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
+        for(LivingEntity getEntityFromList : entityList)
+        {
+            System.out.println(getEntityFromList.getDisplayName().getString());
+            System.out.println(getEntityFromList.getLootTableResourceLocation());
+            System.out.println(getEntityFromList.getAttribute(Attributes.MAX_HEALTH).getValue());
+
+            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
+            if (itemInPedestal.getItem() instanceof SwordItem) {
+                fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
+            }
+            DamageSource source = DamageSource.causePlayerDamage(fakePlayer);
+            LootTable table = world.getServer().getLootTableManager().getLootTableFromLocation(getEntityFromList.getLootTableResourceLocation());
+            LootContext.Builder context = new LootContext.Builder((ServerWorld) world)
+                    .withRandom(world.rand)
+                    .withParameter(LootParameters.THIS_ENTITY, getEntityFromList)
+                    .withParameter(LootParameters.DAMAGE_SOURCE, source)
+                    .withParameter(LootParameters.field_237457_g_, new Vector3d(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))
+                    .withParameter(LootParameters.KILLER_ENTITY, fakePlayer)
+                    .withParameter(LootParameters.LAST_DAMAGE_PLAYER, fakePlayer)
+                    .withNullableParameter(LootParameters.DIRECT_KILLER_ENTITY, fakePlayer);
+            //table.generate(context.build(LootParameterSets.ENTITY)).forEach(stack -> System.out.println(stack.getDisplayName().getString()));
+
+            ItemStack stackDrop = ItemStack.EMPTY;
+            stackDrop = IntStream.range(0,table.generate(context.build(LootParameterSets.ENTITY)).size())//Int Range
+                    .mapToObj(table.generate(context.build(LootParameterSets.ENTITY))::get)//Function being applied to each interval
+                    .filter(itemStack -> !itemStack.isEmpty())
+                    .findFirst().orElse(ItemStack.EMPTY);
+            System.out.println(stackDrop.getDisplayName().getString());
+
+        }
+        */
     }
 
 
