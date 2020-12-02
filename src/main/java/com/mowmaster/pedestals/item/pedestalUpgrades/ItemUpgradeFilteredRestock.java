@@ -73,12 +73,13 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
                             .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
                             .filter(itemStack -> !itemStack.isEmpty())
                             .filter(itemStack -> itemStack.getCount() != itemStack.getMaxStackSize())
+                            .filter(itemStack -> doItemsMatch(itemStack,itemStackIncoming))
                             .filter(itemStack -> (itemStack.getCount()+inPedestal.getCount())<=itemStack.getMaxStackSize())
                             .findFirst().orElse(ItemStack.EMPTY);
 
                     if(!stack.isEmpty())
                     {
-                        if((stack.getCount()+inPedestal.getCount())<=itemStackIncoming.getMaxStackSize())
+                        if((stack.getCount()+inPedestal.getCount())<itemStackIncoming.getMaxStackSize())
                         {
                             return itemStackIncoming.getMaxStackSize()-(stack.getCount()+inPedestal.getCount());
                         }
