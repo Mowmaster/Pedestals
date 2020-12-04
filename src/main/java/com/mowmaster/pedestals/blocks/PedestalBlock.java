@@ -505,7 +505,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                 PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
 
                                 //checks if connecting pedestal is out of range of the senderPedestal
-                                /*if(linkingTool.isPedestalInRange(tilePedestal,linkingTool.getStoredPosition(offhand)))
+                                if(linkingTool.isPedestalInRange(tilePedestal,linkingTool.getStoredPosition(offhand)))
                                 {
                                     //Checks if pedestals to be linked are on same networks or if one is neutral
                                     if(tilePedestal.canLinkToPedestalNetwork(linkingTool.getStoredPosition(offhand)))
@@ -527,7 +527,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                     }
                                     else player.sendMessage(linknetwork,Util.DUMMY_UUID);
                                 }
-                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);*/
+                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);
                             }
                         }
                     }
