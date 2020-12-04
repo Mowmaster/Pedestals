@@ -193,6 +193,7 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                 }
 
                                 int intCraftingSlot = 0;
+                                int intCurrentEstFluidUsed = 0;
                                 for(int i = intSlotToStartFrom; i < intSlotToEndBefore; i++) {
                                     ItemStack stackItemInSlot = handler.getStackInSlot(i);
 
@@ -204,11 +205,12 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                         craftAvailable.setInventorySlotContents(intCraftingSlot, ItemStack.EMPTY);
                                         intCraftingSlot++;
                                     }
-                                    if(stackItemInSlot.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER_BUCKET))
+                                    else if(stackItemInSlot.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER_BUCKET))
                                     {
                                         //Make the recipe invalid if no fluid exists???
                                         ItemStack bucketStack = new ItemStack(Items.BARRIER);
-                                        if(removeFluid(pedestal,coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
+                                        intCurrentEstFluidUsed+=FluidAttributes.BUCKET_VOLUME;
+                                        if(removeFluid(pedestal,coinInPedestal,intCurrentEstFluidUsed,true))
                                         {
                                             FluidStack fluidToBucket = getFluidStored(coinInPedestal);
                                             Item bucket = fluidToBucket.getFluid().getFilledBucket();
@@ -238,6 +240,72 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                         intCraftingSlot++;
                                     }
                                 }
+                                /*// Get Next iteration to craft
+                                int intGetNextIteration = getIntValueFromPedestal(world,posOfPedestal);//Default value is 0
+                                if(intGetNextIteration == 0)
+                                {
+                                    intGetNextIteration = 1;
+                                }
+                                int intSlotToStartFrom = (intGetNextIteration*intGridCount)-intGridCount;//use int i= intSlotToStartFrom in for-loop
+                                //If starting slot will be bigger then our inventory size
+                                int intSlotToEndBefore = (intGetNextIteration*intGridCount);//use i < intSlotToEndBefore in for-loop
+                                //if ending slot is > then total slots then it would error, so reset things
+                                if(intSlotToEndBefore > intInventorySlotCount)
+                                {
+                                    //reset back to 1
+                                    intGetNextIteration = 1;
+                                    intSlotToStartFrom = (intGetNextIteration*intGridCount)-intGridCount;//use int i= intSlotToStartFrom in for-loop
+                                    intSlotToEndBefore = (intGetNextIteration*intGridCount);//use i < intSlotToEndBefore in for-loop
+                                }
+
+                                int intCraftingSlot = 0;
+                                //int intCurrentEstFluidUsed = 0;
+                                for(int i = intSlotToStartFrom; i < intSlotToEndBefore; i++) {
+                                    ItemStack stackItemInSlot = handler.getStackInSlot(i);
+
+                                    //If the item Stack has enough items to craft with
+                                    //stack.getCount()>=2 ||  stack.getMaxStackSize()==1 ||
+                                    if(stackItemInSlot.isEmpty() ||stackItemInSlot.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER))
+                                    {
+                                        craft.setInventorySlotContents(intCraftingSlot, ItemStack.EMPTY);
+                                        craftAvailable.setInventorySlotContents(intCraftingSlot, ItemStack.EMPTY);
+                                        intCraftingSlot++;
+                                    }
+                                    if(stackItemInSlot.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER_BUCKET))
+                                    {
+                                        //Make the recipe invalid if no fluid exists???
+                                        ItemStack bucketStack = new ItemStack(Items.BARRIER);
+                                        //intCurrentEstFluidUsed+=FluidAttributes.BUCKET_VOLUME;
+                                        if(removeFluid(pedestal,coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
+                                        {
+                                            FluidStack fluidToBucket = getFluidStored(coinInPedestal);
+                                            Item bucket = fluidToBucket.getFluid().getFilledBucket();
+                                            bucketStack = new ItemStack(bucket);
+                                        }
+                                        craft.setInventorySlotContents(intCraftingSlot, bucketStack);
+                                        craftAvailable.setInventorySlotContents(intCraftingSlot, bucketStack);
+                                        intCraftingSlot++;
+                                    }
+                                    else if(stackItemInSlot.getMaxStackSize()==1 || stackItemInSlot.isDamageable())
+                                    {
+                                        //Since recipe has a container item we have to limit it to 1 craft
+                                        intBatchCraftingSize = 1;
+                                        craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                        craftAvailable.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                        intCraftingSlot++;
+                                    }
+                                    //first check if an item is in the slot
+                                    else if(stackItemInSlot.getCount() > 0)
+                                    {
+                                        //next check to make sure we have more than enough to craft the recipe
+                                        if(stackItemInSlot.getCount() > (intBatchCraftingSize))
+                                        {
+                                            craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                        }
+                                        craftAvailable.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                        intCraftingSlot++;
+                                    }
+                                }*/
 
 
                                 //Checks to make sure we have enough slots set for out recipe
