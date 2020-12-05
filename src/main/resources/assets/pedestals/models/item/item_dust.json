@@ -4,6 +4,7 @@
     "crystal_cores": "#core",
     "crystal_sides": "#side"
   },
+  "gui_light": "front",
   "elements": [
     {
       "__comment": "pedestals_core",
