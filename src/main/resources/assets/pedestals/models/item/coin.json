@@ -4,6 +4,7 @@
 		"1": "#letter",
 		"particle": "#part"
 	},
+	"gui_light": "front",
 	"elements": [
 		{
 			"name": "middle",

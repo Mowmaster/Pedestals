@@ -4,6 +4,7 @@
 		"1": "pedestals:items/bookguide_top",
 		"particle": "pedestals:items/bookguide"
 	},
+	"gui_light": "front",
 	"elements": [
 		{
 			"name": "cube",

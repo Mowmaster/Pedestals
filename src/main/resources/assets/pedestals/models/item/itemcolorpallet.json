@@ -4,6 +4,7 @@
 		"0": "pedestals:items/colorpallet",
 		"particle": "pedestals:items/colorpallet"
 	},
+	"gui_light": "front",
 	"elements": [
 		{
 			"from": [4, 4, 7],
