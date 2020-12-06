@@ -53,7 +53,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     public int getEnergyTransferRate(ItemStack stack)
     {
         //im assuming # = rf value???
-        int energyTransferRate = 1000;
+        /*int energyTransferRate = 1000;
         switch (getCapacityModifier(stack))
         {
 
@@ -78,7 +78,8 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
             default: energyTransferRate=1000;
         }
 
-        return  energyTransferRate;
+        return  energyTransferRate;*/
+        return 20000;
     }
 
     public static boolean isEnergyItem(ItemStack itemToCheck)
