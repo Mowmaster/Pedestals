@@ -135,12 +135,13 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
         for(ItemEntity getItemFromList : itemList)
         {
             ItemStack copyStack = getItemFromList.getItem().copy();
+            int maxStackSize = copyStack.getMaxStackSize();
             if (itemInPedestal.equals(ItemStack.EMPTY))
             {
                 world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                 if(pedestalInv instanceof PedestalTileEntity) {
-                    if(copyStack.getCount() <=64)
+                    if(copyStack.getCount() <=maxStackSize)
                     {
                         getItemFromList.setItem(ItemStack.EMPTY);
                         getItemFromList.remove();
@@ -150,8 +151,8 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
                     {
                         //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
                         int count = getItemFromList.getItem().getCount();
-                        getItemFromList.getItem().setCount(count-64);
-                        copyStack.setCount(64);
+                        getItemFromList.getItem().setCount(count-maxStackSize);
+                        copyStack.setCount(maxStackSize);
                         ((PedestalTileEntity) pedestalInv).addItem(copyStack);
                     }
                 }

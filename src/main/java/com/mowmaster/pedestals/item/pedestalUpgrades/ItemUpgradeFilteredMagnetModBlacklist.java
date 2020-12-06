@@ -42,12 +42,54 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptRange() {return true;}
+
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
         int aW = getAreaModifier(stack);
         areaWidth = ((aW)+1);
         return  areaWidth;
+    }
+
+    public int getRangeHeight(ItemStack stack)
+    {
+        return getHeight(stack);
+    }
+
+    public int getHeight(ItemStack stack)
+    {
+        int height = 3;
+        switch (getRangeModifier(stack))
+        {
+            case 0:
+                height = 3;
+                break;
+            case 1:
+                height=5;
+                break;
+            case 2:
+                height = 7;
+                break;
+            case 3:
+                height = 9;
+                break;
+            case 4:
+                height = 11;
+                break;
+            case 5:
+                height=13;
+                break;
+            default: height=3;
+        }
+
+        return  height;
     }
 
     @Override
@@ -59,7 +101,7 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
-        return new int[]{((2*getAreaWidth(coin))+1),0};
+        return new int[]{getRangeHeight(coin),0};
     }
 
     @Override
@@ -89,7 +131,7 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
-        int height = (2*width)+1;
+        int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
 
@@ -99,6 +141,7 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
         for(ItemEntity getItemFromList : itemList)
         {
             ItemStack copyStack = getItemFromList.getItem().copy();
+            int maxStackSize = copyStack.getMaxStackSize();
             ItemStack getItemStack = ((ItemEntity) getItemFromList).getItem();
             if (itemInPedestal.equals(ItemStack.EMPTY))
             {
@@ -123,7 +166,7 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
                             world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                             if(pedestalInv instanceof PedestalTileEntity) {
-                                if(copyStack.getCount() <=64)
+                                if(copyStack.getCount() <=maxStackSize)
                                 {
                                     getItemFromList.setItem(ItemStack.EMPTY);
                                     getItemFromList.remove();
@@ -133,8 +176,8 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
                                 {
                                     //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
                                     int count = getItemFromList.getItem().getCount();
-                                    getItemFromList.getItem().setCount(count-64);
-                                    copyStack.setCount(64);
+                                    getItemFromList.getItem().setCount(count-maxStackSize);
+                                    copyStack.setCount(maxStackSize);
                                     ((PedestalTileEntity) pedestalInv).addItem(copyStack);
                                 }
                             }
@@ -196,11 +239,12 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
+        String trr = "" + getRangeHeight(stack) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString(tr);
+        area.appendString(trr);
         area.appendString(areax.getString());
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
