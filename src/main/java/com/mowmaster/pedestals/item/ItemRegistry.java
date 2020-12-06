@@ -51,6 +51,7 @@ public class ItemRegistry
         ItemUpgradeExpGrindstone.onItemRegistryReady(e);
 
         ItemUpgradeEnergyGenerator.onItemRegistryReady(e);
+        ItemUpgradeEnergyGeneratorExp.onItemRegistryReady(e);
         ItemUpgradeEnergyGeneratorMob.onItemRegistryReady(e);
         ItemUpgradeEnergyImport.onItemRegistryReady(e);
         ItemUpgradeEnergyExport.onItemRegistryReady(e);

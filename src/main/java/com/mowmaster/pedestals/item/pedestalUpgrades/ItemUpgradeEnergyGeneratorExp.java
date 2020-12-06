@@ -1,17 +1,22 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -25,58 +30,66 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
+public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
 {
 
-    public ItemUpgradeEnergyGenerator(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeEnergyGeneratorExp(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
-    @Override
-    public Boolean canAcceptCapacity() {
-        return true;
-    }
-
-    public double getCapicityModifier(ItemStack stack)
+    public double getEnchantmentCapacityModifier(PedestalTileEntity pedestalTileEntity)
     {
-        double intModifier = 1.0;
-        switch (getCapacityModifier(stack))
-        {
-            case 0:
-                intModifier = 1.0;
-                break;
-            case 1:
-                intModifier=0.9;
-                break;
-            case 2:
-                intModifier = 0.8;
-                break;
-            case 3:
-                intModifier = 0.7;
-                break;
-            case 4:
-                intModifier = 0.6;
-                break;
-            case 5:
-                intModifier=0.5;
-                break;
-            default: intModifier=1.0;
-        }
+        double rate = (double)((getEnchantmentPowerFromSorroundings(pedestalTileEntity))*0.01);
+        double rater = (rate > 0.9)?(0.9):(rate);
 
-        return  intModifier;
+        return  (1.0-rater);
     }
 
     public int getEnergyBuffer(ItemStack stack) {
-        return  40000;
+        int speed = getOperationSpeed(stack);
+        double fuelSpeedMultiplier = Math.floor(getFuelStored(stack)/55800)*2;
+        double speedMultiplier = (20/speed)*((fuelSpeedMultiplier>=1)?(fuelSpeedMultiplier):(1));
+        return  (int)(3200*speedMultiplier);
+    }
+
+    public float getEnchantmentPowerFromSorroundings(PedestalTileEntity pedestalTileEntity)
+    {
+        World world = pedestalTileEntity.getWorld();
+        BlockPos posOfPedestal = pedestalTileEntity.getPos();
+
+        float enchantPower = 0;
+
+        for (int i = -2; i <= 2; ++i) {
+            for (int j = -2; j <= 2; ++j) {
+                if (i > -2 && i < 2 && j == -1) {
+                    j = 2;
+                }
+                for (int k = 0; k <= 2; ++k) {
+                    BlockPos blockpos = posOfPedestal.add(i, k, j);
+                    BlockState blockNearBy = world.getBlockState(blockpos);
+                    if (blockNearBy.getBlock().getEnchantPowerBonus(blockNearBy, world, blockpos)>0)
+                    {
+                        enchantPower +=blockNearBy.getBlock().getEnchantPowerBonus(blockNearBy, world, blockpos);
+                    }
+                }
+            }
+        }
+
+        /*if((int)(enchantPower*2) > getMaxEnchantLevel)
+        {
+            enchantPower = (float)(getMaxEnchantLevel/2);
+        }*/
+
+        return enchantPower;
     }
 
     public void updateAction(PedestalTileEntity pedestal)
@@ -103,17 +116,22 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
                         }
 
                         if (world.getGameTime()%20 == 0) {
-                            upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
+                            upgradeAction(pedestal);
                         }
                     }
             }
         }
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
+
+    public void upgradeAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        BlockPos posOfPedestal = pedestal.getPos();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         int speed = getOperationSpeed(coinInPedestal);
-        double capacityRate = getCapicityModifier(coinInPedestal);
+        double capacityRate = getEnchantmentCapacityModifier(pedestal);
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 
@@ -121,7 +139,8 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         //20k per 1 coal is base fuel value (2500 needed in mod to process 1 item)
         //1 coal takes 1600 ticks to process default??? furnace uses 2500 per 10 seconds by default
         //so 12.5 energy per tick (250/sec)
-        double speedMultiplier = (20/speed);
+        double fuelSpeedMultiplier = Math.floor(getFuelStored(coinInPedestal)/55800)*2;
+        double speedMultiplier = (20/speed)*((fuelSpeedMultiplier>=1)?(fuelSpeedMultiplier):(1));
         int baseFuel = (int) (20 * speedMultiplier);
         int fuelConsumed = (int) Math.round(baseFuel * capacityRate);
         if(removeFuel(world,posOfPedestal,fuelConsumed,true))
@@ -293,13 +312,31 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         return false;
     }
 
-    public static int getItemFuelBurnTime(ItemStack fuel)
+    public int getItemsExpDisenchantAmount(ItemStack stack)
     {
-        if (fuel.isEmpty()) return 0;
+        int exp = 0;
+        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
+        for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
+            Enchantment enchantment = entry.getKey();
+            Integer integer = entry.getValue();
+
+            exp += enchantment.getMinEnchantability(integer.intValue());
+        }
+        return exp;
+    }
+
+    public int getItemFuelBurnTime(ItemStack fuel)
+    {
+        //TODO: add config for this later
+        int expToFuelModifier = 40;
+        if(!fuel.isEnchanted())return 0;
+        else if(fuel.getItem() instanceof EnchantedBookItem)
+        {
+            return (getItemsExpDisenchantAmount(fuel)*expToFuelModifier);
+        }
         else
         {
-            int burnTime = ForgeHooks.getBurnTime(fuel);
-            return burnTime;
+            return (getItemsExpDisenchantAmount(fuel)*expToFuelModifier);
         }
     }
 
@@ -310,26 +347,67 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         {
             if(!world.isBlockPowered(posPedestal))
             {
-                if(entityIn instanceof ItemEntity)
+                ItemStack itemInPedetsal = tilePedestal.getItemInPedestal();
+                if(itemInPedetsal.isEmpty())
                 {
-                    ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
-                    if(getItemFuelBurnTime(getItemStack)>0)
+                    if(entityIn instanceof ItemEntity)
                     {
-                        int getBurnTimeForStack = getItemFuelBurnTime(getItemStack) * getItemStack.getCount();
-                        if(addFuel(tilePedestal,getBurnTimeForStack,true))
+                        ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
+                        if(getItemFuelBurnTime(getItemStack)>0)
                         {
-                            addFuel(tilePedestal,getBurnTimeForStack,false);
-                            if(getItemStack.getItem().equals(Items.LAVA_BUCKET))
+                            int getBurnTimeForStack = getItemFuelBurnTime(getItemStack) * getItemStack.getCount();
+                            Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
+                            ItemStack stackToReturn = (getItemStack.getItem() instanceof EnchantedBookItem)?(new ItemStack(Items.BOOK,1)):(getItemStack.copy());
+                            stackToReturn.setCount(1);
+                            EnchantmentHelper.setEnchantments(enchantsNone,stackToReturn);
+                            if(!stackToReturn.isEmpty())
                             {
-                                ItemStack getReturned = new ItemStack(Items.BUCKET,getItemStack.getCount());
-                                ItemEntity items1 = new ItemEntity(world, posPedestal.getX() + 0.5, posPedestal.getY() + 1.0, posPedestal.getZ() + 0.5, getReturned);
-                                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                entityIn.remove();
-                                world.addEntity(items1);
+                                if(addFuel(tilePedestal,getBurnTimeForStack,true))
+                                {
+                                    addFuel(tilePedestal,getBurnTimeForStack,false);
+                                    world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                    entityIn.remove();
+                                    tilePedestal.addItem(stackToReturn);
+                                }
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-                            world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.BLOCK_FIRE_AMBIENT, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                            entityIn.remove();
+    @Override
+    public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
+    {
+        super.onRandomDisplayTick(pedestal,tick,stateIn,world,pos,rand);
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        float level = getEnchantmentPowerFromSorroundings(pedestal);
+
+        if(!world.isBlockPowered(pos))
+        {
+            for (int i = -2; i <= 2; ++i)
+            {
+                for (int j = -2; j <= 2; ++j)
+                {
+                    if (i > -2 && i < 2 && j == -1)
+                    {
+                        j = 2;
+                    }
+
+                    if (rand.nextInt(16) == 0)
+                    {
+                        for (int k = 0; k <= 2; ++k)
+                        {
+                            BlockPos blockpos = pos.add(i, k, j);
+
+                            if (world.getBlockState(blockpos).getEnchantPowerBonus(world, pos) > 0) {
+                                if (!world.isAirBlock(pos.add(i / 2, 0, j / 2))) {
+                                    break;
+                                }
+
+                                world.addParticle(ParticleTypes.ENCHANT, (double)pos.getX() + 0.5D, (double)pos.getY() + 2.0D, (double)pos.getZ() + 0.5D, (double)((float)i + rand.nextFloat()) - 0.5D, (double)((float)k - rand.nextFloat() - 1.0F), (double)((float)j + rand.nextFloat()) - 0.5D);
+                            }
                         }
                     }
                 }
@@ -359,15 +437,15 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         player.sendMessage(xpstored,Util.DUMMY_UUID);
 
         int opSpeed = getOperationSpeed(stack);
-        double capacityRate = getCapicityModifier(stack);
-        double speedMultiplier = (20/opSpeed);
+        double fuelSpeedMultiplier = Math.floor(getFuelStored(stack)/55800)*2;
+        double speedMultiplier = (20/opSpeed)*((fuelSpeedMultiplier>=1)?(fuelSpeedMultiplier):(1));
         int rfPerTick = (int) (12.5 * speedMultiplier);
         TranslationTextComponent energyRate = new TranslationTextComponent(getTranslationKey() + ".chat_rfrate");
         energyRate.appendString(""+ rfPerTick +"");
         energyRate.mergeStyle(TextFormatting.AQUA);
         player.sendMessage(energyRate,Util.DUMMY_UUID);
 
-        int capacityRateModified = (int)(Math.round((1.0 - getCapicityModifier(stack))* 100));
+        int capacityRateModified = (int)(Math.round((1.0 - getEnchantmentCapacityModifier(pedestal))* 100));
         TranslationTextComponent rate2 = new TranslationTextComponent(getTranslationKey() + ".chat_rfrate2");
         rate2.appendString("" + capacityRateModified + "%");
         rate2.mergeStyle(TextFormatting.GRAY);
@@ -405,16 +483,17 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         tooltip.add(xpcapacity);
 
         int opSpeed = getOperationSpeed(stack);
-        double speedMultiplier = (20/opSpeed);
+        double fuelSpeedMultiplier = Math.floor(getFuelStored(stack)/55800)*2;
+        double speedMultiplier = (20/opSpeed)*((fuelSpeedMultiplier>=1)?(fuelSpeedMultiplier):(1));
         int rfPerTick = (int) (12.5 * speedMultiplier);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString("" + rfPerTick + "");
         rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
-        int capacityRate = (int)(Math.round((1.0 - getCapicityModifier(stack))* 100));
         TranslationTextComponent rate2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate2");
-        rate2.appendString("" + capacityRate + "%");
+        //Its 0% unless theres bookshelves around it LOL
+        rate2.appendString("" + 0 + "%");
         rate2.mergeStyle(TextFormatting.DARK_GRAY);
         tooltip.add(rate2);
 
@@ -424,12 +503,12 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         tooltip.add(speed);
     }
 
-    public static final Item RFFUELGEN = new ItemUpgradeEnergyGenerator(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rffuelgen"));
+    public static final Item RFEXPGEN = new ItemUpgradeEnergyGeneratorExp(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfexpgen"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(RFFUELGEN);
+        event.getRegistry().register(RFEXPGEN);
     }
 
 
