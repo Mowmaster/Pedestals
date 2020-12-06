@@ -25,6 +25,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -130,6 +131,28 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         return getAreaWidth(coin);
     }
 
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            int width = getAreaWidth(pedestal.getCoinOnPedestal());
+            int height = getRangeHeight(pedestal.getCoinOnPedestal());
+            int amount = blocksToMineInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
+            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            if(amount>0)
+            {
+                float f = (float)amount/(float)area;
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
+    }
+
     public int ticked = 0;
 
     public void updateAction(PedestalTileEntity pedestal)
@@ -140,7 +163,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            int getMaxFuelValue = Integer.MAX_VALUE;
+            int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int rangeWidth = getAreaWidth(coinInPedestal);

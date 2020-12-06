@@ -38,7 +38,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 {
-    private int maxStored = Integer.MAX_VALUE;
+    private int maxStored = 2000000000;
 
     public ItemUpgradeCobbleGen(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 

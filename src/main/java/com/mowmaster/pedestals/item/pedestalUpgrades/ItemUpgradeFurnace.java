@@ -79,7 +79,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            int getMaxFuelValue = Integer.MAX_VALUE;
+            int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int speed = getSmeltingSpeed(coinInPedestal);
