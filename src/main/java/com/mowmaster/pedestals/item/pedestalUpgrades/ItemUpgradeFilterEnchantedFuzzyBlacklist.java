@@ -26,6 +26,9 @@ public class ItemUpgradeFilterEnchantedFuzzyBlacklist extends ItemUpgradeBaseFil
 {
     public ItemUpgradeFilterEnchantedFuzzyBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
     public void updateAction(PedestalTileEntity pedestal)
     {
 

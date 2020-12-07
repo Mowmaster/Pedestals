@@ -21,6 +21,9 @@ public class ItemUpgradeFilterItemBlacklist extends ItemUpgradeBaseFilter
 {
     public ItemUpgradeFilterItemBlacklist(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
     public void updateAction(PedestalTileEntity pedestal)
     {
 

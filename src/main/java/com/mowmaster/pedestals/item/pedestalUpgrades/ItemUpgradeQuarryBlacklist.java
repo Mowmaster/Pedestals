@@ -71,6 +71,9 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;

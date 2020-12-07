@@ -26,6 +26,9 @@ public class ItemUpgradeFilterEnchantedExact extends ItemUpgradeBaseFilter
 {
     public ItemUpgradeFilterEnchantedExact(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
     public void updateAction(PedestalTileEntity pedestal)
     {
 

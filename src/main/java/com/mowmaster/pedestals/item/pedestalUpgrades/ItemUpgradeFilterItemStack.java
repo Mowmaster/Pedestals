@@ -21,6 +21,9 @@ public class ItemUpgradeFilterItemStack extends ItemUpgradeBaseFilter
 {
     public ItemUpgradeFilterItemStack(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
     public void updateAction(PedestalTileEntity pedestal)
     {
 

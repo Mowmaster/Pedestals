@@ -36,6 +36,9 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
     public ItemUpgradeFilterEnchantedCount(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
+    @Override
     public Boolean canAcceptCapacity() {
         return true;
     }

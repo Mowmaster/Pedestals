@@ -68,6 +68,9 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;

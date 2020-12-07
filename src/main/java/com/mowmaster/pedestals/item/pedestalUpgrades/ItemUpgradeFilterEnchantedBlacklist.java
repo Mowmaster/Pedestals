@@ -18,6 +18,9 @@ public class ItemUpgradeFilterEnchantedBlacklist extends ItemUpgradeBaseFilter
 {
     public ItemUpgradeFilterEnchantedBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
     public void updateAction(PedestalTileEntity pedestal)
     {
 
