@@ -75,6 +75,7 @@ public class ItemRegistry
         ItemUpgradeFluidPumpFilter.onItemRegistryReady(e);
         ItemUpgradeFluidPumpFilterBlacklist.onItemRegistryReady(e);
         ItemUpgradeFluidCrafter.onItemRegistryReady(e);
+        ItemUpgradeMilker.onItemRegistryReady(e);
 
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeFilteredImport.onItemRegistryReady(e);
@@ -120,8 +121,6 @@ public class ItemRegistry
         ItemUpgradeAttacker.onItemRegistryReady(e);
         ItemUpgradeEffect.onItemRegistryReady(e);
         ItemUpgradeFan.onItemRegistryReady(e);
-
-        ItemUpgradeMilker.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);
 
         ItemDust.onItemRegistryReady(e);

@@ -516,12 +516,12 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         return false;
     }
 
-    public boolean addFluid(PedestalTileEntity pedestal, ItemStack stack, FluidStack fluid, boolean simulate)
+    public boolean addFluid(PedestalTileEntity pedestal, ItemStack coin, FluidStack fluid, boolean simulate)
     {
         CompoundNBT compound = new CompoundNBT();
-        if(stack.hasTag())
+        if(coin.hasTag())
         {
-            compound = stack.getTag();
+            compound = coin.getTag();
         }
 
         FluidStack old = FluidStack.loadFluidStackFromNBT(compound);
@@ -532,7 +532,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                 int currentAmount = old.getAmount();
                 int newAmount = fluid.getAmount() + currentAmount;
                 FluidStack newStack = new FluidStack(fluid,newAmount);
-                setFluidStored(pedestal,stack,newStack);
+                setFluidStored(pedestal,coin,newStack);
             }
             return true;
         }
