@@ -85,6 +85,8 @@
     "pedestals:coin/filterenchantedexactb",
     "pedestals:coin/filterenchantedfuzzy",
     "pedestals:coin/filterenchantedfuzzyb",
+    "pedestals:coin/rffuelgen",
+    "pedestals:coin/rfexpgen",
     "pedestals:coin/rfexport",
     "pedestals:coin/rfimport",
     "pedestals:coin/rfrelay",
