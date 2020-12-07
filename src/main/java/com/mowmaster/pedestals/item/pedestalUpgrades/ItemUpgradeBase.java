@@ -28,6 +28,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -58,6 +59,23 @@ public class ItemUpgradeBase extends Item {
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World worldIn, BlockPos pos, Random rand)
     {
 
+    }
+
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack itemstack = pedestal.getItemInPedestal();
+            if(!itemstack.isEmpty())
+            {
+                float f = (float)itemstack.getCount()/(float)Math.min(pedestal.getMaxStackSize(), itemstack.getMaxStackSize());
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
     }
 
     public boolean hasEnchant(ItemStack stack)
@@ -946,26 +964,6 @@ public class ItemUpgradeBase extends Item {
     public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
     {
         return false;
-    }
-
-    public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
-    {
-        int validBlocks = 0;
-
-        BlockPos negNums = getNegRangePos(world,pedestalPos,width,height);
-        BlockPos posNums = getPosRangePos(world,pedestalPos,width,height);
-        for (int x = negNums.getX(); x <= posNums.getX(); x++) {
-            for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
-                for (int y = negNums.getY(); y <= posNums.getY(); y++) {
-                    BlockPos blockToMinePos = new BlockPos(x, y, z);
-                    BlockState blockToMineState = world.getBlockState(blockToMinePos);
-                    if(!blockToMineState.getBlock().isAir(blockToMineState,world,blockToMinePos) && !(blockToMineState.getBlock() instanceof PedestalBlock) && canMineBlock(world, pedestalPos, blockToMineState.getBlock())
-                            && !(blockToMineState.getBlock() instanceof IFluidBlock || blockToMineState.getBlock() instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)validBlocks++;
-                }
-            }
-        }
-
-        return validBlocks;
     }
 
     @Override

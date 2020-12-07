@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ComparatorBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -17,12 +18,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.ComparatorTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -56,6 +59,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
 
     public int getEnergyBuffer(ItemStack stack) {
         int speed = getOperationSpeed(stack);
+        //55800 is 30 levels of exp as fuel 1395*40
         double fuelSpeedMultiplier = Math.floor(getFuelStored(stack)/55800)*2;
         double speedMultiplier = (20/speed)*((fuelSpeedMultiplier>=1)?(fuelSpeedMultiplier):(1));
         return  (int)(3200*speedMultiplier);
@@ -84,12 +88,25 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
             }
         }
 
-        /*if((int)(enchantPower*2) > getMaxEnchantLevel)
-        {
-            enchantPower = (float)(getMaxEnchantLevel/2);
-        }*/
-
         return enchantPower;
+    }
+
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            if(getFuelStored(coin)>0)
+            {
+                float f = (float)getFuelStored(coin)/(float)readMaxFuelFromNBT(coin);
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
     }
 
     public void updateAction(PedestalTileEntity pedestal)
@@ -101,7 +118,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
 
         if(!world.isRemote)
         {
-            int getMaxFuelValue = Integer.MAX_VALUE;
+            int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             if(!world.isBlockPowered(pedestalPos))
@@ -109,20 +126,19 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                 //only run 1 per second
-                    if(getFuelStored(coinInPedestal)>0 && getEnergyStored(coinInPedestal) < getEnergyBuffer(coinInPedestal))
-                    {
-                        if (world.getGameTime()%5 == 0) {
-                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ(),145,145,145));
-                        }
-
-                        if (world.getGameTime()%20 == 0) {
-                            upgradeAction(pedestal);
-                        }
+                if(getFuelStored(coinInPedestal)>0 && getEnergyStored(coinInPedestal) < getEnergyBuffer(coinInPedestal))
+                {
+                    if (world.getGameTime()%5 == 0) {
+                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ(),145,145,145));
                     }
+
+                    if (world.getGameTime()%20 == 0) {
+                        upgradeAction(pedestal);
+                    }
+                }
             }
         }
     }
-
 
     public void upgradeAction(PedestalTileEntity pedestal)
     {
@@ -329,15 +345,10 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
     {
         //TODO: add config for this later
         int expToFuelModifier = 40;
-        if(!fuel.isEnchanted())return 0;
-        else if(fuel.getItem() instanceof EnchantedBookItem)
-        {
+        if(fuel.isEnchanted() || fuel.getItem() instanceof EnchantedBookItem){
             return (getItemsExpDisenchantAmount(fuel)*expToFuelModifier);
         }
-        else
-        {
-            return (getItemsExpDisenchantAmount(fuel)*expToFuelModifier);
-        }
+        else return 0;
     }
 
     @Override
@@ -357,17 +368,17 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
                         {
                             int getBurnTimeForStack = getItemFuelBurnTime(getItemStack) * getItemStack.getCount();
                             Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
-                            ItemStack stackToReturn = (getItemStack.getItem() instanceof EnchantedBookItem)?(new ItemStack(Items.BOOK,1)):(getItemStack.copy());
+                            ItemStack stackToReturn = (getItemStack.getItem() instanceof EnchantedBookItem)?(new ItemStack(Items.BOOK)):(getItemStack.copy());
                             stackToReturn.setCount(1);
                             EnchantmentHelper.setEnchantments(enchantsNone,stackToReturn);
                             if(!stackToReturn.isEmpty())
                             {
-                                if(addFuel(tilePedestal,getBurnTimeForStack,true))
+                                if(addFuel(tilePedestal,getBurnTimeForStack,true) && tilePedestal.addItem(stackToReturn,true))
                                 {
                                     addFuel(tilePedestal,getBurnTimeForStack,false);
                                     world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     entityIn.remove();
-                                    tilePedestal.addItem(stackToReturn);
+                                    tilePedestal.addItem(stackToReturn,false);
                                 }
                             }
                         }

@@ -71,7 +71,7 @@ public class ItemUpgradeEnergyGeneratorMob extends ItemUpgradeBaseEnergy
 
         if(!world.isRemote)
         {
-            int getMaxFuelValue = Integer.MAX_VALUE;
+            int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             if(!world.isBlockPowered(pedestalPos))

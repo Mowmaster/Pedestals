@@ -553,9 +553,14 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack itemstack = pedestal.getItemInPedestal();
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            if(coin.getItem() instanceof ItemUpgradeBase)
+            {
+                return ((ItemUpgradeBase)coin.getItem()).getComparatorRedstoneLevel(worldIn,pos);
+            }
             if(!itemstack.isEmpty())
             {
-                float f = (float)itemstack.getCount()/(float)Math.min(64, itemstack.getMaxStackSize());
+                float f = (float)itemstack.getCount()/(float)Math.min(pedestal.getMaxStackSize(), itemstack.getMaxStackSize());
                 hasItem = MathHelper.floor(f*14.0F)+1;
             }
         }
@@ -606,7 +611,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         return BlockRenderType.MODEL;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    /*@OnlyIn(Dist.CLIENT)
     public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
         //Direction direction = stateIn.get(FACING);
         double d0 = (double)pos.getX() + 0.55D - (double)(rand.nextFloat() * 0.1F);
@@ -616,7 +621,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         if (rand.nextInt(5) == 0) {
             //worldIn.addParticle(ParticleTypes.END_ROD, d0 + (double)direction.getXOffset() * d3, d1 + (double)direction.getYOffset() * d3, d2 + (double)direction.getZOffset() * d3, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D, rand.nextGaussian() * 0.005D);
         }
-    }
+    }*/
 
     private static final ResourceLocation R_PEDESTAL_000 = new ResourceLocation(MODID, "pedestal/stone000");
     private static final ResourceLocation R_PEDESTAL_001 = new ResourceLocation(MODID, "pedestal/stone001");

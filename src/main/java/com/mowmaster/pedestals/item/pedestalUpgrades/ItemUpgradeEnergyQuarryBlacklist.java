@@ -25,6 +25,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -125,6 +126,29 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
     public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
     {
         return getAreaWidth(coin);
+    }
+
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            int width = getAreaWidth(coin);
+            int widthModified = (width*2)+1;
+            int height = getRangeHeight(coin);
+            int amount = blocksToMineInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
+            int area = Math.multiplyExact(Math.multiplyExact(widthModified,widthModified),height);
+            if(amount>0)
+            {
+                float f = (float)amount/(float)area;
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
     }
 
     public int ticked = 0;
@@ -293,6 +317,28 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                 break;
             }
         }
+    }
+
+    public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,height);
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,height);
+
+        for(int i=0;!resetCurrentPosInt(i,negNums,posNums);i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,negNums,posNums);
+            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToMineState = world.getBlockState(blockToMinePos);
+            Block blockToMine = blockToMineState.getBlock();
+            if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && canMineBlock(world, pedestalPos, blockToMine)
+                    && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
     }
 
     @Override

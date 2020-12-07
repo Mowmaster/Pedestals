@@ -324,6 +324,28 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         }
     }
 
+    public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,height);
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,height);
+
+        for(int i=0;!resetCurrentPosInt(i,negNums,posNums);i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,negNums,posNums);
+            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToMineState = world.getBlockState(blockToMinePos);
+            Block blockToMine = blockToMineState.getBlock();
+            if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && canMineBlock(world, pedestalPos, blockToMine)
+                    && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
+    }
+
     @Override
     public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
     {
