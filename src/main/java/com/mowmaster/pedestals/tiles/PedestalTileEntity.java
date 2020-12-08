@@ -131,6 +131,8 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                         //Return input power if it can be insert???
                         return maxReceive;
                     }
+                    //Else return availablespace???
+                    else return itemE.availableEnergySpaceInCoin(getCoinOnPedestal());
                 }
 
                 return 0;
@@ -146,6 +148,8 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                         //Return output power if it can be taken???
                         return maxExtract;
                     }
+                    //Else return currently stored energy???
+                    else return itemE.getEnergyStored(getCoinOnPedestal());
                 }
                 return 0;
             }

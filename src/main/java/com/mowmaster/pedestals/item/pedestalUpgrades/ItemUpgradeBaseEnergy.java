@@ -344,6 +344,23 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         }
     }
 
+    public int availableEnergySpaceInCoin(ItemStack coin)
+    {
+
+        int getMaxEnergy = readMaxEnergyFromNBT(coin);
+        int getCurrentEnergy = getEnergyStored(coin);
+        int difference = getMaxEnergy-getCurrentEnergy;
+
+        //If coin already has energy then get the difference
+        if(hasEnergy(coin))
+        {
+            return difference;
+        }
+
+        //Otherwise just return the max allowed
+        return getMaxEnergy;
+    }
+
 
     public boolean addEnergy(ItemStack coin, int energyIn, boolean simulate)
     {
