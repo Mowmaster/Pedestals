@@ -25,10 +25,9 @@ public class ItemEnchantableBook extends Item {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        Enchantment enchant = EnchantmentRegistry.CAPACITY;
         if(stack.getItem() instanceof ItemEnchantableBook)
         {
-            if(enchant.equals(EnchantmentRegistry.ADVANCED)||enchant.equals(EnchantmentRegistry.AREA)||enchant.equals(EnchantmentRegistry.CAPACITY)||enchant.equals(EnchantmentRegistry.OPERATIONSPEED)||enchant.equals(EnchantmentRegistry.RANGE))
+            if(enchantment.equals(EnchantmentRegistry.ADVANCED)||enchantment.equals(EnchantmentRegistry.AREA)||enchantment.equals(EnchantmentRegistry.CAPACITY)||enchantment.equals(EnchantmentRegistry.OPERATIONSPEED)||enchantment.equals(EnchantmentRegistry.RANGE))
             {
                 return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
             }

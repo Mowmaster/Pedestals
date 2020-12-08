@@ -56,6 +56,12 @@ public class EnchantmentAdvanced extends Enchantment
         return canApplyToUpgrade;
     }
 
+    /*@Override
+    public boolean canApplyTogether(Enchantment enchant) {
+
+        return super.canApplyTogether(enchant) && (enchant.equals(EnchantmentRegistry.ADVANCED)||enchant.equals(EnchantmentRegistry.AREA)||enchant.equals(EnchantmentRegistry.CAPACITY)||enchant.equals(EnchantmentRegistry.OPERATIONSPEED)||enchant.equals(EnchantmentRegistry.RANGE));
+    }*/
+
     //Added because wyld found a villager with it...
     @Override
     public boolean canVillagerTrade() {

@@ -10,6 +10,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -44,6 +45,11 @@ public class ItemUpgradeTool extends Item {
 
     public ItemUpgradeTool() {
         super(new Properties().maxStackSize(1).containerItem(UPGRADE).group(PEDESTALS_TAB));
+    }
+
+    @Override
+    public boolean makesPiglinsNeutral(ItemStack stack, LivingEntity wearer) {
+        return stack.getItem() instanceof ItemUpgradeTool || (wearer.getHeldItemMainhand().getItem()instanceof ItemUpgradeTool)?(true):((wearer.getHeldItemOffhand().getItem()instanceof ItemUpgradeTool)?(true):(false));
     }
 
     @Override

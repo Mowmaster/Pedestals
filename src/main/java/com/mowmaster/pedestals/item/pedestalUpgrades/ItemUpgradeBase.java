@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.item.ItemEnchantableBook;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.references.Reference;
@@ -57,6 +58,68 @@ public class ItemUpgradeBase extends Item {
 
     public ItemUpgradeBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
+    public boolean isPiglinCurrency(ItemStack stack) {
+        return stack.getItem() instanceof ItemUpgradeBase;
+    }
+
+    public boolean hasEnchant(ItemStack stack)
+    {
+        return stack.isEnchanted();
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        if(stack.getItem() instanceof ItemEnchantableBook)
+        {
+            if(enchantment.equals(EnchantmentRegistry.ADVANCED)||enchantment.equals(EnchantmentRegistry.AREA)||enchantment.equals(EnchantmentRegistry.CAPACITY)||enchantment.equals(EnchantmentRegistry.OPERATIONSPEED)||enchantment.equals(EnchantmentRegistry.RANGE))
+            {
+                return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int getItemEnchantability()
+    {
+        return 10;
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return super.isBookEnchantable(stack, book);
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return true;
+    }
+
+    public Boolean canAcceptOpSpeed()
+    {
+        return true;
+    }
+
+    public Boolean canAcceptCapacity()
+    {
+        return false;
+    }
+
+    public Boolean canAcceptRange()
+    {
+        return false;
+    }
+
+    public Boolean canAcceptAdvanced()
+    {
+        return false;
+    }
+
+    public Boolean canAcceptArea()
+    {
+        return false;
+    }
 
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World worldIn, BlockPos pos, Random rand)
     {
@@ -78,11 +141,6 @@ public class ItemUpgradeBase extends Item {
         }
 
         return intItem;
-    }
-
-    public boolean hasEnchant(ItemStack stack)
-    {
-        return stack.isEnchanted();
     }
 
     public int getAreaModifier(ItemStack stack)
@@ -964,53 +1022,6 @@ public class ItemUpgradeBase extends Item {
     }
 
     public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
-    }
-
-    @Override
-    public int getItemEnchantability()
-    {
-        return 10;
-    }
-
-    @Override
-    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return super.isBookEnchantable(stack, book);
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
-    }
-
-
-    public Boolean canAcceptOpSpeed()
-    {
-        return true;
-    }
-
-    public Boolean canAcceptCapacity()
-    {
-        return false;
-    }
-
-    public Boolean canAcceptRange()
-    {
-        return false;
-    }
-
-    public Boolean canAcceptAdvanced()
-    {
-        return false;
-    }
-
-    public Boolean canAcceptArea()
     {
         return false;
     }
