@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.item;
 
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
+import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -25,12 +27,9 @@ public class ItemEnchantableBook extends Item {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        if(stack.getItem() instanceof ItemEnchantableBook)
+        if(stack.getItem() instanceof ItemEnchantableBook && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
         {
-            if(enchantment.equals(EnchantmentRegistry.ADVANCED)||enchantment.equals(EnchantmentRegistry.AREA)||enchantment.equals(EnchantmentRegistry.CAPACITY)||enchantment.equals(EnchantmentRegistry.OPERATIONSPEED)||enchantment.equals(EnchantmentRegistry.RANGE))
-            {
-                return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
-            }
+            return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
         }
         return false;
     }
