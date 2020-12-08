@@ -70,7 +70,7 @@ public class ItemUpgradeBase extends Item {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        if(stack.getItem() instanceof ItemEnchantableBook)
+        if(stack.getItem() instanceof ItemUpgradeBase)
         {
             if(enchantment.equals(EnchantmentRegistry.ADVANCED)||enchantment.equals(EnchantmentRegistry.AREA)||enchantment.equals(EnchantmentRegistry.CAPACITY)||enchantment.equals(EnchantmentRegistry.OPERATIONSPEED)||enchantment.equals(EnchantmentRegistry.RANGE))
             {
