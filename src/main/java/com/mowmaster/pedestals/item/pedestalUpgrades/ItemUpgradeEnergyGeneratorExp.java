@@ -158,7 +158,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
         double fuelSpeedMultiplier = Math.floor(getFuelStored(coinInPedestal)/55800)*2;
         double speedMultiplier = (20/speed)*((fuelSpeedMultiplier>=1)?(fuelSpeedMultiplier):(1));
         int baseFuel = (int) (20 * speedMultiplier);
-        int fuelConsumed = (int) Math.round(baseFuel * capacityRate);
+        int fuelConsumed = (int) Math.ceil(baseFuel * capacityRate);
         if(removeFuel(world,posOfPedestal,fuelConsumed,true))
         {
             doEnergyProcess(world,coinInPedestal,posOfPedestal,baseFuel,capacityRate);
@@ -173,7 +173,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
     {
         //System.out.println("Base: " + baseFuel);
         //System.out.println("Rate: " + capacityRate);
-        int fuelConsumed = (int) Math.round(baseFuel * capacityRate);
+        int fuelConsumed = (int) Math.ceil(baseFuel * capacityRate);
         int energyMax = getEnergyBuffer(coinInPedestal);
         int energyCurrent = getEnergyStored(coinInPedestal);
         int estEnergyProduced = (int) Math.round(baseFuel * 12.5);
@@ -188,7 +188,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
             int energyCanProduce = energyMax - energyCurrent;
             int fuelCanConsume = (int)Math.floor(energyCanProduce/12.5);
             estEnergyProduced = (int) Math.round(fuelCanConsume * 12.5);
-            int actualFuelConsumed = (int)Math.round(fuelCanConsume * capacityRate);
+            int actualFuelConsumed = (int)Math.ceil(fuelCanConsume * capacityRate);
             //System.out.println("Actual Consumed: " + actualFuelConsumed);
             removeFuel(world,posOfPedestal,actualFuelConsumed,false);
             //System.out.println("Energy: " + estEnergyProduced);
