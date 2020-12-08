@@ -2,6 +2,8 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.network.PacketHandler;
+import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
@@ -1225,6 +1227,61 @@ public class ItemUpgradeBase extends Item {
                 return;
         }
     }
+
+    /*public void spawnParticleAroundPedestalBase(World world,int tick, BlockPos pos, float r, float g, float b, float alpha)
+    {
+        double dx = (double)pos.getX()-0.5;
+        double dy = (double)pos.getY()-0.5;
+        double dz = (double)pos.getZ()-0.5;
+
+        BlockState state = world.getBlockState(pos);
+        Direction enumfacing = state.get(FACING);
+        switch (enumfacing)
+        {
+            case UP:
+                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.25D,dy+0.15D,dz+0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.15D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED, dx+ 0.75D, dy+0.15D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.15D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
+                return;
+            case DOWN:
+                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+.85D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+.85D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+.85D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+.85D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
+                return;
+            case NORTH:
+                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.25D, dz+.85D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.75D, dz+.85D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.25D, dz+.85D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.75D, dz+.85D,(int)r*255,(int)g*255,(int)b*255));
+                return;
+            case SOUTH:
+                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.25D, dz+0.15D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.75D, dz+0.15D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.25D, dz+0.15D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.75D, dz+0.15D,(int)r*255,(int)g*255,(int)b*255));
+                return;
+            case EAST:
+                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.15D, dy+ 0.25D, dz+0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.15D, dy+ 0.25D, dz+0.75D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.15D, dy+ 0.75D, dz+0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.15D, dy+ 0.75D, dz+0.75D,(int)r*255,(int)g*255,(int)b*255));
+                return;
+            case WEST:
+                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.85D, dy+0.25D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.85D, dy+0.25D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.85D, dy+0.75D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.85D, dy+0.75D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
+                return;
+            default:
+                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.15D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%35 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.15D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.15D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
+                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.15D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
+                return;
+        }
+    }*/
 
     public void spawnParticleAbovePedestal(World world, BlockPos pos, float r, float g, float b, float alpha)
     {
