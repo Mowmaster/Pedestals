@@ -3,10 +3,10 @@ package com.mowmaster.pedestals.util.compat.jei;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.item.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
-import com.mowmaster.pedestals.recipes.ColoredPedestalRecipe;
-import com.mowmaster.pedestals.recipes.CrusherRecipe;
-import com.mowmaster.pedestals.recipes.SawMillRecipe;
+import com.mowmaster.pedestals.recipes.*;
 import com.mowmaster.pedestals.references.Reference;
+import com.mowmaster.pedestals.util.compat.jei.cobblegen.CobbleGenRecipeCategory;
+import com.mowmaster.pedestals.util.compat.jei.cobblegensilk.CobbleGenSilkRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.color_pallet.ColorPalletRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.color_pallet.ColorPedestalRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.crusher.CrusherRecipeCategory;
@@ -20,6 +20,7 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeType;
@@ -69,12 +70,16 @@ public class PedestalsPlugin implements IModPlugin {
 
     public static final IRecipeType<CrusherRecipe> CRUSHER_TYPE = CrusherRecipe.recipeType;
     public static final IRecipeType<SawMillRecipe> SAWING_TYPE = SawMillRecipe.recipeType;
+    public static final IRecipeType<CobbleGenRecipe> COBBLEGEN_TYPE = CobbleGenRecipe.recipeType;
+    public static final IRecipeType<CobbleGenSilkRecipe> COBBLEGENSILK_TYPE = CobbleGenSilkRecipe.recipeType;
     public static final IRecipeType<ColoredPedestalRecipe> COLORING_TYPE = ColoredPedestalRecipe.recipeType;
     public static final IRecipeType<ColoredPedestalRecipe> COLORINGP_TYPE = ColoredPedestalRecipe.recipeType;
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(CRUSHER_TYPE), CrusherRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(SAWING_TYPE), SawMillRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COBBLEGEN_TYPE), CobbleGenRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COBBLEGENSILK_TYPE), CobbleGenSilkRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COLORING_TYPE), ColorPedestalRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COLORINGP_TYPE), ColorPalletRecipeCategory.UID);
         //Pedestals
@@ -264,6 +269,8 @@ public class PedestalsPlugin implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registry) {
         registry.addRecipeCategories(new CrusherRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new SawMillRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new CobbleGenRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new CobbleGenSilkRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new ColorPedestalRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new ColorPalletRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
     }
@@ -286,6 +293,12 @@ public class PedestalsPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ItemColorPallet.COLORPALLET), ColorPedestalRecipeCategory.UID);
         //Color Pallets
         registration.addRecipeCatalyst(new ItemStack(ItemLinkingTool.DEFAULT), ColorPalletRecipeCategory.UID);
+        //Cobble Gen
+        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeCobbleGen.COBBLE), CobbleGenRecipeCategory.UID);
+        //Cobble Gen Silk
+        ItemStack getStack = new ItemStack(ItemUpgradeCobbleGen.COBBLE.getItem());
+        getStack.addEnchantment(Enchantments.SILK_TOUCH,1);
+        registration.addRecipeCatalyst(getStack, CobbleGenSilkRecipeCategory.UID);
     }
 
 

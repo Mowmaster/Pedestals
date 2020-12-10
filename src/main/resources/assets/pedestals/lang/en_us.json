@@ -5,6 +5,8 @@
 
     "pedestals.recipe_category_crusher": "Crusher Upgrade",
     "pedestals.recipe_category_sawing": "SawMill Upgrade",
+    "pedestals.recipe_category_cobblegen": "Cobble Gen",
+    "pedestals.recipe_category_cobblegensilk": "Silky Cobble Gen",
     "pedestals.recipe_category_coloredpedestals": "Use On Pedestal",
     "pedestals.recipe_category_coloredpallets": "In World Crafting",
 
