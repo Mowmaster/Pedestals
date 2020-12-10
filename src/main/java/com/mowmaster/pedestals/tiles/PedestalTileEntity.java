@@ -605,6 +605,11 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         return stack;
     }
 
+    public int getSlotSizeLimit() {
+        IItemHandler h = handler.orElse(null);
+        return h.getSlotLimit(0);
+    }
+
     public ItemStack removeItem(int numToRemove) {
         IItemHandler h = handler.orElse(null);
         ItemStack stack = h.extractItem(0,numToRemove,false);
@@ -1034,9 +1039,10 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 //Two buckets match but cant be stacked since max stack size is 1
                 if(itemsIncoming.getMaxStackSize() > 1)
                 {
-                    if(getItemInPedestal().getCount() < getMaxStackSize())
+                    //If i did this right, slot limit should default to stack max size, or custom allowed
+                    if(getItemInPedestal().getCount() < getSlotSizeLimit())
                     {
-                        canAccept = (getMaxStackSize() - getItemInPedestal().getCount());
+                        canAccept = (getSlotSizeLimit() - getItemInPedestal().getCount());
                     }
                 }
             }
