@@ -2,9 +2,6 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
-import com.mowmaster.pedestals.item.ItemEnchantableBook;
-import com.mowmaster.pedestals.network.PacketHandler;
-import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
@@ -20,6 +17,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.RedstoneParticleData;
@@ -40,7 +38,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -63,394 +60,107 @@ public class ItemUpgradeBase extends Item {
         return stack.getItem() instanceof ItemUpgradeBase;
     }
 
-    public boolean hasEnchant(ItemStack stack)
+    /***************************************
+     ****************************************
+     ** Start of Custom IItemHandler Stuff **
+     ****************************************
+     ***************************************/
+
+    //https://skmedix.github.io/ForgeJavaDocs/javadoc/forge/1.9.4-12.17.0.2051/net/minecraftforge/items/IItemHandler.html
+
+
+    //ItemStack extracted from the slot, must be null, if nothing can be extracted
+    public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
     {
-        return stack.isEnchanted();
+        //Default return that forces pedestal to do a normal thing
+        return new ItemStack(Items.COMMAND_BLOCK);
     }
 
-    @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        if(stack.getItem() instanceof ItemUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
-        {
-            return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
-        }
-        return false;
-    }
-
-    @Override
-    public int getItemEnchantability()
+    //The remaining ItemStack that was not inserted (if the entire stack is accepted, then return null).
+    //May be the same as the input ItemStack if unchanged, otherwise a new ItemStack.
+    public ItemStack customInsertItem(PedestalTileEntity pedestal, ItemStack stackIn, boolean simulate)
     {
-        return 10;
+        //Default return that forces pedestal to do a normal thing
+        return new ItemStack(Items.COMMAND_BLOCK);
     }
 
-    @Override
-    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return super.isBookEnchantable(stack, book);
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
-    }
-
-    public Boolean canAcceptOpSpeed()
+    //ItemStack in given slot. May be null.
+    public ItemStack customStackInSlot(PedestalTileEntity pedestal,ItemStack stackFromHandler)
     {
-        return true;
+        //Default return that forces pedestal to do a normal thing
+        return new ItemStack(Items.COMMAND_BLOCK);
     }
 
-    public Boolean canAcceptCapacity()
+    public int customSlotLimit(PedestalTileEntity pedestal, ItemStack stackIn)
     {
-        return false;
+        return -1;
     }
 
-    public Boolean canAcceptRange()
-    {
-        return false;
-    }
 
-    public Boolean canAcceptAdvanced()
+
+    //For Filters to return if they can or cannot allow items to pass
+    //Will probably need overwritten
+    public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         return false;
     }
 
-    public Boolean canAcceptArea()
+    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
-        return false;
+        int stackabe = itemStackIncoming.getMaxStackSize();
+        return stackabe;
     }
 
-    public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World worldIn, BlockPos pos, Random rand)
+    /**
+     * Can this hopper insert the specified item from the specified slot on the specified side?
+     */
+    public static boolean canInsertItemInSlot(IInventory inventoryIn, ItemStack stack, int index, Direction side)
     {
-
-    }
-
-    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
-    {
-        int intItem=0;
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if(tileEntity instanceof PedestalTileEntity) {
-            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
-            ItemStack itemstack = pedestal.getItemInPedestal();
-            if(!itemstack.isEmpty())
-            {
-                float f = (float)itemstack.getCount()/(float)Math.min(pedestal.getMaxStackSize(), itemstack.getMaxStackSize());
-                intItem = MathHelper.floor(f*14.0F)+1;
-            }
-        }
-
-        return intItem;
-    }
-
-    public int getAreaModifier(ItemStack stack)
-    {
-        int area = 0;
-        if(hasEnchant(stack))
+        if (!inventoryIn.isItemValidForSlot(index, stack))
         {
-            area = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.AREA,stack);
-        }
-        return area;
-    }
-
-    public int getRangeModifier(ItemStack stack)
-    {
-        int range = 0;
-        if(hasEnchant(stack))
-        {
-            range = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack));
-        }
-        return range;
-    }
-
-    public int getCapacityModifier(ItemStack stack)
-    {
-        int capacity = 0;
-        if(hasEnchant(stack))
-        {
-            capacity = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack));
-        }
-        return capacity;
-    }
-
-    public int getAdvancedModifier(ItemStack stack)
-    {
-        int advanced = 0;
-        if(hasEnchant(stack))
-        {
-            advanced = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack) > 1)?(1):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack));
-        }
-        return advanced;
-    }
-
-    public boolean hasAdvancedInventoryTargeting(ItemStack stack)
-    {
-        return getAdvancedModifier(stack)>=1;
-    }
-
-    public int intOperationalSpeedModifier(ItemStack stack)
-    {
-        int rate = 0;
-        if(hasEnchant(stack))
-        {
-            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
-        }
-        return rate;
-    }
-
-    public int getOperationSpeed(ItemStack stack)
-    {
-        int intOperationalSpeed = 20;
-        switch (intOperationalSpeedModifier(stack))
-        {
-            case 0:
-                intOperationalSpeed = 20;//normal speed
-                break;
-            case 1:
-                intOperationalSpeed=10;//2x faster
-                break;
-            case 2:
-                intOperationalSpeed = 5;//4x faster
-                break;
-            case 3:
-                intOperationalSpeed = 3;//6x faster
-                break;
-            case 4:
-                intOperationalSpeed = 2;//10x faster
-                break;
-            case 5:
-                intOperationalSpeed=1;//20x faster
-                break;
-            default: intOperationalSpeed=20;
-        }
-
-        return  intOperationalSpeed;
-    }
-
-    public String getOperationSpeedString(ItemStack stack)
-    {
-        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
-        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
-        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
-        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
-        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
-        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
-        String str = normal.getString();
-        switch (intOperationalSpeedModifier(stack))
-        {
-            case 0:
-                str = normal.getString();//normal speed
-                break;
-            case 1:
-                str = twox.getString();//2x faster
-                break;
-            case 2:
-                str = fourx.getString();//4x faster
-                break;
-            case 3:
-                str = sixx.getString();//6x faster
-                break;
-            case 4:
-                str = tenx.getString();//10x faster
-                break;
-            case 5:
-                str = twentyx.getString();//20x faster
-                break;
-            default: str = normal.getString();;
-        }
-
-        return  str;
-    }
-
-    public int getItemTransferRate(ItemStack stack)
-    {
-        int transferRate = 1;
-        switch (getCapacityModifier(stack))
-        {
-            case 0:
-                transferRate = 1;
-                break;
-            case 1:
-                transferRate=4;
-                break;
-            case 2:
-                transferRate = 8;
-                break;
-            case 3:
-                transferRate = 16;
-                break;
-            case 4:
-                transferRate = 32;
-                break;
-            case 5:
-                transferRate=64;
-                break;
-            default: transferRate=1;
-        }
-
-        return  transferRate;
-    }
-
-    public int getRange(ItemStack stack)
-    {
-        int range = 1;
-        switch (getRangeModifier(stack))
-        {
-            case 0:
-                range = 1;
-                break;
-            case 1:
-                range = 2;
-                break;
-            case 2:
-                range = 4;
-                break;
-            case 3:
-                range = 8;
-                break;
-            case 4:
-                range = 12;
-                break;
-            case 5:
-                range = 16;
-                break;
-            default: range = 1;
-        }
-
-        return  range;
-    }
-
-    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
-    {
-        return 0;
-    }
-
-    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
-    {
-        return new int[]{0,0};
-    }
-
-    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
-    {
-        return 0;
-    }
-
-    public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
-    {
-        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
-
-        /*ITag.INamedTag<Block> BLOCK_EMERALD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/emerald"));
-        ITag.INamedTag<Block> BLOCK_DIAMOND = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/diamond"));
-        ITag.INamedTag<Block> BLOCK_GOLD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/gold"));
-        ITag.INamedTag<Block> BLOCK_LAPIS = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/lapis"));
-        ITag.INamedTag<Block> BLOCK_IRON = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/iron"));
-        ITag.INamedTag<Block> BLOCK_COAL = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/coal"));*/
-        ITag<Block> BLOCK_EMERALD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/emerald"));
-        ITag<Block> BLOCK_DIAMOND = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/diamond"));
-        ITag<Block> BLOCK_GOLD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/gold"));
-        ITag<Block> BLOCK_LAPIS = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/lapis"));
-        ITag<Block> BLOCK_IRON = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/iron"));
-        ITag<Block> BLOCK_COAL = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
-
-        //Netherite
-        if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
-        if(BLOCK_EMERALD.contains(block)) return Blocks.EMERALD_BLOCK;//Players
-        if(BLOCK_DIAMOND.contains(block)) return Blocks.DIAMOND_BLOCK;//All Monsters
-        if(BLOCK_GOLD.contains(block)) return Blocks.GOLD_BLOCK;//All Animals
-        if(BLOCK_LAPIS.contains(block)) return Blocks.LAPIS_BLOCK;//All Flying
-        if(BLOCK_IRON.contains(block)) return Blocks.IRON_BLOCK;//All Creatures
-        if(BLOCK_COAL.contains(block)) return Blocks.COAL_BLOCK;//All Mobs
-
-        return block;
-    }
-
-    public LivingEntity getTargetEntity(World world, BlockPos pedestalPos, Entity entityIn)
-    {
-        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
-        {
-            if(entityIn instanceof PlayerEntity)
-            {
-                return (PlayerEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
-        {
-            if(entityIn instanceof MonsterEntity)
-            {
-                return (MonsterEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
-        {
-            if(entityIn instanceof AnimalEntity)
-            {
-                return (AnimalEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
-        {
-            if(entityIn instanceof FlyingEntity)
-            {
-                return (FlyingEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
-        {
-            if(entityIn instanceof CreatureEntity)
-            {
-                return (CreatureEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
-        {
-            if(entityIn instanceof MobEntity)
-            {
-                return (MobEntity)entityIn;
-            }
+            return false;
         }
         else
         {
-            return (LivingEntity)entityIn;
+            return !(inventoryIn instanceof ISidedInventory) || ((ISidedInventory)inventoryIn).canInsertItem(index, stack, side);
         }
-        return null;
     }
 
-    public String getTargetEntity(World world, BlockPos pedestalPos)
+    /**
+     * Can this hopper extract the specified item from the specified slot on the specified side?
+     */
+    public static boolean canExtractItemFromSlot(IInventory inventoryIn, ItemStack stack, int index, Direction side)
     {
-        TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
-        TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
-        TranslationTextComponent GOLD = new TranslationTextComponent(getTranslationKey() + ".entity_gold");
-        TranslationTextComponent LAPIS = new TranslationTextComponent(getTranslationKey() + ".entity_lapis");
-        TranslationTextComponent IRON = new TranslationTextComponent(getTranslationKey() + ".entity_iron");
-        TranslationTextComponent COAL = new TranslationTextComponent(getTranslationKey() + ".entity_coal");
-        TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
-
-        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
-        {
-            return EMERALD.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
-        {
-            return DIAMOND.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
-        {
-            return GOLD.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
-        {
-            return LAPIS.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
-        {
-            return IRON.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
-        {
-            return COAL.getString();
-        }
-        else {
-            return ALL.getString();
-        }
+        return !(inventoryIn instanceof ISidedInventory) || ((ISidedInventory)inventoryIn).canExtractItem(index, stack, side);
     }
 
+    public int[] getSlotsForSide(World world, BlockPos posOfPedestal, IInventory inventory)
+    {
+        int[] slots = new int[]{};
+
+        if(inventory instanceof ISidedInventory)
+        {
+            slots= ((ISidedInventory) inventory).getSlotsForFace(getPedestalFacing(world, posOfPedestal));
+        }
+
+        return slots;
+    }
+
+    /***************************************
+     ****************************************
+     **  End of Custom IItemHandler Stuff  **
+     ****************************************
+     ***************************************/
+
+
+
+
+
+    /***************************************
+     ****************************************
+     **      Start of Inventory Stuff      **
+     ****************************************
+     ***************************************/
     public ItemStack getStackInPedestal(World world, BlockPos posOfPedestal)
     {
         ItemStack stackInPedestal = ItemStack.EMPTY;
@@ -492,21 +202,6 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-    /*public void addExpToPedestal(World world, BlockPos posOfPedestal,int expToAdd)
-    {
-        TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
-        if(pedestalInventory instanceof TilePedestal) {
-            ((TilePedestal) pedestalInventory).addExpToPedestal(expToAdd);
-        }
-    }
-    public void removeExpFromPedestal(World world, BlockPos posOfPedestal,int expToRemove)
-    {
-        TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
-        if(pedestalInventory instanceof TilePedestal) {
-            ((TilePedestal) pedestalInventory).removeExpFromPedestal(expToRemove);
-        }
-    }*/
-
     public void setIntValueToPedestal(World world, BlockPos posOfPedestal, int value)
     {
         TileEntity pedestal = world.getTileEntity(posOfPedestal);
@@ -545,87 +240,27 @@ public class ItemUpgradeBase extends Item {
 
     public boolean doItemsMatch(ItemStack stackPedestal, ItemStack itemStackIn)
     {
-        /*if(!stackPedestal.equals(ItemStack.EMPTY))
-        {
-            if(itemStackIn.hasTag())
-            {
-                CompoundNBT itemIn = itemStackIn.getTag();
-                CompoundNBT itemStored = stackPedestal.getTag();
-                if(itemIn.equals(itemStored) && itemStackIn.getItem().equals(stackPedestal.getItem()))
-                {
-                    return true;
-                }
-                else return false;
-            }
-            *//*else if(itemStackIn.isDamaged())
-            {
-                if(itemStackIn.isDamaged()==stackPedestal.getDamage() && itemStackIn.getMetadata()==stackPedestal.getMetadata())
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }*//*
-            else
-            {
-                if(itemStackIn.getItem().equals(stackPedestal.getItem()))
-                {
-                    return true;
-                }
-            }
-        }*/
-
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
-     /***************************************
+    public boolean canSendItem(PedestalTileEntity tile)
+    {
+        return true;
+    }
+    /***************************************
      ****************************************
-     ** Start of Custom IItemHandler Stuff **
-     ****************************************
-     ***************************************/
-
-    public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
-    {
-        return ItemStack.EMPTY;
-    }
-
-    public ItemStack customInsertItem(PedestalTileEntity pedestal, ItemStack stackIn, boolean simulate)
-    {
-        return ItemStack.EMPTY;
-    }
-
-    public ItemStack customStackInSlot(PedestalTileEntity pedestal,ItemStack stackFromHandler)
-    {
-        return ItemStack.EMPTY;
-    }
-
-    public int customSlotLimit(PedestalTileEntity pedestal, ItemStack stackIn)
-    {
-        return 0;
-    }
-
-     /***************************************
-     ****************************************
-     **  End of Custom IItemHandler Stuff  **
+     **       End of Inventory Stuff       **
      ****************************************
      ***************************************/
 
-    //For Filters to return if they can or cannot allow items to pass
-    //Will probably need overwritten
-    public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
-    {
-        return false;
-    }
 
-    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
-    {
-        int stackabe = itemStackIncoming.getMaxStackSize();
-        return stackabe;
-    }
 
-    //Info Used to create this goes to https://github.com/BluSunrize/ImmersiveEngineering/blob/f40a49da570c991e51dd96bba1d529e20da6caa6/src/main/java/blusunrize/immersiveengineering/api/ApiUtils.java#L338
+    /***************************************
+     ****************************************
+     **         Start of Cap Stuff         **
+     ****************************************
+     ***************************************/
+//Info Used to create this goes to https://github.com/BluSunrize/ImmersiveEngineering/blob/f40a49da570c991e51dd96bba1d529e20da6caa6/src/main/java/blusunrize/immersiveengineering/api/ApiUtils.java#L338
     public static LazyOptional<IItemHandler> findItemHandlerAtPos(World world, BlockPos pos, Direction side, boolean allowCart)
     {
         TileEntity neighbourTile = world.getTileEntity(pos);
@@ -785,9 +420,6 @@ public class ItemUpgradeBase extends Item {
         return slot.get();
     }
 
-
-
-
     public int getNextSlotWithItems(TileEntity invBeingChecked, Direction sideSlot, ItemStack stackInPedestal)
     {
         int slot = -1;
@@ -822,69 +454,352 @@ public class ItemUpgradeBase extends Item {
 
         return slot;
     }
+    /***************************************
+     ****************************************
+     **          End of Cap Stuff          **
+     ****************************************
+     ***************************************/
 
 
-    /**
-     * Can this hopper insert the specified item from the specified slot on the specified side?
-     */
-    public static boolean canInsertItemInSlot(IInventory inventoryIn, ItemStack stack, int index, Direction side)
+
+    /***************************************
+     ****************************************
+     **      Start of Enchanting Stuff     **
+     ****************************************
+     ***************************************/
+
+    public boolean hasEnchant(ItemStack stack)
     {
-        if (!inventoryIn.isItemValidForSlot(index, stack))
-        {
-            return false;
-        }
-        else
-        {
-            return !(inventoryIn instanceof ISidedInventory) || ((ISidedInventory)inventoryIn).canInsertItem(index, stack, side);
-        }
+        return stack.isEnchanted();
     }
 
-    /**
-     * Can this hopper extract the specified item from the specified slot on the specified side?
-     */
-    public static boolean canExtractItemFromSlot(IInventory inventoryIn, ItemStack stack, int index, Direction side)
-    {
-        return !(inventoryIn instanceof ISidedInventory) || ((ISidedInventory)inventoryIn).canExtractItem(index, stack, side);
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        if(stack.getItem() instanceof ItemUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
+        {
+            return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
+        }
+        return false;
     }
 
-    public int[] getSlotsForSide(World world, BlockPos posOfPedestal, IInventory inventory)
+    @Override
+    public int getItemEnchantability()
     {
-        int[] slots = new int[]{};
-
-        if(inventory instanceof ISidedInventory)
-        {
-            slots= ((ISidedInventory) inventory).getSlotsForFace(getPedestalFacing(world, posOfPedestal));
-        }
-
-        return slots;
+        return 10;
     }
 
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return super.isBookEnchantable(stack, book);
+    }
 
-    /*public boolean canInsertIntoSide(World world, BlockPos posOfPedestal, IInventory inventory, ItemStack itemFromPedestal, int slot)
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return true;
+    }
+
+    public Boolean canAcceptOpSpeed()
     {
-        boolean value = false;
-        if(inventory instanceof ISidedInventory)
+        return true;
+    }
+
+    public Boolean canAcceptCapacity()
+    {
+        return false;
+    }
+
+    public Boolean canAcceptRange()
+    {
+        return false;
+    }
+
+    public Boolean canAcceptAdvanced()
+    {
+        return false;
+    }
+
+    public Boolean canAcceptArea()
+    {
+        return false;
+    }
+
+    /***************************************
+     ****************************************
+     **       End of Enchanting Stuff      **
+     ****************************************
+     ***************************************/
+
+
+
+    /***************************************
+     ****************************************
+     **         Start of Speed Stuff       **
+     ****************************************
+     ***************************************/
+    public int intOperationalSpeedModifier(ItemStack stack)
+    {
+        int rate = 0;
+        if(hasEnchant(stack))
         {
-            int[] slots= ((ISidedInventory) inventory).getSlotsForFace(getPedestalFacing(world, posOfPedestal));
-            for(int i=0;i<slots.length;i++)
-            {
-                if(canInsertItemInSlot(inventory,itemFromPedestal,slots[i],getPedestalFacing(world, posOfPedestal)))
-                {
-                    value=true;
-                }
-                else
-                {
-                    value=false;
-                    break;
-                }
-            }
+            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
         }
-        else
+        return rate;
+    }
+
+    public int getOperationSpeed(ItemStack stack)
+    {
+        int intOperationalSpeed = 20;
+        switch (intOperationalSpeedModifier(stack))
         {
-            if(canInsertItemInSlot(inventory,itemFromPedestal,slot,getPedestalFacing(world, posOfPedestal))) value=true;
+            case 0:
+                intOperationalSpeed = 20;//normal speed
+                break;
+            case 1:
+                intOperationalSpeed=10;//2x faster
+                break;
+            case 2:
+                intOperationalSpeed = 5;//4x faster
+                break;
+            case 3:
+                intOperationalSpeed = 3;//6x faster
+                break;
+            case 4:
+                intOperationalSpeed = 2;//10x faster
+                break;
+            case 5:
+                intOperationalSpeed=1;//20x faster
+                break;
+            default: intOperationalSpeed=20;
         }
-        return value;
-    }*/
+
+        return  intOperationalSpeed;
+    }
+
+    public String getOperationSpeedString(ItemStack stack)
+    {
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        String str = normal.getString();
+        switch (intOperationalSpeedModifier(stack))
+        {
+            case 0:
+                str = normal.getString();//normal speed
+                break;
+            case 1:
+                str = twox.getString();//2x faster
+                break;
+            case 2:
+                str = fourx.getString();//4x faster
+                break;
+            case 3:
+                str = sixx.getString();//6x faster
+                break;
+            case 4:
+                str = tenx.getString();//10x faster
+                break;
+            case 5:
+                str = twentyx.getString();//20x faster
+                break;
+            default: str = normal.getString();;
+        }
+
+        return  str;
+    }
+    /***************************************
+     ****************************************
+     **          End of Speed Stuff        **
+     ****************************************
+     ***************************************/
+
+
+
+    /***************************************
+     ****************************************
+     **       Start of Capacity Stuff      **
+     ****************************************
+     ***************************************/
+    public int getCapacityModifier(ItemStack stack)
+    {
+        int capacity = 0;
+        if(hasEnchant(stack))
+        {
+            capacity = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack));
+        }
+        return capacity;
+    }
+
+    public int getItemTransferRate(ItemStack stack)
+    {
+        int transferRate = 1;
+        switch (getCapacityModifier(stack))
+        {
+            case 0:
+                transferRate = 1;
+                break;
+            case 1:
+                transferRate=4;
+                break;
+            case 2:
+                transferRate = 8;
+                break;
+            case 3:
+                transferRate = 16;
+                break;
+            case 4:
+                transferRate = 32;
+                break;
+            case 5:
+                transferRate=64;
+                break;
+            default: transferRate=1;
+        }
+
+        return  transferRate;
+    }
+    /***************************************
+     ****************************************
+     **        End of Capacity Stuff       **
+     ****************************************
+     ***************************************/
+
+
+
+    /***************************************
+     ****************************************
+     **        Start of Range Stuff        **
+     ****************************************
+     ***************************************/
+    public int getRangeModifier(ItemStack stack)
+    {
+        int range = 0;
+        if(hasEnchant(stack))
+        {
+            range = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack));
+        }
+        return range;
+    }
+
+    public int getRange(ItemStack stack)
+    {
+        int range = 1;
+        switch (getRangeModifier(stack))
+        {
+            case 0:
+                range = 1;
+                break;
+            case 1:
+                range = 2;
+                break;
+            case 2:
+                range = 4;
+                break;
+            case 3:
+                range = 8;
+                break;
+            case 4:
+                range = 12;
+                break;
+            case 5:
+                range = 16;
+                break;
+            default: range = 1;
+        }
+
+        return  range;
+    }
+    /***************************************
+     ****************************************
+     **         End of Range Stuff         **
+     ****************************************
+     ***************************************/
+
+
+
+    /***************************************
+     ****************************************
+     **         Start of Area Stuff        **
+     ****************************************
+     ***************************************/
+    public int getAreaModifier(ItemStack stack)
+    {
+        int area = 0;
+        if(hasEnchant(stack))
+        {
+            area = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.AREA,stack);
+        }
+        return area;
+    }
+    /***************************************
+     ****************************************
+     **          End of Area Stuff         **
+     ****************************************
+     ***************************************/
+
+
+
+    /***************************************
+     ****************************************
+     **       Start of Advanced Stuff      **
+     ****************************************
+     ***************************************/
+    public int getAdvancedModifier(ItemStack stack)
+    {
+        int advanced = 0;
+        if(hasEnchant(stack))
+        {
+            advanced = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack) > 1)?(1):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack));
+        }
+        return advanced;
+    }
+
+    public boolean hasAdvancedInventoryTargeting(ItemStack stack)
+    {
+        return getAdvancedModifier(stack)>=1;
+    }
+    /***************************************
+     ****************************************
+     **        End of Advanced Stuff       **
+     ****************************************
+     ***************************************/
+
+
+    /***************************************
+     ****************************************
+     **      Start of BlockPos Stuff       **
+     ****************************************
+     ***************************************/
+    public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
+    {
+        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
+
+        /*ITag.INamedTag<Block> BLOCK_EMERALD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/emerald"));
+        ITag.INamedTag<Block> BLOCK_DIAMOND = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/diamond"));
+        ITag.INamedTag<Block> BLOCK_GOLD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/gold"));
+        ITag.INamedTag<Block> BLOCK_LAPIS = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/lapis"));
+        ITag.INamedTag<Block> BLOCK_IRON = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/iron"));
+        ITag.INamedTag<Block> BLOCK_COAL = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/coal"));*/
+        ITag<Block> BLOCK_EMERALD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/emerald"));
+        ITag<Block> BLOCK_DIAMOND = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/diamond"));
+        ITag<Block> BLOCK_GOLD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/gold"));
+        ITag<Block> BLOCK_LAPIS = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/lapis"));
+        ITag<Block> BLOCK_IRON = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/iron"));
+        ITag<Block> BLOCK_COAL = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
+
+        //Netherite
+        if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
+        if(BLOCK_EMERALD.contains(block)) return Blocks.EMERALD_BLOCK;//Players
+        if(BLOCK_DIAMOND.contains(block)) return Blocks.DIAMOND_BLOCK;//All Monsters
+        if(BLOCK_GOLD.contains(block)) return Blocks.GOLD_BLOCK;//All Animals
+        if(BLOCK_LAPIS.contains(block)) return Blocks.LAPIS_BLOCK;//All Flying
+        if(BLOCK_IRON.contains(block)) return Blocks.IRON_BLOCK;//All Creatures
+        if(BLOCK_COAL.contains(block)) return Blocks.COAL_BLOCK;//All Mobs
+
+        return block;
+    }
 
     public BlockPos getPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
     {
@@ -959,6 +874,163 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
+    //Trying to work on a way to do better block checks
+    public BlockPos getPosOfNextBlock(int currentPosition, BlockPos negCorner, BlockPos posCorner)
+    {
+        int xRange = Math.abs(posCorner.getX() - negCorner.getX());
+        int yRange = Math.abs(posCorner.getY() - negCorner.getY());
+        int zRange = Math.abs(posCorner.getZ() - negCorner.getZ());
+        int layerVolume = xRange*zRange;
+        int addY = (int)Math.floor(currentPosition/layerVolume);
+        int layerCurrentPosition = currentPosition - addY*layerVolume;
+        int addZ = (int)Math.floor(layerCurrentPosition/xRange);
+        int addX = layerCurrentPosition - addZ*xRange;
+
+        return negCorner.add(addX,addY,addZ);
+    }
+    /*
+    if we have a range of 3x3x3
+    layer = x val * z val
+    cube = layer * y val
+    layer #1-3,4-6,7-9
+    x val = 1-3,1-3,1-3
+    zval = 1,2,3
+
+    Y_Value = (int) total count / layer value : should give us which layer we're on
+
+    LAYER_COUNT = total count - Y_Value*layer value
+
+    Z_Value = (int) LAYER_COUNT / xRange
+
+    X_Value = LAYER_COUNT - Z_Value*xRange
+
+    */
+
+    public boolean resetCurrentPosInt(int currentPosition, BlockPos negCorner, BlockPos posCorner)
+    {
+        int xRange = Math.abs(posCorner.getX() - negCorner.getX());
+        int yRange = Math.abs(posCorner.getY() - negCorner.getY());
+        int zRange = Math.abs(posCorner.getZ() - negCorner.getZ());
+        int layerVolume = xRange*zRange;
+
+        int addY = (int)Math.floor(currentPosition/layerVolume);
+
+        return addY >= yRange;
+    }
+
+    public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
+    {
+        return false;
+    }
+
+    public Direction getPedestalFacing(World world, BlockPos posOfPedestal)
+    {
+        BlockState state = world.getBlockState(posOfPedestal);
+        return state.get(FACING);
+    }
+    /***************************************
+     ****************************************
+     **       End of BlockPos Stuff        **
+     ****************************************
+     ***************************************/
+
+
+
+    /***************************************
+     ****************************************
+     **       Start of Entity Stuff        **
+     ****************************************
+     ***************************************/
+    public LivingEntity getTargetEntity(World world, BlockPos pedestalPos, Entity entityIn)
+    {
+        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
+        {
+            if(entityIn instanceof PlayerEntity)
+            {
+                return (PlayerEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
+        {
+            if(entityIn instanceof MonsterEntity)
+            {
+                return (MonsterEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
+        {
+            if(entityIn instanceof AnimalEntity)
+            {
+                return (AnimalEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
+        {
+            if(entityIn instanceof FlyingEntity)
+            {
+                return (FlyingEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
+        {
+            if(entityIn instanceof CreatureEntity)
+            {
+                return (CreatureEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
+        {
+            if(entityIn instanceof MobEntity)
+            {
+                return (MobEntity)entityIn;
+            }
+        }
+        else
+        {
+            return (LivingEntity)entityIn;
+        }
+        return null;
+    }
+
+    public String getTargetEntity(World world, BlockPos pedestalPos)
+    {
+        TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
+        TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
+        TranslationTextComponent GOLD = new TranslationTextComponent(getTranslationKey() + ".entity_gold");
+        TranslationTextComponent LAPIS = new TranslationTextComponent(getTranslationKey() + ".entity_lapis");
+        TranslationTextComponent IRON = new TranslationTextComponent(getTranslationKey() + ".entity_iron");
+        TranslationTextComponent COAL = new TranslationTextComponent(getTranslationKey() + ".entity_coal");
+        TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
+
+        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
+        {
+            return EMERALD.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
+        {
+            return DIAMOND.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
+        {
+            return GOLD.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
+        {
+            return LAPIS.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
+        {
+            return IRON.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
+        {
+            return COAL.getString();
+        }
+        else {
+            return ALL.getString();
+        }
+    }
+
     public BlockPos getNegRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
     {
         BlockState state = world.getBlockState(posOfPedestal);
@@ -1006,71 +1078,19 @@ public class ItemUpgradeBase extends Item {
                 return blockBelow;
         }
     }
+    /***************************************
+     ****************************************
+     **        End of Entity Stuff         **
+     ****************************************
+     ***************************************/
 
-    //Trying to work on a way to do better block checks
-    public BlockPos getPosOfNextBlock(int currentPosition, BlockPos negCorner, BlockPos posCorner)
-    {
-        int xRange = Math.abs(posCorner.getX() - negCorner.getX());
-        int yRange = Math.abs(posCorner.getY() - negCorner.getY());
-        int zRange = Math.abs(posCorner.getZ() - negCorner.getZ());
-        int layerVolume = xRange*zRange;
-        int addY = (int)Math.floor(currentPosition/layerVolume);
-        int layerCurrentPosition = currentPosition - addY*layerVolume;
-        int addZ = (int)Math.floor(layerCurrentPosition/xRange);
-        int addX = layerCurrentPosition - addZ*xRange;
 
-        return negCorner.add(addX,addY,addZ);
-    }
-    /*
-    if we have a range of 3x3x3
-    layer = x val * z val
-    cube = layer * y val
-    layer #1-3,4-6,7-9
-    x val = 1-3,1-3,1-3
-    zval = 1,2,3
 
-    Y_Value = (int) total count / layer value : should give us which layer we're on
-
-    LAYER_COUNT = total count - Y_Value*layer value
-
-    Z_Value = (int) LAYER_COUNT / xRange
-
-    X_Value = LAYER_COUNT - Z_Value*xRange
-
-    */
-    public boolean resetCurrentPosInt(int currentPosition, BlockPos negCorner, BlockPos posCorner)
-    {
-        int xRange = Math.abs(posCorner.getX() - negCorner.getX());
-        int yRange = Math.abs(posCorner.getY() - negCorner.getY());
-        int zRange = Math.abs(posCorner.getZ() - negCorner.getZ());
-        int layerVolume = xRange*zRange;
-
-        int addY = (int)Math.floor(currentPosition/layerVolume);
-
-        return addY >= yRange;
-    }
-
-    public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
-    {
-        return false;
-    }
-
-    public Direction getPedestalFacing(World world, BlockPos posOfPedestal)
-    {
-        BlockState state = world.getBlockState(posOfPedestal);
-        return state.get(FACING);
-    }
-
-    public void updateAction(PedestalTileEntity pedestal)
-    {
-
-    }
-
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
-    {
-
-    }
-
+    /***************************************
+     ****************************************
+     **        Start of Player Stuff       **
+     ****************************************
+     ***************************************/
     public void removePlayerFromCoin(ItemStack stack)
     {
         if(hasPlayerSet(stack))
@@ -1146,8 +1166,52 @@ public class ItemUpgradeBase extends Item {
 
         return null;
     }
+    /***************************************
+     ****************************************
+     **         End of Player Stuff        **
+     ****************************************
+     ***************************************/
+
+
+
+    /***************************************
+     ****************************************
+     **     Start of UpgradeTool Stuff     **
+     ****************************************
+     ***************************************/
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
+    {
+        return 0;
+    }
+
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
+    {
+        return new int[]{0,0};
+    }
+
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
+    {
+        return 0;
+    }
 
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    {
+
+    }
+    /***************************************
+     ****************************************
+     **      End of UpgradeTool Stuff      **
+     ****************************************
+     ***************************************/
+
+
+
+    /***************************************
+     ****************************************
+     **        Start of Client Stuff       **
+     ****************************************
+     ***************************************/
+    public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World worldIn, BlockPos pos, Random rand)
     {
 
     }
@@ -1268,61 +1332,6 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-    /*public void spawnParticleAroundPedestalBase(World world,int tick, BlockPos pos, float r, float g, float b, float alpha)
-    {
-        double dx = (double)pos.getX()-0.5;
-        double dy = (double)pos.getY()-0.5;
-        double dz = (double)pos.getZ()-0.5;
-
-        BlockState state = world.getBlockState(pos);
-        Direction enumfacing = state.get(FACING);
-        switch (enumfacing)
-        {
-            case UP:
-                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.25D,dy+0.15D,dz+0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.15D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED, dx+ 0.75D, dy+0.15D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.15D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
-                return;
-            case DOWN:
-                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+.85D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+.85D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+.85D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+.85D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
-                return;
-            case NORTH:
-                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.25D, dz+.85D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.75D, dz+.85D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.25D, dz+.85D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.75D, dz+.85D,(int)r*255,(int)g*255,(int)b*255));
-                return;
-            case SOUTH:
-                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.25D, dz+0.15D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.75D, dz+0.15D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.25D, dz+0.15D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.75D, dz+0.15D,(int)r*255,(int)g*255,(int)b*255));
-                return;
-            case EAST:
-                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.15D, dy+ 0.25D, dz+0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.15D, dy+ 0.25D, dz+0.75D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.15D, dy+ 0.75D, dz+0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.15D, dy+ 0.75D, dz+0.75D,(int)r*255,(int)g*255,(int)b*255));
-                return;
-            case WEST:
-                if (tick%20 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.85D, dy+0.25D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.85D, dy+0.25D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%15 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.85D, dy+0.75D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+0.85D, dy+0.75D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
-                return;
-            default:
-                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.15D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%35 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.25D, dy+0.15D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%25 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.15D, dz+ 0.25D,(int)r*255,(int)g*255,(int)b*255));
-                if (tick%30 == 0) PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,dx+ 0.75D, dy+0.15D, dz+ 0.75D,(int)r*255,(int)g*255,(int)b*255));
-                return;
-        }
-    }*/
-
     public void spawnParticleAbovePedestal(World world, BlockPos pos, float r, float g, float b, float alpha)
     {
         double dx = (double)pos.getX();
@@ -1357,11 +1366,6 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-    public boolean canSendItem(PedestalTileEntity tile)
-    {
-        return true;
-    }
-
     //Thanks to Lothrazar for this: https://github.com/Lothrazar/Cyclic/blob/5946452faedd1a59375f7813f5ec9f861914ed8a/src/main/java/com/lothrazar/cyclic/base/BlockBase.java#L59
     @Override
     @OnlyIn(Dist.CLIENT)
@@ -1371,5 +1375,48 @@ public class ItemUpgradeBase extends Item {
         t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
     }
+    /***************************************
+     ****************************************
+     **        End of Client Stuff         **
+     ****************************************
+     ***************************************/
 
+
+
+    /***************************************
+     ****************************************
+     **      Start of Pedestal Stuff       **
+     ****************************************
+     ***************************************/
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack itemstack = pedestal.getItemInPedestal();
+            if(!itemstack.isEmpty())
+            {
+                float f = (float)itemstack.getCount()/(float)Math.min(pedestal.getMaxStackSize(), itemstack.getMaxStackSize());
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
+    }
+
+    public void updateAction(PedestalTileEntity pedestal)
+    {
+
+    }
+
+    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    {
+
+    }
+    /***************************************
+     ****************************************
+     **       End of Pedestal Stuff        **
+     ****************************************
+     ***************************************/
 }

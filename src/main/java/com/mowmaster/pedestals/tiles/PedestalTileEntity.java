@@ -302,7 +302,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 if(hasCoin() && coinOnPedestal.getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                    if(IUB.customSlotLimit(getTile(),stack)!=0)
+                    if(IUB.customSlotLimit(getTile(),stack)!=-1)
                     {
                         return IUB.customSlotLimit(getTile(),stack);
                     }
@@ -327,7 +327,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                     if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                     {
                         ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                        if(!IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).isEmpty())
+                        if(!IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).getItem().equals(Items.COMMAND_BLOCK))
                         {
                             return IUB.customStackInSlot(getTile(),super.getStackInSlot(slot));
                         }
@@ -347,7 +347,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 else if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                    if(!IUB.customInsertItem(getTile(),stack, simulate).isEmpty())
+                    if(!IUB.customInsertItem(getTile(),stack, simulate).getItem().equals(Items.COMMAND_BLOCK))
                     {
                         return IUB.customInsertItem(getTile(),stack, simulate);
                     }
@@ -367,7 +367,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 else if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                    if(!IUB.customExtractItem(getTile(),amount, simulate).isEmpty())
+                    if(!IUB.customExtractItem(getTile(),amount, simulate).getItem().equals(Items.COMMAND_BLOCK))
                     {
                         return IUB.customExtractItem(getTile(),amount, simulate);
                     }
