@@ -287,6 +287,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                //System.out.println("Is Valid");
                 if (slot == 0) return true;
                 return false;
             }
@@ -302,22 +303,32 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 if(hasCoin() && coinOnPedestal.getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                    if(IUB.customSlotLimit(getTile(),stack)!=-1)
-                    {
-                        return IUB.customSlotLimit(getTile(),stack);
-                    }
-                    else
-                    {
-                        return IUB.canAcceptCount(world,pos,getItemInPedestal(),stack);
-                    }
+                    return IUB.canAcceptCount(world,pos,getItemInPedestal(),stack);
                 }
                 else return super.getStackLimit(slot, stack);
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+
+                ItemStack coinOnPedestal = getCoinOnPedestal();
+                if(hasCoin() && coinOnPedestal.getItem() instanceof ItemUpgradeBase)
+                {
+                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    //System.out.println(IUB.customSlotLimit(getTile(),stack));
+                    if(IUB.customSlotLimit(getTile())!=-1)
+                    {
+                        return IUB.customSlotLimit(getTile());
+                    }
+                }
+
+                return super.getSlotLimit(slot);
+
             }
 
             @Nonnull
             @Override
             public ItemStack getStackInSlot(int slot) {
-
                 if(slot == -1)
                 {
                     return super.getStackInSlot(0);
@@ -327,19 +338,21 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                     if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                     {
                         ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                        //System.out.println(IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).getItem().getName().getString());
                         if(!IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).getItem().equals(Items.COMMAND_BLOCK))
                         {
                             return IUB.customStackInSlot(getTile(),super.getStackInSlot(slot));
                         }
                     }
                 }
-
+                //System.out.println(super.getStackInSlot(slot));
                 return super.getStackInSlot(slot);
             }
 
             @Nonnull
             @Override
             public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+                //System.out.println("AttemptInsert");
                 if(slot==-1)
                 {
                     return super.insertItem(0, stack, simulate);
@@ -347,12 +360,13 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 else if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                    if(!IUB.customInsertItem(getTile(),stack, simulate).getItem().equals(Items.COMMAND_BLOCK))
+                    //System.out.println("Coin: "+IUB.customInsertItem(getTile(),stack, true).getItem().getName().toString());
+                    if(!IUB.customInsertItem(getTile(),stack, true).getItem().equals(Items.COMMAND_BLOCK))
                     {
                         return IUB.customInsertItem(getTile(),stack, simulate);
                     }
                 }
-
+                //System.out.println("No Coin: "+super.insertItem(slot, stack, simulate));
                 return super.insertItem(slot, stack, simulate);
             }
 
@@ -367,7 +381,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 else if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                    if(!IUB.customExtractItem(getTile(),amount, simulate).getItem().equals(Items.COMMAND_BLOCK))
+                    if(!IUB.customExtractItem(getTile(),amount, true).getItem().equals(Items.COMMAND_BLOCK))
                     {
                         return IUB.customExtractItem(getTile(),amount, simulate);
                     }

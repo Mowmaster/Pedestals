@@ -223,15 +223,9 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     }
 
     @Override
-    public int customSlotLimit(PedestalTileEntity pedestal, ItemStack stackIn)
+    public int customSlotLimit(PedestalTileEntity pedestal)
     {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        if(stackIn.getItem().equals(getItemToSpawn(pedestal)))
-        {
-            return maxCobbleStorage(pedestal);
-        }
-
-        return 0;
+        return maxCobbleStorage(pedestal);
     }
 
     public int addCobble(PedestalTileEntity pedestal, int amountIn ,boolean simulate)

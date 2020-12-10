@@ -91,7 +91,7 @@ public class ItemUpgradeBase extends Item {
         return new ItemStack(Items.COMMAND_BLOCK);
     }
 
-    public int customSlotLimit(PedestalTileEntity pedestal, ItemStack stackIn)
+    public int customSlotLimit(PedestalTileEntity pedestal)
     {
         return -1;
     }
