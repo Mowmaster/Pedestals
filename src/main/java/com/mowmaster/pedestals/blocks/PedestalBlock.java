@@ -275,7 +275,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 {
                     if (player.getHeldItemMainhand().isEmpty()) {
                         if (tilePedestal.hasItem()) {
-                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItemOverRide());
+                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItemOverride());
                             //player.inventory.addItemStackToInventory(tilePedestal.removeItem());
                         }
                     }
@@ -448,7 +448,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 }
                 else if (player.getHeldItemMainhand().isEmpty()) {
                     if (tilePedestal.hasItem()) {
-                        ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItemOverRide());
+                        ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItemOverride());
                     }
                 }
                 else

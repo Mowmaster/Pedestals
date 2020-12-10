@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegen",
+  "ingredient": {
+    "item": "minecraft:basalt"
+  },
+  "result": {
+    "item": "minecraft:basalt",
+    "count": 1
+  }
+}

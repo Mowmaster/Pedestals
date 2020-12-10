@@ -178,7 +178,7 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                                     if(!returnerStack.isEmpty())
                                     {
                                         removeFluid(pedestal,coinInPedestal,fluidDrained,false);
-                                        pedestal.removeItemOverRide();
+                                        pedestal.removeItemOverride();
                                         pedestal.addItem(returnerStack);
                                     }
                                 }
@@ -213,7 +213,7 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                                     if(!returnerStack.isEmpty())
                                     {
                                         removeFluid(pedestal,coinInPedestal,fluidDrained,false);
-                                        pedestal.removeItemOverRide();
+                                        pedestal.removeItemOverride();
                                         pedestal.addItem(returnerStack);
                                     }
                                 }

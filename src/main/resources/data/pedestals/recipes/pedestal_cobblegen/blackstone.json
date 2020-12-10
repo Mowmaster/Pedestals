@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegen",
+  "ingredient": {
+    "item": "minecraft:gilded_blackstone"
+  },
+  "result": {
+    "item": "minecraft:blackstone",
+    "count": 1
+  }
+}

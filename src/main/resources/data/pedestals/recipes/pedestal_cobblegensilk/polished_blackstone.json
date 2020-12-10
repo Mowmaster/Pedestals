@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegensilk",
+  "ingredient": {
+    "item": "minecraft:gilded_blackstone"
+  },
+  "result": {
+    "item": "minecraft:polished_blackstone",
+    "count": 1
+  }
+}

@@ -155,7 +155,7 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
                                     FluidStack fluidDrained = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.EXECUTE);
                                     addFluid(pedestal,coinInPedestal,fluidDrained,false);
                                     ItemStack returnerStack = fluidHandlerItem.getContainer();
-                                    pedestal.removeItemOverRide();
+                                    pedestal.removeItemOverride();
                                     pedestal.addItem(returnerStack);
                                 }
                             }
@@ -185,7 +185,7 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
                                         FluidStack fluidDrained = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.EXECUTE);
                                         addFluid(pedestal,coinInPedestal,fluidDrained,false);
                                         ItemStack returnerStack = fluidHandlerItem.getContainer();
-                                        pedestal.removeItemOverRide();
+                                        pedestal.removeItemOverride();
                                         pedestal.addItem(returnerStack);
                                     }
                                 }
@@ -215,7 +215,7 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
                                     addFluid(pedestal,coinInPedestal,fluidDrained,false);
                                     ItemStack returnerStack = fluidHandlerItem.getContainer();
                                     //System.out.println(returnerStack.getDisplayName().getString());
-                                    pedestal.removeItemOverRide();
+                                    pedestal.removeItemOverride();
                                     pedestal.addItem(returnerStack);
                                 }
                             }

@@ -580,6 +580,38 @@ public class ItemUpgradeBase extends Item {
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
+     /***************************************
+     ****************************************
+     ** Start of Custom IItemHandler Stuff **
+     ****************************************
+     ***************************************/
+
+    public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
+    {
+        return ItemStack.EMPTY;
+    }
+
+    public ItemStack customInsertItem(PedestalTileEntity pedestal, ItemStack stackIn, boolean simulate)
+    {
+        return ItemStack.EMPTY;
+    }
+
+    public ItemStack customStackInSlot(PedestalTileEntity pedestal,ItemStack stackFromHandler)
+    {
+        return ItemStack.EMPTY;
+    }
+
+    public int customSlotLimit(PedestalTileEntity pedestal, ItemStack stackIn)
+    {
+        return 0;
+    }
+
+     /***************************************
+     ****************************************
+     **  End of Custom IItemHandler Stuff  **
+     ****************************************
+     ***************************************/
+
     //For Filters to return if they can or cannot allow items to pass
     //Will probably need overwritten
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)

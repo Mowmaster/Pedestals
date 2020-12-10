@@ -18,6 +18,12 @@ public final class PedestalsSerializers {
     public static final RegistryObject<IRecipeSerializer<?>> SAWING = RECIPES.register("pedestal_sawing", () ->
             SawMillRecipe.serializer);
 
+    public static final RegistryObject<IRecipeSerializer<?>> COBBLEGEN = RECIPES.register("pedestal_cobblegen", () ->
+            CobbleGenRecipe.serializer);
+
+    public static final RegistryObject<IRecipeSerializer<?>> COBBLEGEN_SILK = RECIPES.register("pedestal_cobblegensilk", () ->
+            CobbleGenSilkRecipe.serializer);
+
     public static final RegistryObject<IRecipeSerializer<?>> COLORING = RECIPES.register("pedestal_coloring", () ->
             ColoredPedestalRecipe.serializer);
 }

@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegensilk",
+  "ingredient": {
+    "item": "minecraft:blue_ice"
+  },
+  "result": {
+    "item": "minecraft:packed_ice",
+    "count": 1
+  }
+}

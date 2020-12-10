@@ -298,12 +298,62 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
             @Override
             protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
-                if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                ItemStack coinOnPedestal = getCoinOnPedestal();
+                if(hasCoin() && coinOnPedestal.getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                    return IUB.canAcceptCount(world,pos,getItemInPedestal(),stack);
+                    if(IUB.customSlotLimit(getTile(),stack)!=0)
+                    {
+                        return IUB.customSlotLimit(getTile(),stack);
+                    }
+                    else
+                    {
+                        return IUB.canAcceptCount(world,pos,getItemInPedestal(),stack);
+                    }
                 }
                 else return super.getStackLimit(slot, stack);
+            }
+
+            @Nonnull
+            @Override
+            public ItemStack getStackInSlot(int slot) {
+
+                if(slot == -1)
+                {
+                    return super.getStackInSlot(0);
+                }
+                else if(hasCoin())
+                {
+                    if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                    {
+                        ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                        if(!IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).isEmpty())
+                        {
+                            return IUB.customStackInSlot(getTile(),super.getStackInSlot(slot));
+                        }
+                    }
+                }
+
+                return super.getStackInSlot(slot);
+            }
+
+            @Nonnull
+            @Override
+            public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+                if(slot==-1)
+                {
+                    return super.insertItem(0, stack, simulate);
+                }
+                else if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                {
+                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    if(!IUB.customInsertItem(getTile(),stack, simulate).isEmpty())
+                    {
+                        return IUB.customInsertItem(getTile(),stack, simulate);
+                    }
+                }
+
+                return super.insertItem(slot, stack, simulate);
             }
 
             @Nonnull
@@ -317,7 +367,14 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                 else if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                    return IUB.canSendItem(getTile())?(super.extractItem(slot, amount, simulate)):(ItemStack.EMPTY);
+                    if(!IUB.customExtractItem(getTile(),amount, simulate).isEmpty())
+                    {
+                        return IUB.customExtractItem(getTile(),amount, simulate);
+                    }
+                    else
+                    {
+                        return IUB.canSendItem(getTile())?(super.extractItem(slot, amount, simulate)):(ItemStack.EMPTY);
+                    }
                 }
                 else return super.extractItem(slot, amount, simulate);
             }
@@ -491,17 +548,23 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
             return h.getStackInSlot(0);
         }
         else return ItemStack.EMPTY;
+    }
 
+    public ItemStack getItemInPedestalOverride()
+    {
+        IItemHandler h = handler.orElse(null);
+        return h.getStackInSlot(-1);
     }
 
     public ItemStack getCoinOnPedestal()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        if(hasCoin())
+        return ph.getStackInSlot(0);
+        /*if(hasCoin())
         {
             return ph.getStackInSlot(0);
         }
-        else return ItemStack.EMPTY;
+        else return ItemStack.EMPTY;*/
     }
 
     public int getSpeed()
@@ -537,6 +600,14 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         return stack;
     }
 
+    public ItemStack removeItemOverride(int numToRemove) {
+        IItemHandler h = handler.orElse(null);
+        ItemStack stack = h.extractItem(-1,numToRemove,false);
+        //update();
+
+        return stack;
+    }
+
     public ItemStack removeItem() {
         IItemHandler h = handler.orElse(null);
         ItemStack stack = h.extractItem(0,h.getStackInSlot(0).getCount(),false);
@@ -545,7 +616,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         return stack;
     }
 
-    public ItemStack removeItemOverRide() {
+    public ItemStack removeItemOverride() {
         IItemHandler h = handler.orElse(null);
         ItemStack stack = h.extractItem(-1,h.getStackInSlot(0).getCount(),false);
         //update();
@@ -583,7 +654,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     public void dropInventoryItems(World worldIn, BlockPos pos) {
         IItemHandler h = handler.orElse(null);
         for(int i = 0; i < h.getSlots(); ++i) {
-            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
+            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(-1));
         }
     }
 
@@ -714,6 +785,22 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
             }
         }
         else {h.insertItem(0, itemFromBlock.copy(), false);}
+        //update();
+
+        return true;
+    }
+
+    public boolean addItemOverride(ItemStack itemFromBlock)
+    {
+        IItemHandler h = handler.orElse(null);
+        if(hasItem())
+        {
+            if(doItemsMatch(itemFromBlock))
+            {
+                h.insertItem(-1, itemFromBlock.copy(), false);
+            }
+        }
+        else {h.insertItem(-1, itemFromBlock.copy(), false);}
         //update();
 
         return true;

@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegen",
+  "ingredient": {
+    "item": "minecraft:vine"
+  },
+  "result": {
+    "item": "minecraft:mossy_cobblestone",
+    "count": 1
+  }
+}

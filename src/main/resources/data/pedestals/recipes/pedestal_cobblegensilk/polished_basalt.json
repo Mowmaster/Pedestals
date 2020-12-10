@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegensilk",
+  "ingredient": {
+    "item": "minecraft:basalt"
+  },
+  "result": {
+    "item": "minecraft:polished_basalt",
+    "count": 1
+  }
+}

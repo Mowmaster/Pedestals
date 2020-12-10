@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegen",
+  "ingredient": {
+    "item": "minecraft:purpur_block"
+  },
+  "result": {
+    "item": "minecraft:end_stone",
+    "count": 1
+  }
+}

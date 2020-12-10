@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegen",
+  "ingredient": {
+    "item": "minecraft:blue_ice"
+  },
+  "result": {
+    "item": "minecraft:ice",
+    "count": 1
+  }
+}

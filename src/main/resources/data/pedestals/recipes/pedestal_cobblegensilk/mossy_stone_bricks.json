@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegensilk",
+  "ingredient": {
+    "item": "minecraft:vine"
+  },
+  "result": {
+    "item": "minecraft:mossy_stone_bricks",
+    "count": 1
+  }
+}

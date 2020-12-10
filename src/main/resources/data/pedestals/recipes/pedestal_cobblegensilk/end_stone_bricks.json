@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_cobblegensilk",
+  "ingredient": {
+    "item": "minecraft:purpur_block"
+  },
+  "result": {
+    "item": "minecraft:end_stone_bricks",
+    "count": 1
+  }
+}
