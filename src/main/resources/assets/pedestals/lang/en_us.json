@@ -149,7 +149,13 @@
     "item.pedestals.coin.cobble.chat_speed": "Operational Speed: ",
     "jei.pedestals.cobble.desc": "By Default This Will Generate Cobblestone, If a stack exists in the buffer, 1 Stack of cobblestone will always be available in the pedestal. You Can drop Cobble on the pedestal to store it in the buffer. The buffer holds ~2 billion cobble. Putting Specific Blocks under the pedestal may change what the generator produces.",
 
-    "item.pedestals.coin.crafter1": "Pedestal Upgrade",
+  "item.pedestals.coin.itemtank": "Pedestal Upgrade",
+  "item.pedestals.coin.itemtank.tooltip_name": "Item Tank Upgrade",
+  "item.pedestals.coin.itemtank.chat_stored": "Stored: ",
+  "item.pedestals.coin.itemtank.chat_buffer": "Max Storage: ",
+  "jei.pedestals.itemtank.desc": "Stores Lots of 1 type of Item, If a stack exists in the buffer, 1 Stack will always be available in the pedestal. You Can The Item on the pedestal to store it in the buffer. The buffer holds up to ~2 billion items when enchanted.",
+
+  "item.pedestals.coin.crafter1": "Pedestal Upgrade",
     "item.pedestals.coin.crafter1.tooltip_name": "Crafter Upgrade (1x1)",
     "item.pedestals.coin.crafter1.tooltip_rate": "Recipes Crafted Per Operation: ",
     "item.pedestals.coin.crafter1.tooltip_speed": "Operational Speed: ",

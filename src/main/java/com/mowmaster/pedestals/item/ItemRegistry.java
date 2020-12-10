@@ -87,6 +87,7 @@ public class ItemRegistry
         ItemUpgradeFilteredExportEnchanted.onItemRegistryReady(e);
         ItemUpgradeRestock.onItemRegistryReady(e);
         ItemUpgradeFilteredRestock.onItemRegistryReady(e);
+        ItemUpgradeItemTank.onItemRegistryReady(e);
 
         ItemUpgradeFilterItem.onItemRegistryReady(e);
         ItemUpgradeFilterItemBlacklist.onItemRegistryReady(e);

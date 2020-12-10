@@ -852,6 +852,12 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
         return false;
     }
 
+    public ItemStack addItemCustom(ItemStack itemFromBlock,boolean simulate)
+    {
+        IItemHandler h = handler.orElse(null);
+        return h.insertItem(0, itemFromBlock.copy(), false);
+    }
+
     public boolean addCoin(PlayerEntity player, ItemStack coinFromBlock,boolean simulate)
     {
         if(!hasCoin())
