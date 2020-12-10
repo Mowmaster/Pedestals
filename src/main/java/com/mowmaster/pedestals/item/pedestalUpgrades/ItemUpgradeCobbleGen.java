@@ -138,7 +138,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     @Override
     public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
     {
-        ItemStack coinOnPedestal = pedestal.getCoinOnPedestal();
+        //Return stack that was extracted, (it cant be more then the amountOut or max size)
         ItemStack itemStackToExtract = new ItemStack(getItemToSpawn(pedestal));
         int cobbleToRemove = removeCobble(pedestal,amountOut,true);
         if(cobbleToRemove==0)
@@ -148,7 +148,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 removeCobble(pedestal,amountOut,false);
             }
-            return itemStackToExtract;
+            return new ItemStack(itemStackToExtract.getItem(),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
         }
         else
         {
@@ -164,7 +164,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     @Override
     public ItemStack customInsertItem(PedestalTileEntity pedestal, ItemStack stackIn, boolean simulate)
     {
-        ItemStack coinOnPedestal = pedestal.getCoinOnPedestal();
+        //Return stack to be inserted if nothing can be accepted, otherwise return Empty if All can be inserted
         if(stackIn.getItem().equals(getItemToSpawn(pedestal)))
         {
             int cobbleToAdd = addCobble(pedestal,stackIn.getCount(),true);
@@ -176,7 +176,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                     {
                         addCobble(pedestal,stackIn.getCount(),false);
                     }
-                    return stackIn;
+                    return ItemStack.EMPTY;
                 }
                 else
                 {
@@ -186,12 +186,15 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                     {
                         addCobble(pedestal,cobbleToAdd,false);
                     }
+                    int currentIn = stackIn.getCount();
+                    int diff = currentIn - cobbleToAdd;
+                    copyStackIn.setCount(diff);
                     return copyStackIn;
                 }
             }
         }
 
-        return ItemStack.EMPTY;
+        return stackIn;
     }
 
     @Override
@@ -242,6 +245,21 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             return 0;
         }
         return space;
+    }
+
+    public int removeCobbleBuffer(PedestalTileEntity pedestal, int amountOut ,boolean simulate)
+    {
+        //Returns 0 if it can remove all cobble, otherwise returns the amount you could remove
+        int current = getCobbleStored(pedestal);
+        if((current - amountOut)>=0)
+        {
+            if(!simulate)
+            {
+                pedestal.setStoredValueForUpgrades((current - amountOut));
+            }
+            return 0;
+        }
+        return current;
     }
 
     public int removeCobble(PedestalTileEntity pedestal, int amountOut ,boolean simulate)
@@ -332,21 +350,20 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         ItemStack itemInPedestal = pedestal.getItemInPedestalOverride();
         int intSpace = intSpaceLeftInStack(itemInPedestal);
         int cobbleStored = this.getCobbleStored(pedestal);
-        ItemStack stackSpawnedItem = new ItemStack(getItemToSpawn(pedestal));
-        stackSpawnedItem.setCount(intSpace);
-
+        ItemStack stackSpawnedItem = new ItemStack(getItemToSpawn(pedestal),intSpace);
         if(intSpace>0 && cobbleStored>0)
         {
-            int cobbleToRemove = removeCobble(pedestal,intSpace,true);
+
+            int cobbleToRemove = removeCobbleBuffer(pedestal,intSpace,true);
             if(cobbleToRemove==0)
             {
-                this.removeCobble(pedestal,intSpace,false);
+                this.removeCobbleBuffer(pedestal,intSpace,false);
                 pedestal.addItemOverride(stackSpawnedItem);
             }
             else
             {
                 stackSpawnedItem.setCount(cobbleToRemove);
-                this.removeCobble(pedestal,cobbleToRemove,false);
+                this.removeCobbleBuffer(pedestal,cobbleToRemove,false);
                 pedestal.addItemOverride(stackSpawnedItem);
             }
         }

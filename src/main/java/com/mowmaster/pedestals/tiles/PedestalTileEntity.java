@@ -338,7 +338,6 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
                     if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                     {
                         ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                        //System.out.println(IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).getItem().getName().getString());
                         if(!IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).getItem().equals(Items.COMMAND_BLOCK))
                         {
                             return IUB.customStackInSlot(getTile(),super.getStackInSlot(slot));
