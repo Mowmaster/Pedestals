@@ -375,6 +375,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
 
                 if(slot==-1)
                 {
+                    System.out.println("Override: "+super.extractItem(0, amount, true));
                     return super.extractItem(0, amount, simulate);
                 }
                 else if(hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
@@ -855,7 +856,7 @@ public class PedestalTileEntity extends TileEntity implements IInventory, ITicka
     public ItemStack addItemCustom(ItemStack itemFromBlock,boolean simulate)
     {
         IItemHandler h = handler.orElse(null);
-        return h.insertItem(0, itemFromBlock.copy(), false);
+        return h.insertItem(0, itemFromBlock.copy(), simulate);
     }
 
     public boolean addCoin(PlayerEntity player, ItemStack coinFromBlock,boolean simulate)

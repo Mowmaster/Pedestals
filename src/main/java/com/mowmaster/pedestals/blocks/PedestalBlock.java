@@ -552,7 +552,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         TileEntity tileEntity = worldIn.getTileEntity(pos);
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
-            ItemStack itemstack = pedestal.getItemInPedestal();
+            ItemStack itemstack = pedestal.getItemInPedestalOverride();
             ItemStack coin = pedestal.getCoinOnPedestal();
             if(coin.getItem() instanceof ItemUpgradeBase)
             {

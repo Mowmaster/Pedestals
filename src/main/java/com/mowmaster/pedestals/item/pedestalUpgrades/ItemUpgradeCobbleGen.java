@@ -26,6 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -50,6 +51,24 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     @Override
     public Boolean canAcceptCapacity() {
         return true;
+    }
+
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            if(getCobbleStored(pedestal)>0)
+            {
+                float f = (float)getCobbleStored(pedestal)/(float)maxCobbleStorage(pedestal);
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
     }
 
     public int getCobbleGenSpawnRate(ItemStack stack)
@@ -139,6 +158,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
     {
         //Return stack that was extracted, (it cant be more then the amountOut or max size)
+        ItemStack stackInPed = pedestal.getItemInPedestalOverride();
         ItemStack itemStackToExtract = new ItemStack(getItemToSpawn(pedestal));
         int cobbleToRemove = removeCobble(pedestal,amountOut,true);
         if(cobbleToRemove==0)
@@ -148,7 +168,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 removeCobble(pedestal,amountOut,false);
             }
-            return new ItemStack(itemStackToExtract.getItem(),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+            return new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
         }
         else
         {

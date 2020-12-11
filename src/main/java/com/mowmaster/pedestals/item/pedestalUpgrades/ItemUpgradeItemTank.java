@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -9,18 +10,27 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityDispatcher;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.lwjgl.system.CallbackI;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -44,35 +54,49 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
     }
 
     @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            if(!getItemStored(pedestal).isEmpty())
+            {
+                float f = (float)getItemStored(pedestal).getCount()/(float)readMaxStorageFromNBT(coin);
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
+    }
+
+    @Override
     public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
     {
         //Return stack that was extracted, (it cant be more then the amountOut or max size)
         ItemStack stored = getItemStored(pedestal);
-        if(!stored.isEmpty())
+        ItemStack itemInPed = pedestal.getItemInPedestalOverride();
+        int itemsToRemove = removeFromStorage(pedestal,amountOut,true);
+        ItemStack itemStackToExtract = stored.copy();
+        if(itemsToRemove==0)
         {
-            ItemStack itemStackToExtract = stored.copy();
-            int itemsToRemove = removeFromStorage(pedestal,amountOut,true);
-            if(itemsToRemove==0)
+            itemStackToExtract.setCount(amountOut);
+            if(!simulate)
             {
-                itemStackToExtract.setCount(amountOut);
-                if(!simulate)
-                {
-                    removeFromStorage(pedestal,amountOut,false);
-                }
-                return new ItemStack(itemStackToExtract.getItem(),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+                removeFromStorage(pedestal,amountOut,false);
             }
-            else
-            {
-                itemStackToExtract.setCount(itemsToRemove);
-                if(!simulate)
-                {
-                    removeFromStorage(pedestal,itemsToRemove,false);
-                }
-                return itemStackToExtract;
-            }
+            return new ItemStack((stored.isEmpty())?(itemInPed.getItem()):(itemStackToExtract.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
         }
-
-        return ItemStack.EMPTY;
+        else
+        {
+            itemStackToExtract.setCount(itemsToRemove);
+            if(!simulate)
+            {
+                removeFromStorage(pedestal,itemsToRemove,false);
+            }
+            return itemStackToExtract;
+        }
     }
 
     @Override
@@ -80,12 +104,23 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
     {
         //Return stack to be inserted if nothing can be accepted, otherwise return Empty if All can be inserted
         ItemStack stored = getItemStored(pedestal);
-        if(stored.isItemEqual(stackIn) || pedestal.getItemInPedestalOverride().isEmpty() && stored.isEmpty())
+        if(stored.isItemEqual(stackIn) || pedestal.getItemInPedestalOverride().isEmpty() || stored.isEmpty())
         {
             if(pedestal.getItemInPedestalOverride().isEmpty() && stored.isEmpty())
             {
+
                 if(!simulate)
                 {
+                    //System.out.println("Triggered1");
+                    setItemStored(pedestal,stackIn);
+                }
+                return ItemStack.EMPTY;
+            }
+            else if(stored.isEmpty() && pedestal.getItemInPedestalOverride().isItemEqual(stackIn))
+            {
+                if(!simulate)
+                {
+                    //System.out.println("Triggered2");
                     setItemStored(pedestal,stackIn);
                 }
                 return ItemStack.EMPTY;
@@ -99,6 +134,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
                     {
                         if(!simulate)
                         {
+                            //System.out.println("Triggered3");
                             addCountToStorage(pedestal,stackIn.getCount(),false);
                         }
                         return ItemStack.EMPTY;
@@ -109,6 +145,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
                         copyStackIn.setCount(itemsToAdd);
                         if(!simulate)
                         {
+                            //System.out.println("Triggered4");
                             addCountToStorage(pedestal,itemsToAdd,false);
                         }
                         int currentIn = stackIn.getCount();
@@ -174,6 +211,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
                 int current = stored.getCount();
                 storedCopy.setCount(current+amountIn);
                 setItemStored(pedestal,storedCopy);
+                System.out.println(getItemStored(pedestal));
             }
             return 0;
         }
@@ -243,6 +281,66 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         return maxStorage(pedestal)-getCountStored(pedestal);
     }
 
+    public CompoundNBT writeStack(CompoundNBT nbt,ItemStack stack) {
+        ResourceLocation resourcelocation = Registry.ITEM.getKey(stack.getItem());
+        nbt.putString(Reference.MODID+"_"+"id", resourcelocation == null?"minecraft:air":resourcelocation.toString());
+        nbt.putInt(Reference.MODID+"_"+"Count", (int)stack.getCount());
+        if(stack.getTag() != null) {
+            nbt.put(Reference.MODID+"_"+"tag", stack.getTag().copy());
+        }
+
+        //Might just have to make my own item count storage and use this for the item
+        /*CompoundNBT cnbt = stack.serializeCaps();
+        if(cnbt != null && !cnbt.isEmpty()) {
+            nbt.put("ForgeCaps", cnbt);
+        }*/
+
+        return nbt;
+    }
+
+    public void setItemStored(PedestalTileEntity pedestal, ItemStack stack)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+        }
+
+        compound = writeStack(compound,stack);
+        coin.setTag(compound);
+        pedestal.update();
+    }
+
+    public ItemStack readStackFromNBT(CompoundNBT compound) {
+        CompoundNBT compoundNBT = new CompoundNBT();
+        Item getItem = ItemStack.EMPTY.getItem();
+        int getCount = 0;
+        getItem = (Item)Registry.ITEM.getOrDefault(new ResourceLocation(compound.getString("id")));
+        getCount = compound.getInt(Reference.MODID+"_"+"Count");
+        if(compound.contains(Reference.MODID+"_"+"tag", 10)) {
+            compoundNBT = compound.getCompound(Reference.MODID+"_"+"tag");
+            getItem.updateItemStackNBT(compound);
+        }
+
+        return new ItemStack(getItem,getCount);
+    }
+
+    public ItemStack getItemStored(PedestalTileEntity pedestal)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+        }
+
+        ItemStack returner = readStackFromNBT(compound);
+
+        return returner;
+    }
+
+    /*
     public void setItemStored(PedestalTileEntity pedestal, ItemStack stack)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
@@ -271,6 +369,20 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
         return returner;
     }
+
+    public ItemStack getItemStored(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+        }
+
+        ItemStack returner = coin.read(compound);
+
+        return returner;
+    }
+     */
 
     public ItemStack getItemStored(ItemStack coin)
     {
@@ -418,6 +530,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             if(tilePedestal.addItemCustom(stackCollidedItem,true).isEmpty())
             {
                 tilePedestal.addItemCustom(stackCollidedItem,false);
+                ((ItemEntity) entityIn).remove();
             }
             else
             {
@@ -440,10 +553,24 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
         ItemStack storedStack = getItemStored(pedestal);
         TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
-        stored.appendString("" +  storedStack.getDisplayName().getString() + " - ");
-        stored.appendString("" +  (storedStack.getCount()+pedestal.getItemInPedestalOverride().getCount()) + "");
-        stored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(stored, Util.DUMMY_UUID);
+        if(!storedStack.isEmpty())
+        {
+            stored.appendString("" +  storedStack.getDisplayName().getString() + " - ");
+            stored.appendString("" +  (storedStack.getCount()+pedestal.getItemInPedestalOverride().getCount()) + "");
+            stored.mergeStyle(TextFormatting.GREEN);
+            player.sendMessage(stored, Util.DUMMY_UUID);
+        }
+        else
+        {
+            if(!pedestal.getItemInPedestalOverride().isEmpty())
+            {
+                stored.appendString("" +  pedestal.getItemInPedestalOverride().getDisplayName().getString() + " - ");
+                stored.appendString("" +  (pedestal.getItemInPedestalOverride().getCount()) + "");
+                stored.mergeStyle(TextFormatting.GREEN);
+                player.sendMessage(stored, Util.DUMMY_UUID);
+            }
+        }
+
 
         TranslationTextComponent buffer = new TranslationTextComponent(getTranslationKey() + ".chat_buffer");
         buffer.appendString("" + readMaxStorageFromNBT(stack) + "");
@@ -457,16 +584,19 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         ItemStack storedStack = getItemStored(stack);
-        TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
-        stored.appendString("" +  storedStack.getDisplayName().getString() + " - ");
-        stored.appendString("" +  (storedStack.getCount()) + "");
-        stored.mergeStyle(TextFormatting.GREEN);
+        if(!storedStack.isEmpty())
+        {
+            TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
+            stored.appendString("" +  storedStack.getDisplayName().getString() + " - ");
+            stored.appendString("" +  (storedStack.getCount()) + "");
+            stored.mergeStyle(TextFormatting.GREEN);
+            tooltip.add(stored);
+        }
 
         TranslationTextComponent buffer = new TranslationTextComponent(getTranslationKey() + ".chat_buffer");
-        buffer.appendString("" + readMaxStorageFromNBT(stack) + "");
+        buffer.appendString("" + getStorageBuffer(stack) + "");
         buffer.mergeStyle(TextFormatting.AQUA);
-
-        tooltip.add(stored);
+        tooltip.add(buffer);
     }
 
     public static final Item ITEMTANK = new ItemUpgradeItemTank(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/itemtank"));
