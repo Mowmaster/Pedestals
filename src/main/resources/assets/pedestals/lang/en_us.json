@@ -1195,7 +1195,7 @@
     "block.pedestals.pedestal333": "Pedestal",
     "jei.pedestals.pedestal333.desc": "Pedestals Can Be Placed on all 6 sides, Colored with Colored Pallets, Lit up with a Block of Glowstone, and Upgraded with Upgrades. Upgraded Pedestals Can be powered off with a Redstone Signal.",
 
-    "pedestals.pedestal_block.cant_color": "Color Can't be set on Pedestals with Items, Light, Upgrades, or Linked Pedestals",
+    "pedestals.pedestal_block.cant_color": "Color Can't be set on Pedestals already this color, on pedestals with Items, Light, Upgrades, or Linked Pedestals",
 
     "item.pedestals.dustiron": "Iron Dust",
     "item.pedestals.dustgold": "Gold Dust",

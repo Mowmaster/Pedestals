@@ -42,6 +42,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
@@ -69,12 +70,49 @@ public class ItemUpgradeBase extends Item {
     //https://skmedix.github.io/ForgeJavaDocs/javadoc/forge/1.9.4-12.17.0.2051/net/minecraftforge/items/IItemHandler.html
 
 
+    public boolean customIsValid(PedestalTileEntity pedestal, int slot, @Nonnull ItemStack stack)
+    {
+        return (slot==0)?(true):(false);
+    }
+
     //ItemStack extracted from the slot, must be null, if nothing can be extracted
     public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
     {
         //Default return that forces pedestal to do a normal thing
         return new ItemStack(Items.COMMAND_BLOCK);
     }
+    /*
+    @Nonnull
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        if(amount == 0) {
+            return ItemStack.EMPTY;
+        } else {
+            this.validateSlotIndex(slot);
+            ItemStack existing = (ItemStack)this.stacks.get(slot);
+            if(existing.isEmpty()) {
+                return ItemStack.EMPTY;
+            } else {
+                int toExtract = Math.min(amount, existing.getMaxStackSize());
+                if(existing.getCount() <= toExtract) {
+                    if(!simulate) {
+                        this.stacks.set(slot, ItemStack.EMPTY);
+                        this.onContentsChanged(slot);
+                        return existing;
+                    } else {
+                        return existing.copy();
+                    }
+                } else {
+                    if(!simulate) {
+                        this.stacks.set(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
+                        this.onContentsChanged(slot);
+                    }
+
+                    return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
+                }
+            }
+        }
+    }
+     */
 
     //The remaining ItemStack that was not inserted (if the entire stack is accepted, then return null).
     //May be the same as the input ItemStack if unchanged, otherwise a new ItemStack.
@@ -83,6 +121,44 @@ public class ItemUpgradeBase extends Item {
         //Default return that forces pedestal to do a normal thing
         return new ItemStack(Items.COMMAND_BLOCK);
     }
+    /*
+    @Nonnull
+    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+        if(stack.isEmpty()) {
+            return ItemStack.EMPTY;
+        } else if(!this.isItemValid(slot, stack)) {
+            return stack;
+        } else {
+            this.validateSlotIndex(slot);
+            ItemStack existing = (ItemStack)this.stacks.get(slot);
+            int limit = this.getStackLimit(slot, stack);
+            if(!existing.isEmpty()) {
+                if(!ItemHandlerHelper.canItemStacksStack(stack, existing)) {
+                    return stack;
+                }
+
+                limit -= existing.getCount();
+            }
+
+            if(limit <= 0) {
+                return stack;
+            } else {
+                boolean reachedLimit = stack.getCount() > limit;
+                if(!simulate) {
+                    if(existing.isEmpty()) {
+                        this.stacks.set(slot, reachedLimit?ItemHandlerHelper.copyStackWithSize(stack, limit):stack);
+                    } else {
+                        existing.grow(reachedLimit?limit:stack.getCount());
+                    }
+
+                    this.onContentsChanged(slot);
+                }
+
+                return reachedLimit?ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit):ItemStack.EMPTY;
+            }
+        }
+    }
+     */
 
     //ItemStack in given slot. May be null.
     public ItemStack customStackInSlot(PedestalTileEntity pedestal,ItemStack stackFromHandler)
@@ -267,6 +343,20 @@ public class ItemUpgradeBase extends Item {
      ****************************************
      ***************************************/
 //Info Used to create this goes to https://github.com/BluSunrize/ImmersiveEngineering/blob/f40a49da570c991e51dd96bba1d529e20da6caa6/src/main/java/blusunrize/immersiveengineering/api/ApiUtils.java#L338
+    public static LazyOptional<IItemHandler> findItemHandlerPedestal(PedestalTileEntity pedestal)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pos = pedestal.getPos();
+        TileEntity neighbourTile = world.getTileEntity(pos);
+        if(neighbourTile!=null)
+        {
+            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP);
+            if(cap.isPresent())
+                return cap;
+        }
+        return LazyOptional.empty();
+    }
+
     public static LazyOptional<IItemHandler> findItemHandlerAtPos(World world, BlockPos pos, Direction side, boolean allowCart)
     {
         TileEntity neighbourTile = world.getTileEntity(pos);

@@ -161,7 +161,12 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         ItemStack stackInPed = pedestal.getItemInPedestalOverride();
         ItemStack itemStackToExtract = new ItemStack(getItemToSpawn(pedestal));
         int cobbleToRemove = removeCobble(pedestal,amountOut,true);
-        if(cobbleToRemove==0)
+        if(getCobbleStored(pedestal)<=0)
+        {
+            //Should default to normal pedestal pull out methods
+            return new ItemStack(Items.COMMAND_BLOCK);
+        }
+        else if(cobbleToRemove==0)
         {
             itemStackToExtract.setCount(amountOut);
             if(!simulate)

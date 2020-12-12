@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -9,26 +8,23 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityDispatcher;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.lwjgl.system.CallbackI;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -61,9 +57,9 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
-            if(!getItemStored(pedestal).isEmpty())
+            if(!getItemStored(coin).isEmpty())
             {
-                float f = (float)getItemStored(pedestal).getCount()/(float)readMaxStorageFromNBT(coin);
+                float f = (float)getItemStored(coin).getCount()/(float)readMaxStorageFromNBT(coin);
                 intItem = MathHelper.floor(f*14.0F)+1;
             }
         }
@@ -72,30 +68,21 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
     }
 
     @Override
-    public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
+    public boolean customIsValid(PedestalTileEntity pedestal, int slot, @Nonnull ItemStack stack)
     {
-        //Return stack that was extracted, (it cant be more then the amountOut or max size)
         ItemStack stored = getItemStored(pedestal);
-        ItemStack itemInPed = pedestal.getItemInPedestalOverride();
-        int itemsToRemove = removeFromStorage(pedestal,amountOut,true);
-        ItemStack itemStackToExtract = stored.copy();
-        if(itemsToRemove==0)
+        ItemStack inPed = pedestal.getItemInPedestalOverride();
+        if(stored.isEmpty() && inPed.isEmpty())
         {
-            itemStackToExtract.setCount(amountOut);
-            if(!simulate)
-            {
-                removeFromStorage(pedestal,amountOut,false);
-            }
-            return new ItemStack((stored.isEmpty())?(itemInPed.getItem()):(itemStackToExtract.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+            return (slot==0)?(true):(false);
+        }
+        else if(stored.isEmpty() && !inPed.isEmpty())
+        {
+            return (slot==0)?(inPed.isItemEqual(stack)):(false);
         }
         else
         {
-            itemStackToExtract.setCount(itemsToRemove);
-            if(!simulate)
-            {
-                removeFromStorage(pedestal,itemsToRemove,false);
-            }
-            return itemStackToExtract;
+            return (slot==0)?(inPed.isItemEqual(stack) && stored.isItemEqual(stack)):(false);
         }
     }
 
@@ -104,25 +91,13 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
     {
         //Return stack to be inserted if nothing can be accepted, otherwise return Empty if All can be inserted
         ItemStack stored = getItemStored(pedestal);
-        if(stored.isItemEqual(stackIn) || pedestal.getItemInPedestalOverride().isEmpty() || stored.isEmpty())
-        {
-            if(pedestal.getItemInPedestalOverride().isEmpty() && stored.isEmpty())
-            {
+        ItemStack inPed = pedestal.getItemInPedestalOverride();
 
-                if(!simulate)
-                {
-                    //System.out.println("Triggered1");
-                    setItemStored(pedestal,stackIn);
-                }
-                return ItemStack.EMPTY;
-            }
-            else if(stored.isEmpty() && pedestal.getItemInPedestalOverride().isItemEqual(stackIn))
+        if(customIsValid(pedestal,0,stackIn))
+        {
+            if(stored.isEmpty())
             {
-                if(!simulate)
-                {
-                    //System.out.println("Triggered2");
-                    setItemStored(pedestal,stackIn);
-                }
+                if(!simulate)setItemStored(pedestal,stackIn);
                 return ItemStack.EMPTY;
             }
             else
@@ -158,6 +133,39 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         }
 
         return stackIn;
+    }
+
+    @Override
+    public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
+    {
+        //Return stack that was extracted, (it cant be more then the amountOut or max size)
+        ItemStack stored = getItemStored(pedestal);
+        ItemStack itemInPed = pedestal.getItemInPedestalOverride();
+        int itemsToRemove = removeFromStorage(pedestal,amountOut,true);
+        ItemStack itemStackToExtract = stored.copy();
+        if(stored.isEmpty())
+        {
+            //Should default to normal pedestal pull out methods
+            return new ItemStack(Items.COMMAND_BLOCK);
+        }
+        else if(itemsToRemove==0)
+        {
+            itemStackToExtract.setCount(amountOut);
+            if(!simulate)
+            {
+                removeFromStorage(pedestal,amountOut,false);
+            }
+            return new ItemStack((stored.isEmpty())?(itemInPed.getItem()):(itemStackToExtract.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+        }
+        else
+        {
+            itemStackToExtract.setCount(itemsToRemove);
+            if(!simulate)
+            {
+                removeFromStorage(pedestal,itemsToRemove,false);
+            }
+            return itemStackToExtract;
+        }
     }
 
     @Override
@@ -211,7 +219,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
                 int current = stored.getCount();
                 storedCopy.setCount(current+amountIn);
                 setItemStored(pedestal,storedCopy);
-                System.out.println(getItemStored(pedestal));
+                //System.out.println(getItemStored(pedestal));
             }
             return 0;
         }
@@ -281,25 +289,11 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         return maxStorage(pedestal)-getCountStored(pedestal);
     }
 
-    public CompoundNBT writeStack(CompoundNBT nbt,ItemStack stack) {
-        ResourceLocation resourcelocation = Registry.ITEM.getKey(stack.getItem());
-        nbt.putString(Reference.MODID+"_"+"id", resourcelocation == null?"minecraft:air":resourcelocation.toString());
-        nbt.putInt(Reference.MODID+"_"+"Count", (int)stack.getCount());
-        if(stack.getTag() != null) {
-            nbt.put(Reference.MODID+"_"+"tag", stack.getTag().copy());
-        }
-
-        //Might just have to make my own item count storage and use this for the item
-        /*CompoundNBT cnbt = stack.serializeCaps();
-        if(cnbt != null && !cnbt.isEmpty()) {
-            nbt.put("ForgeCaps", cnbt);
-        }*/
-
-        return nbt;
-    }
-
     public void setItemStored(PedestalTileEntity pedestal, ItemStack stack)
     {
+        //The itemstack.write() uses a byte value for the count so we have to store the actual count seperately
+        ItemStack getItemToStore = new ItemStack(stack.getItem());
+        int countToStore = stack.getCount();
         ItemStack coin = pedestal.getCoinOnPedestal();
         CompoundNBT compound = new CompoundNBT();
         if(coin.hasTag())
@@ -307,50 +301,9 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             compound = coin.getTag();
         }
 
-        compound = writeStack(compound,stack);
-        coin.setTag(compound);
-        pedestal.update();
-    }
+        compound = getItemToStore.write(compound);
+        compound.putInt("tankcount",countToStore);
 
-    public ItemStack readStackFromNBT(CompoundNBT compound) {
-        CompoundNBT compoundNBT = new CompoundNBT();
-        Item getItem = ItemStack.EMPTY.getItem();
-        int getCount = 0;
-        getItem = (Item)Registry.ITEM.getOrDefault(new ResourceLocation(compound.getString("id")));
-        getCount = compound.getInt(Reference.MODID+"_"+"Count");
-        if(compound.contains(Reference.MODID+"_"+"tag", 10)) {
-            compoundNBT = compound.getCompound(Reference.MODID+"_"+"tag");
-            getItem.updateItemStackNBT(compound);
-        }
-
-        return new ItemStack(getItem,getCount);
-    }
-
-    public ItemStack getItemStored(PedestalTileEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        CompoundNBT compound = new CompoundNBT();
-        if(coin.hasTag())
-        {
-            compound = coin.getTag();
-        }
-
-        ItemStack returner = readStackFromNBT(compound);
-
-        return returner;
-    }
-
-    /*
-    public void setItemStored(PedestalTileEntity pedestal, ItemStack stack)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        CompoundNBT compound = new CompoundNBT();
-        if(coin.hasTag())
-        {
-            compound = coin.getTag();
-        }
-
-        compound = stack.write(compound);
         coin.setTag(compound);
         pedestal.update();
     }
@@ -364,10 +317,11 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             compound = coin.getTag();
         }
 
-        ItemStack returner = coin.read(compound);
-        pedestal.update();
+        ItemStack getItemStored = coin.read(compound);
+        int getItemStackCount = compound.getInt("tankcount");
 
-        return returner;
+        //Should return the stack with any nbt on it???
+        return new ItemStack(getItemStored.getItem(),getItemStackCount,getItemStored.getTag());
     }
 
     public ItemStack getItemStored(ItemStack coin)
@@ -378,23 +332,11 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             compound = coin.getTag();
         }
 
-        ItemStack returner = coin.read(compound);
+        ItemStack getItemStored = coin.read(compound);
+        int getItemStackCount = compound.getInt("tankcount");
 
-        return returner;
-    }
-     */
-
-    public ItemStack getItemStored(ItemStack coin)
-    {
-        CompoundNBT compound = new CompoundNBT();
-        if(coin.hasTag())
-        {
-            compound = coin.getTag();
-        }
-
-        ItemStack returner = coin.read(compound);
-
-        return returner;
+        //Should return the stack with any nbt on it???
+        return new ItemStack(getItemStored.getItem(),getItemStackCount,getItemStored.getTag());
     }
 
     public boolean hasMaxStorageSet(ItemStack stack)
@@ -478,11 +420,13 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
             if(!world.isBlockPowered(pedestalPos))
             {
-                //Keep Pedestal Full at all times
-                ItemStack stackInPed = pedestal.getItemInPedestalOverride();
-                if(stackInPed.getCount() < stackInPed.getMaxStackSize())
-                {
-                    fillPedestalAction(pedestal);
+                if (world.getGameTime()%20 == 0) {
+                    //Keep Pedestal Full at all times
+                    ItemStack stackInPed = pedestal.getItemInPedestalOverride();
+                    if(stackInPed.getCount() < stackInPed.getMaxStackSize())
+                    {
+                        fillPedestalAction(pedestal);
+                    }
                 }
             }
         }
@@ -490,28 +434,46 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
     public void fillPedestalAction(PedestalTileEntity pedestal)
     {
-        ItemStack stored = getItemStored(pedestal);
-        ItemStack itemInPedestal = pedestal.getItemInPedestalOverride();
-        int intSpace = intSpaceLeftInStack(itemInPedestal);
-        int cobbleStored = stored.getCount();
-        ItemStack stackSpawnedItem = new ItemStack(stored.getItem(),intSpace);
-        if(intSpace>0 && cobbleStored>0)
+        if(!pedestal.getWorld().isRemote)
         {
+            ItemStack itemInPedestal = pedestal.getItemInPedestalOverride();
+            int intSpace = intSpaceLeftInStack(itemInPedestal);
+            int cobbleStored = this.getCountStored(pedestal);
+            ItemStack stackSpawnedItem = new ItemStack(getItemStored(pedestal).getItem(),intSpace);
+            if(intSpace>0 && cobbleStored>0)
+            {
 
-            int itemsToRemove = this.removeFromStorageBuffer(pedestal,intSpace,true);
-            if(itemsToRemove==0)
-            {
-                this.removeFromStorageBuffer(pedestal,intSpace,false);
-                pedestal.addItemOverride(stackSpawnedItem);
-            }
-            else
-            {
-                stackSpawnedItem.setCount(itemsToRemove);
-                this.removeFromStorageBuffer(pedestal,itemsToRemove,false);
-                pedestal.addItemOverride(stackSpawnedItem);
+                int cobbleToRemove = removeFromStorageBuffer(pedestal,intSpace,true);
+                if(cobbleToRemove==0)
+                {
+                    this.removeFromStorageBuffer(pedestal,intSpace,false);
+                    pedestal.addItemOverride(stackSpawnedItem);
+                }
+                else
+                {
+                    stackSpawnedItem.setCount(cobbleToRemove);
+                    this.removeFromStorageBuffer(pedestal,cobbleToRemove,false);
+                    pedestal.addItemOverride(stackSpawnedItem);
+                }
             }
         }
     }
+
+    /*public void fillPedestalAction(PedestalTileEntity pedestal)
+    {
+        ItemStack stored = getItemStored(pedestal);
+        ItemStack itemInPedestal = pedestal.getItemInPedestalOverride();
+        int currentCount = itemInPedestal.getCount();
+        int maxCount = itemInPedestal.getMaxStackSize();
+        int getStoredCount = stored.getCount();
+
+        int spaceInStack = maxCount-currentCount;
+        int amountToRemove = (getStoredCount>=spaceInStack)?(spaceInStack):(getStoredCount);
+        if(pedestal.addItemOverride(new ItemStack(stored.getItem(),amountToRemove,stored.getTag())))
+        {
+            removeFromStorageBuffer(pedestal,amountToRemove,false);
+        }
+    }*/
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {

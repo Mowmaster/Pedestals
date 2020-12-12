@@ -17,6 +17,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.*;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -246,228 +247,135 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         return getShape(p_220071_1_,p_220071_2_,p_220071_3_,p_220071_4_);
     }
 
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {
+    public ActionResultType insertToPedestal(World worldIn, BlockPos pos, PlayerEntity player)
+    {
         if(!worldIn.isRemote) {
             TileEntity tileEntity = worldIn.getTileEntity(pos);
             if (tileEntity instanceof PedestalTileEntity) {
                 PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
+                ItemStack getItemStackInHand = player.getHeldItemMainhand();
 
-                if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
+                ItemStack inHandCopy = getItemStackInHand.copy();
+                ItemStack checkInsert = tilePedestal.addItemCustom(inHandCopy,true);
+                if (checkInsert.isEmpty())
                 {
-                    return ActionResultType.FAIL;
-                }
-                if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeTool)
-                {
-                    return ActionResultType.FAIL;
-                }
-
-                if(player.isCrouching())
-                {
-                    if (player.getHeldItemMainhand().isEmpty())
-                    {
-                        if (tilePedestal.hasCoin()) {
-                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeCoin());
-                            //player.inventory.addItemStackToInventory(tilePedestal.removeCoin());
-                        }
-                    }
-                }
-                else if(!tilePedestal.hasCoin())
-                {
-                    if (player.getHeldItemMainhand().isEmpty()) {
-                        if (tilePedestal.hasItem()) {
-                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItemOverride());
-                            //player.inventory.addItemStackToInventory(tilePedestal.removeItem());
-                        }
-                    }
-                    else{
-                        if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeBase)
-                        {
-                            if(tilePedestal.addCoin(player,player.getHeldItemMainhand(),true))
-                            {
-                                ItemStack coinToBePlaced = player.getHeldItemMainhand().copy();
-                                if(tilePedestal.addCoin(player,coinToBePlaced,false))
-                                {
-                                    if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                                }
-
-                            }
-                        }
-                        else if(player.getHeldItemMainhand().getItem().equals(Items.GLOWSTONE))
-                        {
-                            if(!tilePedestal.hasLight())
-                            {
-                                tilePedestal.addLight();
-                                if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                                return ActionResultType.SUCCESS;
-                            }
-                            else
-                            {
-                                int availableSpace = tilePedestal.canAcceptItems(worldIn,pos,player.getHeldItemMainhand());
-                                if(availableSpace>0)
-                                {
-                                    if (tilePedestal.addItem(player.getHeldItemMainhand()))
-                                    {
-                                        player.getHeldItemMainhand().shrink(availableSpace);
-                                        return ActionResultType.SUCCESS;
-                                    }
-                                }
-                                else return ActionResultType.SUCCESS;
-                            }
-                        }
-                        else if(player.getHeldItemMainhand().getItem().equals(ItemColorPallet.COLORPALLET))
-                        {
-                            if(tilePedestal.addColor(player.getHeldItemMainhand()))
-                            {
-                                if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                                return ActionResultType.SUCCESS;
-                            }
-                            else
-                            {
-                                TranslationTextComponent cantsetcolor = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".cant_color");
-                                cantsetcolor.mergeStyle(TextFormatting.WHITE);
-                                player.sendStatusMessage(cantsetcolor,true);
-                                //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"ColorPallet"),player.getUniqueID());
-                                return ActionResultType.FAIL;
-                            }
-
-                        }
-                        else if(player.getHeldItemMainhand().getItem() instanceof ItemPedestalUpgrades)
-                        {
-                            if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.SPEED))
-                            {
-                                if(tilePedestal.addSpeed(player.getHeldItemMainhand()))
-                                {
-                                    if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                                    return ActionResultType.SUCCESS;
-                                }
-                                else return ActionResultType.FAIL;
-                            }
-                            else if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.CAPACITY))
-                            {
-                                if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
-                                {
-                                    if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                                    return ActionResultType.SUCCESS;
-                                }
-                                else return ActionResultType.FAIL;
-                            }
-                            else if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.RANGE))
-                            {
-                                if(tilePedestal.addRange(player.getHeldItemMainhand()))
-                                {
-                                    if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                                    return ActionResultType.SUCCESS;
-                                }
-                                else return ActionResultType.FAIL;
-                            }
-                        }
-                        else
-                        {
-                            int availableSpace = tilePedestal.canAcceptItems(worldIn,pos,player.getHeldItemMainhand());
-                            if(availableSpace>0)
-                            {
-                                if (tilePedestal.addItem(player.getHeldItemMainhand()))
-                                {
-                                    player.getHeldItemMainhand().shrink(availableSpace);
-                                    return ActionResultType.SUCCESS;
-                                }
-                            }
-                            else return ActionResultType.SUCCESS;
-                        }
-                    }
-                }
-                else if(player.getHeldItemMainhand().getItem().equals(ItemColorPallet.COLORPALLET))
-                {
-                    if(tilePedestal.addColor(player.getHeldItemMainhand()))
-                    {
-                        if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                        return ActionResultType.SUCCESS;
-                    }
-                    else
-                    {
-                        TranslationTextComponent cantsetcolor = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".cant_color");
-                        cantsetcolor.mergeStyle(TextFormatting.WHITE);
-                        player.sendStatusMessage(cantsetcolor,true);
-                        //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"ColorPallet"),player.getUniqueID());
-                        return ActionResultType.FAIL;
-                    }
-
-                }
-                else if(player.getHeldItemMainhand().getItem().equals(Items.GLOWSTONE))
-                {
-                    //player.sendMessage(new StringTextComponent(TextFormatting.GOLD +"GLOWSTONE"),player.getUniqueID());
-                    if(!tilePedestal.hasLight())
-                    {
-                        tilePedestal.addLight();
-                        if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                        return ActionResultType.SUCCESS;
-                    }
-                    else
-                    {
-                        int availableSpace = tilePedestal.canAcceptItems(worldIn,pos,player.getHeldItemMainhand());
-                        if(availableSpace>0)
-                        {
-                            if (tilePedestal.addItem(player.getHeldItemMainhand()))
-                            {
-                                player.getHeldItemMainhand().shrink(availableSpace);
-                                return ActionResultType.SUCCESS;
-                            }
-                        }
-                        else return ActionResultType.SUCCESS;
-                    }
-                }
-                else if(player.getHeldItemMainhand().getItem() instanceof ItemPedestalUpgrades)
-                {
-                    if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.SPEED))
-                    {
-                        if(tilePedestal.addSpeed(player.getHeldItemMainhand()))
-                        {
-                            if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                            return ActionResultType.SUCCESS;
-                        }
-                        else return ActionResultType.FAIL;
-                    }
-                    else if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.CAPACITY))
-                    {
-                        if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
-                        {
-                            if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                            return ActionResultType.SUCCESS;
-                        }
-                        else return ActionResultType.FAIL;
-                    }
-                    else if(player.getHeldItemMainhand().getItem().equals(ItemPedestalUpgrades.RANGE))
-                    {
-                        if(tilePedestal.addRange(player.getHeldItemMainhand()))
-                        {
-                            if(!player.isCreative())player.getHeldItemMainhand().shrink(1);
-                            return ActionResultType.SUCCESS;
-                        }
-                        else return ActionResultType.FAIL;
-                    }
-                }
-                else if (player.getHeldItemMainhand().isEmpty()) {
-                    if (tilePedestal.hasItem()) {
-                        ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeItemOverride());
-                    }
+                    tilePedestal.addItemCustom(inHandCopy,false);
+                    getItemStackInHand.shrink(inHandCopy.getCount());
+                    return ActionResultType.SUCCESS;
                 }
                 else
                 {
-                    int availableSpace = tilePedestal.canAcceptItems(worldIn,pos,player.getHeldItemMainhand());
-                    if(availableSpace>0)
+                    int shrink = inHandCopy.getCount() - checkInsert.getCount();
+                    if(shrink>0)
                     {
-                        if (tilePedestal.addItem(player.getHeldItemMainhand()))
-                        {
-                            player.getHeldItemMainhand().shrink(availableSpace);
-                            return ActionResultType.SUCCESS;
-                        }
+                        tilePedestal.addItemCustom(inHandCopy,false);
+                        getItemStackInHand.shrink(shrink);
+                        return ActionResultType.SUCCESS;
                     }
-                    else return ActionResultType.SUCCESS;
+
+                    return ActionResultType.SUCCESS;
                 }
             }
         }
         return ActionResultType.SUCCESS;
     }
+
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {
+        if(!worldIn.isRemote) {
+            TileEntity tileEntity = worldIn.getTileEntity(pos);
+            if (tileEntity instanceof PedestalTileEntity) {
+                PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
+                ItemStack getItemStackInHand = player.getHeldItemMainhand();
+                Item getItemInHand = getItemStackInHand.getItem();
+                boolean hasCoin = tilePedestal.hasCoin();
+                boolean isCreative = player.isCreative();
+
+                if(getItemStackInHand.isEmpty())
+                {
+                    ItemHandlerHelper.giveItemToPlayer(player,(player.isCrouching())?(tilePedestal.removeCoin()):(tilePedestal.removeItem()));
+                }
+                else
+                {
+                    if(getItemInHand instanceof ItemLinkingTool || getItemInHand instanceof ItemUpgradeTool)
+                    {
+                        return ActionResultType.FAIL;
+                    }
+                    else if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeBase)
+                    {
+                        if(tilePedestal.addCoin(player,getItemStackInHand,true))
+                        {
+                            ItemStack coinToBePlaced = getItemStackInHand.copy();
+                            if(tilePedestal.addCoin(player,coinToBePlaced,false))
+                            {
+                                if(!isCreative)getItemStackInHand.shrink(1);
+                            }
+                        }
+                        else return insertToPedestal(worldIn,pos,player);
+                    }
+                    else if(getItemInHand.equals(ItemColorPallet.COLORPALLET))
+                    {
+                        if(tilePedestal.addColor(getItemStackInHand))
+                        {
+                            if(!isCreative)getItemStackInHand.shrink(1);
+                            return ActionResultType.SUCCESS;
+                        }
+                        else
+                        {
+                            TranslationTextComponent cantsetcolor = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".cant_color");
+                            cantsetcolor.mergeStyle(TextFormatting.WHITE);
+                            player.sendStatusMessage(cantsetcolor,true);
+                            return ActionResultType.FAIL;
+                        }
+                    }
+                    else if(getItemInHand.equals(Items.GLOWSTONE))
+                    {
+                        if(!tilePedestal.hasLight())
+                        {
+                            tilePedestal.addLight();
+                            if(!isCreative)getItemStackInHand.shrink(1);
+                            return ActionResultType.SUCCESS;
+                        }
+                        else return insertToPedestal(worldIn,pos,player);
+                    }
+                    else if(getItemInHand instanceof ItemPedestalUpgrades)
+                    {
+                        if(getItemInHand.equals(ItemPedestalUpgrades.SPEED))
+                        {
+                            if(tilePedestal.addSpeed(player.getHeldItemMainhand()))
+                            {
+                                if(!player.isCreative())getItemStackInHand.shrink(1);
+                                return ActionResultType.SUCCESS;
+                            }
+                            else return insertToPedestal(worldIn,pos,player);
+                        }
+                        else if(getItemInHand.equals(ItemPedestalUpgrades.CAPACITY))
+                        {
+                            if(tilePedestal.addCapacity(player.getHeldItemMainhand()))
+                            {
+                                if(!isCreative)getItemStackInHand.shrink(1);
+                                return ActionResultType.SUCCESS;
+                            }
+                            else return insertToPedestal(worldIn,pos,player);
+                        }
+                        else if(getItemInHand.equals(ItemPedestalUpgrades.RANGE))
+                        {
+                            if(tilePedestal.addRange(player.getHeldItemMainhand()))
+                            {
+                                if(!isCreative)getItemStackInHand.shrink(1);
+                                return ActionResultType.SUCCESS;
+                            }
+                            else return insertToPedestal(worldIn,pos,player);
+                        }
+                        else return insertToPedestal(worldIn,pos,player);
+                    }
+                    else return insertToPedestal(worldIn,pos,player);
+                }
+            }
+        }
+        return ActionResultType.SUCCESS;
+    }
+
+
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
