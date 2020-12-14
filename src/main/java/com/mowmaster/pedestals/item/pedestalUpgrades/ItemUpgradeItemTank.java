@@ -175,29 +175,27 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
     @Override
     public ItemStack customStackInSlot(PedestalTileEntity pedestal, ItemStack stackFromHandler)
     {
+        //Somehow when sending items fast, theyll go into the buffer before an item in the stack spawns
         if(!stackFromHandler.isEmpty())
         {
             ItemStack stored = getItemStored(pedestal);
-            if(!stored.isEmpty())
+            Item getItem = stored.getItem();
+            ItemStack getItemStackInPedestal = pedestal.getItemInPedestalOverride();
+            Item getItemInPedestal = getItemStackInPedestal.getItem();
+            int storedCount = stored.getCount();
+            //Basically if the coin and the stack in pedestal dont match, return whats in the pedestal
+            if(getItemInPedestal.equals(getItem) || getItemStackInPedestal.isEmpty())
             {
-                Item getItem = stored.getItem();
-                ItemStack getItemStackInPedestal = pedestal.getItemInPedestalOverride();
-                Item getItemInPedestal = getItemStackInPedestal.getItem();
-                int storedCount = stored.getCount();
-                //Basically if the coin and the stack in pedestal dont match, return whats in the pedestal
-                if(getItemInPedestal.equals(getItem) || getItemStackInPedestal.isEmpty())
+                if(storedCount>0)
                 {
-                    if(storedCount>0)
-                    {
-                        int amount = storedCount+pedestal.getItemInPedestalOverride().getCount();
-                        ItemStack getStack = new ItemStack(getItem,amount);
-                        return getStack;
-                    }
+                    int amount = storedCount+pedestal.getItemInPedestalOverride().getCount();
+                    ItemStack getStack = new ItemStack(getItem,amount);
+                    return getStack;
                 }
-                else
-                {
-                    return getItemStackInPedestal;
-                }
+            }
+            else
+            {
+                return getItemStackInPedestal;
             }
         }
 
