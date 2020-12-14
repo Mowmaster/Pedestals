@@ -34,6 +34,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -241,7 +242,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
                 //System.out.println("Is Valid");
                 ItemStack coinOnPedestal = getCoinOnPedestal();
-                if(hasCoin() && coinOnPedestal.getItem() instanceof ItemUpgradeBase)
+                if(coinOnPedestal.getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
                     //System.out.println(IUB.customSlotLimit(getTile(),stack));
@@ -259,7 +260,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             @Override
             protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
                 ItemStack coinOnPedestal = getCoinOnPedestal();
-                if(hasCoin() && coinOnPedestal.getItem() instanceof ItemUpgradeBase)
+                if(coinOnPedestal.getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
                     return IUB.canAcceptCount(world,pos,getItemInPedestal(),stack);
@@ -271,7 +272,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             public int getSlotLimit(int slot) {
 
                 ItemStack coinOnPedestal = getCoinOnPedestal();
-                if(hasCoin() && coinOnPedestal.getItem() instanceof ItemUpgradeBase)
+                if(coinOnPedestal.getItem() instanceof ItemUpgradeBase)
                 {
                     ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
                     //System.out.println(IUB.customSlotLimit(getTile(),stack));
@@ -290,15 +291,12 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 {
                     return super.getStackInSlot(0);
                 }
-                else if(hasCoin())
+                else if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
                 {
-                    if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    if(!IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).getItem().equals(Items.COMMAND_BLOCK))
                     {
-                        ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
-                        if(!IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).getItem().equals(Items.COMMAND_BLOCK))
-                        {
-                            return IUB.customStackInSlot(getTile(),super.getStackInSlot(slot));
-                        }
+                        return IUB.customStackInSlot(getTile(),super.getStackInSlot(slot));
                     }
                 }
                 return super.getStackInSlot(slot);
@@ -775,9 +773,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public boolean addItemOverride(ItemStack itemFromBlock)
     {
         IItemHandler h = handler.orElse(null);
-        if(hasItem())
+        ItemStack overrideInPedestal = getItemInPedestalOverride();
+        if(!overrideInPedestal.isEmpty())
         {
-            if(doItemsMatch(itemFromBlock))
+            if(ItemStack.areItemsEqual(overrideInPedestal,itemFromBlock))
             {
                 return h.insertItem(-1, itemFromBlock.copy(), false).isEmpty();
             }
@@ -786,6 +785,12 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         update();
 
         return false;
+    }
+
+    public ItemStack addItemStackOverride(ItemStack itemFromBlock)
+    {
+        IItemHandler h = handler.orElse(null);
+        return h.insertItem(-1, itemFromBlock.copy(), false);
     }
 
     public boolean addItem(ItemStack itemFromBlock,boolean simulate)
@@ -941,27 +946,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         IItemHandler h = handler.orElse(null);
         if(hasItem())
         {
-            if(itemStackIn.hasTag())
-            {
-                CompoundNBT itemIn = itemStackIn.getTag();
-                CompoundNBT itemStored = h.getStackInSlot(0).getTag();
-                if(itemIn.equals(itemStored) && itemStackIn.getItem().equals(h.getStackInSlot(0).getItem()))
-                {
-                    return true;
-                }
-                else return false;
-            }
-            else
-            {
-                if(itemStackIn.getItem().equals(h.getStackInSlot(0).getItem()))
-                {
-                    return true;
-                }
-            }
+            return ItemStack.areItemsEqual(h.getStackInSlot(0),itemStackIn);
         }
         else{return true;}
-
-        return false;
     }
 
 

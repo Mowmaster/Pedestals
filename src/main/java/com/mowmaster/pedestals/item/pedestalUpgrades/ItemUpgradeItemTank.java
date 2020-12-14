@@ -76,6 +76,10 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         {
             return (slot==0)?(true):(false);
         }
+        else if(!stored.isEmpty() && inPed.isEmpty())
+        {
+            return (slot==0)?(stored.isItemEqual(stack)):(false);
+        }
         else if(stored.isEmpty() && !inPed.isEmpty())
         {
             return (slot==0)?(inPed.isItemEqual(stack)):(false);
@@ -434,53 +438,34 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
     public void fillPedestalAction(PedestalTileEntity pedestal)
     {
-        if(!pedestal.getWorld().isRemote)
+        ItemStack itemInPedestal = pedestal.getItemInPedestalOverride();
+        int intSpace = intSpaceLeftInStack(itemInPedestal);
+        int cobbleStored = this.getCountStored(pedestal);
+        if(intSpace>0 && cobbleStored>0)
         {
-            ItemStack itemInPedestal = pedestal.getItemInPedestalOverride();
-            int intSpace = intSpaceLeftInStack(itemInPedestal);
-            int cobbleStored = this.getCountStored(pedestal);
-            ItemStack stackSpawnedItem = new ItemStack(getItemStored(pedestal).getItem(),intSpace);
-            if(intSpace>0 && cobbleStored>0)
-            {
 
-                int cobbleToRemove = removeFromStorageBuffer(pedestal,intSpace,true);
-                if(cobbleToRemove==0)
-                {
-                    this.removeFromStorageBuffer(pedestal,intSpace,false);
-                    pedestal.addItemOverride(stackSpawnedItem);
-                }
-                else
-                {
-                    stackSpawnedItem.setCount(cobbleToRemove);
-                    this.removeFromStorageBuffer(pedestal,cobbleToRemove,false);
-                    pedestal.addItemOverride(stackSpawnedItem);
-                }
+            int returned = removeFromStorageBuffer(pedestal,intSpace,true);
+            int itemsToAdd = (returned==0)?(intSpace):(returned);
+            ItemStack stackSpawnedItem = new ItemStack(getItemStored(pedestal).getItem(),itemsToAdd);
+            ItemStack getInserted = pedestal.addItemStackOverride(stackSpawnedItem);
+            if(getInserted.isEmpty())
+            {
+                removeFromStorageBuffer(pedestal,intSpace,false);
             }
+            else
+            {
+                int countUsed = itemsToAdd - getInserted.getCount();
+                removeFromStorageBuffer(pedestal,countUsed,false);
+            }
+
         }
     }
-
-    /*public void fillPedestalAction(PedestalTileEntity pedestal)
-    {
-        ItemStack stored = getItemStored(pedestal);
-        ItemStack itemInPedestal = pedestal.getItemInPedestalOverride();
-        int currentCount = itemInPedestal.getCount();
-        int maxCount = itemInPedestal.getMaxStackSize();
-        int getStoredCount = stored.getCount();
-
-        int spaceInStack = maxCount-currentCount;
-        int amountToRemove = (getStoredCount>=spaceInStack)?(spaceInStack):(getStoredCount);
-        if(pedestal.addItemOverride(new ItemStack(stored.getItem(),amountToRemove,stored.getTag())))
-        {
-            removeFromStorageBuffer(pedestal,amountToRemove,false);
-        }
-    }*/
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos pedestalPos)
     {
 
     }
-
-
+    
     @Override
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
