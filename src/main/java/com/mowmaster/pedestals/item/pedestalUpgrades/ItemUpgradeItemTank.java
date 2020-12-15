@@ -446,9 +446,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             int itemsToAdd = (returned==0)?(intSpace):(returned);
             ItemStack stackSpawnedItem = new ItemStack(getItemStored(pedestal).getItem(),itemsToAdd);
             ItemStack getInserted = pedestal.addItemStackOverride(stackSpawnedItem);
-            System.out.println(returned);
-            System.out.println(stackSpawnedItem);
-            System.out.println(getInserted);
             if(getInserted.isEmpty())
             {
                 removeFromStorageBuffer(pedestal,itemsToAdd,false);

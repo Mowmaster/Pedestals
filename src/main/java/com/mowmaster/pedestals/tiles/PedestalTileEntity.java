@@ -1052,6 +1052,20 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return returner;
     }
 
+    public static LazyOptional<IItemHandler> findItemHandlerPedestal(PedestalTileEntity pedestal)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pos = pedestal.getPos();
+        TileEntity neighbourTile = world.getTileEntity(pos);
+        if(neighbourTile!=null)
+        {
+            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP);
+            if(cap.isPresent())
+                return cap;
+        }
+        return LazyOptional.empty();
+    }
+
     private boolean canSendToPedestal(BlockPos pedestalToSendTo)
     {
         boolean returner = false;
@@ -1075,26 +1089,33 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                             if(world.getTileEntity(pedestalToSendTo) instanceof PedestalTileEntity)
                             {
                                 PedestalTileEntity tilePedestalToSendTo = (PedestalTileEntity)world.getTileEntity(pedestalToSendTo);
-
-                                //Checks if pedestal is empty or if not then checks if items match and how many can be insert
-                                if(tilePedestalToSendTo.canAcceptItems(world,pedestalToSendTo,getItemInPedestal()) > 0)
+                                LazyOptional<IItemHandler> cap = findItemHandlerPedestal(tilePedestalToSendTo);
+                                if(cap.isPresent())
                                 {
-                                    //Check if it has filter, if not return true
-                                    if(hasFilter(tilePedestalToSendTo))
+                                    IItemHandler handler = cap.orElse(null);
+                                    if(handler.isItemValid(0,this.getItemInPedestal()))
                                     {
-                                        Item coinInPed = tilePedestalToSendTo.getCoinOnPedestal().getItem();
-                                        if(coinInPed instanceof ItemUpgradeBaseFilter)
+                                        //Checks if pedestal is empty or if not then checks if items match and how many can be insert
+                                        if(tilePedestalToSendTo.canAcceptItems(world,pedestalToSendTo,getItemInPedestal()) > 0)
                                         {
-                                            //Already checked if its a filter, so now check if it can accept items.
-                                            if(((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,pedestalToSendTo,getItemInPedestal()))
+                                            //Check if it has filter, if not return true
+                                            if(hasFilter(tilePedestalToSendTo))
+                                            {
+                                                Item coinInPed = tilePedestalToSendTo.getCoinOnPedestal().getItem();
+                                                if(coinInPed instanceof ItemUpgradeBaseFilter)
+                                                {
+                                                    //Already checked if its a filter, so now check if it can accept items.
+                                                    if(((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,pedestalToSendTo,getItemInPedestal()))
+                                                    {
+                                                        returner = true;
+                                                    }
+                                                }
+                                            }
+                                            else
                                             {
                                                 returner = true;
                                             }
                                         }
-                                    }
-                                    else
-                                    {
-                                        returner = true;
                                     }
                                 }
                             }

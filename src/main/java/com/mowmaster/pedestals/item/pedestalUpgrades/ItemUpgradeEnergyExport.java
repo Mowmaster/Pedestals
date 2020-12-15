@@ -106,7 +106,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
             PedestalTileEntity ped = ((PedestalTileEntity)tile);
             if(ped.hasItem())
             {
-                if(isEnergyItemInsert(itemInPedestal))
+                if(isEnergyItemInsert(itemInPedestal) && !itemHasMaxEnergy(itemInPedestal))
                 {
                     int itemMaxEnergy = getMaxEnergyInStack(itemInPedestal,null);
                     int itemCurrentEnergy = getEnergyInStack(itemInPedestal);

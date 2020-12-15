@@ -203,6 +203,22 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         return 0;
     }
 
+    public boolean itemHasMaxEnergy(ItemStack itemToCheck)
+    {
+
+        LazyOptional<IEnergyStorage> cap = itemToCheck.getCapability(CapabilityEnergy.ENERGY);
+        if(cap.isPresent())
+        {
+            IEnergyStorage handler = cap.orElse(null);
+            int max = handler.getMaxEnergyStored();
+            int current = handler.getEnergyStored();
+
+            return current>=max;
+        }
+
+        return false;
+    }
+
     public static int extractEnergyFromStack(ItemStack itemToCheck, int energy, boolean simulate)
     {
         return extractEnergyFromStack(itemToCheck, null, energy, simulate);
