@@ -44,12 +44,6 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
         return true;
     }
 
-    @Override
-    public int getItemEnchantability()
-    {
-        return 10;
-    }
-
     public void updateAction(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
