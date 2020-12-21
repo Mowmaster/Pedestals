@@ -231,7 +231,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                 //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                 fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
                 ItemStack harvestingHoe = new ItemStack(Items.DIAMOND_HOE,1);
-                if (itemInPedestal.getItem() instanceof HoeItem || itemInPedestal.getToolTypes().contains(ToolType.HOE)) {
+                if (itemInPedestal.getItem() instanceof HoeItem || itemInPedestal.getToolTypes().contains(ToolType.HOE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
                     fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
                 }
                 else

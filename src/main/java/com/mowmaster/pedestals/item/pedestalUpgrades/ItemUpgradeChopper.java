@@ -162,7 +162,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
             //FakePlayer fakePlayer = FakePlayerFactory.get(world.getServer().func_241755_D_(),new GameProfile(Util.DUMMY_UUID,"fakeplayer"));
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack choppingAxe = new ItemStack(Items.DIAMOND_AXE,1);
-            if (itemInPedestal.getItem() instanceof AxeItem || itemInPedestal.getToolTypes().contains(ToolType.AXE)) {
+            if (itemInPedestal.getItem() instanceof AxeItem || itemInPedestal.getToolTypes().contains(ToolType.AXE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
                 fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
             }
             else

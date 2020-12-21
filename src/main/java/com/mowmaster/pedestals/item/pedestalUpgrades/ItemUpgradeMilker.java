@@ -228,7 +228,10 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                         if(pedestalInv instanceof PedestalTileEntity) {
                             PedestalTileEntity pedestal = (PedestalTileEntity)pedestalInv;
-                            fakePlayer.setHeldItem(Hand.MAIN_HAND,itemForHand);
+                            if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
+                            {
+                                fakePlayer.setHeldItem(Hand.MAIN_HAND,itemForHand);
+                            }
                             ActionResultType result = moomoo.func_230254_b_(fakePlayer,Hand.MAIN_HAND);
                             fluid = getFluidInItem(fakePlayer.getHeldItemMainhand());
                             if (result.isSuccessOrConsume() && addFluid(pedestal,coinInPedestal,fluid,true))

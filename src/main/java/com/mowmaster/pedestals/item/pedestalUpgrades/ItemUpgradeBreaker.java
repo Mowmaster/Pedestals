@@ -143,7 +143,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
          */
 
         if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
-            if (itemInPedestal.getItem() instanceof PickaxeItem || itemInPedestal.getToolTypes().contains(ToolType.PICKAXE)) {
+            if (itemInPedestal.getItem() instanceof PickaxeItem || itemInPedestal.getToolTypes().contains(ToolType.PICKAXE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
                 fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
             }
             else {

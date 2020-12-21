@@ -247,20 +247,23 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE,1);
 
-            if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
+            if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
             {
-                pick.addEnchantment(Enchantments.SILK_TOUCH,1);
-                fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
-            }
-            else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
-            {
-                int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
-                pick.addEnchantment(Enchantments.FORTUNE,lvl);
-                fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
-            }
-            else
-            {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+                if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
+                {
+                    pick.addEnchantment(Enchantments.SILK_TOUCH,1);
+                    fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+                }
+                else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
+                {
+                    int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
+                    pick.addEnchantment(Enchantments.FORTUNE,lvl);
+                    fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+                }
+                else
+                {
+                    fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+                }
             }
             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
             if(pedestalInv instanceof PedestalTileEntity) {
