@@ -53,6 +53,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -212,11 +213,14 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
 
             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-            ItemStack harvestingShears = new ItemStack(Items.SHEARS,1);
-            fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);
+            ItemStack harvestingShears = (itemInPedestal.isEmpty())?(new ItemStack(Items.SHEARS,1)):(itemInPedestal);
+            if(!fakePlayer.getHeldItemMainhand().equals(harvestingShears))
+            {
+                fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);
+            }
             BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
             ItemStack itemFromInv = ItemStack.EMPTY;
-            LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            /*LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
             if(cap.isPresent())
             {
                 IItemHandler handler = cap.orElse(null);
@@ -234,7 +238,10 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                             itemFromInv = handler.getStackInSlot(i);
                             if(itemFromInv.getItem().equals(Items.GLASS_BOTTLE))
                             {
-                                fakePlayer.setHeldItem(Hand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
+                                if(!fakePlayer.getHeldItemMainhand().equals(new ItemStack(Items.GLASS_BOTTLE)))
+                                {
+                                    fakePlayer.setHeldItem(Hand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
+                                }
                                 PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
                                 if (!MinecraftForge.EVENT_BUS.post(e)) {
                                     TileEntity tile = world.getTileEntity(posOfPedestal);
@@ -244,7 +251,8 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                                         if(pedestal.addItem(new ItemStack(Items.HONEY_BOTTLE)))
                                         {
                                             handler.extractItem(i,1 ,false);
-                                            ((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
+                                            ((BeehiveBlock)target.getBlock()).onBlockActivated(target,world,posTarget,fakePlayer,Hand.MAIN_HAND,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,false));
+                                            //((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
                                             PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,178,35));
                                             //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY(),posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                                             world.playSound((PlayerEntity)null, posTarget, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0F, 1.0F);
@@ -274,26 +282,46 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                     }
                 }
 
-            }
+            }*/
             //Is it needed? idk
-            else
-            {
+            //else
+            //{
                 PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
                 if (!MinecraftForge.EVENT_BUS.post(e)) {
                     TileEntity tile = world.getTileEntity(posOfPedestal);
                     if(tile instanceof PedestalTileEntity)
                     {
                         PedestalTileEntity pedestal = ((PedestalTileEntity) tile);
-                        if(pedestal.addItem(new ItemStack(Items.HONEYCOMB,3)))
+                        ActionResultType type = ((BeehiveBlock)target.getBlock()).onBlockActivated(target,world,posTarget,fakePlayer,Hand.MAIN_HAND,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,true));
+                        if(type == ActionResultType.CONSUME || type == ActionResultType.SUCCESS)
+                        {
+                            if(!itemInPedestal.isEmpty())
+                            {
+                                ItemStack itemInFakeBoy = ItemStack.EMPTY;
+                                itemInFakeBoy = IntStream.range(0,fakePlayer.inventory.getSizeInventory())//Int Range
+                                        .mapToObj((fakePlayer.inventory)::getStackInSlot)//Function being applied to each interval
+                                        .filter(itemStack -> !itemStack.isEmpty())
+                                        .filter(itemStack -> !itemStack.getItem().equals(itemInPedestal.getItem()))
+                                        .findFirst().orElse(ItemStack.EMPTY);
+                                BlockPos spawnItemHere = getPosOfBlockBelow(world,posTarget,-1);
+                                pedestal.spawnItemStack(world,spawnItemHere.getX(),spawnItemHere.getY(),spawnItemHere.getZ(),itemInFakeBoy);
+                                int getSlot = getPlayerSlotWithMatchingStackExact(fakePlayer.inventory,itemInFakeBoy);
+                                if(getSlot>=0 && !fakePlayer.inventory.getStackInSlot(0).getItem().equals(itemInPedestal.getItem()))
+                                {
+                                    fakePlayer.inventory.removeStackFromSlot(getSlot);
+                                }
+                            }
+                        }
+                        /*if(pedestal.addItem(new ItemStack(Items.HONEYCOMB,3)))
                         {
                             ((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
                             PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,178,35));
                             //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY(),posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                             world.playSound((PlayerEntity)null, posTarget, SoundEvents.BLOCK_BEEHIVE_SHEAR, SoundCategory.BLOCKS, 1.0F, 1.0F);
-                        }
+                        }*/
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -351,10 +379,10 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         tooltip.add(area);
         tooltip.add(speed);
 
-        //TODO: REMOVE THIS LATER ONCE FIXED FOR MODDED HIVES
+        /*
         TranslationTextComponent wip = new TranslationTextComponent("Works On Vanilla Hives Only");
         wip.mergeStyle(TextFormatting.BLUE);
-        tooltip.add(wip);
+        tooltip.add(wip);*/
     }
 
     public static final Item HARVESTERHIVES = new ItemUpgradeHarvesterBeeHives(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvesterhives"));
