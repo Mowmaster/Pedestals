@@ -196,14 +196,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         List<LivingEntity> itemList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
         for(LivingEntity getEntityFromList : itemList)
         {
-
-            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
-            fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
-            if (itemInPedestal.getItem() instanceof SwordItem) {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
-            }
-
             List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10", "pedestal11", "pedestal12");
             Random rn = new Random();
 
@@ -211,6 +203,10 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
             if(selectedEntity != null)
             {
+                FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+                if (itemInPedestal.getItem() instanceof SwordItem && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);}
+
                 DamageSource sourceE = (selectedEntity instanceof AbstractRaiderEntity && ((AbstractRaiderEntity) selectedEntity).isLeader())?(new EntityDamageSource(list.get(rn.nextInt(list.size())),null)):(new EntityDamageSource(list.get(rn.nextInt(list.size())),fakePlayer));
                 float damage = getAttackDamage(getEntityFromList,itemInPedestal,coinInPedestal);
 
