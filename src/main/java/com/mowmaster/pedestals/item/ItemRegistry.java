@@ -77,6 +77,14 @@ public class ItemRegistry
         ItemUpgradeFluidCrafter.onItemRegistryReady(e);
         ItemUpgradeMilker.onItemRegistryReady(e);
 
+        ItemUpgradeEnderFilteredImporterFood.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterEnchanted.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterMod.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterFuzzy.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterExact.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredExporter.onItemRegistryReady(e);
+        ItemUpgradeEnderImporter.onItemRegistryReady(e);
+        ItemUpgradeEnderExporter.onItemRegistryReady(e);
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeFilteredImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);

@@ -14,6 +14,7 @@ import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
@@ -518,6 +519,27 @@ public class ItemUpgradeBase extends Item {
     }
 
     public int getPlayerSlotWithMatchingStackExact(PlayerInventory inventory, ItemStack stackToFind)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        for(int i=0;i<inventory.getSizeInventory();i++)
+        {
+            ItemStack stackInSlot = inventory.getStackInSlot(i);
+            //find a slot with items
+            if(!stackInSlot.isEmpty())
+            {
+                //check if it could pull the item out or not
+                if(ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToFind))//stackInSlot.isItemEqual(stackToFind)
+                {
+                    slot.set(i);
+                    break;
+                }
+            }
+        }
+
+        return slot.get();
+    }
+
+    public int getEnderChestSlotWithMatchingStackExact(EnderChestInventory inventory, ItemStack stackToFind)
     {
         AtomicInteger slot = new AtomicInteger(-1);
         for(int i=0;i<inventory.getSizeInventory();i++)
