@@ -118,20 +118,34 @@ public class ItemUpgradeEnderFilteredImporterExact extends ItemUpgradeBaseFilter
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
+
         PlayerEntity player = ((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
         if(player != null)
         {
-            if(!itemInPedestal.isEmpty())
+            if(hasAdvancedInventoryTargeting(coinInPedestal))
             {
-                ItemStack leftovers = player.getInventoryEnderChest().addItem(itemInPedestal.copy());
-                if(leftovers.isEmpty())
+                if(!itemInPedestal.isEmpty())
                 {
-                    removeFromPedestal(world,posOfPedestal,itemInPedestal.getCount());
+                    if(player.inventory.addItemStackToInventory(itemInPedestal.copy()))
+                    {
+                        removeFromPedestal(world,posOfPedestal,itemInPedestal.getCount());
+                    }
                 }
-                else
+            }
+            else
+            {
+                if(!itemInPedestal.isEmpty())
                 {
-                    int remover = itemInPedestal.getCount()-leftovers.getCount();
-                    removeFromPedestal(world,posOfPedestal,remover);
+                    ItemStack leftovers = player.getInventoryEnderChest().addItem(itemInPedestal.copy());
+                    if(leftovers.isEmpty())
+                    {
+                        removeFromPedestal(world,posOfPedestal,itemInPedestal.getCount());
+                    }
+                    else
+                    {
+                        int remover = itemInPedestal.getCount()-leftovers.getCount();
+                        removeFromPedestal(world,posOfPedestal,remover);
+                    }
                 }
             }
         }
