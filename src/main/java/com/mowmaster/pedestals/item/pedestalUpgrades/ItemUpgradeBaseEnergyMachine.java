@@ -1,9 +1,11 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,6 +41,17 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     }
 
     @Override
+    public int getCapacityModifier(ItemStack stack)
+    {
+        int capacity = 0;
+        if(hasEnchant(stack))
+        {
+            capacity = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack) > 10)?(10):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack));
+        }
+        return capacity;
+    }
+
+    @Override
     public int getItemTransferRate(ItemStack stack)
     {
         int itemsPerSmelt = 1;
@@ -48,24 +61,50 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
                 itemsPerSmelt = 1;
                 break;
             case 1:
-                itemsPerSmelt=2;
+                itemsPerSmelt=4;
                 break;
             case 2:
-                itemsPerSmelt = 4;
-                break;
-            case 3:
                 itemsPerSmelt = 8;
                 break;
-            case 4:
+            case 3:
                 itemsPerSmelt = 12;
                 break;
+            case 4:
+                itemsPerSmelt = 16;
+                break;
             case 5:
-                itemsPerSmelt=16;
+                itemsPerSmelt=24;
+                break;
+            case 6:
+                itemsPerSmelt=32;
+                break;
+            case 7:
+                itemsPerSmelt=40;
+                break;
+            case 8:
+                itemsPerSmelt=48;
+                break;
+            case 9:
+                itemsPerSmelt=56;
+                break;
+            case 10:
+                itemsPerSmelt=64;
                 break;
             default: itemsPerSmelt=1;
         }
 
         return  itemsPerSmelt;
+    }
+
+    @Override
+    public int intOperationalSpeedModifier(ItemStack stack)
+    {
+        int rate = 0;
+        if(hasEnchant(stack))
+        {
+            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 10)?(10):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
+        }
+        return rate;
     }
 
     public int getSmeltingSpeed(ItemStack stack)
@@ -83,18 +122,89 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
                 smeltingSpeed = 50;//4x faster
                 break;
             case 3:
-                smeltingSpeed = 33;//6x faster
+                smeltingSpeed = 40;//5x faster
                 break;
             case 4:
-                smeltingSpeed = 20;//10x faster
+                smeltingSpeed = 33;//6x faster
                 break;
             case 5:
+                smeltingSpeed=20;//10x faster
+                break;
+            case 6:
                 smeltingSpeed=10;//20x faster
+                break;
+            case 7:
+                smeltingSpeed=5;//40x faster
+                break;
+            case 8:
+                smeltingSpeed=3;//60x faster
+                break;
+            case 9:
+                smeltingSpeed=2;//100x faster
+                break;
+            case 10:
+                smeltingSpeed=1;//200x faster
                 break;
             default: smeltingSpeed=200;
         }
 
         return  smeltingSpeed;
+    }
+
+    @Override
+    public String getOperationSpeedString(ItemStack stack)
+    {
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
+        TranslationTextComponent fivex = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_6");
+        TranslationTextComponent fourtyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_7");
+        TranslationTextComponent sixtyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_8");
+        TranslationTextComponent onehunx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_9");
+        TranslationTextComponent twohunx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_10");
+        String str = normal.getString();
+        switch (intOperationalSpeedModifier(stack))
+        {
+            case 0:
+                str = normal.getString();//normal speed
+                break;
+            case 1:
+                str = twox.getString();//2x faster
+                break;
+            case 2:
+                str = fourx.getString();//4x faster
+                break;
+            case 3:
+                str = fivex.getString();//6x faster
+                break;
+            case 4:
+                str = sixx.getString();//6x faster
+                break;
+            case 5:
+                str = tenx.getString();//10x faster
+                break;
+            case 6:
+                str = twentyx.getString();//20x faster
+                break;
+            case 7:
+                str = fourtyx.getString();//40x faster
+                break;
+            case 8:
+                str = sixtyx.getString();//60x faster
+                break;
+            case 9:
+                str = onehunx.getString();//100x faster
+                break;
+            case 10:
+                str = twohunx.getString();//200x faster
+                break;
+            default: str = normal.getString();;
+        }
+
+        return  str;
     }
 
     public int removeEnergyFuel(PedestalTileEntity pedestal, int amountToRemove, boolean simulate)
@@ -118,40 +228,6 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         //do nothing
-    }
-
-    public String getSmeltingSpeedString(ItemStack stack)
-    {
-        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
-        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
-        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
-        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
-        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
-        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
-        String s3 = normal.getString();
-        switch (getSmeltingSpeed(stack))
-        {
-            case 200:
-                s3 = normal.getString();
-                break;
-            case 100:
-                s3 = twox.getString();
-                break;
-            case 50:
-                s3 = fourx.getString();
-                break;
-            case 33:
-                s3 = sixx.getString();
-                break;
-            case 20:
-                s3 = tenx.getString();
-                break;
-            case 10:
-                s3 = twentyx.getString();
-                break;
-            default: s3 = normal.getString();
-        }
-        return s3;
     }
 
     @Override

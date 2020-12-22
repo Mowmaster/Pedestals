@@ -38,11 +38,18 @@ public class ItemUpgradeDefault extends ItemUpgradeBase
     }
 
     public static final Item DEFAULT = new ItemUpgradeDefault(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/default"));
+    //public static final Item DEFAULT0 = new ItemUpgradeDefault(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/default0"));
+    //public static final Item DEFAULT1 = new ItemUpgradeDefault(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/default1"));
+    //public static final Item DEFAULT2 = new ItemUpgradeDefault(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/default2"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(DEFAULT);
+        //event.getRegistry().register(DEFAULT0);
+        //event.getRegistry().register(DEFAULT1);
+        //event.getRegistry().register(DEFAULT2);
+
     }
 
 

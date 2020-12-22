@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
@@ -341,6 +342,42 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         }
 
         return false;
+    }
+
+    @Override
+    public String getOperationSpeedString(ItemStack stack)
+    {
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        String str = normal.getString();
+        switch (intOperationalSpeedModifier(stack))
+        {
+            case 0:
+                str = normal.getString();//normal speed
+                break;
+            case 1:
+                str = twox.getString();//2x faster
+                break;
+            case 2:
+                str = fourx.getString();//4x faster
+                break;
+            case 3:
+                str = sixx.getString();//6x faster
+                break;
+            case 4:
+                str = tenx.getString();//10x faster
+                break;
+            case 5:
+                str = twentyx.getString();//20x faster
+                break;
+            default: str = normal.getString();;
+        }
+
+        return  str;
     }
 
     @Override

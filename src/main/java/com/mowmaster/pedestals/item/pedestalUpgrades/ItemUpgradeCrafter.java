@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -253,6 +254,41 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 
     }
 
+    public String getOperationSpeedString(ItemStack stack)
+    {
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        String str = normal.getString();
+        switch (intOperationalSpeedModifier(stack))
+        {
+            case 0:
+                str = normal.getString();//normal speed
+                break;
+            case 1:
+                str = twox.getString();//2x faster
+                break;
+            case 2:
+                str = fourx.getString();//4x faster
+                break;
+            case 3:
+                str = sixx.getString();//6x faster
+                break;
+            case 4:
+                str = tenx.getString();//10x faster
+                break;
+            case 5:
+                str = twentyx.getString();//20x faster
+                break;
+            default: str = normal.getString();;
+        }
+
+        return  str;
+    }
+
     @Override
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
@@ -276,7 +312,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getSmeltingSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,Util.DUMMY_UUID);
     }
@@ -289,7 +325,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
         tooltip.add(t);
 
         int s2 = getItemTransferRate(stack);
-        String trr = getSmeltingSpeedString(stack);
+        String trr = getOperationSpeedString(stack);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString(""+s2+"");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
