@@ -2,12 +2,10 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
-import com.mowmaster.pedestals.enchants.EnchantmentArea;
-import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
-import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
-import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -16,6 +14,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -51,6 +50,7 @@ import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
 {
@@ -82,6 +82,17 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         return  areaWidth;
     }
 
+    @Override
+    public int getRangeModifier(ItemStack stack)
+    {
+        int range = 0;
+        if(hasEnchant(stack))
+        {
+            range = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack);
+        }
+        return range;
+    }
+
     public int getRangeHeight(ItemStack stack)
     {
         return getHeight(stack);
@@ -110,7 +121,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
             case 5:
                 height=64;
                 break;
-            default: height=8;
+            default: height=(getRangeModifier(stack)*12);
         }
 
         return  height;
@@ -174,66 +185,66 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
             int speed = getOperationSpeed(coinInPedestal);
             //int breakspeed = Math.multiplyExact(Math.multiplyExact((int)(Math.pow((Math.multiplyExact(rangeWidth,2)+1),2)/9),20),84);
 
-            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-            /*BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
-            BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);*/
+            BlockState pedestalState = world.getBlockState(pedestalPos);
+            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             //System.out.println("World Loaded: " + world.isAreaLoaded(negNums,posNums));
+
             if(world.isAreaLoaded(negNums,posNums))
             {
-                //System.out.println("Powered: " + (!world.isBlockPowered(pedestalPos)));
                 if(!world.isBlockPowered(pedestalPos)) {
 
-                    TileEntity pedestalInv = world.getTileEntity(pedestalPos);
-                    if(pedestalInv instanceof PedestalTileEntity) {
-                        PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
+                    //Should disable magneting when its not needed
+                    AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                    if(itemList.size()>0)
+                    {
+                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                    }
 
-                        //System.out.println("Has Fuel: " + removeFuel(ped,200,true));
-                        if(removeFuel(ped,200,true))
+                    if(removeFuel(pedestal,200,true))
+                    {
+                        if(blocksToMineInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
                         {
-                            upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
-
                             if(!world.isBlockPowered(pedestalPos)) {
                                 if (world.getGameTime() % speed == 0) {
-                                    int currentPosition = pedestal.getStoredValueForUpgrades();
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negNums,posNums);
+                                    int currentPosition = 0;
+                                    for(currentPosition = pedestal.getStoredValueForUpgrades();!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                                    {
+                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                        BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                        BlockState blockToMineState = world.getBlockState(blockToMinePos);
+                                        Block blockToMine = blockToMineState.getBlock();
+                                        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && canMineBlock(world, pedestalPos, blockToMine)
+                                                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)
+                                        {
+                                            pedestal.setStoredValueForUpgrades(currentPosition);
+                                            break;
+                                        }
+                                    }
+                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
                                     BlockState targetBlock = world.getBlockState(targetPos);
+                                    /*BlockPos getNextTargetPos = getNextMineableBlock(world,pedestalPos,rangeWidth,rangeHeight);
+                                    BlockState getNextTargetBlock = world.getBlockState(getNextTargetPos);
+                                    upgradeAction(world, itemInPedestal, coinInPedestal, getNextTargetPos, getNextTargetBlock, pedestalPos);*/
                                     upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                    pedestal.setStoredValueForUpgrades(currentPosition+1);
-                                    if(resetCurrentPosInt(currentPosition,negNums,posNums))
+                                    if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
                                     {
                                         pedestal.setStoredValueForUpgrades(0);
                                     }
                                 }
                             }
-                            /*for (int x = negNums.getX(); x <= posNums.getX(); x++) {
-                                for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
-                                    for (int y = negNums.getY(); y <= posNums.getY(); y++) {
-                                        BlockPos blockToChopPos = new BlockPos(x, y, z);
-                                        //BlockPos blockToChopPos = this.getPos().add(x, y, z);
-                                        BlockState blockToChop = world.getBlockState(blockToChopPos);
-                                        if (world.getGameTime()%speed == 0) {
-                                            ticked++;
-                                        }
-
-                                        //System.out.println("ticks: " + ticked);
-                                        //System.out.println("breakspeed: " + breakspeed);
-                                        if(ticked > breakspeed)
-                                        {
-                                            upgradeAction(world, itemInPedestal, coinInPedestal, blockToChopPos, blockToChop, pedestalPos);
-                                            ticked=0;
-                                        }
-                                        else
-                                        {
-                                            ticked++;
-                                        }
-                                    }
-                                }
-                            }*/
                         }
                     }
                 }
             }
+            /*else {
+                if(pedestal.getStoredValueForUpgrades()!=0)
+                {
+                    pedestal.setStoredValueForUpgrades(0);
+                }
+            }*/
         }
     }
 
@@ -245,7 +256,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-            ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE,1);
+            ItemStack pick = new ItemStack(Items.NETHERITE_PICKAXE,1);
 
             if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
             {
@@ -294,14 +305,8 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         }
     }
 
-    public void upgradeActionMagnet(World world, ItemStack itemInPedestal, BlockPos posOfPedestal, int width, int height)
+    public void upgradeActionMagnet(World world, List<ItemEntity> itemList, ItemStack itemInPedestal, BlockPos posOfPedestal, int width, int height)
     {
-        BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
-        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
-
-        AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
-
-        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
         for(ItemEntity getItemFromList : itemList)
         {
             ItemStack copyStack = getItemFromList.getItem().copy();
@@ -328,17 +333,20 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                 break;
             }
         }
+
     }
 
     public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
     {
         int validBlocks = 0;
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,height);
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,height);
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
 
-        for(int i=0;!resetCurrentPosInt(i,negNums,posNums);i++)
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
         {
-            BlockPos targetPos = getPosOfNextBlock(i,negNums,posNums);
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
             BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
             BlockState blockToMineState = world.getBlockState(blockToMinePos);
             Block blockToMine = blockToMineState.getBlock();
@@ -350,6 +358,51 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         }
 
         return validBlocks;
+    }
+
+    public BlockPos getNextMineableBlock(World world, BlockPos pedestalPos, int width, int height)
+    {
+        BlockPos returnBlockPos = pedestalPos;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        /*int xRange = Math.abs(posNums.getX() - negNums.getX());
+        int yRange = Math.abs(posNums.getY() - negNums.getY());
+        int zRange = Math.abs(posNums.getZ() - negNums.getZ());
+        int largeVal = xRange * yRange * zRange;
+
+        returnBlockPos = IntStream.range(0,largeVal)
+                .mapToObj(i -> getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                .filter(targetPos -> !world.getBlockState(targetPos).getBlock().isAir(world.getBlockState(targetPos),world,targetPos))
+                .filter(targetPos -> !(world.getBlockState(targetPos).getBlock() instanceof PedestalBlock))
+                .filter(targetPos -> canMineBlock(world, pedestalPos, world.getBlockState(targetPos).getBlock()))
+                .filter(targetPos -> !(world.getBlockState(targetPos).getBlock() instanceof IFluidBlock || world.getBlockState(targetPos).getBlock() instanceof FlowingFluidBlock))
+                .filter(targetPos -> world.getBlockState(targetPos).getBlockHardness(world, targetPos) != -1.0F)
+                .findFirst().orElse(pedestalPos);
+
+        Most Optimized IntStream solution offered by @sciwhiz12#1286 in forge discord
+        Im just too dumb to get it to work...
+        Optional<BlockPos> pos = BlockPos.getAllInBoxMutable(firstPos, secondPos)
+                .filter(<your filter here, recommending you use a method reference>)
+        .findFirst()
+            .map(pos -> pos.toImmutable()); // makes sure it's an immutable blockpos
+        */
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToMineState = world.getBlockState(blockToMinePos);
+            Block blockToMine = blockToMineState.getBlock();
+            if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && canMineBlock(world, pedestalPos, blockToMine)
+                    && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)
+            {
+                return blockToMinePos;
+            }
+        }
+
+        return returnBlockPos;
     }
 
     @Override
@@ -380,6 +433,42 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
         }
 
         return returner;
+    }
+
+    @Override
+    public String getOperationSpeedString(ItemStack stack)
+    {
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        String str = normal.getString();
+        switch (intOperationalSpeedModifier(stack))
+        {
+            case 0:
+                str = normal.getString();//normal speed
+                break;
+            case 1:
+                str = twox.getString();//2x faster
+                break;
+            case 2:
+                str = fourx.getString();//4x faster
+                break;
+            case 3:
+                str = sixx.getString();//6x faster
+                break;
+            case 4:
+                str = tenx.getString();//10x faster
+                break;
+            case 5:
+                str = twentyx.getString();//20x faster
+                break;
+            default: str = normal.getString();;
+        }
+
+        return  str;
     }
 
 
@@ -442,7 +531,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getSmeltingSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,Util.DUMMY_UUID);
     }
