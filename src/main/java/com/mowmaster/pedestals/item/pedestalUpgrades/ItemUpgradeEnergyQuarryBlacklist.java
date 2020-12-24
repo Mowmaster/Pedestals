@@ -2,12 +2,10 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
-import com.mowmaster.pedestals.enchants.EnchantmentArea;
-import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
-import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
-import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -51,6 +49,7 @@ import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachine
 {
@@ -77,6 +76,17 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         int aW = getAreaModifier(stack);
         areaWidth = ((aW)+1);
         return  areaWidth;
+    }
+
+    @Override
+    public int getRangeModifier(ItemStack stack)
+    {
+        int range = 0;
+        if(hasEnchant(stack))
+        {
+            range = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack);
+        }
+        return range;
     }
 
     public int getRangeHeight(ItemStack stack)
@@ -107,7 +117,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
             case 5:
                 height=64;
                 break;
-            default: height=8;
+            default: height=(getRangeModifier(stack)*12);
         }
 
         return  height;
@@ -173,36 +183,41 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
             int speed = getOperationSpeed(coinInPedestal);
             //int breakspeed = Math.multiplyExact(Math.multiplyExact((int)(Math.pow((Math.multiplyExact(rangeWidth,2)+1),2)/9),20),84);
 
-            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
+            BlockState pedestalState = world.getBlockState(pedestalPos);
+            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
             /*BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
             BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);*/
-            if(world.isAreaLoaded(negNums,posNums))
+            if(blocksToMineInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
             {
-                if(!world.isBlockPowered(pedestalPos)) {
+                if(world.isAreaLoaded(negNums,posNums))
+                {
+                    if(!world.isBlockPowered(pedestalPos)) {
 
-                    TileEntity pedestalInv = world.getTileEntity(pedestalPos);
-                    if(pedestalInv instanceof PedestalTileEntity) {
-                        PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
-                        //Cost To Mine 1 Block
-                        int fuelToConsume = rfCostPerItemSmelted;
-                        if(hasEnergy(coinInPedestal) && removeEnergyFuel(ped,fuelToConsume,true)>=0)
-                        {
-                            upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                        TileEntity pedestalInv = world.getTileEntity(pedestalPos);
+                        if(pedestalInv instanceof PedestalTileEntity) {
+                            PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
+                            //Cost To Mine 1 Block
+                            int fuelToConsume = rfCostPerItemSmelted;
+                            if(hasEnergy(coinInPedestal) && removeEnergyFuel(ped,fuelToConsume,true)>=0)
+                            {
+                                upgradeActionMagnet(world, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
 
-                            if(!world.isBlockPowered(pedestalPos)) {
-                                if (world.getGameTime() % speed == 0) {
-                                    int currentPosition = pedestal.getStoredValueForUpgrades();
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negNums,posNums);
-                                    BlockState targetBlock = world.getBlockState(targetPos);
-                                    upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                    pedestal.setStoredValueForUpgrades(currentPosition+1);
-                                    if(resetCurrentPosInt(currentPosition,negNums,posNums))
-                                    {
-                                        pedestal.setStoredValueForUpgrades(0);
+                                if(!world.isBlockPowered(pedestalPos)) {
+                                    if (world.getGameTime() % speed == 0) {
+                                        int currentPosition = pedestal.getStoredValueForUpgrades();
+                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                        BlockState targetBlock = world.getBlockState(targetPos);
+                                        upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                        pedestal.setStoredValueForUpgrades(currentPosition+1);
+                                        if(resetCurrentPosInt(currentPosition+1,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                        {
+                                            pedestal.setStoredValueForUpgrades(0);
+                                        }
                                     }
                                 }
-                            }
 
                             /*for (int x = negNums.getX(); x <= posNums.getX(); x++) {
                                 for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
@@ -226,6 +241,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                                     }
                                 }
                             }*/
+                            }
                         }
                     }
                 }
@@ -242,7 +258,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-            ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE,1);
+            ItemStack pick = new ItemStack(Items.NETHERITE_PICKAXE,1);
 
             if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
             {
@@ -328,12 +344,14 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
     public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
     {
         int validBlocks = 0;
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,height);
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,height);
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
 
         for(int i=0;!resetCurrentPosInt(i,negNums,posNums);i++)
         {
-            BlockPos targetPos = getPosOfNextBlock(i,negNums,posNums);
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
             BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
             BlockState blockToMineState = world.getBlockState(blockToMinePos);
             Block blockToMine = blockToMineState.getBlock();
@@ -375,6 +393,42 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         }
 
         return returner;
+    }
+
+    @Override
+    public String getOperationSpeedString(ItemStack stack)
+    {
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        String str = normal.getString();
+        switch (intOperationalSpeedModifier(stack))
+        {
+            case 0:
+                str = normal.getString();//normal speed
+                break;
+            case 1:
+                str = twox.getString();//2x faster
+                break;
+            case 2:
+                str = fourx.getString();//4x faster
+                break;
+            case 3:
+                str = sixx.getString();//6x faster
+                break;
+            case 4:
+                str = tenx.getString();//10x faster
+                break;
+            case 5:
+                str = twentyx.getString();//20x faster
+                break;
+            default: str = normal.getString();;
+        }
+
+        return  str;
     }
 
     @Override
@@ -434,7 +488,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getSmeltingSpeedString(stack));
+        speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
         player.sendMessage(speed,Util.DUMMY_UUID);
     }

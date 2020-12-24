@@ -1028,6 +1028,20 @@ public class ItemUpgradeBase extends Item {
 
         return negCorner.add(addX,addY,addZ);
     }
+
+    public BlockPos getPosOfNextBlockQuarry(int currentPosition, BlockPos negCorner, BlockPos posCorner, Direction pedestalFacing)
+    {
+        int xRange = Math.abs(posCorner.getX() - negCorner.getX());
+        int yRange = Math.abs(posCorner.getY() - negCorner.getY());
+        int zRange = Math.abs(posCorner.getZ() - negCorner.getZ());
+        int layerVolume = xRange*zRange;
+        int addY = (int)Math.floor(currentPosition/layerVolume);
+        int layerCurrentPosition = currentPosition - addY*layerVolume;
+        int addZ = (int)Math.floor(layerCurrentPosition/xRange);
+        int addX = layerCurrentPosition - addZ*xRange;
+
+        return negCorner.add(addX,addY,addZ);
+    }
     /*
     if we have a range of 3x3x3
     layer = x val * z val
