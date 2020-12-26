@@ -7,12 +7,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -21,7 +17,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ForgeHooks;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -178,7 +173,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
                 str = fourx.getString();//4x faster
                 break;
             case 3:
-                str = fivex.getString();//6x faster
+                str = fivex.getString();//5x faster
                 break;
             case 4:
                 str = sixx.getString();//6x faster

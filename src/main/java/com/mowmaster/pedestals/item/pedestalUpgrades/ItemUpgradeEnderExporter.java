@@ -2,15 +2,12 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -106,27 +103,16 @@ public class ItemUpgradeEnderExporter extends ItemUpgradeBase
     @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
-        ItemStack stack = pedestal.getCoinOnPedestal();
-        PlayerEntity playerOnCoin = pedestal.getWorld().getPlayerByUuid(getPlayerFromCoin(stack));
-        for(int i=0; i<playerOnCoin.getInventoryEnderChest().getSizeInventory();i++)
-        {
-            System.out.println(playerOnCoin.getInventoryEnderChest().getStackInSlot(i));
-        }
-
-        /*TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString(""+getItemTransferRate(stack)+"");
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
-
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        speed.appendString(getOperationSpeedString(coin));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);*/
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -134,15 +120,11 @@ public class ItemUpgradeEnderExporter extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString("" + getItemTransferRate(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.appendString(getOperationSpeedString(stack));
 
-        rate.mergeStyle(TextFormatting.GRAY);
         speed.mergeStyle(TextFormatting.RED);
 
-        tooltip.add(rate);
         tooltip.add(speed);
     }
 

@@ -82,38 +82,6 @@ public class ItemUpgradeBase extends Item {
         //Default return that forces pedestal to do a normal thing
         return new ItemStack(Items.COMMAND_BLOCK);
     }
-    /*
-    @Nonnull
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if(amount == 0) {
-            return ItemStack.EMPTY;
-        } else {
-            this.validateSlotIndex(slot);
-            ItemStack existing = (ItemStack)this.stacks.get(slot);
-            if(existing.isEmpty()) {
-                return ItemStack.EMPTY;
-            } else {
-                int toExtract = Math.min(amount, existing.getMaxStackSize());
-                if(existing.getCount() <= toExtract) {
-                    if(!simulate) {
-                        this.stacks.set(slot, ItemStack.EMPTY);
-                        this.onContentsChanged(slot);
-                        return existing;
-                    } else {
-                        return existing.copy();
-                    }
-                } else {
-                    if(!simulate) {
-                        this.stacks.set(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
-                        this.onContentsChanged(slot);
-                    }
-
-                    return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
-                }
-            }
-        }
-    }
-     */
 
     //The remaining ItemStack that was not inserted (if the entire stack is accepted, then return null).
     //May be the same as the input ItemStack if unchanged, otherwise a new ItemStack.
@@ -122,44 +90,6 @@ public class ItemUpgradeBase extends Item {
         //Default return that forces pedestal to do a normal thing
         return new ItemStack(Items.COMMAND_BLOCK);
     }
-    /*
-    @Nonnull
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-        if(stack.isEmpty()) {
-            return ItemStack.EMPTY;
-        } else if(!this.isItemValid(slot, stack)) {
-            return stack;
-        } else {
-            this.validateSlotIndex(slot);
-            ItemStack existing = (ItemStack)this.stacks.get(slot);
-            int limit = this.getStackLimit(slot, stack);
-            if(!existing.isEmpty()) {
-                if(!ItemHandlerHelper.canItemStacksStack(stack, existing)) {
-                    return stack;
-                }
-
-                limit -= existing.getCount();
-            }
-
-            if(limit <= 0) {
-                return stack;
-            } else {
-                boolean reachedLimit = stack.getCount() > limit;
-                if(!simulate) {
-                    if(existing.isEmpty()) {
-                        this.stacks.set(slot, reachedLimit?ItemHandlerHelper.copyStackWithSize(stack, limit):stack);
-                    } else {
-                        existing.grow(reachedLimit?limit:stack.getCount());
-                    }
-
-                    this.onContentsChanged(slot);
-                }
-
-                return reachedLimit?ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit):ItemStack.EMPTY;
-            }
-        }
-    }
-     */
 
     //ItemStack in given slot. May be null.
     public ItemStack customStackInSlot(PedestalTileEntity pedestal,ItemStack stackFromHandler)
@@ -172,8 +102,6 @@ public class ItemUpgradeBase extends Item {
     {
         return -1;
     }
-
-
 
     //For Filters to return if they can or cannot allow items to pass
     //Will probably need overwritten
@@ -1107,37 +1035,6 @@ public class ItemUpgradeBase extends Item {
 
         return negCorner.add(addX,addY,addZ);
     }
-
-    public BlockPos getPosOfNextBlockQuarry(int currentPosition, BlockPos negCorner, BlockPos posCorner, Direction pedestalFacing)
-    {
-        int xRange = Math.abs(posCorner.getX() - negCorner.getX());
-        int yRange = Math.abs(posCorner.getY() - negCorner.getY());
-        int zRange = Math.abs(posCorner.getZ() - negCorner.getZ());
-        int layerVolume = xRange*zRange;
-        int addY = (int)Math.floor(currentPosition/layerVolume);
-        int layerCurrentPosition = currentPosition - addY*layerVolume;
-        int addZ = (int)Math.floor(layerCurrentPosition/xRange);
-        int addX = layerCurrentPosition - addZ*xRange;
-
-        return negCorner.add(addX,addY,addZ);
-    }
-    /*
-    if we have a range of 3x3x3
-    layer = x val * z val
-    cube = layer * y val
-    layer #1-3,4-6,7-9
-    x val = 1-3,1-3,1-3
-    zval = 1,2,3
-
-    Y_Value = (int) total count / layer value : should give us which layer we're on
-
-    LAYER_COUNT = total count - Y_Value*layer value
-
-    Z_Value = (int) LAYER_COUNT / xRange
-
-    X_Value = LAYER_COUNT - Z_Value*xRange
-
-    */
 
     public boolean resetCurrentPosInt(int currentPosition, BlockPos negCorner, BlockPos posCorner)
     {

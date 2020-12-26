@@ -1,14 +1,12 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -38,7 +36,6 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.IFluidBlock;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -123,13 +120,6 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            /*int rangeWidth = getAreaWidth(coinInPedestal);
-            int rangeHeight = getRangeHeight(coinInPedestal);
-            int speed = getOperationSpeed(coinInPedestal);
-
-            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-*/
             int rangeWidth = getAreaWidth(coinInPedestal);
             int rangeHeight = getRangeHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
@@ -165,17 +155,6 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                         }
                     }
                 }
-                /*if (world.getGameTime() % speed == 0) {
-                    int currentPosition = pedestal.getStoredValueForUpgrades();
-                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
-                    BlockState targetBlock = world.getBlockState(targetPos);
-                    upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                    pedestal.setStoredValueForUpgrades(currentPosition+1);
-                    if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
-                    {
-                        pedestal.setStoredValueForUpgrades(0);
-                    }
-                }*/
             }
         }
     }

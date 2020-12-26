@@ -85,7 +85,6 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
             {
                 if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals
-                    //upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                     upgradeAction(world,pedestalPos,coinInPedestal);
                 }
             }
@@ -170,7 +169,6 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                                             itemInputsPerSmelt = Math.floorDiv(fuelLeft,rfCostPerItemSmelted );
                                             if(itemInputsPerSmelt >=1)
                                             {
-                                                //System.out.println(itemInputsPerSmelt);
                                                 fuelToConsume = rfCostPerItemSmelted * itemInputsPerSmelt;
                                                 itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                                 copyIncoming.setCount(itemsOutputWhenStackSmelted);

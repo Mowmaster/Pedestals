@@ -103,14 +103,6 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
         xpstored.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(xpstored, Util.DUMMY_UUID);
 
-        /*Reduce Chat Output, info Unnecessary???
-        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".chat_xpcapacity");
-        TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getTranslationKey() + ".chat_xpcapacitylvl");
-        xpcapacity.appendString(""+ getExpBuffer(stack) +"");
-        xpcapacity.appendString(xpcapacitylvl.getString());
-        xpcapacity.mergeStyle(TextFormatting.AQUA);
-        player.sendMessage(xpcapacity,Util.DUMMY_UUID);*/
-
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString(getExpTransferRateString(stack));
         rate.mergeStyle(TextFormatting.GRAY);

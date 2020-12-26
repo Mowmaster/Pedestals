@@ -14,7 +14,6 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -204,7 +203,6 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                 && !(blockToMine.getBlock() instanceof IFluidBlock || blockToMine.getBlock() instanceof FlowingFluidBlock) && blockToMine.getBlockHardness(world, blockToMinePos) != -1.0F)
         {
             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack pick = new ItemStack(Items.NETHERITE_PICKAXE,1);
 

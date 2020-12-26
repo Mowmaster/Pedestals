@@ -5,7 +5,6 @@ import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ComparatorBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -18,7 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.ComparatorTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -32,7 +30,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -171,17 +168,13 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
 
     public void doEnergyProcess(World world, ItemStack coinInPedestal, BlockPos posOfPedestal, int baseFuel, double capacityRate)
     {
-        //System.out.println("Base: " + baseFuel);
-        //System.out.println("Rate: " + capacityRate);
         int fuelConsumed = (int) Math.ceil(baseFuel * capacityRate);
         int energyMax = getEnergyBuffer(coinInPedestal);
         int energyCurrent = getEnergyStored(coinInPedestal);
         int estEnergyProduced = (int) Math.round(baseFuel * 12.5);
         if(addEnergy(coinInPedestal,estEnergyProduced,true))
         {
-            //System.out.println("Consumed: " + fuelConsumed);
             removeFuel(world,posOfPedestal,fuelConsumed,false);
-            //System.out.println("Energy: " + estEnergyProduced);
             addEnergy(coinInPedestal,estEnergyProduced,false);
         }
         else {
@@ -189,9 +182,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
             int fuelCanConsume = (int)Math.floor(energyCanProduce/12.5);
             estEnergyProduced = (int) Math.round(fuelCanConsume * 12.5);
             int actualFuelConsumed = (int)Math.ceil(fuelCanConsume * capacityRate);
-            //System.out.println("Actual Consumed: " + actualFuelConsumed);
             removeFuel(world,posOfPedestal,actualFuelConsumed,false);
-            //System.out.println("Energy: " + estEnergyProduced);
             addEnergy(coinInPedestal,estEnergyProduced,false);
         }
     }

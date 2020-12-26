@@ -208,13 +208,6 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                                         world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                         removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                     }
-                                /*Removed due to a suggestion in a stream #BlameSoaryn (I want to make it clear, i was on the fence about this anyway but left it in for "balance" reasons)
-                                else
-                                {
-                                    removeFromPedestal(world,posOfPedestal,1);
-                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }*/
                                 }
                             }
                         }
@@ -349,7 +342,6 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        //super.addInformation(stack, worldIn, tooltip, flagIn);
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);

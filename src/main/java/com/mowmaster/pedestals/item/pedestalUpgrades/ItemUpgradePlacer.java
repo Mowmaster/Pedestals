@@ -121,44 +121,19 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
                         if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof Block) {
                             Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
                             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
-                            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
 
-                            //BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal, new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), blockPosBelow, false));
                             BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), blockPosBelow, false));
-
-                            /*ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == ActionResultType.CONSUME) {
-                                this.removeFromPedestal(world,posOfPedestal,1);
-                                world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                            }*/
 
                             ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                             if (result == ActionResultType.CONSUME) {
                                 this.removeFromPedestal(world,posOfPedestal,1);
                                 world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             }
-                            /*world.setBlockState(blockPosBelow,block.getDefaultState());
-                            this.removeFromPedestal(world,posOfPedestal,1);
-                            world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);*/
                         }
                     }
                 }
             }
-
-            /*if(blockBelow.isAir(blockBelow.getDefaultState(),world,blockPosBelow))
-            {
-                FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().getWorld(world.getDimension().getType()));
-                fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
-                fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-                fakePlayer.setHeldItem(Hand.MAIN_HAND,itemInPedestal.copy());
-                //, blockPosBelow, getPedestalFacing(world,posOfPedestal).getOpposite(), 0.5F, 0.5F, 0.5F
-                if(fakePlayer.interactionManager.processRightClick(fakePlayer, world, fakePlayer.getHeldItemMainhand(), Hand.MAIN_HAND).equals(ActionResultType.SUCCESS))
-                {
-                    this.removeFromPedestal(world,posOfPedestal,1);
-                    world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                }
-            }*/
         }
     }
 

@@ -141,7 +141,6 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                             }
                         }
 
-
                         //After an Item Allowed to be sent is found.
                         int i = getSlotWithMatchingStackExact(senderBelowInvCap,toImport);
                         if(i>=0)

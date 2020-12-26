@@ -21,10 +21,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -113,7 +111,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
                     {
                         if(!simulate)
                         {
-                            //System.out.println("Triggered3");
                             addCountToStorage(pedestal,stackIn.getCount(),false);
                         }
                         return ItemStack.EMPTY;
@@ -124,7 +121,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
                         copyStackIn.setCount(itemsToAdd);
                         if(!simulate)
                         {
-                            //System.out.println("Triggered4");
                             addCountToStorage(pedestal,itemsToAdd,false);
                         }
                         int currentIn = stackIn.getCount();
@@ -221,7 +217,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
                 int current = stored.getCount();
                 storedCopy.setCount(current+amountIn);
                 setItemStored(pedestal,storedCopy);
-                //System.out.println(getItemStored(pedestal));
             }
             return 0;
         }

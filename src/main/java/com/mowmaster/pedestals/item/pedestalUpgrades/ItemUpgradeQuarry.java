@@ -240,12 +240,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                 PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
                 if(removeFuel(ped,200,true))
                 {
-                    /*if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true))
-                    {
-                        blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
-                        removeFuel(ped,200,false);
-                        world.setBlockState(blockToMinePos, Blocks.AIR.getDefaultState());
-                    }*/
                     if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true)) {
 
                         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockToMinePos, blockToMine, fakePlayer);
@@ -255,9 +249,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                             removeFuel(ped,200,false);
                             world.removeBlock(blockToMinePos, false);
                             PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
-                            //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,blockToMinePos.getX(),blockToMinePos.getY()-0.5f,blockToMinePos.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                         }
-                        //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
                     }
                 }
             }

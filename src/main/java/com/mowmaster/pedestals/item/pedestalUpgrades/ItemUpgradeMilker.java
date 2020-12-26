@@ -2,12 +2,10 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
 import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -150,8 +148,6 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
         FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
         fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
 
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(cap.isPresent())
         {
@@ -165,14 +161,16 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                 if(handler != null)
                 {
                     int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
-                        if(i>=0)
+                    if(i>=0)
+                    {
+                        itemFromInv = handler.getStackInSlot(i);
+                        if(itemFromInv.getItem().equals(Items.BUCKET))
                         {
-                            itemFromInv = handler.getStackInSlot(i);
-                            if(itemFromInv.getItem().equals(Items.BUCKET))
+                            //Milking Code Here
+                            ItemStack milkBucket = new ItemStack(Items.MILK_BUCKET,1);
+                            List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
+                            if(moo.size()>0)
                             {
-                                //Milking Code Here
-                                ItemStack milkBucket = new ItemStack(Items.MILK_BUCKET,1);
-                                List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
                                 for(CowEntity moomoo : moo)
                                 {
                                     if (!moomoo.isChild() && itemInPedestal.equals(ItemStack.EMPTY))
@@ -190,6 +188,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                                 }
                             }
                         }
+                    }
                 }
             }
         }
@@ -201,32 +200,33 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                 if(!fluid.isEmpty())
                 {
                     List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
-                    for(CowEntity moomoo : moo)
+                    if(moo.size()>0)
                     {
-                        TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                        if(pedestalInv instanceof PedestalTileEntity) {
-                            PedestalTileEntity pedestal = (PedestalTileEntity)pedestalInv;
-                            if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
-                            {
-                                fakePlayer.setHeldItem(Hand.MAIN_HAND,itemForHand);
-                            }
-                            ActionResultType result = moomoo.func_230254_b_(fakePlayer,Hand.MAIN_HAND);
-                            fluid = getFluidInItem(fakePlayer.getHeldItemMainhand());
-                            if (result.isSuccessOrConsume() && addFluid(pedestal,coinInPedestal,fluid,true))
-                            {
-                                BlockPos mooie = moomoo.getPosition();
-                                PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
-                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                                addFluid(pedestal,coinInPedestal,fluid,false);
-                                break;
+                        for(CowEntity moomoo : moo)
+                        {
+                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                            if(pedestalInv instanceof PedestalTileEntity) {
+                                PedestalTileEntity pedestal = (PedestalTileEntity)pedestalInv;
+                                if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
+                                {
+                                    fakePlayer.setHeldItem(Hand.MAIN_HAND,itemForHand);
+                                }
+                                ActionResultType result = moomoo.func_230254_b_(fakePlayer,Hand.MAIN_HAND);
+                                fluid = getFluidInItem(fakePlayer.getHeldItemMainhand());
+                                if (result.isSuccessOrConsume() && addFluid(pedestal,coinInPedestal,fluid,true))
+                                {
+                                    BlockPos mooie = moomoo.getPosition();
+                                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
+                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                    addFluid(pedestal,coinInPedestal,fluid,false);
+                                    break;
+                                }
                             }
                         }
-
                     }
                 }
             }
         }
-        //}
     }
     @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)

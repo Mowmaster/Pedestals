@@ -145,9 +145,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
                     world.removeBlock(posOfBlock, false);
                 }
-                //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
             }
-            //blockToBreak.getBlock().removedByPlayer(blockToBreak, world, posOfBlock, fakePlayer, false, null);
         }
 
     }
@@ -160,7 +158,6 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,Util.DUMMY_UUID);
-        //Util.DUMMY_UUID
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
         range.appendString(""+getRange(stack)+"");

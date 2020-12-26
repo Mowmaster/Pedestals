@@ -14,7 +14,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -29,7 +28,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
@@ -46,7 +44,6 @@ import java.util.Map;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
-import static net.minecraft.block.NetherWartBlock.AGE;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
@@ -170,12 +167,6 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            /*int speed = getOperationSpeed(coinInPedestal);
-            int width = getAreaWidth(coinInPedestal);
-            int height = getHeight(coinInPedestal);
-            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
-            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
-*/
             if(!world.isBlockPowered(pedestalPos)) {
                 if(blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
                 {
@@ -202,45 +193,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                         }
                     }
                 }
-                /*if (world.getGameTime() % speed == 0) {
-                    int currentPosition = pedestal.getStoredValueForUpgrades();
-                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
-                    BlockState targetBlock = world.getBlockState(targetPos);
-                    upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
-                    pedestal.setStoredValueForUpgrades(currentPosition+1);
-                    if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
-                    {
-                        pedestal.setStoredValueForUpgrades(0);
-                    }
-                }*/
             }
-
-            /*BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
-            BlockPos posBlockPos = getPosRangePos(world,pedestalPos,width,height);
-
-            if(!world.isBlockPowered(pedestalPos)) {
-                for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
-                    for (int z = negBlockPos.getZ(); z <= posBlockPos.getZ(); z++) {
-                        for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
-                            BlockPos posTargetBlock = new BlockPos(x, y, z);
-                            BlockState targetBlock = world.getBlockState(posTargetBlock);
-                            if (world.getGameTime()%speed == 0) {
-                                ticked++;
-                            }
-
-                            if(ticked > 84)
-                            {
-                                upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, posTargetBlock, targetBlock);
-                                ticked=0;
-                            }
-                            else
-                            {
-                                ticked++;
-                            }
-                        }
-                    }
-                }
-            }*/
         }
     }
 

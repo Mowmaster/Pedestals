@@ -1,24 +1,16 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.blocks.PedestalBlock;
-import com.mowmaster.pedestals.crafting.CalculateColor;
-import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
-import com.mowmaster.pedestals.network.PacketHandler;
-import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -26,17 +18,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -131,13 +118,6 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             FluidStack fluidInCoin = getFluidStored(coinInPedestal);
-            /*
-                int speed = getOperationSpeed(coinInPedestal);
-                int rangeWidth = getWidth(coinInPedestal);
-                int rangeHeight = getHeight(coinInPedestal)+1;
-                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);*/
-
 
             //Check if we can even have a blocks worth of fluid to place
             if(fluidInCoin.getAmount() >= FluidAttributes.BUCKET_VOLUME)
@@ -170,24 +150,6 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                                 }
                             }
                         }
-                        /*if (world.getGameTime() % speed == 0) {
-
-                            int currentPosition = pedestal.getStoredValueForUpgrades();
-
-                            BlockPos targetPos = getPosOfNextBlock(currentPosition,negNums,posNums);
-                            //Added for testing
-                            //System.out.println("CURRENT POS: "+currentPosition);
-                            //PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),255,164,0));
-                            BlockState targetBlock = world.getBlockState(targetPos);
-
-                            upgradeAction(pedestal, targetPos, itemInPedestal, coinInPedestal);
-
-                            pedestal.setStoredValueForUpgrades(currentPosition+1);
-                            if(resetCurrentPosInt(currentPosition+1,negNums,posNums))
-                            {
-                                pedestal.setStoredValueForUpgrades(0);
-                            }
-                        }*/
                     }
                 }
             }
@@ -271,7 +233,6 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
             if(canPlaceFluidBlock(world,targetPos)) {
                 if(removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
                 {
-                    //fluidInCoin.getFluid().getAttributes().canBePlacedInWorld(world,targetPos,fluidInCoin)
                     FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
                     fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
                     ItemStack getBucketOfFluid = getBucket(fluidInCoin);
@@ -283,15 +244,6 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                         placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,false);
                         world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
                     }
-
-                    /*BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedestalPos), targetPos, false));
-
-                    ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                    if (result == ActionResultType.CONSUME) {
-                        removeFluid(coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
-                        placeFluid(world,targetPos,fluidInCoin.copy(),coinInPedestal);
-                        world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                    }*/
                 }
             }
         }

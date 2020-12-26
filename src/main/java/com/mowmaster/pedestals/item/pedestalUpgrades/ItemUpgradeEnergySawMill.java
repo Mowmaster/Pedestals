@@ -38,12 +38,10 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
     @Nullable
     protected SawMillRecipe getRecipe(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
-        //System.out.println(world == null ? null : world.getRecipeManager().getRecipe(SawMillRecipe.recipeType, inv, world).orElse(null));
         return world == null ? null : world.getRecipeManager().getRecipe(SawMillRecipe.recipeType, inv, world).orElse(null);
     }
 
     protected Collection<ItemStack> getProcessResults(SawMillRecipe recipe) {
-        //System.out.println((recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult())));
         return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
     }
 
@@ -61,7 +59,6 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
             {
                 if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals
-                    //upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                     upgradeAction(world,pedestalPos,coinInPedestal);
                 }
             }
@@ -78,8 +75,6 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
         int itemsPerSmelt = getItemTransferRate(coinInPedestal);
 
         ItemStack itemFromInv = ItemStack.EMPTY;
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(cap.isPresent())
@@ -94,92 +89,89 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
                 if(handler != null)
                 {
                     int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
-                        if(i>=0)
+                    if(i>=0)
+                    {
+                        int maxInSlot = handler.getSlotLimit(i);
+                        itemFromInv = handler.getStackInSlot(i);
+                        //Should work without catch since we null check this in our GetNextSlotFunction\
+                        Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
+                        //Just check to make sure our recipe output isnt air
+                        ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+                        //ItemStack resultSmelted = SawMill.instance().getResult(itemFromInv.getItem());
+                        ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
+                        if(!resultSmelted.equals(ItemStack.EMPTY))
                         {
-                            int maxInSlot = handler.getSlotLimit(i);
-                            itemFromInv = handler.getStackInSlot(i);
-                            //Should work without catch since we null check this in our GetNextSlotFunction\
-                            //System.out.println(SawMill.instance().getResult(itemFromInv.getItem()));
-                            Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
-                            //Just check to make sure our recipe output isnt air
-                            ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-                            //ItemStack resultSmelted = SawMill.instance().getResult(itemFromInv.getItem());
-                            ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
-                            if(!resultSmelted.equals(ItemStack.EMPTY))
+                            //Null check our slot again, which is probably redundant
+                            if(handler.getStackInSlot(i) != null && !handler.getStackInSlot(i).isEmpty() && handler.getStackInSlot(i).getItem() != Items.AIR)
                             {
-                                //Null check our slot again, which is probably redundant
-                                if(handler.getStackInSlot(i) != null && !handler.getStackInSlot(i).isEmpty() && handler.getStackInSlot(i).getItem() != Items.AIR)
+                                int roomLeftInPedestal = 64-itemFromPedestal.getCount();
+                                if(itemFromPedestal.isEmpty() || itemFromPedestal.equals(ItemStack.EMPTY)) roomLeftInPedestal = 64;
+
+                                //Upgrade Determins amout of items to smelt, but space count is determined by how much the item smelts into
+                                int itemInputsPerSmelt = itemsPerSmelt;
+                                int itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
+                                //Checks to see if pedestal can accept as many items as will be returned on smelt, if not reduce items being smelted
+                                if(roomLeftInPedestal < itemsOutputWhenStackSmelted)
                                 {
-                                    int roomLeftInPedestal = 64-itemFromPedestal.getCount();
-                                    if(itemFromPedestal.isEmpty() || itemFromPedestal.equals(ItemStack.EMPTY)) roomLeftInPedestal = 64;
+                                    itemInputsPerSmelt = Math.floorDiv(roomLeftInPedestal, resultSmelted.getCount());
+                                }
+                                //Checks to see how many items are left in the slot IF ITS UNDER the allowedTransferRate then sent the max rate to that.
+                                if(itemFromInv.getCount() < itemInputsPerSmelt) itemInputsPerSmelt = itemFromInv.getCount();
 
-                                    //Upgrade Determins amout of items to smelt, but space count is determined by how much the item smelts into
-                                    int itemInputsPerSmelt = itemsPerSmelt;
-                                    int itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
-                                    //Checks to see if pedestal can accept as many items as will be returned on smelt, if not reduce items being smelted
-                                    if(roomLeftInPedestal < itemsOutputWhenStackSmelted)
+                                itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
+                                ItemStack copyIncoming = resultSmelted.copy();
+                                copyIncoming.setCount(itemsOutputWhenStackSmelted);
+                                //RFFuel Cost
+                                int fuelToConsume = rfCostPerItemSmelted * itemInputsPerSmelt;
+                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                                if(pedestalInv instanceof PedestalTileEntity) {
+                                    PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
+                                    //Checks to make sure we have rffuel to smelt everything
+                                    int fuelLeft = getEnergyStored(ped.getCoinOnPedestal());
+                                    if(hasEnergy(coinInPedestal) && removeEnergyFuel(ped,fuelToConsume,true)>=0)
                                     {
-                                        itemInputsPerSmelt = Math.floorDiv(roomLeftInPedestal, resultSmelted.getCount());
+                                        handler.extractItem(i,itemInputsPerSmelt ,false );
+                                        removeEnergyFuel(ped,fuelToConsume,false);
+                                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                        ped.addItem(copyIncoming);
                                     }
-                                    //Checks to see how many items are left in the slot IF ITS UNDER the allowedTransferRate then sent the max rate to that.
-                                    if(itemFromInv.getCount() < itemInputsPerSmelt) itemInputsPerSmelt = itemFromInv.getCount();
-
-                                    itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
-                                    ItemStack copyIncoming = resultSmelted.copy();
-                                    copyIncoming.setCount(itemsOutputWhenStackSmelted);
-                                    //RFFuel Cost
-                                    int fuelToConsume = rfCostPerItemSmelted * itemInputsPerSmelt;
-                                    TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                    if(pedestalInv instanceof PedestalTileEntity) {
-                                        PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
-                                        //Checks to make sure we have rffuel to smelt everything
-                                        int fuelLeft = getEnergyStored(ped.getCoinOnPedestal());
-                                        if(hasEnergy(coinInPedestal) && removeEnergyFuel(ped,fuelToConsume,true)>=0)
+                                    //If we done have enough fuel to smelt everything then reduce size of smelt
+                                    else
+                                    {
+                                        //this = a number over 1 unless fuelleft < burnTimeCostPeritemSmelted
+                                        itemInputsPerSmelt = Math.floorDiv(fuelLeft,rfCostPerItemSmelted );
+                                        if(itemInputsPerSmelt >=1)
                                         {
+                                            fuelToConsume = rfCostPerItemSmelted * itemInputsPerSmelt;
+                                            itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
+                                            copyIncoming.setCount(itemsOutputWhenStackSmelted);
+
                                             handler.extractItem(i,itemInputsPerSmelt ,false );
                                             removeEnergyFuel(ped,fuelToConsume,false);
                                             world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             ped.addItem(copyIncoming);
                                         }
-                                        //If we done have enough fuel to smelt everything then reduce size of smelt
-                                        else
-                                        {
-                                            //this = a number over 1 unless fuelleft < burnTimeCostPeritemSmelted
-                                            itemInputsPerSmelt = Math.floorDiv(fuelLeft,rfCostPerItemSmelted );
-                                            if(itemInputsPerSmelt >=1)
-                                            {
-                                                //System.out.println(itemInputsPerSmelt);
-                                                fuelToConsume = rfCostPerItemSmelted * itemInputsPerSmelt;
-                                                itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
-                                                copyIncoming.setCount(itemsOutputWhenStackSmelted);
-
-                                                handler.extractItem(i,itemInputsPerSmelt ,false );
-                                                removeEnergyFuel(ped,fuelToConsume,false);
-                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                ped.addItem(copyIncoming);
-                                            }
-                                        }
                                     }
                                 }
                             }
-                            else
-                            {
-                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                if(pedestalInv instanceof PedestalTileEntity) {
-                                    PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
-                                    if(ped.getItemInPedestal().equals(ItemStack.EMPTY))
-                                    {
-                                        ItemStack copyItemFromInv = itemFromInv.copy();
-                                        handler.extractItem(i,itemFromInv.getCount(),false);
-                                        ped.addItem(copyItemFromInv);
-                                    }
+                        }
+                        else
+                        {
+                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                            if(pedestalInv instanceof PedestalTileEntity) {
+                                PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
+                                if(ped.getItemInPedestal().equals(ItemStack.EMPTY))
+                                {
+                                    ItemStack copyItemFromInv = itemFromInv.copy();
+                                    handler.extractItem(i,itemFromInv.getCount(),false);
+                                    ped.addItem(copyItemFromInv);
                                 }
                             }
                         }
                     }
                 }
             }
-        //}
+        }
     }
 
     public static final Item RFSAWMILL = new ItemUpgradeEnergySawMill(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfsawmill"));

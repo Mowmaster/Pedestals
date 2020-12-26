@@ -326,20 +326,11 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
 
     public boolean removeFuel(World world, BlockPos posPedestal, int amountToRemove, boolean simulate)
     {
-        //int amountToSet = 0;
         TileEntity entity = world.getTileEntity(posPedestal);
         if(entity instanceof PedestalTileEntity)
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)entity;
             return removeFuel(pedestal,amountToRemove,simulate);
-            /*int fuelLeft = pedestal.getStoredValueForUpgrades();
-            amountToSet = fuelLeft - amountToRemove;
-            if(amountToRemove >= fuelLeft) amountToSet = -1;
-            if(!simulate)
-            {
-                if(amountToSet == -1) amountToSet = 0;
-                pedestal.setStoredValueForUpgrades(amountToSet);
-            }*/
         }
 
         return false;

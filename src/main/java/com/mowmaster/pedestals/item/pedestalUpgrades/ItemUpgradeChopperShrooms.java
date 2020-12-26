@@ -121,13 +121,6 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            /*int rangeWidth = getAreaWidth(coinInPedestal);
-            int rangeHeight = getRangeHeight(coinInPedestal);
-            int speed = getOperationSpeed(coinInPedestal);
-
-            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);*/
-
             int rangeWidth = getAreaWidth(coinInPedestal);
             int rangeHeight = getRangeHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
@@ -165,47 +158,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                         }
                     }
                 }
-
-                /*if (world.getGameTime() % speed == 0) {
-                    int currentPosition = pedestal.getStoredValueForUpgrades();
-                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
-                    BlockState targetBlock = world.getBlockState(targetPos);
-                    upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                    pedestal.setStoredValueForUpgrades(currentPosition+1);
-                    if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
-                    {
-                        pedestal.setStoredValueForUpgrades(0);
-                    }
-                }*/
             }
-
-            /*BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
-            BlockPos posNums = getPosRangePos(world,pedestalPos,rangeWidth,rangeHeight);
-
-            if(!world.isBlockPowered(pedestalPos)) {
-                for (int x = negNums.getX(); x <= posNums.getX(); x++) {
-                    for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
-                        for (int y = negNums.getY(); y <= posNums.getY(); y++) {
-                            BlockPos blockToChopPos = new BlockPos(x, y, z);
-                            //BlockPos blockToChopPos = this.getPos().add(x, y, z);
-                            BlockState blockToChop = world.getBlockState(blockToChopPos);
-                            if (world.getGameTime()%speed == 0) {
-                                ticked++;
-                            }
-
-                            if(ticked > 84)
-                            {
-                                upgradeAction(world, itemInPedestal, coinInPedestal, blockToChopPos, blockToChop, pedestalPos);
-                                ticked=0;
-                            }
-                            else
-                            {
-                                ticked++;
-                            }
-                        }
-                    }
-                }
-            }*/
         }
     }
 

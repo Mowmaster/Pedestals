@@ -2,29 +2,20 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.enchants.*;
-import com.mowmaster.pedestals.network.PacketHandler;
-import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.command.arguments.EntityAnchorArgument;
-import net.minecraft.dispenser.BeehiveDispenseBehavior;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tileentity.BeehiveTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -33,23 +24,16 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -195,12 +179,6 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            /*int speed = getOperationSpeed(coinInPedestal);
-            int width = getAreaWidth(coinInPedestal);
-            int height = getRangeHeight(coinInPedestal)+1;
-            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
-            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);*/
-
             if(!world.isBlockPowered(pedestalPos)) {
                 if(blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
                 {
@@ -227,17 +205,6 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                         }
                     }
                 }
-                /*if (world.getGameTime() % speed == 0) {
-                    int currentPosition = pedestal.getStoredValueForUpgrades();
-                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
-                    BlockState targetBlock = world.getBlockState(targetPos);
-                    upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
-                    pedestal.setStoredValueForUpgrades(currentPosition+1);
-                    if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
-                    {
-                        pedestal.setStoredValueForUpgrades(0);
-                    }
-                }*/
             }
         }
     }
@@ -440,14 +407,8 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         area.mergeStyle(TextFormatting.WHITE);
         speed.mergeStyle(TextFormatting.RED);
 
-
         tooltip.add(area);
         tooltip.add(speed);
-
-        /*
-        TranslationTextComponent wip = new TranslationTextComponent("Works On Vanilla Hives Only");
-        wip.mergeStyle(TextFormatting.BLUE);
-        tooltip.add(wip);*/
     }
 
     public static final Item HARVESTERHIVES = new ItemUpgradeHarvesterBeeHives(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvesterhives"));
@@ -457,6 +418,5 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
     {
         event.getRegistry().register(HARVESTERHIVES);
     }
-
 
 }

@@ -127,49 +127,52 @@ public class ItemUpgradeFilteredMagnetItem extends ItemUpgradeBase
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
         List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-        for(ItemEntity getItemFromList : itemList)
+        if(itemList.size()>0)
         {
-            ItemStack copyStack = getItemFromList.getItem().copy();
-            int maxStackSize = copyStack.getMaxStackSize();
-            if (itemInPedestal.equals(ItemStack.EMPTY))
+            for(ItemEntity getItemFromList : itemList)
             {
-                BlockPos posInventory = getPosOfBlockBelow(world, posOfPedestal, 1);
-
-                LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-                if(cap.isPresent())
+                ItemStack copyStack = getItemFromList.getItem().copy();
+                int maxStackSize = copyStack.getMaxStackSize();
+                if (itemInPedestal.equals(ItemStack.EMPTY))
                 {
-                    IItemHandler handler = cap.orElse(null);
-                    if(handler != null)
+                    BlockPos posInventory = getPosOfBlockBelow(world, posOfPedestal, 1);
+
+                    LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+                    if(cap.isPresent())
                     {
-                        int range = handler.getSlots();
-
-                        ItemStack itemFromInv = ItemStack.EMPTY;
-                        itemFromInv = IntStream.range(0,range)//Int Range
-                                .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                                .filter(itemStack -> itemStack.getItem().equals(copyStack.getItem()))
-                                .findFirst().orElse(ItemStack.EMPTY);
-
-                        if(!itemFromInv.isEmpty())
+                        IItemHandler handler = cap.orElse(null);
+                        if(handler != null)
                         {
-                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                            if(pedestalInv instanceof PedestalTileEntity) {
-                                if(copyStack.getCount() <=maxStackSize)
-                                {
-                                    getItemFromList.setItem(ItemStack.EMPTY);
-                                    getItemFromList.remove();
-                                    ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                            int range = handler.getSlots();
+
+                            ItemStack itemFromInv = ItemStack.EMPTY;
+                            itemFromInv = IntStream.range(0,range)//Int Range
+                                    .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
+                                    .filter(itemStack -> itemStack.getItem().equals(copyStack.getItem()))
+                                    .findFirst().orElse(ItemStack.EMPTY);
+
+                            if(!itemFromInv.isEmpty())
+                            {
+                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                                if(pedestalInv instanceof PedestalTileEntity) {
+                                    if(copyStack.getCount() <=maxStackSize)
+                                    {
+                                        getItemFromList.setItem(ItemStack.EMPTY);
+                                        getItemFromList.remove();
+                                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                                    }
+                                    else
+                                    {
+                                        //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
+                                        int count = getItemFromList.getItem().getCount();
+                                        getItemFromList.getItem().setCount(count-maxStackSize);
+                                        copyStack.setCount(maxStackSize);
+                                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                                    }
                                 }
-                                else
-                                {
-                                    //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
-                                    int count = getItemFromList.getItem().getCount();
-                                    getItemFromList.getItem().setCount(count-maxStackSize);
-                                    copyStack.setCount(maxStackSize);
-                                    ((PedestalTileEntity) pedestalInv).addItem(copyStack);
-                                }
+                                break;
                             }
-                            break;
                         }
                     }
                 }

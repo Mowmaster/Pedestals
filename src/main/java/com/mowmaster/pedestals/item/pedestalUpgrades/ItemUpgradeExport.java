@@ -82,10 +82,6 @@ public class ItemUpgradeExport extends ItemUpgradeBase
         return slot.get();
     }
 
-
-
-
-    //                          impTicker,this.world,   getItemInPedestal(),      getCoinOnPedestal(),     this.getPos()
     public void updateAction(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
@@ -105,16 +101,12 @@ public class ItemUpgradeExport extends ItemUpgradeBase
         }
     }
 
-
-
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int upgradeTransferRate = getItemTransferRate(coinInPedestal);
         ItemStack itemFromPedestal = ItemStack.EMPTY;
         //Checks to make sure a TE exists
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
@@ -162,7 +154,6 @@ public class ItemUpgradeExport extends ItemUpgradeBase
                                 if(ItemHandlerHelper.insertItem(handler,itemFromPedestal,true).equals(ItemStack.EMPTY)){
                                     removeFromPedestal(world,posOfPedestal ,allowedTransferRate);
                                     ItemHandlerHelper.insertItem(handler,itemFromPedestal,false);
-                                    //handler.insertItem(i,itemFromPedestal,false );
                                 }
                             }
                         }
@@ -170,9 +161,6 @@ public class ItemUpgradeExport extends ItemUpgradeBase
                 }
             }
         }
-
-        //}
-
     }
 
     @Override

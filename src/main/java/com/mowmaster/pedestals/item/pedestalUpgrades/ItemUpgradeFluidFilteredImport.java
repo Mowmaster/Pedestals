@@ -116,7 +116,6 @@ public class ItemUpgradeFluidFilteredImport extends ItemUpgradeBaseFluid
     {
         boolean returner = false;
         BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
-        //System.out.println("Incoming luid : "+fluidIncoming.getDisplayName().getString());
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
         if(cap.isPresent())
@@ -274,7 +273,6 @@ public class ItemUpgradeFluidFilteredImport extends ItemUpgradeBaseFluid
                         {
                             //should i just set this to zero???
                             FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tanks-1);
-                            //System.out.println("GetTanksFluid: "+ fluidInTank.getDisplayName().getString());
                             if(fluidInCoin.isEmpty() || fluidInCoin.isFluidEqual(fluidInTank))
                             {
                                 int amountIn = fluidInTank.getAmount();
@@ -292,7 +290,6 @@ public class ItemUpgradeFluidFilteredImport extends ItemUpgradeBaseFluid
                                         FluidStack fluidDrained = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.EXECUTE);
                                         addFluid(pedestal,coinInPedestal,fluidDrained,false);
                                         ItemStack returnerStack = fluidHandlerItem.getContainer();
-                                        //System.out.println(returnerStack.getDisplayName().getString());
                                         pedestal.removeItemOverride();
                                         pedestal.addItem(returnerStack);
                                     }
@@ -400,7 +397,6 @@ public class ItemUpgradeFluidFilteredImport extends ItemUpgradeBaseFluid
                             FluidStack fluidInTank = handler.getFluidInTank(tanks-1);
                             if(canSendAnyFluid(pedestal,fluidInTank))
                             {
-                                //System.out.println("GetTanksFluid: "+ fluidInTank.getDisplayName().getString());
                                 if(fluidInCoin.isEmpty() || fluidInCoin.isFluidEqual(fluidInTank))
                                 {
                                     int amountIn = fluidInTank.getAmount();

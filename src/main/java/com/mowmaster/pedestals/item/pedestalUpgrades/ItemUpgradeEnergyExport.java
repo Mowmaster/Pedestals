@@ -46,7 +46,6 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
             {
                 if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals
-                    //upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
                     upgradeItemAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                     upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                 }

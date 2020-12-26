@@ -74,8 +74,6 @@ public class ItemUpgradeFilteredExportMod extends ItemUpgradeBaseFilter
         boolean returner = false;
         BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
 
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
         if(cap.isPresent())
         {
@@ -97,7 +95,6 @@ public class ItemUpgradeFilteredExportMod extends ItemUpgradeBaseFilter
                 }
             }
         }
-        //}
 
         return returner;
     }
@@ -140,15 +137,9 @@ public class ItemUpgradeFilteredExportMod extends ItemUpgradeBaseFilter
             }
         }
 
-
-
         return slot.get();
     }
 
-
-
-
-    //                          impTicker,this.world,   getItemInPedestal(),      getCoinOnPedestal(),     this.getPos()
     public void updateAction(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
@@ -168,16 +159,12 @@ public class ItemUpgradeFilteredExportMod extends ItemUpgradeBaseFilter
         }
     }
 
-
-
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int upgradeTransferRate = getItemTransferRate(coinInPedestal);
         ItemStack itemFromPedestal = ItemStack.EMPTY;
         //Checks to make sure a TE exists
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
@@ -225,7 +212,6 @@ public class ItemUpgradeFilteredExportMod extends ItemUpgradeBaseFilter
                                 if(ItemHandlerHelper.insertItem(handler,itemFromPedestal,true).equals(ItemStack.EMPTY)){
                                     removeFromPedestal(world,posOfPedestal ,allowedTransferRate);
                                     ItemHandlerHelper.insertItem(handler,itemFromPedestal,false);
-                                    //handler.insertItem(i,itemFromPedestal,false );
                                 }
                             }
                         }
@@ -233,9 +219,6 @@ public class ItemUpgradeFilteredExportMod extends ItemUpgradeBaseFilter
                 }
             }
         }
-
-        //}
-
     }
 
     @Override

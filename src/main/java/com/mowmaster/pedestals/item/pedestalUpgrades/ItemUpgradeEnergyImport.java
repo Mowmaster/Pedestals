@@ -7,7 +7,6 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -15,7 +14,6 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -73,8 +71,6 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
 
         LazyOptional<IEnergyStorage> cap = findEnergyHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
-        //System.out.println("HAS CAP: " + cap.isPresent());
-
         //Gets inventory TE then makes sure its not a pedestal
         TileEntity invToPushTo = world.getTileEntity(posInventory);
         if(invToPushTo instanceof PedestalTileEntity) {
@@ -85,11 +81,8 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
             {
                 IEnergyStorage handler = cap.orElse(null);
 
-                //System.out.println("Handler NOT NULL??? "+ handler != null);
                 if(handler != null)
                 {
-
-                    //System.out.println("CAN EXTRACT ENERGY" + handler.canExtract());
                     if(handler.canExtract())
                     {
                         int containerCurrentEnergy = handler.getEnergyStored();

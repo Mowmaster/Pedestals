@@ -196,7 +196,6 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
                     {
                         //should i just set this to zero???
                         FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tanks-1);
-                        //System.out.println("GetTanksFluid: "+ fluidInTank.getDisplayName().getString());
                         if(fluidInCoin.isEmpty() || fluidInCoin.isFluidEqual(fluidInTank))
                         {
                             int amountIn = fluidInTank.getAmount();
@@ -214,7 +213,6 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
                                     FluidStack fluidDrained = fluidHandlerItem.drain(estFluidToDrain,IFluidHandler.FluidAction.EXECUTE);
                                     addFluid(pedestal,coinInPedestal,fluidDrained,false);
                                     ItemStack returnerStack = fluidHandlerItem.getContainer();
-                                    //System.out.println(returnerStack.getDisplayName().getString());
                                     pedestal.removeItemOverride();
                                     pedestal.addItem(returnerStack);
                                 }
@@ -313,7 +311,6 @@ public class ItemUpgradeFluidImport extends ItemUpgradeBaseFluid
                         {
                             //should i just set this to zero???
                             FluidStack fluidInTank = handler.getFluidInTank(tanks-1);
-                            //System.out.println("GetTanksFluid: "+ fluidInTank.getDisplayName().getString());
                             if(fluidInCoin.isEmpty() || fluidInCoin.isFluidEqual(fluidInTank))
                             {
                                 int amountIn = fluidInTank.getAmount();

@@ -1,10 +1,8 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;

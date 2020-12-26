@@ -1,14 +1,11 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.IGrowable;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
@@ -125,17 +122,6 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-
-        /*int speed = getOperationSpeed(coinInPedestal);
-
-        int width = getAreaWidth(coinInPedestal);
-        int height = getHeight(coinInPedestal);
-
-        BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
-        BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
-*/
-
-
             if(!world.isBlockPowered(pedestalPos) && !itemInPedestal.isEmpty()) {
                 if(blocksToPlantInArea(world,pedestalPos,itemInPedestal,rangeWidth,rangeHeight) > 0)
                 {
@@ -172,18 +158,6 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                         }
                     }
                 }
-                /*if (world.getGameTime() % speed == 0) {
-
-                    int currentPosition = pedestal.getStoredValueForUpgrades();
-                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
-                    BlockState targetBlock = world.getBlockState(targetPos);
-                    upgradeAction(world, pedestal, itemInPedestal, pedestalPos, targetPos, targetBlock);
-                    pedestal.setStoredValueForUpgrades(currentPosition+1);
-                    if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
-                    {
-                        pedestal.setStoredValueForUpgrades(0);
-                    }
-                }*/
             }
         }
     }
@@ -205,7 +179,6 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 
                         if (world.getBlockState(posTarget.down()).canSustainPlant(world,posTarget.down(), Direction.UP,(IPlantable) block)) {
                             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(pedestal.getCoinOnPedestal()),"[Pedestals]"));
-                            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
 
                             BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget.down(), false));

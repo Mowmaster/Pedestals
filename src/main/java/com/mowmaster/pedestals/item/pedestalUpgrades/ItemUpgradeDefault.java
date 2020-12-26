@@ -18,12 +18,6 @@ public class ItemUpgradeDefault extends ItemUpgradeBase
 
     @Override
     public int canAcceptCount(World world, BlockPos pos,ItemStack inPedestal, ItemStack itemStackIncoming) {
-        /*int allow = 1;
-        if(inPedestal.getCount() > 0)
-        {
-            allow = 0;
-        }
-        return allow;*/
         return 64;
     }
 

@@ -167,19 +167,15 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                 if(addFuel(tilePedestal,getBurnTimeForStack,true))
                 {
                     addFuel(tilePedestal,getBurnTimeForStack,false);
-                    //tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
-
                     entityIn.remove();
                 }
             }
             else if(getItemStack.getItem().equals(Items.CHORUS_FRUIT))
             {
-                //int CurrentBurnTime = tilePedestal.getStoredValueForUpgrades();
                 int getBurnTimeForStack = 4 * getItemStack.getCount();
                 if(addFuel(tilePedestal,getBurnTimeForStack,true))
                 {
                     addFuel(tilePedestal,getBurnTimeForStack,false);
-                    //tilePedestal.setStoredValueForUpgrades(CurrentBurnTime + getBurnTimeForStack);
                     entityIn.remove();
                 }
             }

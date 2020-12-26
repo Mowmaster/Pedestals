@@ -104,32 +104,34 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
         //Entity Creature could be used to cover creepers for better with mods and such
         List<LivingEntity> baa = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
-
-        for(LivingEntity baaaaaa : baa)
+        if(baa.size() > 0)
         {
-            if(baaaaaa instanceof IForgeShearable)
+            for(LivingEntity baaaaaa : baa)
             {
-                IForgeShearable baabaa = (IForgeShearable)baaaaaa;
-                if (baabaa.isShearable(new ItemStack(Items.SHEARS),world,new BlockPos(baaaaaa.getPositionVec())))
+                if(baaaaaa instanceof IForgeShearable)
                 {
-                    if(getStackInPedestal(world,pedestalPos).equals(ItemStack.EMPTY))
+                    IForgeShearable baabaa = (IForgeShearable)baaaaaa;
+                    if (baabaa.isShearable(new ItemStack(Items.SHEARS),world,new BlockPos(baaaaaa.getPositionVec())))
                     {
-                        Random rando = new Random();
-                        int i = 1 + rando.nextInt(3);
-                        List<ItemStack> drops = baabaa.onSheared(null,new ItemStack(Items.SHEARS),world,new BlockPos(baaaaaa.getPositionVec()),0);
-
-                        for (int j = 0; j < i; ++j)
+                        if(getStackInPedestal(world,pedestalPos).equals(ItemStack.EMPTY))
                         {
-                            if(drops.size()>0)
+                            Random rando = new Random();
+                            int i = 1 + rando.nextInt(3);
+                            List<ItemStack> drops = baabaa.onSheared(null,new ItemStack(Items.SHEARS),world,new BlockPos(baaaaaa.getPositionVec()),0);
+
+                            for (int j = 0; j < i; ++j)
                             {
-                                for (int d=0;d<drops.size();d++)
+                                if(drops.size()>0)
                                 {
-                                    if(itemInPedestal.isEmpty() || drops.get(d).equals(itemInPedestal) && canAddToPedestal(world,pedestalPos,drops.get(d)) >= drops.get(d).getCount())
+                                    for (int d=0;d<drops.size();d++)
                                     {
-                                        BlockPos sheerie = baaaaaa.getPosition();
-                                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,sheerie.getX(),sheerie.getY()+0.5,sheerie.getZ(),145,145,145));
-                                        world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_SHEEP_SHEAR, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                        addToPedestal(world,pedestalPos,drops.get(d));
+                                        if(itemInPedestal.isEmpty() || drops.get(d).equals(itemInPedestal) && canAddToPedestal(world,pedestalPos,drops.get(d)) >= drops.get(d).getCount())
+                                        {
+                                            BlockPos sheerie = baaaaaa.getPosition();
+                                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,sheerie.getX(),sheerie.getY()+0.5,sheerie.getZ(),145,145,145));
+                                            world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_SHEEP_SHEAR, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            addToPedestal(world,pedestalPos,drops.get(d));
+                                        }
                                     }
                                 }
                             }

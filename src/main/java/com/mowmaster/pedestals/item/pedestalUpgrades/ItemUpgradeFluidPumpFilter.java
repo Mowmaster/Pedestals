@@ -2,7 +2,6 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.crafting.CalculateColor;
-import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -11,7 +10,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.*;
@@ -91,30 +89,18 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
                     if (((BlockItem) singleItemInPedestal).getBlock() instanceof Block)
                     {
                         if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof Block) {
-                            Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
 
                             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
-                            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                             fakePlayer.setPosition(pedPos.getX(),pedPos.getY(),pedPos.getZ());
 
-                            //BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal, new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), blockPosBelow, false));
                             BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));
-
-                            /*ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == ActionResultType.CONSUME) {
-                                this.removeFromPedestal(world,posOfPedestal,1);
-                                world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                            }*/
 
                             ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                             if (result == ActionResultType.CONSUME) {
                                 this.removeFromPedestal(world,pedPos,1);
                                 world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             }
-                            /*world.setBlockState(blockPosBelow,block.getDefaultState());
-                            this.removeFromPedestal(world,posOfPedestal,1);
-                            world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);*/
-                        }
+                            }
                     }
                 }
             }
@@ -279,12 +265,7 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
                 Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
                 BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-                FluidStack fluidInCoin = getFluidStored(coinInPedestal);
 
-                /*int rangeWidth = getWidth(coinInPedestal);
-                int rangeHeight = getHeight(coinInPedestal)+1;
-                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);*/
                 if(world.isAreaLoaded(negNums,posNums))
                 {
                     if(!world.isBlockPowered(pedestalPos)) {
@@ -316,24 +297,6 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
                                 }
                             }
                         }
-                        /*if (world.getGameTime() % speed == 0) {
-
-                            int currentPosition = pedestal.getStoredValueForUpgrades();
-
-                            BlockPos targetPos = getPosOfNextBlock(currentPosition,negNums,posNums);
-                            //Added for testing
-                            //System.out.println("CURRENT POS: "+currentPosition);
-                            //PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),255,164,0));
-                            BlockState targetBlock = world.getBlockState(targetPos);
-
-                            upgradeAction(pedestal,targetPos, itemInPedestal, coinInPedestal);
-
-                            pedestal.setStoredValueForUpgrades(currentPosition+1);
-                            if(resetCurrentPosInt(currentPosition+1,negNums,posNums))
-                            {
-                                pedestal.setStoredValueForUpgrades(0);
-                            }
-                        }*/
                     }
                 }
             }

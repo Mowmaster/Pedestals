@@ -78,34 +78,10 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
         return  value;
     }
 
-    public float getEnchantmentPowerFromSorroundings(World world, BlockPos posOfPedestal)
-    {
-
-        float enchantPower = 0;
-
-        for (int i = -2; i <= 2; ++i) {
-            for (int j = -2; j <= 2; ++j) {
-                if (i > -2 && i < 2 && j == -1) {
-                    j = 2;
-                }
-                for (int k = 0; k <= 2; ++k) {
-                    BlockPos blockpos = posOfPedestal.add(i, k, j);
-                    BlockState blockNearBy = world.getBlockState(blockpos);
-                    if (blockNearBy.getBlock().getEnchantPowerBonus(blockNearBy, world, blockpos)>0)
-                    {
-                        enchantPower +=blockNearBy.getBlock().getEnchantPowerBonus(blockNearBy, world, blockpos);
-                    }
-                }
-            }
-        }
-        return enchantPower;
-    }
-
     public float getEnchantmentPowerFromSorroundings(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
 
         float enchantPower = 0;
-        //int getMaxEnchantLevel = getExpBuffer(coinInPedestal);
 
         for (int i = -2; i <= 2; ++i) {
             for (int j = -2; j <= 2; ++j) {
@@ -122,11 +98,6 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                 }
             }
         }
-
-        /*if((int)(enchantPower*2) > getMaxEnchantLevel)
-        {
-            enchantPower = (float)(getMaxEnchantLevel/2);
-        }*/
 
         return enchantPower;
     }
@@ -156,8 +127,6 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         ItemStack itemFromInv = ItemStack.EMPTY;
 
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
@@ -172,58 +141,57 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                 if(handler != null)
                 {
                     int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
-                        if(i>=0)
-                        {
-                            itemFromInv = handler.getStackInSlot(i);
-                            int slotCount = itemFromInv.getCount();
-                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                            if(pedestalInv instanceof PedestalTileEntity) {
-                                if(!((PedestalTileEntity) pedestalInv).hasItem())
+                    if(i>=0)
+                    {
+                        itemFromInv = handler.getStackInSlot(i);
+                        int slotCount = itemFromInv.getCount();
+                        TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                        if(pedestalInv instanceof PedestalTileEntity) {
+                            if(!((PedestalTileEntity) pedestalInv).hasItem())
+                            {
+                                if(itemFromInv.isEnchantable() || itemFromInv.getItem().equals(Items.BOOK))
                                 {
-                                    if(itemFromInv.isEnchantable() || itemFromInv.getItem().equals(Items.BOOK))
+                                    //This is Book Shelf Enchanting level, not enchantment level (15 bookshelfves = 30 levels of enchantability)
+                                    float level = getEnchantmentPowerFromSorroundings(world,posOfPedestal,coinInPedestal);
+                                    //Need to charge at min 1 level for an enchant
+                                    int actualEnchantingLevel = ((level * 2)<1)?(1):((int)(level * 2));
+                                    int currentlyStoredExp = getXPStored(coinInPedestal);
+                                    int currentLevelFromStoredXp = getExpLevelFromCount(currentlyStoredExp);
+                                    int xpLevelsNeeded = (actualEnchantingLevel/10);
+                                    int xpAtEnchantingLevel = getExpCountByLevel(actualEnchantingLevel);
+                                    //since this is the number we subtract, if we need at least 1 level then make this 0
+                                    int xpAtLevelsBelowRequired = getExpCountByLevel(((actualEnchantingLevel-xpLevelsNeeded)<1)?(0):((actualEnchantingLevel-xpLevelsNeeded)));
+                                    int expNeeded = (xpAtEnchantingLevel-xpAtLevelsBelowRequired<7)?(7):(xpAtEnchantingLevel-xpAtLevelsBelowRequired);
+                                    if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
                                     {
-                                        //This is Book Shelf Enchanting level, not enchantment level (15 bookshelfves = 30 levels of enchantability)
-                                        float level = getEnchantmentPowerFromSorroundings(world,posOfPedestal,coinInPedestal);
-                                        //Need to charge at min 1 level for an enchant
-                                        int actualEnchantingLevel = ((level * 2)<1)?(1):((int)(level * 2));
-                                        int currentlyStoredExp = getXPStored(coinInPedestal);
-                                        int currentLevelFromStoredXp = getExpLevelFromCount(currentlyStoredExp);
-                                        int xpLevelsNeeded = (actualEnchantingLevel/10);
-                                        int xpAtEnchantingLevel = getExpCountByLevel(actualEnchantingLevel);
-                                        //since this is the number we subtract, if we need at least 1 level then make this 0
-                                        int xpAtLevelsBelowRequired = getExpCountByLevel(((actualEnchantingLevel-xpLevelsNeeded)<1)?(0):((actualEnchantingLevel-xpLevelsNeeded)));
-                                        int expNeeded = (xpAtEnchantingLevel-xpAtLevelsBelowRequired<7)?(7):(xpAtEnchantingLevel-xpAtLevelsBelowRequired);
-                                        if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
+                                        //Enchanting Code Here
+                                        Random rand = new Random();
+                                        ItemStack itemToEnchant = itemFromInv.copy();
+                                        itemToEnchant.setCount(1);
+                                        //the boolean at the end controls if treasure enchants are allowed.
+                                        ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
+                                        if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted())
                                         {
-                                            //Enchanting Code Here
-                                            Random rand = new Random();
-                                            ItemStack itemToEnchant = itemFromInv.copy();
-                                            itemToEnchant.setCount(1);
-                                            //the boolean at the end controls if treasure enchants are allowed.
-                                            ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
-                                            if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted())
-                                            {
-                                                int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
-                                                setXPStored(coinInPedestal,getExpLeftInPedestal);
-                                                handler.extractItem(i,stackToReturn.getCount() ,false );
-                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
-                                                ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
-                                            }
+                                            int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
+                                            setXPStored(coinInPedestal,getExpLeftInPedestal);
+                                            handler.extractItem(i,stackToReturn.getCount() ,false );
+                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
+                                            ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
                                         }
                                     }
-                                    else
-                                    {
-                                        ItemStack toReturn = itemFromInv.copy();
-                                        handler.extractItem(i,toReturn.getCount() ,false );
-                                        ((PedestalTileEntity) pedestalInv).addItem(toReturn);
-                                    }
+                                }
+                                else
+                                {
+                                    ItemStack toReturn = itemFromInv.copy();
+                                    handler.extractItem(i,toReturn.getCount() ,false );
+                                    ((PedestalTileEntity) pedestalInv).addItem(toReturn);
                                 }
                             }
                         }
                     }
                 }
             }
-        //}
+        }
     }
 
     @Override

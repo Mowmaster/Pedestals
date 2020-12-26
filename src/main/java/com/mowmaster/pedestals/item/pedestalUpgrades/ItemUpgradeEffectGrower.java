@@ -1,16 +1,12 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mowmaster.pedestals.blocks.PedestalBlock;
-import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.IGrowable;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -31,7 +27,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.IFluidBlock;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -126,13 +121,6 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            /*int speed = getOperationSpeed(coinInPedestal);
-            int width = getAreaWidth(coinInPedestal);
-            int height = getHeight(coinInPedestal);
-
-            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
-            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);*/
-
             if(!world.isBlockPowered(pedestalPos)) {
                 if(blocksToGrowInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
                 {
@@ -159,40 +147,6 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                         }
                     }
                 }
-                /*if (world.getGameTime() % speed == 0) {
-                    int currentPosition = pedestal.getStoredValueForUpgrades();
-                    BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
-                    BlockState targetBlock = world.getBlockState(targetPos);
-                    upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
-                    pedestal.setStoredValueForUpgrades(currentPosition+1);
-                    if(resetCurrentPosInt(currentPosition,negBlockPos,posBlockPos))
-                    {
-                        pedestal.setStoredValueForUpgrades(0);
-                    }
-                }*/
-
-
-                /*for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
-                    for (int z = negBlockPos.getZ(); z <= posBlockPos.getZ(); z++) {
-                        for (int y = negBlockPos.getY(); y <= posBlockPos.getY(); y++) {
-                            BlockPos posTargetBlock = new BlockPos(x, y, z);
-                            BlockState targetBlock = world.getBlockState(posTargetBlock);
-                            if (world.getGameTime()%speed == 0) {
-                                ticked++;
-                            }
-
-                            if(ticked > 84)
-                            {
-                                upgradeAction(world, itemInPedestal, pedestalPos, posTargetBlock, targetBlock);
-                                ticked=0;
-                            }
-                            else
-                            {
-                                ticked++;
-                            }
-                        }
-                    }
-                }*/
             }
         }
 

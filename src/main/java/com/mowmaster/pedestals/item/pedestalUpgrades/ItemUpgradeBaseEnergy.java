@@ -71,33 +71,6 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
     public int getEnergyTransferRate(ItemStack stack)
     {
-        //im assuming # = rf value???
-        /*int energyTransferRate = 1000;
-        switch (getCapacityModifier(stack))
-        {
-
-            case 0:
-                energyTransferRate = 1000;//1x
-                break;
-            case 1:
-                energyTransferRate=2000;//2x
-                break;
-            case 2:
-                energyTransferRate = 4000;//4x
-                break;
-            case 3:
-                energyTransferRate = 6000;//6x
-                break;
-            case 4:
-                energyTransferRate = 10000;//10x
-                break;
-            case 5:
-                energyTransferRate=20000;//20x
-                break;
-            default: energyTransferRate=1000;
-        }
-
-        return  energyTransferRate;*/
         return 20000;
     }
 
@@ -310,19 +283,10 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
                                             if(itemEB.addEnergy(coinStoredPedestal,transferRate,true) && removeEnergy(coinMainPedestal,transferRate,true))
                                             {
-                                                //if(energyMainPedestal >= transferRate)
-                                                //{
-                                                    //int xpRemainingMainPedestal = energyMainPedestal - transferRate;
-                                                    //int xpRemainingStoredPedestal = energyStoredPedestal + transferRate;
-                                                    //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                    removeEnergy(coinMainPedestal,transferRate,false);
-                                                    //setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
-                                                    tileMainPedestal.update();
-                                                    //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                    addEnergy(coinStoredPedestal,transferRate,false);
-                                                    //setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
-                                                    tileStoredPedestal.update();
-                                                //}
+                                                removeEnergy(coinMainPedestal,transferRate,false);
+                                                tileMainPedestal.update();
+                                                addEnergy(coinStoredPedestal,transferRate,false);
+                                                tileStoredPedestal.update();
                                             }
                                             else
                                             {
@@ -334,16 +298,9 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
                                                 if(itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,true) && removeEnergy(coinMainPedestal,energyLeftToSend,true))
                                                 {
-                                                    //If we have less then X levels, just send them all.
-                                                    //int xpRemainingMainPedestal = 0;
-                                                    //int xpRemainingStoredPedestal = energyStoredPedestal + energyMainPedestal;
-                                                    //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                     removeEnergy(coinMainPedestal,energyLeftToSend,false);
-                                                    //setEnergyStored(coinMainPedestal,xpRemainingMainPedestal);
                                                     tileMainPedestal.update();
-                                                    //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                                     itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,false);
-                                                    //setEnergyStored(coinStoredPedestal,xpRemainingStoredPedestal);
                                                     tileStoredPedestal.update();
                                                 }
                                             }
@@ -552,9 +509,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfstored");
-        //xpstored.appendString()
         xpstored.appendString(""+ getEnergyStored(stack) +"");
-        //xpstored.mergeStyle(TextFormatting.GREEN)
         xpstored.mergeStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
 

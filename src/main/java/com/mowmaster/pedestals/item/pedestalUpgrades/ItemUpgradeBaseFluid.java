@@ -2,20 +2,14 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.item.ItemUpgradeTool;
-import com.mowmaster.pedestals.network.PacketHandler;
-import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -29,16 +23,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fluids.DispenseFluidContainer;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -209,22 +197,11 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                         {
                                             int getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
                                             int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
-                                            //IF main pedestal has more fluid then transfer rate
-                                            //if(mainPedestalFluidAmount >= transferRate)
-                                            //{
-                                                //int mainFluidRemaining = mainPedestalFluidAmount - transferRate;
-                                                //int storedFluidRemaining = storedCoinFluidAmount + transferRate;
-                                                FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate,mainPedestalFluid.getTag());
-                                                //world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                //System.out.println(fluidToStore.getDisplayName().getString() + " - " + fluidToStore.getAmount());
+                                            FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate,mainPedestalFluid.getTag());
                                                 if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,transferRate,true))
                                                 {
                                                     removeFluid(pedestal, mainPedestalCoin,transferRate,false);
-                                                    //System.out.println("Removed Fluid");
-                                                    //setFluidStored(mainPedestalCoin,new FluidStack(mainPedestalFluid,mainFluidRemaining));
                                                     mainPedestalTile.update();
-                                                    //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                    //setFluidStored(storedPedestalCoin,fluidToStore);
                                                     addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                     storedPedestalTile.update();
                                                 }
@@ -241,15 +218,10 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                                     int storedFluidRemaining = storedCoinFluidAmount + transferRate;
                                                     int fluidLeftToSend = (mainPedestalFluidAmount<=transferRate)?(mainPedestalFluidAmount):(transferRate);
                                                     fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend,mainPedestalFluid.getTag());
-                                                    //System.out.println(fluidToStore.getDisplayName().getString() + " - " + fluidToStore.getAmount());
                                                     if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,true))
                                                     {
                                                         removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,false);
-                                                        //setFluidStored(mainPedestalCoin,FluidStack.EMPTY);
-                                                        //System.out.println("Removed Fluid");
                                                         mainPedestalTile.update();
-                                                        //world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                        //setFluidStored(storedPedestalCoin,fluidToStore);
                                                         addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                         storedPedestalTile.update();
                                                     }

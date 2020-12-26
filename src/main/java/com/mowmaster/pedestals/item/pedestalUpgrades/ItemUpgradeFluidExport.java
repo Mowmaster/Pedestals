@@ -189,7 +189,6 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                     {
                         //should i just set this to zero???
                         FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tanks-1);
-                        //System.out.println("GetTanksFluid: "+ fluidInTank.getDisplayName().getString());
                         if(!fluidInCoin.isEmpty() || fluidInCoin.isFluidEqual(fluidInTank))
                         {
                             int getTankCapacity = fluidHandlerItem.getTankCapacity(tanks-1);
@@ -241,7 +240,6 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
             itemFromPedestal = ItemStack.EMPTY;
         }
         else {
-            //System.out.println("Has Cap: "+ cap.isPresent());
             if(cap.isPresent())
             {
                 IFluidHandler handler = cap.orElse(null);
@@ -249,7 +247,6 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                 {
                     int tanks = handler.getTanks();
                     FluidStack fluidInCoin = getFluidStored(coinInPedestal);
-                    //System.out.println("Tanks: "+ tanks);
                     if(tanks > 1)
                     {
                         FluidStack fluidCheckedMatching = FluidStack.EMPTY;
@@ -259,7 +256,6 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                                 .findFirst().orElse(FluidStack.EMPTY);
 
                         //There is a matching fluid in a tank to fill
-                        //System.out.println("Matching Fluid In 1 of the many tanks: "+ !fluidCheckedMatching.isEmpty());
                         if(!fluidCheckedMatching.isEmpty())
                         {
                             FluidStack matchedFluid = fluidCheckedMatching;
@@ -271,7 +267,6 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                                     break;
                                 }
                             }
-                            //System.out.println("Which tank has the matching fluid: "+ location);
 
                             int getTankCapacity = handler.getTankCapacity(value);
                             int tankCurrentlyStored = matchedFluid.getAmount();
@@ -304,7 +299,6 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                                     break;
                                 }
                             }
-                            //System.out.println("Get the first empty tank: "+ location);
                             FluidStack emptyTank = handler.getFluidInTank(value);
                             int getTankCapacity = handler.getTankCapacity(value);
                             int tankCurrentlyStored = emptyTank.getAmount();
@@ -332,7 +326,6 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                     {
                         //should i just set this to zero???
                         FluidStack fluidInTank = handler.getFluidInTank(tanks-1);
-                        //System.out.println("Fluid In Single Tank: "+ fluidInTank.getDisplayName().getString() + ": "+fluidInTank.getAmount());
                         if(fluidInTank.isEmpty() || fluidInCoin.isFluidEqual(fluidInTank))
                         {
                             int getTankCapacity = handler.getTankCapacity(tanks-1);
@@ -343,12 +336,10 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
                             int rate = getFluidTransferRate(coinInPedestal);
                             int actualCoinRate = (spaceInTank>=rate)?(rate):(spaceInTank);
                             int transferRate = (amountInCoin>=actualCoinRate)?(actualCoinRate):(amountInCoin);
-                            //System.out.println("Space vs transfer "+ spaceInTank + " >= " + transferRate);
                             if(spaceInTank >= transferRate)
                             {
                                 FluidStack estFluidToFill = new FluidStack(fluidInCoin,transferRate);
                                 int fluidToActuallyFill = handler.fill(estFluidToFill,IFluidHandler.FluidAction.SIMULATE);
-                                //System.out.println("Simulated to fill amount: "+ fluidToActuallyFill + " ALSO CAN REMOVE FROM COIN:" + removeFluid(pedestal,coinInPedestal,fluidToActuallyFill,true));
                                 if(fluidToActuallyFill>0 && removeFluid(pedestal,coinInPedestal,fluidToActuallyFill,true))
                                 {
                                     estFluidToFill = new FluidStack(fluidInCoin,fluidToActuallyFill);
