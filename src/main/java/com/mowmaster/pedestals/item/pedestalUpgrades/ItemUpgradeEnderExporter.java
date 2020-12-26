@@ -38,6 +38,11 @@ public class ItemUpgradeEnderExporter extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return super.canAcceptAdvanced();
+    }
+
     public void updateAction(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
