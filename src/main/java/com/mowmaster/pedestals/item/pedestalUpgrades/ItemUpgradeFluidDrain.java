@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.network.PacketHandler;
@@ -12,9 +13,11 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.*;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -40,6 +43,7 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
 {
@@ -86,6 +90,26 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
         return getWidth(coin);
     }
 
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            int width = getWidth(pedestal.getCoinOnPedestal());
+            int height = getHeight(pedestal.getCoinOnPedestal());
+            int amount = blocksToFillInArea(pedestal,width,height);
+            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            if(amount>0)
+            {
+                float f = (float)amount/(float)area;
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
+    }
 
     public void updateAction(PedestalTileEntity pedestal)
     {
@@ -98,19 +122,55 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
             int getMaxFluidValue = getFluidbuffer(coinInPedestal);
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 
+            int rangeWidth = getWidth(coinInPedestal);
+            int rangeHeight = getHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
 
-            //Check if we can even have a blocks worth of fluid to place
-            if(getFluidStored(coinInPedestal).getAmount() >= FluidAttributes.BUCKET_VOLUME)
-            {
+            BlockState pedestalState = world.getBlockState(pedestalPos);
+            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            FluidStack fluidInCoin = getFluidStored(coinInPedestal);
+            /*
+                int speed = getOperationSpeed(coinInPedestal);
                 int rangeWidth = getWidth(coinInPedestal);
                 int rangeHeight = getHeight(coinInPedestal)+1;
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
+                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);*/
+
+
+            //Check if we can even have a blocks worth of fluid to place
+            if(fluidInCoin.getAmount() >= FluidAttributes.BUCKET_VOLUME)
+            {
                 if(world.isAreaLoaded(negNums,posNums))
                 {
                     if(!world.isBlockPowered(pedestalPos)) {
-                        if (world.getGameTime() % speed == 0) {
+                        if(blocksToFillInArea(pedestal,rangeWidth,rangeHeight) > 0)
+                        {
+                            if (world.getGameTime() % speed == 0) {
+                                int currentPosition = 0;
+                                for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                                {
+                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                    BlockPos blockToFillPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                    FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                                    fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+                                    if(world.isBlockModifiable(fakePlayer,blockToFillPos) && placeFluid(pedestal,fakePlayer,blockToFillPos,fluidInCoin,true))
+                                    {
+                                        writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                        break;
+                                    }
+                                }
+                                BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                BlockState targetBlock = world.getBlockState(targetPos);
+                                upgradeAction(pedestal, targetPos, itemInPedestal, coinInPedestal);
+                                if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                {
+                                    writeStoredIntToNBT(coinInPedestal,0);
+                                }
+                            }
+                        }
+                        /*if (world.getGameTime() % speed == 0) {
 
                             int currentPosition = pedestal.getStoredValueForUpgrades();
 
@@ -127,7 +187,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                             {
                                 pedestal.setStoredValueForUpgrades(0);
                             }
-                        }
+                        }*/
                     }
                 }
             }
@@ -217,14 +277,11 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                     ItemStack getBucketOfFluid = getBucket(fluidInCoin);
                     fakePlayer.setHeldItem(Hand.MAIN_HAND,getBucketOfFluid);
 
-                    if(world.isBlockModifiable(fakePlayer,targetPos))
+                    if(world.isBlockModifiable(fakePlayer,targetPos) && placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,true))
                     {
-                        if(placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,true))
-                        {
-                            removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
-                            placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,false);
-                            world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                        }
+                        removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
+                        placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,false);
+                        world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
                     }
 
                     /*BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedestalPos), targetPos, false));
@@ -238,6 +295,34 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                 }
             }
         }
+    }
+
+    public int blocksToFillInArea(PedestalTileEntity pedestal, int width, int height)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        FluidStack fluidInCoin = getFluidStored(coinInPedestal);
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToFillPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+
+            if(world.isBlockModifiable(fakePlayer,blockToFillPos) && placeFluid(pedestal,fakePlayer,blockToFillPos,fluidInCoin,true))
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
     }
 
     @Override
@@ -262,6 +347,11 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
             fluid.mergeStyle(TextFormatting.BLUE);
             player.sendMessage(fluid,Util.DUMMY_UUID);
         }
+
+        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
+        btm.appendString("" + blocksToFillInArea(pedestal,getWidth(pedestal.getCoinOnPedestal()),getHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.DUMMY_UUID);
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString("" +  getFluidTransferRate(stack) + "");

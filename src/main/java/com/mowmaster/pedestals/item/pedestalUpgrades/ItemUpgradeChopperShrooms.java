@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -15,10 +16,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -41,6 +44,7 @@ import java.util.Map;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
 {
@@ -87,7 +91,27 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         return getAreaWidth(coin);
     }
 
-    public int ticked = 0;
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            int width = getAreaWidth(pedestal.getCoinOnPedestal());
+            int height = getRangeHeight(pedestal.getCoinOnPedestal());
+            int amount = blocksToChopInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
+            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            if(amount>0)
+            {
+                float f = (float)amount/(float)area;
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
+    }
 
     public void updateAction(PedestalTileEntity pedestal)
     {
@@ -97,15 +121,52 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            int rangeWidth = getAreaWidth(coinInPedestal);
+            /*int rangeWidth = getAreaWidth(coinInPedestal);
             int rangeHeight = getRangeHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
 
             BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
-            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);
+            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,rangeWidth,rangeHeight);*/
+
+            int rangeWidth = getAreaWidth(coinInPedestal);
+            int rangeHeight = getRangeHeight(coinInPedestal);
+            int speed = getOperationSpeed(coinInPedestal);
+
+            BlockState pedestalState = world.getBlockState(pedestalPos);
+            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
 
             if(!world.isBlockPowered(pedestalPos)) {
-                if (world.getGameTime() % speed == 0) {
+                if(blocksToChopInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                {
+                    if (world.getGameTime() % speed == 0) {
+                        int currentPosition = 0;
+                        for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                        {
+                            BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                            BlockPos blockToChopPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                            BlockState blockStateToChop = world.getBlockState(blockToChopPos);
+                            Block blockToChop = blockStateToChop.getBlock();
+                            if(!blockToChop.isAir(blockStateToChop,world,blockToChopPos) && blockToChop.isIn(BlockTags.WART_BLOCKS) || blockToChop.isIn(BlockTags.WARPED_STEMS) || blockToChop.isIn(BlockTags.CRIMSON_STEMS)
+                                    || blockToChop.equals(Blocks.SHROOMLIGHT) || blockToChop.equals(Blocks.MUSHROOM_STEM) || blockToChop.equals(Blocks.BROWN_MUSHROOM_BLOCK) || blockToChop.equals(Blocks.RED_MUSHROOM_BLOCK))
+                            {
+                                writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                break;
+                            }
+                        }
+                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                        BlockState targetBlock = world.getBlockState(targetPos);
+                        upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                        if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                        {
+                            writeStoredIntToNBT(coinInPedestal,0);
+                        }
+                    }
+                }
+
+                /*if (world.getGameTime() % speed == 0) {
                     int currentPosition = pedestal.getStoredValueForUpgrades();
                     BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
                     BlockState targetBlock = world.getBlockState(targetPos);
@@ -115,7 +176,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                     {
                         pedestal.setStoredValueForUpgrades(0);
                     }
-                }
+                }*/
             }
 
             /*BlockPos negNums = getNegRangePos(world,pedestalPos,rangeWidth,rangeHeight);
@@ -156,7 +217,6 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         {
 
             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack choppingAxe = new ItemStack(Items.DIAMOND_AXE,1);
             if (itemInPedestal.getItem() instanceof AxeItem || itemInPedestal.getToolTypes().contains(ToolType.AXE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
@@ -181,12 +241,6 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 }
             }
 
-            /*if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true))
-            {
-                blockToChop.getBlock().harvestBlock(world, fakePlayer, blockToChopPos, blockToChop, null, fakePlayer.getHeldItemMainhand());
-                world.setBlockState(blockToChopPos, Blocks.AIR.getDefaultState());
-            }*/
-
             if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true)) {
 
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockToChopPos, blockToChop, fakePlayer);
@@ -197,10 +251,32 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                     PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,blockToChopPos.getX(),blockToChopPos.getY(),blockToChopPos.getZ(),255,164,0));
                     world.removeBlock(blockToChopPos, false);
                 }
-                //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
             }
-            //blockToChop.getBlock().removedByPlayer(blockToChop,world,blockToChopPos,fakePlayer,false,null);
         }
+    }
+
+    public int blocksToChopInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToChopPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockStateToChop = world.getBlockState(blockToChopPos);
+            Block blockToChop = blockStateToChop.getBlock();
+            if(!blockToChop.isAir(blockStateToChop,world,blockToChopPos) && blockToChop.isIn(BlockTags.WART_BLOCKS) || blockToChop.isIn(BlockTags.WARPED_STEMS) || blockToChop.isIn(BlockTags.CRIMSON_STEMS)
+                    || blockToChop.equals(Blocks.SHROOMLIGHT) || blockToChop.equals(Blocks.MUSHROOM_STEM) || blockToChop.equals(Blocks.BROWN_MUSHROOM_BLOCK) || blockToChop.equals(Blocks.RED_MUSHROOM_BLOCK))
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
     }
 
     @Override
@@ -224,6 +300,12 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,Util.DUMMY_UUID);
+
+        //Display Blocks To Mine Left
+        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
+        btm.appendString("" + blocksToChopInArea(pedestal.getWorld(),pedestal.getPos(),getAreaWidth(pedestal.getCoinOnPedestal()),getRangeHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0)

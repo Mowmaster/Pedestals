@@ -16,10 +16,12 @@ import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -27,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
@@ -44,6 +47,7 @@ import java.util.Map;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 import static net.minecraft.block.NetherWartBlock.AGE;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 {
@@ -126,7 +130,27 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         return returner;
     }
 
-    public int ticked = 0;
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            int width = getAreaWidth(pedestal.getCoinOnPedestal());
+            int height = getHeight(pedestal.getCoinOnPedestal());
+            int amount = blocksToHarvestInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
+            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            if(amount>0)
+            {
+                float f = (float)amount/(float)area;
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
+    }
 
     public void updateAction(PedestalTileEntity pedestal)
     {
@@ -137,16 +161,48 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
         if(!world.isRemote)
         {
+            int rangeWidth = getAreaWidth(coinInPedestal);
+            int rangeHeight = getHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
 
+            BlockState pedestalState = world.getBlockState(pedestalPos);
+            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
+            /*int speed = getOperationSpeed(coinInPedestal);
             int width = getAreaWidth(coinInPedestal);
             int height = getHeight(coinInPedestal);
-
             BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
             BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
-
+*/
             if(!world.isBlockPowered(pedestalPos)) {
-                if (world.getGameTime() % speed == 0) {
+                if(blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                {
+                    if (world.getGameTime() % speed == 0) {
+                        int currentPosition = 0;
+                        for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                        {
+                            BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                            BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                            BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+                            Block blockToHarvest = blockToHarvestState.getBlock();
+                            if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+                            {
+                                writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                break;
+                            }
+                        }
+                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                        BlockState targetBlock = world.getBlockState(targetPos);
+                        upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
+                        if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                        {
+                            writeStoredIntToNBT(coinInPedestal,0);
+                        }
+                    }
+                }
+                /*if (world.getGameTime() % speed == 0) {
                     int currentPosition = pedestal.getStoredValueForUpgrades();
                     BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
                     BlockState targetBlock = world.getBlockState(targetPos);
@@ -156,7 +212,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     {
                         pedestal.setStoredValueForUpgrades(0);
                     }
-                }
+                }*/
             }
 
             /*BlockPos negBlockPos = getNegRangePos(world,pedestalPos,width,height);
@@ -190,13 +246,9 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
     {
-        //if(target.getBlock() instanceof IGrowable && !target.getBlock().isAir(target,world,posTarget))
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
-            //if(!((IGrowable) target.getBlock()).canGrow(world,posTarget,target,false))
-            //{
                 FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-                //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
                 fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
                 ItemStack harvestingHoe = new ItemStack(Items.DIAMOND_HOE,1);
                 if (itemInPedestal.getItem() instanceof HoeItem || itemInPedestal.getToolTypes().contains(ToolType.HOE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
@@ -221,29 +273,59 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     }
                 }
 
-                //System.out.println(target.getBlock().getRegistryName());
-                //System.out.println(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true));
+            if(hasAdvancedInventoryTargeting(coinInPedestal))
+            {
+                //TODO: Make this do gentle harvesting SOMEDAY
                 if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                 {
-                    //if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true)) {
-
-                        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
-                        if (!MinecraftForge.EVENT_BUS.post(e)) {
-                            target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
-                            target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
-                            //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
-                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
-                            world.removeBlock(posTarget, false);
-                        }
-                        //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
-                    //}
-                    /*target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
-                    world.setBlockState(posTarget, Blocks.AIR.getDefaultState());*/
+                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
+                    if (!MinecraftForge.EVENT_BUS.post(e)) {
+                        target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
+                        target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
+                        //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
+                        PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
+                        world.removeBlock(posTarget, false);
+                    }
                 }
-
-                //target.getBlock().removedByPlayer(target,world,posTarget,fakePlayer,false,null);
-            //}
+            }
+            else
+            {
+                if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
+                {
+                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
+                    if (!MinecraftForge.EVENT_BUS.post(e)) {
+                        target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
+                        target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
+                        //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
+                        PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
+                        world.removeBlock(posTarget, false);
+                    }
+                }
+            }
         }
+    }
+
+    public int blocksToHarvestInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+            Block blockToHarvest = blockToHarvestState.getBlock();
+            if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
     }
 
     @Override
@@ -266,6 +348,11 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,Util.DUMMY_UUID);
+
+        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
+        btm.appendString("" + blocksToHarvestInArea(pedestal.getWorld(),pedestal.getPos(),getAreaWidth(pedestal.getCoinOnPedestal()),getHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0)

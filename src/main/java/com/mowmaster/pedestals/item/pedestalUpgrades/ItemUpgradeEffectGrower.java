@@ -1,10 +1,13 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.IGrowable;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -13,9 +16,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -26,6 +31,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.IFluidBlock;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -33,6 +39,7 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 {
@@ -79,6 +86,28 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         return getAreaWidth(coin);
     }
 
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            int width = getAreaWidth(pedestal.getCoinOnPedestal());
+            int height = getHeight(pedestal.getCoinOnPedestal());
+            int amount = blocksToGrowInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
+            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            if(amount>0)
+            {
+                float f = (float)amount/(float)area;
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
+    }
+
     public void updateAction(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
@@ -88,15 +117,49 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
         if(!world.isRemote)
         {
+            int rangeWidth = getAreaWidth(coinInPedestal);
+            int rangeHeight = getHeight(coinInPedestal);
             int speed = getOperationSpeed(coinInPedestal);
+
+            BlockState pedestalState = world.getBlockState(pedestalPos);
+            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
+            /*int speed = getOperationSpeed(coinInPedestal);
             int width = getAreaWidth(coinInPedestal);
             int height = getHeight(coinInPedestal);
 
             BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
-            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
+            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);*/
 
             if(!world.isBlockPowered(pedestalPos)) {
-                if (world.getGameTime() % speed == 0) {
+                if(blocksToGrowInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                {
+                    if (world.getGameTime() % speed == 0) {
+                        int currentPosition = 0;
+                        for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                        {
+                            BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+                            Block blockToGrow = blockToGrowState.getBlock();
+                            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
+                            {
+                                writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                break;
+                            }
+                        }
+                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                        BlockState targetBlock = world.getBlockState(targetPos);
+                        upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                        if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                        {
+                            writeStoredIntToNBT(coinInPedestal,0);
+                        }
+                    }
+                }
+                /*if (world.getGameTime() % speed == 0) {
                     int currentPosition = pedestal.getStoredValueForUpgrades();
                     BlockPos targetPos = getPosOfNextBlock(currentPosition,negBlockPos,posBlockPos);
                     BlockState targetBlock = world.getBlockState(targetPos);
@@ -106,7 +169,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                     {
                         pedestal.setStoredValueForUpgrades(0);
                     }
-                }
+                }*/
 
 
                 /*for (int x = negBlockPos.getX(); x <= posBlockPos.getX(); x++) {
@@ -172,6 +235,29 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         }
     }
 
+    public int blocksToGrowInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+            Block blockToGrow = blockToGrowState.getBlock();
+            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
+    }
+
     @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
@@ -191,6 +277,11 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,Util.DUMMY_UUID);
+
+        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
+        btm.appendString("" + blocksToGrowInArea(pedestal.getWorld(),pedestal.getPos(),getAreaWidth(pedestal.getCoinOnPedestal()),getHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
