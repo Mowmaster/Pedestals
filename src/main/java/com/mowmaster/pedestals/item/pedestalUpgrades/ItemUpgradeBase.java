@@ -10,6 +10,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.BoatEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,9 +27,7 @@ import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -1232,6 +1231,37 @@ public class ItemUpgradeBase extends Item {
                 return blockBelow;
         }
     }
+
+    public void upgradeActionMagnet(World world, List<ItemEntity> itemList, ItemStack itemInPedestal, BlockPos posOfPedestal, int width, int height)
+    {
+        for(ItemEntity getItemFromList : itemList)
+        {
+            ItemStack copyStack = getItemFromList.getItem().copy();
+            if (itemInPedestal.equals(ItemStack.EMPTY))
+            {
+                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                if(pedestalInv instanceof PedestalTileEntity) {
+                    if(copyStack.getCount() <=64)
+                    {
+                        getItemFromList.setItem(ItemStack.EMPTY);
+                        getItemFromList.remove();
+                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                    }
+                    else
+                    {
+                        //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
+                        int count = getItemFromList.getItem().getCount();
+                        getItemFromList.getItem().setCount(count-64);
+                        copyStack.setCount(64);
+                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                    }
+                }
+                break;
+            }
+        }
+
+    }
     /***************************************
      ****************************************
      **        End of Entity Stuff         **
@@ -1567,6 +1597,35 @@ public class ItemUpgradeBase extends Item {
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
 
+    }
+
+    //This function used to be in the pedestal, but got moved out for performance improvements
+    public void writeStoredIntToNBT(ItemStack stack, int value)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putInt("storedint",value);
+        stack.setTag(compound);
+    }
+
+    public int readStoredIntFromNBT(ItemStack stack)
+    {
+        int maxenergy = 0;
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            maxenergy = getCompound.getInt("storedint");
+        }
+        return maxenergy;
+    }
+
+    public int getStoredInt(ItemStack coin)
+    {
+        return readStoredIntFromNBT(coin);
     }
     /***************************************
      ****************************************
