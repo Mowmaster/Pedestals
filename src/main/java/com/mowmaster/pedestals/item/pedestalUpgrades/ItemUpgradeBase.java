@@ -812,7 +812,18 @@ public class ItemUpgradeBase extends Item {
      **        Start of Range Stuff        **
      ****************************************
      ***************************************/
+
     public int getRangeModifier(ItemStack stack)
+    {
+        int range = 0;
+        if(hasEnchant(stack))
+        {
+            range = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack);
+        }
+        return range;
+    }
+
+    public int getRangeModifierLimited(ItemStack stack)
     {
         int range = 0;
         if(hasEnchant(stack))
@@ -822,33 +833,102 @@ public class ItemUpgradeBase extends Item {
         return range;
     }
 
-    public int getRange(ItemStack stack)
+    //Based on old 3x3x3 range
+    public int getRangeTiny(ItemStack stack)
     {
-        int range = 1;
+        return  ((getRangeModifier(stack)*2)+3);
+    }
+    //Based on old 16 block max
+    public int getRangeSmall(ItemStack stack)
+    {
+        int height = 1;
         switch (getRangeModifier(stack))
         {
             case 0:
-                range = 1;
+                height = 1;
                 break;
             case 1:
-                range = 2;
+                height = 2;
                 break;
             case 2:
-                range = 4;
+                height = 4;
                 break;
             case 3:
-                range = 8;
+                height = 8;
                 break;
             case 4:
-                range = 12;
+                height = 12;
                 break;
             case 5:
-                range = 16;
+                height = 16;
                 break;
-            default: range = 1;
+            default: height=((getRangeModifier(stack)*4)-4);
         }
 
-        return  range;
+        return  height;
+    }
+    //Based on old 32 block max
+    public int getRangeMedium(ItemStack stack)
+    {
+        int height = 4;
+        switch (getRangeModifier(stack))
+        {
+            case 0:
+                height = 4;
+                break;
+            case 1:
+                height=8;
+                break;
+            case 2:
+                height = 12;
+                break;
+            case 3:
+                height = 16;
+                break;
+            case 4:
+                height = 24;
+                break;
+            case 5:
+                height=32;
+                break;
+            default: height=((getRangeModifier(stack)*6)+2);
+        }
+
+        return  height;
+    }
+    //Based on old 64 block max
+    public int getRangeLarge(ItemStack stack)
+    {
+        int height = 8;
+        switch (getRangeModifier(stack))
+        {
+            case 0:
+                height = 8;
+                break;
+            case 1:
+                height=16;
+                break;
+            case 2:
+                height = 24;
+                break;
+            case 3:
+                height = 32;
+                break;
+            case 4:
+                height = 48;
+                break;
+            case 5:
+                height=64;
+                break;
+            default: height=(getRangeModifier(stack)*12);
+        }
+
+        return  height;
+    }
+    //Based on old Tree Chopper max
+    public int getRangeTree(ItemStack stack)
+    {
+        return  ((getRangeModifier(stack)*6)+4);
     }
     /***************************************
      ****************************************

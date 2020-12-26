@@ -77,21 +77,21 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     @Override
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         return getPosOfBlockBelow(world,pos,-range).getX();
     }
 
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         return new int[]{getPosOfBlockBelow(world,pos,-range).getY(),1};
     }
 
     @Override
     public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         return getPosOfBlockBelow(world,pos,-range).getZ();
     }
 
@@ -117,7 +117,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     {
         if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(10));}
         int rate = getTransferRate(coinInPedestal);
-        int range = getRange(coinInPedestal);
+        int range = getRangeSmall(coinInPedestal);
 
 
         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
@@ -191,7 +191,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
         player.sendMessage(xpstored,Util.DUMMY_UUID);
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.appendString("" +  getRange(stack) + "");
+        range.appendString("" +  getRangeSmall(stack) + "");
         range.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(range, Util.DUMMY_UUID);
 
@@ -238,7 +238,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
         }
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.appendString("" +  getRange(stack) + "");
+        range.appendString("" +  getRangeSmall(stack) + "");
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString("" +  tr + "");
 

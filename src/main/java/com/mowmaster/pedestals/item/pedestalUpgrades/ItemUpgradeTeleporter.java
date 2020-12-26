@@ -55,7 +55,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     @Override
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         BlockPos posOfBlock = pos;
         TileEntity tile = world.getTileEntity(pos);
         if(tile instanceof PedestalTileEntity)
@@ -75,7 +75,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         BlockPos posOfBlock = pos;
         TileEntity tile = world.getTileEntity(pos);
         if(tile instanceof PedestalTileEntity)
@@ -95,7 +95,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     @Override
     public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         BlockPos posOfBlock = pos;
         TileEntity tile = world.getTileEntity(pos);
         if(tile instanceof PedestalTileEntity)
@@ -227,7 +227,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                         //Random teleport to use up remaining fuel???
                         else if (canTeleportTo(world,tilePedestal,posPedestal,tilePedestal.getStoredPositionAt(i),isItemEntity) == 2 && hasFuel(tilePedestal.getCoinOnPedestal()))
                         {
-                            int range = getRange(tilePedestal.getCoinOnPedestal());
+                            int range = getRangeSmall(tilePedestal.getCoinOnPedestal());
                             int remainingFuel = getFuelStored(tilePedestal.getCoinOnPedestal());
                             BlockPos randomPos = world.getBlockRandomPos((int)entityIn.getPosX(),(int)entityIn.getPosY(),(int)entityIn.getPosZ(),range*remainingFuel);
                             if(teleportEntityRandom(world, randomPos, entityIn))
@@ -259,7 +259,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                     {
                         if(getTeleportDistance(posOrigPedestal,posDestPedestal) <= getFuelStored(tilePedestal.getCoinOnPedestal()))
                         {
-                            int range = getRange(tilePedestal.getCoinOnPedestal());
+                            int range = getRangeSmall(tilePedestal.getCoinOnPedestal());
                             BlockPos posDestBlock = getPosOfBlockBelow(world,posDestPedestal,range);
                             BlockState blocktoTPto = world.getBlockState(posDestBlock);
                             if(isItemEntity)
@@ -290,7 +290,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
     public boolean teleportEntity(World world, PedestalTileEntity tilePedestal, BlockPos posPedestalDest, Entity entityIn)
     {
-        int range = getRange(tilePedestal.getCoinOnPedestal());
+        int range = getRangeSmall(tilePedestal.getCoinOnPedestal());
         BlockPos pos = getPosOfBlockBelow(world,posPedestalDest,range);
         if(entityIn instanceof PlayerEntity)
         {
@@ -406,7 +406,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         player.sendMessage(name,Util.DUMMY_UUID);
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.appendString(""+getRange(stack)+"");
+        range.appendString(""+getRangeSmall(stack)+"");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));
 
@@ -436,7 +436,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         tooltip.add(t);
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.appendString("" + getRange(stack) + "");
+        range.appendString("" + getRangeSmall(stack) + "");
         range.mergeStyle(TextFormatting.WHITE);
         tooltip.add(range);
 

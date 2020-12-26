@@ -78,17 +78,6 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         return  areaWidth;
     }
 
-    @Override
-    public int getRangeModifier(ItemStack stack)
-    {
-        int range = 0;
-        if(hasEnchant(stack))
-        {
-            range = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack);
-        }
-        return range;
-    }
-
     public int getRangeHeight(ItemStack stack)
     {
         return getHeight(stack);
@@ -96,31 +85,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
 
     public int getHeight(ItemStack stack)
     {
-        int height = 8;
-        switch (getRangeModifier(stack))
-        {
-            case 0:
-                height = 8;
-                break;
-            case 1:
-                height=16;
-                break;
-            case 2:
-                height = 24;
-                break;
-            case 3:
-                height = 32;
-                break;
-            case 4:
-                height = 48;
-                break;
-            case 5:
-                height=64;
-                break;
-            default: height=(getRangeModifier(stack)*12);
-        }
-
-        return  height;
+        return getRangeLarge(stack);
     }
 
     @Override

@@ -1,11 +1,13 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
@@ -56,38 +58,9 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         return  areaWidth;
     }
 
-    public int getRangeHeight(ItemStack stack)
-    {
-        return getHeight(stack);
-    }
-
     public int getHeight(ItemStack stack)
     {
-        int height = 3;
-        switch (getRangeModifier(stack))
-        {
-            case 0:
-                height = 3;
-                break;
-            case 1:
-                height=5;
-                break;
-            case 2:
-                height = 7;
-                break;
-            case 3:
-                height = 9;
-                break;
-            case 4:
-                height = 11;
-                break;
-            case 5:
-                height=13;
-                break;
-            default: height=3;
-        }
-
-        return  height;
+        return  getRangeTiny(stack);
     }
 
     @Override
@@ -118,7 +91,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         int speed = getOperationSpeed(coinInPedestal);
 
         int width = getAreaWidth(coinInPedestal);
-        int height = getRangeHeight(coinInPedestal);
+        int height = getHeight(coinInPedestal);
 
         BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
@@ -184,14 +157,13 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,Util.DUMMY_UUID);
-        String trr = "" + getRangeHeight(stack) + "";
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString(trr);
+        area.appendString("" + getHeight(stack) + "");
         area.appendString(areax.getString());
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
@@ -210,12 +182,11 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        String trr = "" + getRangeHeight(stack) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString(trr);
+        area.appendString("" + getHeight(stack) + "");
         area.appendString(areax.getString());
         area.appendString(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");

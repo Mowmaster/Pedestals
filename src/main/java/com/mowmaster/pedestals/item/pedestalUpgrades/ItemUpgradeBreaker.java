@@ -59,30 +59,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
     public int getRange(ItemStack stack)
     {
-        switch (getRangeModifier(stack))
-        {
-            case 0:
-                range = 1;
-                break;
-            case 1:
-                range = 2;
-                break;
-            case 2:
-                range = 4;
-                break;
-            case 3:
-                range = 8;
-                break;
-            case 4:
-                range = 12;
-                break;
-            case 5:
-                range = 16;
-                break;
-            default: range = 1;
-        }
-
-        return  range;
+        return  getRangeSmall(stack);
     }
 
     @Override

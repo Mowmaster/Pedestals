@@ -35,8 +35,6 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeShearer extends ItemUpgradeBase
 {
-    public int rangeHeight = 1;
-
     public ItemUpgradeShearer(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
 
@@ -56,6 +54,11 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
         return  areaWidth;
     }
 
+    public int getHeight(ItemStack stack)
+    {
+        return  getRangeTiny(stack);
+    }
+
     @Override
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
@@ -65,7 +68,7 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
-        return new int[]{2,0};
+        return new int[]{getHeight(coin),0};
     }
 
     @Override
@@ -95,8 +98,9 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
     public void upgradeAction(World world, ItemStack itemInPedestal, BlockPos pedestalPos, ItemStack coinInPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
-        BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,rangeHeight);
-        BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,rangeHeight);
+        int height = getHeight(coinInPedestal);
+        BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
+        BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
         //Entity Creature could be used to cover creepers for better with mods and such
         List<LivingEntity> baa = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
@@ -151,7 +155,7 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString("2");
+        area.appendString("" + getHeight(stack) + "");
         area.appendString(areax.getString());
         area.appendString(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
@@ -177,7 +181,7 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString("2");
+        area.appendString("" + getHeight(stack) + "");
         area.appendString(areax.getString());
         area.appendString(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");

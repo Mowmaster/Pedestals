@@ -1,10 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.enchants.EnchantmentArea;
-import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
-import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
-import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -68,10 +65,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
 
     public int getRangeHeight(ItemStack stack)
     {
-        int rangeHeight = 0;
-        int rH = getRangeModifier(stack);
-        rangeHeight = ((rH*6)+4);
-        return rangeHeight;
+        return getRangeTree(stack);
     }
 
     @Override

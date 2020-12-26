@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.crafting.CalculateColor;
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -10,6 +11,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -62,31 +64,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
 
     public int getHeight(ItemStack stack)
     {
-        int height = 1;
-        switch (getRangeModifier(stack))
-        {
-            case 0:
-                height = 1;
-                break;
-            case 1:
-                height = 4;
-                break;
-            case 2:
-                height = 8;
-                break;
-            case 3:
-                height = 16;
-                break;
-            case 4:
-                height = 32;
-                break;
-            case 5:
-                height = 64;
-                break;
-            default: height = 1;
-        }
-
-        return  height;
+        return getRangeLarge(stack);
     }
 
     //Riped Straight from ItemUpgradePlacer

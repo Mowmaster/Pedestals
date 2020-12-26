@@ -1,9 +1,11 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -56,6 +58,17 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         return  areaWidth;
     }
 
+    @Override
+    public int getRangeModifier(ItemStack stack)
+    {
+        int range = 0;
+        if(hasEnchant(stack))
+        {
+            range = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack);
+        }
+        return range;
+    }
+
     public int getRangeHeight(ItemStack stack)
     {
         return getHeight(stack);
@@ -63,31 +76,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
     public int getHeight(ItemStack stack)
     {
-        int height = 3;
-        switch (getRangeModifier(stack))
-        {
-            case 0:
-                height = 3;
-                break;
-            case 1:
-                height=5;
-                break;
-            case 2:
-                height = 7;
-                break;
-            case 3:
-                height = 9;
-                break;
-            case 4:
-                height = 11;
-                break;
-            case 5:
-                height=13;
-                break;
-            default: height=3;
-        }
-
-        return  height;
+        return  getRangeTiny(stack);
     }
 
     @Override

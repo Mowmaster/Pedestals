@@ -41,21 +41,21 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
     @Override
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         return getPosOfBlockBelow(world,pos,-range).getX();
     }
 
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         return new int[]{getPosOfBlockBelow(world,pos,-range).getY(),1};
     }
 
     @Override
     public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
     {
-        int range = getRange(coin);
+        int range = getRangeSmall(coin);
         return getPosOfBlockBelow(world,pos,-range).getZ();
     }
 
@@ -83,7 +83,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
         int rate = getItemTransferRate(coinOnPedestal);
         int actualRate = (itemInPedestal.getCount() < rate)?(itemInPedestal.getCount()):(rate);
 
-        int range = getRange(coinOnPedestal);
+        int range = getRangeSmall(coinOnPedestal);
         if(!getStackInPedestal(world,posOfPedestal).isEmpty())//hasItem
         {
             ItemStack itemToSummon = getStackInPedestal(world,posOfPedestal).copy();
@@ -105,7 +105,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
         player.sendMessage(name,Util.DUMMY_UUID);
 
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.appendString("" +  getRange(stack) + "");
+        range.appendString("" +  getRangeSmall(stack) + "");
         range.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(range,Util.DUMMY_UUID);
 
@@ -129,7 +129,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString("" + getItemTransferRate(stack) + "");
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.appendString("" + getRange(stack) + "");
+        range.appendString("" + getRangeSmall(stack) + "");
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.appendString(getOperationSpeedString(stack));
 

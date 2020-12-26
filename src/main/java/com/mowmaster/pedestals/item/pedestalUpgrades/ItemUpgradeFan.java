@@ -1,9 +1,11 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -49,31 +51,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
 
     public int getHeight(ItemStack stack)
     {
-        int transferRate = 4;
-        switch (getRangeModifier(stack))
-        {
-            case 0:
-                transferRate = 4;
-                break;
-            case 1:
-                transferRate=8;
-                break;
-            case 2:
-                transferRate = 12;
-                break;
-            case 3:
-                transferRate = 16;
-                break;
-            case 4:
-                transferRate = 24;
-                break;
-            case 5:
-                transferRate=32;
-                break;
-            default: transferRate=4;
-        }
-
-        return  transferRate;
+        return getRangeMedium(stack);
     }
 
     @Override

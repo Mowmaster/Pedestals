@@ -56,6 +56,11 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         return  areaWidth;
     }
 
+    public int getHeight(ItemStack stack)
+    {
+        return  getRangeTiny(stack);
+    }
+
     @Override
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
@@ -65,7 +70,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
-        return new int[]{((2*getAreaWidth(coin))+1),0};
+        return new int[]{(getHeight(coin)),0};
     }
 
     @Override
@@ -171,7 +176,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
-        int height = (2*width)+1;
+        int height = getHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
 
@@ -181,26 +186,28 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         if(instance.size() > 0)
         {
             List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
-            for(LivingEntity getEntityFromList : entityList)
+            if(entityList.size() > 0)
             {
-                if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
+                for(LivingEntity getEntityFromList : entityList)
                 {
-                    instance = getEffectFromPedestal(itemInPedestal,1);
-                }
-
-                if(getTargetEntity(world,posOfPedestal,getEntityFromList) != null)
-                {
-                    if(!hasPotionEffect(getTargetEntity(world,posOfPedestal,getEntityFromList),instance))
+                    if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
                     {
-                        for(int i=0; i<instance.size(); i++)
+                        instance = getEffectFromPedestal(itemInPedestal,1);
+                    }
+
+                    if(getTargetEntity(world,posOfPedestal,getEntityFromList) != null)
+                    {
+                        if(!hasPotionEffect(getTargetEntity(world,posOfPedestal,getEntityFromList),instance))
                         {
-                            if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true))
+                            for(int i=0; i<instance.size(); i++)
                             {
-                                if(getTargetEntity(world,posOfPedestal,getEntityFromList).addPotionEffect(instance.get(i)))
+                                if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true))
                                 {
-                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                    removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
-                                }
+                                    if(getTargetEntity(world,posOfPedestal,getEntityFromList).addPotionEffect(instance.get(i)))
+                                    {
+                                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                        removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
+                                    }
                                 /*Removed due to a suggestion in a stream #BlameSoaryn (I want to make it clear, i was on the fence about this anyway but left it in for "balance" reasons)
                                 else
                                 {
@@ -208,6 +215,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                                     world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                 }*/
+                                }
                             }
                         }
                     }
@@ -300,7 +308,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString(tr);
+        area.appendString("" + getHeight(stack) + "");
         area.appendString(areax.getString());
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
@@ -352,7 +360,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.appendString(tr);
         area.appendString(areax.getString());
-        area.appendString(tr);
+        area.appendString("" + getHeight(stack) + "");
         area.appendString(areax.getString());
         area.appendString(tr);
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");

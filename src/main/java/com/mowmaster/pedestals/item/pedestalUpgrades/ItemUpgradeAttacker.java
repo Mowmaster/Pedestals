@@ -67,31 +67,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
     public int getHeight(ItemStack stack)
     {
-        int height = 3;
-        switch (getRangeModifier(stack))
-        {
-            case 0:
-                height = 3;
-                break;
-            case 1:
-                height=5;
-                break;
-            case 2:
-                height = 7;
-                break;
-            case 3:
-                height = 9;
-                break;
-            case 4:
-                height = 11;
-                break;
-            case 5:
-                height=13;
-                break;
-            default: height=3;
-        }
-
-        return  height;
+        return  getRangeTiny(stack);
     }
 
     @Override
