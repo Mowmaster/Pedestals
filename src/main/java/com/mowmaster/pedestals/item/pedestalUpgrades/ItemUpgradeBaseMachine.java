@@ -176,17 +176,17 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     @Override
     public String getOperationSpeedString(ItemStack stack)
     {
-        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
-        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
-        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
-        TranslationTextComponent fivex = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
-        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
-        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
-        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_6");
-        TranslationTextComponent fourtyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_7");
-        TranslationTextComponent sixtyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_8");
-        TranslationTextComponent onehunx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_9");
-        TranslationTextComponent twohunx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_10");
+        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_0");
+        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_1");
+        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_2");
+        TranslationTextComponent fivex = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_3");
+        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_4");
+        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_5");
+        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_6");
+        TranslationTextComponent fourtyx = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_7");
+        TranslationTextComponent sixtyx = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_8");
+        TranslationTextComponent onehunx = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_9");
+        TranslationTextComponent twohunx = new TranslationTextComponent(Reference.MODID + ".upgrade_machine_tooltips" + ".speed_10");
         String str = normal.getString();
         switch (intOperationalSpeedModifier(stack))
         {
