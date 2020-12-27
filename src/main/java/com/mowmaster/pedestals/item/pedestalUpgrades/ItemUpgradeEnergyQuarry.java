@@ -163,6 +163,7 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
                         upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
                     }
 
+                    //int fuelToConsume = rfCostPerItemSmelted;
                     int fuelToConsume = rfCostPerItemSmelted;
                     if(hasEnergy(coinInPedestal) && removeEnergyFuel(pedestal,fuelToConsume,true)>=0)
                     {
