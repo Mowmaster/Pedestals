@@ -48,6 +48,11 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         return true;
     }
 
+    @Override
+    public Boolean canAcceptRange() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
