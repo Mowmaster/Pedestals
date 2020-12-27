@@ -134,7 +134,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                             Block blockToGrow = blockToGrowState.getBlock();
                             if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
                             {
-                                writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                writeStoredIntToNBT(coinInPedestal,currentPosition+1);
                                 break;
                             }
                         }
