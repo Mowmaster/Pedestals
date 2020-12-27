@@ -154,6 +154,14 @@ public class ItemLinkingTool extends Item {
                                             else
                                             {
                                                 tilePedestal.removeLocation(getStoredPosition(player.getHeldItemMainhand()));
+                                                if(player.getHeldItemMainhand().getItem() instanceof ItemLinkingTool)
+                                                {
+                                                    if(player.getHeldItemMainhand().isEnchanted())
+                                                    {
+                                                        Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
+                                                        EnchantmentHelper.setEnchantments(enchantsNone,player.getHeldItemMainhand());
+                                                    }
+                                                }
                                                 player.sendMessage(linkremoved,Util.DUMMY_UUID);
                                             }
                                         }
