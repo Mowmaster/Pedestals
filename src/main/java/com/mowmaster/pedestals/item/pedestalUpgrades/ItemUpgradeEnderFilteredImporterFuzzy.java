@@ -36,11 +36,6 @@ public class ItemUpgradeEnderFilteredImporterFuzzy extends ItemUpgradeBaseFilter
     public ItemUpgradeEnderFilteredImporterFuzzy(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
-        return true;
-    }
-
-    @Override
     public Boolean canAcceptOpSpeed() {
         return true;
     }

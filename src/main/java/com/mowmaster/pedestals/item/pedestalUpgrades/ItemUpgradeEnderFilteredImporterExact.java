@@ -36,11 +36,6 @@ public class ItemUpgradeEnderFilteredImporterExact extends ItemUpgradeBaseFilter
     public ItemUpgradeEnderFilteredImporterExact(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
-        return true;
-    }
-
-    @Override
     public Boolean canAcceptOpSpeed() {
         return true;
     }

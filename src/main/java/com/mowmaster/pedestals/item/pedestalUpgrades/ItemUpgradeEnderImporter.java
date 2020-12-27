@@ -33,11 +33,6 @@ public class ItemUpgradeEnderImporter extends ItemUpgradeBase
     public ItemUpgradeEnderImporter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
-        return true;
-    }
-
-    @Override
     public Boolean canAcceptAdvanced() {
         return super.canAcceptAdvanced();
     }

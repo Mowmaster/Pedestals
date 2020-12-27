@@ -35,11 +35,6 @@ public class ItemUpgradeEnderFilteredImporterFood extends ItemUpgradeBaseFilter
     public ItemUpgradeEnderFilteredImporterFood(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
-        return true;
-    }
-
-    @Override
     public Boolean canAcceptOpSpeed() {
         return true;
     }
