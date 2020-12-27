@@ -264,6 +264,14 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeAttacker.ATTACK, "attack");
         addValueInfoPage(registration, ItemUpgradeEffect.EFFECT, "effect");
         addValueInfoPage(registration, ItemUpgradeFan.FAN, "fan");
+        addValueInfoPage(registration, ItemUpgradeEnderExporter.ENDEREXPORT, "enderexport");
+        addValueInfoPage(registration, ItemUpgradeEnderFilteredExporter.ENDERFEXPORT, "enderfilteredexport");
+        addValueInfoPage(registration, ItemUpgradeEnderFilteredImporterEnchanted.ENDERFENCHANTEDIMPORT, "enderfilteredenchantedimport");
+        addValueInfoPage(registration, ItemUpgradeEnderFilteredImporterExact.ENDERFEXACTIMPORT, "enderfilteredexactimport");
+        addValueInfoPage(registration, ItemUpgradeEnderFilteredImporterFood.ENDERFFOODIMPORT, "enderfilteredfoodimport");
+        addValueInfoPage(registration, ItemUpgradeEnderFilteredImporterFuzzy.ENDERFFUZZYIMPORT, "enderfilteredfuzzyimport");
+        addValueInfoPage(registration, ItemUpgradeEnderFilteredImporterMod.ENDERFMODIMPORT, "enderfilteredmodimport");
+        addValueInfoPage(registration, ItemUpgradeEnderImporter.ENDERIMPORT, "enderimport");
     }
 
     @Override

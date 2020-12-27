@@ -155,7 +155,7 @@ public class ItemUpgradeEnderFilteredImporterMod extends ItemUpgradeBaseFilter
     @Override
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
-        if(entityIn instanceof ItemEntity)
+        /*if(entityIn instanceof ItemEntity)
         {
             ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
             ItemStack itemFromPedestal = getStackInPedestal(world,posPedestal);
@@ -167,7 +167,7 @@ public class ItemUpgradeEnderFilteredImporterMod extends ItemUpgradeBaseFilter
                     ((PedestalTileEntity) pedestalInv).addItem(getItemStack);
                 }
             }
-        }
+        }*/
     }
 
     @Override

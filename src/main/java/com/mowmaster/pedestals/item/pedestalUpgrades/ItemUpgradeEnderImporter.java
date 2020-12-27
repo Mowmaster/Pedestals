@@ -150,5 +150,4 @@ public class ItemUpgradeEnderImporter extends ItemUpgradeBase
         event.getRegistry().register(ENDERIMPORT);
     }
 
-
 }
