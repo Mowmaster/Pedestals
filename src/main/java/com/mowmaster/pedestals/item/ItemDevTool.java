@@ -39,8 +39,9 @@ public class ItemDevTool extends Item {
         {
             if(!p_77659_2_.getHeldItemOffhand().isEmpty())
             {
-                int getAmp = PotionUtils.getEffectsFromStack(p_77659_2_.getHeldItemOffhand()).get(0).getAmplifier();
-                TranslationTextComponent name = new TranslationTextComponent(""+getAmp+"");
+                //int getAmp = PotionUtils.getEffectsFromStack(p_77659_2_.getHeldItemOffhand()).get(0).getAmplifier();
+                //TranslationTextComponent name = new TranslationTextComponent(""+getAmp+"");
+                TranslationTextComponent name = new TranslationTextComponent(""+p_77659_2_.getHeldItemOffhand().getTag().toString()+"");
                 name.mergeStyle(TextFormatting.GOLD);
                 p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
             }

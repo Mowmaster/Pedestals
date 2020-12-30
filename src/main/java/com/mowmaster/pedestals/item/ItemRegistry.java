@@ -12,12 +12,11 @@ public class ItemRegistry
     {
         //ItemGuideBook.onItemRegistryReady(e);
         PedestalBlock.onItemRegistryReady(e);
-        //PedestalBlock.onItemRegistryReady(e);
 
         ItemLinkingTool.onItemRegistryReady(e);
         ItemTagTool.onItemRegistryReady(e);
         ItemUpgradeTool.onItemRegistryReady(e);
-        //ItemDevTool.onItemRegistryReady(e);
+        ItemDevTool.onItemRegistryReady(e);
         ItemColorPallet.onItemRegistryReady(e);
         ItemEnchantableBook.onItemRegistryReady(e);
         ItemPedestalUpgrades.onItemRegistryReady(e);

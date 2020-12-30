@@ -3,6 +3,8 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -101,11 +103,13 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         {
             if(stored.isEmpty())
             {
+                System.out.println("Empty");
                 if(!simulate)setItemStored(pedestal,stackIn);
                 return ItemStack.EMPTY;
             }
             else
             {
+                System.out.println("Not Empty");
                 int itemsToAdd = addCountToStorage(pedestal,stackIn.getCount(),true);
                 if(availableStorageSpace(pedestal)>0)
                 {
@@ -290,13 +294,30 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
     public void setItemStored(PedestalTileEntity pedestal, ItemStack stack)
     {
+
         //The itemstack.write() uses a byte value for the count so we have to store the actual count seperately
         int countToStore = stack.getCount();
         ItemStack coin = pedestal.getCoinOnPedestal();
-        CompoundNBT compound = new CompoundNBT();
-        if(coin.hasTag())
+        ItemStack coinCopy = coin.copy();
+        //Clear NBT of upgrade by setting to default + enchants
+        if(stack.isEmpty())
         {
-            compound = coin.getTag();
+            System.out.println("RESET COIN");
+            if(coin.isEnchanted())
+            {
+                Map<Enchantment, Integer> enchantsMap = EnchantmentHelper.getEnchantments(coin);
+                EnchantmentHelper.setEnchantments(enchantsMap,coinCopy);
+            }
+            else
+            {
+                coinCopy = new ItemStack(coin.getItem());
+            }
+        }
+
+        CompoundNBT compound = new CompoundNBT();
+        if(coinCopy.hasTag())
+        {
+            compound = coinCopy.getTag();
         }
 
         compound = stack.write(compound);
