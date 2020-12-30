@@ -76,15 +76,17 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         }
         else if(!stored.isEmpty() && inPed.isEmpty())
         {
-            return (slot==0)?(stored.isItemEqual(stack)):(false);
+            return (slot==0)?(doItemsMatch(stored,stack)):(false);
         }
         else if(stored.isEmpty() && !inPed.isEmpty())
         {
-            return (slot==0)?(inPed.isItemEqual(stack)):(false);
+            return (slot==0)?(doItemsMatch(inPed,stack)):(false);
         }
         else
         {
-            return (slot==0)?(inPed.isItemEqual(stack) && stored.isItemEqual(stack)):(false);
+            //Recommended by intelij: (slot==0)&&(doItemsMatch(inPed,stack) && doItemsMatch(stored,stack))
+            return (slot==0)?(doItemsMatch(inPed,stack) && doItemsMatch(stored,stack)):(false);
+
         }
     }
 
@@ -289,7 +291,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
     public void setItemStored(PedestalTileEntity pedestal, ItemStack stack)
     {
         //The itemstack.write() uses a byte value for the count so we have to store the actual count seperately
-        ItemStack getItemToStore = new ItemStack(stack.getItem());
         int countToStore = stack.getCount();
         ItemStack coin = pedestal.getCoinOnPedestal();
         CompoundNBT compound = new CompoundNBT();
@@ -298,7 +299,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             compound = coin.getTag();
         }
 
-        compound = getItemToStore.write(compound);
+        compound = stack.write(compound);
         compound.putInt("tankcount",countToStore);
 
         coin.setTag(compound);
@@ -315,10 +316,14 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         }
 
         ItemStack getItemStored = coin.read(compound);
-        int getItemStackCount = compound.getInt("tankcount");
+        if(!getItemStored.isEmpty())
+        {
+            int getItemStackCount = compound.getInt("tankcount");
+            getItemStored.setCount(getItemStackCount);
+        }
 
         //Should return the stack with any nbt on it???
-        return new ItemStack(getItemStored.getItem(),getItemStackCount,getItemStored.getTag());
+        return getItemStored;
     }
 
     public ItemStack getItemStored(ItemStack coin)
@@ -330,10 +335,15 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         }
 
         ItemStack getItemStored = coin.read(compound);
-        int getItemStackCount = compound.getInt("tankcount");
+        if(!getItemStored.isEmpty())
+        {
+            int getItemStackCount = compound.getInt("tankcount");
+            getItemStored.setCount(getItemStackCount);
+        }
+
 
         //Should return the stack with any nbt on it???
-        return new ItemStack(getItemStored.getItem(),getItemStackCount,getItemStored.getTag());
+        return getItemStored;
     }
 
     public boolean hasMaxStorageSet(ItemStack stack)
@@ -439,7 +449,8 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
             int returned = removeFromStorageBuffer(pedestal,intSpace,true);
             int itemsToAdd = (returned==0)?(intSpace):(returned);
-            ItemStack stackSpawnedItem = new ItemStack(getItemStored(pedestal).getItem(),itemsToAdd);
+            ItemStack stackSpawnedItem = getItemStored(pedestal).copy();//new ItemStack(.getItem(),itemsToAdd);
+            stackSpawnedItem.setCount(itemsToAdd);
             ItemStack getInserted = pedestal.addItemStackOverride(stackSpawnedItem);
             if(getInserted.isEmpty())
             {
@@ -450,7 +461,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
                 int countUsed = itemsToAdd - getInserted.getCount();
                 removeFromStorageBuffer(pedestal,countUsed,false);
             }
-
         }
     }
 
