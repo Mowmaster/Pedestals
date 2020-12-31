@@ -151,39 +151,42 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(cap.isPresent())
         {
-            IItemHandler handler = cap.orElse(null);
-            TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof PedestalTileEntity) {
-                itemFromInv = ItemStack.EMPTY;
+            if(!isInventoryEmpty(cap))
+            {
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if(invToPullFrom instanceof PedestalTileEntity) {
+                    itemFromInv = ItemStack.EMPTY;
 
-            }
-            else {
-                if(handler != null)
-                {
-                    int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
-                    if(i>=0)
+                }
+                else {
+                    if(handler != null)
                     {
-                        itemFromInv = handler.getStackInSlot(i);
-                        if(itemFromInv.getItem().equals(Items.BUCKET))
+                        int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
+                        if(i>=0)
                         {
-                            //Milking Code Here
-                            ItemStack milkBucket = new ItemStack(Items.MILK_BUCKET,1);
-                            List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
-                            if(moo.size()>0)
+                            itemFromInv = handler.getStackInSlot(i);
+                            if(itemFromInv.getItem().equals(Items.BUCKET))
                             {
-                                for(CowEntity moomoo : moo)
+                                //Milking Code Here
+                                ItemStack milkBucket = new ItemStack(Items.MILK_BUCKET,1);
+                                List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
+                                if(moo.size()>0)
                                 {
-                                    if (!moomoo.isChild() && itemInPedestal.equals(ItemStack.EMPTY))
+                                    for(CowEntity moomoo : moo)
                                     {
-                                        BlockPos mooie = moomoo.getPosition();
-                                        PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
-                                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                                        TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                        if(pedestalInv instanceof PedestalTileEntity) {
-                                            handler.extractItem(i,1 ,false );
-                                            ((PedestalTileEntity) pedestalInv).addItem(milkBucket);
+                                        if (!moomoo.isChild() && itemInPedestal.equals(ItemStack.EMPTY))
+                                        {
+                                            BlockPos mooie = moomoo.getPosition();
+                                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
+                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                                            if(pedestalInv instanceof PedestalTileEntity) {
+                                                handler.extractItem(i,1 ,false );
+                                                ((PedestalTileEntity) pedestalInv).addItem(milkBucket);
+                                            }
+                                            break;
                                         }
-                                        break;
                                     }
                                 }
                             }

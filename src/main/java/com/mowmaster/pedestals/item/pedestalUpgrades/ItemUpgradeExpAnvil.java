@@ -257,146 +257,148 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-
-        if(cap.isPresent())
+        if(!isInventoryEmpty(cap))
         {
-            IItemHandler handler = cap.orElse(null);
-            TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof PedestalTileEntity) {
-                itemFromInv = ItemStack.EMPTY;
-            }
-            else {
-                if(handler != null)
-                {
-                    int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
-                    if(i>=0)
+            if(cap.isPresent())
+            {
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if(invToPullFrom instanceof PedestalTileEntity) {
+                    itemFromInv = ItemStack.EMPTY;
+                }
+                else {
+                    if(handler != null)
                     {
-                        itemFromInv = handler.getStackInSlot(i);
-                        int slotCount = itemFromInv.getCount();
-                        TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                        if(pedestalInv instanceof PedestalTileEntity) {
-                            PedestalTileEntity tilePedestal = (PedestalTileEntity) pedestalInv;
+                        int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
+                        if(i>=0)
+                        {
+                            itemFromInv = handler.getStackInSlot(i);
+                            int slotCount = itemFromInv.getCount();
+                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                            if(pedestalInv instanceof PedestalTileEntity) {
+                                PedestalTileEntity tilePedestal = (PedestalTileEntity) pedestalInv;
 
-                            if(!tilePedestal.hasItem())
-                            {
-                                //Repair first if possible
-                                if(itemFromInv.isDamaged())
+                                if(!tilePedestal.hasItem())
                                 {
-                                    if(itemFromInv.getItem().isRepairable(itemFromInv) && itemFromInv.getItem().getMaxDamage(itemFromInv) > 0)
+                                    //Repair first if possible
+                                    if(itemFromInv.isDamaged())
                                     {
-                                        if(intExpInCoin >= intRepairRate)
+                                        if(itemFromInv.getItem().isRepairable(itemFromInv) && itemFromInv.getItem().getMaxDamage(itemFromInv) > 0)
                                         {
-                                            setXPStored(coinInPedestal,(intExpInCoin-intRepairRate));
-                                            itemFromInv.setDamage(itemFromInv.getDamage() - (intRepairRate*2));
+                                            if(intExpInCoin >= intRepairRate)
+                                            {
+                                                setXPStored(coinInPedestal,(intExpInCoin-intRepairRate));
+                                                itemFromInv.setDamage(itemFromInv.getDamage() - (intRepairRate*2));
+                                            }
                                         }
                                     }
-                                }
-                                else if(stackToCombine.size() > 0)
-                                {
-                                    //First check if other enchants exist, then we Need to add the item to enchantments list for combining
-                                    stackToCombine.add(itemFromInv);
-
-                                    for(int e=0;e<stackToCombine.size();e++)
+                                    else if(stackToCombine.size() > 0)
                                     {
-                                        if(stackToCombine.get(e).isEnchanted() || stackToCombine.get(e).getItem().equals(Items.ENCHANTED_BOOK))
+                                        //First check if other enchants exist, then we Need to add the item to enchantments list for combining
+                                        stackToCombine.add(itemFromInv);
+
+                                        for(int e=0;e<stackToCombine.size();e++)
                                         {
-                                            Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stackToCombine.get(e));
+                                            if(stackToCombine.get(e).isEnchanted() || stackToCombine.get(e).getItem().equals(Items.ENCHANTED_BOOK))
+                                            {
+                                                Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stackToCombine.get(e));
 
-                                            for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
-                                                Enchantment enchantment = entry.getKey();
-                                                Integer integer = entry.getValue();
+                                                for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
+                                                    Enchantment enchantment = entry.getKey();
+                                                    Integer integer = entry.getValue();
 
-                                                switch(enchantment.getRarity())
-                                                {
-                                                    case COMMON:
-                                                        intLevelCostToCombine +=Math.round(1.0F*(integer+1));
-                                                        break;
-                                                    case UNCOMMON:
-                                                        intLevelCostToCombine +=Math.round(2.0F*(integer+1));
-                                                        break;
-                                                    case RARE:
-                                                        intLevelCostToCombine +=Math.round(3.0F*(integer+1));
-                                                        break;
-                                                    case VERY_RARE:
-                                                        intLevelCostToCombine +=Math.round(4.0F*(integer+1));
-                                                        break;
-                                                }
-
-                                                //Check if enchant already exists in list
-                                                if(enchantsMap.containsKey(enchantment))
-                                                {
-                                                    //if it does then get the value of it
-                                                    int intNewValue = 0;
-                                                    int e1 = enchantsMap.get(enchantment).intValue();
-                                                    int e2 = integer;
-                                                    if(e1 == e2)
+                                                    switch(enchantment.getRarity())
                                                     {
-                                                        intNewValue = e2 + 1;
-                                                        if(intNewValue > enchantment.getMaxLevel())
-                                                        {
-                                                            if((overCombine-crystalsToRemoveCount) >= intNewValue)
-                                                            {
-                                                                crystalsToRemoveCount += intNewValue;
-                                                            }
-                                                            else
-                                                            {
-                                                                intNewValue = enchantment.getMaxLevel();
-                                                            }
-                                                        }
-
-                                                        enchantsMap.put(enchantment, intNewValue);
+                                                        case COMMON:
+                                                            intLevelCostToCombine +=Math.round(1.0F*(integer+1));
+                                                            break;
+                                                        case UNCOMMON:
+                                                            intLevelCostToCombine +=Math.round(2.0F*(integer+1));
+                                                            break;
+                                                        case RARE:
+                                                            intLevelCostToCombine +=Math.round(3.0F*(integer+1));
+                                                            break;
+                                                        case VERY_RARE:
+                                                            intLevelCostToCombine +=Math.round(4.0F*(integer+1));
+                                                            break;
                                                     }
-                                                    else if(e1 > e2)
+
+                                                    //Check if enchant already exists in list
+                                                    if(enchantsMap.containsKey(enchantment))
                                                     {
-                                                        //if existing enchant is better then the one being applied, then skip just this one
-                                                        continue;
+                                                        //if it does then get the value of it
+                                                        int intNewValue = 0;
+                                                        int e1 = enchantsMap.get(enchantment).intValue();
+                                                        int e2 = integer;
+                                                        if(e1 == e2)
+                                                        {
+                                                            intNewValue = e2 + 1;
+                                                            if(intNewValue > enchantment.getMaxLevel())
+                                                            {
+                                                                if((overCombine-crystalsToRemoveCount) >= intNewValue)
+                                                                {
+                                                                    crystalsToRemoveCount += intNewValue;
+                                                                }
+                                                                else
+                                                                {
+                                                                    intNewValue = enchantment.getMaxLevel();
+                                                                }
+                                                            }
+
+                                                            enchantsMap.put(enchantment, intNewValue);
+                                                        }
+                                                        else if(e1 > e2)
+                                                        {
+                                                            //if existing enchant is better then the one being applied, then skip just this one
+                                                            continue;
+                                                        }
+                                                        else
+                                                        {
+                                                            enchantsMap.put(enchantment, integer);
+                                                        }
                                                     }
                                                     else
                                                     {
                                                         enchantsMap.put(enchantment, integer);
                                                     }
-                                                }
-                                                else
-                                                {
-                                                    enchantsMap.put(enchantment, integer);
+
                                                 }
 
                                             }
+                                            else if(stackToCombine.get(e).getItem().equals(Items.NAME_TAG))
+                                            {
+                                                strNameToChangeTo = stackToCombine.get(e).getDisplayName().getString();
+                                            }
 
                                         }
-                                        else if(stackToCombine.get(e).getItem().equals(Items.NAME_TAG))
+
+                                        //System.out.println("Level To Combine: "+ intLevelCostToCombine);
+                                        int intExpCostToCombine = getExpCountByLevel(intLevelCostToCombine);
+                                        //System.out.println("XP To Combine: "+ intExpCostToCombine);
+                                        if(intExpInCoin >= intExpCostToCombine)
                                         {
-                                            strNameToChangeTo = stackToCombine.get(e).getDisplayName().getString();
+                                            ItemStack itemFromInvCopy = itemFromInv.copy();
+                                            itemFromInvCopy.setCount(1);
+                                            //Charge Exp Cost
+                                            setXPStored(coinInPedestal,(intExpInCoin-intExpCostToCombine));
+                                            //Delete Items On Pedestals
+                                            deleteItemsOnPedestals(world,posOfPedestal,crystalsToRemoveCount);
+                                            EnchantmentHelper.setEnchantments(enchantsMap,itemFromInvCopy);
+                                            if(strNameToChangeTo != "")
+                                            {
+                                                itemFromInvCopy.setDisplayName(new TranslationTextComponent(strNameToChangeTo));
+                                            }
+                                            handler.extractItem(i,itemFromInvCopy.getCount(),false);
+                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            tilePedestal.addItem(itemFromInvCopy);
                                         }
-
                                     }
-
-                                    //System.out.println("Level To Combine: "+ intLevelCostToCombine);
-                                    int intExpCostToCombine = getExpCountByLevel(intLevelCostToCombine);
-                                    //System.out.println("XP To Combine: "+ intExpCostToCombine);
-                                    if(intExpInCoin >= intExpCostToCombine)
+                                    else
                                     {
                                         ItemStack itemFromInvCopy = itemFromInv.copy();
-                                        itemFromInvCopy.setCount(1);
-                                        //Charge Exp Cost
-                                        setXPStored(coinInPedestal,(intExpInCoin-intExpCostToCombine));
-                                        //Delete Items On Pedestals
-                                        deleteItemsOnPedestals(world,posOfPedestal,crystalsToRemoveCount);
-                                        EnchantmentHelper.setEnchantments(enchantsMap,itemFromInvCopy);
-                                        if(strNameToChangeTo != "")
-                                        {
-                                            itemFromInvCopy.setDisplayName(new TranslationTextComponent(strNameToChangeTo));
-                                        }
                                         handler.extractItem(i,itemFromInvCopy.getCount(),false);
-                                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                         tilePedestal.addItem(itemFromInvCopy);
                                     }
-                                }
-                                else
-                                {
-                                    ItemStack itemFromInvCopy = itemFromInv.copy();
-                                    handler.extractItem(i,itemFromInvCopy.getCount(),false);
-                                    tilePedestal.addItem(itemFromInvCopy);
                                 }
                             }
                         }

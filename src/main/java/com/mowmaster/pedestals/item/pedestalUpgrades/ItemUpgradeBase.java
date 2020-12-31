@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
@@ -155,6 +156,30 @@ public class ItemUpgradeBase extends Item {
         }
 
         return slots;
+    }
+
+    public boolean isInventoryEmpty(LazyOptional<IItemHandler> cap)
+    {
+        if(cap.isPresent())
+        {
+            IItemHandler handler = cap.orElse(null);
+            if(handler != null)
+            {
+                int range = handler.getSlots();
+
+                ItemStack itemFromInv = ItemStack.EMPTY;
+                itemFromInv = IntStream.range(0,range)//Int Range
+                        .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
+                        .filter(itemStack -> !itemStack.isEmpty())
+                        .findFirst().orElse(ItemStack.EMPTY);
+
+                if(!itemFromInv.isEmpty())
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /***************************************

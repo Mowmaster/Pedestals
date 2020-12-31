@@ -91,52 +91,54 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
         //{
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-
-        if(cap.isPresent())
+        if(!isInventoryEmpty(cap))
         {
-            IItemHandler handler = cap.orElse(null);
-            TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof PedestalTileEntity) {
-                itemFromInv = ItemStack.EMPTY;
-            }
-            else {
-                if(handler != null)
-                {
-                    int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
-                    if(i>=0)
+            if(cap.isPresent())
+            {
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if(invToPullFrom instanceof PedestalTileEntity) {
+                    itemFromInv = ItemStack.EMPTY;
+                }
+                else {
+                    if(handler != null)
                     {
-                        itemFromInv = handler.getStackInSlot(i);
-                        TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                        if(pedestalInv instanceof PedestalTileEntity) {
-                            if(!((PedestalTileEntity) pedestalInv).hasItem())
-                            {
-                                if(itemFromInv.isEnchanted() || itemFromInv.getItem() instanceof EnchantedBookItem)
+                        int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
+                        if(i>=0)
+                        {
+                            itemFromInv = handler.getStackInSlot(i);
+                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                            if(pedestalInv instanceof PedestalTileEntity) {
+                                if(!((PedestalTileEntity) pedestalInv).hasItem())
                                 {
-                                    int maxXp = readMaxXpFromNBT(coinInPedestal);
-                                    int currentlyStoredExp = getXPStored(coinInPedestal);
-                                    int xpDisenchant = getItemsExpDisenchantAmount(itemFromInv);
-                                    if(maxXp - currentlyStoredExp >= xpDisenchant)
+                                    if(itemFromInv.isEnchanted() || itemFromInv.getItem() instanceof EnchantedBookItem)
                                     {
-                                        //Code Here
-                                        Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
-                                        ItemStack stackToReturn = (itemFromInv.getItem() instanceof EnchantedBookItem)?(new ItemStack(Items.BOOK,1)):(itemFromInv.copy());
-                                        stackToReturn.setCount(1);
-                                        EnchantmentHelper.setEnchantments(enchantsNone,stackToReturn);
-                                        if(!stackToReturn.isEmpty())
+                                        int maxXp = readMaxXpFromNBT(coinInPedestal);
+                                        int currentlyStoredExp = getXPStored(coinInPedestal);
+                                        int xpDisenchant = getItemsExpDisenchantAmount(itemFromInv);
+                                        if(maxXp - currentlyStoredExp >= xpDisenchant)
                                         {
-                                            int getExpLeftInPedestal = currentlyStoredExp + xpDisenchant;
-                                            setXPStored(coinInPedestal,getExpLeftInPedestal);
-                                            handler.extractItem(i,stackToReturn.getCount() ,false );
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
+                                            //Code Here
+                                            Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
+                                            ItemStack stackToReturn = (itemFromInv.getItem() instanceof EnchantedBookItem)?(new ItemStack(Items.BOOK,1)):(itemFromInv.copy());
+                                            stackToReturn.setCount(1);
+                                            EnchantmentHelper.setEnchantments(enchantsNone,stackToReturn);
+                                            if(!stackToReturn.isEmpty())
+                                            {
+                                                int getExpLeftInPedestal = currentlyStoredExp + xpDisenchant;
+                                                setXPStored(coinInPedestal,getExpLeftInPedestal);
+                                                handler.extractItem(i,stackToReturn.getCount() ,false );
+                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
+                                            }
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    ItemStack toReturn = itemFromInv.copy();
-                                    handler.extractItem(i,toReturn.getCount() ,false );
-                                    ((PedestalTileEntity) pedestalInv).addItem(toReturn);
+                                    else
+                                    {
+                                        ItemStack toReturn = itemFromInv.copy();
+                                        handler.extractItem(i,toReturn.getCount() ,false );
+                                        ((PedestalTileEntity) pedestalInv).addItem(toReturn);
+                                    }
                                 }
                             }
                         }
@@ -144,6 +146,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                 }
             }
         }
+
         //}
     }
 

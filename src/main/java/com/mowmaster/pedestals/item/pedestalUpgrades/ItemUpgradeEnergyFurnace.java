@@ -104,18 +104,20 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-        if(cap.isPresent())
+        if(!isInventoryEmpty(cap))
         {
-            IItemHandler handler = cap.orElse(null);
-            TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof PedestalTileEntity) {
-                itemFromInv = ItemStack.EMPTY;
+            if(cap.isPresent())
+            {
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if(invToPullFrom instanceof PedestalTileEntity) {
+                    itemFromInv = ItemStack.EMPTY;
 
-            }
-            else {
-                if(handler != null)
-                {
-                    int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
+                }
+                else {
+                    if(handler != null)
+                    {
+                        int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
                         if(i>=0)
                         {
                             int maxInSlot = handler.getSlotLimit(i);
@@ -200,6 +202,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                     }
                 }
             }
+        }
     }
 
     public static final Item RFSMELTER = new ItemUpgradeEnergyFurnace(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfsmelter"));

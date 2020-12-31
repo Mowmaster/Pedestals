@@ -72,49 +72,52 @@ public class ItemUpgradeImport extends ItemUpgradeBase
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
-        if(cap.isPresent())
+        if(!isInventoryEmpty(cap))
         {
-            IItemHandler handler = cap.orElse(null);
-            TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof PedestalTileEntity) {
-                itemFromInv = ItemStack.EMPTY;
+            if(cap.isPresent())
+            {
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if(invToPullFrom instanceof PedestalTileEntity) {
+                    itemFromInv = ItemStack.EMPTY;
 
-            }
-            else {
-                if(handler != null)
-                {
-                    int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
-                    if(i>=0)
+                }
+                else {
+                    if(handler != null)
                     {
-                        int maxStackSizeAllowedInPedestal = 0;
-                        int roomLeftInPedestal = 0;
-                        itemFromInv = handler.getStackInSlot(i);
-                        ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
-                        //if there IS a valid item in the inventory to pull out
-                        if(itemFromInv != null && !itemFromInv.isEmpty() && itemFromInv.getItem() != Items.AIR)
+                        int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
+                        if(i>=0)
                         {
-                            //If pedestal is empty, if not then set max possible stack size for pedestal itemstack(64)
-                            if(itemFromPedestal.isEmpty() || itemFromPedestal.equals(ItemStack.EMPTY))
-                            {maxStackSizeAllowedInPedestal = 64;}
-                            else
-                            {maxStackSizeAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
-                            //Get Room left in pedestal
-                            roomLeftInPedestal = maxStackSizeAllowedInPedestal-itemFromPedestal.getCount();
-                            //Get items stack count(from inventory)
-                            int itemCountInInv = itemFromInv.getCount();
-                            //Allowed transfer rate (from coin)
-                            int allowedTransferRate = transferRate;
-                            //Checks to see if pedestal can accept as many items as transferRate IF NOT it sets the new rate to what it can accept
-                            if(roomLeftInPedestal < transferRate) allowedTransferRate = roomLeftInPedestal;
-                            //Checks to see how many items are left in the slot IF ITS UNDER the allowedTransferRate then sent the max rate to that.
-                            if(itemCountInInv < allowedTransferRate) allowedTransferRate = itemCountInInv;
+                            int maxStackSizeAllowedInPedestal = 0;
+                            int roomLeftInPedestal = 0;
+                            itemFromInv = handler.getStackInSlot(i);
+                            ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
+                            //if there IS a valid item in the inventory to pull out
+                            if(itemFromInv != null && !itemFromInv.isEmpty() && itemFromInv.getItem() != Items.AIR)
+                            {
+                                //If pedestal is empty, if not then set max possible stack size for pedestal itemstack(64)
+                                if(itemFromPedestal.isEmpty() || itemFromPedestal.equals(ItemStack.EMPTY))
+                                {maxStackSizeAllowedInPedestal = 64;}
+                                else
+                                {maxStackSizeAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
+                                //Get Room left in pedestal
+                                roomLeftInPedestal = maxStackSizeAllowedInPedestal-itemFromPedestal.getCount();
+                                //Get items stack count(from inventory)
+                                int itemCountInInv = itemFromInv.getCount();
+                                //Allowed transfer rate (from coin)
+                                int allowedTransferRate = transferRate;
+                                //Checks to see if pedestal can accept as many items as transferRate IF NOT it sets the new rate to what it can accept
+                                if(roomLeftInPedestal < transferRate) allowedTransferRate = roomLeftInPedestal;
+                                //Checks to see how many items are left in the slot IF ITS UNDER the allowedTransferRate then sent the max rate to that.
+                                if(itemCountInInv < allowedTransferRate) allowedTransferRate = itemCountInInv;
 
-                            ItemStack copyIncoming = itemFromInv.copy();
-                            copyIncoming.setCount(allowedTransferRate);
-                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                            if(pedestalInv instanceof PedestalTileEntity) {
-                                handler.extractItem(i,allowedTransferRate ,false );
-                                ((PedestalTileEntity) pedestalInv).addItem(copyIncoming);
+                                ItemStack copyIncoming = itemFromInv.copy();
+                                copyIncoming.setCount(allowedTransferRate);
+                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                                if(pedestalInv instanceof PedestalTileEntity) {
+                                    handler.extractItem(i,allowedTransferRate ,false );
+                                    ((PedestalTileEntity) pedestalInv).addItem(copyIncoming);
+                                }
                             }
                         }
                     }

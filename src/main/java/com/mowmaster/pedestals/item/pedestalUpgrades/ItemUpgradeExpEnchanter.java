@@ -129,62 +129,64 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-
-        if(cap.isPresent())
+        if(!isInventoryEmpty(cap))
         {
-            IItemHandler handler = cap.orElse(null);
-            TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof PedestalTileEntity) {
-                itemFromInv = ItemStack.EMPTY;
-            }
-            else {
-                if(handler != null)
-                {
-                    int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
-                    if(i>=0)
+            if(cap.isPresent())
+            {
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if(invToPullFrom instanceof PedestalTileEntity) {
+                    itemFromInv = ItemStack.EMPTY;
+                }
+                else {
+                    if(handler != null)
                     {
-                        itemFromInv = handler.getStackInSlot(i);
-                        int slotCount = itemFromInv.getCount();
-                        TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                        if(pedestalInv instanceof PedestalTileEntity) {
-                            if(!((PedestalTileEntity) pedestalInv).hasItem())
-                            {
-                                if(itemFromInv.isEnchantable() || itemFromInv.getItem().equals(Items.BOOK))
+                        int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
+                        if(i>=0)
+                        {
+                            itemFromInv = handler.getStackInSlot(i);
+                            int slotCount = itemFromInv.getCount();
+                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                            if(pedestalInv instanceof PedestalTileEntity) {
+                                if(!((PedestalTileEntity) pedestalInv).hasItem())
                                 {
-                                    //This is Book Shelf Enchanting level, not enchantment level (15 bookshelfves = 30 levels of enchantability)
-                                    float level = getEnchantmentPowerFromSorroundings(world,posOfPedestal,coinInPedestal);
-                                    //Need to charge at min 1 level for an enchant
-                                    int actualEnchantingLevel = ((level * 2)<1)?(1):((int)(level * 2));
-                                    int currentlyStoredExp = getXPStored(coinInPedestal);
-                                    int currentLevelFromStoredXp = getExpLevelFromCount(currentlyStoredExp);
-                                    int xpLevelsNeeded = (actualEnchantingLevel/10);
-                                    int xpAtEnchantingLevel = getExpCountByLevel(actualEnchantingLevel);
-                                    //since this is the number we subtract, if we need at least 1 level then make this 0
-                                    int xpAtLevelsBelowRequired = getExpCountByLevel(((actualEnchantingLevel-xpLevelsNeeded)<1)?(0):((actualEnchantingLevel-xpLevelsNeeded)));
-                                    int expNeeded = (xpAtEnchantingLevel-xpAtLevelsBelowRequired<7)?(7):(xpAtEnchantingLevel-xpAtLevelsBelowRequired);
-                                    if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
+                                    if(itemFromInv.isEnchantable() || itemFromInv.getItem().equals(Items.BOOK))
                                     {
-                                        //Enchanting Code Here
-                                        Random rand = new Random();
-                                        ItemStack itemToEnchant = itemFromInv.copy();
-                                        itemToEnchant.setCount(1);
-                                        //the boolean at the end controls if treasure enchants are allowed.
-                                        ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
-                                        if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted())
+                                        //This is Book Shelf Enchanting level, not enchantment level (15 bookshelfves = 30 levels of enchantability)
+                                        float level = getEnchantmentPowerFromSorroundings(world,posOfPedestal,coinInPedestal);
+                                        //Need to charge at min 1 level for an enchant
+                                        int actualEnchantingLevel = ((level * 2)<1)?(1):((int)(level * 2));
+                                        int currentlyStoredExp = getXPStored(coinInPedestal);
+                                        int currentLevelFromStoredXp = getExpLevelFromCount(currentlyStoredExp);
+                                        int xpLevelsNeeded = (actualEnchantingLevel/10);
+                                        int xpAtEnchantingLevel = getExpCountByLevel(actualEnchantingLevel);
+                                        //since this is the number we subtract, if we need at least 1 level then make this 0
+                                        int xpAtLevelsBelowRequired = getExpCountByLevel(((actualEnchantingLevel-xpLevelsNeeded)<1)?(0):((actualEnchantingLevel-xpLevelsNeeded)));
+                                        int expNeeded = (xpAtEnchantingLevel-xpAtLevelsBelowRequired<7)?(7):(xpAtEnchantingLevel-xpAtLevelsBelowRequired);
+                                        if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
                                         {
-                                            int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
-                                            setXPStored(coinInPedestal,getExpLeftInPedestal);
-                                            handler.extractItem(i,stackToReturn.getCount() ,false );
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
-                                            ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
+                                            //Enchanting Code Here
+                                            Random rand = new Random();
+                                            ItemStack itemToEnchant = itemFromInv.copy();
+                                            itemToEnchant.setCount(1);
+                                            //the boolean at the end controls if treasure enchants are allowed.
+                                            ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
+                                            if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted())
+                                            {
+                                                int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
+                                                setXPStored(coinInPedestal,getExpLeftInPedestal);
+                                                handler.extractItem(i,stackToReturn.getCount() ,false );
+                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
+                                                ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
+                                            }
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    ItemStack toReturn = itemFromInv.copy();
-                                    handler.extractItem(i,toReturn.getCount() ,false );
-                                    ((PedestalTileEntity) pedestalInv).addItem(toReturn);
+                                    else
+                                    {
+                                        ItemStack toReturn = itemFromInv.copy();
+                                        handler.extractItem(i,toReturn.getCount() ,false );
+                                        ((PedestalTileEntity) pedestalInv).addItem(toReturn);
+                                    }
                                 }
                             }
                         }

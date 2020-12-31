@@ -131,47 +131,49 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-
-        if(cap.isPresent())
+        if(!isInventoryEmpty(cap))
         {
-            IItemHandler handler = cap.orElse(null);
-            TileEntity invToPullFrom = world.getTileEntity(posInventory);
-            if(invToPullFrom instanceof PedestalTileEntity) {
-                itemFromInv = ItemStack.EMPTY;
-            }
-            else {
-                if(handler != null)
-                {
-                    int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
-                    if(i>=0)
+            if(cap.isPresent())
+            {
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if(invToPullFrom instanceof PedestalTileEntity) {
+                    itemFromInv = ItemStack.EMPTY;
+                }
+                else {
+                    if(handler != null)
                     {
-                        itemFromInv = handler.getStackInSlot(i);
-                        int slotCount = itemFromInv.getCount();
-                        if(itemFromInv.getItem().equals(Items.GLASS_BOTTLE))
+                        int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
+                        if(i>=0)
                         {
-                            //BottlingCodeHere
-                            //11 exp per bottle
-                            int modifier = getBottlingRate(coinInPedestal);
-
-                            //If we can extract the correct amount of bottles(If it returns empty then it CANT work)
-                            if(!(handler.extractItem(i,modifier ,true ).equals(ItemStack.EMPTY)))
+                            itemFromInv = handler.getStackInSlot(i);
+                            int slotCount = itemFromInv.getCount();
+                            if(itemFromInv.getItem().equals(Items.GLASS_BOTTLE))
                             {
-                                int rate = (modifier * 11);
-                                ItemStack getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
-                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                if(pedestalInv instanceof PedestalTileEntity) {
-                                    if(((PedestalTileEntity) pedestalInv).canAcceptItems(world,posOfPedestal,getBottle)>=rate)
-                                    {
-                                        int currentlyStoredExp = getXPStored(coinInPedestal);
-                                        if(currentlyStoredExp > 0)
+                                //BottlingCodeHere
+                                //11 exp per bottle
+                                int modifier = getBottlingRate(coinInPedestal);
+
+                                //If we can extract the correct amount of bottles(If it returns empty then it CANT work)
+                                if(!(handler.extractItem(i,modifier ,true ).equals(ItemStack.EMPTY)))
+                                {
+                                    int rate = (modifier * 11);
+                                    ItemStack getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
+                                    TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                                    if(pedestalInv instanceof PedestalTileEntity) {
+                                        if(((PedestalTileEntity) pedestalInv).canAcceptItems(world,posOfPedestal,getBottle)>=rate)
                                         {
-                                            if(currentlyStoredExp >= rate)
+                                            int currentlyStoredExp = getXPStored(coinInPedestal);
+                                            if(currentlyStoredExp > 0)
                                             {
-                                                int getExpLeftInPedestal = currentlyStoredExp - rate;
-                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                setXPStored(coinInPedestal,getExpLeftInPedestal);
-                                                handler.extractItem(i,modifier ,false );
-                                                ((PedestalTileEntity) pedestalInv).addItem(getBottle);
+                                                if(currentlyStoredExp >= rate)
+                                                {
+                                                    int getExpLeftInPedestal = currentlyStoredExp - rate;
+                                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                    setXPStored(coinInPedestal,getExpLeftInPedestal);
+                                                    handler.extractItem(i,modifier ,false );
+                                                    ((PedestalTileEntity) pedestalInv).addItem(getBottle);
+                                                }
                                             }
                                         }
                                     }

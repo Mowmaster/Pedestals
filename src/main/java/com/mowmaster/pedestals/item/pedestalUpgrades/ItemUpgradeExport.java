@@ -110,7 +110,6 @@ public class ItemUpgradeExport extends ItemUpgradeBase
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-
         //Gets inventory TE then makes sure its not a pedestal
         TileEntity invToPushTo = world.getTileEntity(posInventory);
         if(invToPushTo instanceof PedestalTileEntity) {
