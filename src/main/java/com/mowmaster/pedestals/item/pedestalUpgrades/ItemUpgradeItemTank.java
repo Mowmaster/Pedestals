@@ -103,13 +103,13 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         {
             if(stored.isEmpty())
             {
-                System.out.println("Empty");
+
                 if(!simulate)setItemStored(pedestal,stackIn);
                 return ItemStack.EMPTY;
             }
             else
             {
-                System.out.println("Not Empty");
+
                 int itemsToAdd = addCountToStorage(pedestal,stackIn.getCount(),true);
                 if(availableStorageSpace(pedestal)>0)
                 {
@@ -312,7 +312,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             if(coinNBT.contains("Count"))coinNBT.remove("Count");
             if(coinNBT.contains("tag"))coinNBT.remove("tag");
             if(coinNBT.contains("ForgeCaps"))coinNBT.remove("ForgeCaps");
-            System.out.println(coinNBT.getString());
             coin.setTag(coinNBT);
         }
 

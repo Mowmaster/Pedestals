@@ -982,6 +982,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     {
         int canAccept = 0;
         int pedestalAccept = 0;
+        boolean isTank = false;
 
         if(hasCoin())
         {
@@ -989,6 +990,11 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             if(coinInPed instanceof ItemUpgradeBase)
             {
                 pedestalAccept = ((ItemUpgradeBase) coinInPed).canAcceptCount(worldIn, posPedestal, getItemInPedestal(), itemsIncoming);
+            }
+
+            if(coinInPed instanceof ItemUpgradeItemTank)
+            {
+                if(((ItemUpgradeItemTank) coinInPed).availableStorageSpace(this) > 0)isTank = true;
             }
         }
 
@@ -1001,7 +1007,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             if(doItemsMatch(itemsIncoming))
             {
                 //Two buckets match but cant be stacked since max stack size is 1
-                if(itemsIncoming.getMaxStackSize() > 1)
+                //BUT if its a tank, its cooler then this
+                if(itemsIncoming.getMaxStackSize() > 1 || isTank)
                 {
                     //If i did this right, slot limit should default to stack max size, or custom allowed
                     if(getItemInPedestal().getCount() < getSlotSizeLimit())
