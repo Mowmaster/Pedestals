@@ -84,6 +84,8 @@ public class ItemRegistry
         ItemUpgradeEnderFilteredExporter.onItemRegistryReady(e);
         ItemUpgradeEnderImporter.onItemRegistryReady(e);
         ItemUpgradeEnderExporter.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredRestock.onItemRegistryReady(e);
+
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeFilteredImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);

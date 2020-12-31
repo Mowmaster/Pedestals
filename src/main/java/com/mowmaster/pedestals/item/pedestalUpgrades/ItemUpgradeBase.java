@@ -491,6 +491,27 @@ public class ItemUpgradeBase extends Item {
         return slot.get();
     }
 
+    public int getPlayerSlotWithMatchingStackExactNotFull(PlayerInventory inventory, ItemStack stackToFind)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        for(int i=0;i<inventory.getSizeInventory();i++)
+        {
+            ItemStack stackInSlot = inventory.getStackInSlot(i);
+            //find a slot with items
+            if(!stackInSlot.isEmpty())
+            {
+                //check if it could pull the item out or not
+                if(ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToFind) && stackInSlot.getCount() < stackInSlot.getMaxStackSize())//stackInSlot.isItemEqual(stackToFind)
+                {
+                    slot.set(i);
+                    break;
+                }
+            }
+        }
+
+        return slot.get();
+    }
+
     public int getEnderChestSlotWithMatchingStackExact(EnderChestInventory inventory, ItemStack stackToFind)
     {
         AtomicInteger slot = new AtomicInteger(-1);
