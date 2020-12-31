@@ -229,6 +229,11 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                     {
                                         craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
                                     }
+                                    else
+                                    {
+                                        intBatchCraftingSize = (stackItemInSlot.getCount()-1);
+                                        if(intBatchCraftingSize>0)craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                    }
                                     craftAvailable.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
                                     intCraftingSlot++;
                                 }
@@ -245,12 +250,16 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                     //Set ItemStack with recipe result
                                     ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
                                     int intRecipeResultCount = stackRecipeResult.getCount();
-                                    int intBatchCraftedAmount = stackRecipeResult.getCount() * intBatchCraftingSize;
 
                                     //Check if pedestal can hold the crafting result, if not then set the batch to be small enough that it can fit
-                                    if(intBatchCraftedAmount > 64)
+                                    if((stackRecipeResult.getCount() * intBatchCraftingSize) > 64)
                                     {
                                         intBatchCraftingSize = 64/intRecipeResultCount;
+                                    }
+
+                                    if((intCurrentEstFluidUsed*intBatchCraftingSize)>getFluidStored(coinInPedestal).getAmount())
+                                    {
+                                        intBatchCraftingSize = getFluidStored(coinInPedestal).getAmount()/intCurrentEstFluidUsed;
                                     }
 
                                     //Loop through inventory again to remove crafted materials used
@@ -264,9 +273,9 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                         Item bucket = fluidToBucket.getFluid().getFilledBucket();
                                         if(stackInRecipe.getItem().equals(bucket))
                                         {
-                                            if(removeFluid(pedestal,coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
+                                            if(removeFluid(pedestal,coinInPedestal,FluidAttributes.BUCKET_VOLUME*intBatchCraftingSize,true))
                                             {
-                                                removeFluid(pedestal,coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
+                                                removeFluid(pedestal,coinInPedestal,FluidAttributes.BUCKET_VOLUME*intBatchCraftingSize,false);
                                                 continue;
                                             }
                                         }
@@ -290,6 +299,7 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                         }
                                     }
 
+                                    int intBatchCraftedAmount = stackRecipeResult.getCount() * intBatchCraftingSize;
                                     stackRecipeResult.setCount(intBatchCraftedAmount);
                                     world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     addToPedestal(world,posOfPedestal,stackRecipeResult);

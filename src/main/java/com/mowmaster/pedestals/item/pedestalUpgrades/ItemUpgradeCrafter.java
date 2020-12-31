@@ -174,6 +174,11 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                     {
                                         craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
                                     }
+                                    else
+                                    {
+                                        intBatchCraftingSize = (stackItemInSlot.getCount()-1);
+                                        if(intBatchCraftingSize>0)craft.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
+                                    }
                                     craftAvailable.setInventorySlotContents(intCraftingSlot,stackItemInSlot);
                                     intCraftingSlot++;
                                 }
