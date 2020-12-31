@@ -161,7 +161,11 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             {
                 removeFromStorage(pedestal,amountOut,false);
             }
-            return new ItemStack((stored.isEmpty())?(itemInPed.getItem()):(itemStackToExtract.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+
+            ItemStack toReturn = new ItemStack((stored.isEmpty())?(itemInPed.getItem()):(itemStackToExtract.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+            toReturn.setTag((stored.isEmpty())?(itemInPed.getTag()):(itemStackToExtract.getTag()));
+
+            return toReturn;
         }
         else
         {
@@ -294,36 +298,25 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
     public void setItemStored(PedestalTileEntity pedestal, ItemStack stack)
     {
-
         //The itemstack.write() uses a byte value for the count so we have to store the actual count seperately
         int countToStore = stack.getCount();
         ItemStack coin = pedestal.getCoinOnPedestal();
-        ItemStack coinCopy = coin.copy();
-        //Clear NBT of upgrade by setting to default + enchants
-        if(stack.isEmpty())
+
+        CompoundNBT coinNBT = (coin.hasTag())?(coin.getTag()):(new CompoundNBT());
+        stack.write(coinNBT);
+        coinNBT.putInt("tankcount",countToStore);
+
+        if(stack.isEmpty()||stack.getCount()<=0)
         {
-            System.out.println("RESET COIN");
-            if(coin.isEnchanted())
-            {
-                Map<Enchantment, Integer> enchantsMap = EnchantmentHelper.getEnchantments(coin);
-                EnchantmentHelper.setEnchantments(enchantsMap,coinCopy);
-            }
-            else
-            {
-                coinCopy = new ItemStack(coin.getItem());
-            }
+            if(coinNBT.contains("id"))coinNBT.remove("id");
+            if(coinNBT.contains("Count"))coinNBT.remove("Count");
+            if(coinNBT.contains("tag"))coinNBT.remove("tag");
+            if(coinNBT.contains("ForgeCaps"))coinNBT.remove("ForgeCaps");
+            System.out.println(coinNBT.getString());
+            coin.setTag(coinNBT);
         }
 
-        CompoundNBT compound = new CompoundNBT();
-        if(coinCopy.hasTag())
-        {
-            compound = coinCopy.getTag();
-        }
-
-        compound = stack.write(compound);
-        compound.putInt("tankcount",countToStore);
-
-        coin.setTag(compound);
+        coin.setTag(coinNBT);
         pedestal.update();
     }
 
@@ -344,6 +337,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         }
 
         //Should return the stack with any nbt on it???
+        //.println("Get Stored: "+ getItemStored.getDisplayName().getString());
         return getItemStored;
     }
 
