@@ -160,10 +160,11 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                                         {maxStackSizeAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
                                         roomLeftInPedestal = maxStackSizeAllowedInPedestal-itemFromPedestal.getCount();
                                         int itemCountInInv = senderBelowInvStack.getCount();
-                                        int itemSpaceinInv = senderBelowInvStack.getMaxStackSize() - itemCountInInv;
+                                        //int itemSpaceinInv = senderBelowInvStack.getMaxStackSize() - itemCountInInv;
                                         int allowedTransferRate = transferRate;
                                         if(roomLeftInPedestal < transferRate) allowedTransferRate = roomLeftInPedestal;
-                                        if(itemSpaceinInv < allowedTransferRate) allowedTransferRate = itemSpaceinInv;
+                                        if(itemCountInInv < allowedTransferRate) allowedTransferRate = itemCountInInv;
+                                        //if(itemSpaceinInv < allowedTransferRate) allowedTransferRate = itemSpaceinInv;
                                         if(senderBelowInvHandler.extractItem(i,allowedTransferRate,true).getCount()>0)
                                         {
                                             ItemStack copyIncoming = senderBelowInvStack.copy();

@@ -272,6 +272,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeEnderFilteredImporterFuzzy.ENDERFFUZZYIMPORT, "enderfilteredfuzzyimport");
         addValueInfoPage(registration, ItemUpgradeEnderFilteredImporterMod.ENDERFMODIMPORT, "enderfilteredmodimport");
         addValueInfoPage(registration, ItemUpgradeEnderImporter.ENDERIMPORT, "enderimport");
+        addValueInfoPage(registration, ItemUpgradeEnderFilteredRestock.ENDERFRESTOCK, "enderfilteredrestock");
     }
 
     @Override
