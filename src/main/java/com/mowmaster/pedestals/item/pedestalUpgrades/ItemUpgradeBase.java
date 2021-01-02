@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
-import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
@@ -46,6 +46,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -931,6 +932,25 @@ public class ItemUpgradeBase extends Item {
      **          End of Area Stuff         **
      ****************************************
      ***************************************/
+
+
+    public int getNumNonPedestalEnchants(Map<Enchantment, Integer> map)
+    {
+        int counter = 0;
+        if(map.size()>0)
+        {
+            for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
+                Enchantment enchantment = entry.getKey();
+                Integer integer = entry.getValue();
+                if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
+                {
+                    counter++;
+                }
+            }
+        }
+
+        return counter;
+    }
 
 
 

@@ -449,7 +449,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         player.sendMessage(stored, Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
-        if(map.size() > 0)
+        if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
             enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);

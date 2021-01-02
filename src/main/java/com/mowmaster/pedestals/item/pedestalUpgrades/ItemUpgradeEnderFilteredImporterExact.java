@@ -1,10 +1,15 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.mowmaster.pedestals.enchants.EnchantmentArea;
+import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
+import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
+import com.mowmaster.pedestals.enchants.EnchantmentRange;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,6 +31,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -172,6 +178,25 @@ public class ItemUpgradeEnderFilteredImporterExact extends ItemUpgradeBaseFilter
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name, Util.DUMMY_UUID);
+
+        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(coin);
+        if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
+        {
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.DUMMY_UUID);
+
+            for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
+                Enchantment enchantment = entry.getKey();
+                Integer integer = entry.getValue();
+                if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
+                {
+                    TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
+                }
+            }
+        }
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
