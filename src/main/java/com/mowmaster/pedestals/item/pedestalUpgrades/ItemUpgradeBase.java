@@ -10,6 +10,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.BoatEntity;
+import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -1014,6 +1015,39 @@ public class ItemUpgradeBase extends Item {
         return block;
     }
 
+    public Block getBaseBlockBelowAdvanced(World world, BlockPos pedestalPos)
+    {
+        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
+
+        /*ITag.INamedTag<Block> BLOCK_EMERALD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/emerald"));
+        ITag.INamedTag<Block> BLOCK_DIAMOND = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/diamond"));
+        ITag.INamedTag<Block> BLOCK_GOLD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/gold"));
+        ITag.INamedTag<Block> BLOCK_LAPIS = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/lapis"));
+        ITag.INamedTag<Block> BLOCK_IRON = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/iron"));
+        ITag.INamedTag<Block> BLOCK_COAL = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/coal"));*/
+        ITag<Block> BLOCK_EMERALD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/emerald"));
+        ITag<Block> BLOCK_DIAMOND = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/diamond"));
+        ITag<Block> BLOCK_GOLD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/gold"));
+        ITag<Block> BLOCK_LAPIS = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/lapis"));
+        ITag<Block> BLOCK_IRON = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/iron"));
+        ITag<Block> BLOCK_COAL = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
+        ITag<Block> BLOCK_QUARTZ = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/quartz"));
+        //ITag<Block> BLOCK_GLOWSTONE = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
+
+        //Netherite
+        if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
+        if(BLOCK_EMERALD.contains(block)) return Blocks.EMERALD_BLOCK;//Players
+        if(BLOCK_DIAMOND.contains(block)) return Blocks.DIAMOND_BLOCK;//All Monsters
+        if(BLOCK_GOLD.contains(block)) return Blocks.GOLD_BLOCK;//All Animals
+        if(BLOCK_LAPIS.contains(block)) return Blocks.LAPIS_BLOCK;//All Flying
+        if(BLOCK_IRON.contains(block)) return Blocks.IRON_BLOCK;//All Creatures
+        if(BLOCK_COAL.contains(block)) return Blocks.COAL_BLOCK;//All Mobs
+        if(BLOCK_QUARTZ.contains(block)) return Blocks.QUARTZ_BLOCK;//All Items
+        if(block.equals(Blocks.GLOWSTONE)) return Blocks.GLOWSTONE;//All Exp
+
+        return block;
+    }
+
     public BlockPos getPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
     {
         BlockState state = world.getBlockState(posOfPedestal);
@@ -1137,7 +1171,7 @@ public class ItemUpgradeBase extends Item {
      **       Start of Entity Stuff        **
      ****************************************
      ***************************************/
-    public LivingEntity getTargetEntity(World world, BlockPos pedestalPos, Entity entityIn)
+    public LivingEntity getTargetEntity(World world, BlockPos pedestalPos, LivingEntity entityIn)
     {
         if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
         {
@@ -1184,6 +1218,71 @@ public class ItemUpgradeBase extends Item {
         else
         {
             return (LivingEntity)entityIn;
+        }
+        return null;
+    }
+
+    public Entity getTargetEntityAdvanced(World world, BlockPos pedestalPos, Entity entityIn)
+    {
+        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
+        {
+            if(entityIn instanceof PlayerEntity)
+            {
+                return (PlayerEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
+        {
+            if(entityIn instanceof MonsterEntity)
+            {
+                return (MonsterEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
+        {
+            if(entityIn instanceof AnimalEntity)
+            {
+                return (AnimalEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
+        {
+            if(entityIn instanceof FlyingEntity)
+            {
+                return (FlyingEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
+        {
+            if(entityIn instanceof CreatureEntity)
+            {
+                return (CreatureEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
+        {
+            if(entityIn instanceof MobEntity)
+            {
+                return (MobEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.QUARTZ_BLOCK))
+        {
+            if(entityIn instanceof ItemEntity)
+            {
+                return (ItemEntity)entityIn;
+            }
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GLOWSTONE))
+        {
+            if(entityIn instanceof ExperienceOrbEntity)
+            {
+                return (ExperienceOrbEntity)entityIn;
+            }
+        }
+        else
+        {
+            return (Entity)entityIn;
         }
         return null;
     }

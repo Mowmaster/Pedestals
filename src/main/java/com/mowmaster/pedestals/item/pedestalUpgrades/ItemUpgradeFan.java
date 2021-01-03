@@ -4,7 +4,9 @@ import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -99,10 +101,64 @@ public class ItemUpgradeFan extends ItemUpgradeBase
                 }
             }
         }
+    }
 
+    protected void useFanOnEntitiesAdvanced(World world, BlockPos posOfPedestal, PedestalTileEntity pedestal, double speed, AxisAlignedBB getBox) {
+        List<Entity> entityList = world.getEntitiesWithinAABB(Entity.class, getBox);
+
+        if(entityList.size()==0)pedestal.setStoredValueForUpgrades(0);
+
+        BlockState state = world.getBlockState(posOfPedestal);
+        Direction enumfacing = state.get(FACING);
+        for (Entity entity : entityList) {
+            Entity getEntity = getTargetEntityAdvanced(world,posOfPedestal,entity);
+            if(getEntity != null)
+            {
+                if(getEntity instanceof PlayerEntity)
+                {
+                    if(!((PlayerEntity) getEntity).abilities.isFlying && !((PlayerEntity) getEntity).isCrouching())
+                    {
+                        addMotionAdvanced(world,posOfPedestal,speed,enumfacing,getEntity);
+                        pedestal.setStoredValueForUpgrades(1);
+                    }
+                }
+                else
+                {
+                    addMotionAdvanced(world,posOfPedestal,speed,enumfacing,getEntity);
+                    pedestal.setStoredValueForUpgrades(1);
+                }
+                if (enumfacing == Direction.UP) {
+                    getEntity.fallDistance = 0;
+                }
+            }
+        }
     }
 
     protected void addMotion(World world, BlockPos posOfPedestal, double speed, Direction enumfacing, LivingEntity entity) {
+
+        switch (enumfacing) {
+            case DOWN:
+                entity.setMotion(entity.getMotion().x, entity.getMotion().y - speed, entity.getMotion().z);
+                break;
+            case UP:
+                entity.setMotion(entity.getMotion().x, entity.getMotion().y + speed, entity.getMotion().z);
+                break;
+            case NORTH:
+                entity.setMotion(entity.getMotion().x, entity.getMotion().y, entity.getMotion().z - speed);
+                break;
+            case SOUTH:
+                entity.setMotion(entity.getMotion().x, entity.getMotion().y, entity.getMotion().z + speed);
+                break;
+            case WEST:
+                entity.setMotion(entity.getMotion().x - speed, entity.getMotion().y, entity.getMotion().z);
+                break;
+            case EAST:
+                entity.setMotion(entity.getMotion().x + speed, entity.getMotion().y, entity.getMotion().z);
+                break;
+        }
+    }
+
+    protected void addMotionAdvanced(World world, BlockPos posOfPedestal, double speed, Direction enumfacing, Entity entity) {
 
         switch (enumfacing) {
             case DOWN:
@@ -197,7 +253,14 @@ public class ItemUpgradeFan extends ItemUpgradeBase
             speed *= 2;
         }
 
-        useFanOnEntities(world,posOfPedestal,pedestal,speed,getBox);
+        if(hasAdvancedInventoryTargeting(coin))
+        {
+            useFanOnEntitiesAdvanced(world,posOfPedestal,pedestal,speed,getBox);
+        }
+        else
+        {
+            useFanOnEntities(world,posOfPedestal,pedestal,speed,getBox);
+        }
     }
 
     @Override
