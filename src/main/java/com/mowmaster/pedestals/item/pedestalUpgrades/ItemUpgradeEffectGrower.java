@@ -92,7 +92,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             int width = getAreaWidth(pedestal.getCoinOnPedestal());
             int height = getHeight(pedestal.getCoinOnPedestal());
             int amount = blocksToGrowInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
-            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            int area = blocksCropsInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -122,7 +122,8 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
             if(!world.isBlockPowered(pedestalPos)) {
-                if(blocksToGrowInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                int leftToGrow = blocksToGrowInArea(world,pedestalPos,rangeWidth,rangeHeight);
+                if(leftToGrow > 0)
                 {
                     if (world.getGameTime() % speed == 0) {
                         int currentPosition = 0;
@@ -143,8 +144,19 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                         upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
                         if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
                         {
+                            if(pedestal.getStoredValueForUpgrades() != leftToGrow)
+                            {
+                                pedestal.setStoredValueForUpgrades(leftToGrow);
+                            }
                             writeStoredIntToNBT(coinInPedestal,0);
                         }
+                    }
+                }
+                else
+                {
+                    if(pedestal.getStoredValueForUpgrades()!= 0)
+                    {
+                        pedestal.setStoredValueForUpgrades(0);
                     }
                 }
             }
@@ -190,6 +202,33 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     }
 
     public int blocksToGrowInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+            Block blockToGrow = blockToGrowState.getBlock();
+            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
+            {
+                if (blockToGrow instanceof IGrowable) {
+                    if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
+                        validBlocks++;
+                    }
+                }
+            }
+        }
+
+        return validBlocks;
+    }
+
+    public int blocksCropsInArea(World world, BlockPos pedestalPos, int width, int height)
     {
         int validBlocks = 0;
         BlockState pedestalState = world.getBlockState(pedestalPos);
