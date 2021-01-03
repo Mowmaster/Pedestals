@@ -151,7 +151,7 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
             int width = getAreaWidth(pedestal.getCoinOnPedestal());
             int height = getHeight(pedestal.getCoinOnPedestal());
             int amount = blocksToHarvestInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
-            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            int area = hivesInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -344,6 +344,29 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
             BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
             Block blockToHarvest = blockToHarvestState.getBlock();
             if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
+    }
+
+    public int hivesInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+            Block blockToHarvest = blockToHarvestState.getBlock();
+            if(blockToHarvestState.isIn(BlockTags.BEEHIVES))
             {
                 validBlocks++;
             }
