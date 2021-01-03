@@ -144,9 +144,13 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                         upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
                         if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
                         {
-                            if(pedestal.getStoredValueForUpgrades() != leftToGrow)
+                            //basically if the fertilizer runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
+                            if(itemInPedestal.isEmpty())
                             {
-                                pedestal.setStoredValueForUpgrades(leftToGrow);
+                                if(pedestal.getStoredValueForUpgrades() != leftToGrow)
+                                {
+                                    pedestal.setStoredValueForUpgrades(leftToGrow);
+                                }
                             }
                             writeStoredIntToNBT(coinInPedestal,0);
                         }
@@ -154,9 +158,13 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                 }
                 else
                 {
-                    if(pedestal.getStoredValueForUpgrades()!= 0)
+                    //basically if the fertilizer runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
+                    if(itemInPedestal.isEmpty())
                     {
-                        pedestal.setStoredValueForUpgrades(0);
+                        if(pedestal.getStoredValueForUpgrades()!= 0)
+                        {
+                            pedestal.setStoredValueForUpgrades(0);
+                        }
                     }
                 }
             }

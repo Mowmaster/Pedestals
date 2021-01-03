@@ -1,10 +1,12 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.IGrowable;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
@@ -92,7 +94,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
             int width = getAreaWidth(pedestal.getCoinOnPedestal());
             int height = getHeight(pedestal.getCoinOnPedestal());
             int amount = blocksToPlantInArea(pedestal.getWorld(),pedestal.getPos(),pedestal.getItemInPedestal(),width,height);
-            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            int area = plantableSpotsInArea(pedestal.getWorld(),pedestal.getPos(),pedestal.getItemInPedestal(),width,height);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -193,6 +195,39 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                 }
             }
         }
+    }
+
+    public int plantableSpotsInArea(World world, BlockPos pedestalPos, ItemStack itemInPedestal, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
+            Block blockToPlant = blockToPlantState.getBlock();
+            Item singleItemInPedestal = itemInPedestal.getItem();
+
+            if(!singleItemInPedestal.equals(Items.AIR)) {
+                if (singleItemInPedestal instanceof BlockItem) {
+                    if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
+                        if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
+                            Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
+                            if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
+                                validBlocks++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return validBlocks;
     }
 
     public int blocksToPlantInArea(World world, BlockPos pedestalPos, ItemStack itemInPedestal, int width, int height)

@@ -28,6 +28,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
@@ -138,7 +139,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             int width = getAreaWidth(pedestal.getCoinOnPedestal());
             int height = getHeight(pedestal.getCoinOnPedestal());
             int amount = blocksToHarvestInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
-            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            int area = blocksCropsInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -168,7 +169,8 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
             if(!world.isBlockPowered(pedestalPos)) {
-                if(blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                int leftToHarvest = blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight);
+                if(leftToHarvest > 0)
                 {
                     if (world.getGameTime() % speed == 0) {
                         int currentPosition = 0;
@@ -186,11 +188,25 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                         }
                         BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
                         BlockState targetBlock = world.getBlockState(targetPos);
+                        //basically the harvester never does block updates, so i need to force them for the comparator to work
+                        //This is probably not ideal though...
+                        if(pedestal.getStoredValueForUpgrades() != leftToHarvest)
+                        {
+                            pedestal.setStoredValueForUpgrades(leftToHarvest);
+                        }
                         upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
                         if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
                         {
                             writeStoredIntToNBT(coinInPedestal,0);
                         }
+                    }
+                }
+                else
+                {
+                    //basically the harvester never does block updates, so i need to force them for the comparator to work
+                    if(pedestal.getStoredValueForUpgrades()!= 0)
+                    {
+                        pedestal.setStoredValueForUpgrades(0);
                     }
                 }
             }
@@ -203,7 +219,8 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         {
                 FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
                 fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-                ItemStack harvestingHoe = new ItemStack(Items.DIAMOND_HOE,1);
+                //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...
+                ItemStack harvestingHoe = new ItemStack(Items.STICK,1);
                 if (itemInPedestal.getItem() instanceof HoeItem || itemInPedestal.getToolTypes().contains(ToolType.HOE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
                     fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
                 }
@@ -229,6 +246,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             if(hasAdvancedInventoryTargeting(coinInPedestal))
             {
                 //TODO: Make this do gentle harvesting SOMEDAY
+                //https://github.com/Lothrazar/Cyclic/blob/trunk/1.16/src/main/java/com/lothrazar/cyclic/block/harvester/TileHarvester.java
                 if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                 {
                     BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
@@ -273,6 +291,29 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
             Block blockToHarvest = blockToHarvestState.getBlock();
             if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
+    }
+
+    public int blocksCropsInArea(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+            Block blockToGrow = blockToGrowState.getBlock();
+            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
             {
                 validBlocks++;
             }
