@@ -180,7 +180,8 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
             if(!world.isBlockPowered(pedestalPos)) {
-                if(blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                int hivesToHarvest = blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight);
+                if(hivesToHarvest > 0)
                 {
                     if (world.getGameTime() % speed == 0) {
                         int currentPosition = 0;
@@ -198,10 +199,29 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                         }
                         BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
                         BlockState targetBlock = world.getBlockState(targetPos);
+                        //basically if the harvester runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
+                        if(itemInPedestal.isEmpty())
+                        {
+                            if(pedestal.getStoredValueForUpgrades() != hivesToHarvest)
+                            {
+                                pedestal.setStoredValueForUpgrades(hivesToHarvest);
+                            }
+                        }
                         upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
                         if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
                         {
                             writeStoredIntToNBT(coinInPedestal,0);
+                        }
+                    }
+                }
+                else
+                {
+                    //basically if the harvester runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
+                    if(itemInPedestal.isEmpty())
+                    {
+                        if(pedestal.getStoredValueForUpgrades()!= 0)
+                        {
+                            pedestal.setStoredValueForUpgrades(0);
                         }
                     }
                 }
