@@ -51,6 +51,9 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
+
     public int getAreaWidth(ItemStack stack)
     {
         return  getAreaModifier(stack);
