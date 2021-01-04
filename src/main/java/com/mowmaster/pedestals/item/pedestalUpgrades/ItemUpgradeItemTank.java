@@ -103,7 +103,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         {
             if(stored.isEmpty())
             {
-
                 if(!simulate)setItemStored(pedestal,stackIn);
                 return ItemStack.EMPTY;
             }
@@ -300,6 +299,8 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
     {
         //The itemstack.write() uses a byte value for the count so we have to store the actual count seperately
         int countToStore = stack.getCount();
+        //after getting the count for our purposes, to prevent the stack from nulling itsself we need to make sure its below max stack size
+        if(stack.getCount()>=stack.getMaxStackSize())stack.setCount(stack.getMaxStackSize());
         ItemStack coin = pedestal.getCoinOnPedestal();
 
         CompoundNBT coinNBT = (coin.hasTag())?(coin.getTag()):(new CompoundNBT());
