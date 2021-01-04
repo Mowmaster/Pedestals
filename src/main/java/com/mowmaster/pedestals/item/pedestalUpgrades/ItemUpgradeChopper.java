@@ -169,6 +169,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
             if (itemInPedestal.getItem() instanceof AxeItem || itemInPedestal.getToolTypes().contains(ToolType.AXE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
                 fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
             }
+
             else
             {
                 if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))

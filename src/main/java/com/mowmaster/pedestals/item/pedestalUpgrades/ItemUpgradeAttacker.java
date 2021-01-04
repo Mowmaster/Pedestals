@@ -187,6 +187,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
                 if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
                 if (itemInPedestal.getItem() instanceof SwordItem && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);}
+                if (itemInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}
 
                 DamageSource sourceE = (selectedEntity instanceof AbstractRaiderEntity && ((AbstractRaiderEntity) selectedEntity).isLeader())?(new EntityDamageSource(list.get(rn.nextInt(list.size())),null)):(new EntityDamageSource(list.get(rn.nextInt(list.size())),fakePlayer));
                 float damage = getAttackDamage(getEntityFromList,itemInPedestal,coinInPedestal);
