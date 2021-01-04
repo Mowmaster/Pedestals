@@ -1032,7 +1032,7 @@ public class ItemUpgradeBase extends Item {
         ITag<Block> BLOCK_IRON = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/iron"));
         ITag<Block> BLOCK_COAL = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
         ITag<Block> BLOCK_QUARTZ = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/quartz"));
-        //ITag<Block> BLOCK_GLOWSTONE = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
+        //ITag<Block> BLOCK_SLIME = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/slime"));
 
         //Netherite
         if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
@@ -1043,7 +1043,7 @@ public class ItemUpgradeBase extends Item {
         if(BLOCK_IRON.contains(block)) return Blocks.IRON_BLOCK;//All Creatures
         if(BLOCK_COAL.contains(block)) return Blocks.COAL_BLOCK;//All Mobs
         if(BLOCK_QUARTZ.contains(block)) return Blocks.QUARTZ_BLOCK;//All Items
-        if(block.equals(Blocks.GLOWSTONE)) return Blocks.GLOWSTONE;//All Exp
+        if(block.equals(Blocks.SLIME_BLOCK)) return Blocks.SLIME_BLOCK;//All Exp
 
         return block;
     }
@@ -1273,7 +1273,7 @@ public class ItemUpgradeBase extends Item {
                 return (ItemEntity)entityIn;
             }
         }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GLOWSTONE))
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.SLIME_BLOCK))
         {
             if(entityIn instanceof ExperienceOrbEntity)
             {
@@ -1335,7 +1335,7 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent IRON = new TranslationTextComponent(getTranslationKey() + ".entity_iron");
         TranslationTextComponent COAL = new TranslationTextComponent(getTranslationKey() + ".entity_coal");
         TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
-        TranslationTextComponent GLOWSTONE = new TranslationTextComponent(getTranslationKey() + ".entity_glowstone");
+        TranslationTextComponent SLIME = new TranslationTextComponent(getTranslationKey() + ".entity_slime");
         TranslationTextComponent QUARTZ = new TranslationTextComponent(getTranslationKey() + ".entity_quartz");
 
         if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
@@ -1362,9 +1362,9 @@ public class ItemUpgradeBase extends Item {
         {
             return COAL.getString();
         }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GLOWSTONE))
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.SLIME_BLOCK))
         {
-            return GLOWSTONE.getString();
+            return SLIME.getString();
         }
         else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.QUARTZ_BLOCK))
         {
