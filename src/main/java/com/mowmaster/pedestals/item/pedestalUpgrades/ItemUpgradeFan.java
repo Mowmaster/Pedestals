@@ -286,7 +286,14 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         player.sendMessage(area,Util.DUMMY_UUID);
 
         TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
-        entityType.appendString(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        if(hasAdvancedInventoryTargeting(stack))
+        {
+            entityType.appendString(getTargetEntityAdvanced(pedestal.getWorld(),pedestal.getPos()));
+        }
+        else
+        {
+            entityType.appendString(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        }
         entityType.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(entityType,Util.DUMMY_UUID);
 

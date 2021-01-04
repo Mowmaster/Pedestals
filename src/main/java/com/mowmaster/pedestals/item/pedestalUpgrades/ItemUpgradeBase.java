@@ -1326,6 +1326,55 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
+    public String getTargetEntityAdvanced(World world, BlockPos pedestalPos)
+    {
+        TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
+        TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
+        TranslationTextComponent GOLD = new TranslationTextComponent(getTranslationKey() + ".entity_gold");
+        TranslationTextComponent LAPIS = new TranslationTextComponent(getTranslationKey() + ".entity_lapis");
+        TranslationTextComponent IRON = new TranslationTextComponent(getTranslationKey() + ".entity_iron");
+        TranslationTextComponent COAL = new TranslationTextComponent(getTranslationKey() + ".entity_coal");
+        TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
+        TranslationTextComponent GLOWSTONE = new TranslationTextComponent(getTranslationKey() + ".entity_glowstone");
+        TranslationTextComponent QUARTZ = new TranslationTextComponent(getTranslationKey() + ".entity_quartz");
+
+        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
+        {
+            return EMERALD.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
+        {
+            return DIAMOND.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
+        {
+            return GOLD.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
+        {
+            return LAPIS.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
+        {
+            return IRON.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
+        {
+            return COAL.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GLOWSTONE))
+        {
+            return GLOWSTONE.getString();
+        }
+        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.QUARTZ_BLOCK))
+        {
+            return QUARTZ.getString();
+        }
+        else {
+            return ALL.getString();
+        }
+    }
+
     public BlockPos getNegRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
     {
         BlockState state = world.getBlockState(posOfPedestal);
