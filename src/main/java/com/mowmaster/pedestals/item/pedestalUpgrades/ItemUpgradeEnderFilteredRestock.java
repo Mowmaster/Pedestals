@@ -57,6 +57,21 @@ public class ItemUpgradeEnderFilteredRestock extends ItemUpgradeBaseFilter
     }
 
     @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        return true;
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return true;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return true;
+    }
+
+    @Override
     public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming) {
         TileEntity tile = world.getTileEntity(posPedestal);
         if(tile instanceof PedestalTileEntity)
