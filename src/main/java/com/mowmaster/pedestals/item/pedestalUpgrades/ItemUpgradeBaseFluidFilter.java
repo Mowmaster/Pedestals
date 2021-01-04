@@ -3,8 +3,10 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.item.ItemUpgradeTool;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import net.minecraft.block.*;
+import net.minecraft.block.AbstractRailBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,18 +36,61 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
-public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
+public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
 
-    public ItemUpgradeBaseFluid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeBaseFluidFilter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+
+    @Override
+    public Boolean canAcceptCapacity() {
+        return true;
+    }
+
+    //Since Energy Transfer is as fast as possible, speed isnt needed, just capacity
+    @Override
+    public Boolean canAcceptOpSpeed() {
+        return false;
+    }
+
+    @Override
+    public int getItemEnchantability()
+    {
+        return 10;
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        return true;
+    }
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return super.isBookEnchantable(stack, book);
+        return true;
     }
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return true;
+    }
+
+
+
+    @Override
+    public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
+    {
+        return false;
+    }
+
+    @Override
+    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
+    {
+        TileEntity tile = world.getTileEntity(posPedestal);
+        if(tile instanceof PedestalTileEntity)
+        {
+            PedestalTileEntity pedestal = (PedestalTileEntity)tile;
+            return pedestal.getSlotSizeLimit();
+        }
+        //int stackabe = itemStackIncoming.getMaxStackSize();
+        return 0;
     }
 
     @Override
@@ -198,34 +243,34 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                             int getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
                                             int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
                                             FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate,mainPedestalFluid.getTag());
-                                            if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,transferRate,true))
-                                            {
-                                                removeFluid(pedestal, mainPedestalCoin,transferRate,false);
-                                                mainPedestalTile.update();
-                                                addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
-                                                storedPedestalTile.update();
-                                            }
-                                            else
-                                            {
-                                                mainPedestalFluid = getFluidStored(mainPedestalCoin);
-                                                mainPedestalFluidAmount = mainPedestalFluid.getAmount();
-                                                storedCoinFluid = storedCoinItem.getFluidStored(storedPedestalCoin);
-                                                storedCoinFluidSpace = storedCoinItem.availableFluidSpaceInCoin(storedPedestalCoin);
-                                                storedCoinFluidAmount = storedCoinFluid.getAmount();
-                                                getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
-                                                transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
-                                                //IF transfer rate is greater then main pedestal (then empty main pedestal)
-                                                int storedFluidRemaining = storedCoinFluidAmount + transferRate;
-                                                int fluidLeftToSend = (mainPedestalFluidAmount<=transferRate)?(mainPedestalFluidAmount):(transferRate);
-                                                fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend,mainPedestalFluid.getTag());
-                                                if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,true))
+                                                if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,transferRate,true))
                                                 {
-                                                    removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,false);
+                                                    removeFluid(pedestal, mainPedestalCoin,transferRate,false);
                                                     mainPedestalTile.update();
                                                     addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                     storedPedestalTile.update();
                                                 }
-                                            }
+                                                else
+                                                {
+                                                    mainPedestalFluid = getFluidStored(mainPedestalCoin);
+                                                    mainPedestalFluidAmount = mainPedestalFluid.getAmount();
+                                                    storedCoinFluid = storedCoinItem.getFluidStored(storedPedestalCoin);
+                                                    storedCoinFluidSpace = storedCoinItem.availableFluidSpaceInCoin(storedPedestalCoin);
+                                                    storedCoinFluidAmount = storedCoinFluid.getAmount();
+                                                    getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
+                                                    transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
+                                                    //IF transfer rate is greater then main pedestal (then empty main pedestal)
+                                                    int storedFluidRemaining = storedCoinFluidAmount + transferRate;
+                                                    int fluidLeftToSend = (mainPedestalFluidAmount<=transferRate)?(mainPedestalFluidAmount):(transferRate);
+                                                    fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend,mainPedestalFluid.getTag());
+                                                    if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,true))
+                                                    {
+                                                        removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,false);
+                                                        mainPedestalTile.update();
+                                                        addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
+                                                        storedPedestalTile.update();
+                                                    }
+                                                }
                                             //}
 
                                             continue;

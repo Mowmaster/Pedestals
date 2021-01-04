@@ -4,6 +4,7 @@ import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,18 +28,61 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
-public class ItemUpgradeBaseExp extends ItemUpgradeBase {
+public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
 
-    public ItemUpgradeBaseExp(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeBaseExpFilter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+
+    @Override
+    public Boolean canAcceptCapacity() {
+        return true;
+    }
+
+    //Since Energy Transfer is as fast as possible, speed isnt needed, just capacity
+    @Override
+    public Boolean canAcceptOpSpeed() {
+        return false;
+    }
+
+    @Override
+    public int getItemEnchantability()
+    {
+        return 10;
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        return true;
+    }
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return super.isBookEnchantable(stack, book);
+        return true;
     }
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return true;
+    }
+
+
+
+    @Override
+    public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
+    {
+        return false;
+    }
+
+    @Override
+    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
+    {
+        TileEntity tile = world.getTileEntity(posPedestal);
+        if(tile instanceof PedestalTileEntity)
+        {
+            PedestalTileEntity pedestal = (PedestalTileEntity)tile;
+            return pedestal.getSlotSizeLimit();
+        }
+        //int stackabe = itemStackIncoming.getMaxStackSize();
+        return 0;
     }
 
     @Override

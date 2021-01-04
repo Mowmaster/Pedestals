@@ -42,6 +42,7 @@ public class ItemRegistry
 
         ItemUpgradeExpCollector.onItemRegistryReady(e);
         ItemUpgradeExpRelay.onItemRegistryReady(e);
+        ItemUpgradeExpRelayBlocked.onItemRegistryReady(e);
         ItemUpgradeExpTank.onItemRegistryReady(e);
         ItemUpgradeExpBottler.onItemRegistryReady(e);
         ItemUpgradeExpDropper.onItemRegistryReady(e);
@@ -55,6 +56,7 @@ public class ItemRegistry
         ItemUpgradeEnergyImport.onItemRegistryReady(e);
         ItemUpgradeEnergyExport.onItemRegistryReady(e);
         ItemUpgradeEnergyRelay.onItemRegistryReady(e);
+        ItemUpgradeEnergyRelayBlocked.onItemRegistryReady(e);
         ItemUpgradeEnergyTank.onItemRegistryReady(e);
         ItemUpgradeEnergyCrusher.onItemRegistryReady(e);
         ItemUpgradeEnergyFurnace.onItemRegistryReady(e);
@@ -68,6 +70,7 @@ public class ItemRegistry
         ItemUpgradeFluidDrain.onItemRegistryReady(e);
         ItemUpgradeFluidTank.onItemRegistryReady(e);
         ItemUpgradeFluidRelay.onItemRegistryReady(e);
+        ItemUpgradeFluidRelayBlocked.onItemRegistryReady(e);
         ItemUpgradeFluidFilter.onItemRegistryReady(e);
         ItemUpgradeFluidFilterBlacklist.onItemRegistryReady(e);
         ItemUpgradeFluidFilteredImport.onItemRegistryReady(e);
@@ -122,6 +125,7 @@ public class ItemRegistry
         ItemUpgradeSawMill.onItemRegistryReady(e);
         ItemUpgradeQuarry.onItemRegistryReady(e);
         ItemUpgradeQuarryBlacklist.onItemRegistryReady(e);
+        ItemUpgradeCompactingCrafter.onItemRegistryReady(e);
         ItemUpgradeCrafter.onItemRegistryReady(e);
         ItemCraftingPlaceholder.onItemRegistryReady(e);
         ItemUpgradeCobbleGen.onItemRegistryReady(e);

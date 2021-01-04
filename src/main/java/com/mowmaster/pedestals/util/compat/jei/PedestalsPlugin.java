@@ -175,6 +175,8 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeCrafter.CRAFTER_ONE, "crafter1");
         addValueInfoPage(registration, ItemUpgradeCrafter.CRAFTER_TWO, "crafter2");
         addValueInfoPage(registration, ItemUpgradeCrafter.CRAFTER_THREE, "crafter3");
+        addValueInfoPage(registration, ItemUpgradeCompactingCrafter.COMPACTOR_TWO, "compactor2");
+        addValueInfoPage(registration, ItemUpgradeCompactingCrafter.COMPACTOR_THREE, "compactor3");
         addValueInfoPage(registration, ItemUpgradeCrusher.CRUSHER, "crusher");
         addValueInfoPage(registration, ItemUpgradeDefault.DEFAULT, "default");
         addValueInfoPage(registration, ItemUpgradeDropper.DROPPER, "dropper");
@@ -194,6 +196,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeEnergyGenerator.RFFUELGEN, "rffuelgen");
         addValueInfoPage(registration, ItemUpgradeEnergyImport.RFIMPORT, "rfimport");
         addValueInfoPage(registration, ItemUpgradeEnergyRelay.RFRELAY, "rfrelay");
+        addValueInfoPage(registration, ItemUpgradeEnergyRelayBlocked.RFRELAYBLOCKED, "rfrelayblocked");
         addValueInfoPage(registration, ItemUpgradeEnergyTank.RFTANK, "rftank");
         addValueInfoPage(registration, ItemUpgradeEnergyCrusher.RFCRUSHER, "rfcrusher");
         addValueInfoPage(registration, ItemUpgradeEnergyFurnace.RFSMELTER, "rfsmelter");
@@ -202,6 +205,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeEnergyQuarryBlacklist.RFQUARRYB, "rfquarryb");
         addValueInfoPage(registration, ItemUpgradeExpCollector.XPMAGNET, "xpmagnet");
         addValueInfoPage(registration, ItemUpgradeExpRelay.XPRELAY, "xprelay");
+        addValueInfoPage(registration, ItemUpgradeExpRelayBlocked.XPRELAYBLOCKED, "xprelayblocked");
         addValueInfoPage(registration, ItemUpgradeExpTank.XPTANK, "xptank");
         addValueInfoPage(registration, ItemUpgradeExpBottler.XPBOTTLER, "xpbottler");
         addValueInfoPage(registration, ItemUpgradeExpDropper.XPDROPPER, "xpdropper");
@@ -214,6 +218,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeFluidDrain.FLUIDDRAIN, "fluiddrain");
         addValueInfoPage(registration, ItemUpgradeFluidTank.FLUIDTANK, "fluidtank");
         addValueInfoPage(registration, ItemUpgradeFluidRelay.FLUIDRELAY, "fluidrelay");
+        addValueInfoPage(registration, ItemUpgradeFluidRelayBlocked.FLUIDRELAYBLOCKED, "fluidrelayblocked");
         addValueInfoPage(registration, ItemUpgradeFluidFilteredImport.FLUIDFILTEREDIMPORT, "fluidfilteredimport");
         addValueInfoPage(registration, ItemUpgradeFluidFilter.FLUIDFILTER, "fluidfilter");
         addValueInfoPage(registration, ItemUpgradeFluidFilterBlacklist.FLUIDFILTERBLACKLIST, "fluidfilterblacklist");
