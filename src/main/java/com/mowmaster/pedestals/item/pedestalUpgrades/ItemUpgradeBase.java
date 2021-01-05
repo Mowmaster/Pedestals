@@ -2,6 +2,10 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
+import com.mowmaster.pedestals.recipes.CobbleGenRecipe;
+import com.mowmaster.pedestals.recipes.CobbleGenSilkRecipe;
+import com.mowmaster.pedestals.recipes.QuarryAdvancedRecipe;
+import com.mowmaster.pedestals.recipes.QuarryBlacklistBlockRecipe;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
@@ -19,6 +23,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -48,10 +53,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -1179,18 +1181,55 @@ public class ItemUpgradeBase extends Item {
         return validBlocks;
     }
 
+    @Nullable
+    protected QuarryBlacklistBlockRecipe getRecipeQuarryBlacklistBlock(World world, ItemStack stackIn)
+    {
+        Inventory inv = new Inventory(stackIn);
+        return world == null ? null : world.getRecipeManager().getRecipe(QuarryBlacklistBlockRecipe.recipeType, inv, world).orElse(null);
+    }
+
+    protected Collection<ItemStack> getProcessResultsQuarryBlacklistBlock(QuarryBlacklistBlockRecipe recipe)
+    {
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
+    }
+
+    @Nullable
+    protected QuarryAdvancedRecipe getRecipeQuarryAdvanced(World world, ItemStack stackIn)
+    {
+        Inventory inv = new Inventory(stackIn);
+        return world == null ? null : world.getRecipeManager().getRecipe(QuarryAdvancedRecipe.recipeType, inv, world).orElse(null);
+    }
+
+    protected Collection<ItemStack> getProcessResultsQuarryAdvanced(QuarryAdvancedRecipe recipe)
+    {
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
+    }
+
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
         int toolLevel = pickaxe.getHarvestLevel(tool, null, blockToMineState);
 
+        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
+        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
+
+        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
+        ItemStack resultQuarryAdvanced = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
+        boolean advanced = (hasAdvancedInventoryTargeting(coinInPedestal))?((!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER))):(!(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER)));
+
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && passesFilter(world, pedestalPos, blockToMine)
-                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && toolLevel >= blockToMineState.getHarvestLevel() && toolLevel >= blockToMineState.getHarvestLevel() && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)
+                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && toolLevel >= blockToMineState.getHarvestLevel()
+                && toolLevel >= blockToMineState.getHarvestLevel() && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
+                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER)) && advanced)
+
         {
             return true;
         }

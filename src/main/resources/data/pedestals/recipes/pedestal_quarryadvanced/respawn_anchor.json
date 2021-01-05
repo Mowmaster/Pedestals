@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_quarryblacklistblock",
+  "ingredient": {
+    "item": "minecraft:respawn_anchor"
+  },
+  "result": {
+    "item": "minecraft:barrier",
+    "count": 1
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_quarryblacklistblock",
+  "ingredient": {
+    "item": "minecraft:spawner"
+  },
+  "result": {
+    "item": "minecraft:barrier",
+    "count": 1
+  }
+}
