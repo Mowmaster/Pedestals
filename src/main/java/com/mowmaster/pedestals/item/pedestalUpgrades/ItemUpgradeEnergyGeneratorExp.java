@@ -126,7 +126,8 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
                 if(getFuelStored(coinInPedestal)>0 && getEnergyStored(coinInPedestal) < getEnergyBuffer(coinInPedestal))
                 {
                     if (world.getGameTime()%5 == 0) {
-                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ(),145,145,145));
+                        BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,-1);
+                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
                     }
 
                     if (world.getGameTime()%20 == 0) {
