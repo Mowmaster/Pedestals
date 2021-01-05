@@ -1223,7 +1223,7 @@ public class ItemUpgradeBase extends Item {
         Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
         ItemStack resultQuarryAdvanced = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
         Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
-        boolean advanced = (hasAdvancedInventoryTargeting(coinInPedestal))?((!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER))):(!(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER)));
+        boolean advanced = (hasAdvancedInventoryTargeting(coinInPedestal))?(!(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER))):((!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER)));
 
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && passesFilter(world, pedestalPos, blockToMine)
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && toolLevel >= blockToMineState.getHarvestLevel()

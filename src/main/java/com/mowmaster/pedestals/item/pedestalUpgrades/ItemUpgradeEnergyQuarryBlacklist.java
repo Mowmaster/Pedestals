@@ -352,7 +352,11 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         tool.mergeStyle(TextFormatting.BLUE);
         player.sendMessage(tool,Util.DUMMY_UUID);
 
-        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
+        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
+        if(hasAdvancedInventoryTargeting(stack))
+        {
+            map.put(EnchantmentRegistry.ADVANCED,1);
+        }
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");

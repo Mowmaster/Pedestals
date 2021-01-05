@@ -31,5 +31,5 @@ public final class PedestalsSerializers {
             QuarryBlacklistBlockRecipe.serializer);
 
     public static final RegistryObject<IRecipeSerializer<?>> QUARRYADVANCED = RECIPES.register("pedestal_quarryadvanced", () ->
-            QuarryBlacklistBlockRecipe.serializer);
+            QuarryAdvancedRecipe.serializer);
 }

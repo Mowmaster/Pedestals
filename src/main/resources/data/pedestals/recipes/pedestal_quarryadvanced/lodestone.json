@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:pedestal_quarryblacklistblock",
+  "type": "pedestals:pedestal_quarryadvanced",
   "ingredient": {
     "item": "minecraft:lodestone"
   },

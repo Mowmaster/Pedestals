@@ -357,6 +357,10 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
         player.sendMessage(tool,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
+        if(hasAdvancedInventoryTargeting(stack))
+        {
+            map.put(EnchantmentRegistry.ADVANCED,1);
+        }
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
