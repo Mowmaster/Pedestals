@@ -217,15 +217,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
 
             if(!pedestal.hasTool())
             {
-                if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
-                {
-                    pick.addEnchantment(Enchantments.SILK_TOUCH,1);
-                }
-                else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
-                {
-                    int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
-                    pick.addEnchantment(Enchantments.FORTUNE,lvl);
-                }
+                pick = getToolDefaultEnchanted(coinInPedestal,pick);
             }
 
             if(removeEnergyFuel(pedestal,fuelToConsume,true)>=0)

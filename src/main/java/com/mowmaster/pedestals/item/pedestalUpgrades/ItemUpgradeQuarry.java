@@ -224,15 +224,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
             if(!pedestal.hasTool())
             {
-                if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
-                {
-                    pick.addEnchantment(Enchantments.SILK_TOUCH,1);
-                }
-                else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
-                {
-                    int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
-                    pick.addEnchantment(Enchantments.FORTUNE,lvl);
-                }
+                pick = getToolDefaultEnchanted(coinInPedestal,pick);
             }
 
             if(removeFuel(pedestal,200,true))
