@@ -35,6 +35,7 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.IFluidBlock;
 
@@ -111,43 +112,43 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
         //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
         fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
-        ItemStack pickaxe = new ItemStack(Items.DIAMOND_PICKAXE, 1);
+        ItemStack pickaxe = (itemInPedestal.isEmpty())?(new ItemStack(Items.DIAMOND_PICKAXE, 1)):(itemInPedestal);
         BlockPos posOfBlock = getPosOfBlockBelow(world, posOfPedestal, range);
         BlockState blockToBreak = world.getBlockState(posOfBlock);
 
         /*
         BREAKS BLOCKS AND DROPS THEM IN WORLD FOR PICKUP LATER
          */
-
-        if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
-            if (itemInPedestal.getItem() instanceof PickaxeItem || itemInPedestal.getToolTypes().contains(ToolType.PICKAXE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
-            }
-            else {
-                if (EnchantmentHelper.getEnchantments(coinOnPedestal).containsKey(Enchantments.SILK_TOUCH)) {
-                    pickaxe.addEnchantment(Enchantments.SILK_TOUCH, 1);
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND, pickaxe);
-                } else if (EnchantmentHelper.getEnchantments(coinOnPedestal).containsKey(Enchantments.FORTUNE)) {
-                    int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, coinOnPedestal);
-                    pickaxe.addEnchantment(Enchantments.FORTUNE, lvl);
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND, pickaxe);
-                } else {
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND, pickaxe);
-                }
-            }
-
-            if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,true)) {
-
-                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
-                if (!MinecraftForge.EVENT_BUS.post(e)) {
-                    blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
-                    blockToBreak.getBlock().onBlockHarvested(world, posOfBlock, blockToBreak, fakePlayer);
-
-                    world.removeBlock(posOfBlock, false);
-                }
+        if(itemInPedestal.isEmpty())
+        {
+            if (EnchantmentHelper.getEnchantments(coinOnPedestal).containsKey(Enchantments.SILK_TOUCH)) {
+                pickaxe.addEnchantment(Enchantments.SILK_TOUCH, 1);
+            } else if (EnchantmentHelper.getEnchantments(coinOnPedestal).containsKey(Enchantments.FORTUNE)) {
+                int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, coinOnPedestal);
+                pickaxe.addEnchantment(Enchantments.FORTUNE, lvl);
             }
         }
 
+        ToolType tool = blockToBreak.getHarvestTool();
+        int toolLevel = pickaxe.getHarvestLevel(tool, null, blockToBreak);
+        if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && toolLevel >= blockToBreak.getHarvestLevel() &&blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
+
+            if (pickaxe.getItem() instanceof PickaxeItem || pickaxe.getToolTypes().contains(ToolType.PICKAXE) && !fakePlayer.getHeldItemMainhand().equals(pickaxe)) {
+                fakePlayer.setHeldItem(Hand.MAIN_HAND, pickaxe);
+            }
+
+            tool = blockToBreak.getHarvestTool();
+            toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToBreak);
+            if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,toolLevel >= blockToBreak.getHarvestLevel())) {
+                //This event is already called in the Event factory doPlayerHarvestCheck
+                //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
+                //if (MinecraftForge.EVENT_BUS.post(e)) {
+                    blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
+                    blockToBreak.getBlock().onBlockHarvested(world, posOfBlock, blockToBreak, fakePlayer);
+                    world.removeBlock(posOfBlock, false);
+                //}
+            }
+        }
     }
 
     @Override

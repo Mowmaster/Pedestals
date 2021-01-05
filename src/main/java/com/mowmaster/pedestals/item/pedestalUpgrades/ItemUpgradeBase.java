@@ -38,8 +38,10 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -1148,8 +1150,51 @@ public class ItemUpgradeBase extends Item {
         return addY >= yRange;
     }
 
-    public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
+    public boolean passesFilter(World world, BlockPos posPedestal, Block blockIn)
     {
+        return false;
+    }
+
+    public int blocksToMineInArea(PedestalTileEntity pedestal, int width, int height)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            if(canMineBlock(pedestal, blockToMinePos))
+            {
+                validBlocks++;
+            }
+        }
+
+        return validBlocks;
+    }
+
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        BlockState blockToMineState = world.getBlockState(blockToMinePos);
+        Block blockToMine = blockToMineState.getBlock();
+        ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
+        ToolType tool = blockToMineState.getHarvestTool();
+        int toolLevel = pickaxe.getHarvestLevel(tool, null, blockToMineState);
+
+        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && passesFilter(world, pedestalPos, blockToMine)
+                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && toolLevel >= blockToMineState.getHarvestLevel() && toolLevel >= blockToMineState.getHarvestLevel() && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)
+        {
+            return true;
+        }
+
         return false;
     }
 

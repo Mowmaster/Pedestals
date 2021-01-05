@@ -219,6 +219,14 @@ public class ItemLinkingTool extends Item {
                             }
                         }
 
+                        if(tilePedestal.hasTool())
+                        {
+                            TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".tool_stored");
+                            tool.append(tilePedestal.getToolOnPedestal().getDisplayName());
+                            tool.mergeStyle(TextFormatting.LIGHT_PURPLE);
+                            player.sendMessage(tool,Util.DUMMY_UUID);
+                        }
+
                         TranslationTextComponent capacity = new TranslationTextComponent(getTranslationKey() + ".tool_capacity");
                         capacity.appendString(""+tilePedestal.getCapacity()+"");
                         capacity.mergeStyle(TextFormatting.BLUE);

@@ -15,6 +15,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.ToolItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -24,6 +25,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LockCode;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -362,7 +364,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     }
 
     private IItemHandler createHandlerPedestalPrivate() {
-        return new ItemStackHandler(5) {
+        return new ItemStackHandler(6) {
             @Override
             protected void onContentsChanged(int slot) {
                 update();
@@ -375,12 +377,17 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if (slot == 2 && stack.getItem().equals(ItemPedestalUpgrades.SPEED) && getSpeed()<5) return true;
                 if (slot == 3 && stack.getItem().equals(ItemPedestalUpgrades.CAPACITY) && getCapacity()<5) return true;
                 if (slot == 4 && stack.getItem().equals(ItemPedestalUpgrades.RANGE) && getRange()<5) return true;
+                if (slot == 5 && stack.getItem() instanceof ToolItem || stack.getToolTypes().contains(ToolType.PICKAXE)
+                        || stack.getToolTypes().contains(ToolType.HOE) || stack.getToolTypes().contains(ToolType.AXE)) return true;
                 return false;
             }
 
+
+
+
             @Override
             public int getSlots() {
-                return 5;
+                return 6;
             }
         };
     }
@@ -515,6 +522,25 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else  return true;
     }
 
+
+
+    public boolean hasTool()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        CompoundNBT nbt = this.serializeNBT();
+        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
+        if(slotSize > 5)
+        {
+            if(ph.getStackInSlot(5).isEmpty())
+            {
+                return false;
+            }
+            else  return true;
+        }
+
+        return false;
+    }
+
     public ItemStack getItemInPedestal()
     {
         IItemHandler h = handler.orElse(null);
@@ -558,6 +584,19 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     {
         IItemHandler ph = privateHandler.orElse(null);
         return ph.getStackInSlot(4).getCount();
+    }
+
+    public ItemStack getToolOnPedestal()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        CompoundNBT nbt = this.serializeNBT();
+        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
+        if(slotSize > 5)
+        {
+            return ph.getStackInSlot(5);
+        }
+
+        return ItemStack.EMPTY;
     }
 
     public ItemStack setItemInPedestal(ItemStack itemToSet)
@@ -612,6 +651,18 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         //update();
 
         return stack;
+    }
+
+    public ItemStack removeTool() {
+        IItemHandler ph = privateHandler.orElse(null);
+        CompoundNBT nbt = this.serializeNBT();
+        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
+        if(slotSize > 5)
+        {
+            return ph.extractItem(5,ph.getStackInSlot(5).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+
     }
 
     public void spawnItemStack(World worldIn, double x, double y, double z, ItemStack stack) {
@@ -939,6 +990,26 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         {
             return false;
         }
+    }
+
+    public boolean addTool(ItemStack tool,boolean simulate)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        CompoundNBT nbt = this.serializeNBT();
+        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
+        if(slotSize > 5)
+        {
+            ItemStack itemFromBlock = tool.copy();
+            itemFromBlock.setCount(1);
+            if(!hasTool() && ph.isItemValid(5,itemFromBlock))
+            {
+                if(!simulate)ph.insertItem(5,itemFromBlock,false);
+                return true;
+            }
+            else return false;
+        }
+
+        return false;
     }
 
     public boolean doItemsMatch(ItemStack itemStackIn)

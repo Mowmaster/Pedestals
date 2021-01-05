@@ -1,9 +1,6 @@
 package com.mowmaster.pedestals.blocks;
 
-import com.mowmaster.pedestals.item.ItemColorPallet;
-import com.mowmaster.pedestals.item.ItemLinkingTool;
-import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
-import com.mowmaster.pedestals.item.ItemUpgradeTool;
+import com.mowmaster.pedestals.item.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -17,7 +14,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.*;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -34,16 +30,12 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
-
-import java.util.Random;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -298,6 +290,24 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 {
                     if(getItemInHand instanceof ItemLinkingTool || getItemInHand instanceof ItemUpgradeTool)
                     {
+                        return ActionResultType.FAIL;
+                    }
+                    else if(getItemInHand instanceof ItemToolSwapper)
+                    {
+                        if(tilePedestal.addTool(player.getHeldItemOffhand(),true))
+                        {
+                            tilePedestal.addTool(player.getHeldItemOffhand(),false);
+                            player.getHeldItemOffhand().shrink(1);
+                            TranslationTextComponent settool = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".add_tool");
+                            settool.mergeStyle(TextFormatting.WHITE);
+                            player.sendStatusMessage(settool,true);
+                            return ActionResultType.SUCCESS;
+                        }
+                        else if(tilePedestal.hasTool())
+                        {
+                            ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeTool());
+                            return ActionResultType.SUCCESS;
+                        }
                         return ActionResultType.FAIL;
                     }
                     else if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeBase)

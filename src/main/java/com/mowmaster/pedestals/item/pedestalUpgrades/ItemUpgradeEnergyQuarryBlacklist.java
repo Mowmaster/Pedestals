@@ -32,6 +32,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
@@ -117,7 +118,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
             int width = getAreaWidth(coin);
             int widthModified = (width*2)+1;
             int height = getRangeHeight(coin);
-            int amount = blocksToMineInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
+            int amount = blocksToMineInArea(pedestal,width,height);
             int area = Math.multiplyExact(Math.multiplyExact(widthModified,widthModified),height);
             if(amount>0)
             {
@@ -127,6 +128,17 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         }
 
         return intItem;
+    }
+
+    @Override
+    public int intOperationalSpeedModifier(ItemStack stack)
+    {
+        int rate = 0;
+        if(hasEnchant(stack))
+        {
+            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
+        }
+        return rate;
     }
 
     public void updateAction(PedestalTileEntity pedestal)
@@ -165,7 +177,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                     int fuelToConsume = rfCostPerItemSmelted;
                     if(hasEnergy(coinInPedestal) && removeEnergyFuel(pedestal,fuelToConsume,true)>=0)
                     {
-                        if(blocksToMineInArea(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                        if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
                         {
                             if (world.getGameTime() % speed == 0) {
                                 int currentPosition = 0;
@@ -173,10 +185,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                                 {
                                     BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
                                     BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                    BlockState blockToMineState = world.getBlockState(blockToMinePos);
-                                    Block blockToMine = blockToMineState.getBlock();
-                                    if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && canMineBlock(world, pedestalPos, blockToMine)
-                                            && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)
+                                    if(canMineBlock(pedestal,blockToMinePos))
                                     {
                                         writeStoredIntToNBT(coinInPedestal,currentPosition);
                                         break;
@@ -184,7 +193,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                                 }
                                 BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
                                 BlockState targetBlock = world.getBlockState(targetPos);
-                                upgradeAction(world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
                                 if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
                                 {
                                     writeStoredIntToNBT(coinInPedestal,0);
@@ -197,80 +206,46 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         }
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos blockToMinePos, BlockState blockToMine, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos blockToMinePos, BlockState blockToMine, BlockPos posOfPedestal)
     {
         int fuelToConsume = rfCostPerItemSmelted;
-        if(!blockToMine.getBlock().isAir(blockToMine,world,blockToMinePos) && !(blockToMine.getBlock() instanceof PedestalBlock) && canMineBlock(world, posOfPedestal, blockToMine.getBlock())
-                && !(blockToMine.getBlock() instanceof IFluidBlock || blockToMine.getBlock() instanceof FlowingFluidBlock) && blockToMine.getBlockHardness(world, blockToMinePos) != -1.0F)
+        if(canMineBlock(pedestal, blockToMinePos))
         {
             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-            ItemStack pick = new ItemStack(Items.NETHERITE_PICKAXE,1);
+            ItemStack pick = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
 
-            if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
+            if(!pedestal.hasTool())
             {
                 if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
                 {
                     pick.addEnchantment(Enchantments.SILK_TOUCH,1);
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
                 }
                 else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
                 {
                     int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
                     pick.addEnchantment(Enchantments.FORTUNE,lvl);
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
-                }
-                else
-                {
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
                 }
             }
-            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-            if(pedestalInv instanceof PedestalTileEntity) {
-                PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
-                if(removeEnergyFuel(ped,fuelToConsume,true)>=0)
-                {
-                    if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,true)) {
 
-                        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockToMinePos, blockToMine, fakePlayer);
-                        if (!MinecraftForge.EVENT_BUS.post(e)) {
-                            blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
-                            blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
-                            removeEnergyFuel(ped,fuelToConsume,false);
-                            world.removeBlock(blockToMinePos, false);
-                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public int blocksToMineInArea(World world, BlockPos pedestalPos, int width, int height)
-    {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToMineState = world.getBlockState(blockToMinePos);
-            Block blockToMine = blockToMineState.getBlock();
-            if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && canMineBlock(world, pedestalPos, blockToMine)
-                    && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F)
+            if(removeEnergyFuel(pedestal,fuelToConsume,true)>=0)
             {
-                validBlocks++;
+                if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+                ToolType tool = blockToMine.getHarvestTool();
+                int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToMine);
+                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,toolLevel >= blockToMine.getHarvestLevel())) {
+                    blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
+                    blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
+                    removeEnergyFuel(pedestal,fuelToConsume,false);
+                    world.removeBlock(blockToMinePos, false);
+                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
+                }
             }
         }
-
-        return validBlocks;
     }
 
-    public boolean canMineBlock(World world, BlockPos posPedestal, Block blockIn)
+    @Override
+    public boolean passesFilter(World world, BlockPos posPedestal, Block blockIn)
     {
         boolean returner = true;
         BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
@@ -360,7 +335,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
 
         //Display Blocks To Mine Left
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + blocksToMineInArea(pedestal.getWorld(),pedestal.getPos(),getAreaWidth(pedestal.getCoinOnPedestal()),getRangeHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.appendString("" + blocksToMineInArea(pedestal,getAreaWidth(pedestal.getCoinOnPedestal()),getRangeHeight(pedestal.getCoinOnPedestal())) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 
@@ -370,6 +345,12 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         fuel.appendString("" + fuelValue/2500 + "");
         fuel.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(fuel,Util.DUMMY_UUID);
+
+        ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE));
+        TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
+        tool.append(toolStack.getDisplayName());
+        tool.mergeStyle(TextFormatting.BLUE);
+        player.sendMessage(tool,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
