@@ -12,6 +12,7 @@ import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
@@ -1221,9 +1222,19 @@ public class ItemUpgradeBase extends Item {
         Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
 
         Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryAdvanced = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
         Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
-        boolean advanced = (hasAdvancedInventoryTargeting(coinInPedestal))?(!(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER))):((!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER)));
+
+        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
+        boolean advanced = false;
+        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
+        {
+            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
+        }
+        else
+        {
+            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
+        }
 
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && passesFilter(world, pedestalPos, blockToMine)
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && toolLevel >= blockToMineState.getHarvestLevel()
@@ -1235,6 +1246,21 @@ public class ItemUpgradeBase extends Item {
         }
 
         return false;
+    }
+
+    public ItemStack getToolDefaultEnchanted(ItemStack coinInPedestal, ItemStack tool)
+    {
+        if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
+        {
+            tool.addEnchantment(Enchantments.SILK_TOUCH,1);
+        }
+        else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
+        {
+            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
+            tool.addEnchantment(Enchantments.FORTUNE,lvl);
+        }
+
+        return tool;
     }
 
     public Direction getPedestalFacing(World world, BlockPos posOfPedestal)

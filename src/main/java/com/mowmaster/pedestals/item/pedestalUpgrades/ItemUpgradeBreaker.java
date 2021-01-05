@@ -1,25 +1,26 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.enchants.EnchantmentArea;
-import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
-import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
-import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.PickaxeItem;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -45,6 +46,7 @@ import java.util.Map;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeBreaker extends ItemUpgradeBase
 {
@@ -57,6 +59,9 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     public Boolean canAcceptRange() {
         return true;
     }
+
+    @Override
+    public Boolean canAcceptAdvanced() {return true;}
 
     public int getRange(ItemStack stack)
     {
@@ -98,41 +103,53 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
+                //Should disable magneting when its not needed
+                int range = getRange(coinInPedestal);
+                BlockState pedestalState = world.getBlockState(pedestalPos);
+                Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
+                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
+                AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                if(itemList.size()>0)
+                {
+                    upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, 3, 3);
+                }
+
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
+                    upgradeAction(pedestal);
                 }
             }
         }
 
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinOnPedestal) {
-        int range = getRange(coinOnPedestal);
+    public void upgradeAction(PedestalTileEntity pedestal) {
+        World world = pedestal.getWorld();
+        BlockPos posOfPedestal = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        int range = getRange(coinInPedestal);
 
-        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
+        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
         //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
         fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
-        ItemStack pickaxe = (itemInPedestal.isEmpty())?(new ItemStack(Items.DIAMOND_PICKAXE, 1)):(itemInPedestal);
+        ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         BlockPos posOfBlock = getPosOfBlockBelow(world, posOfPedestal, range);
         BlockState blockToBreak = world.getBlockState(posOfBlock);
 
         /*
         BREAKS BLOCKS AND DROPS THEM IN WORLD FOR PICKUP LATER
          */
-        if(itemInPedestal.isEmpty())
+        if(!pedestal.hasTool())
         {
-            if (EnchantmentHelper.getEnchantments(coinOnPedestal).containsKey(Enchantments.SILK_TOUCH)) {
-                pickaxe.addEnchantment(Enchantments.SILK_TOUCH, 1);
-            } else if (EnchantmentHelper.getEnchantments(coinOnPedestal).containsKey(Enchantments.FORTUNE)) {
-                int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, coinOnPedestal);
-                pickaxe.addEnchantment(Enchantments.FORTUNE, lvl);
-            }
+            pickaxe = getToolDefaultEnchanted(coinInPedestal,pickaxe);
         }
 
         ToolType tool = blockToBreak.getHarvestTool();
         int toolLevel = pickaxe.getHarvestLevel(tool, null, blockToBreak);
-        if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && toolLevel >= blockToBreak.getHarvestLevel() &&blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
-
+        //if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && toolLevel >= blockToBreak.getHarvestLevel() &&blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
+        if(canMineBlock(pedestal, posOfBlock))
+        {
             if (pickaxe.getItem() instanceof PickaxeItem || pickaxe.getToolTypes().contains(ToolType.PICKAXE) && !fakePlayer.getHeldItemMainhand().equals(pickaxe)) {
                 fakePlayer.setHeldItem(Hand.MAIN_HAND, pickaxe);
             }
@@ -151,6 +168,13 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         }
     }
 
+    //No filter here, Jokes on YOU!
+    @Override
+    public boolean passesFilter(World world, BlockPos posPedestal, Block blockIn)
+    {
+        return true;
+    }
+
     @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
@@ -165,8 +189,18 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         range.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(range,Util.DUMMY_UUID);
 
-        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
-        if(map.size() > 0)
+        ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE));
+        TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
+        tool.append(toolStack.getDisplayName());
+        tool.mergeStyle(TextFormatting.BLUE);
+        player.sendMessage(tool,Util.DUMMY_UUID);
+
+        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
+        if(hasAdvancedInventoryTargeting(stack))
+        {
+            map.put(EnchantmentRegistry.ADVANCED,1);
+        }
+        if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
             enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);

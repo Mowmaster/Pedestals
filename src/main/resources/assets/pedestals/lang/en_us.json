@@ -133,7 +133,8 @@
     "item.pedestals.coin.breaker.tooltip_range": "Breaker Range: ",
     "item.pedestals.coin.breaker.tooltip_speed": "Operational Speed: ",
     "item.pedestals.coin.breaker.chat_range": "Range: ",
-    "item.pedestals.coin.breaker.chat_enchants": "Enchantments:",
+  "item.pedestals.coin.breaker.chat_tool": "Tool: ",
+  "item.pedestals.coin.breaker.chat_enchants": "Enchantments:",
     "item.pedestals.coin.breaker.chat_speed": "Operational Speed: ",
     "jei.pedestals.breaker.desc": "This Upgrade will Break the Block Below The Pedestal, Range Makes it break a block farther down. If a Pickaxe is put in the pedestal, the breaker will use that tool to break blocks.",
 
