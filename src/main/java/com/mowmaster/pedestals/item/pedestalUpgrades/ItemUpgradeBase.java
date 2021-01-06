@@ -875,8 +875,38 @@ public class ItemUpgradeBase extends Item {
 
         return  height;
     }
-    //Based on old 64 block max
+    //Based on old 64 block max starting at 1
     public int getRangeLarge(ItemStack stack)
+    {
+        int height = 8;
+        switch (getRangeModifier(stack))
+        {
+            case 0:
+                height = 1;
+                break;
+            case 1:
+                height=4;
+                break;
+            case 2:
+                height = 8;
+                break;
+            case 3:
+                height = 16;
+                break;
+            case 4:
+                height = 32;
+                break;
+            case 5:
+                height=64;
+                break;
+            default: height=(getRangeModifier(stack)*12);
+        }
+
+        return  height;
+    }
+
+    //Based on old 64 block max
+    public int getRangeLargest(ItemStack stack)
     {
         int height = 8;
         switch (getRangeModifier(stack))
