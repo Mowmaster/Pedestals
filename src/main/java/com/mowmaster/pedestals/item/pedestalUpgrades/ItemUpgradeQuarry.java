@@ -235,6 +235,10 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                 if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,toolLevel >= blockToMine.getHarvestLevel())) {
                     blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
                     blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
+                    int expdrop = blockToMine.getBlock().getExpDrop(blockToMine,world,blockToMinePos,
+                            (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
+                            (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
+                    if(expdrop>0)blockToMine.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
                     removeFuel(pedestal,200,false);
                     world.removeBlock(blockToMinePos, false);
                     PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
