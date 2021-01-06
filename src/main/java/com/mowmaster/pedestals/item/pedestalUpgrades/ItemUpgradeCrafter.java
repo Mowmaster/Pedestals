@@ -221,13 +221,17 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 
                                             if(stackInRecipe.getItem().hasContainerItem(stackInRecipe))
                                             {
-                                                //System.out.println(stackInRecipe.getDisplayName());
-                                                ItemStack container = stackInRecipe.getItem().getContainerItem(stackInRecipe);
-                                                if(!world.isRemote)
+                                                //Will Now Hold All Container items if set with advanced enchant
+                                                if(!hasAdvancedInventoryTargeting(coinInPedestal))
                                                 {
-                                                    world.addEntity(new ItemEntity(world,getPosOfBlockBelow(world,posOfPedestal,-1).getX() + 0.5,getPosOfBlockBelow(world,posOfPedestal,-1).getY()+ 0.5,getPosOfBlockBelow(world,posOfPedestal,-1).getZ()+ 0.5,container));
+                                                    ItemStack container = stackInRecipe.getItem().getContainerItem(stackInRecipe);
+                                                    if(!world.isRemote)
+                                                    {
+                                                        world.addEntity(new ItemEntity(world,getPosOfBlockBelow(world,posOfPedestal,-1).getX() + 0.5,getPosOfBlockBelow(world,posOfPedestal,-1).getY()+ 0.5,getPosOfBlockBelow(world,posOfPedestal,-1).getZ()+ 0.5,container));
+                                                    }
+                                                    handler.extractItem(intGetActualSlot,intBatchCraftingSize,false);
                                                 }
-                                                handler.extractItem(intGetActualSlot,intBatchCraftingSize,false);
+                                                else continue;
                                             }
                                             else
                                             {
