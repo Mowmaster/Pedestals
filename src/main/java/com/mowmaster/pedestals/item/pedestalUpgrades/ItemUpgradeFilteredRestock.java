@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -44,12 +45,28 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
 
     @Override
     public Boolean canAcceptAdvanced() {return true;}
-
+    
     @Override
     public int getItemEnchantability()
     {
         return 10;
     }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        return true;
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return true;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return true;
+    }
+
 
     @Override
     public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming) {
