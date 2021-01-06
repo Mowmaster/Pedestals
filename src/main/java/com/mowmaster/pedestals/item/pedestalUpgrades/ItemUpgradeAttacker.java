@@ -1,10 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.enchants.EnchantmentArea;
-import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
-import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
-import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -12,6 +9,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
@@ -25,6 +23,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegistryEvent;
@@ -93,49 +92,61 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         return getAreaWidth(coin);
     }
 
-    public float getSwordDamage(LivingEntity entityIn, ItemStack itemInPedestal)
+    public float getSwordDamage(LivingEntity entityIn, ItemStack toolInPedestal)
     {
         float damage = 2.0f;
-        if(itemInPedestal.getItem() instanceof SwordItem){
-            SwordItem sword = (SwordItem)itemInPedestal.getItem();
+
+        if(toolInPedestal.getItem() instanceof SwordItem)
+        {
+            SwordItem sword = (SwordItem)toolInPedestal.getItem();
             if(sword.getAttackDamage() > damage)damage += sword.getAttackDamage();
         }
+        else if(toolInPedestal.getItem() instanceof ToolItem){
+            ToolItem tool = (ToolItem)toolInPedestal.getItem();
+            if(tool.getAttackDamage() > damage)damage += tool.getAttackDamage();
+        }
 
-        if(EnchantmentHelper.getEnchantments(itemInPedestal).containsKey(Enchantments.SHARPNESS))
+        if(EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.SHARPNESS))
         {
-            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS,itemInPedestal);
+            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS,toolInPedestal);
             damage += 1+(lvl*0.5);
         }
-        if(entityIn instanceof SpiderEntity && EnchantmentHelper.getEnchantments(itemInPedestal).containsKey(Enchantments.BANE_OF_ARTHROPODS))
+        if(entityIn instanceof SpiderEntity && EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.BANE_OF_ARTHROPODS))
         {
-            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.BANE_OF_ARTHROPODS,itemInPedestal);
+            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.BANE_OF_ARTHROPODS,toolInPedestal);
             damage += 1+(lvl*0.5);
         }
-        if(entityIn instanceof ZombieEntity || entityIn instanceof SkeletonEntity && EnchantmentHelper.getEnchantments(itemInPedestal).containsKey(Enchantments.BANE_OF_ARTHROPODS))
+        if(entityIn instanceof ZombieEntity || entityIn instanceof SkeletonEntity && EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.BANE_OF_ARTHROPODS))
         {
-            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.BANE_OF_ARTHROPODS,itemInPedestal);
+            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.BANE_OF_ARTHROPODS,toolInPedestal);
             damage += 1+(lvl*0.5);
         }
 
         return  damage;
     }
 
-    public float getAttackDamage(LivingEntity entityIn, ItemStack itemInPedestal, ItemStack coinInPedestal)
+    public float getAttackDamage(LivingEntity entityIn, ItemStack toolInPedestal, ItemStack coinInPedestal)
     {
         float damage = getCapacityModifier(coinInPedestal)*2 + 2.0F;
-        damage += getSwordDamage(entityIn,itemInPedestal);
+        damage += getSwordDamage(entityIn,toolInPedestal);
         return damage;
     }
 
     public float getMostlyDamage(PedestalTileEntity pedestal)
     {
-        ItemStack inPedestal = pedestal.getItemInPedestal();
+        ItemStack inPedestal = pedestal.getToolOnPedestal();
         float damage = getCapacityModifier(pedestal.getCoinOnPedestal()) + 2.0f;
         float damage2 = 2.0f;
         if(inPedestal.getItem() instanceof SwordItem){
             SwordItem sword = (SwordItem)inPedestal.getItem();
             if(sword.getAttackDamage() > damage2){
                 damage += (sword.getAttackDamage()/2);
+            }
+        }
+        else if(inPedestal.getItem() instanceof ToolItem){
+            ToolItem tool = (ToolItem)inPedestal.getItem();
+            if(tool.getAttackDamage() > damage2){
+                damage += (tool.getAttackDamage()/2);
             }
         }
         if(EnchantmentHelper.getEnchantments(inPedestal).containsKey(Enchantments.SHARPNESS))
@@ -155,18 +166,36 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
+            int width = getAreaWidth(coinInPedestal);
+            int height = getRangeHeight(coinInPedestal);
+            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
+            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
+            AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+            List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+            if(itemList.size()>0)
+            {
+                upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, width, height);
+            }
+
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
+                    upgradeAction(pedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        //ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack toolInPedestal = pedestal.getToolOnPedestal().copy();
+        BlockPos posOfPedestal = pedestal.getPos();
+
+
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
@@ -186,11 +215,11 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
             {
                 FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
                 if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
-                if (itemInPedestal.getItem() instanceof SwordItem && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);}
-                if (itemInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}
+                if (pedestal.hasTool() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, toolInPedestal);}
+                if (toolInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}
 
                 DamageSource sourceE = (selectedEntity instanceof AbstractRaiderEntity && ((AbstractRaiderEntity) selectedEntity).isLeader())?(new EntityDamageSource(list.get(rn.nextInt(list.size())),null)):(new EntityDamageSource(list.get(rn.nextInt(list.size())),fakePlayer));
-                float damage = getAttackDamage(getEntityFromList,itemInPedestal,coinInPedestal);
+                float damage = getAttackDamage(getEntityFromList,toolInPedestal,coinInPedestal);
 
                 if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
                 {
@@ -228,7 +257,21 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,Util.DUMMY_UUID);
 
-        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(pedestal.getItemInPedestal());
+        ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY);
+        if(!toolStack.isEmpty())
+        {
+            TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
+            tool.append(toolStack.getDisplayName());
+            tool.mergeStyle(TextFormatting.BLUE);
+            player.sendMessage(tool,Util.DUMMY_UUID);
+        }
+
+        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
+        //Not Used Yet
+        /*if(hasAdvancedInventoryTargeting(stack))
+        {
+            map.put(EnchantmentRegistry.ADVANCED,1);
+        }*/
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");

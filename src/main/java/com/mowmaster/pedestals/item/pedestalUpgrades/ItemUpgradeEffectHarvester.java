@@ -9,16 +9,18 @@ import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -29,13 +31,11 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
@@ -114,6 +114,10 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         {
             returner = true;
         }
+        else if (state.getBlock() instanceof StemBlock)
+        {
+            returner = false;
+        }
         else
         {
             int current = state.get(propInt);
@@ -169,6 +173,14 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
             if(!world.isBlockPowered(pedestalPos)) {
+
+                AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                if(itemList.size()>0)
+                {
+                    upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                }
+
                 int leftToHarvest = blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight);
                 if(leftToHarvest > 0)
                 {
@@ -194,7 +206,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                         {
                             pedestal.setStoredValueForUpgrades(leftToHarvest);
                         }
-                        upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
+                        upgradeAction(pedestal, targetPos, targetBlock);
                         if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
                         {
                             writeStoredIntToNBT(coinInPedestal,0);
@@ -213,64 +225,73 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         }
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
+    public void upgradeAction(PedestalTileEntity pedestal, BlockPos posTarget, BlockState target)
     {
+        World world = pedestal.getWorld();
+        //ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack toolInPedestal = pedestal.getToolOnPedestal();
+        BlockPos posOfPedestal = pedestal.getPos();
+
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
-                FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-                fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-                //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...
-                ItemStack harvestingHoe = new ItemStack(Items.STICK,1);
-                if (itemInPedestal.getItem() instanceof HoeItem || itemInPedestal.getToolTypes().contains(ToolType.HOE) && !fakePlayer.getHeldItemMainhand().equals(itemInPedestal)) {
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND, itemInPedestal);
-                }
-                else
-                {
-                    if(EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.SILK_TOUCH))
-                    {
-                        harvestingHoe.addEnchantment(Enchantments.SILK_TOUCH,1);
-                        fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
-                    }
-                    else if (EnchantmentHelper.getEnchantments(coinInPedestal).containsKey(Enchantments.FORTUNE))
-                    {
-                        int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,coinInPedestal);
-                        harvestingHoe.addEnchantment(Enchantments.FORTUNE,lvl);
-                        fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
-                    }
-                    else
-                    {
-                        fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingHoe);
-                    }
-                }
+            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+            //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...
+            ItemStack harvestingHoe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
+            if (
+                    (
+                            harvestingHoe.getItem() instanceof HoeItem
+                            || harvestingHoe.getToolTypes().contains(ToolType.HOE)
+                            || harvestingHoe.getItem() instanceof AxeItem
+                            || harvestingHoe.getToolTypes().contains(ToolType.AXE)
+                    )
+                    && !fakePlayer.getHeldItemMainhand().equals(harvestingHoe)
+               ) {
+                fakePlayer.setHeldItem(Hand.MAIN_HAND, harvestingHoe);
+            }
+
+            if(!pedestal.hasTool())
+            {
+                harvestingHoe = getToolDefaultEnchanted(coinInPedestal,harvestingHoe);
+            }
+
+            ToolType tool = target.getHarvestTool();
+            int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, target);
+            /*System.out.println(tool.getName());
+            System.out.println(toolLevel);
+            System.out.println(target.getHarvestLevel());*/
 
             if(hasAdvancedInventoryTargeting(coinInPedestal))
             {
                 //TODO: Make this do gentle harvesting SOMEDAY
                 //https://github.com/Lothrazar/Cyclic/blob/trunk/1.16/src/main/java/com/lothrazar/cyclic/block/harvester/TileHarvester.java
-                if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
+                //toolLevel >= target.getHarvestLevel()
+                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                 {
-                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
-                    if (!MinecraftForge.EVENT_BUS.post(e)) {
+                    //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
+                    //if (!MinecraftForge.EVENT_BUS.post(e)) {
                         target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
                         target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
                         //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                         PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
                         world.removeBlock(posTarget, false);
-                    }
+                    //}
                 }
             }
             else
             {
-                if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
+                //toolLevel >= target.getHarvestLevel()
+                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                 {
-                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
-                    if (!MinecraftForge.EVENT_BUS.post(e)) {
+                    //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
+                    //if (!MinecraftForge.EVENT_BUS.post(e)) {
                         target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
                         target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
                         //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
                         PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
                         world.removeBlock(posTarget, false);
-                    }
+                    //}
                 }
             }
         }
@@ -348,8 +369,19 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 
-        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
-        if(map.size() > 0)
+        //Hoe isnt actually used, but lets just pretend
+        ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_HOE));
+        TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
+        tool.append(toolStack.getDisplayName());
+        tool.mergeStyle(TextFormatting.BLUE);
+        player.sendMessage(tool,Util.DUMMY_UUID);
+
+        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
+        if(hasAdvancedInventoryTargeting(stack))
+        {
+            map.put(EnchantmentRegistry.ADVANCED,1);
+        }
+        if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
             enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
@@ -362,7 +394,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
                     enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants, Util.DUMMY_UUID);
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }

@@ -12,10 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.ToolItem;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -377,8 +374,13 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if (slot == 2 && stack.getItem().equals(ItemPedestalUpgrades.SPEED) && getSpeed()<5) return true;
                 if (slot == 3 && stack.getItem().equals(ItemPedestalUpgrades.CAPACITY) && getCapacity()<5) return true;
                 if (slot == 4 && stack.getItem().equals(ItemPedestalUpgrades.RANGE) && getRange()<5) return true;
-                if (slot == 5 && stack.getItem() instanceof ToolItem || stack.getToolTypes().contains(ToolType.PICKAXE)
-                        || stack.getToolTypes().contains(ToolType.HOE) || stack.getToolTypes().contains(ToolType.AXE)) return true;
+                if (slot == 5 &&
+                        (       stack.getItem() instanceof ToolItem
+                                || stack.getItem() instanceof SwordItem
+                                || stack.getToolTypes().contains(ToolType.PICKAXE)
+                                || stack.getToolTypes().contains(ToolType.HOE)
+                                || stack.getToolTypes().contains(ToolType.AXE)
+                        )) return true;
                 return false;
             }
 

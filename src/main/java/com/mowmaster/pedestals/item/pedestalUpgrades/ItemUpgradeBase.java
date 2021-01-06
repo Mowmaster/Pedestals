@@ -1236,10 +1236,14 @@ public class ItemUpgradeBase extends Item {
             advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
         }
 
-        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos) && !(blockToMine instanceof PedestalBlock) && passesFilter(world, pedestalPos, blockToMine)
-                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock) && toolLevel >= blockToMineState.getHarvestLevel()
-                && toolLevel >= blockToMineState.getHarvestLevel() && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER)) && advanced)
+        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
+                && !(blockToMine instanceof PedestalBlock)
+                && passesFilter(world, pedestalPos, blockToMine)
+                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
+                && toolLevel >= blockToMineState.getHarvestLevel()
+                && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
+                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && advanced)
 
         {
             return true;
@@ -1538,24 +1542,42 @@ public class ItemUpgradeBase extends Item {
         for(ItemEntity getItemFromList : itemList)
         {
             ItemStack copyStack = getItemFromList.getItem().copy();
-            if (itemInPedestal.equals(ItemStack.EMPTY))
+            int maxSize = copyStack.getMaxStackSize();
+            boolean stacksMatch = doItemsMatch(itemInPedestal,copyStack);
+            if (itemInPedestal.isEmpty() || stacksMatch)
             {
-                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                 if(pedestalInv instanceof PedestalTileEntity) {
-                    if(copyStack.getCount() <=64)
+                    int spaceInPed = itemInPedestal.getMaxStackSize()-itemInPedestal.getCount();
+                    if(stacksMatch)
+                    {
+                        if(spaceInPed > 0)
+                        {
+                            int itemInCount = getItemFromList.getItem().getCount();
+                            int countToAdd = ( itemInCount<= spaceInPed)?(itemInCount):(spaceInPed);
+                            getItemFromList.getItem().setCount(itemInCount-countToAdd);
+                            copyStack.setCount(countToAdd);
+                            ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                        }
+                        else break;
+                    }
+                    else if(copyStack.getCount() <=maxSize)
                     {
                         getItemFromList.setItem(ItemStack.EMPTY);
                         getItemFromList.remove();
                         ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+
                     }
                     else
                     {
                         //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
                         int count = getItemFromList.getItem().getCount();
-                        getItemFromList.getItem().setCount(count-64);
-                        copyStack.setCount(64);
+                        getItemFromList.getItem().setCount(count-maxSize);
+                        copyStack.setCount(maxSize);
                         ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                     }
                 }
                 break;
