@@ -12,10 +12,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.PickaxeItem;
+import net.minecraft.item.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -150,7 +147,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         //if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && toolLevel >= blockToBreak.getHarvestLevel() &&blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
         if(canMineBlock(pedestal, posOfBlock))
         {
-            if (pickaxe.getItem() instanceof PickaxeItem || pickaxe.getToolTypes().contains(ToolType.PICKAXE) && !fakePlayer.getHeldItemMainhand().equals(pickaxe)) {
+            if (!fakePlayer.getHeldItemMainhand().equals(pickaxe)) {
                 fakePlayer.setHeldItem(Hand.MAIN_HAND, pickaxe);
             }
 
@@ -166,6 +163,22 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                 //}
             }
         }
+    }
+
+    @Override
+    public boolean hasAcceptableTool(ItemStack tool)
+    {
+        if(tool.getItem() instanceof ToolItem
+                || tool.getItem() instanceof SwordItem
+                || tool.getToolTypes().contains(ToolType.PICKAXE)
+                || tool.getToolTypes().contains(ToolType.HOE)
+                || tool.getToolTypes().contains(ToolType.AXE)
+                || tool.getToolTypes().contains(ToolType.SHOVEL))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     //No filter here, Jokes on YOU!

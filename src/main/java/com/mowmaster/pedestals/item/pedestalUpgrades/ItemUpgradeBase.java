@@ -25,9 +25,7 @@ import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.RedstoneParticleData;
@@ -1245,6 +1243,20 @@ public class ItemUpgradeBase extends Item {
                 && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
                 && advanced)
 
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    //Maybe Not Needed???
+    public boolean hasAcceptableTool(ItemStack tool)
+    {
+        if(tool.getItem() instanceof PickaxeItem
+                || tool.getItem() instanceof ShovelItem
+                || tool.getToolTypes().contains(ToolType.PICKAXE)
+                || tool.getToolTypes().contains(ToolType.SHOVEL))
         {
             return true;
         }

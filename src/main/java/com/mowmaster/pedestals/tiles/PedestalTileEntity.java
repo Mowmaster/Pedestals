@@ -380,6 +380,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || stack.getToolTypes().contains(ToolType.PICKAXE)
                                 || stack.getToolTypes().contains(ToolType.HOE)
                                 || stack.getToolTypes().contains(ToolType.AXE)
+                                || stack.getToolTypes().contains(ToolType.SHOVEL)
                         )) return true;
                 return false;
             }
