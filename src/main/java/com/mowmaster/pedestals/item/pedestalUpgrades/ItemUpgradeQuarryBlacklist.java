@@ -89,7 +89,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
 
     public int getHeight(ItemStack stack)
     {
-        return getRangeLarge(stack);
+        return getRangeLargest(stack);
     }
 
     @Override

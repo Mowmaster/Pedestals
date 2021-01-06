@@ -87,7 +87,7 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
 
     public int getHeight(ItemStack stack)
     {
-        return getRangeLarge(stack);
+        return getRangeLargest(stack);
     }
 
     @Override

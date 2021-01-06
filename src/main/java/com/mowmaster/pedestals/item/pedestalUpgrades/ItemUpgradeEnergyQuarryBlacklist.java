@@ -86,7 +86,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
 
     public int getHeight(ItemStack stack)
     {
-        return getRangeLarge(stack);
+        return getRangeLargest(stack);
     }
 
     @Override
