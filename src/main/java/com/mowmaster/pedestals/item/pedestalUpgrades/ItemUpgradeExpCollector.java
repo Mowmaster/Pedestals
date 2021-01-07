@@ -137,9 +137,11 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
+                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
+                upgradeActionSendExp(pedestal);
+
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world, coinInPedestal, pedestalPos);
-                    upgradeActionSendExp(world, coinInPedestal,pedestalPos);
                 }
             }
         }
@@ -147,7 +149,6 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
     public void upgradeAction(World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
-        if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);

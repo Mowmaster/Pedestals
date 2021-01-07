@@ -34,28 +34,25 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
         return super.canAcceptCapacity();
     }
 
+    @Override
+    public Boolean canAcceptOpSpeed() {
+        return false;
+    }
+
     public void updateAction(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
-                if (world.getGameTime()%speed == 0) {
-                    upgradeAction(coinInPedestal);
-                    upgradeActionSendExp( world, coinInPedestal, pedestalPos);
-                }
+                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
+                upgradeActionSendExp(pedestal);
             }
         }
-    }
-
-    public void upgradeAction(ItemStack coinInPedestal)
-    {
-        if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
     }
 
     public int getExpBuffer(ItemStack stack)
@@ -81,12 +78,6 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
         rate.appendString(getExpTransferRateString(stack));
         rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,Util.DUMMY_UUID);
-
-        //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -96,14 +87,8 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString(getExpTransferRateString(stack));
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
-
         rate.mergeStyle(TextFormatting.GRAY);
-        speed.mergeStyle(TextFormatting.RED);
-
         tooltip.add(rate);
-        tooltip.add(speed);
     }
 
     public static final Item XPRELAY = new ItemUpgradeExpRelay(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xprelay"));

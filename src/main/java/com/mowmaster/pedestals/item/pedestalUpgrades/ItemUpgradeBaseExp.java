@@ -64,9 +64,10 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         writeMaxXpToNBT(stack, value);
     }
 
+    //Just set to 30 levels worth for all sending
     public int getExpTransferRate(ItemStack stack)
     {
-        int summonRate = 55;
+        /*int summonRate = 55;
         switch (getCapacityModifier(stack))
         {
 
@@ -89,9 +90,9 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                 summonRate=1395;//30
                 break;
             default: summonRate=55;
-        }
+        }*/
 
-        return  summonRate;
+        return  1395;
     }
 
     public String getExpTransferRateString(ItemStack stack)
@@ -162,102 +163,101 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         return startAmount - amount;
     }
 
-    public void upgradeActionSendExp(World world, ItemStack coinMainPedestal, BlockPos posMainPedestal)
+    public void upgradeActionSendExp(PedestalTileEntity pedestal)
     {
-        TileEntity pedestalInv = world.getTileEntity(posMainPedestal);
-        if(pedestalInv instanceof PedestalTileEntity) {
-            PedestalTileEntity tileMainPedestal = ((PedestalTileEntity) pedestalInv);
-            //If this Pedestal has any Exp
-            int xpMainPedestal = getXPStored(coinMainPedestal);
-            if(xpMainPedestal>0)
+        World world = pedestal.getWorld();
+        ItemStack coinMainPedestal = pedestal.getCoinOnPedestal();
+        BlockPos posMainPedestal = pedestal.getPos();
+
+        int xpMainPedestal = getXPStored(coinMainPedestal);
+        if(xpMainPedestal>0)
+        {
+            //Grab the connected pedestals to send to
+            if(pedestal.getNumberOfStoredLocations()>0)
             {
-                //Grab the connected pedestals to send to
-                if(tileMainPedestal.getNumberOfStoredLocations()>0)
+                for(int i=0; i<pedestal.getNumberOfStoredLocations();i++)
                 {
-                    for(int i=0; i<tileMainPedestal.getNumberOfStoredLocations();i++)
+                    BlockPos posStoredPedestal = pedestal.getStoredPositionAt(i);
+                    //Make sure pedestal ISNOT powered and IS loaded in world
+                    if(!world.isBlockPowered(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
                     {
-                        BlockPos posStoredPedestal = tileMainPedestal.getStoredPositionAt(i);
-                        //Make sure pedestal ISNOT powered and IS loaded in world
-                        if(!world.isBlockPowered(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
+                        if(posStoredPedestal != posMainPedestal)
                         {
-                            if(posStoredPedestal != posMainPedestal)
-                            {
-                                TileEntity storedPedestal = world.getTileEntity(posStoredPedestal);
-                                if(storedPedestal instanceof PedestalTileEntity) {
-                                    PedestalTileEntity tileStoredPedestal = ((PedestalTileEntity) storedPedestal);
-                                    ItemStack coinStoredPedestal = tileStoredPedestal.getCoinOnPedestal();
-                                    //Check if pedestal to send to can even be sent exp
-                                    if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseExp)
+                            TileEntity storedPedestal = world.getTileEntity(posStoredPedestal);
+                            if(storedPedestal instanceof PedestalTileEntity) {
+                                PedestalTileEntity tileStoredPedestal = ((PedestalTileEntity) storedPedestal);
+                                ItemStack coinStoredPedestal = tileStoredPedestal.getCoinOnPedestal();
+                                //Check if pedestal to send to can even be sent exp
+                                if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseExp)
+                                {
+                                    int xpMaxStoredPedestal = ((ItemUpgradeBaseExp)coinStoredPedestal.getItem()).readMaxXpFromNBT(coinStoredPedestal);
+                                    int xpStoredPedestal = getXPStored(coinStoredPedestal);
+                                    //if Stored Pedestal has room for exp (will be lazy sending exp here)
+                                    if(xpStoredPedestal < xpMaxStoredPedestal)
                                     {
-                                        int xpMaxStoredPedestal = ((ItemUpgradeBaseExp)coinStoredPedestal.getItem()).readMaxXpFromNBT(coinStoredPedestal);
-                                        int xpStoredPedestal = getXPStored(coinStoredPedestal);
-                                        //if Stored Pedestal has room for exp (will be lazy sending exp here)
-                                        if(xpStoredPedestal < xpMaxStoredPedestal)
+                                        int transferRate = getExpTransferRate(coinMainPedestal);
+                                        //If we have more then X levels in the pedestal we're sending from
+                                        if(xpMainPedestal >= transferRate)
                                         {
-                                            int transferRate = getExpTransferRate(coinMainPedestal);
-                                            //If we have more then X levels in the pedestal we're sending from
-                                            if(xpMainPedestal >= transferRate)
-                                            {
-                                                int xpRemainingMainPedestal = xpMainPedestal - transferRate;
-                                                int xpRemainingStoredPedestal = xpStoredPedestal + transferRate;
-                                                world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setXPStored(coinMainPedestal,xpRemainingMainPedestal);
-                                                tileMainPedestal.update();
-                                                world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
-                                                tileStoredPedestal.update();
-                                            }
-                                            else
-                                            {
-                                                //If we have less then X levels, just send them all.
-                                                int xpRemainingMainPedestal = 0;
-                                                int xpRemainingStoredPedestal = xpStoredPedestal + xpMainPedestal;
-                                                world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setXPStored(coinMainPedestal,xpRemainingMainPedestal);
-                                                tileMainPedestal.update();
-                                                world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
-                                                tileStoredPedestal.update();
-                                            }
-
-                                            break;
+                                            int xpRemainingMainPedestal = xpMainPedestal - transferRate;
+                                            int xpRemainingStoredPedestal = xpStoredPedestal + transferRate;
+                                            world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            setXPStored(coinMainPedestal,xpRemainingMainPedestal);
+                                            pedestal.update();
+                                            world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                            tileStoredPedestal.update();
                                         }
+                                        else
+                                        {
+                                            //If we have less then X levels, just send them all.
+                                            int xpRemainingMainPedestal = 0;
+                                            int xpRemainingStoredPedestal = xpStoredPedestal + xpMainPedestal;
+                                            world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            setXPStored(coinMainPedestal,xpRemainingMainPedestal);
+                                            pedestal.update();
+                                            world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                            tileStoredPedestal.update();
+                                        }
+
+                                        break;
                                     }
-                                    else if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseExpFilter)
+                                }
+                                else if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseExpFilter)
+                                {
+                                    int xpMaxStoredPedestal = ((ItemUpgradeBaseExpFilter)coinStoredPedestal.getItem()).readMaxXpFromNBT(coinStoredPedestal);
+                                    int xpStoredPedestal = getXPStored(coinStoredPedestal);
+                                    //if Stored Pedestal has room for exp (will be lazy sending exp here)
+                                    if(xpStoredPedestal < xpMaxStoredPedestal)
                                     {
-                                        int xpMaxStoredPedestal = ((ItemUpgradeBaseExpFilter)coinStoredPedestal.getItem()).readMaxXpFromNBT(coinStoredPedestal);
-                                        int xpStoredPedestal = getXPStored(coinStoredPedestal);
-                                        //if Stored Pedestal has room for exp (will be lazy sending exp here)
-                                        if(xpStoredPedestal < xpMaxStoredPedestal)
+                                        int transferRate = getExpTransferRate(coinMainPedestal);
+                                        //If we have more then X levels in the pedestal we're sending from
+                                        if(xpMainPedestal >= transferRate)
                                         {
-                                            int transferRate = getExpTransferRate(coinMainPedestal);
-                                            //If we have more then X levels in the pedestal we're sending from
-                                            if(xpMainPedestal >= transferRate)
-                                            {
-                                                int xpRemainingMainPedestal = xpMainPedestal - transferRate;
-                                                int xpRemainingStoredPedestal = xpStoredPedestal + transferRate;
-                                                world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setXPStored(coinMainPedestal,xpRemainingMainPedestal);
-                                                tileMainPedestal.update();
-                                                world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
-                                                tileStoredPedestal.update();
-                                            }
-                                            else
-                                            {
-                                                //If we have less then X levels, just send them all.
-                                                int xpRemainingMainPedestal = 0;
-                                                int xpRemainingStoredPedestal = xpStoredPedestal + xpMainPedestal;
-                                                world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setXPStored(coinMainPedestal,xpRemainingMainPedestal);
-                                                tileMainPedestal.update();
-                                                world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                                setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
-                                                tileStoredPedestal.update();
-                                            }
-
-                                            break;
+                                            int xpRemainingMainPedestal = xpMainPedestal - transferRate;
+                                            int xpRemainingStoredPedestal = xpStoredPedestal + transferRate;
+                                            world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            setXPStored(coinMainPedestal,xpRemainingMainPedestal);
+                                            pedestal.update();
+                                            world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                            tileStoredPedestal.update();
                                         }
+                                        else
+                                        {
+                                            //If we have less then X levels, just send them all.
+                                            int xpRemainingMainPedestal = 0;
+                                            int xpRemainingStoredPedestal = xpStoredPedestal + xpMainPedestal;
+                                            world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            setXPStored(coinMainPedestal,xpRemainingMainPedestal);
+                                            pedestal.update();
+                                            world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
+                                            tileStoredPedestal.update();
+                                        }
+
+                                        break;
                                     }
                                 }
                             }

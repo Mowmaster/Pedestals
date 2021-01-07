@@ -210,6 +210,7 @@
   "item.pedestals.coin.compactor2.tooltip_rate": "Recipes Crafted Per Operation: ",
   "item.pedestals.coin.compactor2.tooltip_speed": "Operational Speed: ",
   "item.pedestals.coin.compactor2.chat_rate": "Recipes Crafted Per Operation: ",
+  "item.pedestals.coin.compactor2.chat_enchants": "Enchants: ",
   "item.pedestals.coin.compactor2.chat_speed": "Operational Speed: ",
   "jei.pedestals.compactor2.desc": "Place an Inventory Below the Pedestal, The crafter will look at a single slot in the inventory, If it can compact the items, it will craft until 1 item is left in the slot.",
 
@@ -218,6 +219,7 @@
   "item.pedestals.coin.compactor3.tooltip_rate": "Recipes Crafted Per Operation: ",
   "item.pedestals.coin.compactor3.tooltip_speed": "Operational Speed: ",
   "item.pedestals.coin.compactor3.chat_rate": "Recipes Crafted Per Operation: ",
+  "item.pedestals.coin.compactor3.chat_enchants": "Enchants: ",
   "item.pedestals.coin.compactor3.chat_speed": "Operational Speed: ",
   "jei.pedestals.compactor3.desc": "Place an Inventory Below the Pedestal, The crafter will look at a single slot in the inventory, If it can compact the items, it will craft until 1 item is left in the slot.",
 

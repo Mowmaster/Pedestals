@@ -608,7 +608,7 @@ public class ItemUpgradeBase extends Item {
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return super.isBookEnchantable(stack, book);
+        return (stack.getCount()==1)?(super.isBookEnchantable(stack, book)):(false);
     }
 
     @Override

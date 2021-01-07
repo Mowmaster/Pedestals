@@ -24,6 +24,11 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
     }
 
     @Override
+    public Boolean canAcceptOpSpeed() {
+        return false;
+    }
+
+    @Override
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         return false;
@@ -39,25 +44,17 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
     {
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
-                if (world.getGameTime()%speed == 0) {
-                    upgradeAction(coinInPedestal);
-                    upgradeActionSendExp( world, coinInPedestal, pedestalPos);
-                }
+                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
+                upgradeActionSendExp(pedestal);
             }
         }
     }
 
-    public void upgradeAction(ItemStack coinInPedestal)
-    {
-        if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
-    }
 
     @Override
     public int getExpBuffer(ItemStack stack)
