@@ -72,20 +72,12 @@ public class ItemUpgradeFluidRelayBlocked extends ItemUpgradeBaseFluidFilter
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 
             if(!world.isBlockPowered(pedestalPos)) {
-                int speed = getOperationSpeed(coinInPedestal);
-                if (world.getGameTime() % speed == 0) {
-                    if(hasFluidInCoin(coinInPedestal))
-                    {
-                        upgradeActionSendFluid(pedestal);
-                    }
+                if(hasFluidInCoin(coinInPedestal))
+                {
+                    upgradeActionSendFluid(pedestal);
                 }
             }
         }
-    }
-
-    public void upgradeAction(World world, BlockPos pedestalPos, BlockPos targetPos, ItemStack coinInPedestal)
-    {
-
     }
 
     @Override
@@ -116,12 +108,6 @@ public class ItemUpgradeFluidRelayBlocked extends ItemUpgradeBaseFluidFilter
         rate.appendString(fluidLabel.getString());
         rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,Util.DUMMY_UUID);
-
-        //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -157,11 +143,6 @@ public class ItemUpgradeFluidRelayBlocked extends ItemUpgradeBaseFluidFilter
         rate.appendString(fluidLabel.getString());
         rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
-
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        tooltip.add(speed);
     }
 
     public static final Item FLUIDRELAYBLOCKED = new ItemUpgradeFluidRelayBlocked(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fluidrelayblocked"));

@@ -176,12 +176,13 @@ public class ItemUpgradeFluidFilteredImport extends ItemUpgradeBaseFluid
 
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos)) {
-                if (world.getGameTime() % speed == 0) {
-                    if(hasFluidInCoin(coinInPedestal))
-                    {
-                        upgradeActionSendFluid(pedestal);
-                    }
 
+                if(hasFluidInCoin(coinInPedestal))
+                {
+                    upgradeActionSendFluid(pedestal);
+                }
+
+                if (world.getGameTime() % speed == 0) {
                     upgradeActionItem(pedestal);
                     upgradeActionBlock(pedestal);
                 }

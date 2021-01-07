@@ -127,12 +127,9 @@ public class ItemUpgradeFluidFilter extends ItemUpgradeBaseFluid
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 
             if(!world.isBlockPowered(pedestalPos)) {
-                int speed = getOperationSpeed(coinInPedestal);
-                if (world.getGameTime() % speed == 0) {
-                    if(hasFluidInCoin(coinInPedestal))
-                    {
-                        upgradeActionSendFluid(pedestal);
-                    }
+                if(hasFluidInCoin(coinInPedestal))
+                {
+                    upgradeActionSendFluid(pedestal);
                 }
             }
         }
@@ -171,12 +168,6 @@ public class ItemUpgradeFluidFilter extends ItemUpgradeBaseFluid
         rate.appendString(fluidLabel.getString());
         rate.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(rate,Util.DUMMY_UUID);
-
-        //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -212,11 +203,6 @@ public class ItemUpgradeFluidFilter extends ItemUpgradeBaseFluid
         rate.appendString(fluidLabel.getString());
         rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
-
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        tooltip.add(speed);
     }
 
     public static final Item FLUIDFILTER = new ItemUpgradeFluidFilter(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fluidfilter"));

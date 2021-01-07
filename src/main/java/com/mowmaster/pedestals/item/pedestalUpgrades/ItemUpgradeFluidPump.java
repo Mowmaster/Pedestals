@@ -153,15 +153,13 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
+
             if(!world.isBlockPowered(pedestalPos)) {
-                if (world.getGameTime() % speed == 0) {
-                    if(hasFluidInCoin(coinInPedestal))
-                    {
-                        upgradeActionSendFluid(pedestal);
-                    }
+                if(hasFluidInCoin(coinInPedestal))
+                {
+                    upgradeActionSendFluid(pedestal);
                 }
             }
-
 
             //Check if we can even insert a blocks worth of fluid
             if(availableFluidSpaceInCoin(coinInPedestal) >= FluidAttributes.BUCKET_VOLUME || getFluidStored(coinInPedestal).isEmpty())

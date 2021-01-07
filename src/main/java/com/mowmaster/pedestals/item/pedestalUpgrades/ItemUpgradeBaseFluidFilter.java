@@ -50,7 +50,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
     //Since Energy Transfer is as fast as possible, speed isnt needed, just capacity
     @Override
     public Boolean canAcceptOpSpeed() {
-        return true;
+        return false;
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
     public int getFluidTransferRate(ItemStack stack)
     {
         //im assuming # = rf value???
-        int fluidTransferRate = 1000;
+        /*int fluidTransferRate = 1000;
         switch (getCapacityModifier(stack))
         {
 
@@ -148,9 +148,9 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
                 fluidTransferRate=20000;//20x
                 break;
             default: fluidTransferRate=1000;
-        }
+        }*/
 
-        return  fluidTransferRate;
+        return  20000;
     }
 
     public static boolean isFluidItem(ItemStack itemToCheck)

@@ -882,7 +882,7 @@ public class ItemUpgradeBase extends Item {
         switch (getRangeModifier(stack))
         {
             case 0:
-                height = 1;
+                height = 2;
                 break;
             case 1:
                 height=4;

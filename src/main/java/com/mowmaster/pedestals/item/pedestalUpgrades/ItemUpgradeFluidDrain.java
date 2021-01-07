@@ -305,11 +305,11 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        /*TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString("" +  getFluidTransferRate(stack) + "");
         rate.appendString(fluidLabel.getString());
         rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        player.sendMessage(rate,Util.DUMMY_UUID);*/
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
@@ -360,11 +360,11 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
         fluidcapacity.mergeStyle(TextFormatting.AQUA);
         tooltip.add(fluidcapacity);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        /*TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString("" + getFluidTransferRate(stack) + "");
         rate.appendString(fluidLabel.getString());
         rate.mergeStyle(TextFormatting.GRAY);
-        tooltip.add(rate);
+        tooltip.add(rate);*/
 
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.appendString(getOperationSpeedString(stack));
