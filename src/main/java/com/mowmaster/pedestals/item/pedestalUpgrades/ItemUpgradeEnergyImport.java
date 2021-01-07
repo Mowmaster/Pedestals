@@ -52,7 +52,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
             if(!world.isBlockPowered(pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
-                upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
+                upgradeActionSendEnergy(pedestal);
                 if (world.getGameTime()%speed == 0) {
                     upgradeItemAction(world,pedestalPos,itemInPedestal,coinInPedestal);
                     upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);

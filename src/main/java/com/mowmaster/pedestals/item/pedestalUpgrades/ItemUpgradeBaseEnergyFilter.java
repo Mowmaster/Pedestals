@@ -1,5 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
@@ -49,19 +51,23 @@ public class ItemUpgradeBaseEnergyFilter extends ItemUpgradeBaseFilter {
     }
 
     @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        if(stack.getItem() instanceof ItemUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
+        {
+            return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
+        }
+        return false;
+    }
+
+    @Override
     public int getItemEnchantability()
     {
         return 10;
     }
 
     @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return true;
-    }
-
-    @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return true;
+        return (stack.getCount()==1)?(super.isBookEnchantable(stack, book)):(false);
     }
 
     @Override
@@ -289,8 +295,11 @@ public class ItemUpgradeBaseEnergyFilter extends ItemUpgradeBaseFilter {
         return LazyOptional.empty();
     }
 
-    public void upgradeActionSendEnergy(World world, ItemStack coinMainPedestal, BlockPos posMainPedestal)
+    public void upgradeActionSendEnergy(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack coinMainPedestal = pedestal.getCoinOnPedestal();
+        BlockPos posMainPedestal = pedestal.getPos();
         TileEntity pedestalInv = world.getTileEntity(posMainPedestal);
         if(pedestalInv instanceof PedestalTileEntity) {
             PedestalTileEntity tileMainPedestal = ((PedestalTileEntity) pedestalInv);

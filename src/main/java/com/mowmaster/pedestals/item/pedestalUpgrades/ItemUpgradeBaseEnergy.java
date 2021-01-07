@@ -245,106 +245,105 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         return LazyOptional.empty();
     }
 
-    public void upgradeActionSendEnergy(World world, ItemStack coinMainPedestal, BlockPos posMainPedestal)
+    public void upgradeActionSendEnergy(PedestalTileEntity pedestal)
     {
-        TileEntity pedestalInv = world.getTileEntity(posMainPedestal);
-        if(pedestalInv instanceof PedestalTileEntity) {
-            PedestalTileEntity tileMainPedestal = ((PedestalTileEntity) pedestalInv);
-            //If this Pedestal has any Energy
-            int energyMainPedestal = getEnergyStored(coinMainPedestal);
-            if(energyMainPedestal>0)
+        World world = pedestal.getWorld();
+        ItemStack coinMainPedestal = pedestal.getCoinOnPedestal();
+        BlockPos posMainPedestal = pedestal.getPos();
+
+        int energyMainPedestal = getEnergyStored(coinMainPedestal);
+        if(energyMainPedestal>0)
+        {
+            //Grab the connected pedestals to send to
+            if(pedestal.getNumberOfStoredLocations()>0)
             {
-                //Grab the connected pedestals to send to
-                if(tileMainPedestal.getNumberOfStoredLocations()>0)
+                for(int i=0; i<pedestal.getNumberOfStoredLocations();i++)
                 {
-                    for(int i=0; i<tileMainPedestal.getNumberOfStoredLocations();i++)
+                    BlockPos posStoredPedestal = pedestal.getStoredPositionAt(i);
+                    //Make sure pedestal ISNOT powered and IS loaded in world
+                    if(!world.isBlockPowered(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
                     {
-                        BlockPos posStoredPedestal = tileMainPedestal.getStoredPositionAt(i);
-                        //Make sure pedestal ISNOT powered and IS loaded in world
-                        if(!world.isBlockPowered(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
+                        if(posStoredPedestal != posMainPedestal)
                         {
-                            if(posStoredPedestal != posMainPedestal)
-                            {
-                                TileEntity storedPedestal = world.getTileEntity(posStoredPedestal);
-                                if(storedPedestal instanceof PedestalTileEntity) {
-                                    PedestalTileEntity tileStoredPedestal = ((PedestalTileEntity) storedPedestal);
-                                    ItemStack coinStoredPedestal = tileStoredPedestal.getCoinOnPedestal();
-                                    //Check if pedestal to send to can even be sent exp
-                                    if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseEnergy)
+                            TileEntity storedPedestal = world.getTileEntity(posStoredPedestal);
+                            if(storedPedestal instanceof PedestalTileEntity) {
+                                PedestalTileEntity tileStoredPedestal = ((PedestalTileEntity) storedPedestal);
+                                ItemStack coinStoredPedestal = tileStoredPedestal.getCoinOnPedestal();
+                                //Check if pedestal to send to can even be sent exp
+                                if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseEnergy)
+                                {
+                                    ItemUpgradeBaseEnergy itemEB = ((ItemUpgradeBaseEnergy)coinStoredPedestal.getItem());
+                                    int energyMaxStoredPedestal = itemEB.readMaxEnergyFromNBT(coinStoredPedestal);
+                                    int energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
+                                    int energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
+
+                                    if(energySpaceInTargetPedestal > 0)
                                     {
-                                        ItemUpgradeBaseEnergy itemEB = ((ItemUpgradeBaseEnergy)coinStoredPedestal.getItem());
-                                        int energyMaxStoredPedestal = itemEB.readMaxEnergyFromNBT(coinStoredPedestal);
-                                        int energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
-                                        int energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
+                                        int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
 
-                                        if(energySpaceInTargetPedestal > 0)
+                                        if(itemEB.addEnergy(coinStoredPedestal,transferRate,true) && removeEnergy(coinMainPedestal,transferRate,true))
                                         {
-                                            int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
+                                            removeEnergy(coinMainPedestal,transferRate,false);
+                                            pedestal.update();
+                                            addEnergy(coinStoredPedestal,transferRate,false);
+                                            tileStoredPedestal.update();
+                                        }
+                                        else
+                                        {
+                                            int energyLeftInMain = (getEnergyStored(coinMainPedestal) < getEnergyTransferRate(coinMainPedestal))?(getEnergyStored(coinMainPedestal)):(getEnergyTransferRate(coinMainPedestal));
+                                            energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
+                                            energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
+                                            transferRate = (energyLeftInMain <= energySpaceInTargetPedestal)?(energyLeftInMain):(energySpaceInTargetPedestal);
+                                            int energyLeftToSend = (energyLeftInMain<=transferRate)?(energyLeftInMain):(transferRate);
 
-                                            if(itemEB.addEnergy(coinStoredPedestal,transferRate,true) && removeEnergy(coinMainPedestal,transferRate,true))
+                                            if(itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,true) && removeEnergy(coinMainPedestal,energyLeftToSend,true))
                                             {
-                                                removeEnergy(coinMainPedestal,transferRate,false);
-                                                tileMainPedestal.update();
-                                                addEnergy(coinStoredPedestal,transferRate,false);
+                                                removeEnergy(coinMainPedestal,energyLeftToSend,false);
+                                                pedestal.update();
+                                                itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,false);
                                                 tileStoredPedestal.update();
                                             }
-                                            else
-                                            {
-                                                int energyLeftInMain = (getEnergyStored(coinMainPedestal) < getEnergyTransferRate(coinMainPedestal))?(getEnergyStored(coinMainPedestal)):(getEnergyTransferRate(coinMainPedestal));
-                                                energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
-                                                energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
-                                                transferRate = (energyLeftInMain <= energySpaceInTargetPedestal)?(energyLeftInMain):(energySpaceInTargetPedestal);
-                                                int energyLeftToSend = (energyLeftInMain<=transferRate)?(energyLeftInMain):(transferRate);
-
-                                                if(itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,true) && removeEnergy(coinMainPedestal,energyLeftToSend,true))
-                                                {
-                                                    removeEnergy(coinMainPedestal,energyLeftToSend,false);
-                                                    tileMainPedestal.update();
-                                                    itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,false);
-                                                    tileStoredPedestal.update();
-                                                }
-                                            }
-
-                                            continue;
                                         }
+
+                                        continue;
                                     }
-                                    else if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseEnergyFilter)
+                                }
+                                else if(coinStoredPedestal.getItem() instanceof ItemUpgradeBaseEnergyFilter)
+                                {
+                                    ItemUpgradeBaseEnergyFilter itemEB = ((ItemUpgradeBaseEnergyFilter)coinStoredPedestal.getItem());
+                                    int energyMaxStoredPedestal = itemEB.readMaxEnergyFromNBT(coinStoredPedestal);
+                                    int energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
+                                    int energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
+
+                                    if(energySpaceInTargetPedestal > 0)
                                     {
-                                        ItemUpgradeBaseEnergyFilter itemEB = ((ItemUpgradeBaseEnergyFilter)coinStoredPedestal.getItem());
-                                        int energyMaxStoredPedestal = itemEB.readMaxEnergyFromNBT(coinStoredPedestal);
-                                        int energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
-                                        int energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
+                                        int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
 
-                                        if(energySpaceInTargetPedestal > 0)
+                                        if(itemEB.addEnergy(coinStoredPedestal,transferRate,true) && removeEnergy(coinMainPedestal,transferRate,true))
                                         {
-                                            int transferRate = (getEnergyTransferRate(coinMainPedestal) <= energySpaceInTargetPedestal)?(getEnergyTransferRate(coinMainPedestal)):(energySpaceInTargetPedestal);
+                                            removeEnergy(coinMainPedestal,transferRate,false);
+                                            pedestal.update();
+                                            addEnergy(coinStoredPedestal,transferRate,false);
+                                            tileStoredPedestal.update();
+                                        }
+                                        else
+                                        {
+                                            int energyLeftInMain = (getEnergyStored(coinMainPedestal) < getEnergyTransferRate(coinMainPedestal))?(getEnergyStored(coinMainPedestal)):(getEnergyTransferRate(coinMainPedestal));
+                                            energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
+                                            energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
+                                            transferRate = (energyLeftInMain <= energySpaceInTargetPedestal)?(energyLeftInMain):(energySpaceInTargetPedestal);
+                                            int energyLeftToSend = (energyLeftInMain<=transferRate)?(energyLeftInMain):(transferRate);
 
-                                            if(itemEB.addEnergy(coinStoredPedestal,transferRate,true) && removeEnergy(coinMainPedestal,transferRate,true))
+                                            if(itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,true) && removeEnergy(coinMainPedestal,energyLeftToSend,true))
                                             {
-                                                removeEnergy(coinMainPedestal,transferRate,false);
-                                                tileMainPedestal.update();
-                                                addEnergy(coinStoredPedestal,transferRate,false);
+                                                removeEnergy(coinMainPedestal,energyLeftToSend,false);
+                                                pedestal.update();
+                                                itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,false);
                                                 tileStoredPedestal.update();
                                             }
-                                            else
-                                            {
-                                                int energyLeftInMain = (getEnergyStored(coinMainPedestal) < getEnergyTransferRate(coinMainPedestal))?(getEnergyStored(coinMainPedestal)):(getEnergyTransferRate(coinMainPedestal));
-                                                energyStoredPedestal = itemEB.getEnergyStored(coinStoredPedestal);
-                                                energySpaceInTargetPedestal = energyMaxStoredPedestal - energyStoredPedestal;
-                                                transferRate = (energyLeftInMain <= energySpaceInTargetPedestal)?(energyLeftInMain):(energySpaceInTargetPedestal);
-                                                int energyLeftToSend = (energyLeftInMain<=transferRate)?(energyLeftInMain):(transferRate);
-
-                                                if(itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,true) && removeEnergy(coinMainPedestal,energyLeftToSend,true))
-                                                {
-                                                    removeEnergy(coinMainPedestal,energyLeftToSend,false);
-                                                    tileMainPedestal.update();
-                                                    itemEB.addEnergy(coinStoredPedestal,energyLeftToSend,false);
-                                                    tileStoredPedestal.update();
-                                                }
-                                            }
-
-                                            continue;
                                         }
+
+                                        continue;
                                     }
                                 }
                             }

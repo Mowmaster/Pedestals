@@ -35,24 +35,15 @@ public class ItemUpgradeEnergyRelay extends ItemUpgradeBaseEnergy
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            //Still needed for capacity reasons
-            int speed = getOperationSpeed(coinInPedestal);
+            int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
+            if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 
             if(!world.isBlockPowered(pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
-                upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
-                if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,coinInPedestal);
-                }
+                upgradeActionSendEnergy(pedestal);
             }
         }
-    }
-
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
-    {
-        int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
-        if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
     }
 
     public static final Item RFRELAY = new ItemUpgradeEnergyRelay(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfrelay"));
@@ -62,6 +53,5 @@ public class ItemUpgradeEnergyRelay extends ItemUpgradeBaseEnergy
     {
         event.getRegistry().register(RFRELAY);
     }
-
 
 }

@@ -72,18 +72,12 @@ public class ItemUpgradeEnergyTank extends ItemUpgradeBaseEnergy
             if(!world.isBlockPowered(pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
-                upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
-                if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,coinInPedestal);
-                }
+                upgradeActionSendEnergy(pedestal);
+                int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
+                if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
+
             }
         }
-    }
-
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
-    {
-        int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
-        if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
     }
 
     public static final Item RFTANK = new ItemUpgradeEnergyTank(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rftank"));

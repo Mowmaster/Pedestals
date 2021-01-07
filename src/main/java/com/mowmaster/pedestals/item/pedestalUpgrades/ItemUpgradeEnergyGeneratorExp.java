@@ -121,7 +121,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
             if(!world.isBlockPowered(pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
-                upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
+                upgradeActionSendEnergy(pedestal);
                 //only run 1 per second
                 if(getFuelStored(coinInPedestal)>0 && getEnergyStored(coinInPedestal) < getEnergyBuffer(coinInPedestal))
                 {
