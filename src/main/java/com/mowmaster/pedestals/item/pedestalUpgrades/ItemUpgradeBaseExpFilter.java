@@ -488,6 +488,17 @@ public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpstored");
+        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
+        tooltip.add(xpstored);
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacity");
+        TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacitylvl");
+        xpcapacity.appendString(""+ getExpBuffer(stack) +"");
+        xpcapacity.appendString(xpcapacitylvl.getString());
+        xpcapacity.mergeStyle(TextFormatting.AQUA);
+        tooltip.add(xpcapacity);
+
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString(getExpTransferRateString(stack));
         rate.mergeStyle(TextFormatting.GRAY);
