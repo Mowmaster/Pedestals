@@ -1,5 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
@@ -19,6 +21,17 @@ public class ItemUpgradeEnergyRelayBlocked extends ItemUpgradeBaseEnergyFilter
     public ItemUpgradeEnergyRelayBlocked(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
+    public Boolean canAcceptCapacity() {
+        return true;
+    }
+
+    //Since Energy Transfer is as fast as possible, speed isnt needed, just capacity
+    @Override
+    public Boolean canAcceptOpSpeed() {
+        return false;
+    }
+
+    @Override
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         return false;
@@ -30,32 +43,47 @@ public class ItemUpgradeEnergyRelayBlocked extends ItemUpgradeBaseEnergyFilter
         return 0;
     }
 
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        if(stack.getItem() instanceof ItemUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
+        {
+            return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
+        }
+        return false;
+    }
+
+    @Override
+    public int getItemEnchantability()
+    {
+        return 10;
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return (stack.getCount()==1)?(super.isBookEnchantable(stack, book)):(false);
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return true;
+    }
+
     public void updateAction(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            //Still needed for capacity reasons
-            int speed = getOperationSpeed(coinInPedestal);
+            int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
+            if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 
             if(!world.isBlockPowered(pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
-                upgradeActionSendEnergy(world,coinInPedestal,pedestalPos);
-                if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,coinInPedestal);
-                }
+                upgradeActionSendEnergy(pedestal);
             }
         }
-    }
-
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
-    {
-        int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
-        if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
     }
 
     public static final Item RFRELAYBLOCKED = new ItemUpgradeEnergyRelayBlocked(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfrelayblocked"));

@@ -1,10 +1,8 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
-import com.mowmaster.pedestals.enchants.EnchantmentArea;
-import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
-import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
-import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.enchants.*;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -50,19 +48,23 @@ public class ItemUpgradeEnderFilteredImporterExact extends ItemUpgradeBaseFilter
     public Boolean canAcceptAdvanced() {return true;}
 
     @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        if(stack.getItem() instanceof ItemUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
+        {
+            return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
+        }
+        return false;
+    }
+
+    @Override
     public int getItemEnchantability()
     {
         return 10;
     }
 
     @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return true;
-    }
-
-    @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return true;
+        return (stack.getCount()==1)?(super.isBookEnchantable(stack, book)):(false);
     }
 
     @Override

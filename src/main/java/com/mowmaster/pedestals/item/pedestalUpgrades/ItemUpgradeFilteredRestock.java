@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -47,19 +49,23 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
     public Boolean canAcceptAdvanced() {return true;}
 
     @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        if(stack.getItem() instanceof ItemUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
+        {
+            return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
+        }
+        return false;
+    }
+
+    @Override
     public int getItemEnchantability()
     {
         return 10;
     }
 
     @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return true;
-    }
-
-    @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return true;
+        return (stack.getCount()==1)?(super.isBookEnchantable(stack, book)):(false);
     }
 
     @Override
