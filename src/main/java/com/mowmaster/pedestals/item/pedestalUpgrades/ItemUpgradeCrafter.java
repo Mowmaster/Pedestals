@@ -121,7 +121,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                     IItemHandler handler = cap.orElse(null);
                     TileEntity invToPullFrom = world.getTileEntity(posInventory);
                     int intInventorySlotCount = handler.getSlots();//normal chests return value of 1-27
-                    if (invToPullFrom instanceof PedestalTileEntity) {
+                    if ((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)?(false):(invToPullFrom instanceof PedestalTileEntity)) {
                         itemFromInv = ItemStack.EMPTY;
                     }
                     else
