@@ -84,7 +84,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
             {
                 IItemHandler handler = cap.orElse(null);
                 TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if ((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)?(false):(invToPullFrom instanceof PedestalTileEntity)) {
+                if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
                     itemFromInv = ItemStack.EMPTY;
                 }
                 else {

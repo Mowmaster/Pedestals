@@ -137,7 +137,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                     int intInventorySlotCount = handler.getSlots();//normal chests return value of 1-27
 
                     //Should Allow Using a pedestal when it has the advanced enchant
-                    if ((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)?(false):(invToPullFrom instanceof PedestalTileEntity)) {
+                    if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
                         itemFromInv = ItemStack.EMPTY;
                     }
                     else
