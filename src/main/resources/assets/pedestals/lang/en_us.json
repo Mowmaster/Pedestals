@@ -615,7 +615,9 @@
     "item.pedestals.coin.xpgrindstone.tooltip_speed": "Operational Speed: ",
     "item.pedestals.coin.xpgrindstone.chat_xp": "Exp Levels Stored: ",
     "item.pedestals.coin.xpgrindstone.chat_rate": "Exp Levels Transfered at a Time: ",
+    "item.pedestals.coin.xpgrindstone.chat_enchants": "Enchants: ",
     "item.pedestals.coin.xpgrindstone.chat_speed": "Operational Speed: ",
+    "item.pedestals.coin.xpgrindstone.cloth": "Cloth",
     "jei.pedestals.xpgrindstone.desc": "Place an Inventory below the pedestal for grinding inputs. This upgrade will Grind the enchants off of items and return the unenchanted items to the pedestal, while storing the xp from the process in its buffer, which can be transferred out.",
 
   "item.pedestals.coin.fluidimport": "Pedestal Upgrade",

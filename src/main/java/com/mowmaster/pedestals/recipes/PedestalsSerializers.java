@@ -32,4 +32,7 @@ public final class PedestalsSerializers {
 
     public static final RegistryObject<IRecipeSerializer<?>> QUARRYADVANCED = RECIPES.register("pedestal_quarryadvanced", () ->
             QuarryAdvancedRecipe.serializer);
+
+    public static final RegistryObject<IRecipeSerializer<?>> RECYCLER = RECIPES.register("pedestal_recycler", () ->
+            RecyclerRecipe.serializer);
 }

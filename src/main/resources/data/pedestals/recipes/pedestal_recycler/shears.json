@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_recycler",
+  "ingredient": {
+    "item": "minecraft:shears"
+  },
+  "result": {
+    "item": "minecraft:iron_ingot",
+    "count": 2
+  }
+}
