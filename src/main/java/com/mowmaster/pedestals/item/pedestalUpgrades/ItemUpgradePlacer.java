@@ -1,14 +1,17 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -17,20 +20,28 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.List;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.block.SkullBlock.ROTATION;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
+import static net.minecraft.state.properties.BlockStateProperties.ROTATION_0_15;
 
 public class ItemUpgradePlacer extends ItemUpgradeBase
 {
@@ -122,9 +133,8 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
                             Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
                             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
                             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-
+                            if(fakePlayer.getHeldItemMainhand().isEmpty() || !doItemsMatch(fakePlayer.getHeldItemMainhand(),itemInPedestal))fakePlayer.setHeldItem(Hand.MAIN_HAND,itemInPedestal.copy());
                             BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), blockPosBelow, false));
-
                             ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                             if (result == ActionResultType.CONSUME) {
                                 this.removeFromPedestal(world,posOfPedestal,1);
@@ -135,6 +145,20 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
                 }
             }
         }
+    }
+
+    public static int getRotFromSide(Direction side)
+    {
+        switch (side)
+        {
+            case UP:return 0;
+            case DOWN:return 8;
+            case NORTH:return 0;
+            case SOUTH:return 8;
+            case EAST:return 4;
+            case WEST:return 12;
+        }
+        return 0;
     }
 
     @Override
