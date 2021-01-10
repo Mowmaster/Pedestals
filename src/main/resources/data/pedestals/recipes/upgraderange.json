@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "pedestals:linkingtool"
+      "tag": "pedestals:linkingtool"
     },
     {
       "item": "minecraft:nether_star"

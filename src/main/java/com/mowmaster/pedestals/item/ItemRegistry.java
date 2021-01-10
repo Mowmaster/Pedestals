@@ -14,6 +14,7 @@ public class ItemRegistry
         PedestalBlock.onItemRegistryReady(e);
 
         ItemLinkingTool.onItemRegistryReady(e);
+        ItemLinkingToolBackwards.onItemRegistryReady(e);
         ItemTagTool.onItemRegistryReady(e);
         ItemUpgradeTool.onItemRegistryReady(e);
         ItemToolSwapper.onItemRegistryReady(e);

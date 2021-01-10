@@ -10,7 +10,7 @@
       "item": "minecraft:stone_slab"
     },
     "L": {
-      "item": "pedestals:linkingtool"
+      "tag": "pedestals:linkingtool"
     },
     "B": {
       "item": "minecraft:stone"

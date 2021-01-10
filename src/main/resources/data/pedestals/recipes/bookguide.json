@@ -10,7 +10,7 @@
   },
   "ingredients": [
     {
-      "item": "pedestals:linkingtool"
+      "tag": "pedestals:linkingtool"
     },
     {
       "item": "minecraft:book"

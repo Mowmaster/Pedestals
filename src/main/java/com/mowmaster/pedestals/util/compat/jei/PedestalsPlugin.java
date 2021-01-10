@@ -156,6 +156,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemCraftingPlaceholder.PLACEHOLDER, "placeholder");
         addValueInfoPage(registration, ItemCraftingPlaceholder.PLACEHOLDER_BUCKET, "placeholderbucket");
         addValueInfoPage(registration, ItemLinkingTool.DEFAULT, "linkingtool");
+        addValueInfoPage(registration, ItemLinkingToolBackwards.DEFAULT, "linkingtoolbackwards");
         addValueInfoPage(registration, ItemPedestalUpgrades.SPEED, "upgradespeed");
         addValueInfoPage(registration, ItemPedestalUpgrades.CAPACITY, "upgradecapacity");
         addValueInfoPage(registration, ItemPedestalUpgrades.RANGE, "upgraderange");
