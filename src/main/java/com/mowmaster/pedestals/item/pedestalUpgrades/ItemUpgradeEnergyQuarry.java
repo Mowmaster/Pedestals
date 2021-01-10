@@ -32,6 +32,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
@@ -228,7 +229,7 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
                 if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
                 ToolType tool = blockToMine.getHarvestTool();
                 int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToMine);
-                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,toolLevel >= blockToMine.getHarvestLevel())) {
+                if (ForgeHooks.canHarvestBlock(blockToMine,fakePlayer,world,blockToMinePos)) {
                     blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
                     blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
                     int expdrop = blockToMine.getBlock().getExpDrop(blockToMine,world,blockToMinePos,

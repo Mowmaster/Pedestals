@@ -525,8 +525,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else  return true;
     }
 
-
-
     public boolean hasTool()
     {
         IItemHandler ph = privateHandler.orElse(null);

@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.recipes.CobbleGenRecipe;
@@ -40,10 +41,14 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -1243,7 +1248,9 @@ public class ItemUpgradeBase extends Item {
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
-        int toolLevel = pickaxe.getHarvestLevel(tool, null, blockToMineState);
+        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+        fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+        if(!fakePlayer.getHeldItemMainhand().equals(pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
 
         Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
         ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
@@ -1268,7 +1275,7 @@ public class ItemUpgradeBase extends Item {
                 && !(blockToMine instanceof PedestalBlock)
                 && passesFilter(world, pedestalPos, blockToMine)
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
-                && toolLevel >= blockToMineState.getHarvestLevel()
+                && ForgeHooks.canHarvestBlock(blockToMineState,fakePlayer,world,blockToMinePos)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
                 && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
                 && advanced)
