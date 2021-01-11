@@ -103,6 +103,8 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
+            if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(getExpBuffer(coinInPedestal)));}
+
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
@@ -115,10 +117,8 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
 
     public void upgradeAction(World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
-        if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(10));}
         int rate = getExpCountByLevel(getTransferRate(coinInPedestal));
         int range = getRangeSmall(coinInPedestal);
-
 
         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
         if(pedestalInv instanceof PedestalTileEntity) {
