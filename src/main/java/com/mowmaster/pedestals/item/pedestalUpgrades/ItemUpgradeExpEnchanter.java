@@ -51,36 +51,12 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        int value = 30;
-        switch (getCapacityModifier(stack))
-        {
-            case 0:
-                value = 30;//30
-                break;
-            case 1:
-                value=44;//44
-                break;
-            case 2:
-                value = 58;//58
-                break;
-            case 3:
-                value = 72;//72
-                break;
-            case 4:
-                value = 86;//86
-                break;
-            case 5:
-                value=100;//100
-                break;
-            default: value=30;
-        }
-
-        return  value;
+        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*15)+30;
+        return  (overEnchanted>20000)?(20000):(overEnchanted);
     }
 
     public float getEnchantmentPowerFromSorroundings(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-
         float enchantPower = 0;
 
         for (int i = -2; i <= 2; ++i) {
