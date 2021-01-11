@@ -139,19 +139,19 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                 writeStoredIntTwoToNBT(coinInPedestal,val-1);
             }
             else {
-                if(blocksToChopInAreaGetOne(pedestal,rangeWidth,rangeHeight) > 0)
+                if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(world.isAreaLoaded(negNums,posNums))
-                    {
-                        if(!world.isBlockPowered(pedestalPos)) {
+                    if(!world.isBlockPowered(pedestalPos)) {
 
-                            AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                            List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                            if(itemList.size()>0)
-                            {
-                                upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
-                            }
+                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                        if(itemList.size()>0)
+                        {
+                            upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                        }
 
+                        if(blocksToChopInAreaGetOne(pedestal,rangeWidth,rangeHeight) > 0)
+                        {
                             if (world.getGameTime() % speed == 0) {
                                 int currentPosition = 0;
                                 for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
@@ -173,10 +173,10 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                                 }
                             }
                         }
+                        else {
+                            writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
+                        }
                     }
-                }
-                else {
-                    writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
                 }
             }
         }

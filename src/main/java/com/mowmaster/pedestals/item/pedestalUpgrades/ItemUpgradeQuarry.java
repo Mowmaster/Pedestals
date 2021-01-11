@@ -171,53 +171,48 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                 writeStoredIntTwoToNBT(coinInPedestal,val-1);
             }
             else {
-                if(blocksToMineInAreaMoreThenOne(pedestal,rangeWidth,rangeHeight) > 0)
+                if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(world.isAreaLoaded(negNums,posNums))
-                    {
-                        if(!world.isBlockPowered(pedestalPos)) {
+                    if(!world.isBlockPowered(pedestalPos)) {
 
-                            //Should disable magneting when its not needed
-                            AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                            List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                            if(itemList.size()>0)
+                        //Should disable magneting when its not needed
+                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                        if(itemList.size()>0)
+                        {
+                            upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                        }
+
+                        if(blocksToMineInAreaMoreThenOne(pedestal,rangeWidth,rangeHeight) > 0)
+                        {
+                            if(removeFuel(pedestal,200,true))
                             {
-                                upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
-                            }
-
-                            TileEntity pedestalInv = world.getTileEntity(pedestalPos);
-                            if(pedestalInv instanceof PedestalTileEntity) {
-                                PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
-
-                                if(removeFuel(ped,200,true))
-                                {
-                                    if (world.getGameTime() % speed == 0) {
-                                        int currentPosition = 0;
-                                        for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
-                                        {
-                                            BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                            if(canMineBlock(pedestal,blockToMinePos))
-                                            {
-                                                writeStoredIntToNBT(coinInPedestal,currentPosition);
-                                                break;
-                                            }
-                                        }
+                                if (world.getGameTime() % speed == 0) {
+                                    int currentPosition = 0;
+                                    for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                                    {
                                         BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                        BlockState targetBlock = world.getBlockState(targetPos);
-                                        upgradeAction(pedestal,world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                        if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                        BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                        if(canMineBlock(pedestal,blockToMinePos))
                                         {
-                                            writeStoredIntToNBT(coinInPedestal,0);
+                                            writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                            break;
                                         }
+                                    }
+                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                    BlockState targetBlock = world.getBlockState(targetPos);
+                                    upgradeAction(pedestal,world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                    if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                    {
+                                        writeStoredIntToNBT(coinInPedestal,0);
                                     }
                                 }
                             }
                         }
+                        else {
+                            writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
+                        }
                     }
-                }
-                else {
-                    writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
                 }
             }
         }

@@ -127,11 +127,11 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                 writeStoredIntTwoToNBT(coinInPedestal,val-1);
             }
             else {
-                if(blocksToGrowInAreaGetOne(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(world.isAreaLoaded(negNums,posNums))
-                    {
-                        if(!world.isBlockPowered(pedestalPos)) {
+                    if(!world.isBlockPowered(pedestalPos)) {
+                        if(blocksToGrowInAreaGetOne(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                        {
                             int leftToGrow = blocksToGrowInArea(world,pedestalPos,rangeWidth,rangeHeight);
                             if(leftToGrow > 0)
                             {
@@ -178,10 +178,10 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                                 }
                             }
                         }
+                        else {
+                            writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
+                        }
                     }
-                }
-                else {
-                    writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
                 }
             }
         }

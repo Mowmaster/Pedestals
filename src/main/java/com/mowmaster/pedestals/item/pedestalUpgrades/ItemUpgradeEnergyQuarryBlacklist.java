@@ -170,20 +170,20 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                 writeStoredIntTwoToNBT(coinInPedestal,val-1);
             }
             else {
-                if(blocksToMineInAreaMoreThenOne(pedestal,rangeWidth,rangeHeight) > 0)
+                if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(world.isAreaLoaded(negNums,posNums))
-                    {
-                        if(!world.isBlockPowered(pedestalPos)) {
+                    if(!world.isBlockPowered(pedestalPos)) {
 
-                            //Should disable magneting when its not needed
-                            AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                            List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                            if(itemList.size()>0)
-                            {
-                                upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
-                            }
+                        //Should disable magneting when its not needed
+                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                        if(itemList.size()>0)
+                        {
+                            upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                        }
 
+                        if(blocksToMineInAreaMoreThenOne(pedestal,rangeWidth,rangeHeight) > 0)
+                        {
                             int fuelToConsume = rfCostPerItemSmelted;
                             if(hasEnergy(coinInPedestal) && removeEnergyFuel(pedestal,fuelToConsume,true)>=0)
                             {
@@ -209,10 +209,10 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                                 }
                             }
                         }
+                        else {
+                            writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
+                        }
                     }
-                }
-                else {
-                    writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
                 }
             }
         }
