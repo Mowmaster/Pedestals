@@ -165,10 +165,10 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            int val = pedestal.getStoredValueForUpgrades();
+            int val = readStoredIntTwoFromNBT(coinInPedestal);
             if(val>0)
             {
-                pedestal.setStoredValueForUpgrades(val-1);
+                writeStoredIntTwoToNBT(coinInPedestal,val-1);
             }
             else {
                 if(blocksToMineInAreaMoreThenOne(pedestal,rangeWidth,rangeHeight) > 0)
@@ -217,7 +217,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                     }
                 }
                 else {
-                    pedestal.setStoredValueForUpgrades((rangeWidth*20)+20);
+                    writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
                 }
             }
         }

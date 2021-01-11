@@ -172,13 +172,13 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            int val = pedestal.getStoredValueForUpgrades();
+            int val = readStoredIntTwoFromNBT(coinInPedestal);
             if(val>0)
             {
-                pedestal.setStoredValueForUpgrades(val-1);
+                writeStoredIntTwoToNBT(coinInPedestal,val-1);
             }
             else {
-                if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
+                if(blocksToHarvestInAreaGetOne(world,pedestalPos,rangeWidth,rangeHeight) > 0)
                 {
                     if(world.isAreaLoaded(negNums,posNums))
                     {
@@ -235,7 +235,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     }
                 }
                 else {
-                    pedestal.setStoredValueForUpgrades((rangeWidth*20)+20);
+                    writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
                 }
             }
         }
@@ -330,6 +330,30 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
             {
                 validBlocks++;
+            }
+        }
+
+        return validBlocks;
+    }
+
+    public int blocksToHarvestInAreaGetOne(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+            Block blockToHarvest = blockToHarvestState.getBlock();
+            if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+            {
+                validBlocks++;
+                break;
             }
         }
 

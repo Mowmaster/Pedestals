@@ -121,13 +121,13 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            int val = pedestal.getStoredValueForUpgrades();
+            int val = readStoredIntTwoFromNBT(coinInPedestal);
             if(val>0)
             {
-                pedestal.setStoredValueForUpgrades(val-1);
+                writeStoredIntTwoToNBT(coinInPedestal,val-1);
             }
             else {
-                if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
+                if(blocksToGrowInAreaGetOne(world,pedestalPos,rangeWidth,rangeHeight) > 0)
                 {
                     if(world.isAreaLoaded(negNums,posNums))
                     {
@@ -181,7 +181,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                     }
                 }
                 else {
-                    pedestal.setStoredValueForUpgrades((rangeWidth*20)+20);
+                    writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
                 }
             }
         }
@@ -244,6 +244,34 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                 if (blockToGrow instanceof IGrowable) {
                     if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
                         validBlocks++;
+                    }
+                }
+            }
+        }
+
+        return validBlocks;
+    }
+
+    public int blocksToGrowInAreaGetOne(World world, BlockPos pedestalPos, int width, int height)
+    {
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+            Block blockToGrow = blockToGrowState.getBlock();
+            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
+            {
+                if (blockToGrow instanceof IGrowable) {
+                    if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
+                        validBlocks++;
+                        break;
                     }
                 }
             }

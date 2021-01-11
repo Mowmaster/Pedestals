@@ -2051,6 +2051,36 @@ public class ItemUpgradeBase extends Item {
     {
         return readStoredIntFromNBT(coin);
     }
+
+
+    //This is needed for the "slowdown" of machines
+    public void writeStoredIntTwoToNBT(ItemStack stack, int value)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putInt("storedinttwo",value);
+        stack.setTag(compound);
+    }
+
+    public int readStoredIntTwoFromNBT(ItemStack stack)
+    {
+        int maxenergy = 0;
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            maxenergy = getCompound.getInt("storedinttwo");
+        }
+        return maxenergy;
+    }
+
+    public int getStoredIntTwo(ItemStack coin)
+    {
+        return readStoredIntTwoFromNBT(coin);
+    }
     /***************************************
      ****************************************
      **       End of Pedestal Stuff        **
