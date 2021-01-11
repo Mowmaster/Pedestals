@@ -55,60 +55,14 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        int value = 30;
-        switch (getCapacityModifier(stack))
-        {
-            case 0:
-                value = 30;//30
-                break;
-            case 1:
-                value=44;//44
-                break;
-            case 2:
-                value = 58;//58
-                break;
-            case 3:
-                value = 72;//72
-                break;
-            case 4:
-                value = 86;//86
-                break;
-            case 5:
-                value=100;//100
-                break;
-            default: value=30;
-        }
-
-        return  value;
+        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*15)+30;
+        return  (overEnchanted>20000)?(20000):(overEnchanted);
     }
 
     public int getRepairRate(ItemStack stack)
     {
-        int value = 5;
-        switch (getCapacityModifier(stack))
-        {
-            case 0:
-                value = 5;//10 durability/ operation
-                break;
-            case 1:
-                value=10;//20
-                break;
-            case 2:
-                value = 15;//30
-                break;
-            case 3:
-                value = 20;//40
-                break;
-            case 4:
-                value = 25;//50
-                break;
-            case 5:
-                value= 50;//100
-                break;
-            default: value=1;
-        }
-
-        return  value;
+        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*10);
+        return  (overEnchanted>20000)?(20000):(overEnchanted);
     }
 
     private int correctlyPlacedSorroundingPedestals(World world, BlockPos posPedestal)
@@ -310,16 +264,16 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                                     switch(enchantment.getRarity())
                                                     {
                                                         case COMMON:
-                                                            intLevelCostToCombine +=Math.round(1.0F*(integer+1));
-                                                            break;
-                                                        case UNCOMMON:
                                                             intLevelCostToCombine +=Math.round(2.0F*(integer+1));
                                                             break;
+                                                        case UNCOMMON:
+                                                            intLevelCostToCombine +=Math.round(4.0F*(integer+1));
+                                                            break;
                                                         case RARE:
-                                                            intLevelCostToCombine +=Math.round(3.0F*(integer+1));
+                                                            intLevelCostToCombine +=Math.round(6.0F*(integer+1));
                                                             break;
                                                         case VERY_RARE:
-                                                            intLevelCostToCombine +=Math.round(4.0F*(integer+1));
+                                                            intLevelCostToCombine +=Math.round(8.0F*(integer+1));
                                                             break;
                                                     }
 
