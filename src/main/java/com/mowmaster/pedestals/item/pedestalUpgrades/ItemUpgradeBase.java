@@ -1287,7 +1287,7 @@ public class ItemUpgradeBase extends Item {
         ToolType tool = blockToMineState.getHarvestTool();
         FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
         fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
-        //if(!fakePlayer.getHeldItemMainhand().equals(pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+        if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
 
         Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
         ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
@@ -1312,31 +1312,15 @@ public class ItemUpgradeBase extends Item {
                 && !(blockToMine instanceof PedestalBlock)
                 && passesFilter(world, pedestalPos, blockToMine)
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
-                && canHarvestBlock(blockToMineState,fakePlayer,pickaxe,world,blockToMinePos)
+                && ForgeHooks.canHarvestBlock(blockToMineState,fakePlayer,world,blockToMinePos)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
                 && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
                 && advanced)
-
         {
             return true;
         }
 
         return false;
-    }
-
-    public static boolean canHarvestBlock(@Nonnull BlockState state, @Nonnull PlayerEntity player,ItemStack toolToUse, @Nonnull IBlockReader world, @Nonnull BlockPos pos) {
-        if(!state.getRequiresTool()) {
-            return ForgeEventFactory.doPlayerHarvestCheck(player, state, true);
-        } else {
-            ItemStack stack = toolToUse;
-            ToolType tool = state.getHarvestTool();
-            if(!stack.isEmpty() && tool != null) {
-                int toolLevel = stack.getHarvestLevel(tool, player, state);
-                return toolLevel < 0?player.func_234569_d_(state):ForgeEventFactory.doPlayerHarvestCheck(player, state, toolLevel >= state.getHarvestLevel());
-            } else {
-                return player.func_234569_d_(state);
-            }
-        }
     }
 
     //Maybe Not Needed???
