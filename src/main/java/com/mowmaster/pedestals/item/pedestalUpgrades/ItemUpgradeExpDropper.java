@@ -47,28 +47,29 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
 
     public int getTransferRate(ItemStack stack)
     {
-        int summonRate = 7;
-        switch (getCapacityModifier(stack))
+        int overEnchanted = getCapacityModifierOverEnchanted(stack)*5;
+        int summonRate = 1;
+        switch (getCapacityModifierOverEnchanted(stack))
         {
             case 0:
-                summonRate = 7;//1
+                summonRate = 1;//1
                 break;
             case 1:
-                summonRate=16;//2
+                summonRate=5;//2
                 break;
             case 2:
-                summonRate = 40;//4
+                summonRate = 10;//4
                 break;
             case 3:
-                summonRate = 72;//6
+                summonRate = 15;//6
                 break;
             case 4:
-                summonRate = 112;//8
+                summonRate = 20;//8
                 break;
             case 5:
-                summonRate=160;//10
+                summonRate=25;//10
                 break;
-            default: summonRate=7;
+            default: summonRate=(overEnchanted>20000)?(20000):(overEnchanted);
         }
 
         return  summonRate;
@@ -99,14 +100,13 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     {
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
-                if (world.getGameTime()%speed == 0) {
+                if (world.getGameTime()%speed == 0 && getXPStored(coinInPedestal)>0) {
                     upgradeAction(world, coinInPedestal, pedestalPos);
                 }
             }
@@ -116,7 +116,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     public void upgradeAction(World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(10));}
-        int rate = getTransferRate(coinInPedestal);
+        int rate = getExpCountByLevel(getTransferRate(coinInPedestal));
         int range = getRangeSmall(coinInPedestal);
 
 
@@ -146,39 +146,20 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
 
     }
 
+    @Override
     public int getExpBuffer(ItemStack stack)
     {
-        return  10;
+        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)+5;
+
+        //20k being the max before we get close to int overflow
+        return  (overEnchanted>=20000)?(20000):(overEnchanted);
     }
 
     @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
-        int tr = 1;
-
-        switch (getTransferRate(stack))
-        {
-            case 7:
-                tr = 1;
-                break;
-            case 16:
-                tr=2;
-                break;
-            case 40:
-                tr = 4;
-                break;
-            case 72:
-                tr = 6;
-                break;
-            case 112:
-                tr = 8;
-                break;
-            case 160:
-                tr=10;
-                break;
-            default: tr=1;
-        }
+        int tr = getTransferRate(stack);
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
@@ -211,31 +192,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        int tr = 1;
-
-        switch (getTransferRate(stack))
-        {
-            case 7:
-                tr = 1;
-                break;
-            case 16:
-                tr=2;
-                break;
-            case 40:
-                tr = 4;
-                break;
-            case 72:
-                tr = 6;
-                break;
-            case 112:
-                tr = 8;
-                break;
-            case 160:
-                tr=10;
-                break;
-            default: tr=1;
-        }
-
+        int tr = getTransferRate(stack);
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
         range.appendString("" +  getRangeSmall(stack) + "");
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");

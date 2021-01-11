@@ -99,7 +99,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
     public int getSuckiRate(ItemStack stack)
     {
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)-5;
+        int overEnchanted = getCapacityModifierOverEnchanted(stack)*5;
         int suckiRate = 1;
         switch (getCapacityModifierOverEnchanted(stack))
         {
@@ -116,10 +116,10 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
                 suckiRate = 15;//4
                 break;
             case 4:
-                suckiRate = 15;//5
+                suckiRate = 20;//5
                 break;
             case 5:
-                suckiRate=20;//10
+                suckiRate=25;//10
                 break;
             default: suckiRate=(overEnchanted>20000)?(20000):(overEnchanted);
         }
@@ -235,7 +235,6 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        int value = 100;
         int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)+30;
 
         //20k being the max before we get close to int overflow
