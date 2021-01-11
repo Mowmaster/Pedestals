@@ -154,6 +154,19 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                 }
                             }
                         }
+                        else
+                        {
+                            ItemStack nextItemToRemove = ItemStack.EMPTY;
+                            nextItemToRemove = IntStream.range(0,range)//Int Range
+                                    .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
+                                    .filter(itemStack -> !itemStack.isEnchanted() || !(itemStack.getItem() instanceof EnchantedBookItem))
+                                    .findFirst().orElse(ItemStack.EMPTY);
+
+                            int slotItemToRemove = getSlotWithMatchingStackExact(cap,nextItemToRemove);
+                            ItemStack toReturn = nextItemToRemove.copy();
+                            handler.extractItem(slotItemToRemove,toReturn.getCount(),false);
+                            pedestal.addItem(toReturn);
+                        }
                     }
                 }
             }
