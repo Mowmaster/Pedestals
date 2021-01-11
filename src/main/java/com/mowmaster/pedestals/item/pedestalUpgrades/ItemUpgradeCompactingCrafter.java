@@ -207,7 +207,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                             handler.extractItem(intGetActualSlot,(intBatchCraftingSize*intItemsUsedCount),false);
 
                                             stackRecipeResult.setCount(intBatchCraftedAmount);
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             addToPedestal(world,posOfPedestal,stackRecipeResult);
                                         }
                                     }
