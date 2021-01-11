@@ -121,51 +121,67 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            if(!world.isBlockPowered(pedestalPos)) {
-                int leftToGrow = blocksToGrowInArea(world,pedestalPos,rangeWidth,rangeHeight);
-                if(leftToGrow > 0)
+            int val = pedestal.getStoredValueForUpgrades();
+            if(val>0)
+            {
+                pedestal.setStoredValueForUpgrades(val-1);
+            }
+            else {
+                if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
                 {
-                    if (world.getGameTime() % speed == 0) {
-                        int currentPosition = 0;
-                        for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
-                        {
-                            BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
-                            Block blockToGrow = blockToGrowState.getBlock();
-                            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
+                    if(world.isAreaLoaded(negNums,posNums))
+                    {
+                        if(!world.isBlockPowered(pedestalPos)) {
+                            int leftToGrow = blocksToGrowInArea(world,pedestalPos,rangeWidth,rangeHeight);
+                            if(leftToGrow > 0)
                             {
-                                writeStoredIntToNBT(coinInPedestal,currentPosition+1);
-                                break;
-                            }
-                        }
-                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                        BlockState targetBlock = world.getBlockState(targetPos);
-                        upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
-                        if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
-                        {
-                            //basically if the fertilizer runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
-                            if(itemInPedestal.isEmpty())
-                            {
-                                if(pedestal.getStoredValueForUpgrades() != leftToGrow)
-                                {
-                                    pedestal.setStoredValueForUpgrades(leftToGrow);
+                                if (world.getGameTime() % speed == 0) {
+                                    int currentPosition = 0;
+                                    for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                                    {
+                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                        BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+                                        Block blockToGrow = blockToGrowState.getBlock();
+                                        if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
+                                        {
+                                            writeStoredIntToNBT(coinInPedestal,currentPosition+1);
+                                            break;
+                                        }
+                                    }
+                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                    BlockState targetBlock = world.getBlockState(targetPos);
+                                    upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                                    if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                    {
+                                        //basically if the fertilizer runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
+                                        if(itemInPedestal.isEmpty())
+                                        {
+                                            if(pedestal.getStoredValueForUpgrades() != leftToGrow)
+                                            {
+                                                pedestal.setStoredValueForUpgrades(leftToGrow);
+                                            }
+                                        }
+                                        writeStoredIntToNBT(coinInPedestal,0);
+                                    }
                                 }
                             }
-                            writeStoredIntToNBT(coinInPedestal,0);
+                            else
+                            {
+                                //basically if the fertilizer runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
+                                if(itemInPedestal.isEmpty())
+                                {
+                                    if(pedestal.getStoredValueForUpgrades()!= 0)
+                                    {
+                                        pedestal.setStoredValueForUpgrades(0);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                else
-                {
-                    //basically if the fertilizer runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
-                    if(itemInPedestal.isEmpty())
-                    {
-                        if(pedestal.getStoredValueForUpgrades()!= 0)
-                        {
-                            pedestal.setStoredValueForUpgrades(0);
-                        }
-                    }
+                else {
+                    pedestal.setStoredValueForUpgrades((rangeWidth*20)+20);
                 }
             }
         }

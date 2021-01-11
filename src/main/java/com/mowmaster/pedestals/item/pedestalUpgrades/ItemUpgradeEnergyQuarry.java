@@ -165,46 +165,59 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            if(world.isAreaLoaded(negNums,posNums))
+            int val = pedestal.getStoredValueForUpgrades();
+            if(val>0)
             {
-                if(!world.isBlockPowered(pedestalPos)) {
-
-                    //Should disable magneting when its not needed
-                    AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                    if(itemList.size()>0)
+                pedestal.setStoredValueForUpgrades(val-1);
+            }
+            else {
+                if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
+                {
+                    if(world.isAreaLoaded(negNums,posNums))
                     {
-                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
-                    }
+                        if(!world.isBlockPowered(pedestalPos)) {
 
-                    //int fuelToConsume = rfCostPerItemSmelted;
-                    int fuelToConsume = rfCostPerItemSmelted;
-                    if(hasEnergy(coinInPedestal) && removeEnergyFuel(pedestal,fuelToConsume,true)>=0)
-                    {
-                        if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
-                        {
-                            if (world.getGameTime() % speed == 0) {
-                                int currentPosition = 0;
-                                for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                            //Should disable magneting when its not needed
+                            AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                            List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                            if(itemList.size()>0)
+                            {
+                                upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                            }
+
+                            //int fuelToConsume = rfCostPerItemSmelted;
+                            int fuelToConsume = rfCostPerItemSmelted;
+                            if(hasEnergy(coinInPedestal) && removeEnergyFuel(pedestal,fuelToConsume,true)>=0)
+                            {
+                                if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
                                 {
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                    if(canMineBlock(pedestal,blockToMinePos))
-                                    {
-                                        writeStoredIntToNBT(coinInPedestal,currentPosition);
-                                        break;
+                                    if (world.getGameTime() % speed == 0) {
+                                        int currentPosition = 0;
+                                        for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                                        {
+                                            BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                            if(canMineBlock(pedestal,blockToMinePos))
+                                            {
+                                                writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                                break;
+                                            }
+                                        }
+                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                        BlockState targetBlock = world.getBlockState(targetPos);
+                                        upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                        if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                        {
+                                            writeStoredIntToNBT(coinInPedestal,0);
+                                        }
                                     }
-                                }
-                                BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                BlockState targetBlock = world.getBlockState(targetPos);
-                                upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
-                                {
-                                    writeStoredIntToNBT(coinInPedestal,0);
                                 }
                             }
                         }
                     }
+                }
+                else {
+                    pedestal.setStoredValueForUpgrades((rangeWidth*20)+20);
                 }
             }
         }

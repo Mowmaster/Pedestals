@@ -179,51 +179,67 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            if(!world.isBlockPowered(pedestalPos)) {
-                int hivesToHarvest = blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight);
-                if(hivesToHarvest > 0)
+            int val = pedestal.getStoredValueForUpgrades();
+            if(val>0)
+            {
+                pedestal.setStoredValueForUpgrades(val-1);
+            }
+            else {
+                if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
                 {
-                    if (world.getGameTime() % speed == 0) {
-                        int currentPosition = 0;
-                        for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
-                        {
-                            BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                            BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                            BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
-                            Block blockToHarvest = blockToHarvestState.getBlock();
-                            if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+                    if(world.isAreaLoaded(negNums,posNums))
+                    {
+                        if(!world.isBlockPowered(pedestalPos)) {
+                            int hivesToHarvest = blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight);
+                            if(hivesToHarvest > 0)
                             {
-                                writeStoredIntToNBT(coinInPedestal,currentPosition);
-                                break;
+                                if (world.getGameTime() % speed == 0) {
+                                    int currentPosition = 0;
+                                    for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                                    {
+                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                        BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                        BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+                                        Block blockToHarvest = blockToHarvestState.getBlock();
+                                        if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+                                        {
+                                            writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                            break;
+                                        }
+                                    }
+                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                    BlockState targetBlock = world.getBlockState(targetPos);
+                                    //basically if the harvester runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
+                                    if(itemInPedestal.isEmpty())
+                                    {
+                                        if(pedestal.getStoredValueForUpgrades() != hivesToHarvest)
+                                        {
+                                            pedestal.setStoredValueForUpgrades(hivesToHarvest);
+                                        }
+                                    }
+                                    upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
+                                    if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                    {
+                                        writeStoredIntToNBT(coinInPedestal,0);
+                                    }
+                                }
                             }
-                        }
-                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                        BlockState targetBlock = world.getBlockState(targetPos);
-                        //basically if the harvester runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
-                        if(itemInPedestal.isEmpty())
-                        {
-                            if(pedestal.getStoredValueForUpgrades() != hivesToHarvest)
+                            else
                             {
-                                pedestal.setStoredValueForUpgrades(hivesToHarvest);
+                                //basically if the harvester runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
+                                if(itemInPedestal.isEmpty())
+                                {
+                                    if(pedestal.getStoredValueForUpgrades()!= 0)
+                                    {
+                                        pedestal.setStoredValueForUpgrades(0);
+                                    }
+                                }
                             }
-                        }
-                        upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
-                        if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
-                        {
-                            writeStoredIntToNBT(coinInPedestal,0);
                         }
                     }
                 }
-                else
-                {
-                    //basically if the harvester runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
-                    if(itemInPedestal.isEmpty())
-                    {
-                        if(pedestal.getStoredValueForUpgrades()!= 0)
-                        {
-                            pedestal.setStoredValueForUpgrades(0);
-                        }
-                    }
+                else {
+                    pedestal.setStoredValueForUpgrades((rangeWidth*20)+20);
                 }
             }
         }
