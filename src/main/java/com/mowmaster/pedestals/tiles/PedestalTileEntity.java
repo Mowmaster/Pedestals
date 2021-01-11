@@ -373,7 +373,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    System.out.println("STACKS: "+ stacksList);
                     setSize(6);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
