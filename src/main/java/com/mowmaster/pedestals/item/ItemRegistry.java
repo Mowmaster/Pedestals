@@ -131,6 +131,7 @@ public class ItemRegistry
         ItemUpgradeQuarryBlacklist.onItemRegistryReady(e);
         ItemUpgradeCompactingCrafter.onItemRegistryReady(e);
         ItemUpgradeCrafter.onItemRegistryReady(e);
+        ItemUpgradeRecycler.onItemRegistryReady(e);
         ItemCraftingPlaceholder.onItemRegistryReady(e);
         ItemUpgradeCobbleGen.onItemRegistryReady(e);
         ItemUpgradeVoid.onItemRegistryReady(e);

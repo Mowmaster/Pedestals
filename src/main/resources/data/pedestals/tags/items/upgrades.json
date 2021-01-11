@@ -3,6 +3,7 @@
   "values": [
     "pedestals:coin/default",
     "pedestals:coin/restriction",
+    "pedestals:coin/recycler",
     "pedestals:coin/dropper",
     "pedestals:coin/import",
     "pedestals:coin/fimport",

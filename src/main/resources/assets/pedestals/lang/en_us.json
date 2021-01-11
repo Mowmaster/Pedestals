@@ -155,6 +155,14 @@
   "item.pedestals.coin.restriction.chat_rate": "Flow Rate: ",
   "jei.pedestals.restriction.desc": "This upgrade will restrict how many items can be sent to it at once, and if full, wont allow any more items to be sent.",
 
+  "item.pedestals.coin.recycler": "Pedestal Upgrade",
+  "item.pedestals.coin.recycler.tooltip_name": "Recycler Upgrade",
+  "item.pedestals.coin.recycler.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.recycler.chat_enchants": "Enchants: ",
+  "item.pedestals.coin.recycler.chat_speed": "Operational Speed: ",
+  "item.pedestals.coin.recycler.cloth": "Cloth",
+  "jei.pedestals.recycler.desc": "Recycles Tools, Armor, and Other Items back into Materials. Damaged Items will give back based on their remaining durability",
+
   "item.pedestals.coin.filterdurability": "Pedestal Upgrade",
   "item.pedestals.coin.filterdurability.tooltip_name": "Filter Durability",
   "item.pedestals.coin.filterdurability.tooltip_rate": "Checking Items Over: ",
