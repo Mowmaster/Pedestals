@@ -18,6 +18,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LockCode;
@@ -50,6 +51,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandler);
     private LazyOptional<IItemHandler> privateHandler = LazyOptional.of(this::createHandlerPedestalPrivate);
     private LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(this::createHandlerEnergy);
+    private List<ItemStack> stacksList = new ArrayList<>();
 
     private static final int[] SLOTS_ALLSIDES = new int[] {0};
 
@@ -361,10 +363,32 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     }
 
     private IItemHandler createHandlerPedestalPrivate() {
+        //going from 5 to 10 slots to future proof things
         return new ItemStackHandler(6) {
+
+            @Override
+            protected void onLoad() {
+                if(getSlots()<6)
+                {
+                    for(int i = 0; i < getSlots(); ++i) {
+                        stacksList.add(i,getStackInSlot(i));
+                    }
+                    System.out.println("STACKS: "+ stacksList);
+                    setSize(6);
+                    for(int j = 0;j<stacksList.size();j++) {
+                        setStackInSlot(j, stacksList.get(j));
+                    }
+                }
+
+                super.onLoad();
+            }
+
             @Override
             protected void onContentsChanged(int slot) {
-                update();
+                if(!(stacksList.size()>0))
+                {
+                    update();
+                }
             }
 
             @Override
@@ -383,14 +407,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || stack.getToolTypes().contains(ToolType.SHOVEL)
                         )) return true;
                 return false;
-            }
-
-
-
-
-            @Override
-            public int getSlots() {
-                return 6;
             }
         };
     }
@@ -528,18 +544,18 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public boolean hasTool()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        CompoundNBT nbt = this.serializeNBT();
+        /*CompoundNBT nbt = this.serializeNBT();
         int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
-        if(slotSize > 5)
-        {
+        if(slotSize > 5)*/
+        //{
             if(ph.getStackInSlot(5).isEmpty())
             {
                 return false;
             }
             else  return true;
-        }
+        //}
 
-        return false;
+        //return false;
     }
 
     public ItemStack getItemInPedestal()
@@ -590,14 +606,14 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public ItemStack getToolOnPedestal()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        CompoundNBT nbt = this.serializeNBT();
-        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
-        if(slotSize > 5)
-        {
+        //CompoundNBT nbt = this.serializeNBT();
+        //int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
+        //if(slotSize > 5)
+        //{
             return ph.getStackInSlot(5);
-        }
+        //}
 
-        return ItemStack.EMPTY;
+        //return ItemStack.EMPTY;
     }
 
     public ItemStack setItemInPedestal(ItemStack itemToSet)
@@ -656,13 +672,13 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public ItemStack removeTool() {
         IItemHandler ph = privateHandler.orElse(null);
-        CompoundNBT nbt = this.serializeNBT();
-        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
-        if(slotSize > 5)
-        {
+        //CompoundNBT nbt = this.serializeNBT();
+        //int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
+        //if(slotSize > 5)
+        //{
             return ph.extractItem(5,ph.getStackInSlot(5).getCount(),false);
-        }
-        else return ItemStack.EMPTY;
+        //}
+        //else return ItemStack.EMPTY;
 
     }
 
@@ -996,10 +1012,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public boolean addTool(ItemStack tool,boolean simulate)
     {
         IItemHandler ph = privateHandler.orElse(null);
-        CompoundNBT nbt = this.serializeNBT();
-        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
-        if(slotSize > 5)
-        {
+        //CompoundNBT nbt = this.serializeNBT();
+        //int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
+        //if(slotSize > 5)
+        //{
             ItemStack itemFromBlock = tool.copy();
             itemFromBlock.setCount(1);
             if(!hasTool() && ph.isItemValid(5,itemFromBlock))
@@ -1008,9 +1024,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 return true;
             }
             else return false;
-        }
+        //}
 
-        return false;
+        //return false;
     }
 
     public boolean doItemsMatch(ItemStack itemStackIn)
