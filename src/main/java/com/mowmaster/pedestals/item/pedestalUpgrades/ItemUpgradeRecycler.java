@@ -5,21 +5,16 @@ import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
-import com.mowmaster.pedestals.recipes.QuarryAdvancedRecipe;
 import com.mowmaster.pedestals.recipes.RecyclerRecipe;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import net.minecraft.block.AnvilBlock;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.RepairContainer;
 import net.minecraft.item.*;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.RepairItemRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -37,8 +32,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -47,10 +40,10 @@ import java.util.stream.IntStream;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
+public class ItemUpgradeRecycler extends ItemUpgradeBaseExp
 {
 
-    public ItemUpgradeExpGrindstone(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeRecycler(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -146,17 +139,146 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                 {
                                     int getExpLeftInPedestal = currentlyStoredExp + xpDisenchant;
                                     setXPStored(coinInPedestal,getExpLeftInPedestal);
-
-                                    ItemStack toReturn = stackToReturn.copy();
-                                    handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
-                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                    pedestal.addItem(toReturn);
+                                    recyclerAction(pedestal,handler,slotItemToGrind,stackToReturn);
                                 }
                             }
+                        }
+                        else
+                        {
+                            nextItemToGrind = IntStream.range(0,range)//Int Range
+                                    .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
+                                    .filter(itemStack -> !itemStack.isEmpty())
+                                    .findFirst().orElse(ItemStack.EMPTY);
+                            int slotItemToGrind = getSlotWithMatchingStackExact(cap,nextItemToGrind);
+                            recyclerAction(pedestal,handler,slotItemToGrind,nextItemToGrind);
                         }
                     }
                 }
             }
+        }
+    }
+
+    @Nullable
+    protected RecyclerRecipe getRecipeRecycler(World world, ItemStack stackIn)
+    {
+        Inventory inv = new Inventory(stackIn);
+        return world == null ? null : world.getRecipeManager().getRecipe(RecyclerRecipe.recipeType, inv, world).orElse(null);
+    }
+
+    protected Collection<ItemStack> getProcessResultsRecycler(RecyclerRecipe recipe)
+    {
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
+    }
+
+    public void recyclerAction(PedestalTileEntity pedestal, IItemHandler handler,int slot, ItemStack itemJustExpGround)
+    {
+        World world = pedestal.getWorld();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        BlockPos posOfPedestal = pedestal.getPos();
+        if(hasAdvancedInventoryTargeting(coinInPedestal))
+        {
+            Item input = itemJustExpGround.getItem();
+            Collection<ItemStack> jsonResults = getProcessResultsRecycler(getRecipeRecycler(pedestal.getWorld(),itemJustExpGround));
+            ItemStack resultRecycler = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+            Item getItemResultRecycler = resultRecycler.getItem();
+
+            if((input instanceof TieredItem || !resultRecycler.isEmpty()) && !getItemResultRecycler.equals(Items.BARRIER))
+            {
+                //Assume its from the recipe, but if not, then set to another itemstack
+                Ingredient repairIngredient = Ingredient.fromStacks(resultRecycler);
+                int returnedMaxCount = resultRecycler.getCount();
+                if(resultRecycler.isEmpty())
+                {
+                    if(input instanceof TieredItem)repairIngredient = ((TieredItem)input).getTier().getRepairMaterial();
+
+                    if(input instanceof PickaxeItem || itemJustExpGround.getToolTypes().contains(ToolType.PICKAXE))returnedMaxCount=3;
+                    else if(input instanceof AxeItem || itemJustExpGround.getToolTypes().contains(ToolType.AXE))returnedMaxCount=3;
+                    else if(input instanceof SwordItem)returnedMaxCount=2;
+                    else if(input instanceof HoeItem || itemJustExpGround.getToolTypes().contains(ToolType.HOE))returnedMaxCount=2;
+                    else if(input instanceof ShovelItem || itemJustExpGround.getToolTypes().contains(ToolType.SHOVEL))returnedMaxCount=1;
+                    else returnedMaxCount = 1;
+                }
+
+                ItemStack repairIngredientStack = repairIngredient.getMatchingStacks()[0];
+                int maxdamage = itemJustExpGround.getMaxDamage();
+                int damage = itemJustExpGround.getDamage();
+                int durability = maxdamage - damage;
+                int devider = maxdamage/returnedMaxCount;
+                int countToReturn = returnedMaxCount;
+                if(damage == 0)
+                {
+                    countToReturn = returnedMaxCount;
+                }
+                else if(durability<devider)
+                {
+                    repairIngredientStack = new ItemStack(Items.STICK);
+                    countToReturn=1;
+                }
+                else
+                {
+                    countToReturn = Math.floorDiv(durability,devider);
+                }
+
+                ItemStack toReturn = repairIngredientStack.copy();
+                repairIngredientStack.setCount(countToReturn);
+                handler.extractItem(slot,toReturn.getCount(),false);
+                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                pedestal.addItem(toReturn);
+            }
+            else if((input instanceof ArmorItem || !resultRecycler.isEmpty()) && !getItemResultRecycler.equals(Items.BARRIER))
+            {
+                Ingredient repairIngredient = Ingredient.fromStacks(resultRecycler);
+                int returnedMaxCount = resultRecycler.getCount();
+                if(resultRecycler.isEmpty())
+                {
+                    repairIngredient = ((ArmorItem)input).getArmorMaterial().getRepairMaterial();
+                    if(((ArmorItem)input).getEquipmentSlot().equals(EquipmentSlotType.HEAD))returnedMaxCount = 5;
+                    else if(((ArmorItem)input).getEquipmentSlot().equals(EquipmentSlotType.CHEST))returnedMaxCount = 8;
+                    else if(((ArmorItem)input).getEquipmentSlot().equals(EquipmentSlotType.LEGS))returnedMaxCount = 7;
+                    else if(((ArmorItem)input).getEquipmentSlot().equals(EquipmentSlotType.FEET))returnedMaxCount = 4;
+                    else returnedMaxCount = 1;
+                }
+
+                ItemStack repairIngredientStack = repairIngredient.getMatchingStacks()[0];
+                int maxdamage = itemJustExpGround.getMaxDamage();
+                int damage = itemJustExpGround.getDamage();
+                int durability = maxdamage - damage;
+                int devider = maxdamage/returnedMaxCount;
+                int countToReturn = returnedMaxCount;
+                if(damage == 0)
+                {
+                    countToReturn = returnedMaxCount;
+                }
+                else if(durability<devider)
+                {
+                    repairIngredientStack = new ItemStack(Items.PAPER).setDisplayName(new TranslationTextComponent(getTranslationKey() + ".cloth"));
+                    countToReturn=1;
+                }
+                else
+                {
+                    countToReturn = Math.floorDiv(durability,devider);
+                }
+
+                ItemStack toReturn = repairIngredientStack.copy();
+                repairIngredientStack.setCount(countToReturn);
+                handler.extractItem(slot,toReturn.getCount(),false);
+                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                pedestal.addItem(toReturn);
+            }
+            else
+            {
+                ItemStack toReturn = itemJustExpGround.copy();
+                handler.extractItem(slot,toReturn.getCount(),false);
+                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                pedestal.addItem(toReturn);
+            }
+        }
+        else
+        {
+            ItemStack toReturn = itemJustExpGround.copy();
+            handler.extractItem(slot,toReturn.getCount(),false);
+            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+            pedestal.addItem(toReturn);
         }
     }
 
@@ -227,12 +349,12 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
         tooltip.add(speed);
     }
 
-    public static final Item XPGRINDSTONE = new ItemUpgradeExpGrindstone(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpgrindstone"));
+    public static final Item RECYCLER = new ItemUpgradeRecycler(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/recycler"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(XPGRINDSTONE);
+        event.getRegistry().register(RECYCLER);
     }
 
 
