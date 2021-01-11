@@ -1227,6 +1227,31 @@ public class ItemUpgradeBase extends Item {
         return validBlocks;
     }
 
+    public int blocksToMineInAreaMoreThenOne(PedestalTileEntity pedestal, int width, int height)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        int validBlocks = 0;
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            if(canMineBlock(pedestal, blockToMinePos))
+            {
+                validBlocks++;
+                break;
+            }
+        }
+
+        return validBlocks;
+    }
+
     @Nullable
     protected QuarryBlacklistBlockRecipe getRecipeQuarryBlacklistBlock(World world, ItemStack stackIn)
     {

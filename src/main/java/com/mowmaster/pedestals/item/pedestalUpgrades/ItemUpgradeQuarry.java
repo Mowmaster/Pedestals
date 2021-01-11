@@ -171,7 +171,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                 pedestal.setStoredValueForUpgrades(val-1);
             }
             else {
-                if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
+                if(blocksToMineInAreaMoreThenOne(pedestal,rangeWidth,rangeHeight) > 0)
                 {
                     if(world.isAreaLoaded(negNums,posNums))
                     {
@@ -191,27 +191,24 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
                                 if(removeFuel(ped,200,true))
                                 {
-                                    if(blocksToMineInArea(pedestal,rangeWidth,rangeHeight) > 0)
-                                    {
-                                        if (world.getGameTime() % speed == 0) {
-                                            int currentPosition = 0;
-                                            for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
-                                            {
-                                                BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                                BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                                if(canMineBlock(pedestal,blockToMinePos))
-                                                {
-                                                    writeStoredIntToNBT(coinInPedestal,currentPosition);
-                                                    break;
-                                                }
-                                            }
+                                    if (world.getGameTime() % speed == 0) {
+                                        int currentPosition = 0;
+                                        for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                                        {
                                             BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                            BlockState targetBlock = world.getBlockState(targetPos);
-                                            upgradeAction(pedestal,world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                            if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                            if(canMineBlock(pedestal,blockToMinePos))
                                             {
-                                                writeStoredIntToNBT(coinInPedestal,0);
+                                                writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                                break;
                                             }
+                                        }
+                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                        BlockState targetBlock = world.getBlockState(targetPos);
+                                        upgradeAction(pedestal,world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                        if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                        {
+                                            writeStoredIntToNBT(coinInPedestal,0);
                                         }
                                     }
                                 }
