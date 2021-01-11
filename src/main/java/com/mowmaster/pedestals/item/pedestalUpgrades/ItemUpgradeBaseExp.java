@@ -334,6 +334,14 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         return Math.abs(i);
     }
 
+    public int spaceForXP(ItemStack coin)
+    {
+        int max = readMaxXpFromNBT(coin);
+        int stored = getXPStored(coin);
+        int space = max-stored;
+        return (space>0)?(space):(0);
+    }
+
     public void setXPStored(ItemStack stack, int value)
     {
         CompoundNBT compound = new CompoundNBT();

@@ -757,6 +757,16 @@ public class ItemUpgradeBase extends Item {
         return capacity;
     }
 
+    public int getCapacityModifierOverEnchanted(ItemStack stack)
+    {
+        int capacity = 0;
+        if(hasEnchant(stack))
+        {
+            capacity = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack);
+        }
+        return capacity;
+    }
+
     public int getItemTransferRate(ItemStack stack)
     {
         int transferRate = 1;

@@ -99,28 +99,29 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
     public int getSuckiRate(ItemStack stack)
     {
-        int suckiRate = 7;
-        switch (getCapacityModifier(stack))
+        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)-5;
+        int suckiRate = 1;
+        switch (getCapacityModifierOverEnchanted(stack))
         {
             case 0:
-                suckiRate = 7;//1
+                suckiRate = 1;//1
                 break;
             case 1:
-                suckiRate=16;//2
+                suckiRate=5;//2
                 break;
             case 2:
-                suckiRate = 27;//3
+                suckiRate = 10;//3
                 break;
             case 3:
-                suckiRate = 40;//4
+                suckiRate = 15;//4
                 break;
             case 4:
-                suckiRate = 55;//5
+                suckiRate = 15;//5
                 break;
             case 5:
-                suckiRate=160;//10
+                suckiRate=20;//10
                 break;
-            default: suckiRate=7;
+            default: suckiRate=(overEnchanted>20000)?(20000):(overEnchanted);
         }
 
         return  suckiRate;
@@ -137,10 +138,11 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
-                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
+                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpBuffer(coinInPedestal));}
                 upgradeActionSendExp(pedestal);
 
-                if (world.getGameTime()%speed == 0) {
+                //added check to make sure it has room for exp before pulling it.
+                if (world.getGameTime()%speed == 0 && spaceForXP(coinInPedestal)>0) {
                     upgradeAction(world, coinInPedestal, pedestalPos);
                 }
             }
@@ -197,7 +199,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
                         int currentlyStoredExp = getXPStored(coin);
                         if(currentlyStoredExp < readMaxXpFromNBT(coin))
                         {
-                            int transferRate = getSuckiRate(coin);
+                            int transferRate = getExpCountByLevel(getSuckiRate(coin));
                             int value = removeXp(getPlayer, transferRate);
                             if(value > 0)
                             {
@@ -230,9 +232,14 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         }
     }
 
+    @Override
     public int getExpBuffer(ItemStack stack)
     {
-        return  30;
+        int value = 100;
+        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)+30;
+
+        //20k being the max before we get close to int overflow
+        return  (overEnchanted>=20000)?(20000):(overEnchanted);
     }
 
     @Override
