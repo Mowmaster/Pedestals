@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "pedestals:coin/default",
+    "pedestals:coin/restriction",
     "pedestals:coin/dropper",
     "pedestals:coin/import",
     "pedestals:coin/fimport",
@@ -68,6 +69,7 @@
     "pedestals:coin/restock",
     "pedestals:coin/frestock",
     "pedestals:coin/itemtank",
+    "pedestals:coin/filterdurability",
     "pedestals:coin/filterenchanted",
     "pedestals:coin/filterenchantedb",
     "pedestals:coin/filteritem",

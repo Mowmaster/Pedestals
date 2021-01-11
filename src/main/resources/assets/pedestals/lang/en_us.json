@@ -149,7 +149,21 @@
     "death.attack.pedestal11": "%1$s has kicked the bucket",
     "death.attack.pedestal12": "%1$s, We told you not to play around with sharp things!",
 
-    "item.pedestals.coin.breaker": "Pedestal Upgrade",
+  "item.pedestals.coin.restriction": "Pedestal Upgrade",
+  "item.pedestals.coin.restriction.tooltip_name": "Restriction Upgrade",
+  "item.pedestals.coin.restriction.tooltip_rate": "Flow Rate: ",
+  "item.pedestals.coin.restriction.chat_rate": "Flow Rate: ",
+  "jei.pedestals.restriction.desc": "This upgrade will restrict how many items can be sent to it at once, and if full, wont allow any more items to be sent.",
+
+  "item.pedestals.coin.filterdurability": "Pedestal Upgrade",
+  "item.pedestals.coin.filterdurability.tooltip_name": "Filter Durability",
+  "item.pedestals.coin.filterdurability.tooltip_rate": "Checking Items Over: ",
+  "item.pedestals.coin.filterdurability.tooltip_rate2": "% Durability",
+  "item.pedestals.coin.filterdurability.chat_rate": "Checking Items Over: ",
+  "item.pedestals.coin.filterdurability.chat_rate2": "% Durability",
+  "jei.pedestals.filterdurability.desc": "This upgrade will restrict how many items can be sent to it at once, and if full, wont allow any more items to be sent.",
+
+  "item.pedestals.coin.breaker": "Pedestal Upgrade",
     "item.pedestals.coin.breaker.tooltip_name": "Block Breaker Upgrade",
     "item.pedestals.coin.breaker.tooltip_range": "Breaker Range: ",
     "item.pedestals.coin.breaker.tooltip_speed": "Operational Speed: ",

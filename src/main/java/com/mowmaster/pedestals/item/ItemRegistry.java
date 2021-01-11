@@ -24,6 +24,7 @@ public class ItemRegistry
         ItemPedestalUpgrades.onItemRegistryReady(e);
         ItemUpgradeDefault.onItemRegistryReady(e);
 
+        ItemUpgradeRestriction.onItemRegistryReady(e);
         ItemUpgradeDropper.onItemRegistryReady(e);
         ItemUpgradePlacer.onItemRegistryReady(e);
         ItemUpgradeBreaker.onItemRegistryReady(e);
@@ -113,6 +114,7 @@ public class ItemRegistry
         ItemUpgradeFilterModBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterFood.onItemRegistryReady(e);
         ItemUpgradeFilterFoodBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFilterDurability.onItemRegistryReady(e);
         ItemUpgradeFilterEnchanted.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedFuzzy.onItemRegistryReady(e);
