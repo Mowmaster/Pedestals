@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Linking-Pedestals%2C-and-Advanced-Uses)A pedestal powered by redstone/$ $(li)Cannot be sent Items, Exp, Energy, or Fluids.$(li)Will prevent its Upgrade from functioning.$(li)Will prevent being teleported to (if connected to a Teleporter upgraded pedestal)"
+      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Linking-Pedestals%2C-and-Advanced-Uses#redstone-control)Redstone Control: A pedestal powered by redstone/$ $(li)Cannot be sent Items, Exp, Energy, or Fluids.$(li)Will prevent its Upgrade from functioning.$(li)Will prevent being teleported to (if connected to a Teleporter upgraded pedestal)"
     },
     {
       "type": "text",
