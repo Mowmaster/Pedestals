@@ -219,10 +219,12 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
         TileEntity tileEntity = worldIn.getTileEntity(pos);
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
             int width = getWidth(pedestal.getCoinOnPedestal());
+            int widdth = (width*2)+1;
             int height = getHeight(pedestal.getCoinOnPedestal());
-            int amount = blocksToPumpInArea(pedestal,width,height);
-            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            int amount = workQueueSize(coin);
+            int area = Math.multiplyExact(Math.multiplyExact(widdth,widdth),height);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -251,11 +253,8 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
                 {
                     upgradeActionSendFluid(pedestal);
                 }
-            }
 
-            //Check if we can even insert a blocks worth of fluid
-            if(availableFluidSpaceInCoin(coinInPedestal) >= FluidAttributes.BUCKET_VOLUME || getFluidStored(coinInPedestal).isEmpty())
-            {
+
                 int rangeWidth = getWidth(coinInPedestal);
                 int rangeHeight = getHeight(coinInPedestal);
 
@@ -266,34 +265,50 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
 
                 if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(!world.isBlockPowered(pedestalPos)) {
-                        if(blocksToPumpInArea(pedestal,rangeWidth,rangeHeight) > 0)
-                        {
-                            if (world.getGameTime() % speed == 0) {
-                                int currentPosition = 0;
-                                for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
-                                {
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                    BlockPos blockToPumpPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                    BlockState targetFluidState = world.getBlockState(blockToPumpPos);
-                                    Block targetFluidBlock = targetFluidState.getBlock();
-                                    FluidStack fluidToStore = (targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0)?(new FluidStack(((FlowingFluidBlock) targetFluidBlock).getFluid(), FluidAttributes.BUCKET_VOLUME)):((targetFluidBlock instanceof IFluidBlock)?(((IFluidBlock) targetFluidBlock).drain(world, targetPos, IFluidHandler.FluidAction.SIMULATE)):(FluidStack.EMPTY));
+                    int val = readStoredIntTwoFromNBT(coinInPedestal);
+                    if(val>0)
+                    {
+                        writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                    }
+                    else {
 
-                                    if((targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0
-                                            || targetFluidBlock instanceof IFluidBlock) && canPumpFluid(world,pedestalPos,fluidToStore))
+                        //If work queue doesnt exist, try to make one
+                        if(workQueueSize(coinInPedestal)<=0)
+                        {
+                            buildWorkQueue(pedestal,rangeWidth,rangeHeight);
+                        }
+
+                        //
+                        if(workQueueSize(coinInPedestal) > 0)
+                        {
+                            //Check if we can even insert a blocks worth of fluid
+                            if(availableFluidSpaceInCoin(coinInPedestal) >= FluidAttributes.BUCKET_VOLUME || getFluidStored(coinInPedestal).isEmpty())
+                            {
+                                List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+                                if (world.getGameTime() % speed == 0) {
+                                    for(int i = 0;i< workQueue.size(); i++)
                                     {
-                                        writeStoredIntToNBT(coinInPedestal,currentPosition);
-                                        break;
+                                        BlockPos targetPos = workQueue.get(i);
+                                        BlockPos blockToPumpPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                        BlockState targetFluidState = world.getBlockState(blockToPumpPos);
+                                        Block targetFluidBlock = targetFluidState.getBlock();
+                                        if(canMineBlock(pedestal,blockToPumpPos))
+                                        {
+                                            workQueue.remove(i);
+                                            writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                            upgradeAction(pedestal, targetPos, itemInPedestal, coinInPedestal);
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            workQueue.remove(i);
+                                        }
                                     }
                                 }
-                                BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                BlockState targetBlock = world.getBlockState(targetPos);
-                                upgradeAction(pedestal, targetPos, itemInPedestal, coinInPedestal);
-                                if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
-                                {
-                                    writeStoredIntToNBT(coinInPedestal,0);
-                                }
                             }
+                        }
+                        else {
+                            writeStoredIntTwoToNBT(coinInPedestal,(((rangeWidth*2)+1)*20)+20);
                         }
                     }
                 }
@@ -358,32 +373,24 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
         }
     }
 
-    public int blocksToPumpInArea(PedestalTileEntity pedestal, int width, int height)
+    //Can Pump Block, but just reusing the quarry method here
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos blockToPumpPos = new BlockPos(blockToMinePos.getX(), blockToMinePos.getY(), blockToMinePos.getZ());
+        BlockState targetFluidState = world.getBlockState(blockToPumpPos);
+        Block targetFluidBlock = targetFluidState.getBlock();
+        FluidStack fluidToStore = (targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0)?(new FluidStack(((FlowingFluidBlock) targetFluidBlock).getFluid(), FluidAttributes.BUCKET_VOLUME)):((targetFluidBlock instanceof IFluidBlock)?(((IFluidBlock) targetFluidBlock).drain(world, blockToMinePos, IFluidHandler.FluidAction.SIMULATE)):(FluidStack.EMPTY));
 
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        if((targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0
+                || targetFluidBlock instanceof IFluidBlock) && canPumpFluid(world,pedestalPos,fluidToStore))
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToPumpPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState targetFluidState = world.getBlockState(blockToPumpPos);
-            Block targetFluidBlock = targetFluidState.getBlock();
-            FluidStack fluidToStore = (targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0)?(new FluidStack(((FlowingFluidBlock) targetFluidBlock).getFluid(), FluidAttributes.BUCKET_VOLUME)):((targetFluidBlock instanceof IFluidBlock)?(((IFluidBlock) targetFluidBlock).drain(world, targetPos, IFluidHandler.FluidAction.SIMULATE)):(FluidStack.EMPTY));
-
-            if((targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0
-                    || targetFluidBlock instanceof IFluidBlock) && canPumpFluid(world,pedestalPos,fluidToStore))
-            {
-                validBlocks++;
-            }
+            return true;
         }
 
-        return validBlocks;
+        return false;
     }
 
     @Override
@@ -410,7 +417,7 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
         }
 
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + blocksToPumpInArea(pedestal,getWidth(pedestal.getCoinOnPedestal()),getHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.appendString("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 

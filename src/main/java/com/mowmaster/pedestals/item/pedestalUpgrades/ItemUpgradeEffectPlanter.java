@@ -150,7 +150,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                                             if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
                                                 if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
                                                     Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
-                                                    if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
+                                                    if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), getPedestalFacing(world,pedestalPos), (IPlantable) block)) {
                                                         writeStoredIntToNBT(coinInPedestal, currentPosition);
                                                         break;
                                                     }

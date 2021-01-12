@@ -103,9 +103,10 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
             int width = getAreaWidth(pedestal.getCoinOnPedestal());
+            int widdth = (width*2)+1;
             int height = getRangeHeight(pedestal.getCoinOnPedestal());
-            int amount = blocksToChopInArea(pedestal,width,height);
-            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            int amount = workQueueSize(coin);
+            int area = Math.multiplyExact(Math.multiplyExact(widdth,widdth),height);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -124,58 +125,65 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            int rangeWidth = getAreaWidth(coinInPedestal);
-            int rangeHeight = getRangeHeight(coinInPedestal);
-            int speed = getOperationSpeed(coinInPedestal);
-
-            BlockState pedestalState = world.getBlockState(pedestalPos);
-            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-
-            int val = readStoredIntTwoFromNBT(coinInPedestal);
-            if(val>0)
+            if(!world.isBlockPowered(pedestalPos))
             {
-                writeStoredIntTwoToNBT(coinInPedestal,val-1);
-            }
-            else {
-                if(world.isAreaLoaded(negNums,posNums))
+                int rangeWidth = getAreaWidth(coinInPedestal);
+                int rangeHeight = getRangeHeight(coinInPedestal);
+                int speed = getOperationSpeed(coinInPedestal);
+
+                BlockState pedestalState = world.getBlockState(pedestalPos);
+                Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
+                //Should disable magneting when its not needed
+                AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                if(itemList.size()>0)
                 {
-                    if(!world.isBlockPowered(pedestalPos)) {
+                    upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                }
 
-                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                        if(itemList.size()>0)
-                        {
-                            upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
-                        }
+                int val = readStoredIntTwoFromNBT(coinInPedestal);
+                if(val>0)
+                {
+                    writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                }
+                else {
 
-                        if(blocksToChopInAreaGetOne(pedestal,rangeWidth,rangeHeight) > 0)
-                        {
-                            if (world.getGameTime() % speed == 0) {
-                                int currentPosition = 0;
-                                for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                    //If work queue doesnt exist, try to make one
+                    if(workQueueSize(coinInPedestal)<=0)
+                    {
+                        buildWorkQueue(pedestal,rangeWidth,rangeHeight);
+                    }
+
+                    //
+                    if(workQueueSize(coinInPedestal) > 0)
+                    {
+                        List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+                        if (world.getGameTime() % speed == 0) {
+                            for(int i = 0;i< workQueue.size(); i++)
+                            {
+                                BlockPos targetPos = workQueue.get(i);
+                                BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                BlockState targetBlock = world.getBlockState(blockToMinePos);
+                                if(canMineBlock(pedestal,blockToMinePos))
                                 {
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                    BlockPos blockToChopPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                    if(canChopBlock(pedestal,blockToChopPos))
-                                    {
-                                        writeStoredIntToNBT(coinInPedestal,currentPosition);
-                                        break;
-                                    }
+                                    workQueue.remove(i);
+                                    writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                    upgradeAction(pedestal, targetPos, targetBlock);
+                                    break;
                                 }
-                                BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                BlockState targetBlock = world.getBlockState(targetPos);
-                                upgradeAction(pedestal, targetPos, targetBlock);
-                                if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
+                                else
                                 {
-                                    writeStoredIntToNBT(coinInPedestal,0);
+                                    workQueue.remove(i);
                                 }
                             }
                         }
-                        else {
-                            writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
-                        }
+                    }
+                    else {
+                        //5 second cooldown
+                        writeStoredIntTwoToNBT(coinInPedestal,100);
                     }
                 }
             }
@@ -231,62 +239,14 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         }
     }
 
-    public int blocksToChopInArea(PedestalTileEntity pedestal, int width, int height)
-    {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToChopPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            if(canChopBlock(pedestal,blockToChopPos))
-            {
-                validBlocks++;
-            }
-        }
-
-        return validBlocks;
-    }
-
-    public int blocksToChopInAreaGetOne(PedestalTileEntity pedestal, int width, int height)
-    {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToChopPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            if(canChopBlock(pedestal,blockToChopPos))
-            {
-                validBlocks++;
-                break;
-            }
-        }
-
-        return validBlocks;
-    }
-
-    public boolean canChopBlock(PedestalTileEntity pedestal, BlockPos blockToChopPos)
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
-        BlockState blockStateToChop = world.getBlockState(blockToChopPos);
+        BlockState blockStateToChop = world.getBlockState(blockToMinePos);
         Block blockToChop = blockStateToChop.getBlock();
-        if(!blockToChop.isAir(blockStateToChop,world,blockToChopPos))
+        if(!blockToChop.isAir(blockStateToChop,world,blockToMinePos))
         {
             ItemStack axe = (pedestal.hasTool())?(toolInPedestal):(new ItemStack(Items.DIAMOND_AXE,1));
             ToolType tool = blockStateToChop.getHarvestTool();
@@ -356,7 +316,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
 
         //Display Blocks To Mine Left
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + blocksToChopInArea(pedestal,getAreaWidth(stack),getRangeHeight(stack)) + "");
+        btm.appendString("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 

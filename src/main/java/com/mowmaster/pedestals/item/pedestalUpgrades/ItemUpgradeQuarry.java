@@ -46,6 +46,7 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -121,9 +122,10 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
             int width = getAreaWidth(pedestal.getCoinOnPedestal());
+            int widdth = (width*2)+1;
             int height = getRangeHeight(pedestal.getCoinOnPedestal());
-            int amount = blocksToMineInArea(pedestal,width,height);
-            int area = Math.multiplyExact(Math.multiplyExact(amount,amount),height);
+            int amount = workQueueSize(coin);
+            int area = Math.multiplyExact(Math.multiplyExact(widdth,widdth),height);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -165,52 +167,60 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
             BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
-            int val = readStoredIntTwoFromNBT(coinInPedestal);
-            if(val>0)
+            if(world.isAreaLoaded(negNums,posNums))
             {
-                writeStoredIntTwoToNBT(coinInPedestal,val-1);
-            }
-            else {
-                if(world.isAreaLoaded(negNums,posNums))
-                {
-                    if(!world.isBlockPowered(pedestalPos)) {
+                if(!world.isBlockPowered(pedestalPos)) {
 
-                        //Should disable magneting when its not needed
-                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                        if(itemList.size()>0)
+                    //Should disable magneting when its not needed
+                    AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                    if(itemList.size()>0)
+                    {
+                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                    }
+
+                    int val = readStoredIntTwoFromNBT(coinInPedestal);
+                    if(val>0)
+                    {
+                        writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                    }
+                    else {
+
+                        //If work queue doesnt exist, try to make one
+                        if(workQueueSize(coinInPedestal)<=0)
                         {
-                            upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                            buildWorkQueue(pedestal,rangeWidth,rangeHeight);
                         }
 
-                        if(blocksToMineInAreaMoreThenOne(pedestal,rangeWidth,rangeHeight) > 0)
+                        //
+                        if(workQueueSize(coinInPedestal) > 0)
                         {
+                            List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
                             if(removeFuel(pedestal,200,true))
                             {
                                 if (world.getGameTime() % speed == 0) {
-                                    int currentPosition = 0;
-                                    for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
+                                    for(int i = 0;i< workQueue.size(); i++)
                                     {
-                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                                        BlockPos targetPos = workQueue.get(i);
                                         BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                        BlockState targetBlock = world.getBlockState(blockToMinePos);
                                         if(canMineBlock(pedestal,blockToMinePos))
                                         {
-                                            writeStoredIntToNBT(coinInPedestal,currentPosition);
+                                            workQueue.remove(i);
+                                            writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                            upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
                                             break;
                                         }
-                                    }
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                    BlockState targetBlock = world.getBlockState(targetPos);
-                                    upgradeAction(pedestal,world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                    if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
-                                    {
-                                        writeStoredIntToNBT(coinInPedestal,0);
+                                        else
+                                        {
+                                            workQueue.remove(i);
+                                        }
                                     }
                                 }
                             }
                         }
                         else {
-                            writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
+                            writeStoredIntTwoToNBT(coinInPedestal,(((rangeWidth*2)+1)*20)+20);
                         }
                     }
                 }
@@ -344,7 +354,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
         //Display Blocks To Mine Left
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + blocksToMineInArea(pedestal,getAreaWidth(pedestal.getCoinOnPedestal()),getRangeHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.appendString("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 

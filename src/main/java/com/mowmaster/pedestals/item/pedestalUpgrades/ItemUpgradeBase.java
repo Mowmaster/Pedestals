@@ -37,6 +37,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -1203,16 +1204,33 @@ public class ItemUpgradeBase extends Item {
         return false;
     }
 
-    public int blocksToMineInArea(PedestalTileEntity pedestal, int width, int height)
+    public int workQueueSize(ItemStack coin)
+    {
+        int workQueueSize = 0;
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            if(getCompound.contains("workqueueposx"))
+            {
+                int[] xval = getCompound.getIntArray("workqueueposx");
+                return xval.length;
+            }
+
+        }
+
+        return workQueueSize;
+    }
+
+    public void buildWorkQueue(PedestalTileEntity pedestal, int width, int height)
     {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
-        int validBlocks = 0;
+        ItemStack coin = pedestal.getCoinOnPedestal();
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
         BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
         BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
+        List<BlockPos> workQueue = new ArrayList<>();
 
         for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
         {
@@ -1220,37 +1238,132 @@ public class ItemUpgradeBase extends Item {
             BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
             if(canMineBlock(pedestal, blockToMinePos))
             {
-                validBlocks++;
+                workQueue.add(blockToMinePos);
             }
         }
 
-        return validBlocks;
+        writeWorkQueueToNBT(coin, workQueue);
     }
 
-    public int blocksToMineInAreaMoreThenOne(PedestalTileEntity pedestal, int width, int height)
+    public void writeWorkQueueToNBT(ItemStack coin, List<BlockPos> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+        }
+
+        List<Integer> xval = new ArrayList<Integer>();
+        List<Integer> yval = new ArrayList<Integer>();
+        List<Integer> zval = new ArrayList<Integer>();
+        for(int i=0;i<listIn.size();i++)
+        {
+            xval.add(i,listIn.get(i).getX());
+            yval.add(i,listIn.get(i).getY());
+            zval.add(i,listIn.get(i).getZ());
+        }
+        compound.putIntArray("workqueueposx",xval);
+        compound.putIntArray("workqueueposy",yval);
+        compound.putIntArray("workqueueposz",zval);
+
+        coin.setTag(compound);
+    }
+
+    public List<BlockPos> readWorkQueueFromNBT(ItemStack coin)
+    {
+        List<BlockPos> workQueue = new ArrayList<>();
+
+        if(workQueueSize(coin)>=0)
+        {
+            if(coin.hasTag())
+            {
+                CompoundNBT getCompound = coin.getTag();
+                int[] xval = getCompound.getIntArray("workqueueposx");
+                int[] yval = getCompound.getIntArray("workqueueposy");
+                int[] zval = getCompound.getIntArray("workqueueposz");
+
+                for(int i = 0;i<xval.length;i++)
+                {
+                    workQueue.add(new BlockPos(xval[i],yval[i],zval[i]));
+                }
+            }
+        }
+
+        return workQueue;
+    }
+
+    public List<ItemStack> buildFilterQueue(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
         int validBlocks = 0;
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posInventory = getPosOfBlockBelow(world, pedestalPos, 1);
 
+        List<ItemStack> filterQueue = new ArrayList<ItemStack>(){};
 
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
+        if(cap.isPresent())
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            if(canMineBlock(pedestal, blockToMinePos))
+            IItemHandler handler = cap.orElse(null);
+            if(handler != null)
             {
-                validBlocks++;
-                break;
+                int range = handler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = handler.getStackInSlot(i);
+                    if(!stackInSlot.isEmpty())
+                    {
+                        filterQueue.add(i,stackInSlot);
+                    }
+                }
             }
         }
 
-        return validBlocks;
+        return filterQueue;
     }
+
+    //This is needed for the "slowdown" of machines
+    public void writeFilterQueueToNBT(ItemStack stack, List<ItemStack> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putInt("filterqueuesize",listIn.size());
+        for(int i=0;i<listIn.size();i++)
+        {
+            ResourceLocation resourcelocation = Registry.ITEM.getKey(listIn.get(i).getItem());
+            compound.putString("filterqueueitem"+ i,resourcelocation == null?"minecraft:air":resourcelocation.toString());
+        }
+        stack.setTag(compound);
+    }
+
+    public List<ItemStack> readFilterQueueFromNBT(ItemStack coin)
+    {
+        int filterQueueSize = 0;
+        List<ItemStack> filterQueue = new ArrayList<ItemStack>(){};
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            filterQueueSize = getCompound.getInt("filterqueuesize");
+            for(int i=0;i<filterQueueSize;i++)
+            {
+                filterQueue.add(i,new ItemStack((Item)Registry.ITEM.getOrDefault(new ResourceLocation(getCompound.getString("filterqueueitem"+ i)))));
+            }
+        }
+
+        return filterQueue;
+    }
+
+    public boolean doesFilterAndQueueMatch(List<ItemStack> filterIn, List<ItemStack> queueMatch)
+    {
+        return filterIn.containsAll(queueMatch);
+    }
+
 
     @Nullable
     protected QuarryBlacklistBlockRecipe getRecipeQuarryBlacklistBlock(World world, ItemStack stackIn)
@@ -1313,6 +1426,53 @@ public class ItemUpgradeBase extends Item {
                 && passesFilter(world, pedestalPos, blockToMine)
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
                 && ForgeHooks.canHarvestBlock(blockToMineState,fakePlayer,world,blockToMinePos)
+                && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
+                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && advanced)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        BlockState blockToMineState = world.getBlockState(blockToMinePos);
+        Block blockToMine = blockToMineState.getBlock();
+        ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
+        ToolType tool = blockToMineState.getHarvestTool();
+
+        player.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+        if(!doItemsMatch(player.getHeldItemMainhand(),pickaxe))player.setHeldItem(Hand.MAIN_HAND,pickaxe);
+
+        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
+        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
+
+        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
+        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
+        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
+
+        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
+        boolean advanced = false;
+        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
+        {
+            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
+        }
+        else
+        {
+            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
+        }
+
+        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
+                && !(blockToMine instanceof PedestalBlock)
+                && passesFilter(world, pedestalPos, blockToMine)
+                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
+                && ForgeHooks.canHarvestBlock(blockToMineState,player,world,blockToMinePos)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
                 && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
                 && advanced)
