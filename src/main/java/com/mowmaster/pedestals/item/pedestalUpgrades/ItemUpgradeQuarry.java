@@ -220,7 +220,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                             }
                         }
                         else {
-                            writeStoredIntTwoToNBT(coinInPedestal,(((rangeWidth*2)+1)*20)+20);
+                            writeStoredIntTwoToNBT(coinInPedestal,((rangeWidth+1)*20)+20);
                         }
                     }
                 }
@@ -230,23 +230,23 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
     public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos blockToMinePos, BlockState blockToMine, BlockPos posOfPedestal)
     {
-        if(canMineBlock(pedestal, blockToMinePos))
+        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+        fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+        ItemStack pick = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
+
+        if(!pedestal.hasTool())
         {
-            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-            ItemStack pick = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
+            pick = getToolDefaultEnchanted(coinInPedestal,pick);
+        }
 
-            if(!pedestal.hasTool())
+        if(removeFuel(pedestal,200,true))
+        {
+            if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+            ToolType tool = blockToMine.getHarvestTool();
+            int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToMine);
+
+            if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
             {
-                pick = getToolDefaultEnchanted(coinInPedestal,pick);
-            }
-
-            if(removeFuel(pedestal,200,true))
-            {
-                if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
-                ToolType tool = blockToMine.getHarvestTool();
-                int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToMine);
-
                 //ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,toolLevel >= blockToMine.getHarvestLevel())
                 if (ForgeHooks.canHarvestBlock(blockToMine,fakePlayer,world,blockToMinePos)) {
                     blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());

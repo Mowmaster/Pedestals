@@ -91,10 +91,8 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
-            int width = getAreaWidth(pedestal.getCoinOnPedestal());
-            int height = getHeight(pedestal.getCoinOnPedestal());
-            int amount = blocksToPlantInArea(pedestal.getWorld(),pedestal.getPos(),pedestal.getItemInPedestal(),width,height);
-            int area = plantableSpotsInArea(pedestal.getWorld(),pedestal.getPos(),pedestal.getItemInPedestal(),width,height);
+            int amount = workQueueSize(coin);
+            int area = workQueueTwoSize(coin);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -112,70 +110,70 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
 
-
         if(!world.isRemote)
         {
-            int rangeWidth = getAreaWidth(coinInPedestal);
-            int rangeHeight = getHeight(coinInPedestal);
-            int speed = getOperationSpeed(coinInPedestal);
-
-            BlockState pedestalState = world.getBlockState(pedestalPos);
-            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-
-            int val = readStoredIntTwoFromNBT(coinInPedestal);
-            if(val>0)
+            if(!world.isBlockPowered(pedestalPos))
             {
-                writeStoredIntTwoToNBT(coinInPedestal,val-1);
-            }
-            else {
+                int rangeWidth = getAreaWidth(coinInPedestal);
+                int rangeHeight = getHeight(coinInPedestal);
+                BlockState pedestalState = world.getBlockState(pedestalPos);
+                Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
                 if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(!world.isBlockPowered(pedestalPos) && !itemInPedestal.isEmpty()) {
-                        if(blocksToPlantInAreaGetOne(world,pedestalPos,itemInPedestal,rangeWidth,rangeHeight) > 0)
-                        {
-                            if (world.getGameTime() % speed == 0) {
-                                int currentPosition = 0;
-                                for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
-                                {
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                    BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                    BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
-                                    Block blockToPlant = blockToPlantState.getBlock();
-                                    Item singleItemInPedestal = itemInPedestal.getItem();
+                    int speed = getOperationSpeed(coinInPedestal);
 
-                                    if(blockToPlant.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
-                                        if (singleItemInPedestal instanceof BlockItem) {
-                                            if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
-                                                if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
-                                                    Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
-                                                    if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), getPedestalFacing(world,pedestalPos), (IPlantable) block)) {
-                                                        writeStoredIntToNBT(coinInPedestal, currentPosition);
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
+                    //Wont Magnet anything
+
+                    int val = readStoredIntTwoFromNBT(coinInPedestal);
+                    if(val>0)
+                    {
+                        writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                    }
+                    else {
+
+                        //If work queue doesnt exist, try to make one
+                        if(workQueueSize(coinInPedestal)<=0)
+                        {
+                            buildWorkQueue(pedestal,rangeWidth,rangeHeight);
+                            buildWorkQueueTwo(pedestal,rangeWidth,rangeHeight);
+                            //No Need to update since the item getting removed will update the ped for us
+                        }
+
+                        if(workQueueSize(coinInPedestal) > 0)
+                        {
+                            List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+                            if (world.getGameTime() % speed == 0) {
+                                for(int i = 0;i< workQueue.size(); i++)
+                                {
+                                    BlockPos targetPos = workQueue.get(i);
+                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                    BlockState targetBlock = world.getBlockState(blockToMinePos);
+                                    if(canMineBlock(pedestal,blockToMinePos))
+                                    {
+                                        workQueue.remove(i);
+                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                        upgradeAction(world, pedestal, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        workQueue.remove(i);
                                     }
                                 }
-                                BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                BlockState targetBlock = world.getBlockState(targetPos);
-                                upgradeAction(world, pedestal, itemInPedestal, pedestalPos, targetPos, targetBlock);
-                                if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
-                                {
-                                    writeStoredIntToNBT(coinInPedestal,0);
-                                }
                             }
-
                         }
                         else {
-                            writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
+                            //5 second cooldown
+                            writeStoredIntTwoToNBT(coinInPedestal,100);
                         }
                     }
                 }
             }
         }
+
     }
 
     public void upgradeAction(World world, PedestalTileEntity pedestal, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
@@ -211,104 +209,60 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         }
     }
 
-    public int plantableSpotsInArea(World world, BlockPos pedestalPos, ItemStack itemInPedestal, int width, int height)
+    //Blocks That Can Be Planted
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        World world = pedestal.getWorld();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
+        Block blockToPlant = blockToPlantState.getBlock();
+        Item singleItemInPedestal = itemInPedestal.getItem();
 
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
-            Block blockToPlant = blockToPlantState.getBlock();
-            Item singleItemInPedestal = itemInPedestal.getItem();
-
-            if(!singleItemInPedestal.equals(Items.AIR)) {
-                if (singleItemInPedestal instanceof BlockItem) {
-                    if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
-                        if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
-                            Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
-                            if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
-                                validBlocks++;
-                            }
+        if(!singleItemInPedestal.equals(Items.AIR)) {
+            if (singleItemInPedestal instanceof BlockItem) {
+                if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
+                    if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
+                        Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
+                        if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
+                            return true;
                         }
                     }
                 }
             }
         }
 
-        return validBlocks;
+        return false;
     }
 
-    public int blocksToPlantInArea(World world, BlockPos pedestalPos, ItemStack itemInPedestal, int width, int height)
+    //All Possible Crop Spaces In Area
+    @Override
+    public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        World world = pedestal.getWorld();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
+        Block blockToPlant = blockToPlantState.getBlock();
+        Item singleItemInPedestal = itemInPedestal.getItem();
 
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
-            Block blockToPlant = blockToPlantState.getBlock();
-            Item singleItemInPedestal = itemInPedestal.getItem();
-
-            if(blockToPlant.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
-                if (singleItemInPedestal instanceof BlockItem) {
-                    if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
-                        if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
-                            Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
-                            if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
-                                validBlocks++;
-                            }
+        if(blockToPlant.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
+            if (singleItemInPedestal instanceof BlockItem) {
+                if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
+                    if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
+                        Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
+                        if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
+                            return true;
                         }
                     }
                 }
             }
         }
 
-        return validBlocks;
-    }
-
-    public int blocksToPlantInAreaGetOne(World world, BlockPos pedestalPos, ItemStack itemInPedestal, int width, int height)
-    {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
-            Block blockToPlant = blockToPlantState.getBlock();
-            Item singleItemInPedestal = itemInPedestal.getItem();
-
-            if(blockToPlant.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
-                if (singleItemInPedestal instanceof BlockItem) {
-                    if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
-                        if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
-                            Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
-                            if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
-                                validBlocks++;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return validBlocks;
+        return false;
     }
 
     @Override
@@ -332,7 +286,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         player.sendMessage(area,Util.DUMMY_UUID);
 
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + blocksToPlantInArea(pedestal.getWorld(),pedestal.getPos(),pedestal.getItemInPedestal(),getAreaWidth(pedestal.getCoinOnPedestal()),getHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.appendString("" + workQueueSize(stack) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 

@@ -220,7 +220,7 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
                             }
                         }
                         else {
-                            writeStoredIntTwoToNBT(coinInPedestal,(((rangeWidth*2)+1)*20)+20);
+                            writeStoredIntTwoToNBT(coinInPedestal,((rangeWidth+1)*20)+20);
                         }
                     }
                 }

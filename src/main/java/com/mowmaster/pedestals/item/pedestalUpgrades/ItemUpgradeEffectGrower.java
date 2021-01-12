@@ -89,10 +89,8 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
-            int width = getAreaWidth(pedestal.getCoinOnPedestal());
-            int height = getHeight(pedestal.getCoinOnPedestal());
-            int amount = blocksToGrowInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
-            int area = blocksCropsInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
+            int amount = workQueueSize(coin);
+            int area = workQueueTwoSize(coin);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -112,80 +110,68 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
         if(!world.isRemote)
         {
-            int rangeWidth = getAreaWidth(coinInPedestal);
-            int rangeHeight = getHeight(coinInPedestal);
-            int speed = getOperationSpeed(coinInPedestal);
-
-            BlockState pedestalState = world.getBlockState(pedestalPos);
-            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-
-            int val = readStoredIntTwoFromNBT(coinInPedestal);
-            if(val>0)
+            if(!world.isBlockPowered(pedestalPos))
             {
-                writeStoredIntTwoToNBT(coinInPedestal,val-1);
-            }
-            else {
+                int rangeWidth = getAreaWidth(coinInPedestal);
+                int rangeHeight = getHeight(coinInPedestal);
+                BlockState pedestalState = world.getBlockState(pedestalPos);
+                Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
                 if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(!world.isBlockPowered(pedestalPos)) {
-                        if(blocksToGrowInAreaGetOne(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+                    int speed = getOperationSpeed(coinInPedestal);
+
+                    //Wont Magnet anything
+
+                    int val = readStoredIntTwoFromNBT(coinInPedestal);
+                    if(val>0)
+                    {
+                        writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                    }
+                    else {
+
+                        //If work queue doesnt exist, try to make one
+                        if(workQueueSize(coinInPedestal)<=0)
                         {
-                            int leftToGrow = blocksToGrowInArea(world,pedestalPos,rangeWidth,rangeHeight);
-                            if(leftToGrow > 0)
-                            {
-                                if (world.getGameTime() % speed == 0) {
-                                    int currentPosition = 0;
-                                    for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
-                                    {
-                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                        BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
-                                        Block blockToGrow = blockToGrowState.getBlock();
-                                        if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
-                                        {
-                                            writeStoredIntToNBT(coinInPedestal,currentPosition+1);
-                                            break;
-                                        }
-                                    }
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                    BlockState targetBlock = world.getBlockState(targetPos);
-                                    upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
-                                    if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
-                                    {
-                                        //basically if the fertilizer runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
-                                        if(itemInPedestal.isEmpty())
-                                        {
-                                            if(pedestal.getStoredValueForUpgrades() != leftToGrow)
-                                            {
-                                                pedestal.setStoredValueForUpgrades(leftToGrow);
-                                            }
-                                        }
-                                        writeStoredIntToNBT(coinInPedestal,0);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                //basically if the fertilizer runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
-                                if(itemInPedestal.isEmpty())
+                            buildWorkQueue(pedestal,rangeWidth,rangeHeight);
+                            buildWorkQueueTwo(pedestal,rangeWidth,rangeHeight);
+                            //Update pedestal if no items are present so that the comparator will update for the passive mode
+                            if(itemInPedestal.isEmpty()) {pedestal.update();}
+                        }
+
+                        if(workQueueSize(coinInPedestal) > 0)
+                        {
+                            List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+                            if (world.getGameTime() % speed == 0) {
+                                for(int i = 0;i< workQueue.size(); i++)
                                 {
-                                    if(pedestal.getStoredValueForUpgrades()!= 0)
+                                    BlockPos targetPos = workQueue.get(i);
+                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                    BlockState targetBlock = world.getBlockState(blockToMinePos);
+                                    if(canMineBlock(pedestal,blockToMinePos))
                                     {
-                                        pedestal.setStoredValueForUpgrades(0);
+                                        workQueue.remove(i);
+                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                        upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        workQueue.remove(i);
                                     }
                                 }
                             }
                         }
                         else {
-                            writeStoredIntTwoToNBT(coinInPedestal,(rangeWidth*20)+20);
+                            //5 second cooldown
+                            writeStoredIntTwoToNBT(coinInPedestal,100);
                         }
                     }
                 }
             }
         }
-
     }
 
     public void upgradeAction(World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
@@ -225,82 +211,42 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         }
     }
 
-    public int blocksToGrowInArea(World world, BlockPos pedestalPos, int width, int height)
+    //Blocks That Can Be Bonemealed
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+        Block blockToGrow = blockToGrowState.getBlock();
+        if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
-            Block blockToGrow = blockToGrowState.getBlock();
-            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
-            {
-                if (blockToGrow instanceof IGrowable) {
-                    if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
-                        validBlocks++;
-                    }
+            if (blockToGrow instanceof IGrowable) {
+                if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
+                    return true;
                 }
             }
         }
 
-        return validBlocks;
+        return false;
     }
 
-    public int blocksToGrowInAreaGetOne(World world, BlockPos pedestalPos, int width, int height)
+    //All Possible Crops In Area
+    @Override
+    public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+        Block blockToGrow = blockToGrowState.getBlock();
+        if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
-            Block blockToGrow = blockToGrowState.getBlock();
-            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
-            {
-                if (blockToGrow instanceof IGrowable) {
-                    if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
-                        validBlocks++;
-                        break;
-                    }
-                }
-            }
+            return true;
         }
 
-        return validBlocks;
-    }
-
-    public int blocksCropsInArea(World world, BlockPos pedestalPos, int width, int height)
-    {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
-            Block blockToGrow = blockToGrowState.getBlock();
-            if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
-            {
-                validBlocks++;
-            }
-        }
-
-        return validBlocks;
+        return false;
     }
 
     @Override
@@ -324,7 +270,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         player.sendMessage(area,Util.DUMMY_UUID);
 
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + blocksToGrowInArea(pedestal.getWorld(),pedestal.getPos(),getAreaWidth(pedestal.getCoinOnPedestal()),getHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.appendString("" + workQueueSize(stack) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 

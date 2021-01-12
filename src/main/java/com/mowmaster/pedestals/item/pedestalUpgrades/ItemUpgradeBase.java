@@ -1292,6 +1292,95 @@ public class ItemUpgradeBase extends Item {
         return workQueue;
     }
 
+
+    public int workQueueTwoSize(ItemStack coin)
+    {
+        int workQueueTwoSize = 0;
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            if(getCompound.contains("workqueuetwoposx"))
+            {
+                int[] xval = getCompound.getIntArray("workqueuetwoposx");
+                return xval.length;
+            }
+
+        }
+
+        return workQueueTwoSize;
+    }
+
+    public void buildWorkQueueTwo(PedestalTileEntity pedestal, int width, int height)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        List<BlockPos> workQueueTwo = new ArrayList<>();
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            if(canMineBlockTwo(pedestal, blockToMinePos))
+            {
+                workQueueTwo.add(blockToMinePos);
+            }
+        }
+
+        writeWorkQueueTwoToNBT(coin, workQueueTwo);
+    }
+
+    public void writeWorkQueueTwoToNBT(ItemStack coin, List<BlockPos> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+        }
+
+        List<Integer> xval = new ArrayList<Integer>();
+        List<Integer> yval = new ArrayList<Integer>();
+        List<Integer> zval = new ArrayList<Integer>();
+        for(int i=0;i<listIn.size();i++)
+        {
+            xval.add(i,listIn.get(i).getX());
+            yval.add(i,listIn.get(i).getY());
+            zval.add(i,listIn.get(i).getZ());
+        }
+        compound.putIntArray("workqueuetwoposx",xval);
+        compound.putIntArray("workqueuetwoposy",yval);
+        compound.putIntArray("workqueuetwoposz",zval);
+
+        coin.setTag(compound);
+    }
+
+    public List<BlockPos> readWorkQueueTwoFromNBT(ItemStack coin)
+    {
+        List<BlockPos> workQueueTwo = new ArrayList<>();
+
+        if(workQueueTwoSize(coin)>=0)
+        {
+            if(coin.hasTag())
+            {
+                CompoundNBT getCompound = coin.getTag();
+                int[] xval = getCompound.getIntArray("workqueuetwoposx");
+                int[] yval = getCompound.getIntArray("workqueuetwoposy");
+                int[] zval = getCompound.getIntArray("workqueuetwoposz");
+
+                for(int i = 0;i<xval.length;i++)
+                {
+                    workQueueTwo.add(new BlockPos(xval[i],yval[i],zval[i]));
+                }
+            }
+        }
+
+        return workQueueTwo;
+    }
+
     public List<ItemStack> buildFilterQueue(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
@@ -1433,6 +1522,11 @@ public class ItemUpgradeBase extends Item {
             return true;
         }
 
+        return false;
+    }
+
+    public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    {
         return false;
     }
 

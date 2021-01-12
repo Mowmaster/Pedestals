@@ -6,6 +6,7 @@ import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
@@ -13,6 +14,7 @@ import net.minecraft.state.Property;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -148,10 +150,8 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
-            int width = getAreaWidth(pedestal.getCoinOnPedestal());
-            int height = getHeight(pedestal.getCoinOnPedestal());
-            int amount = blocksToHarvestInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
-            int area = hivesInArea(pedestal.getWorld(),pedestal.getPos(),width,height);
+            int amount = workQueueSize(coin);
+            int area = workQueueTwoSize(coin);
             if(amount>0)
             {
                 float f = (float)amount/(float)area;
@@ -170,74 +170,65 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            int rangeWidth = getAreaWidth(coinInPedestal);
-            int rangeHeight = getHeight(coinInPedestal);
-            int speed = getOperationSpeed(coinInPedestal);
-
-            BlockState pedestalState = world.getBlockState(pedestalPos);
-            Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-
-            int val = pedestal.getStoredValueForUpgrades();
-            if(val>0)
+            if(!world.isBlockPowered(pedestalPos))
             {
-                pedestal.setStoredValueForUpgrades(val-1);
-            }
-            else {
+                int rangeWidth = getAreaWidth(coinInPedestal);
+                int rangeHeight = getRangeHeight(coinInPedestal);
+                BlockState pedestalState = world.getBlockState(pedestalPos);
+                Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
                 if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(!world.isBlockPowered(pedestalPos)) {
-                        if(blocksToHarvestInAreaGetOne(world,pedestalPos,rangeWidth,rangeHeight) > 0)
+
+                    int speed = getOperationSpeed(coinInPedestal);
+
+                    //Wont Magnet anything
+
+                    int val = readStoredIntTwoFromNBT(coinInPedestal);
+                    if(val>0)
+                    {
+                        writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                    }
+                    else {
+
+                        //If work queue doesnt exist, try to make one
+                        if(workQueueSize(coinInPedestal)<=0)
                         {
-                            int hivesToHarvest = blocksToHarvestInArea(world,pedestalPos,rangeWidth,rangeHeight);
-                            if(hivesToHarvest > 0)
-                            {
-                                if (world.getGameTime() % speed == 0) {
-                                    int currentPosition = 0;
-                                    for(currentPosition = getStoredInt(coinInPedestal);!resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));currentPosition++)
-                                    {
-                                        BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                        BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                        BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
-                                        Block blockToHarvest = blockToHarvestState.getBlock();
-                                        if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
-                                        {
-                                            writeStoredIntToNBT(coinInPedestal,currentPosition);
-                                            break;
-                                        }
-                                    }
-                                    BlockPos targetPos = getPosOfNextBlock(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-                                    BlockState targetBlock = world.getBlockState(targetPos);
-                                    //basically if the harvester runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
-                                    if(itemInPedestal.isEmpty())
-                                    {
-                                        if(pedestal.getStoredValueForUpgrades() != hivesToHarvest)
-                                        {
-                                            pedestal.setStoredValueForUpgrades(hivesToHarvest);
-                                        }
-                                    }
-                                    upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
-                                    if(resetCurrentPosInt(currentPosition,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums)))
-                                    {
-                                        writeStoredIntToNBT(coinInPedestal,0);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                //basically if the harvester runs in "passive" mode it never does block updates, so i need to force them for the comparator to work
-                                if(itemInPedestal.isEmpty())
+                            buildWorkQueue(pedestal,rangeWidth,rangeHeight);
+                            buildWorkQueueTwo(pedestal,rangeWidth,rangeHeight);
+                            //Update Pedestal so the comparator can update just incase the pedestal inv never changes
+                            pedestal.update();
+                        }
+
+                        //
+                        if(workQueueSize(coinInPedestal) > 0)
+                        {
+                            List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+                            if (world.getGameTime() % speed == 0) {
+                                for(int i = 0;i< workQueue.size(); i++)
                                 {
-                                    if(pedestal.getStoredValueForUpgrades()!= 0)
+                                    BlockPos targetPos = workQueue.get(i);
+                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                    BlockState targetBlock = world.getBlockState(blockToMinePos);
+                                    if(canMineBlock(pedestal,blockToMinePos))
                                     {
-                                        pedestal.setStoredValueForUpgrades(0);
+                                        workQueue.remove(i);
+                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                        upgradeAction(world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        workQueue.remove(i);
                                     }
                                 }
                             }
                         }
                         else {
-                            pedestal.setStoredValueForUpgrades((rangeWidth*20)+20);
+                            //5 second cooldown
+                            writeStoredIntTwoToNBT(coinInPedestal,100);
                         }
                     }
                 }
@@ -247,192 +238,76 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
 
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
     {
-
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
-
             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
             ItemStack harvestingShears = (itemInPedestal.isEmpty())?(new ItemStack(Items.SHEARS,1)):(itemInPedestal);
-            if(!fakePlayer.getHeldItemMainhand().equals(harvestingShears))
-            {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);
-            }
-            BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
-            ItemStack itemFromInv = ItemStack.EMPTY;
-            /*LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-            if(cap.isPresent())
-            {
-                IItemHandler handler = cap.orElse(null);
-                TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if(invToPullFrom instanceof PedestalTileEntity) {
-                    itemFromInv = ItemStack.EMPTY;
+            if(!fakePlayer.getHeldItemMainhand().equals(harvestingShears)) {fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);}
 
-                }
-                else {
-                    if(handler != null)
+            PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
+            if (!MinecraftForge.EVENT_BUS.post(e)) {
+                TileEntity tile = world.getTileEntity(posOfPedestal);
+                if(tile instanceof PedestalTileEntity)
+                {
+                    PedestalTileEntity pedestal = ((PedestalTileEntity) tile);
+                    ActionResultType type = ((BeehiveBlock)target.getBlock()).onBlockActivated(target,world,posTarget,fakePlayer,Hand.MAIN_HAND,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,true));
+                    if(type == ActionResultType.CONSUME || type == ActionResultType.SUCCESS)
                     {
-                        int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
-                        if(i>=0)
+                        if(!itemInPedestal.isEmpty())
                         {
-                            itemFromInv = handler.getStackInSlot(i);
-                            if(itemFromInv.getItem().equals(Items.GLASS_BOTTLE))
+                            ItemStack itemInFakeBoy = ItemStack.EMPTY;
+                            itemInFakeBoy = IntStream.range(0,fakePlayer.inventory.getSizeInventory())//Int Range
+                                    .mapToObj((fakePlayer.inventory)::getStackInSlot)//Function being applied to each interval
+                                    .filter(itemStack -> !itemStack.isEmpty())
+                                    .filter(itemStack -> !itemStack.getItem().equals(itemInPedestal.getItem()))
+                                    .findFirst().orElse(ItemStack.EMPTY);
+                            BlockPos spawnItemHere = getPosOfBlockBelow(world,posTarget,-1);
+                            pedestal.spawnItemStack(world,spawnItemHere.getX(),spawnItemHere.getY(),spawnItemHere.getZ(),itemInFakeBoy);
+                            int getSlot = getPlayerSlotWithMatchingStackExact(fakePlayer.inventory,itemInFakeBoy);
+                            if(getSlot>=0 && !fakePlayer.inventory.getStackInSlot(0).getItem().equals(itemInPedestal.getItem()))
                             {
-                                if(!fakePlayer.getHeldItemMainhand().equals(new ItemStack(Items.GLASS_BOTTLE)))
-                                {
-                                    fakePlayer.setHeldItem(Hand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
-                                }
-                                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
-                                if (!MinecraftForge.EVENT_BUS.post(e)) {
-                                    TileEntity tile = world.getTileEntity(posOfPedestal);
-                                    if(tile instanceof PedestalTileEntity)
-                                    {
-                                        PedestalTileEntity pedestal = ((PedestalTileEntity) tile);
-                                        if(pedestal.addItem(new ItemStack(Items.HONEY_BOTTLE)))
-                                        {
-                                            handler.extractItem(i,1 ,false);
-                                            ((BeehiveBlock)target.getBlock()).onBlockActivated(target,world,posTarget,fakePlayer,Hand.MAIN_HAND,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,false));
-                                            //((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
-                                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,178,35));
-                                            //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY(),posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
-                                            world.playSound((PlayerEntity)null, posTarget, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0F, 1.0F);
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
-                                if (!MinecraftForge.EVENT_BUS.post(e)) {
-                                    TileEntity tile = world.getTileEntity(posOfPedestal);
-                                    if(tile instanceof PedestalTileEntity)
-                                    {
-                                        PedestalTileEntity pedestal = ((PedestalTileEntity) tile);
-                                        if(pedestal.addItem(new ItemStack(Items.HONEYCOMB,3)))
-                                        {
-                                            ((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
-                                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,178,35));
-                                            //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY(),posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
-                                            world.playSound((PlayerEntity)null, posTarget, SoundEvents.BLOCK_BEEHIVE_SHEAR, SoundCategory.BLOCKS, 1.0F, 1.0F);
-                                        }
-                                    }
-                                }
+                                fakePlayer.inventory.removeStackFromSlot(getSlot);
                             }
                         }
                     }
                 }
-
-            }*/
-            //Is it needed? idk
-            //else
-            //{
-                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
-                if (!MinecraftForge.EVENT_BUS.post(e)) {
-                    TileEntity tile = world.getTileEntity(posOfPedestal);
-                    if(tile instanceof PedestalTileEntity)
-                    {
-                        PedestalTileEntity pedestal = ((PedestalTileEntity) tile);
-                        ActionResultType type = ((BeehiveBlock)target.getBlock()).onBlockActivated(target,world,posTarget,fakePlayer,Hand.MAIN_HAND,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,true));
-                        if(type == ActionResultType.CONSUME || type == ActionResultType.SUCCESS)
-                        {
-                            if(!itemInPedestal.isEmpty())
-                            {
-                                ItemStack itemInFakeBoy = ItemStack.EMPTY;
-                                itemInFakeBoy = IntStream.range(0,fakePlayer.inventory.getSizeInventory())//Int Range
-                                        .mapToObj((fakePlayer.inventory)::getStackInSlot)//Function being applied to each interval
-                                        .filter(itemStack -> !itemStack.isEmpty())
-                                        .filter(itemStack -> !itemStack.getItem().equals(itemInPedestal.getItem()))
-                                        .findFirst().orElse(ItemStack.EMPTY);
-                                BlockPos spawnItemHere = getPosOfBlockBelow(world,posTarget,-1);
-                                pedestal.spawnItemStack(world,spawnItemHere.getX(),spawnItemHere.getY(),spawnItemHere.getZ(),itemInFakeBoy);
-                                int getSlot = getPlayerSlotWithMatchingStackExact(fakePlayer.inventory,itemInFakeBoy);
-                                if(getSlot>=0 && !fakePlayer.inventory.getStackInSlot(0).getItem().equals(itemInPedestal.getItem()))
-                                {
-                                    fakePlayer.inventory.removeStackFromSlot(getSlot);
-                                }
-                            }
-                        }
-                        /*if(pedestal.addItem(new ItemStack(Items.HONEYCOMB,3)))
-                        {
-                            ((BeehiveBlock)target.getBlock()).takeHoney(world,target,posTarget,fakePlayer, BeehiveTileEntity.State.BEE_RELEASED);
-                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,178,35));
-                            //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY(),posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
-                            world.playSound((PlayerEntity)null, posTarget, SoundEvents.BLOCK_BEEHIVE_SHEAR, SoundCategory.BLOCKS, 1.0F, 1.0F);
-                        }*/
-                    }
-                }
-            //}
+            }
         }
     }
 
-    public int blocksToHarvestInArea(World world, BlockPos pedestalPos, int width, int height)
+    //Can Harvest Hives (hives available to harvest)
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+        Block blockToHarvest = blockToHarvestState.getBlock();
+        if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
-            Block blockToHarvest = blockToHarvestState.getBlock();
-            if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
-            {
-                validBlocks++;
-            }
+            return true;
         }
 
-        return validBlocks;
+        return false;
     }
 
-    public int blocksToHarvestInAreaGetOne(World world, BlockPos pedestalPos, int width, int height)
+    //All Hives In Area
+    @Override
+    public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+        Block blockToHarvest = blockToHarvestState.getBlock();
+        if(blockToHarvestState.isIn(BlockTags.BEEHIVES))
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
-            Block blockToHarvest = blockToHarvestState.getBlock();
-            if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
-            {
-                validBlocks++;
-                break;
-            }
+            return true;
         }
 
-        return validBlocks;
-    }
-
-    public int hivesInArea(World world, BlockPos pedestalPos, int width, int height)
-    {
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
-            Block blockToHarvest = blockToHarvestState.getBlock();
-            if(blockToHarvestState.isIn(BlockTags.BEEHIVES))
-            {
-                validBlocks++;
-            }
-        }
-
-        return validBlocks;
+        return false;
     }
 
     @Override
@@ -458,7 +333,7 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         player.sendMessage(area,Util.DUMMY_UUID);
 
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + blocksToHarvestInArea(pedestal.getWorld(),pedestal.getPos(),getAreaWidth(pedestal.getCoinOnPedestal()),getHeight(pedestal.getCoinOnPedestal())) + "");
+        btm.appendString("" + workQueueSize(stack) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
 
