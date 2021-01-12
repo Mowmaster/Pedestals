@@ -145,18 +145,18 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         ToolType tool = blockToBreak.getHarvestTool();
         int toolLevel = pickaxe.getHarvestLevel(tool, null, blockToBreak);
         //if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && toolLevel >= blockToBreak.getHarvestLevel() &&blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
-        if(canMineBlock(pedestal, posOfBlock))
+        if(!blockToBreak.isAir())
         {
-            if (!fakePlayer.getHeldItemMainhand().equals(pickaxe)) {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND, pickaxe);
-            }
+            if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
 
-            tool = blockToBreak.getHarvestTool();
-            toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToBreak);
-            if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,toolLevel >= blockToBreak.getHarvestLevel())) {
-                //This event is already called in the Event factory doPlayerHarvestCheck
-                //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
-                //if (MinecraftForge.EVENT_BUS.post(e)) {
+            if(canMineBlock(pedestal, posOfBlock,fakePlayer))
+            {
+                tool = blockToBreak.getHarvestTool();
+                toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToBreak);
+                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,toolLevel >= blockToBreak.getHarvestLevel())) {
+                    //This event is already called in the Event factory doPlayerHarvestCheck
+                    //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
+                    //if (MinecraftForge.EVENT_BUS.post(e)) {
                     blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
                     blockToBreak.getBlock().onBlockHarvested(world, posOfBlock, blockToBreak, fakePlayer);
                     int expdrop = blockToBreak.getBlock().getExpDrop(blockToBreak,world,posOfBlock,
@@ -164,7 +164,8 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                             (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
                     if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
                     world.removeBlock(posOfBlock, false);
-                //}
+                    //}
+                }
             }
         }
     }
