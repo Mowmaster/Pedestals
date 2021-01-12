@@ -147,7 +147,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                             itemToEnchant.setCount(1);
                                             //the boolean at the end controls if treasure enchants are allowed.
                                             ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
-                                            if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted())
+                                            if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted() || stackToReturn.getItem().equals(Items.ENCHANTED_BOOK))
                                             {
                                                 int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
                                                 setXPStored(coinInPedestal,getExpLeftInPedestal);
