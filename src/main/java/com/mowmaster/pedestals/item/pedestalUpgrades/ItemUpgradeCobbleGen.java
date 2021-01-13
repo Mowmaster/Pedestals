@@ -170,7 +170,13 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 removeCobble(pedestal,amountOut,false);
             }
-            return new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+
+            ItemStack toReturn = new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+            return (toReturn.getCount()>0 || toReturn.isEmpty())?(toReturn):(ItemStack.EMPTY);
+            //Fm in e6 discord pinged me an issue where mek was spamming the console
+            //#BlameMek
+            //https://github.com/mekanism/Mekanism/blob/99f3b1e517a58f825349772cfd981d15f1c40e8f/src/main/java/mekanism/common/lib/inventory/TileTransitRequest.java#L67
+            //return new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
         }
         else
         {
