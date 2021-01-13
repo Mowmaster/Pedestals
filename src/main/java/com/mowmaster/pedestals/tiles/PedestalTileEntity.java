@@ -661,13 +661,17 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public ItemStack removeCoin() {
         IItemHandler ph = privateHandler.orElse(null);
-        ItemStack stack = ph.extractItem(0,ph.getStackInSlot(0).getCount(),false);
-        ((ItemUpgradeBase)stack.getItem()).removePlayerFromCoin(stack);
-        ((ItemUpgradeBase)stack.getItem()).removeWorkQueueFromCoin(stack);
-        ((ItemUpgradeBase)stack.getItem()).removeWorkQueueTwoFromCoin(stack);
-        ((ItemUpgradeBase)stack.getItem()).removeStoredIntFromCoin(stack);
-        ((ItemUpgradeBase)stack.getItem()).removeStoredIntTwoFromCoin(stack);
-
+        ItemStack stack = ph.getStackInSlot(0);
+        if(stack.getItem() instanceof ItemUpgradeBase){
+            ItemUpgradeBase coin = (ItemUpgradeBase)stack.getItem();
+            coin.removePlayerFromCoin(stack);
+            coin.removeWorkQueueFromCoin(stack);
+            coin.removeWorkQueueTwoFromCoin(stack);
+            coin.removeStoredIntFromCoin(stack);
+            coin.removeStoredIntTwoFromCoin(stack);
+            coin.removeFilterQueueHandler(stack);
+        }
+        ph.extractItem(0,stack.getCount(),false);
         setStoredValueForUpgrades(0);
         //update();
 
@@ -1333,7 +1337,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                     Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
                     if(coinInPed instanceof ItemUpgradeBase)
                     {
-                        ((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(world, tilePedestal, pos, state, entityIn);
+                        ((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(tilePedestal, entityIn);
                     }
                 }
             }
