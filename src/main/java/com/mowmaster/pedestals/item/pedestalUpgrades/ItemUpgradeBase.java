@@ -28,6 +28,8 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tags.BlockTags;
@@ -57,6 +59,7 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -1037,6 +1040,11 @@ public class ItemUpgradeBase extends Item {
      **      Start of BlockPos Stuff       **
      ****************************************
      ***************************************/
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal)
+    {
+
+    }
+
     public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
     {
         Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
@@ -1203,256 +1211,6 @@ public class ItemUpgradeBase extends Item {
     {
         return false;
     }
-
-    public int workQueueSize(ItemStack coin)
-    {
-        int workQueueSize = 0;
-        if(coin.hasTag())
-        {
-            CompoundNBT getCompound = coin.getTag();
-            if(getCompound.contains("workqueueposx"))
-            {
-                int[] xval = getCompound.getIntArray("workqueueposx");
-                return xval.length;
-            }
-
-        }
-
-        return workQueueSize;
-    }
-
-    public void buildWorkQueue(PedestalTileEntity pedestal, int width, int height)
-    {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        List<BlockPos> workQueue = new ArrayList<>();
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            if(canMineBlock(pedestal, blockToMinePos))
-            {
-                workQueue.add(blockToMinePos);
-            }
-        }
-
-        writeWorkQueueToNBT(coin, workQueue);
-    }
-
-    public void writeWorkQueueToNBT(ItemStack coin, List<BlockPos> listIn)
-    {
-        CompoundNBT compound = new CompoundNBT();
-        if(coin.hasTag())
-        {
-            compound = coin.getTag();
-        }
-
-        List<Integer> xval = new ArrayList<Integer>();
-        List<Integer> yval = new ArrayList<Integer>();
-        List<Integer> zval = new ArrayList<Integer>();
-        for(int i=0;i<listIn.size();i++)
-        {
-            xval.add(i,listIn.get(i).getX());
-            yval.add(i,listIn.get(i).getY());
-            zval.add(i,listIn.get(i).getZ());
-        }
-        compound.putIntArray("workqueueposx",xval);
-        compound.putIntArray("workqueueposy",yval);
-        compound.putIntArray("workqueueposz",zval);
-
-        coin.setTag(compound);
-    }
-
-    public List<BlockPos> readWorkQueueFromNBT(ItemStack coin)
-    {
-        List<BlockPos> workQueue = new ArrayList<>();
-
-        if(workQueueSize(coin)>=0)
-        {
-            if(coin.hasTag())
-            {
-                CompoundNBT getCompound = coin.getTag();
-                int[] xval = getCompound.getIntArray("workqueueposx");
-                int[] yval = getCompound.getIntArray("workqueueposy");
-                int[] zval = getCompound.getIntArray("workqueueposz");
-
-                for(int i = 0;i<xval.length;i++)
-                {
-                    workQueue.add(new BlockPos(xval[i],yval[i],zval[i]));
-                }
-            }
-        }
-
-        return workQueue;
-    }
-
-
-    public int workQueueTwoSize(ItemStack coin)
-    {
-        int workQueueTwoSize = 0;
-        if(coin.hasTag())
-        {
-            CompoundNBT getCompound = coin.getTag();
-            if(getCompound.contains("workqueuetwoposx"))
-            {
-                int[] xval = getCompound.getIntArray("workqueuetwoposx");
-                return xval.length;
-            }
-
-        }
-
-        return workQueueTwoSize;
-    }
-
-    public void buildWorkQueueTwo(PedestalTileEntity pedestal, int width, int height)
-    {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        List<BlockPos> workQueueTwo = new ArrayList<>();
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
-        {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            if(canMineBlockTwo(pedestal, blockToMinePos))
-            {
-                workQueueTwo.add(blockToMinePos);
-            }
-        }
-
-        writeWorkQueueTwoToNBT(coin, workQueueTwo);
-    }
-
-    public void writeWorkQueueTwoToNBT(ItemStack coin, List<BlockPos> listIn)
-    {
-        CompoundNBT compound = new CompoundNBT();
-        if(coin.hasTag())
-        {
-            compound = coin.getTag();
-        }
-
-        List<Integer> xval = new ArrayList<Integer>();
-        List<Integer> yval = new ArrayList<Integer>();
-        List<Integer> zval = new ArrayList<Integer>();
-        for(int i=0;i<listIn.size();i++)
-        {
-            xval.add(i,listIn.get(i).getX());
-            yval.add(i,listIn.get(i).getY());
-            zval.add(i,listIn.get(i).getZ());
-        }
-        compound.putIntArray("workqueuetwoposx",xval);
-        compound.putIntArray("workqueuetwoposy",yval);
-        compound.putIntArray("workqueuetwoposz",zval);
-
-        coin.setTag(compound);
-    }
-
-    public List<BlockPos> readWorkQueueTwoFromNBT(ItemStack coin)
-    {
-        List<BlockPos> workQueueTwo = new ArrayList<>();
-
-        if(workQueueTwoSize(coin)>=0)
-        {
-            if(coin.hasTag())
-            {
-                CompoundNBT getCompound = coin.getTag();
-                int[] xval = getCompound.getIntArray("workqueuetwoposx");
-                int[] yval = getCompound.getIntArray("workqueuetwoposy");
-                int[] zval = getCompound.getIntArray("workqueuetwoposz");
-
-                for(int i = 0;i<xval.length;i++)
-                {
-                    workQueueTwo.add(new BlockPos(xval[i],yval[i],zval[i]));
-                }
-            }
-        }
-
-        return workQueueTwo;
-    }
-
-    public List<ItemStack> buildFilterQueue(PedestalTileEntity pedestal)
-    {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
-        int validBlocks = 0;
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos posInventory = getPosOfBlockBelow(world, pedestalPos, 1);
-
-        List<ItemStack> filterQueue = new ArrayList<ItemStack>(){};
-
-        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
-        if(cap.isPresent())
-        {
-            IItemHandler handler = cap.orElse(null);
-            if(handler != null)
-            {
-                int range = handler.getSlots();
-                for(int i=0;i<range;i++)
-                {
-                    ItemStack stackInSlot = handler.getStackInSlot(i);
-                    if(!stackInSlot.isEmpty())
-                    {
-                        filterQueue.add(i,stackInSlot);
-                    }
-                }
-            }
-        }
-
-        return filterQueue;
-    }
-
-    //This is needed for the "slowdown" of machines
-    public void writeFilterQueueToNBT(ItemStack stack, List<ItemStack> listIn)
-    {
-        CompoundNBT compound = new CompoundNBT();
-        if(stack.hasTag())
-        {
-            compound = stack.getTag();
-        }
-
-        compound.putInt("filterqueuesize",listIn.size());
-        for(int i=0;i<listIn.size();i++)
-        {
-            ResourceLocation resourcelocation = Registry.ITEM.getKey(listIn.get(i).getItem());
-            compound.putString("filterqueueitem"+ i,resourcelocation == null?"minecraft:air":resourcelocation.toString());
-        }
-        stack.setTag(compound);
-    }
-
-    public List<ItemStack> readFilterQueueFromNBT(ItemStack coin)
-    {
-        int filterQueueSize = 0;
-        List<ItemStack> filterQueue = new ArrayList<ItemStack>(){};
-        if(coin.hasTag())
-        {
-            CompoundNBT getCompound = coin.getTag();
-            filterQueueSize = getCompound.getInt("filterqueuesize");
-            for(int i=0;i<filterQueueSize;i++)
-            {
-                filterQueue.add(i,new ItemStack((Item)Registry.ITEM.getOrDefault(new ResourceLocation(getCompound.getString("filterqueueitem"+ i)))));
-            }
-        }
-
-        return filterQueue;
-    }
-
-    public boolean doesFilterAndQueueMatch(List<ItemStack> filterIn, List<ItemStack> queueMatch)
-    {
-        return filterIn.containsAll(queueMatch);
-    }
-
 
     @Nullable
     protected QuarryBlacklistBlockRecipe getRecipeQuarryBlacklistBlock(World world, ItemStack stackIn)
@@ -2022,6 +1780,418 @@ public class ItemUpgradeBase extends Item {
 
     /***************************************
      ****************************************
+     **         Start of Queue Stuff       **
+     ****************************************
+     ***************************************/
+
+    public void removeWorkQueueFromCoin(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("workqueueposx"))
+            {
+                compound.remove("workqueueposx");
+                compound.remove("workqueueposy");
+                compound.remove("workqueueposz");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+    public int workQueueSize(ItemStack coin)
+    {
+        int workQueueSize = 0;
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            if(getCompound.contains("workqueueposx"))
+            {
+                int[] xval = getCompound.getIntArray("workqueueposx");
+                return xval.length;
+            }
+
+        }
+
+        return workQueueSize;
+    }
+
+    public void buildWorkQueue(PedestalTileEntity pedestal, int width, int height)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        List<BlockPos> workQueue = new ArrayList<>();
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            if(canMineBlock(pedestal, blockToMinePos))
+            {
+                workQueue.add(blockToMinePos);
+            }
+        }
+
+        writeWorkQueueToNBT(coin, workQueue);
+    }
+
+    public void writeWorkQueueToNBT(ItemStack coin, List<BlockPos> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+        }
+
+        List<Integer> xval = new ArrayList<Integer>();
+        List<Integer> yval = new ArrayList<Integer>();
+        List<Integer> zval = new ArrayList<Integer>();
+        for(int i=0;i<listIn.size();i++)
+        {
+            xval.add(i,listIn.get(i).getX());
+            yval.add(i,listIn.get(i).getY());
+            zval.add(i,listIn.get(i).getZ());
+        }
+        compound.putIntArray("workqueueposx",xval);
+        compound.putIntArray("workqueueposy",yval);
+        compound.putIntArray("workqueueposz",zval);
+
+        coin.setTag(compound);
+    }
+
+    public List<BlockPos> readWorkQueueFromNBT(ItemStack coin)
+    {
+        List<BlockPos> workQueue = new ArrayList<>();
+
+        if(workQueueSize(coin)>=0)
+        {
+            if(coin.hasTag())
+            {
+                CompoundNBT getCompound = coin.getTag();
+                int[] xval = getCompound.getIntArray("workqueueposx");
+                int[] yval = getCompound.getIntArray("workqueueposy");
+                int[] zval = getCompound.getIntArray("workqueueposz");
+
+                for(int i = 0;i<xval.length;i++)
+                {
+                    workQueue.add(new BlockPos(xval[i],yval[i],zval[i]));
+                }
+            }
+        }
+
+        return workQueue;
+    }
+
+    public void removeWorkQueueTwoFromCoin(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("workqueuetwoposx"))
+            {
+                compound.remove("workqueuetwoposx");
+                compound.remove("workqueuetwoposy");
+                compound.remove("workqueuetwoposz");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+
+    public int workQueueTwoSize(ItemStack coin)
+    {
+        int workQueueTwoSize = 0;
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            if(getCompound.contains("workqueuetwoposx"))
+            {
+                int[] xval = getCompound.getIntArray("workqueuetwoposx");
+                return xval.length;
+            }
+
+        }
+
+        return workQueueTwoSize;
+    }
+
+    public void buildWorkQueueTwo(PedestalTileEntity pedestal, int width, int height)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        List<BlockPos> workQueueTwo = new ArrayList<>();
+
+        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        {
+            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            if(canMineBlockTwo(pedestal, blockToMinePos))
+            {
+                workQueueTwo.add(blockToMinePos);
+            }
+        }
+
+        writeWorkQueueTwoToNBT(coin, workQueueTwo);
+    }
+
+    public void writeWorkQueueTwoToNBT(ItemStack coin, List<BlockPos> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+        }
+
+        List<Integer> xval = new ArrayList<Integer>();
+        List<Integer> yval = new ArrayList<Integer>();
+        List<Integer> zval = new ArrayList<Integer>();
+        for(int i=0;i<listIn.size();i++)
+        {
+            xval.add(i,listIn.get(i).getX());
+            yval.add(i,listIn.get(i).getY());
+            zval.add(i,listIn.get(i).getZ());
+        }
+        compound.putIntArray("workqueuetwoposx",xval);
+        compound.putIntArray("workqueuetwoposy",yval);
+        compound.putIntArray("workqueuetwoposz",zval);
+
+        coin.setTag(compound);
+    }
+
+    public List<BlockPos> readWorkQueueTwoFromNBT(ItemStack coin)
+    {
+        List<BlockPos> workQueueTwo = new ArrayList<>();
+
+        if(workQueueTwoSize(coin)>=0)
+        {
+            if(coin.hasTag())
+            {
+                CompoundNBT getCompound = coin.getTag();
+                int[] xval = getCompound.getIntArray("workqueuetwoposx");
+                int[] yval = getCompound.getIntArray("workqueuetwoposy");
+                int[] zval = getCompound.getIntArray("workqueuetwoposz");
+
+                for(int i = 0;i<xval.length;i++)
+                {
+                    workQueueTwo.add(new BlockPos(xval[i],yval[i],zval[i]));
+                }
+            }
+        }
+
+        return workQueueTwo;
+    }
+
+    public int filterQueueSize(ItemStack coin)
+    {
+        int filterQueueSize = 0;
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            ItemStackHandler handler = new ItemStackHandler();
+            handler.deserializeNBT(getCompound);
+            return handler.getSlots();
+        }
+
+        return filterQueueSize;
+    }
+
+    public List<ItemStack> buildFilterQueue(PedestalTileEntity pedestal)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos posInventory = getPosOfBlockBelow(world, pedestalPos, 1);
+
+        List<ItemStack> filterQueue = new ArrayList<ItemStack>(){};
+
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
+        if(cap.isPresent())
+        {
+            IItemHandler handler = cap.orElse(null);
+            if(handler != null)
+            {
+                int range = handler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = handler.getStackInSlot(i);
+                    if(!stackInSlot.isEmpty()) {filterQueue.add(i,stackInSlot);}
+                }
+            }
+        }
+
+        return filterQueue;
+    }
+
+    //This is needed for the "slowdown" of machines
+    public void writeFilterQueueToNBT(ItemStack stack, List<ItemStack> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag()) {compound = stack.getTag();}
+
+        ItemStackHandler handler = new ItemStackHandler();
+        handler.setSize(listIn.size());
+
+        for(int i=0;i<handler.getSlots();i++) {handler.setStackInSlot(i,listIn.get(i));}
+
+        compound = handler.serializeNBT();
+        stack.setTag(compound);
+    }
+
+    public List<ItemStack> readFilterQueueFromNBT(ItemStack coin)
+    {
+        int filterQueueSize = 0;
+        List<ItemStack> filterQueue = new ArrayList<ItemStack>(){};
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            ItemStackHandler handler = new ItemStackHandler();
+            handler.deserializeNBT(getCompound);
+
+            for(int i=0;i<handler.getSlots();i++) {filterQueue.add(i,handler.getStackInSlot(i));}
+        }
+
+        return filterQueue;
+    }
+
+    public boolean doesFilterAndQueueMatch(List<ItemStack> filterIn, List<ItemStack> queueMatch)
+    {
+        return filterIn.containsAll(queueMatch);
+    }
+
+    /***************************************
+     ****************************************
+     **          End of Queue Stuff        **
+     ****************************************
+     ***************************************/
+
+
+
+
+    /***************************************
+     ****************************************
+     **       Start Of StoredINT Stuff     **
+     ****************************************
+     ***************************************/
+
+
+    public void removeStoredIntFromCoin(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("storedint"))
+            {
+                compound.remove("storedint");
+                compound.remove("storedint");
+                compound.remove("storedint");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+    //This function used to be in the pedestal, but got moved out for performance improvements
+    public void writeStoredIntToNBT(ItemStack stack, int value)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putInt("storedint",value);
+        stack.setTag(compound);
+    }
+
+    public int readStoredIntFromNBT(ItemStack stack)
+    {
+        int maxenergy = 0;
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            maxenergy = getCompound.getInt("storedint");
+        }
+        return maxenergy;
+    }
+
+    public int getStoredInt(ItemStack coin)
+    {
+        return readStoredIntFromNBT(coin);
+    }
+
+
+
+    public void removeStoredIntTwoFromCoin(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("storedinttwo"))
+            {
+                compound.remove("storedinttwo");
+                compound.remove("storedinttwo");
+                compound.remove("storedinttwo");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+    //This is needed for the "slowdown" of machines
+    public void writeStoredIntTwoToNBT(ItemStack stack, int value)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putInt("storedinttwo",value);
+        stack.setTag(compound);
+    }
+
+    public int readStoredIntTwoFromNBT(ItemStack stack)
+    {
+        int maxenergy = 0;
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            maxenergy = getCompound.getInt("storedinttwo");
+        }
+        return maxenergy;
+    }
+
+    public int getStoredIntTwo(ItemStack coin)
+    {
+        return readStoredIntTwoFromNBT(coin);
+    }
+
+
+    /***************************************
+     ****************************************
+     **      End Of StoredINT Stuff        **
+     ****************************************
+     ***************************************/
+
+
+
+
+    /***************************************
+     ****************************************
      **     Start of UpgradeTool Stuff     **
      ****************************************
      ***************************************/
@@ -2128,7 +2298,11 @@ public class ItemUpgradeBase extends Item {
         double dz = (double)pos.getZ();
 
         BlockState state = world.getBlockState(pos);
-        Direction enumfacing = state.get(FACING);
+        Direction enumfacing = Direction.UP;
+        if(state.getBlock() instanceof PedestalBlock)
+        {
+            enumfacing = state.get(FACING);
+        }
         BlockPos blockBelow = pos;
         RedstoneParticleData parti = new RedstoneParticleData(r, g, b, alpha);
         switch (enumfacing)
@@ -2184,7 +2358,11 @@ public class ItemUpgradeBase extends Item {
         double dy = (double)pos.getY();
         double dz = (double)pos.getZ();
         BlockState state = world.getBlockState(pos);
-        Direction enumfacing = state.get(FACING);
+        Direction enumfacing = Direction.UP;
+        if(state.getBlock() instanceof PedestalBlock)
+        {
+            enumfacing = state.get(FACING);
+        }
         RedstoneParticleData parti = new RedstoneParticleData(r, g, b, alpha);
         switch (enumfacing)
         {
@@ -2261,64 +2439,7 @@ public class ItemUpgradeBase extends Item {
 
     }
 
-    //This function used to be in the pedestal, but got moved out for performance improvements
-    public void writeStoredIntToNBT(ItemStack stack, int value)
-    {
-        CompoundNBT compound = new CompoundNBT();
-        if(stack.hasTag())
-        {
-            compound = stack.getTag();
-        }
 
-        compound.putInt("storedint",value);
-        stack.setTag(compound);
-    }
-
-    public int readStoredIntFromNBT(ItemStack stack)
-    {
-        int maxenergy = 0;
-        if(stack.hasTag())
-        {
-            CompoundNBT getCompound = stack.getTag();
-            maxenergy = getCompound.getInt("storedint");
-        }
-        return maxenergy;
-    }
-
-    public int getStoredInt(ItemStack coin)
-    {
-        return readStoredIntFromNBT(coin);
-    }
-
-
-    //This is needed for the "slowdown" of machines
-    public void writeStoredIntTwoToNBT(ItemStack stack, int value)
-    {
-        CompoundNBT compound = new CompoundNBT();
-        if(stack.hasTag())
-        {
-            compound = stack.getTag();
-        }
-
-        compound.putInt("storedinttwo",value);
-        stack.setTag(compound);
-    }
-
-    public int readStoredIntTwoFromNBT(ItemStack stack)
-    {
-        int maxenergy = 0;
-        if(stack.hasTag())
-        {
-            CompoundNBT getCompound = stack.getTag();
-            maxenergy = getCompound.getInt("storedinttwo");
-        }
-        return maxenergy;
-    }
-
-    public int getStoredIntTwo(ItemStack coin)
-    {
-        return readStoredIntTwoFromNBT(coin);
-    }
     /***************************************
      ****************************************
      **       End of Pedestal Stuff        **

@@ -12,6 +12,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -33,31 +34,32 @@ public class ItemUpgradeFilterItem extends ItemUpgradeBaseFilter
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         boolean returner = false;
-        BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
 
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
-        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
-            if(cap.isPresent())
+        if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
+        {
+            PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!(stackCurrent.size()>0))
             {
-                IItemHandler handler = cap.orElse(null);
-                if(handler != null)
-                {
-                    int range = handler.getSlots();
-
-                    ItemStack itemFromInv = ItemStack.EMPTY;
-                    itemFromInv = IntStream.range(0,range)//Int Range
-                            .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                            .filter(itemStack -> itemStack.getItem().equals(itemStackIn.getItem()))
-                            .findFirst().orElse(ItemStack.EMPTY);
-
-                    if(!itemFromInv.isEmpty())
-                    {
-                        returner = true;
-                    }
-                }
+                stackCurrent = buildFilterQueue(pedestal);
+                writeFilterQueueToNBT(coin,stackCurrent);
             }
-        //}
+
+
+            int range = stackCurrent.size();
+
+            ItemStack itemFromInv = ItemStack.EMPTY;
+            itemFromInv = IntStream.range(0,range)//Int Range
+                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                    .filter(itemStack -> itemStack.getItem().equals(itemStackIn.getItem()))
+                    .findFirst().orElse(ItemStack.EMPTY);
+
+            if(!itemFromInv.isEmpty())
+            {
+                returner = true;
+            }
+        }
 
         return returner;
     }
@@ -66,6 +68,25 @@ public class ItemUpgradeFilterItem extends ItemUpgradeBaseFilter
     {
 
     }
+
+    @Override
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackIn = buildFilterQueue(pedestal);
+        if(filterQueueSize(coin)>0)
+        {
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
+            {
+                writeFilterQueueToNBT(coin,stackIn);
+            }
+        }
+        else
+        {
+            writeFilterQueueToNBT(coin,stackIn);
+        }
+    }
+    //Save the inv of the filter to a thing, normally use it to check for the right filtered stuff, when the block updates, check to see if the inv actually changed anything, if so then build a new list
 
     public static final Item ITEM = new ItemUpgradeFilterItem(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filteritem"));
 

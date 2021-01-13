@@ -663,6 +663,11 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         IItemHandler ph = privateHandler.orElse(null);
         ItemStack stack = ph.extractItem(0,ph.getStackInSlot(0).getCount(),false);
         ((ItemUpgradeBase)stack.getItem()).removePlayerFromCoin(stack);
+        ((ItemUpgradeBase)stack.getItem()).removeWorkQueueFromCoin(stack);
+        ((ItemUpgradeBase)stack.getItem()).removeWorkQueueTwoFromCoin(stack);
+        ((ItemUpgradeBase)stack.getItem()).removeStoredIntFromCoin(stack);
+        ((ItemUpgradeBase)stack.getItem()).removeStoredIntTwoFromCoin(stack);
+
         setStoredValueForUpgrades(0);
         //update();
 
@@ -708,7 +713,16 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public void dropInventoryItemsPrivate(World worldIn, BlockPos pos) {
         IItemHandler ph = privateHandler.orElse(null);
         for(int i = 0; i < ph.getSlots(); ++i) {
-            if(i==0 && hasCoin())((ItemUpgradeBase)ph.getStackInSlot(i).getItem()).removePlayerFromCoin(ph.getStackInSlot(i));
+            if(i==0 && hasCoin())
+            {
+                ItemUpgradeBase coin = ((ItemUpgradeBase)ph.getStackInSlot(0).getItem());
+                ItemStack actualCoin = ph.getStackInSlot(0);
+                coin.removePlayerFromCoin(actualCoin);
+                coin.removeWorkQueueFromCoin(actualCoin);
+                coin.removeWorkQueueTwoFromCoin(actualCoin);
+                coin.removeStoredIntFromCoin(actualCoin);
+                coin.removeStoredIntTwoFromCoin(actualCoin);
+            }
             spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
         }
     }

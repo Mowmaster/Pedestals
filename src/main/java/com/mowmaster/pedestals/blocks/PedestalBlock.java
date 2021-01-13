@@ -13,10 +13,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.inventory.container.ChestContainer;
 import net.minecraft.item.*;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +33,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -40,6 +43,7 @@ import javax.annotation.Nullable;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
+import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
 
@@ -520,6 +524,54 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         builder.add(FACING,WATERLOGGED,LIT);
     }
 
+    @Override
+    public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
+        if(!world.isRemote())
+        {
+            if(state.getBlock() instanceof PedestalBlock)
+            {
+                BlockPos blockBelow = getPosOfBlockBelow((ServerWorld)world,pos,1);
+                if(blockBelow.equals(neighbor))
+                {
+                    TileEntity tile = world.getTileEntity(pos);
+                    if(tile instanceof PedestalTileEntity)
+                    {
+                        PedestalTileEntity pedestal = (PedestalTileEntity)tile;
+                        Item coin = pedestal.getCoinOnPedestal().getItem();
+                        if(coin instanceof ItemUpgradeBase)
+                        {
+                            ((ItemUpgradeBase)coin).onPedestalNeighborChanged(pedestal);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public BlockPos getPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
+    {
+        BlockState state = world.getBlockState(posOfPedestal);
+
+        Direction enumfacing = (state.hasProperty(FACING))?(state.get(FACING)):(Direction.UP);
+        BlockPos blockBelow = posOfPedestal;
+        switch (enumfacing)
+        {
+            case UP:
+                return blockBelow.add(0,-numBelow,0);
+            case DOWN:
+                return blockBelow.add(0,numBelow,0);
+            case NORTH:
+                return blockBelow.add(0,0,numBelow);
+            case SOUTH:
+                return blockBelow.add(0,0,-numBelow);
+            case EAST:
+                return blockBelow.add(-numBelow,0,0);
+            case WEST:
+                return blockBelow.add(numBelow,0,0);
+            default:
+                return blockBelow;
+        }
+    }
 
     private int getRedstoneLevel(World worldIn, BlockPos pos)
     {
