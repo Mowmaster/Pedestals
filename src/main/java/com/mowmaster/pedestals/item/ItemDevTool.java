@@ -55,7 +55,7 @@ public class ItemDevTool extends Item {
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        //event.getRegistry().register(DEV);
+        event.getRegistry().register(DEV);
     }
 
 

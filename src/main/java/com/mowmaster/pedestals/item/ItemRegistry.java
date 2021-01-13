@@ -15,6 +15,7 @@ public class ItemRegistry
 
         ItemLinkingTool.onItemRegistryReady(e);
         ItemLinkingToolBackwards.onItemRegistryReady(e);
+        ItemDevTool.onItemRegistryReady(e);
         ItemTagTool.onItemRegistryReady(e);
         ItemUpgradeTool.onItemRegistryReady(e);
         ItemToolSwapper.onItemRegistryReady(e);
