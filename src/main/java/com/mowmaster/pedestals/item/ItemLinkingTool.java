@@ -19,6 +19,7 @@ import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -249,19 +250,30 @@ public class ItemLinkingTool extends Item {
     //Thanks to TheBoo on the e6 Discord for this suggestion
     @Override
     public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
-        if(p_77659_2_.isCrouching())
+        //Thankyou past self: https://github.com/Mowmaster/Ensorcelled/blob/main/src/main/java/com/mowmaster/ensorcelled/enchantments/handlers/HandlerAOEMiner.java#L53
+        //RayTraceResult result = player.pick(player.getLookVec().length(),0,false); results in MISS type returns
+        RayTraceResult result = p_77659_2_.pick(5,0,false);
+        if(result != null)
         {
-            ItemStack heldItem = p_77659_2_.getHeldItem(p_77659_3_);
-            if(heldItem.getItem().equals(ItemLinkingTool.DEFAULT) && !heldItem.isEnchanted())
+            //Assuming it it hits a block it wont work???
+            if(result.getType() == RayTraceResult.Type.MISS)
             {
-                p_77659_2_.setHeldItem(p_77659_3_,new ItemStack(ItemLinkingToolBackwards.DEFAULT));
-                TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_change");
-                range.mergeStyle(TextFormatting.GREEN);
-                p_77659_2_.sendStatusMessage(range,true);
-                return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                if(p_77659_2_.isCrouching())
+                {
+                    ItemStack heldItem = p_77659_2_.getHeldItem(p_77659_3_);
+                    if(heldItem.getItem().equals(ItemLinkingTool.DEFAULT) && !heldItem.isEnchanted())
+                    {
+                        p_77659_2_.setHeldItem(p_77659_3_,new ItemStack(ItemLinkingToolBackwards.DEFAULT));
+                        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_change");
+                        range.mergeStyle(TextFormatting.GREEN);
+                        p_77659_2_.sendStatusMessage(range,true);
+                        return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                    return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                }
             }
-            return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
         }
+
         return super.onItemRightClick(p_77659_1_, p_77659_2_, p_77659_3_);
     }
 

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -13,11 +14,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.UseAction;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -33,6 +36,7 @@ import java.util.Map;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
+import static sun.audio.AudioPlayer.player;
 
 public class ItemLinkingToolBackwards extends ItemLinkingTool {
 
@@ -176,7 +180,7 @@ public class ItemLinkingToolBackwards extends ItemLinkingTool {
                         return ActionResultType.FAIL;
                     }
                 }
-                else
+                else if(!(getBlockState.getBlock().equals(Blocks.AIR)))
                 {
                     this.storedPosition = defaultPos;
                     this.storedPositionList = new ArrayList<>();
@@ -192,6 +196,10 @@ public class ItemLinkingToolBackwards extends ItemLinkingTool {
                             return ActionResultType.SUCCESS;
                         }
                     }
+                }
+                else
+                {
+
                 }
 
                 return ActionResultType.FAIL;
@@ -258,19 +266,30 @@ public class ItemLinkingToolBackwards extends ItemLinkingTool {
     //Thanks to TheBoo on the e6 Discord for this suggestion
     @Override
     public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
-        if(p_77659_2_.isCrouching())
+        //Thankyou past self: https://github.com/Mowmaster/Ensorcelled/blob/main/src/main/java/com/mowmaster/ensorcelled/enchantments/handlers/HandlerAOEMiner.java#L53
+        //RayTraceResult result = player.pick(player.getLookVec().length(),0,false); results in MISS type returns
+        RayTraceResult result = p_77659_2_.pick(5,0,false);
+        if(result != null)
         {
-            ItemStack heldItem = p_77659_2_.getHeldItem(p_77659_3_);
-            if(heldItem.getItem().equals(ItemLinkingToolBackwards.DEFAULT) && !heldItem.isEnchanted())
+            //Assuming it it hits a block it wont work???
+            if(result.getType() == RayTraceResult.Type.MISS)
             {
-                p_77659_2_.setHeldItem(p_77659_3_,new ItemStack(ItemLinkingTool.DEFAULT));
-                TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_change");
-                range.mergeStyle(TextFormatting.GREEN);
-                p_77659_2_.sendStatusMessage(range,true);
-                return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                if(p_77659_2_.isCrouching())
+                {
+                    ItemStack heldItem = p_77659_2_.getHeldItem(p_77659_3_);
+                    if(heldItem.getItem().equals(ItemLinkingToolBackwards.DEFAULT) && !heldItem.isEnchanted())
+                    {
+                        p_77659_2_.setHeldItem(p_77659_3_,new ItemStack(ItemLinkingTool.DEFAULT));
+                        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_change");
+                        range.mergeStyle(TextFormatting.GREEN);
+                        p_77659_2_.sendStatusMessage(range,true);
+                        return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                    return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                }
             }
-            return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
         }
+
         return super.onItemRightClick(p_77659_1_, p_77659_2_, p_77659_3_);
     }
 
