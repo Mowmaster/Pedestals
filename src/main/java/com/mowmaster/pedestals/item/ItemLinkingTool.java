@@ -17,10 +17,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -247,6 +244,25 @@ public class ItemLinkingTool extends Item {
         }
 
         return super.onItemUse(context);
+    }
+
+    //Thanks to TheBoo on the e6 Discord for this suggestion
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
+        if(p_77659_2_.isCrouching())
+        {
+            ItemStack heldItem = p_77659_2_.getHeldItem(p_77659_3_);
+            if(heldItem.getItem().equals(ItemLinkingTool.DEFAULT) && !heldItem.isEnchanted())
+            {
+                p_77659_2_.setHeldItem(p_77659_3_,new ItemStack(ItemLinkingToolBackwards.DEFAULT));
+                TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_change");
+                range.mergeStyle(TextFormatting.GREEN);
+                p_77659_2_.sendStatusMessage(range,true);
+                return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+            }
+            return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+        }
+        return super.onItemRightClick(p_77659_1_, p_77659_2_, p_77659_3_);
     }
 
     int ticker=0;
