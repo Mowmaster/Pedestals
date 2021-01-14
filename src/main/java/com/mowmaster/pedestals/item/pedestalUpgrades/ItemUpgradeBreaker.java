@@ -194,15 +194,36 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
-        
+
+        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
+        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
+
+        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
+        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
+        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
+
+        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
+        boolean advanced = false;
+        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
+        {
+            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
+        }
+        else
+        {
+            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
+        }
+
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
                 && !(blockToMine instanceof PedestalBlock)
                 && passesFilter(world, pedestalPos, blockToMine)
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                )
+                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && advanced)
         {
             return true;
         }
