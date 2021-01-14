@@ -176,7 +176,15 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
                     if(itemList.size()>0)
                     {
-                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                        ItemStack coin = pedestal.getCoinOnPedestal();
+                        List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+                        if(!(stackCurrent.size()>0))
+                        {
+                            stackCurrent = buildFilterQueue(pedestal);
+                            writeFilterQueueToNBT(coin,stackCurrent);
+                        }
+
+                        upgradeActionFilteredMagnet(world,itemList, itemInPedestal, pedestalPos, stackCurrent, false);
                     }
 
                     int speed = getOperationSpeed(coinInPedestal);
@@ -334,6 +342,24 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         }
 
         return false;
+    }
+
+    @Override
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackIn = buildFilterQueue(pedestal);
+        if(filterQueueSize(coin)>0)
+        {
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
+            {
+                writeFilterQueueToNBT(coin,stackIn);
+            }
+        }
+        else
+        {
+            writeFilterQueueToNBT(coin,stackIn);
+        }
     }
 
     @Override

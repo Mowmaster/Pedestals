@@ -110,7 +110,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                 List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
                 if(itemList.size()>0)
                 {
-                    upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, 1, 1);
+                    upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
                 }
 
                 if (world.getGameTime()%speed == 0) {

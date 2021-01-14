@@ -176,7 +176,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                     List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
                     if(itemList.size()>0)
                     {
-                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos, rangeWidth, rangeHeight);
+                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
                     }
 
                     int val = readStoredIntTwoFromNBT(coinInPedestal);
@@ -267,30 +267,50 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
     public boolean passesFilter(World world, BlockPos posPedestal, Block blockIn)
     {
         boolean returner = false;
-        BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
-
-        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
-        if(cap.isPresent())
+        if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
         {
-            IItemHandler handler = cap.orElse(null);
-            if(handler != null)
+            PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!(stackCurrent.size()>0))
             {
-                int range = handler.getSlots();
+                stackCurrent = buildFilterQueue(pedestal);
+                writeFilterQueueToNBT(coin,stackCurrent);
+            }
 
-                ItemStack itemFromInv = ItemStack.EMPTY;
-                itemFromInv = IntStream.range(0,range)//Int Range
-                        .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                        .filter(itemStack -> Block.getBlockFromItem(itemStack.getItem()).equals(blockIn))
-                        .findFirst().orElse(ItemStack.EMPTY);
+            int range = stackCurrent.size();
 
-                if(!itemFromInv.isEmpty())
-                {
-                    returner = true;
-                }
+            ItemStack itemFromInv = ItemStack.EMPTY;
+            itemFromInv = IntStream.range(0,range)//Int Range
+                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                    .filter(itemStack -> Block.getBlockFromItem(itemStack.getItem()).equals(blockIn))
+                    .findFirst().orElse(ItemStack.EMPTY);
+
+            if(!itemFromInv.isEmpty())
+            {
+                returner = true;
             }
         }
 
         return returner;
+    }
+
+    @Override
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackIn = buildFilterQueue(pedestal);
+        if(filterQueueSize(coin)>0)
+        {
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
+            {
+                writeFilterQueueToNBT(coin,stackIn);
+            }
+        }
+        else
+        {
+            writeFilterQueueToNBT(coin,stackIn);
+        }
     }
 
     @Override

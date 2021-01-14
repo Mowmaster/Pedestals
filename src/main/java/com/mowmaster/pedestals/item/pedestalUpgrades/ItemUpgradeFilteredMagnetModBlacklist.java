@@ -2,7 +2,6 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -10,10 +9,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -23,10 +19,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -111,14 +105,18 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
             if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
+                    upgradeAction(pedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        BlockPos posOfPedestal = pedestal.getPos();
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
@@ -127,96 +125,74 @@ public class ItemUpgradeFilteredMagnetModBlacklist extends ItemUpgradeBase
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
         List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-        if(itemList.size()>0)
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+        if(!(stackCurrent.size()>0))
         {
-            for(ItemEntity getItemFromList : itemList)
+            stackCurrent = buildFilterQueue(pedestal);
+            writeFilterQueueToNBT(coin,stackCurrent);
+        }
+
+        upgradeActionFilteredMagnet(world,itemList, itemInPedestal, posOfPedestal, stackCurrent, true);
+    }
+
+    @Override
+    public ItemStack getFilterReturnStack(List<ItemStack> stack, ItemStack incoming)
+    {
+        int range = stack.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stack)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem().getRegistryName().getNamespace()==incoming.getItem().getRegistryName().getNamespace())
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        return itemFromInv;
+    }
+
+    @Override
+    public void actionOnCollideWithBlock(PedestalTileEntity pedestal, Entity entityIn)
+    {
+        if(entityIn instanceof ItemEntity)
+        {
+            ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
+            ItemStack itemFromPedestal = pedestal.getItemInPedestal();
+            if(itemFromPedestal.isEmpty())
             {
-                ItemStack copyStack = getItemFromList.getItem().copy();
-                int maxStackSize = copyStack.getMaxStackSize();
-                ItemStack getItemStack = ((ItemEntity) getItemFromList).getItem();
-                if (itemInPedestal.equals(ItemStack.EMPTY))
+                ItemStack coin = pedestal.getCoinOnPedestal();
+                List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+                if(!(stackCurrent.size()>0))
                 {
-                    BlockPos posInventory = getPosOfBlockBelow(world, posOfPedestal, 1);
+                    stackCurrent = buildFilterQueue(pedestal);
+                    writeFilterQueueToNBT(coin,stackCurrent);
+                }
 
-                    LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-                    if(cap.isPresent())
-                    {
-                        IItemHandler handler = cap.orElse(null);
-                        if(handler != null)
-                        {
-                            int range = handler.getSlots();
+                ItemStack itemFromInv = getFilterReturnStack(stackCurrent, getItemStack);
 
-                            ItemStack itemFromInv = ItemStack.EMPTY;
-                            itemFromInv = IntStream.range(0,range)//Int Range
-                                    .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                                    .filter(itemStack -> itemStack.getItem().getRegistryName().getNamespace()==getItemStack.getItem().getRegistryName().getNamespace())
-                                    .findFirst().orElse(ItemStack.EMPTY);
-
-                            if(itemFromInv.isEmpty())
-                            {
-                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                if(pedestalInv instanceof PedestalTileEntity) {
-                                    if(copyStack.getCount() <=maxStackSize)
-                                    {
-                                        getItemFromList.setItem(ItemStack.EMPTY);
-                                        getItemFromList.remove();
-                                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
-                                    }
-                                    else
-                                    {
-                                        //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
-                                        int count = getItemFromList.getItem().getCount();
-                                        getItemFromList.getItem().setCount(count-maxStackSize);
-                                        copyStack.setCount(maxStackSize);
-                                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
+                if(itemFromInv.isEmpty())
+                {
+                    entityIn.remove();
+                    pedestal.addItem(getItemStack);
                 }
             }
         }
     }
 
     @Override
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
-    {
-        if(entityIn instanceof ItemEntity)
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackIn = buildFilterQueue(pedestal);
+        if(filterQueueSize(coin)>0)
         {
-            ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
-            ItemStack itemFromPedestal = getStackInPedestal(world,posPedestal);
-            if(itemFromPedestal.isEmpty())
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
             {
-                BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
-
-                LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
-                if(cap.isPresent())
-                {
-                    IItemHandler handler = cap.orElse(null);
-                    if(handler != null)
-                    {
-                        int range = handler.getSlots();
-
-                        ItemStack itemFromInv = ItemStack.EMPTY;
-                        itemFromInv = IntStream.range(0,range)//Int Range
-                                .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                                .filter(itemStack -> itemStack.getItem().getRegistryName().getNamespace()==getItemStack.getItem().getRegistryName().getNamespace())
-                                .findFirst().orElse(ItemStack.EMPTY);
-
-                        if(itemFromInv.isEmpty())
-                        {
-                            TileEntity pedestalInv = world.getTileEntity(posPedestal);
-                            if(pedestalInv instanceof PedestalTileEntity) {
-                                entityIn.remove();
-                                ((PedestalTileEntity) pedestalInv).addItem(getItemStack);
-                            }
-                        }
-                    }
-                }
+                writeFilterQueueToNBT(coin,stackIn);
             }
+        }
+        else
+        {
+            writeFilterQueueToNBT(coin,stackIn);
         }
     }
 
