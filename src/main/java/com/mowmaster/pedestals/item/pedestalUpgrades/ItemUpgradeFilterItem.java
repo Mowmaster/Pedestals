@@ -46,7 +46,6 @@ public class ItemUpgradeFilterItem extends ItemUpgradeBaseFilter
                 writeFilterQueueToNBT(coin,stackCurrent);
             }
 
-
             int range = stackCurrent.size();
 
             ItemStack itemFromInv = ItemStack.EMPTY;

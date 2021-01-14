@@ -15,6 +15,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -39,6 +40,49 @@ public class ItemUpgradeFilterEnchantedExactBlacklist extends ItemUpgradeBaseFil
     {
         boolean returner = false;
         int countAnyMatches = 0;
+        if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
+        {
+            if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
+            {
+                PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
+                ItemStack coin = pedestal.getCoinOnPedestal();
+                List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+                if(!(stackCurrent.size()>0))
+                {
+                    stackCurrent = buildFilterQueue(pedestal);
+                    writeFilterQueueToNBT(coin,stackCurrent);
+                }
+
+                int range = stackCurrent.size();
+                Map<Enchantment, Integer> mapIncomming = EnchantmentHelper.getEnchantments(itemStackIn);
+                for(Map.Entry<Enchantment, Integer> entry : mapIncomming.entrySet()) {
+                    Enchantment enchantment = entry.getKey();
+                    int level = entry.getValue();
+
+                    ItemStack itemFromInv = ItemStack.EMPTY;
+                    itemFromInv = IntStream.range(0,range)//Int Range
+                            .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                            //Check to make sure filter item is enchanted
+                            .filter(itemStack -> itemStack.isEnchanted() || itemStack.getItem().equals(Items.ENCHANTED_BOOK))
+                            //Check to see if any have matching enchant sizes
+                            .filter(itemStack -> EnchantmentHelper.getEnchantments(itemStack).size()==mapIncomming.size())
+                            //Check if filter item has any enchant that the item in the pedestal has
+                            .filter(itemStack -> EnchantmentHelper.getEnchantments(itemStack).containsKey(enchantment))
+                            .filter(itemStack -> EnchantmentHelper.getEnchantments(itemStack).get(enchantment).intValue() == level)
+                            .findFirst().orElse(ItemStack.EMPTY);
+
+                    if(!itemFromInv.isEmpty())
+                    {
+                        countAnyMatches ++;
+                    }
+                }
+                if(countAnyMatches==mapIncomming.size())
+                {
+                    return true;
+                }
+            }
+        }
+        /*int countAnyMatches = 0;
         if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
         {
             BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
@@ -80,7 +124,7 @@ public class ItemUpgradeFilterEnchantedExactBlacklist extends ItemUpgradeBaseFil
                     }
                 }
             }
-        }
+        }*/
 
         return false;
     }
@@ -88,6 +132,24 @@ public class ItemUpgradeFilterEnchantedExactBlacklist extends ItemUpgradeBaseFil
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
 
+    }
+
+    @Override
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackIn = buildFilterQueue(pedestal);
+        if(filterQueueSize(coin)>0)
+        {
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
+            {
+                writeFilterQueueToNBT(coin,stackIn);
+            }
+        }
+        else
+        {
+            writeFilterQueueToNBT(coin,stackIn);
+        }
     }
 
     public static final Item ENCHANTEDSPECIFICB= new ItemUpgradeFilterEnchantedExactBlacklist(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedexactb"));

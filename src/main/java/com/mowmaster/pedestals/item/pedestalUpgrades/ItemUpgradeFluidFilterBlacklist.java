@@ -95,26 +95,28 @@ public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
     public boolean canRecieveFluid(World world, BlockPos posPedestal, FluidStack fluidIncoming)
     {
         boolean returner = true;
-        BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
-
-        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
-        if(cap.isPresent())
+        if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
         {
-            IItemHandler handler = cap.orElse(null);
-            if(handler != null)
+            PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!(stackCurrent.size()>0))
             {
-                int range = handler.getSlots();
+                stackCurrent = buildFilterQueue(pedestal);
+                writeFilterQueueToNBT(coin,stackCurrent);
+            }
 
-                ItemStack itemFromInv = ItemStack.EMPTY;
-                itemFromInv = IntStream.range(0,range)//Int Range
-                        .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                        .filter(itemStack -> doesFluidBucketMatch(itemStack,fluidIncoming))
-                        .findFirst().orElse(ItemStack.EMPTY);
+            int range = stackCurrent.size();
 
-                if(!itemFromInv.isEmpty())
-                {
-                    returner = false;
-                }
+            ItemStack itemFromInv = ItemStack.EMPTY;
+            itemFromInv = IntStream.range(0,range)//Int Range
+                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                    .filter(itemStack -> doesFluidBucketMatch(itemStack,fluidIncoming))
+                    .findFirst().orElse(ItemStack.EMPTY);
+
+            if(!itemFromInv.isEmpty())
+            {
+                returner = false;
             }
         }
 
@@ -137,6 +139,24 @@ public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
                     upgradeActionSendFluid(pedestal);
                 }
             }
+        }
+    }
+
+    @Override
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackIn = buildFilterQueue(pedestal);
+        if(filterQueueSize(coin)>0)
+        {
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
+            {
+                writeFilterQueueToNBT(coin,stackIn);
+            }
+        }
+        else
+        {
+            writeFilterQueueToNBT(coin,stackIn);
         }
     }
 

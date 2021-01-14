@@ -12,6 +12,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -33,31 +34,31 @@ public class ItemUpgradeFilterItemBlacklist extends ItemUpgradeBaseFilter
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         boolean returner = true;
-        BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
 
-        //if(world.getTileEntity(posInventory) !=null)
-        //{
-        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
-        if(cap.isPresent())
+        if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
         {
-            IItemHandler handler = cap.orElse(null);
-            if(handler != null)
-                {
-                    int range = handler.getSlots();
-
-                    ItemStack itemFromInv = ItemStack.EMPTY;
-                    itemFromInv = IntStream.range(0,range)//Int Range
-                            .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                            .filter(itemStack -> itemStack.getItem().equals(itemStackIn.getItem()))
-                            .findFirst().orElse(ItemStack.EMPTY);
-
-                    if(!itemFromInv.isEmpty())
-                    {
-                        returner = false;
-                    }
-                }
+            PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!(stackCurrent.size()>0))
+            {
+                stackCurrent = buildFilterQueue(pedestal);
+                writeFilterQueueToNBT(coin,stackCurrent);
             }
-        //}
+
+            int range = stackCurrent.size();
+
+            ItemStack itemFromInv = ItemStack.EMPTY;
+            itemFromInv = IntStream.range(0,range)//Int Range
+                    .mapToObj((stackCurrent)::get)
+                    .filter(itemStack -> itemStack.getItem().equals(itemStackIn.getItem()))
+                    .findFirst().orElse(ItemStack.EMPTY);
+
+            if(!itemFromInv.isEmpty())
+            {
+                returner = false;
+            }
+        }
 
         return returner;
     }
@@ -65,6 +66,24 @@ public class ItemUpgradeFilterItemBlacklist extends ItemUpgradeBaseFilter
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
 
+    }
+
+    @Override
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackIn = buildFilterQueue(pedestal);
+        if(filterQueueSize(coin)>0)
+        {
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
+            {
+                writeFilterQueueToNBT(coin,stackIn);
+            }
+        }
+        else
+        {
+            writeFilterQueueToNBT(coin,stackIn);
+        }
     }
 
     public static final Item ITEM = new ItemUpgradeFilterItemBlacklist(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filteritemb"));

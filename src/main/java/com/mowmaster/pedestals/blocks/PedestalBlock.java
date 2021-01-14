@@ -41,6 +41,8 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 
+import java.util.Random;
+
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
@@ -546,6 +548,34 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 }
             }
         }
+    }
+
+    //Found this beauty inside of the observer block class :D
+    @Override
+    public BlockState updatePostPlacement(BlockState p_196271_1_, Direction p_196271_2_, BlockState p_196271_3_, IWorld p_196271_4_, BlockPos p_196271_5_, BlockPos p_196271_6_) {
+        if(!p_196271_4_.isRemote())
+        {
+            if(p_196271_1_.getBlock() instanceof PedestalBlock)
+            {
+                BlockPos blockBelowPos = p_196271_6_;
+                BlockState blockBelow = p_196271_3_;
+                if(getPosOfBlockBelow((ServerWorld)p_196271_4_,p_196271_5_,1).equals(blockBelowPos))
+                {
+                    TileEntity tile = p_196271_4_.getTileEntity(p_196271_5_);
+                    if(tile instanceof PedestalTileEntity)
+                    {
+                        PedestalTileEntity pedestal = (PedestalTileEntity)tile;
+                        Item coin = pedestal.getCoinOnPedestal().getItem();
+                        if(coin instanceof ItemUpgradeBase)
+                        {
+                            ((ItemUpgradeBase)coin).onPedestalBelowNeighborChanged(pedestal);
+                        }
+                    }
+                }
+            }
+        }
+
+        return super.updatePostPlacement(p_196271_1_, p_196271_2_, p_196271_3_, p_196271_4_, p_196271_5_, p_196271_6_);
     }
 
     public BlockPos getPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)

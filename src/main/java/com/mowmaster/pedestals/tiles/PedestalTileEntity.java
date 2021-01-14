@@ -726,6 +726,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 coin.removeWorkQueueTwoFromCoin(actualCoin);
                 coin.removeStoredIntFromCoin(actualCoin);
                 coin.removeStoredIntTwoFromCoin(actualCoin);
+                coin.removeFilterQueueHandler(actualCoin);
             }
             spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
         }

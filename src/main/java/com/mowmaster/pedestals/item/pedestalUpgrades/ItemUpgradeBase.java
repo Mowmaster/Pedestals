@@ -1045,6 +1045,11 @@ public class ItemUpgradeBase extends Item {
 
     }
 
+    public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal)
+    {
+
+    }
+
     public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
     {
         Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
@@ -1634,53 +1639,127 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-    public void upgradeActionMagnet(World world, List<ItemEntity> itemList, ItemStack itemInPedestal, BlockPos posOfPedestal, int width, int height)
+    public void upgradeActionMagnet(World world, List<ItemEntity> itemList, ItemStack itemInPedestal, BlockPos posOfPedestal)
     {
-        for(ItemEntity getItemFromList : itemList)
+        if(itemList.size()>0)
         {
-            ItemStack copyStack = getItemFromList.getItem().copy();
-            int maxSize = copyStack.getMaxStackSize();
-            boolean stacksMatch = doItemsMatch(itemInPedestal,copyStack);
-            if (itemInPedestal.isEmpty() || stacksMatch)
+            for(ItemEntity getItemFromList : itemList)
             {
-                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                if(pedestalInv instanceof PedestalTileEntity) {
-                    int spaceInPed = itemInPedestal.getMaxStackSize()-itemInPedestal.getCount();
-                    if(stacksMatch)
-                    {
-                        if(spaceInPed > 0)
+                ItemStack copyStack = getItemFromList.getItem().copy();
+                int maxSize = copyStack.getMaxStackSize();
+                boolean stacksMatch = doItemsMatch(itemInPedestal,copyStack);
+                if (itemInPedestal.isEmpty() || stacksMatch)
+                {
+                    TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                    if(pedestalInv instanceof PedestalTileEntity) {
+                        int spaceInPed = itemInPedestal.getMaxStackSize()-itemInPedestal.getCount();
+                        if(stacksMatch)
                         {
-                            int itemInCount = getItemFromList.getItem().getCount();
-                            int countToAdd = ( itemInCount<= spaceInPed)?(itemInCount):(spaceInPed);
-                            getItemFromList.getItem().setCount(itemInCount-countToAdd);
-                            copyStack.setCount(countToAdd);
+                            if(spaceInPed > 0)
+                            {
+                                int itemInCount = getItemFromList.getItem().getCount();
+                                int countToAdd = ( itemInCount<= spaceInPed)?(itemInCount):(spaceInPed);
+                                getItemFromList.getItem().setCount(itemInCount-countToAdd);
+                                copyStack.setCount(countToAdd);
+                                ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                            }
+                            else break;
+                        }
+                        else if(copyStack.getCount() <=maxSize)
+                        {
+                            getItemFromList.setItem(ItemStack.EMPTY);
+                            getItemFromList.remove();
+                            ((PedestalTileEntity) pedestalInv).addItem(copyStack);
+                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+
+                        }
+                        else
+                        {
+                            //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
+                            int count = getItemFromList.getItem().getCount();
+                            getItemFromList.getItem().setCount(count-maxSize);
+                            copyStack.setCount(maxSize);
                             ((PedestalTileEntity) pedestalInv).addItem(copyStack);
                             world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                         }
-                        else break;
                     }
-                    else if(copyStack.getCount() <=maxSize)
-                    {
-                        getItemFromList.setItem(ItemStack.EMPTY);
-                        getItemFromList.remove();
-                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
-                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                    break;
+                }
+            }
+        }
+    }
 
-                    }
-                    else
+    public ItemStack getFilterReturnStack(List<ItemStack> stack, ItemStack incoming)
+    {
+        int range = stack.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stack)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem().equals(incoming.getItem()))
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        return itemFromInv;
+    }
+
+    public void upgradeActionFilteredMagnet(World world, List<ItemEntity> itemList, ItemStack itemInPedestal, BlockPos posOfPedestal, List<ItemStack> filterList, boolean invIsEmpty)
+    {
+        if(itemList.size()>0)
+        {
+            for(ItemEntity getItemFromList : itemList)
+            {
+                ItemStack copyStack = getItemFromList.getItem().copy();
+                int maxSize = copyStack.getMaxStackSize();
+                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
+                if(pedestalInv instanceof PedestalTileEntity) {
+
+                    PedestalTileEntity pedestal = (PedestalTileEntity)pedestalInv;
+
+                    ItemStack itemFromInv = getFilterReturnStack(filterList, copyStack);
+
+                    if((invIsEmpty)?(itemFromInv.isEmpty()):(!itemFromInv.isEmpty()))
                     {
-                        //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
-                        int count = getItemFromList.getItem().getCount();
-                        getItemFromList.getItem().setCount(count-maxSize);
-                        copyStack.setCount(maxSize);
-                        ((PedestalTileEntity) pedestalInv).addItem(copyStack);
-                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                        boolean stacksMatch = doItemsMatch(itemInPedestal,itemFromInv);
+                        if (itemInPedestal.isEmpty() || stacksMatch)
+                        {
+                            int spaceInPed = itemInPedestal.getMaxStackSize()-itemInPedestal.getCount();
+                            if(stacksMatch)
+                            {
+                                if(spaceInPed > 0)
+                                {
+                                    int itemInCount = getItemFromList.getItem().getCount();
+                                    int countToAdd = ( itemInCount<= spaceInPed)?(itemInCount):(spaceInPed);
+                                    getItemFromList.getItem().setCount(itemInCount-countToAdd);
+                                    itemFromInv.setCount(countToAdd);
+                                    ((PedestalTileEntity) pedestalInv).addItem(itemFromInv);
+                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                }
+                                else break;
+                            }
+                            else if(itemFromInv.getCount() <=maxSize)
+                            {
+                                getItemFromList.setItem(ItemStack.EMPTY);
+                                getItemFromList.remove();
+                                ((PedestalTileEntity) pedestalInv).addItem(itemFromInv);
+                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+
+                            }
+                            else
+                            {
+                                //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
+                                int count = getItemFromList.getItem().getCount();
+                                getItemFromList.getItem().setCount(count-maxSize);
+                                itemFromInv.setCount(maxSize);
+                                ((PedestalTileEntity) pedestalInv).addItem(itemFromInv);
+                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                            }
+                        }
                     }
                 }
                 break;
             }
         }
-
     }
     /***************************************
      ****************************************
@@ -1993,6 +2072,26 @@ public class ItemUpgradeBase extends Item {
         return workQueueTwo;
     }
 
+    public void removeFilterQueueHandler(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("Size"))
+            {
+                compound.remove("Size");
+                stack.setTag(compound);
+            }
+
+            if(compound.contains("Items"))
+            {
+                compound.remove("Items");
+                stack.setTag(compound);
+            }
+        }
+    }
+
     public int filterQueueSize(ItemStack coin)
     {
         int filterQueueSize = 0;
@@ -2016,9 +2115,10 @@ public class ItemUpgradeBase extends Item {
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
         BlockPos posInventory = getPosOfBlockBelow(world, pedestalPos, 1);
 
-        List<ItemStack> filterQueue = new ArrayList<ItemStack>(){};
+        List<ItemStack> filterQueue = new ArrayList<>();
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
+        if(hasAdvancedInventoryTargeting(coin))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, pedestalPos),true);
         if(cap.isPresent())
         {
             IItemHandler handler = cap.orElse(null);
@@ -2028,7 +2128,7 @@ public class ItemUpgradeBase extends Item {
                 for(int i=0;i<range;i++)
                 {
                     ItemStack stackInSlot = handler.getStackInSlot(i);
-                    if(!stackInSlot.isEmpty()) {filterQueue.add(i,stackInSlot);}
+                    if(!stackInSlot.isEmpty()) {filterQueue.add(stackInSlot);}
                 }
             }
         }
@@ -2036,11 +2136,10 @@ public class ItemUpgradeBase extends Item {
         return filterQueue;
     }
 
-    //This is needed for the "slowdown" of machines
     public void writeFilterQueueToNBT(ItemStack stack, List<ItemStack> listIn)
     {
         CompoundNBT compound = new CompoundNBT();
-        if(stack.hasTag()) {compound = stack.getTag();}
+        if(stack.hasTag()){compound = stack.getTag();}
 
         ItemStackHandler handler = new ItemStackHandler();
         handler.setSize(listIn.size());
@@ -2053,15 +2152,14 @@ public class ItemUpgradeBase extends Item {
 
     public List<ItemStack> readFilterQueueFromNBT(ItemStack coin)
     {
-        int filterQueueSize = 0;
-        List<ItemStack> filterQueue = new ArrayList<ItemStack>(){};
+        List<ItemStack> filterQueue = new ArrayList<>();
         if(coin.hasTag())
         {
             CompoundNBT getCompound = coin.getTag();
             ItemStackHandler handler = new ItemStackHandler();
             handler.deserializeNBT(getCompound);
 
-            for(int i=0;i<handler.getSlots();i++) {filterQueue.add(i,handler.getStackInSlot(i));}
+            for(int i=0;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
         }
 
         return filterQueue;
@@ -2071,6 +2169,12 @@ public class ItemUpgradeBase extends Item {
     {
         return filterIn.containsAll(queueMatch);
     }
+
+    /*
+    NOTES FOR THE CRAFTERS/MACHINES
+    MAYBE ADD A VARIABLE TO THE PROCESS SO WHEN WE CRAFT SOMETHING, BEFORE THE EXTRACT, ITERATE THE VAR ONCE, THEN EXTRACT,
+    THE EXTRACT WILL TRIGGER A CHANGE, BUT WITH OUR VAR OVER 0 IT WONT CHECK TO VERIFY THE INVENTORY SO WE JUST NEED TO SAVE OUR MODIFIED LIST AND CONTINUE.
+     */
 
     /***************************************
      ****************************************
@@ -2432,6 +2536,14 @@ public class ItemUpgradeBase extends Item {
     public void updateAction(PedestalTileEntity pedestal)
     {
 
+    }
+
+    public void actionOnCollideWithBlock(PedestalTileEntity tilePedestal, Entity entityIn)
+    {
+        World world = tilePedestal.getWorld();
+        BlockPos posPedestal = tilePedestal.getPos();
+        BlockState state = world.getBlockState(posPedestal);
+        actionOnCollideWithBlock(world, tilePedestal, posPedestal, state, entityIn);
     }
 
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
