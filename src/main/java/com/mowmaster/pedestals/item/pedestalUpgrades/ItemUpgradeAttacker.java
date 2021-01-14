@@ -3,6 +3,8 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -194,14 +196,13 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal().copy();
         BlockPos posOfPedestal = pedestal.getPos();
-
-
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
-
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+        if(!hasFilterBlock(coinInPedestal)) {writeFilterBlockToNBT(pedestal);}
+        Block filterBlock = readFilterBlockFromNBT(coinInPedestal);
 
         List<LivingEntity> itemList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
         for(LivingEntity getEntityFromList : itemList)
@@ -209,7 +210,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
             List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10", "pedestal11", "pedestal12");
             Random rn = new Random();
 
-            LivingEntity selectedEntity = getTargetEntity(world,posOfPedestal,getEntityFromList);
+            LivingEntity selectedEntity = getTargetEntity(filterBlock,getEntityFromList);
 
             if(selectedEntity != null)
             {
@@ -221,13 +222,21 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 DamageSource sourceE = (selectedEntity instanceof AbstractRaiderEntity && ((AbstractRaiderEntity) selectedEntity).isLeader())?(new EntityDamageSource(list.get(rn.nextInt(list.size())),null)):(new EntityDamageSource(list.get(rn.nextInt(list.size())),fakePlayer));
                 float damage = getAttackDamage(getEntityFromList,toolInPedestal,coinInPedestal);
 
-                if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
-                {
-                    damage *= 2.0f;
-                }
+                if(filterBlock.equals(Blocks.NETHERITE_BLOCK)) {damage *= 2.0f;}
 
                 selectedEntity.attackEntityFrom(sourceE,damage);
             }
+        }
+    }
+
+    //Just update the block, whatever it is. genrally this wont be changing much anyway so we'll take the hit when it does change.
+    @Override
+    public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
+    {
+        BlockPos blockBelow = getPosOfBlockBelow(pedestal.getWorld(),pedestal.getPos(),1);
+        if(blockBelow.equals(blockChangedPos))
+        {
+            writeFilterBlockToNBT(pedestal);
         }
     }
 
@@ -235,6 +244,8 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
+        Block filterBlock = (hasFilterBlock(stack))?(readFilterBlockFromNBT(stack)):(Blocks.AIR);
+
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
 
@@ -291,7 +302,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         }
 
         TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
-        entityType.appendString(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        entityType.appendString(getTargetEntity(filterBlock));
         entityType.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(entityType,Util.DUMMY_UUID);
 

@@ -103,7 +103,7 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
         List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-        upgradeActionMagnet(world, itemList, itemInPedestal, posOfPedestal, width, height);
+        upgradeActionMagnet(world, itemList, itemInPedestal, posOfPedestal);
         /*if(itemList.size() > 0)
         {
             for(ItemEntity getItemFromList : itemList)

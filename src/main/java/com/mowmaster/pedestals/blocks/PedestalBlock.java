@@ -27,6 +27,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -568,7 +569,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                         Item coin = pedestal.getCoinOnPedestal().getItem();
                         if(coin instanceof ItemUpgradeBase)
                         {
-                            ((ItemUpgradeBase)coin).onPedestalBelowNeighborChanged(pedestal);
+                            ((ItemUpgradeBase)coin).onPedestalBelowNeighborChanged(pedestal,p_196271_3_,p_196271_6_);
                         }
                     }
                 }

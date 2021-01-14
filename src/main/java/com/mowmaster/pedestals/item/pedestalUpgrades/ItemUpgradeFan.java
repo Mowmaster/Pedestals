@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -82,63 +83,71 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return getAreaWidth(coin);
     }
 
-    protected void useFanOnEntities(World world, BlockPos posOfPedestal, PedestalTileEntity pedestal, double speed, AxisAlignedBB getBox) {
+    protected void useFanOnEntities(PedestalTileEntity pedestal,Block filterBlock, double speed, AxisAlignedBB getBox) {
+        World world = pedestal.getWorld();
+        BlockPos posOfPedestal = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class, getBox);
-
-        if(entityList.size()==0)pedestal.setStoredValueForUpgrades(0);
-
-        BlockState state = world.getBlockState(posOfPedestal);
-        Direction enumfacing = state.get(FACING);
-        for (LivingEntity entity : entityList) {
-            LivingEntity getEntity = getTargetEntity(world,posOfPedestal,entity);
-            if(getEntity != null)
-            {
-                if(getEntity instanceof PlayerEntity)
+        if(entityList.size()==0)writeStoredIntToNBT(coinInPedestal,0);
+        if(entityList.size()>0)
+        {
+            BlockState state = world.getBlockState(posOfPedestal);
+            Direction enumfacing = state.get(FACING);
+            for (LivingEntity entity : entityList) {
+                LivingEntity getEntity = getTargetEntity(filterBlock,entity);
+                if(getEntity != null)
                 {
-                    if(!((PlayerEntity) getEntity).abilities.isFlying && !((PlayerEntity) getEntity).isCrouching())
+                    if(getEntity instanceof PlayerEntity)
+                    {
+                        if(!((PlayerEntity) getEntity).abilities.isFlying && !((PlayerEntity) getEntity).isCrouching())
+                        {
+                            addMotion(world,posOfPedestal,speed,enumfacing,getEntity);
+                            writeStoredIntToNBT(coinInPedestal,1);
+                        }
+                    }
+                    else
                     {
                         addMotion(world,posOfPedestal,speed,enumfacing,getEntity);
-                        pedestal.setStoredValueForUpgrades(1);
+                        writeStoredIntToNBT(coinInPedestal,1);
                     }
-                }
-                else
-                {
-                    addMotion(world,posOfPedestal,speed,enumfacing,getEntity);
-                    pedestal.setStoredValueForUpgrades(1);
-                }
-                if (enumfacing == Direction.UP) {
-                    getEntity.fallDistance = 0;
+                    if (enumfacing == Direction.UP) {
+                        getEntity.fallDistance = 0;
+                    }
                 }
             }
         }
     }
 
-    protected void useFanOnEntitiesAdvanced(World world, BlockPos posOfPedestal, PedestalTileEntity pedestal, double speed, AxisAlignedBB getBox) {
+    protected void useFanOnEntitiesAdvanced(PedestalTileEntity pedestal,Block filterBlock, double speed, AxisAlignedBB getBox) {
+        World world = pedestal.getWorld();
+        BlockPos posOfPedestal = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         List<Entity> entityList = world.getEntitiesWithinAABB(Entity.class, getBox);
-
-        if(entityList.size()==0)pedestal.setStoredValueForUpgrades(0);
-
-        BlockState state = world.getBlockState(posOfPedestal);
-        Direction enumfacing = state.get(FACING);
-        for (Entity entity : entityList) {
-            Entity getEntity = getTargetEntityAdvanced(world,posOfPedestal,entity);
-            if(getEntity != null)
-            {
-                if(getEntity instanceof PlayerEntity)
+        if(entityList.size()==0)writeStoredIntToNBT(coinInPedestal,0);
+        if(entityList.size()>0)
+        {
+            BlockState state = world.getBlockState(posOfPedestal);
+            Direction enumfacing = state.get(FACING);
+            for (Entity entity : entityList) {
+                Entity getEntity = getTargetEntityAdvanced(filterBlock, entity);
+                if(getEntity != null)
                 {
-                    if(!((PlayerEntity) getEntity).abilities.isFlying && !((PlayerEntity) getEntity).isCrouching())
+                    if(getEntity instanceof PlayerEntity)
+                    {
+                        if(!((PlayerEntity) getEntity).abilities.isFlying && !((PlayerEntity) getEntity).isCrouching())
+                        {
+                            addMotionAdvanced(world,posOfPedestal,speed,enumfacing,getEntity);
+                            writeStoredIntToNBT(coinInPedestal,1);
+                        }
+                    }
+                    else
                     {
                         addMotionAdvanced(world,posOfPedestal,speed,enumfacing,getEntity);
-                        pedestal.setStoredValueForUpgrades(1);
+                        writeStoredIntToNBT(coinInPedestal,1);
                     }
-                }
-                else
-                {
-                    addMotionAdvanced(world,posOfPedestal,speed,enumfacing,getEntity);
-                    pedestal.setStoredValueForUpgrades(1);
-                }
-                if (enumfacing == Direction.UP) {
-                    getEntity.fallDistance = 0;
+                    if (enumfacing == Direction.UP) {
+                        getEntity.fallDistance = 0;
+                    }
                 }
             }
         }
@@ -223,53 +232,55 @@ public class ItemUpgradeFan extends ItemUpgradeBase
 
     public void updateAction(PedestalTileEntity pedestal)
     {
-
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isBlockPowered(pedestalPos))
         {
-            TileEntity entity = world.getTileEntity(pedestalPos);
-            if(entity instanceof PedestalTileEntity)
+            upgradeAction(pedestal);
+            if(readStoredIntFromNBT(coinInPedestal) > 0)
             {
-                PedestalTileEntity ped = ((PedestalTileEntity)entity);
-                upgradeAction(world, pedestalPos, ped);
-                if(ped.getStoredValueForUpgrades() > 0)
-                {
-                    int speedSound = getOperationSpeed(coinInPedestal);
-                    if (world.getGameTime()%speedSound == 0) {
-                        world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                    }
+                int speedSound = getOperationSpeed(coinInPedestal);
+                if (world.getGameTime()%speedSound == 0) {
+                    world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.BLOCKS, 0.25F, 1.0F);
                 }
             }
         }
     }
 
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, PedestalTileEntity pedestal)
+    public void upgradeAction(PedestalTileEntity pedestal)
     {
+        /*
+        THIS F'ING FAN NEEDS BOTH CLIENT AND SERVER FOR PLAYER CLIENT TO UPDATE (VISUALLY)
+        IF SOMETHING DOESNT WORK, MAKE SURE BOTH THE CLIENT AND SERVER CAN ACCESS THE SAME SORT OF INFO
+        USE THE filterBlock AS AN EXAMPLE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         */
+        World world = pedestal.getWorld();
+        BlockPos posOfPedestal = pedestal.getPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         int width = getAreaWidth(coin);
         int height = getHeight(coin);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
         double speed = getFanSpeed(coin);
-
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+        if(!hasFilterBlock(coin)) {writeFilterBlockToNBT(pedestal);}
+        Block filterBlock = (!world.isRemote)?(readFilterBlockFromNBT(coin)):(world.getBlockState(getPosOfBlockBelow(world,posOfPedestal,1)).getBlock());
 
-        if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
-        {
-            speed *= 2;
-        }
+        if(filterBlock.equals(Blocks.NETHERITE_BLOCK)) {speed *= 2;}
+        if(hasAdvancedInventoryTargeting(coin)) {useFanOnEntitiesAdvanced(pedestal,filterBlock,speed,getBox);}
+        else {useFanOnEntities(pedestal, filterBlock,speed,getBox);}
+    }
 
-        if(hasAdvancedInventoryTargeting(coin))
+    //Just update the block, whatever it is. genrally this wont be changing much anyway so we'll take the hit when it does change.
+    @Override
+    public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
+    {
+        BlockPos blockBelow = getPosOfBlockBelow(pedestal.getWorld(),pedestal.getPos(),1);
+        if(blockBelow.equals(blockChangedPos))
         {
-            useFanOnEntitiesAdvanced(world,posOfPedestal,pedestal,speed,getBox);
-        }
-        else
-        {
-            useFanOnEntities(world,posOfPedestal,pedestal,speed,getBox);
+            writeFilterBlockToNBT(pedestal);
         }
     }
 
@@ -277,6 +288,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
+        Block filterBlock = (hasFilterBlock(stack))?(readFilterBlockFromNBT(stack)):(Blocks.AIR);
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
@@ -317,11 +329,11 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
         if(hasAdvancedInventoryTargeting(stack))
         {
-            entityType.appendString(getTargetEntityAdvanced(pedestal.getWorld(),pedestal.getPos()));
+            entityType.appendString(getTargetEntityAdvanced(filterBlock));
         }
         else
         {
-            entityType.appendString(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+            entityType.appendString(getTargetEntity(filterBlock));
         }
         entityType.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(entityType,Util.DUMMY_UUID);

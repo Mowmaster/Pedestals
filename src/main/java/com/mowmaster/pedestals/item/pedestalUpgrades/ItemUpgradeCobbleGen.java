@@ -7,6 +7,7 @@ import com.mowmaster.pedestals.enchants.EnchantmentRange;
 import com.mowmaster.pedestals.recipes.CobbleGenRecipe;
 import com.mowmaster.pedestals.recipes.CobbleGenSilkRecipe;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -70,31 +71,23 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public int getCobbleGenSpawnRate(ItemStack stack)
     {
-        int intCobbleSpawned = 1;
-        switch (getCapacityModifier(stack))
+        int intCobbleSpawned = (getCapacityModifierOverEnchanted(stack)==0)?(1):(getCapacityModifierOverEnchanted(stack)*8 + 24);
+        switch (getCapacityModifierOverEnchanted(stack))
         {
             case 0:
-                intCobbleSpawned = 1;
-                break;
+                return 1;
             case 1:
-                intCobbleSpawned=4;
-                break;
+                return 4;
             case 2:
-                intCobbleSpawned = 8;
-                break;
+                return 8;
             case 3:
-                intCobbleSpawned = 16;
-                break;
+                return 16;
             case 4:
-                intCobbleSpawned = 32;
-                break;
+                return 32;
             case 5:
-                intCobbleSpawned=64;
-                break;
-            default: intCobbleSpawned=1;
+                return 64;
+            default: return (intCobbleSpawned >= maxStored)?(maxStored):(intCobbleSpawned);
         }
-
-        return  intCobbleSpawned;
     }
 
     @Nullable
@@ -120,11 +113,10 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     public Item getItemToSpawn(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
-        BlockPos posBlockBelow = getPosOfBlockBelow(world,pedestalPos,1);
-        BlockState getBlockBelow = world.getBlockState(posBlockBelow);
-        ItemStack itemBlockBelow = new ItemStack(getBlockBelow.getBlock());
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        if(!hasFilterBlock(coinInPedestal)) {writeFilterBlockToNBT(pedestal);}
+        Block filterBlock = readFilterBlockFromNBT(coinInPedestal);
+        ItemStack itemBlockBelow = new ItemStack(filterBlock);
 
         Collection<ItemStack> jsonResults = getProcessResultsNormal(getRecipeNormal(world,itemBlockBelow));
         ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
@@ -261,6 +253,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public int addCobble(PedestalTileEntity pedestal, int amountIn ,boolean simulate)
     {
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         //Returns 0 if it can add all cobble, otherwise returns the amount you could add
         int space = availableCobbleStorageSpace(pedestal);
         if(space>=amountIn)
@@ -268,7 +261,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             if(!simulate)
             {
                 int current = getCobbleStored(pedestal);
-                pedestal.setStoredValueForUpgrades((current+amountIn));
+                writeStoredIntToNBT(coinInPedestal,(current+amountIn));
             }
             return 0;
         }
@@ -277,13 +270,14 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public int removeCobbleBuffer(PedestalTileEntity pedestal, int amountOut ,boolean simulate)
     {
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         //Returns 0 if it can remove all cobble, otherwise returns the amount you could remove
         int current = getCobbleStored(pedestal);
         if((current - amountOut)>=0)
         {
             if(!simulate)
             {
-                pedestal.setStoredValueForUpgrades((current - amountOut));
+                writeStoredIntToNBT(coinInPedestal,(current - amountOut));
             }
             return 0;
         }
@@ -292,6 +286,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public int removeCobble(PedestalTileEntity pedestal, int amountOut ,boolean simulate)
     {
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         //Returns 0 if it can remove all cobble, otherwise returns the amount you could remove
         int current = getCobbleStored(pedestal);
         int currentActual = current+pedestal.getItemInPedestalOverride().getCount();
@@ -301,12 +296,12 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 if((current - amountOut)>=0)
                 {
-                    pedestal.setStoredValueForUpgrades((current - amountOut));
+                    writeStoredIntToNBT(coinInPedestal,(current - amountOut));
                 }
                 else
                 {
                     int removeFromPedestal = amountOut - current;
-                    pedestal.setStoredValueForUpgrades(0);
+                    writeStoredIntToNBT(coinInPedestal,0);
                     pedestal.removeItemOverride(removeFromPedestal);
                 }
 
@@ -318,7 +313,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public int getCobbleStored(PedestalTileEntity pedestal)
     {
-        return pedestal.getStoredValueForUpgrades();
+        return readStoredIntFromNBT(pedestal.getCoinOnPedestal());
     }
 
     public int maxCobbleStorage(PedestalTileEntity pedestal)
@@ -335,7 +330,6 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     {
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
 
         if(!world.isRemote)
@@ -431,6 +425,17 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                     }
                 }
             }
+        }
+    }
+
+    //Just update the block, whatever it is. genrally this wont be changing much anyway so we'll take the hit when it does change.
+    @Override
+    public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
+    {
+        BlockPos blockBelow = getPosOfBlockBelow(pedestal.getWorld(),pedestal.getPos(),1);
+        if(blockBelow.equals(blockChangedPos))
+        {
+            writeFilterBlockToNBT(pedestal);
         }
     }
 

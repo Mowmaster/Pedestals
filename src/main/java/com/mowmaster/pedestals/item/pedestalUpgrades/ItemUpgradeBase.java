@@ -1045,7 +1045,7 @@ public class ItemUpgradeBase extends Item {
 
     }
 
-    public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal)
+    public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
     {
 
     }
@@ -1387,123 +1387,33 @@ public class ItemUpgradeBase extends Item {
      **       Start of Entity Stuff        **
      ****************************************
      ***************************************/
-    public LivingEntity getTargetEntity(World world, BlockPos pedestalPos, LivingEntity entityIn)
+    public LivingEntity getTargetEntity(Block filterBlock, LivingEntity entityIn)
     {
-        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
-        {
-            if(entityIn instanceof PlayerEntity)
-            {
-                return (PlayerEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
-        {
-            if(entityIn instanceof MonsterEntity)
-            {
-                return (MonsterEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
-        {
-            if(entityIn instanceof AnimalEntity)
-            {
-                return (AnimalEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
-        {
-            if(entityIn instanceof FlyingEntity)
-            {
-                return (FlyingEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
-        {
-            if(entityIn instanceof CreatureEntity)
-            {
-                return (CreatureEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
-        {
-            if(entityIn instanceof MobEntity)
-            {
-                return (MobEntity)entityIn;
-            }
-        }
-        else
-        {
-            return (LivingEntity)entityIn;
-        }
+        if(filterBlock.equals(Blocks.EMERALD_BLOCK)) {if(entityIn instanceof PlayerEntity) {return (PlayerEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.DIAMOND_BLOCK)) {if(entityIn instanceof MonsterEntity) {return (MonsterEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.GOLD_BLOCK)) {if(entityIn instanceof AnimalEntity) {return (AnimalEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {if(entityIn instanceof FlyingEntity) {return (FlyingEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.IRON_BLOCK)) {if(entityIn instanceof CreatureEntity) {return (CreatureEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.COAL_BLOCK)) {if(entityIn instanceof MobEntity) {return (MobEntity)entityIn;}}
+        else {return (LivingEntity)entityIn;}
         return null;
     }
 
-    public Entity getTargetEntityAdvanced(World world, BlockPos pedestalPos, Entity entityIn)
+    public Entity getTargetEntityAdvanced(Block filterBlock, Entity entityIn)
     {
-        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
-        {
-            if(entityIn instanceof PlayerEntity)
-            {
-                return (PlayerEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
-        {
-            if(entityIn instanceof MonsterEntity)
-            {
-                return (MonsterEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
-        {
-            if(entityIn instanceof AnimalEntity)
-            {
-                return (AnimalEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
-        {
-            if(entityIn instanceof FlyingEntity)
-            {
-                return (FlyingEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
-        {
-            if(entityIn instanceof CreatureEntity)
-            {
-                return (CreatureEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
-        {
-            if(entityIn instanceof MobEntity)
-            {
-                return (MobEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.QUARTZ_BLOCK))
-        {
-            if(entityIn instanceof ItemEntity)
-            {
-                return (ItemEntity)entityIn;
-            }
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.SLIME_BLOCK))
-        {
-            if(entityIn instanceof ExperienceOrbEntity)
-            {
-                return (ExperienceOrbEntity)entityIn;
-            }
-        }
-        else
-        {
-            return (Entity)entityIn;
-        }
+        if(filterBlock.equals(Blocks.EMERALD_BLOCK)) {if(entityIn instanceof PlayerEntity) {return (PlayerEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.DIAMOND_BLOCK)) {if(entityIn instanceof MonsterEntity) {return (MonsterEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.GOLD_BLOCK)) {if(entityIn instanceof AnimalEntity) {return (AnimalEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {if(entityIn instanceof FlyingEntity) {return (FlyingEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.IRON_BLOCK)) {if(entityIn instanceof CreatureEntity) {return (CreatureEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.COAL_BLOCK)) {if(entityIn instanceof MobEntity) {return (MobEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.QUARTZ_BLOCK)) {if(entityIn instanceof ItemEntity) {return (ItemEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.SLIME_BLOCK)) {if(entityIn instanceof ExperienceOrbEntity) {return (ExperienceOrbEntity)entityIn;}}
+        else {return (Entity)entityIn;}
         return null;
     }
 
-    public String getTargetEntity(World world, BlockPos pedestalPos)
+    public String getTargetEntity(Block filterBlock)
     {
         TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
         TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
@@ -1513,36 +1423,16 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent COAL = new TranslationTextComponent(getTranslationKey() + ".entity_coal");
         TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
 
-        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
-        {
-            return EMERALD.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
-        {
-            return DIAMOND.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
-        {
-            return GOLD.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
-        {
-            return LAPIS.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
-        {
-            return IRON.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
-        {
-            return COAL.getString();
-        }
-        else {
-            return ALL.getString();
-        }
+        if(filterBlock.equals(Blocks.EMERALD_BLOCK)) {return EMERALD.getString();}
+        else if(filterBlock.equals(Blocks.DIAMOND_BLOCK)) {return DIAMOND.getString();}
+        else if(filterBlock.equals(Blocks.GOLD_BLOCK)) {return GOLD.getString();}
+        else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {return LAPIS.getString();}
+        else if(filterBlock.equals(Blocks.IRON_BLOCK)) {return IRON.getString();}
+        else if(filterBlock.equals(Blocks.COAL_BLOCK)) {return COAL.getString();}
+        else {return ALL.getString();}
     }
 
-    public String getTargetEntityAdvanced(World world, BlockPos pedestalPos)
+    public String getTargetEntityAdvanced(Block filterBlock)
     {
         TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
         TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
@@ -1554,41 +1444,15 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent SLIME = new TranslationTextComponent(getTranslationKey() + ".entity_slime");
         TranslationTextComponent QUARTZ = new TranslationTextComponent(getTranslationKey() + ".entity_quartz");
 
-        if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.EMERALD_BLOCK))
-        {
-            return EMERALD.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.DIAMOND_BLOCK))
-        {
-            return DIAMOND.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.GOLD_BLOCK))
-        {
-            return GOLD.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.LAPIS_BLOCK))
-        {
-            return LAPIS.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.IRON_BLOCK))
-        {
-            return IRON.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.COAL_BLOCK))
-        {
-            return COAL.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.SLIME_BLOCK))
-        {
-            return SLIME.getString();
-        }
-        else if(getBaseBlockBelow(world,pedestalPos).equals(Blocks.QUARTZ_BLOCK))
-        {
-            return QUARTZ.getString();
-        }
-        else {
-            return ALL.getString();
-        }
+        if(filterBlock.equals(Blocks.EMERALD_BLOCK)) {return EMERALD.getString();}
+        else if(filterBlock.equals(Blocks.DIAMOND_BLOCK)) {return DIAMOND.getString();}
+        else if(filterBlock.equals(Blocks.GOLD_BLOCK)) {return GOLD.getString();}
+        else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {return LAPIS.getString();}
+        else if(filterBlock.equals(Blocks.IRON_BLOCK)) {return IRON.getString();}
+        else if(filterBlock.equals(Blocks.COAL_BLOCK)) {return COAL.getString();}
+        else if(filterBlock.equals(Blocks.SLIME_BLOCK)) {return SLIME.getString();}
+        else if(filterBlock.equals(Blocks.QUARTZ_BLOCK)) {return QUARTZ.getString();}
+        else {return ALL.getString();}
     }
 
     public BlockPos getNegRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
@@ -2168,6 +2032,67 @@ public class ItemUpgradeBase extends Item {
     public boolean doesFilterAndQueueMatch(List<ItemStack> filterIn, List<ItemStack> queueMatch)
     {
         return filterIn.containsAll(queueMatch);
+    }
+
+
+
+
+
+
+    public void removeFilterBlock(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("blockbelow"))
+            {
+                compound.remove("blockbelow");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+    public boolean hasFilterBlock(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("blockbelow"))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void writeFilterBlockToNBT(PedestalTileEntity pedestal)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        BlockPos blockBelowPos = getPosOfBlockBelow(world,pedestalPos,1);
+        Block blockBelow = world.getBlockState(blockBelowPos).getBlock();
+
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag()){compound = coin.getTag();}
+
+        compound.putString("blockbelow", blockBelow.getRegistryName() == null?"minecraft:air":blockBelow.getRegistryName().toString());
+
+        coin.setTag(compound);
+    }
+
+    public Block readFilterBlockFromNBT(ItemStack coin)
+    {
+        Block blocked = Blocks.AIR;
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            blocked = (Block)Registry.BLOCK.getOrDefault(new ResourceLocation(getCompound.getString("blockbelow")));
+        }
+        return blocked;
     }
 
     /*

@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -100,7 +101,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
             if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
+                    upgradeAction(pedestal);
                 }
             }
         }
@@ -178,14 +179,19 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
 
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal)
     {
+        World world = pedestal.getWorld();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        BlockPos posOfPedestal = pedestal.getPos();
         int width = getAreaWidth(coinInPedestal);
         int height = getHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
         BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
-
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+        if(!hasFilterBlock(coinInPedestal)) {writeFilterBlockToNBT(pedestal);}
+        Block filterBlock = readFilterBlockFromNBT(coinInPedestal);
 
         List<EffectInstance> instance = getEffectFromPedestal(itemInPedestal,0);
         if(instance.size() > 0)
@@ -195,20 +201,20 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
             {
                 for(LivingEntity getEntityFromList : entityList)
                 {
-                    if(getBaseBlockBelow(world,posOfPedestal).equals(Blocks.NETHERITE_BLOCK))
+                    if(filterBlock.equals(Blocks.NETHERITE_BLOCK))
                     {
                         instance = getEffectFromPedestal(itemInPedestal,1);
                     }
 
-                    if(getTargetEntity(world,posOfPedestal,getEntityFromList) != null)
+                    if(getTargetEntity(filterBlock,getEntityFromList) != null)
                     {
-                        if(!hasPotionEffect(getTargetEntity(world,posOfPedestal,getEntityFromList),instance))
+                        if(!hasPotionEffect(getTargetEntity(filterBlock,getEntityFromList),instance))
                         {
                             for(int i=0; i<instance.size(); i++)
                             {
                                 if(removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),true))
                                 {
-                                    if(getTargetEntity(world,posOfPedestal,getEntityFromList).addPotionEffect(instance.get(i)))
+                                    if(getTargetEntity(filterBlock,getEntityFromList).addPotionEffect(instance.get(i)))
                                     {
                                         world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                         removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
@@ -219,6 +225,15 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                     }
                 }
             }
+        }
+    }
+
+    public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
+    {
+        BlockPos blockBelow = getPosOfBlockBelow(pedestal.getWorld(),pedestal.getPos(),1);
+        if(blockBelow.equals(blockChangedPos))
+        {
+            writeFilterBlockToNBT(pedestal);
         }
     }
 
@@ -295,6 +310,8 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
+        Block filterBlock = (hasFilterBlock(stack))?(readFilterBlockFromNBT(stack)):(Blocks.AIR);
+
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
 
@@ -333,7 +350,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         }
 
         TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
-        entityType.appendString(getTargetEntity(pedestal.getWorld(),pedestal.getPos()));
+        entityType.appendString(getTargetEntity(filterBlock));
         entityType.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(entityType,Util.DUMMY_UUID);
 

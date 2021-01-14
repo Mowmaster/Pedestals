@@ -1,12 +1,16 @@
 package com.mowmaster.pedestals.item;
 
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionUtils;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -37,13 +41,57 @@ public class ItemDevTool extends Item {
 
         if(!p_77659_1_.isRemote)
         {
-            if(!p_77659_2_.getHeldItemOffhand().isEmpty())
+            RayTraceResult result = p_77659_2_.pick(5,0,false);
+            if(result != null)
             {
-                //int getAmp = PotionUtils.getEffectsFromStack(p_77659_2_.getHeldItemOffhand()).get(0).getAmplifier();
-                //TranslationTextComponent name = new TranslationTextComponent(""+getAmp+"");
-                TranslationTextComponent name = new TranslationTextComponent(""+p_77659_2_.getHeldItemOffhand().getTag().toString()+"");
-                name.mergeStyle(TextFormatting.GOLD);
-                p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
+                //Assuming it it hits a block it wont work???
+                if(result.getType() == RayTraceResult.Type.MISS)
+                {
+                    if(!p_77659_2_.getHeldItemOffhand().isEmpty())
+                    {
+                        //int getAmp = PotionUtils.getEffectsFromStack(p_77659_2_.getHeldItemOffhand()).get(0).getAmplifier();
+                        //TranslationTextComponent name = new TranslationTextComponent(""+getAmp+"");
+                        if(p_77659_2_.getHeldItemOffhand().hasTag())
+                        {
+                            TranslationTextComponent name = new TranslationTextComponent(""+p_77659_2_.getHeldItemOffhand().getTag().toString()+"");
+                            name.mergeStyle(TextFormatting.GOLD);
+                            p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
+                        return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                }
+                else if(result.getType() == RayTraceResult.Type.BLOCK)
+                {
+                    ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
+                    BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);
+                    BlockPos hit = res.getPos();
+
+                    if(p_77659_1_.getTileEntity(hit) instanceof PedestalTileEntity)
+                    {
+                        PedestalTileEntity pedestal = (PedestalTileEntity)p_77659_1_.getTileEntity(hit);
+                        if(p_77659_2_.isCrouching())
+                        {
+                            if(pedestal.getCoinOnPedestal().hasTag())
+                            {
+                                TranslationTextComponent name = new TranslationTextComponent(""+pedestal.getCoinOnPedestal().getTag().toString()+"");
+                                name.mergeStyle(TextFormatting.GOLD);
+                                p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
+                                return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                            }
+                        }
+                        else
+                        {
+                            TranslationTextComponent name = new TranslationTextComponent(""+pedestal.getTileData().toString()+"");
+                            name.mergeStyle(TextFormatting.WHITE);
+                            p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
+
+                    }
+
+                    return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                }
             }
         }
 

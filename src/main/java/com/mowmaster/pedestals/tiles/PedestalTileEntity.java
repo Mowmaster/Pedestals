@@ -670,6 +670,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             coin.removeStoredIntFromCoin(stack);
             coin.removeStoredIntTwoFromCoin(stack);
             coin.removeFilterQueueHandler(stack);
+            if(coin.hasFilterBlock(stack))coin.removeFilterBlock(stack);
         }
         ph.extractItem(0,stack.getCount(),false);
         setStoredValueForUpgrades(0);
@@ -727,6 +728,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 coin.removeStoredIntFromCoin(actualCoin);
                 coin.removeStoredIntTwoFromCoin(actualCoin);
                 coin.removeFilterQueueHandler(actualCoin);
+                if(coin.hasFilterBlock(actualCoin))coin.removeFilterBlock(actualCoin);
             }
             spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
         }
