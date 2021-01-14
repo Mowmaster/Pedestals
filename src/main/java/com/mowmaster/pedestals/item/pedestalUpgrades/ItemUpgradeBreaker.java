@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.Block;
@@ -26,6 +27,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
@@ -38,6 +40,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.IFluidBlock;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -151,12 +154,12 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
             if(canMineBlock(pedestal, posOfBlock,fakePlayer))
             {
-                tool = blockToBreak.getHarvestTool();
-                toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToBreak);
-                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,toolLevel >= blockToBreak.getHarvestLevel())) {
+                //tool = blockToBreak.getHarvestTool();
+                //toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToBreak);
+                //if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,toolLevel >= blockToBreak.getHarvestLevel())) {
                     //This event is already called in the Event factory doPlayerHarvestCheck
-                    //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
-                    //if (MinecraftForge.EVENT_BUS.post(e)) {
+                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
+                    if (MinecraftForge.EVENT_BUS.post(e)) {
                     blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
                     blockToBreak.getBlock().onBlockHarvested(world, posOfBlock, blockToBreak, fakePlayer);
                     int expdrop = blockToBreak.getBlock().getExpDrop(blockToBreak,world,posOfBlock,
@@ -164,8 +167,8 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                             (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
                     if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
                     world.removeBlock(posOfBlock, false);
-                    //}
-                }
+                    }
+                //}
             }
         }
     }
@@ -179,6 +182,27 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                 || tool.getToolTypes().contains(ToolType.HOE)
                 || tool.getToolTypes().contains(ToolType.AXE)
                 || tool.getToolTypes().contains(ToolType.SHOVEL))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        BlockState blockToMineState = world.getBlockState(blockToMinePos);
+        Block blockToMine = blockToMineState.getBlock();
+        
+        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
+                && !(blockToMine instanceof PedestalBlock)
+                && passesFilter(world, pedestalPos, blockToMine)
+                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
+                && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
+                )
         {
             return true;
         }
