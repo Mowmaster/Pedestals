@@ -91,8 +91,11 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                 break;
             default: summonRate=55;
         }*/
+        //Clearly capped at 1995 when everything else can exceed it wasnt gonna cut it
+        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)+5;
 
-        return  1395;
+        //21,863 being the max before we get close to int overflow
+        return  (overEnchanted>=20000)?(20000):(overEnchanted);
     }
 
     public String getExpTransferRateString(ItemStack stack)
