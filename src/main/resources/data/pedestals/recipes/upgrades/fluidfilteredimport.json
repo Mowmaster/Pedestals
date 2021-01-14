@@ -5,13 +5,10 @@
       "tag": "pedestals:filters"
     },
     {
-      "item": "minecraft:hopper"
-    },
-    {
-      "item": "minecraft:bucket"
+      "item": "pedestals:coin/fluidimport"
     }
   ],
   "result": {
-    "item": "pedestals:coin/fluidimport"
+    "item": "pedestals:coin/fluidfilteredimport"
   }
 }
