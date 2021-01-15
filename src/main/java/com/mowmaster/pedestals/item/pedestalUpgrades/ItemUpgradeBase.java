@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
+import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
 import com.mowmaster.pedestals.recipes.CobbleGenRecipe;
 import com.mowmaster.pedestals.recipes.CobbleGenSilkRecipe;
 import com.mowmaster.pedestals.recipes.QuarryAdvancedRecipe;
@@ -22,11 +23,11 @@ import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.EnderChestInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.*;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.*;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -53,6 +54,7 @@ import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fluids.IFluidBlock;
@@ -292,6 +294,13 @@ public class ItemUpgradeBase extends Item {
 
     public boolean doItemsMatch(ItemStack stackPedestal, ItemStack itemStackIn)
     {
+        return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
+    }
+
+    public boolean doItemsMatchWithEmpty(ItemStack stackPedestal, ItemStack itemStackIn)
+    {
+        if(stackPedestal.isEmpty() && itemStackIn.isEmpty())return true;
+
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
@@ -582,6 +591,22 @@ public class ItemUpgradeBase extends Item {
         }
 
         return slot;
+    }
+
+    public int getNextIndexWithItems(List<ItemStack> stackList)
+    {
+        int range = stackList.size();
+        for(int i=0;i<range;i++)
+        {
+            ItemStack stackInSlot = stackList.get(i);
+            //find a slot with items
+            if(!stackInSlot.isEmpty())
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
     /***************************************
      ****************************************
@@ -2034,6 +2059,237 @@ public class ItemUpgradeBase extends Item {
         return filterIn.containsAll(queueMatch);
     }
 
+    public void removeInventoryQueue(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("invqueue"))
+            {
+                compound.remove("invqueue");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+    public List<ItemStack> buildInventoryQueue(PedestalTileEntity pedestal)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos posInventory = getPosOfBlockBelow(world, pedestalPos, 1);
+
+        List<ItemStack> filterQueue = new ArrayList<>();
+
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
+        if(hasAdvancedInventoryTargeting(coin))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, pedestalPos),true);
+        if(cap.isPresent())
+        {
+            IItemHandler handler = cap.orElse(null);
+            if(handler != null)
+            {
+                int range = handler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = handler.getStackInSlot(i).copy();
+                    filterQueue.add(stackInSlot);
+                }
+            }
+        }
+
+        return filterQueue;
+    }
+
+    public void writeInventoryQueueToNBT(ItemStack stack, List<ItemStack> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        CompoundNBT tag = new CompoundNBT();
+        if(stack.hasTag()){tag = stack.getTag();}
+
+        ItemStackHandler handler = new ItemStackHandler();
+        handler.setSize(listIn.size());
+
+        for(int i=0;i<handler.getSlots();i++) {handler.setStackInSlot(i,listIn.get(i));}
+
+        compound = ((INBTSerializable<CompoundNBT>) handler).serializeNBT();
+        tag.put("invqueue", compound);
+        stack.setTag(tag);
+    }
+
+    public List<ItemStack> readInventoryQueueFromNBT(ItemStack coin)
+    {
+        List<ItemStack> filterQueue = new ArrayList<>();
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            if(getCompound.contains("invqueue"))
+            {
+                CompoundNBT invTag = getCompound.getCompound("invqueue");
+                ItemStackHandler handler = new ItemStackHandler();
+                ((INBTSerializable<CompoundNBT>) handler).deserializeNBT(invTag);
+
+                for(int i=0;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
+            }
+        }
+
+        return filterQueue;
+    }
+
+    public boolean doInventoryQueuesMatch(List<ItemStack> stackIn, List<ItemStack> stackCurrent)
+    {
+        int matching = 0;
+        if(stackIn.size() == stackCurrent.size())
+        {
+            for(int i=0;i<stackIn.size();i++)
+            {
+                if(doItemsMatchWithEmpty(stackIn.get(i),stackCurrent.get(i)))
+                {
+                    matching++;
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        return matching == stackIn.size();
+    }
+
+
+    public static IRecipe<CraftingInventory> findRecipe(CraftingInventory inv, World world) {
+        return world.getRecipeManager().getRecipe(IRecipeType.CRAFTING, inv, world).orElse(null);
+    }
+
+    public int getGridSize(ItemStack itemStack)
+    {
+        int gridSize = 0;
+        if(itemStack.getItem().equals(ItemUpgradeCrafter.CRAFTER_ONE)){gridSize = 1;}
+        else if(itemStack.getItem().equals(ItemUpgradeCrafter.CRAFTER_TWO)){gridSize = 2;}
+        else if(itemStack.getItem().equals(ItemUpgradeCrafter.CRAFTER_THREE)){gridSize = 3;}
+        else{gridSize = 1;}
+
+        return gridSize;
+    }
+
+    //Write recipes in order as they appear in the inventory, and since we check for changed, we should be able to get which recipe is which
+    public void buildAndWriteCraftingQueue(PedestalTileEntity pedestal, List<ItemStack> inventoryQueue)
+    {
+        World world = pedestal.getWorld();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        int gridSize = getGridSize(coin);
+        int intGridCount = gridSize*gridSize;
+        List<ItemStack> invQueue = inventoryQueue;
+        int recipeCount = Math.floorDiv(invQueue.size(),intGridCount);
+
+        List<ItemStack> recipeQueue = new ArrayList<>();
+
+        CraftingInventory craft = new CraftingInventory(new Container(null, -1) {
+            @Override
+            public boolean canInteractWith(PlayerEntity playerIn) {
+                return false;
+            }
+        }, gridSize, gridSize);
+
+        for(int r=1;r<= recipeCount; r++)
+        {
+            for(int s=0;s<intGridCount; s++)
+            {
+                int getActualIndex = ((r*intGridCount)-intGridCount)+s;
+                ItemStack getStack = invQueue.get(getActualIndex);
+                //If the item Stack has enough items to craft with
+                //stack.getCount()>=2 ||  stack.getMaxStackSize()==1 ||
+                if(getStack.isEmpty() || getStack.getItem() instanceof ItemCraftingPlaceholder)
+                {
+                    //System.out.println("SetEmpty");
+                    craft.setInventorySlotContents(s, ItemStack.EMPTY);
+                }
+                else
+                {
+                    //System.out.println("SetNormal: " + getStack);
+                    craft.setInventorySlotContents(s,getStack);
+                }
+            }
+            //Checks to make sure we have enough slots set for out recipe
+            if(craft.getSizeInventory() >= intGridCount)
+            {
+                IRecipe recipe = findRecipe(craft,world);
+                if(recipe  != null &&  recipe.matches(craft, world)) {
+                    //Set ItemStack with recipe result
+                    ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
+                    recipeQueue.add(stackRecipeResult);
+                }
+                else
+                {
+                    recipeQueue.add(ItemStack.EMPTY);
+                }
+            }
+        }
+        writeCraftingQueueToNBT(coin, recipeQueue);
+    }
+
+    public void writeCraftingQueueToNBT(ItemStack stack, List<ItemStack> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        CompoundNBT tag = new CompoundNBT();
+        if(stack.hasTag()){tag = stack.getTag();}
+
+        ItemStackHandler handler = new ItemStackHandler();
+        handler.setSize(listIn.size());
+
+        for(int i=0;i<handler.getSlots();i++) {handler.setStackInSlot(i,listIn.get(i));}
+
+        compound = ((INBTSerializable<CompoundNBT>) handler).serializeNBT();
+        tag.put("craftqueue", compound);
+        stack.setTag(tag);
+    }
+
+    public List<ItemStack> readCraftingQueueFromNBT(ItemStack coin)
+    {
+        List<ItemStack> filterQueue = new ArrayList<>();
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            if(getCompound.contains("craftqueue"))
+            {
+                CompoundNBT invTag = getCompound.getCompound("craftqueue");
+                ItemStackHandler handler = new ItemStackHandler();
+                ((INBTSerializable<CompoundNBT>) handler).deserializeNBT(invTag);
+
+                for(int i=0;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
+            }
+        }
+
+        return filterQueue;
+    }
+
+    public void removeCraftingQueue(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("craftqueue"))
+            {
+                compound.remove("craftqueue");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+
+
+
+
+    public void notifyTransferUpdate(PedestalTileEntity receiverTile)
+    {
+
+    }
+
 
 
 
@@ -2148,13 +2404,13 @@ public class ItemUpgradeBase extends Item {
 
     public int readStoredIntFromNBT(ItemStack stack)
     {
-        int maxenergy = 0;
+        int value = 0;
         if(stack.hasTag())
         {
             CompoundNBT getCompound = stack.getTag();
-            maxenergy = getCompound.getInt("storedint");
+            value = getCompound.getInt("storedint");
         }
-        return maxenergy;
+        return value;
     }
 
     public int getStoredInt(ItemStack coin)

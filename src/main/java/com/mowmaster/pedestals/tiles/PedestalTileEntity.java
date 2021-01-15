@@ -416,7 +416,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return handler.cast();
         }
-        if (cap == CapabilityEnergy.ENERGY) {
+        if ((cap == CapabilityEnergy.ENERGY) && (getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergy || getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergyFilter)) {
             return energyHandler.cast();
         }
         return super.getCapability(cap, side);
@@ -670,7 +670,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             coin.removeStoredIntFromCoin(stack);
             coin.removeStoredIntTwoFromCoin(stack);
             coin.removeFilterQueueHandler(stack);
-            if(coin.hasFilterBlock(stack))coin.removeFilterBlock(stack);
+            coin.removeFilterBlock(stack);
+            coin.removeInventoryQueue(stack);
+            coin.removeCraftingQueue(stack);
         }
         ph.extractItem(0,stack.getCount(),false);
         setStoredValueForUpgrades(0);
@@ -728,7 +730,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 coin.removeStoredIntFromCoin(actualCoin);
                 coin.removeStoredIntTwoFromCoin(actualCoin);
                 coin.removeFilterQueueHandler(actualCoin);
-                if(coin.hasFilterBlock(actualCoin))coin.removeFilterBlock(actualCoin);
+                coin.removeFilterBlock(actualCoin);
+                coin.removeInventoryQueue(actualCoin);
+                coin.removeCraftingQueue(actualCoin);
             }
             spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
         }
@@ -928,6 +932,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 ((ItemUpgradeBase)itemFromBlock.getItem()).setPlayerOnCoin(itemFromBlock,player);
                 if(!hasCoin())ph.insertItem(0,itemFromBlock,false);
                 setStoredValueForUpgrades(0);
+                //if(coinFromBlock.getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)coinFromBlock.getItem()).onPedestalNeighborChanged(this);
                 //update();
             }
             return true;
