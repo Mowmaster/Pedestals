@@ -20,7 +20,7 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
 
     @Override
     public Boolean canAcceptCapacity() {
-        return super.canAcceptCapacity();
+        return true;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
         {
             if(!world.isBlockPowered(pedestalPos))
             {
-                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
+                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(getExpBuffer(coinInPedestal)));}
                 upgradeActionSendExp(pedestal);
             }
         }
@@ -59,7 +59,12 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        return  30;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
+        int overEnchanted = (advancedAllowed*5)+30;
+
+        //20k being the max before we get close to int overflow
+        return  (overEnchanted>=20000)?(20000):(overEnchanted);
     }
 
     public static final Item XPRELAYBLOCKED = new ItemUpgradeExpRelayBlocked(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xprelayblocked"));

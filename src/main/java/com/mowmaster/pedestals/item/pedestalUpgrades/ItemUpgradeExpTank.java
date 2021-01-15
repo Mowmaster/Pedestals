@@ -37,9 +37,11 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        int overenchanted = (getCapacityModifierOverEnchanted(stack)*1)+20000;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
+        int overenchanted = (advancedAllowed*1)+20000;
         int value = 100;
-        switch (getCapacityModifierOverEnchanted(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 value = 100;//
