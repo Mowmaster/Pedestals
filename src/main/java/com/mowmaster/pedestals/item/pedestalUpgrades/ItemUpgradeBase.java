@@ -2095,6 +2095,7 @@ public class ItemUpgradeBase extends Item {
                 for(int i=0;i<range;i++)
                 {
                     ItemStack stackInSlot = handler.getStackInSlot(i).copy();
+                    if(stackInSlot.getCount() > 64)stackInSlot.setCount(64);
                     filterQueue.add(stackInSlot);
                 }
             }
