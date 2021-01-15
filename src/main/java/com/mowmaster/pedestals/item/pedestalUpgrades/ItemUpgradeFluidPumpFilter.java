@@ -269,7 +269,7 @@ public class ItemUpgradeFluidPumpFilter extends ItemUpgradeBaseFluid
             int speed = getOperationSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos)) {
-                if(hasFluidInCoin(coinInPedestal))
+                if(hasFluidInCoin(coinInPedestal) && world.getGameTime() % speed == 0)
                 {
                     upgradeActionSendFluid(pedestal);
                 }

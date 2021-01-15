@@ -74,10 +74,9 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
     public int getFluidTransferRate(ItemStack stack)
     {
         //im assuming # = rf value???
-        /*int fluidTransferRate = 1000;
-        switch (getCapacityModifier(stack))
+        int fluidTransferRate = 1000;
+        switch (getCapacityModifierOverEnchanted(stack))
         {
-
             case 0:
                 fluidTransferRate = 1000;//1x
                 break;
@@ -96,10 +95,10 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
             case 5:
                 fluidTransferRate=20000;//20x
                 break;
-            default: fluidTransferRate=1000;
-        }*/
+            default: fluidTransferRate=getCapacityModifierOverEnchanted(stack)*4000;
+        }
 
-        return  20000;
+        return  fluidTransferRate;
     }
 
     public static boolean isFluidItem(ItemStack itemToCheck)
