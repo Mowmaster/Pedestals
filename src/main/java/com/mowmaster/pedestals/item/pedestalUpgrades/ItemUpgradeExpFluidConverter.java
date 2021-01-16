@@ -71,11 +71,16 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
     @Override
     public int canAcceptCount(World world, BlockPos pos,ItemStack inPedestal, ItemStack itemStackIncoming) {
 
+        FluidStack fluidIn = getFluidInItem(inPedestal);
+        if(fluidIn.isEmpty())
+        {
+            return 0;
+        }
         //If incoming item has a fluid then set max stack to 1, if the pedestal has an item then 0, else allow normal transferring
-        return (!getFluidInItem(itemStackIncoming).isEmpty())?(1):((inPedestal.isEmpty())?(itemStackIncoming.getMaxStackSize()):(0));
+        return (canRecieveFluid(world,pos,fluidIn))?(1):(0);
     }
 
-    /*@Override
+    @Override
     public boolean canRecieveFluid(World world, BlockPos posPedestal, FluidStack fluidIncoming)
     {
         boolean returner = false;
@@ -83,29 +88,26 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
             ItemStack coin = pedestal.getCoinOnPedestal();
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
-            if(!(stackCurrent.size()>0))
+
+            ItemStack bucketStack = new ItemStack(Items.BARRIER);
+            if(removeFluid(pedestal,coin, FluidAttributes.BUCKET_VOLUME,true))
             {
-                stackCurrent = buildFilterQueue(pedestal);
-                writeFilterQueueToNBT(coin,stackCurrent);
+                FluidStack fluidToBucket = fluidIncoming;
+                Item bucket = fluidToBucket.getFluid().getFilledBucket();
+                bucketStack = new ItemStack(bucket);
             }
+            Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,bucketStack));
+            //Just check to make sure our recipe output isnt air
+            ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
 
-            int range = stackCurrent.size();
-
-            ItemStack itemFromInv = ItemStack.EMPTY;
-            itemFromInv = IntStream.range(0,range)//Int Range
-                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                    .filter(itemStack -> doesFluidBucketMatch(itemStack,fluidIncoming))
-                    .findFirst().orElse(ItemStack.EMPTY);
-
-            if(!itemFromInv.isEmpty())
+            if(resultSmelted.getItem().equals(Items.EXPERIENCE_BOTTLE))
             {
-                returner = true;
+                return true;
             }
         }
 
         return returner;
-    }*/
+    }
 
     @Override
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
@@ -420,11 +422,9 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
             Item bucket = fluidToBucket.getFluid().getFilledBucket();
             bucketStack = new ItemStack(bucket);
         }
-        System.out.println(bucketStack);
         Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,bucketStack));
         //Just check to make sure our recipe output isnt air
         ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-        System.out.println(resultSmelted);
         if(!resultSmelted.isEmpty() && resultSmelted.getItem().equals(Items.EXPERIENCE_BOTTLE))
         {
             int outputCount = resultSmelted.getCount();
@@ -888,7 +888,6 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString(getExpTransferRateString(stack));
-        rate.appendString(fluidLabel.getString());
         rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 

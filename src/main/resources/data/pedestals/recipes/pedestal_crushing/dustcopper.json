@@ -10,7 +10,7 @@
               "type": "forge:tag_empty"
             }
           ],
-          "type": "forge:not"
+          "type": "forge:and"
         }
       ],
       "recipe": {
