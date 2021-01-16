@@ -170,7 +170,7 @@ public class ItemUpgradeFilterDurabilityLess extends ItemUpgradeBaseFilter
         tooltip.add(rate);
     }
 
-    public static final Item DURABILITYLESS = new ItemUpgradeFilterDurabilityLess(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterdurability"));
+    public static final Item DURABILITYLESS = new ItemUpgradeFilterDurabilityLess(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterdurabilityless"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
