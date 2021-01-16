@@ -19,7 +19,7 @@ import net.minecraft.util.ResourceLocation;
 import java.util.Collections;
 
 
-public class FluidToXPRecipeCategory implements IRecipeCategory<FluidtoExpConverterRecipe>
+public class FluidtoExpConverterRecipeCategory implements IRecipeCategory<FluidtoExpConverterRecipe>
 {
     private final String localizedName;
     private final IDrawable background;
@@ -27,7 +27,7 @@ public class FluidToXPRecipeCategory implements IRecipeCategory<FluidtoExpConver
     public static final ResourceLocation FTE_TEXTURE = new ResourceLocation(Reference.MODID + ":textures/gui/jei/crusherprocessing.png");
     public static final ResourceLocation UID = new ResourceLocation(Reference.MODID, "fluid_to_xp");
 
-    public FluidToXPRecipeCategory(IGuiHelper guiHelper) {
+    public FluidtoExpConverterRecipeCategory(IGuiHelper guiHelper) {
         icon = guiHelper.createDrawableIngredient(new ItemStack(ItemUpgradeExpFluidConverter.FLUIDXPCONVERTER.getItem()));
         background = guiHelper.createDrawable(FTE_TEXTURE, 0, 0, 73, 35);
         localizedName = I18n.format(Reference.MODID + ".fluid_to_xp");

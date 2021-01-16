@@ -9,6 +9,8 @@
     "pedestals.recipe_category_cobblegensilk": "Silky Cobble Gen",
     "pedestals.recipe_category_coloredpedestals": "Use On Pedestal",
     "pedestals.recipe_category_coloredpallets": "In World Crafting",
+    "pedestals.recipe_category_fluid_to_xp": "Fluid to XP Conversions",
+
 
     "pedestals.pedestal_block.add_tool": "Tool Added Successfully",
 
@@ -115,6 +117,16 @@
     "pedestals.xpupgrade_tooltips.rate_4": "25 Levels",
     "pedestals.xpupgrade_tooltips.rate_5": "30 Levels",
 
+  "pedestals.target_entities.entity_emerald": "Players",
+  "pedestals.target_entities.entity_diamond": "Monsters",
+  "pedestals.target_entities.entity_gold": "Animals",
+  "pedestals.target_entities.entity_lapis": "Flying Types",
+  "pedestals.target_entities.entity_iron": "Creatures",
+  "pedestals.target_entities.entity_coal": "Mobs",
+  "pedestals.target_entities.entity_glass_lime": "Villagers",
+  "pedestals.target_entities.entity_glass_black": "Raiders",
+  "pedestals.target_entities.entity_all": "All",
+
     "item.pedestals.coin.attack": "Pedestal Upgrade",
     "item.pedestals.coin.attack.tooltip_name": "Auto Attacker",
     "item.pedestals.coin.attack.tooltip_area": "Effected Area: ",
@@ -128,13 +140,6 @@
     "item.pedestals.coin.attack.chat_speed": "Operational Speed: ",
     "item.pedestals.coin.attack.chat_tool": "Tool: ",
     "item.pedestals.coin.attack.chat_enchants": "Enchantments:",
-    "item.pedestals.coin.attack.entity_emerald": "Players",
-    "item.pedestals.coin.attack.entity_diamond": "Monsters",
-    "item.pedestals.coin.attack.entity_gold": "Animals",
-    "item.pedestals.coin.attack.entity_lapis": "Flying Types",
-    "item.pedestals.coin.attack.entity_iron": "Creatures",
-    "item.pedestals.coin.attack.entity_coal": "Mobs",
-    "item.pedestals.coin.attack.entity_all": "All",
     "jei.pedestals.attack.desc": "Attacks Entities in the area around it, Placing a Block of Netherite/Emerald/Diamond/Gold/Iron Under the pedestal will change what is attacked. Putting a sword into the pedestal will increase the damage delt, Sharpness/Bane/Smite on the sword also increases attack damage.",
 
     "death.attack.pedestal1": "%1$s was poked one to many times",

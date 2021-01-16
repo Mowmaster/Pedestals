@@ -10,6 +10,7 @@ import com.mowmaster.pedestals.util.compat.jei.cobblegensilk.CobbleGenSilkRecipe
 import com.mowmaster.pedestals.util.compat.jei.color_pallet.ColorPalletRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.color_pallet.ColorPedestalRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.crusher.CrusherRecipeCategory;
+import com.mowmaster.pedestals.util.compat.jei.fluid_to_xp.FluidtoExpConverterRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.sawmill.SawMillRecipeCategory;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -74,6 +75,7 @@ public class PedestalsPlugin implements IModPlugin {
     public static final IRecipeType<CobbleGenSilkRecipe> COBBLEGENSILK_TYPE = CobbleGenSilkRecipe.recipeType;
     public static final IRecipeType<ColoredPedestalRecipe> COLORING_TYPE = ColoredPedestalRecipe.recipeType;
     public static final IRecipeType<ColoredPedestalRecipe> COLORINGP_TYPE = ColoredPedestalRecipe.recipeType;
+    public static final IRecipeType<FluidtoExpConverterRecipe> FLUIDTOXP_TYPE = FluidtoExpConverterRecipe.recipeType;
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(CRUSHER_TYPE), CrusherRecipeCategory.UID);
@@ -82,6 +84,7 @@ public class PedestalsPlugin implements IModPlugin {
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COBBLEGENSILK_TYPE), CobbleGenSilkRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COLORING_TYPE), ColorPedestalRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COLORINGP_TYPE), ColorPalletRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(FLUIDTOXP_TYPE), FluidtoExpConverterRecipeCategory.UID);
         //Pedestals
         addValueInfoPage(registration, PedestalBlock.I_PEDESTAL_000, "pedestal000");
         addValueInfoPage(registration, PedestalBlock.I_PEDESTAL_001, "pedestal001");
