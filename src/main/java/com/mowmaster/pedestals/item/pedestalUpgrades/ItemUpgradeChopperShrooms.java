@@ -210,11 +210,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
             choppingAxe = getToolDefaultEnchanted(coinInPedestal,choppingAxe);
         }
 
-        if (choppingAxe.getItem() instanceof AxeItem || choppingAxe.getToolTypes().contains(ToolType.AXE) ||
-                choppingAxe.getItem() instanceof HoeItem || choppingAxe.getToolTypes().contains(ToolType.HOE)
-                && !fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {
-            fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);
-        }
+        if (!fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);}
 
         ToolType tool = blockToChop.getHarvestTool();
         int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToChop);
