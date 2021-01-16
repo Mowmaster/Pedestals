@@ -1,10 +1,28 @@
 {
-  "type": "pedestals:pedestal_crushing",
-  "ingredient": {
-    "tag": "forge:ores/nickel"
-  },
-  "result": {
-    "item": "pedestals:dustnickel",
-    "count": 2
-  }
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "values": [
+            {
+              "tag": "forge:ores/nickel",
+              "type": "forge:tag_empty"
+            }
+          ],
+          "type": "forge:not"
+        }
+      ],
+      "recipe": {
+        "type": "pedestals:pedestal_crushing",
+        "ingredient": {
+          "tag": "forge:ores/nickel"
+        },
+        "result": {
+          "item": "pedestals:dustnickel",
+          "count": 2
+        }
+      }
+    }
+  ]
 }
