@@ -593,7 +593,7 @@
     "item.pedestals.coin.rfquarryb.tooltip_rfcapacity": "Energy Capacity: ",
     "item.pedestals.coin.rfquarryb.chat_btm": "Blocks To Mine: ",
     "item.pedestals.coin.rfquarryb.chat_fuel": "Fuel Left: ",
-  "item.pedestals.coin.rfquarryb.chat_tool": "Tool: ",
+    "item.pedestals.coin.rfquarryb.chat_tool": "Tool: ",
     "item.pedestals.coin.rfquarryb.chat_enchants": "Enchantments:",
     "item.pedestals.coin.rfquarryb.chat_rate": "Items Crushed per Operation: ",
     "item.pedestals.coin.rfquarryb.chat_speed": "Operational Speed: ",
@@ -614,7 +614,7 @@
   "item.pedestals.coin.fluidxpconverter.chat_fluidlabel": "mb",
   "item.pedestals.coin.fluidxpconverter.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidxpconverter.chat_speed": "Operational Speed: ",
-  "jei.pedestals.fluidxpconverter.desc": "Place Tanks with Compatable Exp/Essence 'Below' the Pedestal, or Put Buckets of Fluid in the pedestal. Pedestal will store Exp fluids in its buffer, and convert it into exp over time. Exp can be sent to a connected Exp compatable upgraded pedestal.",
+  "jei.pedestals.fluidxpconverter.desc": "Place Tanks with Compatable Exp/Essence 'Below' the Pedestal, Put Buckets of Fluid in the pedestal, Or Connect this pedestal to one that can transfer it fluid. PEDESTAL WILL ONLY ALLOW ITEMS/FLUIDS THAT ARE CONFIGURED TO BE INSERT INTO THE PEDESTAL. Pedestal will store Exp fluids in its buffer, and convert it into exp over time. Exp can be sent to a connected Exp compatable upgraded pedestal.",
 
   "item.pedestals.coin.xpanvil": "Pedestal Upgrade",
     "item.pedestals.coin.xpanvil.tooltip_name": "Exp Anvil Upgrade",

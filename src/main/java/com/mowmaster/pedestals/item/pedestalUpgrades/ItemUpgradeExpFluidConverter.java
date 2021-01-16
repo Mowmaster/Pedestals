@@ -90,12 +90,14 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
             ItemStack coin = pedestal.getCoinOnPedestal();
 
             ItemStack bucketStack = new ItemStack(Items.BARRIER);
-            if(removeFluid(pedestal,coin, FluidAttributes.BUCKET_VOLUME,true))
+
+            if(!fluidIncoming.isEmpty())
             {
                 FluidStack fluidToBucket = fluidIncoming;
                 Item bucket = fluidToBucket.getFluid().getFilledBucket();
                 bucketStack = new ItemStack(bucket);
             }
+
             Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,bucketStack));
             //Just check to make sure our recipe output isnt air
             ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
