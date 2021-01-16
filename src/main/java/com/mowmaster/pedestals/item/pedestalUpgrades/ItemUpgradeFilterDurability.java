@@ -128,7 +128,7 @@ public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)tile;
             ItemStack coin = pedestal.getCoinOnPedestal();
-            capacity = (getCapacityModifierOverEnchanted(coin)*4);
+            capacity = (getCapacityModifierOver(coin)*4);
         }
 
         int percentDurabilityCurrent = getPercentDamaged(itemStackIn);
@@ -151,7 +151,7 @@ public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name, Util.DUMMY_UUID);
 
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack));
+        int overEnchanted = (getCapacityModifierOver(stack));
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         TranslationTextComponent rate2 = new TranslationTextComponent(getTranslationKey() + ".chat_rate2");
         rate.appendString("" + getCapacityTarget(overEnchanted) + "");
@@ -165,7 +165,7 @@ public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack));
+        int overEnchanted = (getCapacityModifierOver(stack));
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         TranslationTextComponent rate2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate2");
         rate.appendString("" + getCapacityTarget(overEnchanted) + "");

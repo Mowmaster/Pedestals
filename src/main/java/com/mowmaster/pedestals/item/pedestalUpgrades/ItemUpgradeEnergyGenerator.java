@@ -48,12 +48,11 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
     public double getCapicityModifier(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
-        double rate = (double)(((advancedAllowed)*0.01)+0.5);
+        double rate = (double)(((capacityOver)*0.01)+0.5);
         double rater = (rate > 0.9)?(0.9):(rate);
 
         double intModifier = 1.0;
-        switch (advancedAllowed)
+        switch (capacityOver)
         {
             case 0:
                 intModifier = 1.0;
@@ -81,9 +80,8 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
 
     public int getEnergyBuffer(ItemStack stack) {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
-
-        return  (advancedAllowed*2000)+20000;
+        int buffer = (capacityOver*2000)+20000;
+        return  (buffer>maxStored)?(maxStored):(buffer);
     }
 
     @Override

@@ -48,10 +48,9 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     public int getTransferRate(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
-        int overEnchanted = advancedAllowed*5;
+        int overEnchanted = capacityOver*5;
         int summonRate = 1;
-        switch (advancedAllowed)
+        switch (capacityOver)
         {
             case 0:
                 summonRate = 1;//1
@@ -71,7 +70,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
             case 5:
                 summonRate=25;//10
                 break;
-            default: summonRate=(overEnchanted>20000)?(20000):(overEnchanted);
+            default: summonRate=(overEnchanted>maxLVLStored)?(maxLVLStored):(overEnchanted);
         }
 
         return  summonRate;
@@ -152,11 +151,10 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     public int getExpBuffer(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
-        int overEnchanted = (advancedAllowed*5)+5;
+        int overEnchanted = (capacityOver*5)+5;
 
         //20k being the max before we get close to int overflow
-        return  (overEnchanted>=20000)?(20000):(overEnchanted);
+        return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     @Override

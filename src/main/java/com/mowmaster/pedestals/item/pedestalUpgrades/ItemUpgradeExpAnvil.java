@@ -56,18 +56,16 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     public int getExpBuffer(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
 
-        int overEnchanted = (advancedAllowed*15)+30;
-        return  (overEnchanted>20000)?(20000):(overEnchanted);
+        int overEnchanted = (capacityOver*15)+30;
+        return  (overEnchanted>maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     public int getRepairRate(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
-        int overEnchanted = (advancedAllowed*10);
-        return  (overEnchanted>20000)?(20000):(overEnchanted);
+        int overEnchanted = (capacityOver*10);
+        return  (overEnchanted>maxStored)?(maxStored):(overEnchanted);
     }
 
     private int correctlyPlacedSorroundingPedestals(World world, BlockPos posPedestal)

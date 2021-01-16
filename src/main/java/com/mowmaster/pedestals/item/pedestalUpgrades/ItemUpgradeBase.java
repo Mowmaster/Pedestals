@@ -74,6 +74,8 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeBase extends Item {
 
+    public int maxStored = 2000000000;
+    public int maxLVLStored = 20000;
     public ItemUpgradeBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
@@ -669,7 +671,7 @@ public class ItemUpgradeBase extends Item {
 
     public Boolean canAcceptAdvanced()
     {
-        return false;
+        return true;
     }
 
     public Boolean canAcceptArea()
@@ -702,18 +704,19 @@ public class ItemUpgradeBase extends Item {
 
     public int intOperationalSpeedModifierOverride(ItemStack stack)
     {
+
         int rate = 0;
         if(hasEnchant(stack))
         {
-            rate = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack);
+            int speedOver = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack);
+            return (hasAdvancedInventoryTargeting(stack))?(speedOver):((speedOver>5)?(5):(speedOver));
         }
         return rate;
     }
 
     public double getOperationSpeedOverride(ItemStack stack)
     {
-        int speedOver = intOperationalSpeedModifierOverride(stack);
-        int advancedAllowedSpeed = (hasAdvancedInventoryTargeting(stack))?(speedOver):((speedOver>5)?(5):(speedOver));
+        int advancedAllowedSpeed = intOperationalSpeedModifierOverride(stack);
         double intOperationalSpeed = 20;
         switch (advancedAllowedSpeed)
         {
@@ -829,12 +832,24 @@ public class ItemUpgradeBase extends Item {
         return capacity;
     }
 
-    public int getCapacityModifierOverEnchanted(ItemStack stack)
+    public int getCapacityModifierOver(ItemStack stack)
     {
         int capacity = 0;
         if(hasEnchant(stack))
         {
             capacity = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack);
+        }
+        return capacity;
+    }
+
+    public int getCapacityModifierOverEnchanted(ItemStack stack)
+    {
+        int capacity = 0;
+        if(hasEnchant(stack))
+        {
+            int capacityOver = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack);
+            int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
+            return advancedAllowed;
         }
         return capacity;
     }
@@ -909,8 +924,11 @@ public class ItemUpgradeBase extends Item {
     //Based on old 16 block max
     public int getRangeSmall(ItemStack stack)
     {
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
         int height = 1;
-        switch (getRangeModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 height = 1;
@@ -930,7 +948,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 height = 16;
                 break;
-            default: height=((getRangeModifier(stack)*4)-4);
+            default: height=((advancedAllowed*4)-4);
         }
 
         return  height;
@@ -938,8 +956,11 @@ public class ItemUpgradeBase extends Item {
     //Based on old 32 block max
     public int getRangeMedium(ItemStack stack)
     {
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
         int height = 4;
-        switch (getRangeModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 height = 4;
@@ -959,7 +980,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 height=32;
                 break;
-            default: height=((getRangeModifier(stack)*6)+2);
+            default: height=((advancedAllowed*6)+2);
         }
 
         return  height;
@@ -967,8 +988,11 @@ public class ItemUpgradeBase extends Item {
     //Based on old 64 block max starting at 1
     public int getRangeLarge(ItemStack stack)
     {
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
         int height = 8;
-        switch (getRangeModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 height = 2;
@@ -988,7 +1012,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 height=64;
                 break;
-            default: height=(getRangeModifier(stack)*12);
+            default: height=(advancedAllowed*12);
         }
 
         return  height;
@@ -997,8 +1021,11 @@ public class ItemUpgradeBase extends Item {
     //Based on old 64 block max
     public int getRangeLargest(ItemStack stack)
     {
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
         int height = 8;
-        switch (getRangeModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 height = 8;
@@ -1018,7 +1045,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 height=64;
                 break;
-            default: height=(getRangeModifier(stack)*12);
+            default: height=(advancedAllowed*12);
         }
 
         return  height;
@@ -1026,7 +1053,10 @@ public class ItemUpgradeBase extends Item {
     //Based on old Tree Chopper max
     public int getRangeTree(ItemStack stack)
     {
-        return  ((getRangeModifier(stack)*6)+4);
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
+        return  ((advancedAllowed*6)+4);
     }
     /***************************************
      ****************************************

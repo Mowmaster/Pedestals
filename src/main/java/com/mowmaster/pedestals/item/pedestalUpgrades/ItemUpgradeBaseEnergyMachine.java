@@ -41,7 +41,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
         int capacity = 0;
         if(hasEnchant(stack))
         {
-            capacity = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack) > 10)?(10):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack));
+            capacity = (getCapacityModifierOverEnchanted(stack) > 10)?(10):(getCapacityModifierOverEnchanted(stack));
         }
         return capacity;
     }
@@ -49,10 +49,9 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     @Override
     public int getEnergyBuffer(ItemStack stack) {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
 
-        int energyBuffer = 10000;
-        switch (advancedAllowed)
+        int energyBuffer = (capacityOver*20000);;
+        switch (capacityOver)
         {
             case 0:
                 energyBuffer = 10000;
@@ -72,7 +71,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
             case 5:
                 energyBuffer = 100000;
                 break;
-            default: energyBuffer = (advancedAllowed*20000);
+            default: energyBuffer = (energyBuffer> maxStored)?(maxStored):(energyBuffer);
         }
 
         return  energyBuffer;
@@ -129,7 +128,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
         int rate = 0;
         if(hasEnchant(stack))
         {
-            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 10)?(10):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
+            rate = (intOperationalSpeedModifierOverride(stack) > 10)?(10):(intOperationalSpeedModifierOverride(stack));
         }
         return rate;
     }

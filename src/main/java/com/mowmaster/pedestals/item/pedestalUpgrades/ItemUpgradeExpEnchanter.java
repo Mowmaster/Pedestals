@@ -52,9 +52,8 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     public int getExpBuffer(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
-        int overEnchanted = (advancedAllowed*15)+30;
-        return  (overEnchanted>20000)?(20000):(overEnchanted);
+        int overEnchanted = (capacityOver*15)+30;
+        return  (overEnchanted>maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     public float getEnchantmentPowerFromSorroundings(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)

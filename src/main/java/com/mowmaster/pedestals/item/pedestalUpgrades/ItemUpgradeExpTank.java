@@ -38,33 +38,9 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
     public int getExpBuffer(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
-        int overenchanted = (advancedAllowed*1)+20000;
-        int value = 100;
-        switch (advancedAllowed)
-        {
-            case 0:
-                value = 100;//
-                break;
-            case 1:
-                value=250;//
-                break;
-            case 2:
-                value = 500;//
-                break;
-            case 3:
-                value = 1000;//
-                break;
-            case 4:
-                value = 10000;//
-                break;
-            case 5:
-                value=20000;//~21862 levels seems to overflow the int.max
-                break;
-            default: value=(overenchanted>21800)?(21800):(overenchanted);
-        }
+        int overenchanted = (int)(Math.pow(2,capacityOver)*100);
 
-        return  value;
+        return (overenchanted>21800)?(21800):(overenchanted);
     }
 
     public void updateAction(PedestalTileEntity pedestal)

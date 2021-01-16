@@ -60,11 +60,10 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
     public int getExpBuffer(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
-        int overEnchanted = (advancedAllowed*5)+30;
+        int overEnchanted = (capacityOver*5)+30;
 
         //20k being the max before we get close to int overflow
-        return  (overEnchanted>=20000)?(20000):(overEnchanted);
+        return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     public static final Item XPRELAYBLOCKED = new ItemUpgradeExpRelayBlocked(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xprelayblocked"));

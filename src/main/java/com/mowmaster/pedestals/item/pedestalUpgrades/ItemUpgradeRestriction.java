@@ -48,7 +48,7 @@ public class ItemUpgradeRestriction extends ItemUpgradeBase
                 PedestalTileEntity pedestal = (PedestalTileEntity)tile;
                 ItemStack coin = pedestal.getCoinOnPedestal();
                 int maxIncomming = itemStackIncoming.getMaxStackSize();
-                int overEnchanted = (getCapacityModifierOverEnchanted(coin)*4);
+                int overEnchanted = (getCapacityModifierOver(coin)*4);
                 return (overEnchanted>0)?((overEnchanted>maxIncomming)?(maxIncomming):(overEnchanted)):(1);
             }
 
@@ -77,7 +77,7 @@ public class ItemUpgradeRestriction extends ItemUpgradeBase
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name, Util.DUMMY_UUID);
 
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*4);
+        int overEnchanted = (getCapacityModifierOver(stack)*4);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString("" + ((overEnchanted>0)?(overEnchanted):(1)) + "");
         rate.mergeStyle(TextFormatting.GRAY);
@@ -89,7 +89,7 @@ public class ItemUpgradeRestriction extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*4);
+        int overEnchanted = (getCapacityModifierOver(stack)*4);
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString("" + ((overEnchanted>0)?(overEnchanted):(1)) + "");
         rate.mergeStyle(TextFormatting.GRAY);

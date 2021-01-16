@@ -125,7 +125,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
     public int getFluidTransferRate(ItemStack stack)
     {
         //im assuming # = rf value???
-        int fluidTransferRate = 1000;
+        int fluidTransferRate = getCapacityModifierOverEnchanted(stack)*4000;
         switch (getCapacityModifier(stack))
         {
 
@@ -147,7 +147,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
             case 5:
                 fluidTransferRate=20000;//20x
                 break;
-            default: fluidTransferRate=getCapacityModifierOverEnchanted(stack)*4000;
+            default: fluidTransferRate=(fluidTransferRate>maxStored)?(maxStored):(fluidTransferRate);
         }
 
         return  fluidTransferRate;
