@@ -199,7 +199,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                                 getRecipe.setCount(itemsToInsertToPedestal);
                                                 world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                 addToPedestal(world, pedestalPos, getRecipe);
-                                                writeInventoryQueueToNBT(coin,stackCurrent);
+                                                onPedestalNeighborChanged(pedestal);
                                                 writeStoredIntToNBT(coin,intGetNextIteration+1);
                                             }
                                             else writeStoredIntToNBT(coin,intGetNextIteration+1);
@@ -215,135 +215,6 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
             }
         }
     }
-
-    /*public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
-    {
-        int gridSize = getGridSize(coinInPedestal);
-        int gridSlots = gridSize*gridSize;
-        ItemStack itemFromInv = ItemStack.EMPTY;
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
-        //Since we'll be checking each slot for a compacting recipe
-        int intGridCount = 1;
-        int intItemsUsedCount = gridSize*gridSize;
-        int intBatchCraftingSize = getItemTransferRate(coinInPedestal);
-
-
-        //Dont bother unless pedestal is empty
-        //Yes i'm being lazy here...
-
-        if(itemInPedestal.isEmpty())
-        {
-            LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-
-            if(!isInventoryEmpty(cap))
-            {
-                if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-                //Setup new Container for our Crafting Grid Size
-                CraftingInventory craft = new CraftingInventory(new Container(null, -1) {
-                    @Override
-                    public boolean canInteractWith(PlayerEntity playerIn) {
-                        return false;
-                    }
-                }, gridSize, gridSize);
-
-                CraftingInventory craftAvailable = new CraftingInventory(new Container(null, -1) {
-                    @Override
-                    public boolean canInteractWith(PlayerEntity playerIn) {
-                        return false;
-                    }
-                }, gridSize, gridSize);
-
-                //Get Inventory Below
-                if(cap.isPresent()) {
-                    IItemHandler handler = cap.orElse(null);
-                    TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                    int intInventorySlotCount = handler.getSlots();//normal chests return value of 1-27
-
-                    //Should Allow Using a pedestal when it has the advanced enchant
-                    if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
-                        itemFromInv = ItemStack.EMPTY;
-                    }
-                    else
-                    {
-                        if(handler != null)
-                        {
-                            //Makes sure we have more slots then the recipe requires
-                            if(intInventorySlotCount>=intGridCount)
-                            {
-                                // Get Next iteration to craft
-                                int intGetNextIteration = getIntValueFromPedestal(world,posOfPedestal);//Default value is 0
-                                if(intGetNextIteration >= intInventorySlotCount)
-                                {
-                                    intGetNextIteration = 0;
-                                }
-
-                                int slotToCheck = intGetNextIteration;
-                                ItemStack stackItemInSlot = handler.getStackInSlot(slotToCheck);
-                                if(!stackItemInSlot.isEmpty())
-                                {
-                                    //System.out.println("SLOT: "+slotToCheck);
-                                    //System.out.println("Item In Slot: "+stackItemInSlot);
-                                    //System.out.println("Items To Use: "+intItemsUsedCount);
-                                    if(stackItemInSlot.getCount() > intItemsUsedCount)
-                                    {
-                                        for(int i=0; i< gridSlots;i++)
-                                        {
-                                            //next check to make sure we have more than enough to craft the recipe
-                                            if(stackItemInSlot.getCount() > (intBatchCraftingSize*intItemsUsedCount))
-                                            {
-                                                //System.out.println("SET ITEM FOR SLOT");
-                                                craft.setInventorySlotContents(i,stackItemInSlot);
-                                            }
-                                            else
-                                            {
-                                                intBatchCraftingSize = ((stackItemInSlot.getCount()/intItemsUsedCount)-1);
-                                                if(intBatchCraftingSize>0)craft.setInventorySlotContents(i,stackItemInSlot);
-                                            }
-                                            craftAvailable.setInventorySlotContents(i,stackItemInSlot);
-                                        }
-                                    }
-
-                                    //Checks to make sure we have enough slots set for out recipe
-                                    if(craft.getSizeInventory() >= intGridCount)
-                                    {
-
-                                        IRecipe recipe = findRecipe(craft,world);
-                                        //This is the set recipe, which might differ from the recipe given current available inputs
-                                        IRecipe setRecipe = findRecipe(craftAvailable,world);
-
-                                        //if(recipe != null)System.out.println("RECIPE: "+recipe.getRecipeOutput());
-
-                                        if(recipe  != null &&  recipe.matches(craft, world) && recipe.matches(craftAvailable,world)) {
-                                            //Set ItemStack with recipe result
-                                            ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
-                                            int intRecipeResultCount = stackRecipeResult.getCount();
-                                            int intBatchCraftedAmount = stackRecipeResult.getCount() * intBatchCraftingSize;
-
-                                            //Check if pedestal can hold the crafting result, if not then set the batch to be small enough that it can fit
-                                            if(intBatchCraftedAmount > 64)
-                                            {
-                                                intBatchCraftingSize = 64/intRecipeResultCount;
-                                            }
-
-                                            //Remove items from slotquar
-                                            int intGetActualSlot = intGetNextIteration;
-                                            handler.extractItem(intGetActualSlot,(intBatchCraftingSize*intItemsUsedCount),false);
-
-                                            stackRecipeResult.setCount(intBatchCraftedAmount);
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            addToPedestal(world,posOfPedestal,stackRecipeResult);
-                                        }
-                                    }
-                                }
-
-                                setIntValueToPedestal(world,posOfPedestal,(intGetNextIteration+1));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 
     //Write recipes in order as they appear in the inventory, and since we check for changed, we should be able to get which recipe is which
     @Override

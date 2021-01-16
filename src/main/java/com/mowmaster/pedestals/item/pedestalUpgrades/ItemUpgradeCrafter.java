@@ -259,7 +259,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                             getRecipe.setCount(intBatchCraftedAmount);
                                             world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             addToPedestal(world, pedestalPos, getRecipe);
-                                            writeInventoryQueueToNBT(coin,stackCurrent);
+                                            onPedestalNeighborChanged(pedestal);
                                             writeStoredIntToNBT(coin,intGetNextIteration+1);
                                         }
                                         else writeStoredIntToNBT(coin,intGetNextIteration+1);
