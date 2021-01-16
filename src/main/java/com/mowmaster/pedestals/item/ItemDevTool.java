@@ -2,9 +2,11 @@ package com.mowmaster.pedestals.item;
 
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -14,8 +16,12 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -79,13 +85,17 @@ public class ItemDevTool extends Item {
                                 p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
                                 return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                             }
-                        }
-                        else
-                        {
-                            TranslationTextComponent name = new TranslationTextComponent(""+pedestal.getTileData().toString()+"");
-                            name.mergeStyle(TextFormatting.WHITE);
-                            p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
-                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                            else
+                            {
+                                CompoundNBT nbt = pedestal.getUpdateTag();
+                                if(nbt.contains("inv"))
+                                {
+                                    TranslationTextComponent name = new TranslationTextComponent(""+ nbt.toString() +"");
+                                    name.mergeStyle(TextFormatting.WHITE);
+                                    p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
+                                    return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                                }
+                            }
                         }
 
                     }

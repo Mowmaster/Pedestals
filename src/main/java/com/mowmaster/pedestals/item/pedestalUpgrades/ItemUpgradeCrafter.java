@@ -60,8 +60,9 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
     {
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
+        int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
+        int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
 
         if(!world.isRemote)
         {
@@ -69,8 +70,17 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 
             if(!world.isBlockPowered(pedestalPos))
             {
-                if (world.getGameTime()%speed == 0) {
+                //Dont run if theres nothing queued
+                if (world.getGameTime()%speed == 0 && storedTwo<=craftingCount) {
                     upgradeAction(pedestal);
+                }
+
+                //Basically if our crafting queue has been empty for a while, every 5 seconds refresh it
+                if(storedTwo>=craftingCount)
+                {
+                    if (world.getGameTime()%100 == 0) {
+                        onPedestalNeighborChanged(pedestal);
+                    }
                 }
             }
         }
@@ -262,7 +272,11 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                             onPedestalNeighborChanged(pedestal);
                                             writeStoredIntToNBT(coin,intGetNextIteration+1);
                                         }
-                                        else writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                        else
+                                        {
+                                            writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                            writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
+                                        }
                                     }
                                     else writeStoredIntToNBT(coin,intGetNextIteration+1);
                                 }
@@ -289,10 +303,12 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
         if(!doInventoryQueuesMatch(stackIn,stackCurrent))
         {
             writeInventoryQueueToNBT(coin,stackIn);
+            writeStoredIntTwoToNBT(coin,0);
             buildAndWriteCraftingQueue(pedestal,stackIn);
         }
         else {
             writeInventoryQueueToNBT(coin,stackIn);
+            writeStoredIntTwoToNBT(coin,0);
         }
     }
 

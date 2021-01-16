@@ -296,7 +296,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 }
                 else
                 {
-                    if(getItemInHand instanceof ItemLinkingTool || getItemInHand instanceof ItemUpgradeTool)
+                    if(getItemInHand instanceof ItemLinkingTool || getItemInHand instanceof ItemUpgradeTool || getItemInHand instanceof ItemDevTool)
                     {
                         return ActionResultType.FAIL;
                     }

@@ -73,8 +73,9 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
     {
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
+        int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
+        int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
 
         if(!world.isRemote)
         {
@@ -82,8 +83,17 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
 
             if(!world.isBlockPowered(pedestalPos))
             {
-                if (world.getGameTime()%speed == 0) {
+                //Dont run if theres nothing queued
+                if (world.getGameTime()%speed == 0 && storedTwo<=craftingCount) {
                     upgradeAction(pedestal);
+                }
+
+                //Basically if our crafting queue has been empty for a while, every 5 seconds refresh it
+                if(storedTwo>=craftingCount)
+                {
+                    if (world.getGameTime()%100 == 0) {
+                        onPedestalNeighborChanged(pedestal);
+                    }
                 }
             }
         }
@@ -142,72 +152,76 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                             //System.out.println("CurrentCraftingSize: "+craftingCurrent.size());
                             if(craftingCurrent.size() > 0)
                             {
-                                //Makes sure Out Estimated and Actual Inventories Match AND we have more slots then the recipe requires
-                                if(intInventorySlotCount >= intGridCount) {
-                                    // Get Next iteration to craft
-                                    int intGetNextIteration = getStoredInt(coin);//Default value is 0
-                                    if(intGetNextIteration >= intInventorySlotCount)
-                                    {
-                                        intGetNextIteration = 0;
-                                    }
-
-                                    int slotToCheck = intGetNextIteration;
-                                    ItemStack stackItemInSlot = stackCurrent.get(slotToCheck);
-                                    if(!stackItemInSlot.isEmpty())
-                                    {
-                                        //copy so we dont set the stack size any higher
-                                        ItemStack getRecipe = craftingCurrent.get(intGetNextIteration).copy();
-
-                                        //System.out.println("GetRecipe: "+getRecipe);
-
-                                        if(!getRecipe.isEmpty())
-                                        {
-                                            //Calc max stack size craftable
-                                            ItemStack getIngredientStack = stackCurrent.get(intGetNextIteration);
-                                            int stackSize = getIngredientStack.getCount();
-
-                                            if((stackSize-1) < intGridCount*intBatchCraftingSize)
-                                            {
-                                                intBatchCraftingSize = Math.floorDiv(stackSize,intGridCount);
-                                                //Because im paranoid???
-                                                if(intGridCount*intBatchCraftingSize>=stackSize)intBatchCraftingSize--;
-                                            }
-                                            else if(getIngredientStack.isEmpty())
-                                            {
-                                                intBatchCraftingSize=0;
-                                            }
-
-                                            //Means there is something to craft, realistically since getRecipe.isEmpty is checked already, this should never be < 0
-                                            if(intBatchCraftingSize > 0)
-                                            {
-                                                int intRecipeResultCount = getRecipe.getCount();
-                                                int intBatchCraftedAmount = intRecipeResultCount * intBatchCraftingSize;
-
-                                                //Check if pedestal can hold the crafting result, if not then set the batch to be small enough that it can fit
-                                                if (intBatchCraftedAmount > 64) {
-                                                    intBatchCraftingSize = Math.floorDiv(64, intRecipeResultCount);
-                                                }
-
-                                                int itemsToRemove = intBatchCraftingSize*intGridCount;
-                                                int itemsToInsertToPedestal = intBatchCraftingSize*intRecipeResultCount;
-
-                                                ItemStack queueStack = stackCurrent.get(intGetNextIteration);
-                                                queueStack.shrink(itemsToRemove);
-                                                stackCurrent.set(intGetNextIteration,queueStack);
-                                                handler.extractItem(intGetNextIteration, itemsToRemove, false);
-
-                                                getRecipe.setCount(itemsToInsertToPedestal);
-                                                world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                addToPedestal(world, pedestalPos, getRecipe);
-                                                onPedestalNeighborChanged(pedestal);
-                                                writeStoredIntToNBT(coin,intGetNextIteration+1);
-                                            }
-                                            else writeStoredIntToNBT(coin,intGetNextIteration+1);
-                                        }
-                                        else writeStoredIntToNBT(coin,intGetNextIteration+1);
-                                    }
-                                    else writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                // Get Next iteration to craft
+                                int intGetNextIteration = getStoredInt(coin);//Default value is 0
+                                if(intGetNextIteration >= intInventorySlotCount)
+                                {
+                                    intGetNextIteration = 0;
                                 }
+
+                                int slotToCheck = intGetNextIteration;
+                                ItemStack stackItemInSlot = stackCurrent.get(slotToCheck);
+                                if(!stackItemInSlot.isEmpty())
+                                {
+                                    //copy so we dont set the stack size any higher
+                                    ItemStack getRecipe = craftingCurrent.get(intGetNextIteration).copy();
+
+                                    //System.out.println("GetRecipe: "+getRecipe);
+
+                                    if(!getRecipe.isEmpty())
+                                    {
+                                        //Calc max stack size craftable
+                                        ItemStack getIngredientStack = stackCurrent.get(intGetNextIteration);
+                                        int stackSize = getIngredientStack.getCount();
+
+                                        if((stackSize-1) < intGridCount*intBatchCraftingSize)
+                                        {
+                                            intBatchCraftingSize = Math.floorDiv(stackSize,intGridCount);
+                                            //Because im paranoid???
+                                            if(intGridCount*intBatchCraftingSize>=stackSize)intBatchCraftingSize--;
+                                        }
+                                        else if(getIngredientStack.isEmpty())
+                                        {
+                                            intBatchCraftingSize=0;
+                                        }
+
+                                        //Means there is something to craft, realistically since getRecipe.isEmpty is checked already, this should never be < 0
+                                        if(intBatchCraftingSize > 0)
+                                        {
+                                            int intRecipeResultCount = getRecipe.getCount();
+                                            int intBatchCraftedAmount = intRecipeResultCount * intBatchCraftingSize;
+
+                                            //Check if pedestal can hold the crafting result, if not then set the batch to be small enough that it can fit
+                                            if (intBatchCraftedAmount > 64) {
+                                                intBatchCraftingSize = Math.floorDiv(64, intRecipeResultCount);
+                                            }
+
+                                            int itemsToRemove = intBatchCraftingSize*intGridCount;
+                                            int itemsToInsertToPedestal = intBatchCraftingSize*intRecipeResultCount;
+
+                                            ItemStack queueStack = stackCurrent.get(intGetNextIteration);
+                                            queueStack.shrink(itemsToRemove);
+                                            stackCurrent.set(intGetNextIteration,queueStack);
+                                            handler.extractItem(intGetNextIteration, itemsToRemove, false);
+
+                                            getRecipe.setCount(itemsToInsertToPedestal);
+                                            world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            addToPedestal(world, pedestalPos, getRecipe);
+                                            onPedestalNeighborChanged(pedestal);
+                                            writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                        }
+                                        else
+                                        {
+                                            writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                            writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                    }
+                                }
+                                else writeStoredIntToNBT(coin,intGetNextIteration+1);
                             }
                         }
                     }
@@ -284,10 +298,14 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
         if(!doInventoryQueuesMatch(stackIn,stackCurrent))
         {
             writeInventoryQueueToNBT(coin,stackIn);
+            //Reset value on 'neighbor' update
+            writeStoredIntTwoToNBT(coin,0);
             buildAndWriteCraftingQueue(pedestal,stackIn);
+
         }
         else {
             writeInventoryQueueToNBT(coin,stackIn);
+            writeStoredIntTwoToNBT(coin,0);
         }
     }
 
