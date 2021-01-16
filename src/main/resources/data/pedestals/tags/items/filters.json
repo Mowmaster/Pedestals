@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "pedestals:coin/filterdurability",
+    "pedestals:coin/filterdurabilityless",
     "pedestals:coin/filterenchanted",
     "pedestals:coin/filterenchantedb",
     "pedestals:coin/filteritem",

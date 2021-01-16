@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/default"
+    },
+    {
+      "item": "minecraft:experience_bottle"
+    },
+    {
+      "item": "minecraft:bucket"
+    },
+    {
+      "item": "minecraft:grindstone"
+    },
+    {
+      "item": "minecraft:wooden_pickaxe"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/fluidxpconverter"
+  }
+}

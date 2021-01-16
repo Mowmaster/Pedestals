@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/filterdurability"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/filterdurabilityless"
+  }
+}

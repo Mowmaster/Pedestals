@@ -281,6 +281,9 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeEnderFilteredImporterMod.ENDERFMODIMPORT, "enderfilteredmodimport");
         addValueInfoPage(registration, ItemUpgradeEnderImporter.ENDERIMPORT, "enderimport");
         addValueInfoPage(registration, ItemUpgradeEnderFilteredRestock.ENDERFRESTOCK, "enderfilteredrestock");
+        addValueInfoPage(registration, ItemUpgradeRestriction.DEFAULT, "restriction");
+        addValueInfoPage(registration, ItemUpgradeFilterDurability.DURABILITY, "filterdurability");
+        addValueInfoPage(registration, ItemUpgradeFilterDurabilityLess.DURABILITYLESS, "filterdurabilityless");
     }
 
     @Override

@@ -35,4 +35,7 @@ public final class PedestalsSerializers {
 
     public static final RegistryObject<IRecipeSerializer<?>> RECYCLER = RECIPES.register("pedestal_recycler", () ->
             RecyclerRecipe.serializer);
+
+    public static final RegistryObject<IRecipeSerializer<?>> FLUIDTOXPCONVERTER = RECIPES.register("pedestal_fluid_to_xp", () ->
+            FluidtoExpConverterRecipe.serializer);
 }
