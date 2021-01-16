@@ -130,7 +130,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         int range = getRange(coinInPedestal);
 
-        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile((((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal)) !=null)?(getPlayerFromCoin(coinInPedestal)):(Util.DUMMY_UUID),"[Pedestals]"));
         //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
         fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
@@ -154,11 +154,25 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
             if(canMineBlock(pedestal, posOfBlock,fakePlayer))
             {
+                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,true)) {
+
+                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
+                    if (!MinecraftForge.EVENT_BUS.post(e)) {
+                        blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
+                        blockToBreak.getBlock().onBlockHarvested(world, posOfBlock, blockToBreak, fakePlayer);
+                        int expdrop = blockToBreak.getBlock().getExpDrop(blockToBreak,world,posOfBlock,
+                                (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
+                                (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
+                        if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
+                        world.removeBlock(posOfBlock, false);
+                    }
+                    //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
+                }
                 //tool = blockToBreak.getHarvestTool();
                 //toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToBreak);
                 //if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,toolLevel >= blockToBreak.getHarvestLevel())) {
                     //This event is already called in the Event factory doPlayerHarvestCheck
-                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
+                    /*BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
                     if (MinecraftForge.EVENT_BUS.post(e)) {
                     blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
                     blockToBreak.getBlock().onBlockHarvested(world, posOfBlock, blockToBreak, fakePlayer);
@@ -167,7 +181,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                             (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
                     if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
                     world.removeBlock(posOfBlock, false);
-                    }
+                    }*/
                 //}
             }
         }
