@@ -5,16 +5,20 @@ import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
@@ -31,10 +35,20 @@ public class RenderPedestal extends TileEntityRenderer<PedestalTileEntity> {
     public void render(@Nonnull PedestalTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
         if (!tileEntityIn.isRemoved()) {
-            Direction facing = tileEntityIn.getBlockState().get(FACING);
-            ItemStack stack = tileEntityIn.getItemInPedestalOverride();
-            ItemStack coin = tileEntityIn.getCoinOnPedestal();
             World world = tileEntityIn.getWorld();
+            Direction facing = tileEntityIn.getBlockState().get(FACING);
+            ItemStack coin = tileEntityIn.getCoinOnPedestal();
+            ItemStack stack = ItemStack.EMPTY;
+            CompoundNBT nbt = tileEntityIn.getUpdateTag();
+            if(world.getGameTime()%1 == 0)
+            {
+                if(nbt.contains("inv")) {
+                    ItemStackHandler handler = new ItemStackHandler();
+                    ((INBTSerializable<CompoundNBT>) handler).deserializeNBT(nbt.getCompound("inv"));
+                    if(handler.getSlots()>=1) stack = handler.getStackInSlot(0);
+                }
+            }
+
 
             if(facing== Direction.UP)//when placed on ground
             {
