@@ -94,6 +94,7 @@
     "pedestals.upgrade_tooltips.speed_3": "6x Speed",
     "pedestals.upgrade_tooltips.speed_4": "10x Speed",
     "pedestals.upgrade_tooltips.speed_5": "20x Speed",
+    "pedestals.upgrade_tooltips.speed_x": "Overclocked: x",
 
   "pedestals.upgrade_machine_tooltips.speed_0": "Normal Speed",
   "pedestals.upgrade_machine_tooltips.speed_1": "2x Speed",

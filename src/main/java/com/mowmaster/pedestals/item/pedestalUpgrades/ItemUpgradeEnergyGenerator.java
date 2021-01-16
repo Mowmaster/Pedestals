@@ -47,8 +47,13 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
 
     public double getCapicityModifier(ItemStack stack)
     {
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
+        double rate = (double)(((advancedAllowed)*0.01)+0.5);
+        double rater = (rate > 0.9)?(0.9):(rate);
+
         double intModifier = 1.0;
-        switch (getCapacityModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 intModifier = 1.0;
@@ -68,14 +73,17 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
             case 5:
                 intModifier=0.5;
                 break;
-            default: intModifier=1.0;
+            default: intModifier=(1.0-rater);
         }
 
         return  intModifier;
     }
 
     public int getEnergyBuffer(ItemStack stack) {
-        return  40000;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
+
+        return  (advancedAllowed*2000)+20000;
     }
 
     @Override
@@ -130,7 +138,8 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
-        int speed = getOperationSpeed(coinInPedestal);
+        //Takes into account if it has Advanced or Not
+        double speed = getOperationSpeedOverride(coinInPedestal);
         double capacityRate = getCapicityModifier(coinInPedestal);
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}

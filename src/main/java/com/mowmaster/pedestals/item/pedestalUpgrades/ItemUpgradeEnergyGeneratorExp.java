@@ -55,7 +55,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
     }
 
     public int getEnergyBuffer(ItemStack stack) {
-        int speed = getOperationSpeed(stack);
+        double speed = getOperationSpeedOverride(stack);
         //55800 is 30 levels of exp as fuel 1395*40
         double fuelSpeedMultiplier = Math.floor(getFuelStored(stack)/55800)*2;
         double speedMultiplier = (20/speed)*((fuelSpeedMultiplier>=1)?(fuelSpeedMultiplier):(1));
@@ -144,7 +144,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
         BlockPos posOfPedestal = pedestal.getPos();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        int speed = getOperationSpeed(coinInPedestal);
+        double speed = getOperationSpeedOverride(coinInPedestal);
         double capacityRate = getEnchantmentCapacityModifier(pedestal);
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}

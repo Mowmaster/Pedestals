@@ -700,6 +700,47 @@ public class ItemUpgradeBase extends Item {
         return rate;
     }
 
+    public int intOperationalSpeedModifierOverride(ItemStack stack)
+    {
+        int rate = 0;
+        if(hasEnchant(stack))
+        {
+            rate = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack);
+        }
+        return rate;
+    }
+
+    public double getOperationSpeedOverride(ItemStack stack)
+    {
+        int speedOver = intOperationalSpeedModifierOverride(stack);
+        int advancedAllowedSpeed = (hasAdvancedInventoryTargeting(stack))?(speedOver):((speedOver>5)?(5):(speedOver));
+        double intOperationalSpeed = 20;
+        switch (advancedAllowedSpeed)
+        {
+            case 0:
+                intOperationalSpeed = 20;//normal speed
+                break;
+            case 1:
+                intOperationalSpeed=10;//2x faster
+                break;
+            case 2:
+                intOperationalSpeed = 5;//4x faster
+                break;
+            case 3:
+                intOperationalSpeed = 3;//6x faster
+                break;
+            case 4:
+                intOperationalSpeed = 2;//10x faster
+                break;
+            case 5:
+                intOperationalSpeed=1;//20x faster
+                break;
+            default: intOperationalSpeed=((advancedAllowedSpeed*0.01)>0.9)?(0.1):(1-(advancedAllowedSpeed*0.01));
+        }
+
+        return  intOperationalSpeed;
+    }
+
     public int getOperationSpeed(ItemStack stack)
     {
         int intOperationalSpeed = 20;
@@ -737,6 +778,8 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
         TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
         TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        TranslationTextComponent overclockedx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_x");
+        String overAmount = ""+(intOperationalSpeedModifier(stack)-5)+"";
         String str = normal.getString();
         switch (intOperationalSpeedModifier(stack))
         {
@@ -758,7 +801,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 str = twentyx.getString();//20x faster
                 break;
-            default: str = normal.getString();;
+            default: str = overclockedx.getString() + overAmount;
         }
 
         return  str;

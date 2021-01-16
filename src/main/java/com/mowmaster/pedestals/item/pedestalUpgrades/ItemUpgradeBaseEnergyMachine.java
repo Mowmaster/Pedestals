@@ -48,8 +48,11 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
 
     @Override
     public int getEnergyBuffer(ItemStack stack) {
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
+
         int energyBuffer = 10000;
-        switch (getCapacityModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 energyBuffer = 10000;
@@ -69,7 +72,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
             case 5:
                 energyBuffer = 100000;
                 break;
-            default: energyBuffer = (getCapacityModifier(stack)*20000);
+            default: energyBuffer = (advancedAllowed*20000);
         }
 
         return  energyBuffer;
