@@ -16,6 +16,8 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tags.ITag;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
@@ -370,6 +372,12 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return this;
     }
 
+    ResourceLocation grabTools = new ResourceLocation("pedestals", "allowed_tools");
+    ITag<Item> GET_TOOLS = ItemTags.getCollection().get(grabTools);
+
+    ResourceLocation grabNotTools = new ResourceLocation("pedestals", "disallowed_tools");
+    ITag<Item> GET_NOTTOOLS = ItemTags.getCollection().get(grabNotTools);
+
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 10 slots to future proof things
         return new ItemStackHandler(6) {
@@ -412,7 +420,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || stack.getToolTypes().contains(ToolType.HOE)
                                 || stack.getToolTypes().contains(ToolType.AXE)
                                 || stack.getToolTypes().contains(ToolType.SHOVEL)
-                        )) return true;
+                                || GET_TOOLS.contains(stack.getItem())
+                        ) && !GET_NOTTOOLS.contains(stack.getItem())
+                        ) return true;
                 return false;
             }
         };

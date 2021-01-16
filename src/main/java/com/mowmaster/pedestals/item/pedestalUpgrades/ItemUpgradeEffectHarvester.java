@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -248,21 +249,12 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
-            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+            FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
+            //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
             //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...
-            ItemStack harvestingHoe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
-            if (
-                    (
-                            harvestingHoe.getItem() instanceof HoeItem
-                            || harvestingHoe.getToolTypes().contains(ToolType.HOE)
-                            || harvestingHoe.getItem() instanceof AxeItem
-                            || harvestingHoe.getToolTypes().contains(ToolType.AXE)
-                    )
-                    && !fakePlayer.getHeldItemMainhand().equals(harvestingHoe)
-               ) {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND, harvestingHoe);
-            }
+            ItemStack harvestingHoe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_HOE,1));
+            if (!fakePlayer.getHeldItemMainhand().equals(harvestingHoe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, harvestingHoe);}
 
             if(!pedestal.hasTool())
             {
