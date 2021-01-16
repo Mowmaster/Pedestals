@@ -1,28 +1,10 @@
 {
-  "type": "forge:conditional",
-  "recipes": [
-    {
-      "conditions": [
-        {
-          "values": [
-            {
-              "tag": "forge:ores/tin",
-              "type": "forge:tag_empty"
-            }
-          ],
-          "type": "forge:and"
-        }
-      ],
-      "recipe": {
-        "type": "pedestals:pedestal_crushing",
-        "ingredient": {
-          "tag": "forge:ores/tin"
-        },
-        "result": {
-          "item": "pedestals:dusttin",
-          "count": 2
-        }
-      }
-    }
-  ]
+  "type": "pedestals:pedestal_crushing",
+  "ingredient": {
+    "tag": "forge:ores/tin"
+  },
+  "result": {
+    "item": "pedestals:dusttin",
+    "count": 2
+  }
 }
