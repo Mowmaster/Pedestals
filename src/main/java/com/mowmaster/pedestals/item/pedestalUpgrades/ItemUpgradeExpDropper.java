@@ -104,7 +104,8 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(getExpBuffer(coinInPedestal)));}
+            int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+            if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getMaxXpValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))

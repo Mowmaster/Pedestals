@@ -70,7 +70,8 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(getExpBuffer(coinInPedestal)));}
+            int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+            if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
             upgradeActionSendExp(pedestal);
 
             int speed = getOperationSpeed(coinInPedestal);

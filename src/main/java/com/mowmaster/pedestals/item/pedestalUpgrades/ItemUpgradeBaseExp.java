@@ -133,8 +133,6 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         return  tr;
     }
 
-
-
     public static int removeXp(PlayerEntity player, int amount) {
         //Someday consider using player.addExpierence()
         int startAmount = amount;

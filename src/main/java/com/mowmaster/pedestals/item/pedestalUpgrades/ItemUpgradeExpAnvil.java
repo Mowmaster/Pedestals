@@ -196,7 +196,6 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
-
         if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
 
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);

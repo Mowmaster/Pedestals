@@ -49,7 +49,8 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
         {
             if(!world.isBlockPowered(pedestalPos))
             {
-                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(getExpBuffer(coinInPedestal)));}
+                int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+                if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
                 upgradeActionSendExp(pedestal);
             }
         }

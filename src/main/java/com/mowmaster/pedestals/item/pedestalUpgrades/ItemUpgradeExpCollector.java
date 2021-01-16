@@ -139,7 +139,8 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
-                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpBuffer(coinInPedestal));}
+                int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getMaxXpValue);}
                 upgradeActionSendExp(pedestal);
 
                 //added check to make sure it has room for exp before pulling it.

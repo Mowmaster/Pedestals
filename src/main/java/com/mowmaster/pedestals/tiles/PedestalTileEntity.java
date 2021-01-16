@@ -235,6 +235,14 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public IItemHandler createHandler() {
         return new ItemStackHandler(1) {
             @Override
+            protected void onLoad() {
+
+
+                super.onLoad();
+            }
+
+
+            @Override
             protected void onContentsChanged(int slot) {
                 update();
             }
