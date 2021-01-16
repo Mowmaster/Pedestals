@@ -71,7 +71,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
             if(!world.isBlockPowered(pedestalPos))
             {
                 //Dont run if theres nothing queued
-                if (world.getGameTime()%speed == 0 && storedTwo<=craftingCount) {
+                if (world.getGameTime()%speed == 0) {
                     upgradeAction(pedestal);
                 }
 
@@ -137,17 +137,17 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                             }
 
                             //System.out.println("CurrentCraftingSize: "+craftingCurrent.size());
-                            if(craftingCurrent.size() > 0)
+                            if(intInventorySlotCount >= intGridCount)
                             {
+                                int intGetNextIteration = getStoredInt(coin);//Default value is 0
+                                if (intGetNextIteration == 0)
+                                {
+                                    intGetNextIteration = 1;//Start at 1 since thats the start for the number of recipes we have}
+                                }
                                 //Makes sure Out Estimated and Actual Inventories Match AND we have more slots then the recipe requires
-                                if(intInventorySlotCount >= intGridCount) {
+                                if(craftingCurrent.size() > 0)
+                                {
                                     // Get Next iteration to craft
-                                        int intGetNextIteration = getStoredInt(coin);//Default value is 0
-                                    if (intGetNextIteration == 0)
-                                    {
-                                        intGetNextIteration = 1;//Start at 1 since thats the start for the number of recipes we have}
-                                    }
-
 
                                     int intSlotToStartFrom = (intGetNextIteration * intGridCount) - intGridCount;//(Recipe# * GridSize) - GridSize
                                     //If starting slot will be bigger then our inventory size
@@ -278,7 +278,16 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                             writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
                                         }
                                     }
-                                    else writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                    else
+                                    {
+                                        writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                        writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
+                                    }
+                                }
+                                else
+                                {
+                                    writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                    writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
                                 }
                             }
                         }

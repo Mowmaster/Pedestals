@@ -2456,8 +2456,6 @@ public class ItemUpgradeBase extends Item {
             if(compound.contains("storedint"))
             {
                 compound.remove("storedint");
-                compound.remove("storedint");
-                compound.remove("storedint");
                 stack.setTag(compound);
             }
         }
@@ -2502,8 +2500,6 @@ public class ItemUpgradeBase extends Item {
             compound = stack.getTag();
             if(compound.contains("storedinttwo"))
             {
-                compound.remove("storedinttwo");
-                compound.remove("storedinttwo");
                 compound.remove("storedinttwo");
                 stack.setTag(compound);
             }

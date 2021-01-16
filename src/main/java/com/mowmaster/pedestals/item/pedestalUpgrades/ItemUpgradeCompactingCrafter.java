@@ -84,7 +84,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
             if(!world.isBlockPowered(pedestalPos))
             {
                 //Dont run if theres nothing queued
-                if (world.getGameTime()%speed == 0 && storedTwo<=craftingCount) {
+                if (world.getGameTime()%speed == 0) {
                     upgradeAction(pedestal);
                 }
 
@@ -149,15 +149,15 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                 buildAndWriteCraftingQueue(pedestal,stackIn);
                             }
 
+                            int intGetNextIteration = getStoredInt(coin);//Default value is 0
+                            if(intGetNextIteration >= intInventorySlotCount)
+                            {
+                                intGetNextIteration = 0;
+                            }
                             //System.out.println("CurrentCraftingSize: "+craftingCurrent.size());
                             if(craftingCurrent.size() > 0)
                             {
                                 // Get Next iteration to craft
-                                int intGetNextIteration = getStoredInt(coin);//Default value is 0
-                                if(intGetNextIteration >= intInventorySlotCount)
-                                {
-                                    intGetNextIteration = 0;
-                                }
 
                                 int slotToCheck = intGetNextIteration;
                                 ItemStack stackItemInSlot = stackCurrent.get(slotToCheck);
@@ -219,9 +219,19 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                     else
                                     {
                                         writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                        writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
                                     }
                                 }
-                                else writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                else
+                                {
+                                    writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                    writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
+                                }
+                            }
+                            else
+                            {
+                                writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
                             }
                         }
                     }
