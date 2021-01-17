@@ -297,6 +297,7 @@ public class PedestalsPlugin implements IModPlugin {
         registry.addRecipeCategories(new CobbleGenSilkRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new ColorPedestalRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new ColorPalletRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new FluidtoExpConverterRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -323,6 +324,8 @@ public class PedestalsPlugin implements IModPlugin {
         ItemStack getStack = new ItemStack(ItemUpgradeCobbleGen.COBBLE.getItem());
         getStack.addEnchantment(Enchantments.SILK_TOUCH,1);
         registration.addRecipeCatalyst(getStack, CobbleGenSilkRecipeCategory.UID);
+        //Fluid To XP
+        registration.addRecipeCatalyst(new ItemStack(ItemUpgradeExpFluidConverter.FLUIDXPCONVERTER), FluidtoExpConverterRecipeCategory.UID);
     }
 
 
