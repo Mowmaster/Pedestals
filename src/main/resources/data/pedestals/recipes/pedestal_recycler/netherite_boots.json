@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_recycler",
+  "ingredient": {
+    "item": "minecraft:netherite_boots"
+  },
+  "result": {
+    "item": "minecraft:netherite_ingot",
+    "count": 1
+  }
+}

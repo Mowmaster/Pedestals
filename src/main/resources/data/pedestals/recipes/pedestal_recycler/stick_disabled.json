@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_recycler",
+  "ingredient": {
+    "item": "minecraft:stick"
+  },
+  "result": {
+    "item": "minecraft:barrier",
+    "count": 1
+  }
+}
