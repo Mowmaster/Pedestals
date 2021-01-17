@@ -14,7 +14,9 @@ import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.Collections;
 
@@ -69,7 +71,9 @@ public class FluidtoExpConverterRecipeCategory implements IRecipeCategory<Fluidt
         recipeLayout.getItemStacks().init(0, true, 5, 14);
         recipeLayout.getItemStacks().set(0, ingredients.getInputs(VanillaTypes.ITEM).get(0));
         recipeLayout.getItemStacks().init(1, false, 50, 14);
-        recipeLayout.getItemStacks().set(1, ingredients.getOutputs(VanillaTypes.ITEM).get(0));
+        ItemStack CustomExpBottle = new ItemStack(Items.EXPERIENCE_BOTTLE);
+        CustomExpBottle.setDisplayName(new TranslationTextComponent(Reference.MODID + ".jei.fluid_to_xp"));
+        recipeLayout.getItemStacks().set(1, CustomExpBottle);
     }
 
     @Override
