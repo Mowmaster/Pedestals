@@ -38,9 +38,9 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
     public int getExpBuffer(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int overenchanted = (int)(Math.pow(2,capacityOver)*100);
+        int overEnchanted = (capacityOver*15)+100;
 
-        return (overenchanted>21800)?(21800):(overenchanted);
+        return (overEnchanted>21800)?(21800):(overEnchanted);
     }
 
     public void updateAction(PedestalTileEntity pedestal)

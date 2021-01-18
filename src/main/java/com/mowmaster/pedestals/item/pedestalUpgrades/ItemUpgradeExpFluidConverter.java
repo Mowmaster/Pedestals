@@ -542,38 +542,6 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
         return  ""+getExpTransferRateLevel(stack)+"";
     }
 
-
-    public static int removeXp(PlayerEntity player, int amount) {
-        //Someday consider using player.addExpierence()
-        int startAmount = amount;
-        while(amount > 0) {
-            int barCap = player.xpBarCap();
-            int barXp = (int) (barCap * player.experience);
-            int removeXp = Math.min(barXp, amount);
-            int newBarXp = barXp - removeXp;
-            amount -= removeXp;//amount = amount-removeXp
-
-            player.experienceTotal -= removeXp;
-            if(player.experienceTotal < 0) {
-                player.experienceTotal = 0;
-            }
-            if(newBarXp == 0 && amount > 0) {
-                player.experienceLevel--;
-                if(player.experienceLevel < 0) {
-                    player.experienceLevel = 0;
-                    player.experienceTotal = 0;
-                    player.experience = 0;
-                    break;
-                } else {
-                    player.experience = 1.0F;
-                }
-            } else {
-                player.experience = newBarXp / (float) barCap;
-            }
-        }
-        return startAmount - amount;
-    }
-
     public void upgradeActionSendExp(PedestalTileEntity pedestal)
     {
         World world = pedestal.getWorld();
@@ -675,24 +643,6 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
                         }
                     }
                 }
-            }
-        }
-    }
-
-    public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
-    {
-        if(entityIn instanceof ExperienceOrbEntity)
-        {
-            ItemStack coin = tilePedestal.getCoinOnPedestal();
-            ExperienceOrbEntity getXPFromList = ((ExperienceOrbEntity)entityIn);
-            world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
-            int currentlyStoredExp = getXPStored(coin);
-            if(currentlyStoredExp < readMaxXpFromNBT(coin))
-            {
-                int value = getXPFromList.getXpValue();
-                getXPFromList.remove();
-                setXPStored(coin, currentlyStoredExp + value);
-                tilePedestal.update();
             }
         }
     }
@@ -817,7 +767,11 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
 
     public int getExpBuffer(ItemStack stack)
     {
-        return  30;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*5)+30;
+
+        //20k being the max before we get close to int overflow
+        return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     @Override

@@ -164,7 +164,11 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
 
     public int getExpBuffer(ItemStack stack)
     {
-        return  30;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*5)+30;
+
+        //20k being the max before we get close to int overflow
+        return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     @Override
