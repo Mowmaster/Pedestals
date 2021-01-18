@@ -205,6 +205,20 @@ public class ItemUpgradeExpAnvilmk2 extends ItemUpgradeBaseExp
 Other materials: Phantom brains, netherite, totems of undying, elytra, dragon breath bottles, chorus plants, dragon heads, netherstars, sponge
 gueadian drops, fish, coral, notalisk shells, or orb of the seas.
 
+https://youtu.be/BwwtnhWm480?t=24
+
+genshin impact uses a boss or guild reward as 1 item, an inworkd material as the second, and a mob drop as the third
+weapons however use dungeon loot + 2 mob loots
+
+sooooo, maybe add boss drops based on death conditions,
+added wandering villager trades
+also a way to combine materials, so maybe an inworld crafter???
+
+in worldgen for custom flowers, and bush plants that are biome specific.
+
+added mob drops, that have secondary uses so theyre not 'worthless' maybe look into reliquary???
+
+
 PROTECTION: leather or turtle shells
 SHARPNESS:  inst damage potions???
 EFFICIENCY: Redstone blocks???
