@@ -233,7 +233,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
     }
 
     @Override
-    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
         World world = pedestal.getWorld();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
@@ -261,8 +261,38 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 return true;
             }
         }
+        return false;
+    }
 
-
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    {
+        World world = pedestal.getWorld();
+        ItemStack toolInPedestal = pedestal.getToolOnPedestal();
+        BlockState blockStateToChop = world.getBlockState(blockToMinePos);
+        Block blockToChop = blockStateToChop.getBlock();
+        if(!blockToChop.isAir(blockStateToChop,world,blockToMinePos))
+        {
+            ItemStack axe = (pedestal.hasTool())?(toolInPedestal):(new ItemStack(Items.DIAMOND_AXE,1));
+            ToolType tool = blockStateToChop.getHarvestTool();
+            int toolLevel = axe.getHarvestLevel(tool, null, blockStateToChop);
+            //toolLevel >= blockStateToChop.getHarvestLevel() &&
+            if(
+                    (
+                            blockToChop.isIn(BlockTags.WART_BLOCKS)
+                                    || blockToChop.isIn(BlockTags.WARPED_STEMS)
+                                    || blockToChop.isIn(BlockTags.CRIMSON_STEMS)
+                                    || blockToChop.equals(Blocks.SHROOMLIGHT)
+                                    || blockToChop.equals(Blocks.MUSHROOM_STEM)
+                                    || blockToChop.equals(Blocks.BROWN_MUSHROOM_BLOCK)
+                                    || blockToChop.equals(Blocks.RED_MUSHROOM_BLOCK)
+                    )
+                            && passesFilter(world, pedestal.getPos(), blockToChop)
+                    )
+            {
+                return true;
+            }
+        }
         return false;
     }
 

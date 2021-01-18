@@ -279,6 +279,21 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
 
     //Can Pump Block, but just reusing the quarry method here
     @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        BlockPos blockToPumpPos = new BlockPos(blockToMinePos.getX(), blockToMinePos.getY(), blockToMinePos.getZ());
+        BlockState targetFluidState = world.getBlockState(blockToPumpPos);
+        Block targetFluidBlock = targetFluidState.getBlock();
+        if(targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0
+                || targetFluidBlock instanceof IFluidBlock)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();

@@ -170,61 +170,64 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
             {
                 if(!world.isBlockPowered(pedestalPos)) {
 
-                    //Should disable magneting when its not needed
-                    AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                    if(itemList.size()>0)
+                    if(hasFuel(coinInPedestal))
                     {
-                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
-                    }
-
-                    int val = readStoredIntTwoFromNBT(coinInPedestal);
-                    if(val>0)
-                    {
-                        if (world.getGameTime()%5 == 0) {
-                            BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,-1);
-                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
-                        }
-                        writeStoredIntTwoToNBT(coinInPedestal,val-1);
-                    }
-                    else {
-
-                        //If work queue doesnt exist, try to make one
-                        if(workQueueSize(coinInPedestal)<=0)
+                        //Should disable magneting when its not needed
+                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                        if(itemList.size()>0)
                         {
-                            buildWorkQueue(pedestal,rangeWidth,rangeHeight);
+                            upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
                         }
 
-                        //
-                        if(workQueueSize(coinInPedestal) > 0)
+                        int val = readStoredIntTwoFromNBT(coinInPedestal);
+                        if(val>0)
                         {
-                            List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
-                            if(removeFuel(pedestal,200,true))
+                            if (world.getGameTime()%5 == 0) {
+                                BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,0);
+                                PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
+                            }
+                            writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                        }
+                        else {
+
+                            //If work queue doesnt exist, try to make one
+                            if(workQueueSize(coinInPedestal)<=0)
                             {
-                                if (world.getGameTime() % speed == 0) {
-                                    for(int i = 0;i< workQueue.size(); i++)
-                                    {
-                                        BlockPos targetPos = workQueue.get(i);
-                                        BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                        BlockState targetBlock = world.getBlockState(blockToMinePos);
-                                        if(canMineBlock(pedestal,blockToMinePos))
+                                buildWorkQueue(pedestal,rangeWidth,rangeHeight);
+                            }
+
+                            //
+                            if(workQueueSize(coinInPedestal) > 0)
+                            {
+                                List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+                                if(removeFuel(pedestal,200,true))
+                                {
+                                    if (world.getGameTime() % speed == 0) {
+                                        for(int i = 0;i< workQueue.size(); i++)
                                         {
-                                            workQueue.remove(i);
-                                            writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                            upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            workQueue.remove(i);
+                                            BlockPos targetPos = workQueue.get(i);
+                                            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                            BlockState targetBlock = world.getBlockState(blockToMinePos);
+                                            if(canMineBlock(pedestal,blockToMinePos))
+                                            {
+                                                workQueue.remove(i);
+                                                writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                                upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                workQueue.remove(i);
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        else {
-                            int delay = rangeWidth*rangeWidth*rangeHeight;
-                            writeStoredIntTwoToNBT(coinInPedestal,(delay<100)?(100):(delay));
+                            else {
+                                int delay = rangeWidth*rangeWidth*rangeHeight;
+                                writeStoredIntTwoToNBT(coinInPedestal,(delay<100)?(100):(delay));
+                            }
                         }
                     }
                 }

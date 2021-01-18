@@ -193,6 +193,10 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     int val = readStoredIntTwoFromNBT(coinInPedestal);
                     if(val>0)
                     {
+                        if (world.getGameTime()%5 == 0) {
+                            BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,0);
+                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
+                        }
                         writeStoredIntTwoToNBT(coinInPedestal,val-1);
                     }
                     else {
@@ -230,8 +234,8 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                             }
                         }
                         else {
-                            //5 second cooldown
-                            writeStoredIntTwoToNBT(coinInPedestal,100);
+                            int delay = rangeWidth*rangeWidth*rangeHeight;
+                            writeStoredIntTwoToNBT(coinInPedestal,(delay<100)?(100):(delay));
                         }
                     }
                 }
@@ -303,6 +307,22 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
     }
 
     //Blocks That Can Be Harvested
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+        Block blockToHarvest = blockToHarvestState.getBlock();
+        if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {

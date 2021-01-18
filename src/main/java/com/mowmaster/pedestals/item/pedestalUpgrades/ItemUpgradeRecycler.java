@@ -99,9 +99,6 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
         return exp*stack.getCount();
     }
 
-    ResourceLocation disabledRecycles = new ResourceLocation("pedestals", "recycler_blacklist");
-    ITag<Item> BLACKLISTED = ItemTags.getCollection().get(disabledRecycles);
-
     @Nullable
     protected AbstractCookingRecipe getNormalRecipe(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
@@ -141,6 +138,8 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
         //Need to null check invalid recipes
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         ItemStack itemFromInv = ItemStack.EMPTY;
+        ResourceLocation disabledRecycles = new ResourceLocation("pedestals", "recycler_blacklist");
+        ITag<Item> BLACKLISTED = ItemTags.getCollection().get(disabledRecycles);
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(!isInventoryEmpty(cap))
@@ -208,6 +207,8 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
 
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         ItemStack itemFromInv = ItemStack.EMPTY;
+        ResourceLocation disabledRecycles = new ResourceLocation("pedestals", "recycler_blacklist");
+        ITag<Item> BLACKLISTED = ItemTags.getCollection().get(disabledRecycles);
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(!isInventoryEmpty(cap))

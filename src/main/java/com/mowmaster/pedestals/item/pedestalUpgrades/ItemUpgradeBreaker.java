@@ -220,6 +220,33 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
         return false;
     }
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        BlockState blockToMineState = world.getBlockState(blockToMinePos);
+        Block blockToMine = blockToMineState.getBlock();
+        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
+
+
+        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
+                && !(blockToMine instanceof PedestalBlock)
+                && passesFilter(world, pedestalPos, blockToMine)
+                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
+                && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
+                && !BLACKLIST.contains(blockToMine)
+                && advanced)
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     //No filter here, Jokes on YOU!
     @Override

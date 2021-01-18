@@ -215,6 +215,33 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 
     //Blocks That Can Be Planted
     @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
+        Block blockToPlant = blockToPlantState.getBlock();
+        Item singleItemInPedestal = itemInPedestal.getItem();
+
+        if(!singleItemInPedestal.equals(Items.AIR)) {
+            if (singleItemInPedestal instanceof BlockItem) {
+                if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
+                    if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
+                        Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
+                        if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();
