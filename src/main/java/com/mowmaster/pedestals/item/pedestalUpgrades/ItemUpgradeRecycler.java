@@ -15,6 +15,8 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
 import net.minecraft.item.crafting.*;
+import net.minecraft.tags.ITag;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -97,6 +99,9 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
         return exp*stack.getCount();
     }
 
+    ResourceLocation disabledRecycles = new ResourceLocation("pedestals", "recycler_blacklist");
+    ITag<Item> BLACKLISTED = ItemTags.getCollection().get(disabledRecycles);
+
     @Nullable
     protected AbstractCookingRecipe getNormalRecipe(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
@@ -161,7 +166,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                         ItemStack resultRecycler = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
                         Item getItemResultRecycler = resultRecycler.getItem();
                         int slotItemToGrind = getSlotWithMatchingStackExact(cap,nextItemToGrind);
-                        if(!nextItemToGrind.isEmpty() && (nextItemToGrind.getItem() instanceof ItemUpgradeBase || nextItemToGrind.getItem() instanceof TieredItem || nextItemToGrind.getItem() instanceof ArmorItem ||  !resultRecycler.isEmpty()) && !getItemResultRecycler.equals(Items.BARRIER))
+                        if(!nextItemToGrind.isEmpty() && (nextItemToGrind.getItem() instanceof ItemUpgradeBase || nextItemToGrind.getItem() instanceof TieredItem || nextItemToGrind.getItem() instanceof ArmorItem ||  !resultRecycler.isEmpty()) && !BLACKLISTED.contains(nextItemToGrind.getItem()))
                         {
                             Collection<ItemStack> smeltedResults = getNormalResults(getNormalRecipe(world,nextItemToGrind),nextItemToGrind);
                             //Make sure recipe output isnt empty
@@ -230,7 +235,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                         Item getItemResultRecycler = resultRecycler.getItem();
                         int slotItemToGrind = getSlotWithMatchingStackExact(cap,nextItemToGrind);
 
-                        if((input instanceof TieredItem || !resultRecycler.isEmpty()) && !getItemResultRecycler.equals(Items.BARRIER))
+                        if((input instanceof TieredItem || !resultRecycler.isEmpty()) && !BLACKLISTED.contains(nextItemToGrind.getItem()))
                         {
                             //Assume its from the recipe, but if not, then set to another itemstack
                             Ingredient repairIngredient = Ingredient.fromStacks(resultRecycler);
