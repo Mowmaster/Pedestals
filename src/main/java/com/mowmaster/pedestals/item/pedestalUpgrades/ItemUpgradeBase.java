@@ -1773,17 +1773,23 @@ public class ItemUpgradeBase extends Item {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
+        ItemStack pickaxe = pedestal.getToolOnPedestal();
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
         BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
         BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coin),pedestalPos,pickaxe.copy());
+        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
+        if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+
+
         List<BlockPos> workQueue = new ArrayList<>();
 
         for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
         {
             BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
             BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            if(canMineBlock(pedestal, blockToMinePos))
+            if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
             {
                 workQueue.add(blockToMinePos);
             }

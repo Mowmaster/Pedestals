@@ -180,6 +180,10 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                     int val = readStoredIntTwoFromNBT(coinInPedestal);
                     if(val>0)
                     {
+                        if (world.getGameTime()%5 == 0) {
+                            BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,-1);
+                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
+                        }
                         writeStoredIntTwoToNBT(coinInPedestal,val-1);
                     }
                     else {
@@ -219,7 +223,8 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                             }
                         }
                         else {
-                            writeStoredIntTwoToNBT(coinInPedestal,((rangeWidth+1)*20)+20);
+                            int delay = rangeWidth*rangeWidth*rangeHeight;
+                            writeStoredIntTwoToNBT(coinInPedestal,(delay<100)?(100):(delay));
                         }
                     }
                 }
