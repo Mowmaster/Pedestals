@@ -10,6 +10,7 @@ import com.mowmaster.pedestals.recipes.QuarryAdvancedRecipe;
 import com.mowmaster.pedestals.recipes.QuarryBlacklistBlockRecipe;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -1288,30 +1289,6 @@ public class ItemUpgradeBase extends Item {
         return false;
     }
 
-    @Nullable
-    protected QuarryBlacklistBlockRecipe getRecipeQuarryBlacklistBlock(World world, ItemStack stackIn)
-    {
-        Inventory inv = new Inventory(stackIn);
-        return world == null ? null : world.getRecipeManager().getRecipe(QuarryBlacklistBlockRecipe.recipeType, inv, world).orElse(null);
-    }
-
-    protected Collection<ItemStack> getProcessResultsQuarryBlacklistBlock(QuarryBlacklistBlockRecipe recipe)
-    {
-        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
-    }
-
-    @Nullable
-    protected QuarryAdvancedRecipe getRecipeQuarryAdvanced(World world, ItemStack stackIn)
-    {
-        Inventory inv = new Inventory(stackIn);
-        return world == null ? null : world.getRecipeManager().getRecipe(QuarryAdvancedRecipe.recipeType, inv, world).orElse(null);
-    }
-
-    protected Collection<ItemStack> getProcessResultsQuarryAdvanced(QuarryAdvancedRecipe recipe)
-    {
-        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
-    }
-
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();
@@ -1321,28 +1298,14 @@ public class ItemUpgradeBase extends Item {
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
-        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-        fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),pedestalPos,pickaxe.copy());
+        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
         if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
-        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
-
-        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
-        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
-
-        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
-        boolean advanced = false;
-        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
-        {
-            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
-        }
-        else
-        {
-            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
-        }
 
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
                 && !(blockToMine instanceof PedestalBlock)
@@ -1350,7 +1313,7 @@ public class ItemUpgradeBase extends Item {
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
                 && ForgeHooks.canHarvestBlock(blockToMineState,fakePlayer,world,blockToMinePos)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && !BLACKLIST.contains(blockToMine)
                 && advanced)
         {
             return true;
@@ -1373,28 +1336,14 @@ public class ItemUpgradeBase extends Item {
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
-
         player.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
         if(!doItemsMatch(player.getHeldItemMainhand(),pickaxe))player.setHeldItem(Hand.MAIN_HAND,pickaxe);
 
-        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
+        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
-        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
-        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
-
-        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
-        boolean advanced = false;
-        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
-        {
-            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
-        }
-        else
-        {
-            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
-        }
 
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
                 && !(blockToMine instanceof PedestalBlock)
@@ -1402,22 +1351,8 @@ public class ItemUpgradeBase extends Item {
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
                 && ForgeHooks.canHarvestBlock(blockToMineState,player,world,blockToMinePos)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && !BLACKLIST.contains(blockToMine)
                 && advanced)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    //Maybe Not Needed???
-    public boolean hasAcceptableTool(ItemStack tool)
-    {
-        if(tool.getItem() instanceof PickaxeItem
-                || tool.getItem() instanceof ShovelItem
-                || tool.getToolTypes().contains(ToolType.PICKAXE)
-                || tool.getToolTypes().contains(ToolType.SHOVEL))
         {
             return true;
         }

@@ -7,6 +7,7 @@ import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -15,6 +16,8 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -191,22 +194,6 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     }
 
     @Override
-    public boolean hasAcceptableTool(ItemStack tool)
-    {
-        if(tool.getItem() instanceof ToolItem
-                || tool.getItem() instanceof SwordItem
-                || tool.getToolTypes().contains(ToolType.PICKAXE)
-                || tool.getToolTypes().contains(ToolType.HOE)
-                || tool.getToolTypes().contains(ToolType.AXE)
-                || tool.getToolTypes().contains(ToolType.SHOVEL))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
         World world = pedestal.getWorld();
@@ -214,32 +201,18 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
+        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
-        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
-
-        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
-        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
-
-        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
-        boolean advanced = false;
-        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
-        {
-            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
-        }
-        else
-        {
-            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
-        }
 
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
                 && !(blockToMine instanceof PedestalBlock)
                 && passesFilter(world, pedestalPos, blockToMine)
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && !BLACKLIST.contains(blockToMine)
                 && advanced)
         {
             return true;
