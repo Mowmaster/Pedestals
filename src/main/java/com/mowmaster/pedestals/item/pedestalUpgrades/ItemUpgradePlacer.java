@@ -4,6 +4,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -105,23 +106,23 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
             if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
+                    int range = getRangeSmall(coinInPedestal);
+                    BlockPos blockPosBelow = getPosOfBlockBelow(world,pedestalPos,range);
+                    placeBlock(pedestal,blockPosBelow);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinOnPedestal)
+    public void placeBlock(PedestalTileEntity pedestal, BlockPos targetPos)
     {
-        int range = getRangeSmall(coinOnPedestal);
-        if(!itemInPedestal.isEmpty())//hasItem
+        World world = pedestal.getWorld();
+        BlockPos pedPos = pedestal.getPos();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        ItemStack coinOnPedestal = pedestal.getCoinOnPedestal();
+        if(!itemInPedestal.isEmpty())
         {
-            /*
-            Block Placing stuff here!
-             */
-            BlockPos blockPosBelow = getPosOfBlockBelow(world,posOfPedestal,range);//Check if its replaceable instead of checking for air
-            Block blockBelow = world.getBlockState(blockPosBelow).getBlock();
-
+            Block blockBelow = world.getBlockState(targetPos).getBlock();
             Item singleItemInPedestal = itemInPedestal.getItem();
 
             if(blockBelow.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
@@ -130,15 +131,16 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
                     if (((BlockItem) singleItemInPedestal).getBlock() instanceof Block)
                     {
                         if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof Block) {
-                            Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
-                            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
-                            fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-                            if(fakePlayer.getHeldItemMainhand().isEmpty() || !doItemsMatch(fakePlayer.getHeldItemMainhand(),itemInPedestal))fakePlayer.setHeldItem(Hand.MAIN_HAND,itemInPedestal.copy());
-                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), blockPosBelow, false));
+
+                            FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinOnPedestal),pedPos,itemInPedestal);
+                            if(!fakePlayer.getPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPosition(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
+
+                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));
+
                             ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                             if (result == ActionResultType.CONSUME) {
-                                this.removeFromPedestal(world,posOfPedestal,1);
-                                world.playSound((PlayerEntity) null, blockPosBelow.getX(), blockPosBelow.getY(), blockPosBelow.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                this.removeFromPedestal(world,pedPos,1);
+                                world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             }
                         }
                     }

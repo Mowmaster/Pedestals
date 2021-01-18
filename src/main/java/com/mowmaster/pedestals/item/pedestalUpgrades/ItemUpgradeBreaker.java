@@ -4,8 +4,10 @@ import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -14,6 +16,8 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -128,11 +132,13 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         World world = pedestal.getWorld();
         BlockPos posOfPedestal = pedestal.getPos();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        ItemStack toolInPedestal = pedestal.getToolOnPedestal();
         int range = getRange(coinInPedestal);
 
-        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+        //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile((((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal)) !=null)?(getPlayerFromCoin(coinInPedestal)):(Util.DUMMY_UUID),"[Pedestals]"));
         //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
-        fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
+        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
+        if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         BlockPos posOfBlock = getPosOfBlockBelow(world, posOfPedestal, range);
         BlockState blockToBreak = world.getBlockState(posOfBlock);
@@ -154,11 +160,25 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
             if(canMineBlock(pedestal, posOfBlock,fakePlayer))
             {
+                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,true)) {
+
+                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
+                    if (!MinecraftForge.EVENT_BUS.post(e)) {
+                        blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
+                        blockToBreak.getBlock().onBlockHarvested(world, posOfBlock, blockToBreak, fakePlayer);
+                        int expdrop = blockToBreak.getBlock().getExpDrop(blockToBreak,world,posOfBlock,
+                                (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
+                                (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
+                        if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
+                        world.removeBlock(posOfBlock, false);
+                    }
+                    //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
+                }
                 //tool = blockToBreak.getHarvestTool();
                 //toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToBreak);
                 //if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToBreak,toolLevel >= blockToBreak.getHarvestLevel())) {
                     //This event is already called in the Event factory doPlayerHarvestCheck
-                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
+                    /*BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posOfBlock, blockToBreak, fakePlayer);
                     if (MinecraftForge.EVENT_BUS.post(e)) {
                     blockToBreak.getBlock().harvestBlock(world, fakePlayer, posOfBlock, blockToBreak, null, fakePlayer.getHeldItemMainhand());
                     blockToBreak.getBlock().onBlockHarvested(world, posOfBlock, blockToBreak, fakePlayer);
@@ -167,26 +187,10 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                             (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
                     if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
                     world.removeBlock(posOfBlock, false);
-                    }
+                    }*/
                 //}
             }
         }
-    }
-
-    @Override
-    public boolean hasAcceptableTool(ItemStack tool)
-    {
-        if(tool.getItem() instanceof ToolItem
-                || tool.getItem() instanceof SwordItem
-                || tool.getToolTypes().contains(ToolType.PICKAXE)
-                || tool.getToolTypes().contains(ToolType.HOE)
-                || tool.getToolTypes().contains(ToolType.AXE)
-                || tool.getToolTypes().contains(ToolType.SHOVEL))
-        {
-            return true;
-        }
-
-        return false;
     }
 
     @Override
@@ -197,32 +201,45 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
+        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
-        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
-
-        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
-        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
-
-        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
-        boolean advanced = false;
-        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
-        {
-            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
-        }
-        else
-        {
-            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
-        }
 
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
                 && !(blockToMine instanceof PedestalBlock)
                 && passesFilter(world, pedestalPos, blockToMine)
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && !BLACKLIST.contains(blockToMine)
+                && advanced)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        BlockState blockToMineState = world.getBlockState(blockToMinePos);
+        Block blockToMine = blockToMineState.getBlock();
+        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
+
+
+        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
+                && !(blockToMine instanceof PedestalBlock)
+                && passesFilter(world, pedestalPos, blockToMine)
+                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
+                && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
+                && !BLACKLIST.contains(blockToMine)
                 && advanced)
         {
             return true;

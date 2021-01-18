@@ -45,6 +45,11 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     }
 
     @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
+    @Override
     public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
     {
         int intItem=0;
@@ -68,7 +73,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         int capacity = 0;
         if(hasEnchant(stack))
         {
-            capacity = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack) > 10)?(10):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack));
+            capacity = (getCapacityModifierOverEnchanted(stack) > 10)?(10):(getCapacityModifierOverEnchanted(stack));
         }
         return capacity;
     }
@@ -124,7 +129,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         int rate = 0;
         if(hasEnchant(stack))
         {
-            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 10)?(10):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
+            rate = (intOperationalSpeedModifierOverride(stack) > 10)?(10):(intOperationalSpeedModifierOverride(stack));
         }
         return rate;
     }

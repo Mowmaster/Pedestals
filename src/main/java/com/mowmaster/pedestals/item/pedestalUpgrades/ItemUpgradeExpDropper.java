@@ -47,9 +47,10 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
 
     public int getTransferRate(ItemStack stack)
     {
-        int overEnchanted = getCapacityModifierOverEnchanted(stack)*5;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = capacityOver*5;
         int summonRate = 1;
-        switch (getCapacityModifierOverEnchanted(stack))
+        switch (capacityOver)
         {
             case 0:
                 summonRate = 1;//1
@@ -69,7 +70,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
             case 5:
                 summonRate=25;//10
                 break;
-            default: summonRate=(overEnchanted>20000)?(20000):(overEnchanted);
+            default: summonRate=(overEnchanted>maxLVLStored)?(maxLVLStored):(overEnchanted);
         }
 
         return  summonRate;
@@ -103,7 +104,8 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(getExpBuffer(coinInPedestal)));}
+            int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+            if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getMaxXpValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
@@ -149,10 +151,11 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)+5;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*5)+5;
 
         //20k being the max before we get close to int overflow
-        return  (overEnchanted>=20000)?(20000):(overEnchanted);
+        return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     @Override

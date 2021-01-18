@@ -5,21 +5,12 @@ import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
 import com.mowmaster.pedestals.enchants.EnchantmentRange;
-import com.mowmaster.pedestals.recipes.QuarryAdvancedRecipe;
-import com.mowmaster.pedestals.recipes.RecyclerRecipe;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import net.minecraft.block.AnvilBlock;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.RepairContainer;
 import net.minecraft.item.*;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.RepairItemRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -32,13 +23,10 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -70,7 +58,8 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
-            if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(getExpBuffer(coinInPedestal)));}
+            int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+            if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
             upgradeActionSendExp(pedestal);
 
             int speed = getOperationSpeed(coinInPedestal);
@@ -175,7 +164,11 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
 
     public int getExpBuffer(ItemStack stack)
     {
-        return  30;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*5)+30;
+
+        //20k being the max before we get close to int overflow
+        return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     @Override

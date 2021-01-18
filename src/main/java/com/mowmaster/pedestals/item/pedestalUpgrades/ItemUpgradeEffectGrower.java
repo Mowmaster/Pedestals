@@ -213,6 +213,25 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
     //Blocks That Can Be Bonemealed
     @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
+        Block blockToGrow = blockToGrowState.getBlock();
+        if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
+        {
+            if (blockToGrow instanceof IGrowable) {
+                if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+    @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();

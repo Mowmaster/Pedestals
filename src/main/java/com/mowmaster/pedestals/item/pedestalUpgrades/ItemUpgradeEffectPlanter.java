@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -180,6 +181,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
     {
         Random rand = new Random();
         Item singleItemInPedestal = itemInPedestal.getItem();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
 
         if(world.getBlockState(posTarget).getBlock().equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR))
         {
@@ -192,8 +194,10 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 
 
                         if (world.getBlockState(posTarget.down()).canSustainPlant(world,posTarget.down(), Direction.UP,(IPlantable) block)) {
-                            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(pedestal.getCoinOnPedestal()),"[Pedestals]"));
-                            fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+                            //Use item in pedestal because, we're planting it
+                            FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,itemInPedestal.copy());
+                            //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
 
                             BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget.down(), false));
 
@@ -211,6 +215,33 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 
     //Blocks That Can Be Planted
     @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
+        Block blockToPlant = blockToPlantState.getBlock();
+        Item singleItemInPedestal = itemInPedestal.getItem();
+
+        if(blockToPlant.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
+            if (singleItemInPedestal instanceof BlockItem) {
+                if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
+                    if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
+                        Block block = ((BlockItem) itemInPedestal.getItem()).getBlock();
+                        if (world.getBlockState(blockToPlantPos.down()).canSustainPlant(world, blockToPlantPos.down(), Direction.UP, (IPlantable) block)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();
@@ -221,7 +252,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         Block blockToPlant = blockToPlantState.getBlock();
         Item singleItemInPedestal = itemInPedestal.getItem();
 
-        if(!singleItemInPedestal.equals(Items.AIR)) {
+        if(blockToPlant.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
             if (singleItemInPedestal instanceof BlockItem) {
                 if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
                     if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
@@ -249,7 +280,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         Block blockToPlant = blockToPlantState.getBlock();
         Item singleItemInPedestal = itemInPedestal.getItem();
 
-        if(blockToPlant.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
+        if(!singleItemInPedestal.equals(Items.AIR)) {
             if (singleItemInPedestal instanceof BlockItem) {
                 if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
                     if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {

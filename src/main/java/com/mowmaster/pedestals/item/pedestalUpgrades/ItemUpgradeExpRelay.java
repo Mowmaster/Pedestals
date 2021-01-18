@@ -31,7 +31,7 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
 
     @Override
     public Boolean canAcceptCapacity() {
-        return super.canAcceptCapacity();
+        return true;
     }
 
     @Override
@@ -49,15 +49,21 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
-                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpCountByLevel(30));}
+                int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+                if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
                 upgradeActionSendExp(pedestal);
             }
         }
     }
 
+    @Override
     public int getExpBuffer(ItemStack stack)
     {
-        return  30;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*5)+30;
+
+        //20k being the max before we get close to int overflow
+        return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     @Override

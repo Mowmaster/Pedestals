@@ -82,6 +82,7 @@ public class ItemRegistry
         ItemUpgradeFluidPumpFilterBlacklist.onItemRegistryReady(e);
         ItemUpgradeFluidCrafter.onItemRegistryReady(e);
         ItemUpgradeMilker.onItemRegistryReady(e);
+        ItemUpgradeExpFluidConverter.onItemRegistryReady(e);
 
         ItemUpgradeEnderFilteredImporterFood.onItemRegistryReady(e);
         ItemUpgradeEnderFilteredImporterEnchanted.onItemRegistryReady(e);
@@ -116,6 +117,7 @@ public class ItemRegistry
         ItemUpgradeFilterFood.onItemRegistryReady(e);
         ItemUpgradeFilterFoodBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterDurability.onItemRegistryReady(e);
+        ItemUpgradeFilterDurabilityLess.onItemRegistryReady(e);
         ItemUpgradeFilterEnchanted.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedFuzzy.onItemRegistryReady(e);

@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -200,8 +201,9 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
 
         if(!blockToChop.getBlock().isAir(blockToChop,world,blockToChopPos) && blockToChop.getBlock().isIn(BlockTags.LOGS) || blockToChop.getBlock().isIn(BlockTags.LEAVES))
         {
-            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+            FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
+            //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
             ItemStack choppingAxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
 
             if(!pedestal.hasTool())
@@ -209,11 +211,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                 choppingAxe = getToolDefaultEnchanted(coinInPedestal,choppingAxe);
             }
 
-            if (choppingAxe.getItem() instanceof AxeItem || choppingAxe.getToolTypes().contains(ToolType.AXE) ||
-                    choppingAxe.getItem() instanceof HoeItem || choppingAxe.getToolTypes().contains(ToolType.HOE)
-                    && !fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {
-                fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);
-            }
+            if (!fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);}
 
             ToolType tool = blockToChop.getHarvestTool();
             int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToChop);
@@ -237,6 +235,29 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                 //}
             }
         }
+    }
+
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        ItemStack toolInPedestal = pedestal.getToolOnPedestal();
+        BlockState blockStateToChop = world.getBlockState(blockToMinePos);
+        Block blockToChop = blockStateToChop.getBlock();
+        if(!blockToChop.isAir(blockStateToChop,world,blockToMinePos))
+        {
+            ItemStack axe = (pedestal.hasTool())?(toolInPedestal):(new ItemStack(Items.DIAMOND_AXE,1));
+            ToolType tool = blockStateToChop.getHarvestTool();
+            int toolLevel = axe.getHarvestLevel(tool, null, blockStateToChop);
+            //Annoying As F since leaves need the hoe and logs neeed the axe...
+            //&& toolLevel >= blockStateToChop.getHarvestLevel()
+            if((blockToChop.isIn(BlockTags.LOGS) || blockToChop.isIn(BlockTags.LEAVES)) && passesFilter(world, pedestal.getPos(), blockToChop))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

@@ -51,8 +51,9 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*15)+30;
-        return  (overEnchanted>20000)?(20000):(overEnchanted);
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*15)+30;
+        return  (overEnchanted>maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     public float getEnchantmentPowerFromSorroundings(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
@@ -225,7 +226,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
             //To show when the enchanting table has enough XP to enchant an item at the current level
             if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
             {
-                BlockPos directionalPos = getPosOfBlockBelow(world,pos,-1);
+                BlockPos directionalPos = getPosOfBlockBelow(world,pos,0);
                 spawnParticleAbovePedestal(world,directionalPos,0.94f,0.8f,0.95f,1.0f);
             }
         }

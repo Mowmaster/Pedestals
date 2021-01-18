@@ -38,6 +38,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -63,7 +64,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
         int gridSize = 0;
         if(itemStack.getItem().equals(ItemUpgradeCompactingCrafter.COMPACTOR_TWO)){gridSize = 2;}
         else if(itemStack.getItem().equals(ItemUpgradeCompactingCrafter.COMPACTOR_THREE)){gridSize = 3;}
-        else{gridSize = 1;}
+        else{gridSize = 2;}
 
         return gridSize;
     }
@@ -72,8 +73,9 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
     {
         World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
         BlockPos pedestalPos = pedestal.getPos();
+        int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
+        int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
 
         if(!world.isRemote)
         {
@@ -81,8 +83,17 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
 
             if(!world.isBlockPowered(pedestalPos))
             {
+                //Dont run if theres nothing queued
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,itemInPedestal,coinInPedestal,pedestalPos);
+                    upgradeAction(pedestal);
+                }
+
+                //Basically if our crafting queue has been empty for a while, every 5 seconds refresh it
+                if(storedTwo>=craftingCount)
+                {
+                    if (world.getGameTime()%100 == 0) {
+                        onPedestalNeighborChanged(pedestal);
+                    }
                 }
             }
         }
@@ -93,132 +104,218 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
         return world.getRecipeManager().getRecipe(IRecipeType.CRAFTING, inv, world).orElse(null);
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal)
     {
-        int gridSize = getGridSize(coinInPedestal);
-        int gridSlots = gridSize*gridSize;
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        int gridSize = getGridSize(coin);
+        int intBatchCraftingSize = getItemTransferRate(coin);
         ItemStack itemFromInv = ItemStack.EMPTY;
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
-        //Since we'll be checking each slot for a compacting recipe
-        int intGridCount = 1;
-        int intItemsUsedCount = gridSize*gridSize;
-        int intBatchCraftingSize = getItemTransferRate(coinInPedestal);
+        BlockPos posInventory = getPosOfBlockBelow(world,pedestalPos,1);
+        int intGridCount = gridSize*gridSize;
 
+        List<ItemStack> stackCurrent = readInventoryQueueFromNBT(coin);
+        List<ItemStack> craftingCurrent = readCraftingQueueFromNBT(coin);
 
         //Dont bother unless pedestal is empty
         //Yes i'm being lazy here...
 
         if(itemInPedestal.isEmpty())
         {
-            LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
 
             if(!isInventoryEmpty(cap))
             {
-                if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-                //Setup new Container for our Crafting Grid Size
-                CraftingInventory craft = new CraftingInventory(new Container(null, -1) {
-                    @Override
-                    public boolean canInteractWith(PlayerEntity playerIn) {
-                        return false;
-                    }
-                }, gridSize, gridSize);
-
-                CraftingInventory craftAvailable = new CraftingInventory(new Container(null, -1) {
-                    @Override
-                    public boolean canInteractWith(PlayerEntity playerIn) {
-                        return false;
-                    }
-                }, gridSize, gridSize);
-
                 //Get Inventory Below
                 if(cap.isPresent()) {
                     IItemHandler handler = cap.orElse(null);
                     TileEntity invToPullFrom = world.getTileEntity(posInventory);
                     int intInventorySlotCount = handler.getSlots();//normal chests return value of 1-27
-
-                    //Should Allow Using a pedestal when it has the advanced enchant
-                    if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
+                    if (((hasAdvancedInventoryTargeting(coin) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
                         itemFromInv = ItemStack.EMPTY;
                     }
                     else
                     {
                         if(handler != null)
                         {
-                            //Makes sure we have more slots then the recipe requires
-                            if(intInventorySlotCount>=intGridCount)
+                            //If they Dont Match, this should force that
+                            //System.out.println("CurrentStackSizeOfInv: "+stackCurrent.size());
+                            if(stackCurrent.size() != intInventorySlotCount)
+                            {
+                                List<ItemStack> stackIn = buildInventoryQueue(pedestal);
+                                writeInventoryQueueToNBT(coin,stackIn);
+                                buildAndWriteCraftingQueue(pedestal,stackIn);
+                            }
+
+                            int intGetNextIteration = getStoredInt(coin);//Default value is 0
+                            if(intGetNextIteration >= intInventorySlotCount)
+                            {
+                                intGetNextIteration = 0;
+                            }
+                            //System.out.println("CurrentCraftingSize: "+craftingCurrent.size());
+                            if(craftingCurrent.size() > 0)
                             {
                                 // Get Next iteration to craft
-                                int intGetNextIteration = getIntValueFromPedestal(world,posOfPedestal);//Default value is 0
-                                if(intGetNextIteration >= intInventorySlotCount)
-                                {
-                                    intGetNextIteration = 0;
-                                }
 
                                 int slotToCheck = intGetNextIteration;
-                                ItemStack stackItemInSlot = handler.getStackInSlot(slotToCheck);
+                                ItemStack stackItemInSlot = stackCurrent.get(slotToCheck);
                                 if(!stackItemInSlot.isEmpty())
                                 {
-                                    //System.out.println("SLOT: "+slotToCheck);
-                                    //System.out.println("Item In Slot: "+stackItemInSlot);
-                                    //System.out.println("Items To Use: "+intItemsUsedCount);
-                                    if(stackItemInSlot.getCount() > intItemsUsedCount)
+                                    //copy so we dont set the stack size any higher
+                                    ItemStack getRecipe = craftingCurrent.get(intGetNextIteration).copy();
+
+                                    //System.out.println("GetRecipe: "+getRecipe);
+
+                                    if(!getRecipe.isEmpty())
                                     {
-                                        for(int i=0; i< gridSlots;i++)
+                                        //Calc max stack size craftable
+                                        ItemStack getIngredientStack = stackCurrent.get(intGetNextIteration);
+                                        int stackSize = getIngredientStack.getCount();
+
+                                        if((stackSize-1) < intGridCount*intBatchCraftingSize)
                                         {
-                                            //next check to make sure we have more than enough to craft the recipe
-                                            if(stackItemInSlot.getCount() > (intBatchCraftingSize*intItemsUsedCount))
-                                            {
-                                                //System.out.println("SET ITEM FOR SLOT");
-                                                craft.setInventorySlotContents(i,stackItemInSlot);
-                                            }
-                                            else
-                                            {
-                                                intBatchCraftingSize = ((stackItemInSlot.getCount()/intItemsUsedCount)-1);
-                                                if(intBatchCraftingSize>0)craft.setInventorySlotContents(i,stackItemInSlot);
-                                            }
-                                            craftAvailable.setInventorySlotContents(i,stackItemInSlot);
+                                            intBatchCraftingSize = Math.floorDiv(stackSize,intGridCount);
+                                            //Because im paranoid???
+                                            if(intGridCount*intBatchCraftingSize>=stackSize)intBatchCraftingSize--;
                                         }
-                                    }
+                                        else if(getIngredientStack.isEmpty())
+                                        {
+                                            intBatchCraftingSize=0;
+                                        }
 
-                                    //Checks to make sure we have enough slots set for out recipe
-                                    if(craft.getSizeInventory() >= intGridCount)
-                                    {
-
-                                        IRecipe recipe = findRecipe(craft,world);
-                                        //This is the set recipe, which might differ from the recipe given current available inputs
-                                        IRecipe setRecipe = findRecipe(craftAvailable,world);
-
-                                        //if(recipe != null)System.out.println("RECIPE: "+recipe.getRecipeOutput());
-
-                                        if(recipe  != null &&  recipe.matches(craft, world) && recipe.matches(craftAvailable,world)) {
-                                            //Set ItemStack with recipe result
-                                            ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
-                                            int intRecipeResultCount = stackRecipeResult.getCount();
-                                            int intBatchCraftedAmount = stackRecipeResult.getCount() * intBatchCraftingSize;
+                                        //Means there is something to craft, realistically since getRecipe.isEmpty is checked already, this should never be < 0
+                                        if(intBatchCraftingSize > 0)
+                                        {
+                                            int intRecipeResultCount = getRecipe.getCount();
+                                            int intBatchCraftedAmount = intRecipeResultCount * intBatchCraftingSize;
 
                                             //Check if pedestal can hold the crafting result, if not then set the batch to be small enough that it can fit
-                                            if(intBatchCraftedAmount > 64)
-                                            {
-                                                intBatchCraftingSize = 64/intRecipeResultCount;
+                                            if (intBatchCraftedAmount > 64) {
+                                                intBatchCraftingSize = Math.floorDiv(64, intRecipeResultCount);
                                             }
 
-                                            //Remove items from slotquar
-                                            int intGetActualSlot = intGetNextIteration;
-                                            handler.extractItem(intGetActualSlot,(intBatchCraftingSize*intItemsUsedCount),false);
+                                            int itemsToRemove = intBatchCraftingSize*intGridCount;
+                                            int itemsToInsertToPedestal = intBatchCraftingSize*intRecipeResultCount;
 
-                                            stackRecipeResult.setCount(intBatchCraftedAmount);
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            addToPedestal(world,posOfPedestal,stackRecipeResult);
+                                            ItemStack queueStack = stackCurrent.get(intGetNextIteration);
+                                            queueStack.shrink(itemsToRemove);
+                                            stackCurrent.set(intGetNextIteration,queueStack);
+                                            handler.extractItem(intGetNextIteration, itemsToRemove, false);
+
+                                            getRecipe.setCount(itemsToInsertToPedestal);
+                                            world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            addToPedestal(world, pedestalPos, getRecipe);
+                                            onPedestalNeighborChanged(pedestal);
+                                            writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                        }
+                                        else
+                                        {
+                                            writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                            writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
                                         }
                                     }
+                                    else
+                                    {
+                                        writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                        writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
+                                    }
                                 }
-
-                                setIntValueToPedestal(world,posOfPedestal,(intGetNextIteration+1));
+                                else
+                                {
+                                    writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                    writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
+                                }
+                            }
+                            else
+                            {
+                                writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                writeStoredIntTwoToNBT(coin,readStoredIntTwoFromNBT(coin)+1);
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    //Write recipes in order as they appear in the inventory, and since we check for changed, we should be able to get which recipe is which
+    @Override
+    public void buildAndWriteCraftingQueue(PedestalTileEntity pedestal, List<ItemStack> inventoryQueue)
+    {
+        World world = pedestal.getWorld();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        int gridSize = getGridSize(coin);
+        int intGridCount = gridSize*gridSize;
+        List<ItemStack> invQueue = inventoryQueue;
+
+        List<ItemStack> recipeQueue = new ArrayList<>();
+
+        CraftingInventory craft = new CraftingInventory(new Container(null, -1) {
+            @Override
+            public boolean canInteractWith(PlayerEntity playerIn) {
+                return false;
+            }
+        }, gridSize, gridSize);
+
+        //System.out.println("THIS IS THE GRID COUNT FOR THE RECIPE!!!"+ intGridCount);
+
+        //For Each stack in the invBuffer
+        for(int s=0; s<invQueue.size(); s++)
+        {
+            ItemStack getStack = invQueue.get(s).copy();
+            getStack.setCount(1);
+            //If the item Stack has enough items to craft with
+            //stack.getCount()>=2 ||  stack.getMaxStackSize()==1 ||
+            if(!getStack.isEmpty())
+            {
+                for(int r=0;r < intGridCount;r++)
+                {
+                    craft.setInventorySlotContents(r,getStack);
+                }
+            }
+            else
+            {
+                recipeQueue.add(ItemStack.EMPTY);
+                continue;
+            }
+            //Checks to make sure we have enough slots set for out recipe
+            if(craft.getSizeInventory() >= intGridCount)
+            {
+                IRecipe recipe = findRecipe(craft,world);
+                if(recipe  != null &&  recipe.matches(craft, world)) {
+                    //Set ItemStack with recipe result
+                    ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
+                    recipeQueue.add(stackRecipeResult);
+                    continue;
+                }
+                else
+                {
+                    recipeQueue.add(ItemStack.EMPTY);
+                    continue;
+                }
+            }
+        }
+        writeCraftingQueueToNBT(coin, recipeQueue);
+    }
+
+    @Override
+    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        List<ItemStack> stackIn = buildInventoryQueue(pedestal);
+        List<ItemStack> stackCurrent = readInventoryQueueFromNBT(coin);
+        if(!doInventoryQueuesMatch(stackIn,stackCurrent))
+        {
+            writeInventoryQueueToNBT(coin,stackIn);
+            //Reset value on 'neighbor' update
+            writeStoredIntTwoToNBT(coin,0);
+            buildAndWriteCraftingQueue(pedestal,stackIn);
+
+        }
+        else {
+            writeInventoryQueueToNBT(coin,stackIn);
+            writeStoredIntTwoToNBT(coin,0);
         }
     }
 
@@ -278,6 +375,21 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name, Util.DUMMY_UUID);
+
+        List<ItemStack> list = readCraftingQueueFromNBT(stack);
+        if(list.size()>0)
+        {
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_recipes");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.DUMMY_UUID);
+
+            for(int i=0;i<list.size();i++) {
+                if(list.get(i).isEmpty())continue;
+                TranslationTextComponent enchants = new TranslationTextComponent(i +": " + list.get(i).getDisplayName().getString());
+                enchants.mergeStyle(TextFormatting.GRAY);
+                player.sendMessage(enchants,Util.DUMMY_UUID);
+            }
+        }
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
         rate.appendString(""+getItemTransferRate(stack)+"");

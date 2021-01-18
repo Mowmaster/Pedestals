@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -199,8 +200,9 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
         BlockPos posOfPedestal = pedestal.getPos();
         //wart blocks*, warped stems*, crimson stems*, shroomlight*, mushroom stems, mushroom brown and mushroom red
-        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-        fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
+        //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+        if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
         ItemStack choppingAxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
 
         if(!pedestal.hasTool())
@@ -208,11 +210,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
             choppingAxe = getToolDefaultEnchanted(coinInPedestal,choppingAxe);
         }
 
-        if (choppingAxe.getItem() instanceof AxeItem || choppingAxe.getToolTypes().contains(ToolType.AXE) ||
-                choppingAxe.getItem() instanceof HoeItem || choppingAxe.getToolTypes().contains(ToolType.HOE)
-                && !fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {
-            fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);
-        }
+        if (!fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);}
 
         ToolType tool = blockToChop.getHarvestTool();
         int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToChop);
@@ -235,7 +233,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
     }
 
     @Override
-    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
         World world = pedestal.getWorld();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
@@ -263,8 +261,38 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 return true;
             }
         }
+        return false;
+    }
 
-
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    {
+        World world = pedestal.getWorld();
+        ItemStack toolInPedestal = pedestal.getToolOnPedestal();
+        BlockState blockStateToChop = world.getBlockState(blockToMinePos);
+        Block blockToChop = blockStateToChop.getBlock();
+        if(!blockToChop.isAir(blockStateToChop,world,blockToMinePos))
+        {
+            ItemStack axe = (pedestal.hasTool())?(toolInPedestal):(new ItemStack(Items.DIAMOND_AXE,1));
+            ToolType tool = blockStateToChop.getHarvestTool();
+            int toolLevel = axe.getHarvestLevel(tool, null, blockStateToChop);
+            //toolLevel >= blockStateToChop.getHarvestLevel() &&
+            if(
+                    (
+                            blockToChop.isIn(BlockTags.WART_BLOCKS)
+                                    || blockToChop.isIn(BlockTags.WARPED_STEMS)
+                                    || blockToChop.isIn(BlockTags.CRIMSON_STEMS)
+                                    || blockToChop.equals(Blocks.SHROOMLIGHT)
+                                    || blockToChop.equals(Blocks.MUSHROOM_STEM)
+                                    || blockToChop.equals(Blocks.BROWN_MUSHROOM_BLOCK)
+                                    || blockToChop.equals(Blocks.RED_MUSHROOM_BLOCK)
+                    )
+                            && passesFilter(world, pedestal.getPos(), blockToChop)
+                    )
+            {
+                return true;
+            }
+        }
         return false;
     }
 

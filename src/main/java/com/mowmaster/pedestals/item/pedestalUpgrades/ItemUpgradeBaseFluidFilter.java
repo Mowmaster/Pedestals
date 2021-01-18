@@ -125,7 +125,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
     public int getFluidTransferRate(ItemStack stack)
     {
         //im assuming # = rf value???
-        /*int fluidTransferRate = 1000;
+        int fluidTransferRate = getCapacityModifierOverEnchanted(stack)*4000;
         switch (getCapacityModifier(stack))
         {
 
@@ -147,10 +147,10 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
             case 5:
                 fluidTransferRate=20000;//20x
                 break;
-            default: fluidTransferRate=1000;
-        }*/
+            default: fluidTransferRate=(fluidTransferRate>maxStored)?(maxStored):(fluidTransferRate);
+        }
 
-        return  20000;
+        return  fluidTransferRate;
     }
 
     public static boolean isFluidItem(ItemStack itemToCheck)
@@ -255,6 +255,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
                                                     mainPedestalTile.update();
                                                     addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                     storedPedestalTile.update();
+                                                    if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                                 }
                                                 else
                                                 {
@@ -275,6 +276,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
                                                         mainPedestalTile.update();
                                                         addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                         storedPedestalTile.update();
+                                                        if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                                     }
                                                 }
                                             //}
@@ -305,6 +307,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
                                                 mainPedestalTile.update();
                                                 addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                 storedPedestalTile.update();
+                                                if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                             }
                                             else
                                             {
@@ -325,6 +328,7 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
                                                     mainPedestalTile.update();
                                                     addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                     storedPedestalTile.update();
+                                                    if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                                 }
                                             }
                                             //}

@@ -55,14 +55,17 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*15)+30;
-        return  (overEnchanted>20000)?(20000):(overEnchanted);
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+
+        int overEnchanted = (capacityOver*15)+30;
+        return  (overEnchanted>maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     public int getRepairRate(ItemStack stack)
     {
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*10);
-        return  (overEnchanted>20000)?(20000):(overEnchanted);
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*10);
+        return  (overEnchanted>maxStored)?(maxStored):(overEnchanted);
     }
 
     private int correctlyPlacedSorroundingPedestals(World world, BlockPos posPedestal)
@@ -193,7 +196,6 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
-
         if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
 
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);

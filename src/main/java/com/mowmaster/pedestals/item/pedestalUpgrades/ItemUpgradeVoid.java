@@ -86,7 +86,9 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
 
     public float getDamageDelt(ItemStack coinInPedestal)
     {
-        return getCapacityModifier(coinInPedestal)*2 + 2.0F;
+        int capacityOver = getCapacityModifierOverEnchanted(coinInPedestal);
+
+        return capacityOver*2 + 2.0F;
     }
 
     @Override

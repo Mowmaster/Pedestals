@@ -99,9 +99,10 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
     public int getSuckiRate(ItemStack stack)
     {
-        int overEnchanted = getCapacityModifierOverEnchanted(stack)*5;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = capacityOver*5;
         int suckiRate = 1;
-        switch (getCapacityModifierOverEnchanted(stack))
+        switch (capacityOver)
         {
             case 0:
                 suckiRate = 1;//1
@@ -121,7 +122,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
             case 5:
                 suckiRate=25;//10
                 break;
-            default: suckiRate=(overEnchanted>20000)?(20000):(overEnchanted);
+            default: suckiRate=(overEnchanted>maxLVLStored)?(maxLVLStored):(overEnchanted);
         }
 
         return  suckiRate;
@@ -138,7 +139,8 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
             int speed = getOperationSpeed(coinInPedestal);
             if(!world.isBlockPowered(pedestalPos))
             {
-                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getExpBuffer(coinInPedestal));}
+                int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
+                if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getMaxXpValue);}
                 upgradeActionSendExp(pedestal);
 
                 //added check to make sure it has room for exp before pulling it.
@@ -235,10 +237,11 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     @Override
     public int getExpBuffer(ItemStack stack)
     {
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)+30;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*5)+30;
 
         //20k being the max before we get close to int overflow
-        return  (overEnchanted>=20000)?(20000):(overEnchanted);
+        return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
     @Override

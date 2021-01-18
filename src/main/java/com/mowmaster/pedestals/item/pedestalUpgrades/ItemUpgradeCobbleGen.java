@@ -52,6 +52,11 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     }
 
     @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
+    @Override
     public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
     {
         int intItem=0;

@@ -92,7 +92,40 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
             default: summonRate=55;
         }*/
         //Clearly capped at 1995 when everything else can exceed it wasnt gonna cut it
-        int overEnchanted = (getCapacityModifierOverEnchanted(stack)*5)+5;
+        int overEnchanted = getExpCountByLevel(((getCapacityModifierOverEnchanted(stack)*5)+5));
+
+        //21,863 being the max before we get close to int overflow
+        return  (overEnchanted>=20000)?(20000):(overEnchanted);
+    }
+
+    public int getExpTransferRateLevel(ItemStack stack)
+    {
+        /*int summonRate = 55;
+        switch (getCapacityModifier(stack))
+        {
+
+            case 0:
+                summonRate = 55;//5
+                break;
+            case 1:
+                summonRate=160;//10
+                break;
+            case 2:
+                summonRate = 315;//15
+                break;
+            case 3:
+                summonRate = 550;//20
+                break;
+            case 4:
+                summonRate = 910;//25
+                break;
+            case 5:
+                summonRate=1395;//30
+                break;
+            default: summonRate=55;
+        }*/
+        //Clearly capped at 1995 when everything else can exceed it wasnt gonna cut it
+        int overEnchanted = ((getCapacityModifierOverEnchanted(stack)*5)+5);
 
         //21,863 being the max before we get close to int overflow
         return  (overEnchanted>=20000)?(20000):(overEnchanted);
@@ -100,40 +133,8 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
 
     public String getExpTransferRateString(ItemStack stack)
     {
-        TranslationTextComponent fivelevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_0");
-        TranslationTextComponent tenlevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_1");
-        TranslationTextComponent fifteenlevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_2");
-        TranslationTextComponent twentylevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_3");
-        TranslationTextComponent twentyfivelevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_4");
-        TranslationTextComponent thirtylevels = new TranslationTextComponent(Reference.MODID + ".xpupgrade_tooltips" + ".rate_5");
-        String tr = fivelevels.getString();
-        switch (getExpTransferRate(stack))
-        {
-            case 55:
-                tr = fivelevels.getString();
-                break;
-            case 160:
-                tr = tenlevels.getString();
-                break;
-            case 315:
-                tr = fifteenlevels.getString();
-                break;
-            case 550:
-                tr = twentylevels.getString();
-                break;
-            case 910:
-                tr = twentyfivelevels.getString();
-                break;
-            case 1395:
-                tr = thirtylevels.getString();
-                break;
-            default: tr = fivelevels.getString();
-        }
-
-        return  tr;
+        return  ""+getExpTransferRateLevel(stack)+"";
     }
-
-
 
     public static int removeXp(PlayerEntity player, int amount) {
         //Someday consider using player.addExpierence()

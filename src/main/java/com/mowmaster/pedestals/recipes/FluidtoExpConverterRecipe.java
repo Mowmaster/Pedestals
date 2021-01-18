@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.IRecipeType;
@@ -19,16 +20,16 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 
-public class QuarryAdvancedRecipe implements IRecipe<IInventory> {
+public class FluidtoExpConverterRecipe implements IRecipe<IInventory> {
 
-    public static final IRecipeType<QuarryAdvancedRecipe> recipeType = IRecipeType.register(Reference.MODID + ":quarryadvanced");
+    public static final IRecipeType<FluidtoExpConverterRecipe> recipeType = IRecipeType.register(Reference.MODID + ":fluid_to_xp");
     public static final Serializer serializer = new Serializer();
 
     private final ResourceLocation recipeId;
     private Ingredient ingredient;
     private ItemStack result;
 
-    public QuarryAdvancedRecipe(ResourceLocation recipeId) {
+    public FluidtoExpConverterRecipe(ResourceLocation recipeId) {
         this.recipeId = recipeId;
     }
 
@@ -76,17 +77,16 @@ public class QuarryAdvancedRecipe implements IRecipe<IInventory> {
         return recipeType;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<QuarryAdvancedRecipe> {
+    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<FluidtoExpConverterRecipe> {
 
         public static ArrayList<Item> ingredientList = new ArrayList<>();
 
         @Override
-        public QuarryAdvancedRecipe read(ResourceLocation recipeId, JsonObject json) {
+        public FluidtoExpConverterRecipe read(ResourceLocation recipeId, JsonObject json) {
 
-            QuarryAdvancedRecipe recipe = new QuarryAdvancedRecipe(recipeId);
+            FluidtoExpConverterRecipe recipe = new FluidtoExpConverterRecipe(recipeId);
 
             recipe.ingredient = Ingredient.deserialize(json.get("ingredient"));
-            //recipe.ingredientCount = JSONUtils.getInt(json.get("ingredient").getAsJsonObject(), "count", 1);
 
             for (ItemStack stack : recipe.ingredient.getMatchingStacks()) {
                 if (!ingredientList.contains(stack.getItem())) ingredientList.add(stack.getItem());
@@ -101,15 +101,15 @@ public class QuarryAdvancedRecipe implements IRecipe<IInventory> {
 
         @Nullable
         @Override
-        public QuarryAdvancedRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            QuarryAdvancedRecipe recipe = new QuarryAdvancedRecipe(recipeId);
+        public FluidtoExpConverterRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
+            FluidtoExpConverterRecipe recipe = new FluidtoExpConverterRecipe(recipeId);
             recipe.ingredient = Ingredient.read(buffer);
             recipe.result = buffer.readItemStack();
             return recipe;
         }
 
         @Override
-        public void write(PacketBuffer buffer, QuarryAdvancedRecipe recipe) {
+        public void write(PacketBuffer buffer, FluidtoExpConverterRecipe recipe) {
             recipe.ingredient.write(buffer);
             buffer.writeItemStack(recipe.getResult());
         }

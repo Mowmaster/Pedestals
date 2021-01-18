@@ -399,33 +399,13 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         return maxStorage;
     }
 
+    //nerfed technically, but also give the ability to set storage to a nice number
     public int getStorageBuffer(ItemStack stack) {
-        int storageBuffer = 6912;
-        switch (getCapacityModifier(stack))
-        {
-            //1Double chest = 1728
-            case 0:
-                storageBuffer = 6912;//4x
-                break;
-            case 1:
-                storageBuffer = 27648;//16x
-                break;
-            case 2:
-                storageBuffer = 110592;//64x
-                break;
-            case 3:
-                storageBuffer = 442368;//256x
-                break;
-            case 4:
-                storageBuffer = 1769472;//1024x
-                break;
-            case 5:
-                storageBuffer = maxStored;//A Lot
-                break;
-            default: storageBuffer = 6912;
-        }
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        //1728 = 27*64 (size of double chest)
+        int storageBuffer = (int)(Math.pow(4,(capacityOver>=33)?(33):(capacityOver)+1)*1728);
 
-        return  storageBuffer;
+        return  (storageBuffer>=Integer.MAX_VALUE)?(Integer.MAX_VALUE):(storageBuffer);
     }
 
     public void updateAction(PedestalTileEntity pedestal)

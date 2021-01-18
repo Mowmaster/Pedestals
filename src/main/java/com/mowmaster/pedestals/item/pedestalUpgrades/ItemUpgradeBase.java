@@ -1,14 +1,11 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
-import com.mowmaster.pedestals.recipes.CobbleGenRecipe;
-import com.mowmaster.pedestals.recipes.CobbleGenSilkRecipe;
-import com.mowmaster.pedestals.recipes.QuarryAdvancedRecipe;
-import com.mowmaster.pedestals.recipes.QuarryBlacklistBlockRecipe;
+import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -18,18 +15,18 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.merchant.villager.VillagerEntity;
+import net.minecraft.entity.monster.AbstractRaiderEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.EnderChestInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.*;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.*;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tags.BlockTags;
@@ -43,7 +40,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -52,9 +48,8 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -72,6 +67,8 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeBase extends Item {
 
+    public int maxStored = 2000000000;
+    public int maxLVLStored = 20000;
     public ItemUpgradeBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
@@ -292,6 +289,13 @@ public class ItemUpgradeBase extends Item {
 
     public boolean doItemsMatch(ItemStack stackPedestal, ItemStack itemStackIn)
     {
+        return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
+    }
+
+    public boolean doItemsMatchWithEmpty(ItemStack stackPedestal, ItemStack itemStackIn)
+    {
+        if(stackPedestal.isEmpty() && itemStackIn.isEmpty())return true;
+
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
@@ -583,6 +587,22 @@ public class ItemUpgradeBase extends Item {
 
         return slot;
     }
+
+    public int getNextIndexWithItems(List<ItemStack> stackList)
+    {
+        int range = stackList.size();
+        for(int i=0;i<range;i++)
+        {
+            ItemStack stackInSlot = stackList.get(i);
+            //find a slot with items
+            if(!stackInSlot.isEmpty())
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
     /***************************************
      ****************************************
      **          End of Cap Stuff          **
@@ -644,7 +664,7 @@ public class ItemUpgradeBase extends Item {
 
     public Boolean canAcceptAdvanced()
     {
-        return false;
+        return true;
     }
 
     public Boolean canAcceptArea()
@@ -673,6 +693,48 @@ public class ItemUpgradeBase extends Item {
             rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
         }
         return rate;
+    }
+
+    public int intOperationalSpeedModifierOverride(ItemStack stack)
+    {
+
+        int rate = 0;
+        if(hasEnchant(stack))
+        {
+            int speedOver = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack);
+            return (hasAdvancedInventoryTargeting(stack))?(speedOver):((speedOver>5)?(5):(speedOver));
+        }
+        return rate;
+    }
+
+    public double getOperationSpeedOverride(ItemStack stack)
+    {
+        int advancedAllowedSpeed = intOperationalSpeedModifierOverride(stack);
+        double intOperationalSpeed = 20;
+        switch (advancedAllowedSpeed)
+        {
+            case 0:
+                intOperationalSpeed = 20;//normal speed
+                break;
+            case 1:
+                intOperationalSpeed=10;//2x faster
+                break;
+            case 2:
+                intOperationalSpeed = 5;//4x faster
+                break;
+            case 3:
+                intOperationalSpeed = 3;//6x faster
+                break;
+            case 4:
+                intOperationalSpeed = 2;//10x faster
+                break;
+            case 5:
+                intOperationalSpeed=1;//20x faster
+                break;
+            default: intOperationalSpeed=((advancedAllowedSpeed*0.01)>0.9)?(0.1):(1-(advancedAllowedSpeed*0.01));
+        }
+
+        return  intOperationalSpeed;
     }
 
     public int getOperationSpeed(ItemStack stack)
@@ -712,6 +774,8 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
         TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
         TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
+        TranslationTextComponent overclockedx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_x");
+        String overAmount = ""+(intOperationalSpeedModifier(stack)-5)+"";
         String str = normal.getString();
         switch (intOperationalSpeedModifier(stack))
         {
@@ -733,7 +797,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 str = twentyx.getString();//20x faster
                 break;
-            default: str = normal.getString();;
+            default: str = overclockedx.getString() + overAmount;
         }
 
         return  str;
@@ -761,12 +825,24 @@ public class ItemUpgradeBase extends Item {
         return capacity;
     }
 
-    public int getCapacityModifierOverEnchanted(ItemStack stack)
+    public int getCapacityModifierOver(ItemStack stack)
     {
         int capacity = 0;
         if(hasEnchant(stack))
         {
             capacity = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack);
+        }
+        return capacity;
+    }
+
+    public int getCapacityModifierOverEnchanted(ItemStack stack)
+    {
+        int capacity = 0;
+        if(hasEnchant(stack))
+        {
+            int capacityOver = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.CAPACITY,stack);
+            int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
+            return advancedAllowed;
         }
         return capacity;
     }
@@ -841,8 +917,11 @@ public class ItemUpgradeBase extends Item {
     //Based on old 16 block max
     public int getRangeSmall(ItemStack stack)
     {
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
         int height = 1;
-        switch (getRangeModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 height = 1;
@@ -862,7 +941,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 height = 16;
                 break;
-            default: height=((getRangeModifier(stack)*4)-4);
+            default: height=((advancedAllowed*4)-4);
         }
 
         return  height;
@@ -870,8 +949,11 @@ public class ItemUpgradeBase extends Item {
     //Based on old 32 block max
     public int getRangeMedium(ItemStack stack)
     {
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
         int height = 4;
-        switch (getRangeModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 height = 4;
@@ -891,7 +973,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 height=32;
                 break;
-            default: height=((getRangeModifier(stack)*6)+2);
+            default: height=((advancedAllowed*6)+2);
         }
 
         return  height;
@@ -899,8 +981,11 @@ public class ItemUpgradeBase extends Item {
     //Based on old 64 block max starting at 1
     public int getRangeLarge(ItemStack stack)
     {
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
         int height = 8;
-        switch (getRangeModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 height = 2;
@@ -920,7 +1005,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 height=64;
                 break;
-            default: height=(getRangeModifier(stack)*12);
+            default: height=(advancedAllowed*12);
         }
 
         return  height;
@@ -929,8 +1014,11 @@ public class ItemUpgradeBase extends Item {
     //Based on old 64 block max
     public int getRangeLargest(ItemStack stack)
     {
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
         int height = 8;
-        switch (getRangeModifier(stack))
+        switch (advancedAllowed)
         {
             case 0:
                 height = 8;
@@ -950,7 +1038,7 @@ public class ItemUpgradeBase extends Item {
             case 5:
                 height=64;
                 break;
-            default: height=(getRangeModifier(stack)*12);
+            default: height=(advancedAllowed*12);
         }
 
         return  height;
@@ -958,7 +1046,10 @@ public class ItemUpgradeBase extends Item {
     //Based on old Tree Chopper max
     public int getRangeTree(ItemStack stack)
     {
-        return  ((getRangeModifier(stack)*6)+4);
+        int rangeOver = getRangeModifier(stack);
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+
+        return  ((advancedAllowed*6)+4);
     }
     /***************************************
      ****************************************
@@ -1051,35 +1142,6 @@ public class ItemUpgradeBase extends Item {
     }
 
     public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
-    {
-        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
-
-        /*ITag.INamedTag<Block> BLOCK_EMERALD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/emerald"));
-        ITag.INamedTag<Block> BLOCK_DIAMOND = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/diamond"));
-        ITag.INamedTag<Block> BLOCK_GOLD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/gold"));
-        ITag.INamedTag<Block> BLOCK_LAPIS = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/lapis"));
-        ITag.INamedTag<Block> BLOCK_IRON = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/iron"));
-        ITag.INamedTag<Block> BLOCK_COAL = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/coal"));*/
-        ITag<Block> BLOCK_EMERALD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/emerald"));
-        ITag<Block> BLOCK_DIAMOND = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/diamond"));
-        ITag<Block> BLOCK_GOLD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/gold"));
-        ITag<Block> BLOCK_LAPIS = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/lapis"));
-        ITag<Block> BLOCK_IRON = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/iron"));
-        ITag<Block> BLOCK_COAL = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
-
-        //Netherite
-        if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
-        if(BLOCK_EMERALD.contains(block)) return Blocks.EMERALD_BLOCK;//Players
-        if(BLOCK_DIAMOND.contains(block)) return Blocks.DIAMOND_BLOCK;//All Monsters
-        if(BLOCK_GOLD.contains(block)) return Blocks.GOLD_BLOCK;//All Animals
-        if(BLOCK_LAPIS.contains(block)) return Blocks.LAPIS_BLOCK;//All Flying
-        if(BLOCK_IRON.contains(block)) return Blocks.IRON_BLOCK;//All Creatures
-        if(BLOCK_COAL.contains(block)) return Blocks.COAL_BLOCK;//All Mobs
-
-        return block;
-    }
-
-    public Block getBaseBlockBelowAdvanced(World world, BlockPos pedestalPos)
     {
         Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
 
@@ -1217,30 +1279,6 @@ public class ItemUpgradeBase extends Item {
         return false;
     }
 
-    @Nullable
-    protected QuarryBlacklistBlockRecipe getRecipeQuarryBlacklistBlock(World world, ItemStack stackIn)
-    {
-        Inventory inv = new Inventory(stackIn);
-        return world == null ? null : world.getRecipeManager().getRecipe(QuarryBlacklistBlockRecipe.recipeType, inv, world).orElse(null);
-    }
-
-    protected Collection<ItemStack> getProcessResultsQuarryBlacklistBlock(QuarryBlacklistBlockRecipe recipe)
-    {
-        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
-    }
-
-    @Nullable
-    protected QuarryAdvancedRecipe getRecipeQuarryAdvanced(World world, ItemStack stackIn)
-    {
-        Inventory inv = new Inventory(stackIn);
-        return world == null ? null : world.getRecipeManager().getRecipe(QuarryAdvancedRecipe.recipeType, inv, world).orElse(null);
-    }
-
-    protected Collection<ItemStack> getProcessResultsQuarryAdvanced(QuarryAdvancedRecipe recipe)
-    {
-        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
-    }
-
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
         World world = pedestal.getWorld();
@@ -1250,28 +1288,14 @@ public class ItemUpgradeBase extends Item {
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
-        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-        fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),pedestalPos,pickaxe.copy());
+        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
         if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
-        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
-
-        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
-        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
-
-        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
-        boolean advanced = false;
-        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
-        {
-            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
-        }
-        else
-        {
-            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
-        }
 
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
                 && !(blockToMine instanceof PedestalBlock)
@@ -1279,7 +1303,7 @@ public class ItemUpgradeBase extends Item {
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
                 && ForgeHooks.canHarvestBlock(blockToMineState,fakePlayer,world,blockToMinePos)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && !BLACKLIST.contains(blockToMine)
                 && advanced)
         {
             return true;
@@ -1302,28 +1326,14 @@ public class ItemUpgradeBase extends Item {
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
-
         player.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
         if(!doItemsMatch(player.getHeldItemMainhand(),pickaxe))player.setHeldItem(Hand.MAIN_HAND,pickaxe);
 
-        Collection<ItemStack> jsonResults = getProcessResultsQuarryBlacklistBlock(getRecipeQuarryBlacklistBlock(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryBlacklistBlock = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-        Item getItemQuarryBlacklistBlock = resultQuarryBlacklistBlock.getItem();
+        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
-        Collection<ItemStack> jsonResultsAdvanced = getProcessResultsQuarryAdvanced(getRecipeQuarryAdvanced(world,new ItemStack(blockToMine.asItem())));
-        ItemStack resultQuarryAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
-        Item getItemQuarryAdvanced = resultQuarryAdvanced.getItem();
-
-        //if its on the advanced recipes then its false unless the upgrade has advanced enchant
-        boolean advanced = false;
-        if(hasAdvancedInventoryTargeting(coinInPedestal) && !resultQuarryAdvanced.isEmpty())
-        {
-            advanced = getItemQuarryAdvanced.equals(Items.BARRIER);
-        }
-        else
-        {
-            advanced = !(!resultQuarryAdvanced.isEmpty() && getItemQuarryAdvanced.equals(Items.BARRIER));
-        }
 
         if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
                 && !(blockToMine instanceof PedestalBlock)
@@ -1331,22 +1341,8 @@ public class ItemUpgradeBase extends Item {
                 && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
                 && ForgeHooks.canHarvestBlock(blockToMineState,player,world,blockToMinePos)
                 && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !(!resultQuarryBlacklistBlock.isEmpty() && getItemQuarryBlacklistBlock.equals(Items.BARRIER))
+                && !BLACKLIST.contains(blockToMine)
                 && advanced)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    //Maybe Not Needed???
-    public boolean hasAcceptableTool(ItemStack tool)
-    {
-        if(tool.getItem() instanceof PickaxeItem
-                || tool.getItem() instanceof ShovelItem
-                || tool.getToolTypes().contains(ToolType.PICKAXE)
-                || tool.getToolTypes().contains(ToolType.SHOVEL))
         {
             return true;
         }
@@ -1395,6 +1391,8 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {if(entityIn instanceof FlyingEntity) {return (FlyingEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {if(entityIn instanceof CreatureEntity) {return (CreatureEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {if(entityIn instanceof MobEntity) {return (MobEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {if(entityIn instanceof VillagerEntity) {return (VillagerEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {if(entityIn instanceof AbstractRaiderEntity) {return (AbstractRaiderEntity)entityIn;}}
         else {return (LivingEntity)entityIn;}
         return null;
     }
@@ -1407,6 +1405,8 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {if(entityIn instanceof FlyingEntity) {return (FlyingEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {if(entityIn instanceof CreatureEntity) {return (CreatureEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {if(entityIn instanceof MobEntity) {return (MobEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {if(entityIn instanceof VillagerEntity) {return (VillagerEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {if(entityIn instanceof AbstractRaiderEntity) {return (AbstractRaiderEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.QUARTZ_BLOCK)) {if(entityIn instanceof ItemEntity) {return (ItemEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.SLIME_BLOCK)) {if(entityIn instanceof ExperienceOrbEntity) {return (ExperienceOrbEntity)entityIn;}}
         else {return (Entity)entityIn;}
@@ -1415,13 +1415,15 @@ public class ItemUpgradeBase extends Item {
 
     public String getTargetEntity(Block filterBlock)
     {
-        TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
-        TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
-        TranslationTextComponent GOLD = new TranslationTextComponent(getTranslationKey() + ".entity_gold");
-        TranslationTextComponent LAPIS = new TranslationTextComponent(getTranslationKey() + ".entity_lapis");
-        TranslationTextComponent IRON = new TranslationTextComponent(getTranslationKey() + ".entity_iron");
-        TranslationTextComponent COAL = new TranslationTextComponent(getTranslationKey() + ".entity_coal");
-        TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
+        TranslationTextComponent EMERALD = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_emerald");
+        TranslationTextComponent DIAMOND = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_diamond");
+        TranslationTextComponent GOLD = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_gold");
+        TranslationTextComponent LAPIS = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_lapis");
+        TranslationTextComponent IRON = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_iron");
+        TranslationTextComponent COAL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_coal");
+        TranslationTextComponent GLASS_LIME = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_lime");
+        TranslationTextComponent GLASS_BLACK = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_black");
+        TranslationTextComponent ALL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_all");
 
         if(filterBlock.equals(Blocks.EMERALD_BLOCK)) {return EMERALD.getString();}
         else if(filterBlock.equals(Blocks.DIAMOND_BLOCK)) {return DIAMOND.getString();}
@@ -1429,20 +1431,24 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {return LAPIS.getString();}
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {return IRON.getString();}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {return COAL.getString();}
+        else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {return GLASS_LIME.getString();}
+        else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {return GLASS_BLACK.getString();}
         else {return ALL.getString();}
     }
 
     public String getTargetEntityAdvanced(Block filterBlock)
     {
-        TranslationTextComponent EMERALD = new TranslationTextComponent(getTranslationKey() + ".entity_emerald");
-        TranslationTextComponent DIAMOND = new TranslationTextComponent(getTranslationKey() + ".entity_diamond");
-        TranslationTextComponent GOLD = new TranslationTextComponent(getTranslationKey() + ".entity_gold");
-        TranslationTextComponent LAPIS = new TranslationTextComponent(getTranslationKey() + ".entity_lapis");
-        TranslationTextComponent IRON = new TranslationTextComponent(getTranslationKey() + ".entity_iron");
-        TranslationTextComponent COAL = new TranslationTextComponent(getTranslationKey() + ".entity_coal");
-        TranslationTextComponent ALL = new TranslationTextComponent(getTranslationKey() + ".entity_all");
-        TranslationTextComponent SLIME = new TranslationTextComponent(getTranslationKey() + ".entity_slime");
-        TranslationTextComponent QUARTZ = new TranslationTextComponent(getTranslationKey() + ".entity_quartz");
+        TranslationTextComponent EMERALD = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_emerald");
+        TranslationTextComponent DIAMOND = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_diamond");
+        TranslationTextComponent GOLD = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_gold");
+        TranslationTextComponent LAPIS = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_lapis");
+        TranslationTextComponent IRON = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_iron");
+        TranslationTextComponent COAL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_coal");
+        TranslationTextComponent ALL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_all");
+        TranslationTextComponent GLASS_LIME = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_lime");
+        TranslationTextComponent GLASS_BLACK = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_black");
+        TranslationTextComponent SLIME = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_slime");
+        TranslationTextComponent QUARTZ = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_quartz");
 
         if(filterBlock.equals(Blocks.EMERALD_BLOCK)) {return EMERALD.getString();}
         else if(filterBlock.equals(Blocks.DIAMOND_BLOCK)) {return DIAMOND.getString();}
@@ -1452,6 +1458,8 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {return COAL.getString();}
         else if(filterBlock.equals(Blocks.SLIME_BLOCK)) {return SLIME.getString();}
         else if(filterBlock.equals(Blocks.QUARTZ_BLOCK)) {return QUARTZ.getString();}
+        else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {return GLASS_LIME.getString();}
+        else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {return GLASS_BLACK.getString();}
         else {return ALL.getString();}
     }
 
@@ -1765,17 +1773,23 @@ public class ItemUpgradeBase extends Item {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
+        ItemStack pickaxe = pedestal.getToolOnPedestal();
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
         BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
         BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coin),pedestalPos,pickaxe.copy());
+        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
+        if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+
+
         List<BlockPos> workQueue = new ArrayList<>();
 
         for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
         {
             BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
             BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            if(canMineBlock(pedestal, blockToMinePos))
+            if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
             {
                 workQueue.add(blockToMinePos);
             }
@@ -2034,6 +2048,238 @@ public class ItemUpgradeBase extends Item {
         return filterIn.containsAll(queueMatch);
     }
 
+    public void removeInventoryQueue(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("invqueue"))
+            {
+                compound.remove("invqueue");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+    public List<ItemStack> buildInventoryQueue(PedestalTileEntity pedestal)
+    {
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+        BlockPos posInventory = getPosOfBlockBelow(world, pedestalPos, 1);
+
+        List<ItemStack> filterQueue = new ArrayList<>();
+
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
+        if(hasAdvancedInventoryTargeting(coin))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, pedestalPos),true);
+        if(cap.isPresent())
+        {
+            IItemHandler handler = cap.orElse(null);
+            if(handler != null)
+            {
+                int range = handler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = handler.getStackInSlot(i).copy();
+                    if(stackInSlot.getCount() > 64)stackInSlot.setCount(64);
+                    filterQueue.add(stackInSlot);
+                }
+            }
+        }
+
+        return filterQueue;
+    }
+
+    public void writeInventoryQueueToNBT(ItemStack stack, List<ItemStack> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        CompoundNBT tag = new CompoundNBT();
+        if(stack.hasTag()){tag = stack.getTag();}
+
+        ItemStackHandler handler = new ItemStackHandler();
+        handler.setSize(listIn.size());
+
+        for(int i=0;i<handler.getSlots();i++) {handler.setStackInSlot(i,listIn.get(i));}
+
+        compound = ((INBTSerializable<CompoundNBT>) handler).serializeNBT();
+        tag.put("invqueue", compound);
+        stack.setTag(tag);
+    }
+
+    public List<ItemStack> readInventoryQueueFromNBT(ItemStack coin)
+    {
+        List<ItemStack> filterQueue = new ArrayList<>();
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            if(getCompound.contains("invqueue"))
+            {
+                CompoundNBT invTag = getCompound.getCompound("invqueue");
+                ItemStackHandler handler = new ItemStackHandler();
+                ((INBTSerializable<CompoundNBT>) handler).deserializeNBT(invTag);
+
+                for(int i=0;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
+            }
+        }
+
+        return filterQueue;
+    }
+
+    public boolean doInventoryQueuesMatch(List<ItemStack> stackIn, List<ItemStack> stackCurrent)
+    {
+        int matching = 0;
+        if(stackIn.size() == stackCurrent.size())
+        {
+            for(int i=0;i<stackIn.size();i++)
+            {
+                if(doItemsMatchWithEmpty(stackIn.get(i),stackCurrent.get(i)))
+                {
+                    matching++;
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        return matching == stackIn.size();
+    }
+
+
+    public static IRecipe<CraftingInventory> findRecipe(CraftingInventory inv, World world) {
+        return world.getRecipeManager().getRecipe(IRecipeType.CRAFTING, inv, world).orElse(null);
+    }
+
+    public int getGridSize(ItemStack itemStack)
+    {
+        int gridSize = 0;
+        if(itemStack.getItem().equals(ItemUpgradeCrafter.CRAFTER_ONE)){gridSize = 1;}
+        else if(itemStack.getItem().equals(ItemUpgradeCrafter.CRAFTER_TWO)){gridSize = 2;}
+        else if(itemStack.getItem().equals(ItemUpgradeCrafter.CRAFTER_THREE)){gridSize = 3;}
+        else{gridSize = 1;}
+
+        return gridSize;
+    }
+
+    //Write recipes in order as they appear in the inventory, and since we check for changed, we should be able to get which recipe is which
+    public void buildAndWriteCraftingQueue(PedestalTileEntity pedestal, List<ItemStack> inventoryQueue)
+    {
+        World world = pedestal.getWorld();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        int gridSize = getGridSize(coin);
+        int intGridCount = gridSize*gridSize;
+        List<ItemStack> invQueue = inventoryQueue;
+        int recipeCount = Math.floorDiv(invQueue.size(),intGridCount);
+
+        List<ItemStack> recipeQueue = new ArrayList<>();
+
+        CraftingInventory craft = new CraftingInventory(new Container(null, -1) {
+            @Override
+            public boolean canInteractWith(PlayerEntity playerIn) {
+                return false;
+            }
+        }, gridSize, gridSize);
+
+        for(int r=1;r<= recipeCount; r++)
+        {
+            for(int s=0;s<intGridCount; s++)
+            {
+                int getActualIndex = ((r*intGridCount)-intGridCount)+s;
+                ItemStack getStack = invQueue.get(getActualIndex);
+                //If the item Stack has enough items to craft with
+                //stack.getCount()>=2 ||  stack.getMaxStackSize()==1 ||
+                if(getStack.isEmpty() || getStack.getItem() instanceof ItemCraftingPlaceholder)
+                {
+                    //System.out.println("SetEmpty");
+                    craft.setInventorySlotContents(s, ItemStack.EMPTY);
+                }
+                else
+                {
+                    //System.out.println("SetNormal: " + getStack);
+                    craft.setInventorySlotContents(s,getStack);
+                }
+            }
+            //Checks to make sure we have enough slots set for out recipe
+            if(craft.getSizeInventory() >= intGridCount)
+            {
+                IRecipe recipe = findRecipe(craft,world);
+                if(recipe  != null &&  recipe.matches(craft, world)) {
+                    //Set ItemStack with recipe result
+                    ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
+                    recipeQueue.add(stackRecipeResult);
+                }
+                else
+                {
+                    recipeQueue.add(ItemStack.EMPTY);
+                }
+            }
+        }
+        writeCraftingQueueToNBT(coin, recipeQueue);
+    }
+
+    public void writeCraftingQueueToNBT(ItemStack stack, List<ItemStack> listIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        CompoundNBT tag = new CompoundNBT();
+        if(stack.hasTag()){tag = stack.getTag();}
+
+        ItemStackHandler handler = new ItemStackHandler();
+        handler.setSize(listIn.size());
+
+        for(int i=0;i<handler.getSlots();i++) {handler.setStackInSlot(i,listIn.get(i));}
+
+        compound = ((INBTSerializable<CompoundNBT>) handler).serializeNBT();
+        tag.put("craftqueue", compound);
+        stack.setTag(tag);
+    }
+
+    public List<ItemStack> readCraftingQueueFromNBT(ItemStack coin)
+    {
+        List<ItemStack> filterQueue = new ArrayList<>();
+        if(coin.hasTag())
+        {
+            CompoundNBT getCompound = coin.getTag();
+            if(getCompound.contains("craftqueue"))
+            {
+                CompoundNBT invTag = getCompound.getCompound("craftqueue");
+                ItemStackHandler handler = new ItemStackHandler();
+                ((INBTSerializable<CompoundNBT>) handler).deserializeNBT(invTag);
+
+                for(int i=0;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
+            }
+        }
+
+        return filterQueue;
+    }
+
+    public void removeCraftingQueue(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("craftqueue"))
+            {
+                compound.remove("craftqueue");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+
+
+
+
+    public void notifyTransferUpdate(PedestalTileEntity receiverTile)
+    {
+
+    }
+
 
 
 
@@ -2073,8 +2319,7 @@ public class ItemUpgradeBase extends Item {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
-        BlockPos blockBelowPos = getPosOfBlockBelow(world,pedestalPos,1);
-        Block blockBelow = world.getBlockState(blockBelowPos).getBlock();
+        Block blockBelow = getBaseBlockBelow(world,pedestalPos);
 
         CompoundNBT compound = new CompoundNBT();
         if(coin.hasTag()){compound = coin.getTag();}
@@ -2126,8 +2371,6 @@ public class ItemUpgradeBase extends Item {
             if(compound.contains("storedint"))
             {
                 compound.remove("storedint");
-                compound.remove("storedint");
-                compound.remove("storedint");
                 stack.setTag(compound);
             }
         }
@@ -2148,13 +2391,13 @@ public class ItemUpgradeBase extends Item {
 
     public int readStoredIntFromNBT(ItemStack stack)
     {
-        int maxenergy = 0;
+        int value = 0;
         if(stack.hasTag())
         {
             CompoundNBT getCompound = stack.getTag();
-            maxenergy = getCompound.getInt("storedint");
+            value = getCompound.getInt("storedint");
         }
-        return maxenergy;
+        return value;
     }
 
     public int getStoredInt(ItemStack coin)
@@ -2172,8 +2415,6 @@ public class ItemUpgradeBase extends Item {
             compound = stack.getTag();
             if(compound.contains("storedinttwo"))
             {
-                compound.remove("storedinttwo");
-                compound.remove("storedinttwo");
                 compound.remove("storedinttwo");
                 stack.setTag(compound);
             }

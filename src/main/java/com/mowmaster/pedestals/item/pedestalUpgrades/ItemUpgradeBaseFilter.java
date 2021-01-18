@@ -40,6 +40,11 @@ public class ItemUpgradeBaseFilter extends ItemUpgradeBase {
         return false;
     }
 
+    public Boolean canAcceptAdvanced()
+    {
+        return false;
+    }
+
     @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {

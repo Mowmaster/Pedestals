@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -68,8 +69,12 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
     }
 
     //Riped Straight from ItemUpgradePlacer
-    public void placeBlock(World world, BlockPos pedPos, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinOnPedestal)
+    public void placeBlock(PedestalTileEntity pedestal, BlockPos targetPos)
     {
+        World world = pedestal.getWorld();
+        BlockPos pedPos = pedestal.getPos();
+        ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        ItemStack coinOnPedestal = pedestal.getCoinOnPedestal();
         if(!itemInPedestal.isEmpty())
         {
             Block blockBelow = world.getBlockState(targetPos).getBlock();
@@ -82,8 +87,8 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                     {
                         if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof Block) {
 
-                            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinOnPedestal),"[Pedestals]"));
-                            fakePlayer.setPosition(pedPos.getX(),pedPos.getY(),pedPos.getZ());
+                            FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinOnPedestal),pedPos,itemInPedestal);
+                            if(!fakePlayer.getPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPosition(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
 
                             BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));
 
@@ -159,11 +164,10 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
             int speed = getOperationSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos)) {
-                if(hasFluidInCoin(coinInPedestal))
+                if(hasFluidInCoin(coinInPedestal) && world.getGameTime() % speed == 0)
                 {
                     upgradeActionSendFluid(pedestal);
                 }
-
 
                 int rangeWidth = getWidth(coinInPedestal);
                 int rangeHeight = getHeight(coinInPedestal);
@@ -248,7 +252,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                         int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
                         PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
                     }
-                    else {placeBlock(world,pedestalPos,targetPos,itemInPedestal,coinInPedestal);}
+                    else {placeBlock(pedestal,targetPos);}
                 }
             }
         }
@@ -267,13 +271,28 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                         PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
 
                     }
-                    else {placeBlock(world,pedestalPos,targetPos,itemInPedestal,coinInPedestal);}
+                    else {placeBlock(pedestal,targetPos);}
                 }
             }
         }
     }
 
     //Can Pump Block, but just reusing the quarry method here
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        BlockPos blockToPumpPos = new BlockPos(blockToMinePos.getX(), blockToMinePos.getY(), blockToMinePos.getZ());
+        BlockState targetFluidState = world.getBlockState(blockToPumpPos);
+        Block targetFluidBlock = targetFluidState.getBlock();
+        if(targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0
+                || targetFluidBlock instanceof IFluidBlock)
+        {
+            return true;
+        }
+
+        return false;
+    }
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
