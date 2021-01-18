@@ -318,9 +318,17 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                                         ItemStack queueStack = stackCurrent.get(s);
                                                         if(queueStack.isDamageable())
                                                         {
-                                                            queueStack.setDamage(queueStack.getDamage()+1);
-                                                            stackCurrent.set(s,queueStack);
-                                                            handler.getStackInSlot(s).setDamage(queueStack.getDamage()+1);
+                                                            if(queueStack.getDamage() > queueStack.getMaxDamage())
+                                                            {
+                                                                stackCurrent.set(s,ItemStack.EMPTY);
+                                                                handler.extractItem(s, intBatchCraftingSize, false);
+                                                            }
+                                                            else {
+                                                                int damage = queueStack.getDamage();
+                                                                queueStack.setDamage(damage+1);
+                                                                stackCurrent.set(s,queueStack);
+                                                                handler.getStackInSlot(s).setDamage(queueStack.getDamage());
+                                                            }
                                                         }
                                                     }
                                                 }

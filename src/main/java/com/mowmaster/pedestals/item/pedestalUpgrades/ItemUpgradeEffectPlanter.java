@@ -225,7 +225,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         Block blockToPlant = blockToPlantState.getBlock();
         Item singleItemInPedestal = itemInPedestal.getItem();
 
-        if(!singleItemInPedestal.equals(Items.AIR)) {
+        if(blockToPlant.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
             if (singleItemInPedestal instanceof BlockItem) {
                 if (((BlockItem) singleItemInPedestal).getBlock() instanceof IPlantable) {
                     if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof IPlantable) {
