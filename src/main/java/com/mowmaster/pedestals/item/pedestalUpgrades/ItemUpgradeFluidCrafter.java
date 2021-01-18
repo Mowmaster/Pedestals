@@ -313,7 +313,16 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                                         stackCurrent.set(s,queueStack);
                                                         handler.extractItem(s, intBatchCraftingSize, false);
                                                     }
-                                                    else continue;
+                                                    else
+                                                    {
+                                                        ItemStack queueStack = stackCurrent.get(s);
+                                                        if(queueStack.isDamageable())
+                                                        {
+                                                            queueStack.setDamage(queueStack.getDamage()+1);
+                                                            stackCurrent.set(s,queueStack);
+                                                            handler.getStackInSlot(s).setDamage(queueStack.getDamage()+1);
+                                                        }
+                                                    }
                                                 }
                                                 else
                                                 {
