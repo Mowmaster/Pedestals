@@ -266,7 +266,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         double speed = getFanSpeed(coin);
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
         if(!hasFilterBlock(coin)) {writeFilterBlockToNBT(pedestal);}
-        Block filterBlock = (!world.isRemote)?(readFilterBlockFromNBT(coin)):(world.getBlockState(getPosOfBlockBelow(world,posOfPedestal,1)).getBlock());
+        Block filterBlock = (!world.isRemote)?(readFilterBlockFromNBT(coin)):(getBaseBlockBelow(world,posOfPedestal));
 
         if(filterBlock.equals(Blocks.NETHERITE_BLOCK)) {speed *= 2;}
         if(hasAdvancedInventoryTargeting(coin)) {useFanOnEntitiesAdvanced(pedestal,filterBlock,speed,getBox);}

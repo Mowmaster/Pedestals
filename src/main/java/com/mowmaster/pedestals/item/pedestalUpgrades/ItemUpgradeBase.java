@@ -1166,35 +1166,6 @@ public class ItemUpgradeBase extends Item {
         ITag<Block> BLOCK_LAPIS = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/lapis"));
         ITag<Block> BLOCK_IRON = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/iron"));
         ITag<Block> BLOCK_COAL = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
-
-        //Netherite
-        if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
-        if(BLOCK_EMERALD.contains(block)) return Blocks.EMERALD_BLOCK;//Players
-        if(BLOCK_DIAMOND.contains(block)) return Blocks.DIAMOND_BLOCK;//All Monsters
-        if(BLOCK_GOLD.contains(block)) return Blocks.GOLD_BLOCK;//All Animals
-        if(BLOCK_LAPIS.contains(block)) return Blocks.LAPIS_BLOCK;//All Flying
-        if(BLOCK_IRON.contains(block)) return Blocks.IRON_BLOCK;//All Creatures
-        if(BLOCK_COAL.contains(block)) return Blocks.COAL_BLOCK;//All Mobs
-
-        return block;
-    }
-
-    public Block getBaseBlockBelowAdvanced(World world, BlockPos pedestalPos)
-    {
-        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
-
-        /*ITag.INamedTag<Block> BLOCK_EMERALD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/emerald"));
-        ITag.INamedTag<Block> BLOCK_DIAMOND = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/diamond"));
-        ITag.INamedTag<Block> BLOCK_GOLD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/gold"));
-        ITag.INamedTag<Block> BLOCK_LAPIS = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/lapis"));
-        ITag.INamedTag<Block> BLOCK_IRON = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/iron"));
-        ITag.INamedTag<Block> BLOCK_COAL = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/coal"));*/
-        ITag<Block> BLOCK_EMERALD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/emerald"));
-        ITag<Block> BLOCK_DIAMOND = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/diamond"));
-        ITag<Block> BLOCK_GOLD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/gold"));
-        ITag<Block> BLOCK_LAPIS = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/lapis"));
-        ITag<Block> BLOCK_IRON = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/iron"));
-        ITag<Block> BLOCK_COAL = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
         ITag<Block> BLOCK_QUARTZ = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/quartz"));
         //ITag<Block> BLOCK_SLIME = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/slime"));
 
@@ -2417,8 +2388,7 @@ public class ItemUpgradeBase extends Item {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
-        BlockPos blockBelowPos = getPosOfBlockBelow(world,pedestalPos,1);
-        Block blockBelow = world.getBlockState(blockBelowPos).getBlock();
+        Block blockBelow = getBaseBlockBelow(world,pedestalPos);
 
         CompoundNBT compound = new CompoundNBT();
         if(coin.hasTag()){compound = coin.getTag();}
