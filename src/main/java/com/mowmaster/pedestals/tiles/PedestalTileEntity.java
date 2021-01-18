@@ -372,10 +372,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return this;
     }
 
-    ResourceLocation grabTools = new ResourceLocation("pedestals", "allowed_tools");
+    ResourceLocation grabTools = new ResourceLocation("pedestals", "pedestal_tool_whitelist");
     ITag<Item> GET_TOOLS = ItemTags.getCollection().get(grabTools);
 
-    ResourceLocation grabNotTools = new ResourceLocation("pedestals", "disallowed_tools");
+    ResourceLocation grabNotTools = new ResourceLocation("pedestals", "pedestal_tool_blacklist");
     ITag<Item> GET_NOTTOOLS = ItemTags.getCollection().get(grabNotTools);
 
     private IItemHandler createHandlerPedestalPrivate() {
