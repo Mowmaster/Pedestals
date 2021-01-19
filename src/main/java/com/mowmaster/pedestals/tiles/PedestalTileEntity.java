@@ -34,6 +34,9 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -53,6 +56,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandler);
     private LazyOptional<IItemHandler> privateHandler = LazyOptional.of(this::createHandlerPedestalPrivate);
     private LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(this::createHandlerEnergy);
+    private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(this::createHandlerFluid);
     private List<ItemStack> stacksList = new ArrayList<>();
 
     private static final int[] SLOTS_ALLSIDES = new int[] {0};
@@ -219,10 +223,162 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
      **********************************
      *********************************/
 
+    /**********************************
+     **********************************
+     **  Fluid IMPLIMENTION START  ***
+     **********************************
+     *********************************/
+
+    public IFluidHandler createHandlerFluid() {
+        return new IFluidHandler() {
+            @Nonnull
+            @Override
+            public FluidStack getFluidInTank(int i) {
+                ItemStack coin = getCoinOnPedestal();
+                return (coin.getItem() instanceof ItemUpgradeBaseFluid || coin.getItem() instanceof ItemUpgradeBaseFluidFilter)?((coin.getItem() instanceof ItemUpgradeBaseFluid)?(((ItemUpgradeBaseFluid)coin.getItem()).getFluidStored(coin)):(((ItemUpgradeBaseFluidFilter)coin.getItem()).getFluidStored(coin))):(FluidStack.EMPTY);
+            }
+
+            @Override
+            public int getTanks() {
+                //Technically we dont use the tanks thing, but we'll pretend and hope it doesnt break...
+                return 1;
+            }
+
+            @Nonnull
+            @Override
+            public FluidStack drain(int i, FluidAction fluidAction) {
+                ItemStack coin = getCoinOnPedestal();
+                if(coin.getItem() instanceof ItemUpgradeFluidExport)
+                {
+                    ItemUpgradeFluidExport coinFluid = ((ItemUpgradeFluidExport)coin.getItem());
+                    FluidStack coinFluidStored = coinFluid.getFluidStored(coin);
+                    int storedCoinFluidSpace = coinFluid.availableFluidSpaceInCoin(coin);
+                    int getMainTransferRate = coinFluid.getFluidTransferRate(coin);
+                    int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
+                    FluidStack fluidToDrain = new FluidStack(coinFluidStored.getFluid(),transferRate,coinFluidStored.getTag());
+                    if(coinFluid.hasFluidInCoin(coin))
+                    {
+                        if(fluidToDrain.getAmount() > 0)
+                        {
+                            if(fluidAction != FluidAction.SIMULATE)
+                            {
+                                if(coinFluid.removeFluid(getTile(),coin,fluidToDrain,true))
+                                {
+                                    coinFluid.removeFluid(getTile(),coin,fluidToDrain,false);
+                                    return fluidToDrain;
+                                }
+                                else return FluidStack.EMPTY;
+                            }
+                            else return fluidToDrain;
+                        }
+                    }
+                }
+                return FluidStack.EMPTY;
+            }
+
+            @Nonnull
+            @Override
+            public FluidStack drain(FluidStack fluidStack, FluidAction fluidAction) {
+                ItemStack coin = getCoinOnPedestal();
+                if(coin.getItem() instanceof ItemUpgradeFluidExport)
+                {
+                    ItemUpgradeFluidExport coinFluid = ((ItemUpgradeFluidExport)coin.getItem());
+                    FluidStack coinFluidStored = coinFluid.getFluidStored(coin);
+                    int storedCoinFluidSpace = coinFluid.availableFluidSpaceInCoin(coin);
+                    int getMainTransferRate = coinFluid.getFluidTransferRate(coin);
+                    int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
+                    FluidStack fluidToDrain = new FluidStack(coinFluidStored.getFluid(),transferRate,coinFluidStored.getTag());
+                    if(coinFluid.hasFluidInCoin(coin))
+                    {
+                        if(fluidToDrain.getAmount() > 0)
+                        {
+                            if(fluidAction != FluidAction.SIMULATE)
+                            {
+                                if(coinFluid.removeFluid(getTile(),coin,fluidToDrain,true))
+                                {
+                                    coinFluid.removeFluid(getTile(),coin,fluidToDrain,false);
+                                    return fluidToDrain;
+                                }
+                                else return FluidStack.EMPTY;
+                            }
+                            else return fluidToDrain;
+                        }
+                    }
+                }
+                return FluidStack.EMPTY;
+            }
+
+            @Override
+            public int getTankCapacity(int i) {
+                ItemStack coin = getCoinOnPedestal();
+                return (coin.getItem() instanceof ItemUpgradeBaseFluid || coin.getItem() instanceof ItemUpgradeBaseFluidFilter)?((coin.getItem() instanceof ItemUpgradeBaseFluid)?(((ItemUpgradeBaseFluid)coin.getItem()).getFluidbuffer(coin)):(((ItemUpgradeBaseFluidFilter)coin.getItem()).getFluidbuffer(coin))):(0);
+            }
+
+            @Override
+            public boolean isFluidValid(int i, @Nonnull FluidStack fluidStack) {
+                ItemStack coin = getCoinOnPedestal();
+                if(coin.getItem() instanceof ItemUpgradeBaseFluid || coin.getItem() instanceof ItemUpgradeBaseFluidFilter)
+                {
+                    if(coin.getItem() instanceof ItemUpgradeBaseFluid)
+                    {
+                        FluidStack inCoin = ((ItemUpgradeBaseFluid) coin.getItem()).getFluidStored(coin);
+                        return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluid) coin.getItem()).canRecieveFluid(getWorld(), getPos(), fluidStack);
+                    }
+                    else
+                    {
+                        FluidStack inCoin = ((ItemUpgradeBaseFluidFilter) coin.getItem()).getFluidStored(coin);
+                        return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluidFilter) coin.getItem()).canRecieveFluid(getWorld(), getPos(), fluidStack);
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public int fill(FluidStack fluidStack, FluidAction fluidAction) {
+                ItemStack coin = getCoinOnPedestal();
+                if(coin.getItem() instanceof ItemUpgradeFluidImport)
+                {
+                    ItemUpgradeFluidImport coinFluid = ((ItemUpgradeFluidImport)coin.getItem());
+                    FluidStack coinFluidStored = coinFluid.getFluidStored(coin);
+                    int storedCoinFluidSpace = coinFluid.availableFluidSpaceInCoin(coin);
+                    int getMainTransferRate = coinFluid.getFluidTransferRate(coin);
+                    int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
+                    if(coinFluidStored.isFluidEqual(fluidStack) || coinFluidStored.isEmpty() && coinFluid.canRecieveFluid(getWorld(), getPos(), fluidStack))
+                    {
+                        if(storedCoinFluidSpace > 0)
+                        {
+                            if(fluidAction != FluidAction.SIMULATE)
+                            {
+                                FluidStack fluidToStore = new FluidStack(fluidStack.getFluid(),transferRate,fluidStack.getTag());
+                                if(coinFluid.addFluid(getTile(),coin,fluidToStore,true))
+                                {
+                                    coinFluid.addFluid(getTile(),coin,fluidToStore,false);
+                                    return fluidToStore.getAmount();
+                                }
+                                else return 0;
+                            }
+                            else return transferRate;
+                        }
+                    }
+                }
+                return 0;
+            }
+        };
+    }
+
+    /**********************************
+     **********************************
+     ***  Fluid IMPLIMENTION END   ***
+     **********************************
+     *********************************/
+
     public void update()
     {
         this.markDirty();
         this.world.notifyBlockUpdate(pos,getBlockState(),getBlockState(),2);
+        //do this for pedestals that do inv buffers
+        this.world.notifyBlockUpdate(pos,getBlockState(),getBlockState(),1);
         /*public static final int NOTIFY_NEIGHBORS = 1;
         public static final int BLOCK_UPDATE = 2;
         public static final int NO_RERENDER = 4;
@@ -238,8 +394,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return new ItemStackHandler(1) {
             @Override
             protected void onLoad() {
-
-
                 super.onLoad();
             }
 
@@ -436,6 +590,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
         if ((cap == CapabilityEnergy.ENERGY) && (getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergy || getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergyFilter)) {
             return energyHandler.cast();
+        }
+        if ((cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) && (getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseFluid || getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseFluidFilter)) {
+            return fluidHandler.cast();
         }
         return super.getCapability(cap, side);
     }
