@@ -1745,5 +1745,11 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         if(this.privateHandler != null) {
             this.privateHandler.invalidate();
         }
+        if(this.energyHandler != null) {
+            this.energyHandler.invalidate();
+        }
+        if(this.fluidHandler != null) {
+            this.fluidHandler.invalidate();
+        }
     }
 }
