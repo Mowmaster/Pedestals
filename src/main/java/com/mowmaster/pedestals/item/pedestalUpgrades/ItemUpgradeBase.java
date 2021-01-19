@@ -31,6 +31,7 @@ import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -1107,8 +1108,11 @@ public class ItemUpgradeBase extends Item {
      ***************************************/
     public int getAdvancedModifier(ItemStack stack)
     {
+        ResourceLocation disabled = new ResourceLocation("pedestals", "enchant_limits/advanced_blacklist");
+        ITag<Item> BLACKLISTED = ItemTags.getCollection().get(disabled);
+
         int advanced = 0;
-        if(hasEnchant(stack))
+        if(hasEnchant(stack) && !BLACKLISTED.contains(stack.getItem()))
         {
             advanced = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack) > 1)?(1):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack));
         }
