@@ -1072,12 +1072,22 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         //return false;
     }
 
-    public boolean doItemsMatch(ItemStack itemStackIn)
+    /*public boolean doItemsMatch(ItemStack itemStackIn)
     {
         IItemHandler h = handler.orElse(null);
         if(hasItem())
         {
             return ItemStack.areItemsEqual(h.getStackInSlot(0),itemStackIn);
+        }
+        else{return true;}
+    }*/
+
+    public boolean doItemsMatch(ItemStack itemStackIn)
+    {
+        IItemHandler h = handler.orElse(null);
+        if(hasItem())
+        {
+            return ItemHandlerHelper.canItemStacksStack(h.getStackInSlot(0),itemStackIn);
         }
         else{return true;}
     }
