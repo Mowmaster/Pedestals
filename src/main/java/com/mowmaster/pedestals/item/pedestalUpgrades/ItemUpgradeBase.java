@@ -1592,7 +1592,7 @@ public class ItemUpgradeBase extends Item {
 
                     PedestalTileEntity pedestal = (PedestalTileEntity)pedestalInv;
 
-                    ItemStack itemFromInv = getFilterReturnStack(filterList, copyStack);
+                    ItemStack itemFromInv = ((ItemUpgradeBase)pedestal.getCoinOnPedestal().getItem()).getFilterReturnStack(filterList, copyStack);
 
                     if((invIsEmpty)?(itemFromInv.isEmpty()):(!itemFromInv.isEmpty()))
                     {
@@ -1960,15 +1960,9 @@ public class ItemUpgradeBase extends Item {
         if(stack.hasTag())
         {
             compound = stack.getTag();
-            if(compound.contains("Size"))
+            if(compound.contains("filterqueue"))
             {
-                compound.remove("Size");
-                stack.setTag(compound);
-            }
-
-            if(compound.contains("Items"))
-            {
-                compound.remove("Items");
+                compound.remove("filterqueue");
                 stack.setTag(compound);
             }
         }
@@ -1980,9 +1974,13 @@ public class ItemUpgradeBase extends Item {
         if(coin.hasTag())
         {
             CompoundNBT getCompound = coin.getTag();
-            ItemStackHandler handler = new ItemStackHandler();
-            handler.deserializeNBT(getCompound);
-            return handler.getSlots();
+            if(getCompound.contains("filterqueue"))
+            {
+                getCompound.get("filterqueue");
+                ItemStackHandler handler = new ItemStackHandler();
+                handler.deserializeNBT(getCompound);
+                return handler.getSlots();
+            }
         }
 
         return filterQueueSize;
@@ -2021,6 +2019,7 @@ public class ItemUpgradeBase extends Item {
     public void writeFilterQueueToNBT(ItemStack stack, List<ItemStack> listIn)
     {
         CompoundNBT compound = new CompoundNBT();
+        CompoundNBT compoundStorage = new CompoundNBT();
         if(stack.hasTag()){compound = stack.getTag();}
 
         ItemStackHandler handler = new ItemStackHandler();
@@ -2028,7 +2027,8 @@ public class ItemUpgradeBase extends Item {
 
         for(int i=0;i<handler.getSlots();i++) {handler.setStackInSlot(i,listIn.get(i));}
 
-        compound = handler.serializeNBT();
+        compoundStorage = handler.serializeNBT();
+        compound.put("filterqueue",compoundStorage);
         stack.setTag(compound);
     }
 
@@ -2038,10 +2038,14 @@ public class ItemUpgradeBase extends Item {
         if(coin.hasTag())
         {
             CompoundNBT getCompound = coin.getTag();
-            ItemStackHandler handler = new ItemStackHandler();
-            handler.deserializeNBT(getCompound);
+            if(getCompound.contains("filterqueue"))
+            {
+                CompoundNBT invTag = getCompound.getCompound("filterqueue");
+                ItemStackHandler handler = new ItemStackHandler();
+                ((INBTSerializable<CompoundNBT>) handler).deserializeNBT(invTag);
 
-            for(int i=0;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
+                for(int i=0;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
+            }
         }
 
         return filterQueue;
@@ -2049,7 +2053,24 @@ public class ItemUpgradeBase extends Item {
 
     public boolean doesFilterAndQueueMatch(List<ItemStack> filterIn, List<ItemStack> queueMatch)
     {
-        return filterIn.containsAll(queueMatch);
+        int matching = 0;
+        if(filterIn.size() == queueMatch.size())
+        {
+            for(int i=0;i<filterIn.size();i++)
+            {
+                if(doItemsMatchWithEmpty(filterIn.get(i),queueMatch.get(i)))
+                {
+                    matching++;
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        return matching == filterIn.size();
     }
 
     public void removeInventoryQueue(ItemStack stack)
