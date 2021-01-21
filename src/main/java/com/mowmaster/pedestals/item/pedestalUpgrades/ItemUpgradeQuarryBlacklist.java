@@ -221,6 +221,7 @@ public class ItemUpgradeQuarryBlacklist extends ItemUpgradeBaseMachine
                                                 workQueue.remove(i);
                                             }
                                         }
+                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
                                     }
                                 }
                             }

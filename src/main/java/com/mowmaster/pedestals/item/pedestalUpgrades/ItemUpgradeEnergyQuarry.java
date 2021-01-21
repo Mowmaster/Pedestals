@@ -223,6 +223,7 @@ public class ItemUpgradeEnergyQuarry extends ItemUpgradeBaseEnergyMachine
                                                 workQueue.remove(i);
                                             }
                                         }
+                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
                                     }
                                 }
                             }

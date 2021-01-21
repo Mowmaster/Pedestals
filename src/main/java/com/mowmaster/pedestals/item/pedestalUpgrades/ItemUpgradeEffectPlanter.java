@@ -164,6 +164,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                                         workQueue.remove(i);
                                     }
                                 }
+                                writeWorkQueueToNBT(coinInPedestal,workQueue);
                             }
                         }
                         else {

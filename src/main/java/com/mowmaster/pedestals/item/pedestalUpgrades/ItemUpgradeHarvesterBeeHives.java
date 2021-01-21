@@ -225,6 +225,7 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                                         workQueue.remove(i);
                                     }
                                 }
+                                writeWorkQueueToNBT(coinInPedestal,workQueue);
                             }
                         }
                         else {

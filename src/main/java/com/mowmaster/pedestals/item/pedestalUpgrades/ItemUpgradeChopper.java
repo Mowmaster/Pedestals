@@ -180,6 +180,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                                     workQueue.remove(i);
                                 }
                             }
+                            writeWorkQueueToNBT(coinInPedestal,workQueue);
                         }
                     }
                     else {

@@ -24,6 +24,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidBlock;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -125,7 +126,55 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                 if(world.isAreaLoaded(negNums,posNums))
                 {
                     if(!world.isBlockPowered(pedestalPos)) {
-                        if(blocksToFillInArea(pedestal,rangeWidth,rangeHeight) > 0)
+
+                        int val = readStoredIntTwoFromNBT(coinInPedestal);
+                        if(val>0)
+                        {
+                            writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                        }
+                        else {
+
+                            //If work queue doesnt exist, try to make one
+                            if(workQueueSize(coinInPedestal)<=0)
+                            {
+                                buildWorkQueue(pedestal,rangeWidth,rangeHeight);
+                            }
+
+                            //
+                            if(workQueueSize(coinInPedestal) > 0)
+                            {
+                                //Check if we can even have a bucket of fluid to place down
+                                if(getFluidStored(coinInPedestal).getAmount() >= FluidAttributes.BUCKET_VOLUME)
+                                {
+                                    List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+                                    if (world.getGameTime() % speed == 0) {
+                                        for(int i = 0;i< workQueue.size(); i++)
+                                        {
+                                            BlockPos targetPos = workQueue.get(i);
+                                            BlockPos blockToPumpPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                            BlockState targetFluidState = world.getBlockState(blockToPumpPos);
+                                            Block targetFluidBlock = targetFluidState.getBlock();
+                                            if(canMineBlock(pedestal,blockToPumpPos))
+                                            {
+                                                workQueue.remove(i);
+                                                writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                                upgradeAction(pedestal, targetPos, itemInPedestal, coinInPedestal);
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                workQueue.remove(i);
+                                            }
+                                        }
+                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                    }
+                                }
+                            }
+                            else {
+                                writeStoredIntTwoToNBT(coinInPedestal,(((rangeWidth*2)+1)*20)+20);
+                            }
+                        }
+                        /*if(blocksToFillInArea(pedestal,rangeWidth,rangeHeight) > 0)
                         {
                             if (world.getGameTime() % speed == 0) {
                                 int currentPosition = 0;
@@ -149,11 +198,29 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                                     writeStoredIntToNBT(coinInPedestal,0);
                                 }
                             }
-                        }
+                        }*/
                     }
                 }
             }
         }
+    }
+
+    //Can Pump Block, but just reusing the quarry method here
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        BlockPos blockToPumpPos = new BlockPos(blockToMinePos.getX(), blockToMinePos.getY(), blockToMinePos.getZ());
+
+        return canPlaceFluidBlock(world, blockToPumpPos);
+    }
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
+    {
+        World world = pedestal.getWorld();
+        BlockPos blockToPumpPos = new BlockPos(blockToMinePos.getX(), blockToMinePos.getY(), blockToMinePos.getZ());
+
+        return canPlaceFluidBlock(world, blockToPumpPos);
     }
 
     public boolean canPlaceFluidBlock(World world, BlockPos targetPos)

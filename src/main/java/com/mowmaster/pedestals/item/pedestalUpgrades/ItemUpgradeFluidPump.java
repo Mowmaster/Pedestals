@@ -218,6 +218,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                                             workQueue.remove(i);
                                         }
                                     }
+                                    writeWorkQueueToNBT(coinInPedestal,workQueue);
                                 }
                             }
                         }

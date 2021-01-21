@@ -231,6 +231,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                                         workQueue.remove(i);
                                     }
                                 }
+                                writeWorkQueueToNBT(coinInPedestal,workQueue);
                             }
                         }
                         else {

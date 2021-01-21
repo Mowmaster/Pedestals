@@ -221,6 +221,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                                                 workQueue.remove(i);
                                             }
                                         }
+                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
                                     }
                                 }
                             }
