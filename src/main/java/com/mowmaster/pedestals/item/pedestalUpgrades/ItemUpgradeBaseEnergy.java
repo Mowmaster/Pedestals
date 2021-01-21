@@ -71,7 +71,23 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
     public int getEnergyTransferRate(ItemStack stack)
     {
-        return 20000;
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*20000);
+        switch (capacityOver)
+        {
+            case 0:return 5000;
+            case 1:return 10000;
+            case 2:return 30000;
+            case 3:return 50000;
+            case 4:return 40000;
+            case 5:return 60000;
+            case 6:return 80000;
+            case 7:return 100000;
+            case 8:return 120000;
+            case 9:return 140000;
+            case 10:return 160000;
+            default:return (overEnchanted>maxStored)?(maxStored):(overEnchanted);
+        }
     }
 
     public static boolean isEnergyItem(ItemStack itemToCheck)
@@ -474,31 +490,23 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     }
 
     public int getEnergyBuffer(ItemStack stack) {
-        int energyBuffer = 10000;
-        switch (getCapacityModifier(stack))
+        int capacityOver = getCapacityModifierOverEnchanted(stack);
+        int overEnchanted = (capacityOver*20000);
+        switch (capacityOver)
         {
-            case 0:
-                energyBuffer = 10000;
-                break;
-            case 1:
-                energyBuffer = 20000;
-                break;
-            case 2:
-                energyBuffer = 40000;
-                break;
-            case 3:
-                energyBuffer = 60000;
-                break;
-            case 4:
-                energyBuffer = 80000;
-                break;
-            case 5:
-                energyBuffer = 100000;
-                break;
-            default: energyBuffer = 10000;
+            case 0:return 5000;
+            case 1:return 10000;
+            case 2:return 30000;
+            case 3:return 50000;
+            case 4:return 40000;
+            case 5:return 60000;
+            case 6:return 80000;
+            case 7:return 100000;
+            case 8:return 120000;
+            case 9:return 140000;
+            case 10:return 160000;
+            default:return (overEnchanted>maxStored)?(maxStored):(overEnchanted);
         }
-
-        return  energyBuffer;
     }
 
     @Override

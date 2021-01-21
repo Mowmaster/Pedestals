@@ -64,7 +64,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     public int getRepairRate(ItemStack stack)
     {
         int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int overEnchanted = (capacityOver*10);
+        int overEnchanted = ((capacityOver*10)+10);
         return  (overEnchanted>maxStored)?(maxStored):(overEnchanted);
     }
 

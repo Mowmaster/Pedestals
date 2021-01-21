@@ -218,6 +218,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                                             workQueue.remove(i);
                                         }
                                     }
+                                    writeWorkQueueToNBT(coinInPedestal,workQueue);
                                 }
                             }
                         }
@@ -317,6 +318,20 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,Util.DUMMY_UUID);
+
+        int s3 = getWidth(stack);
+        int s4 = getHeight(stack);
+        String tr = "" + (s3+s3+1) + "";
+        String trr = "" + s4 + "";
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(trr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.mergeStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.DUMMY_UUID);
 
         FluidStack fluidStored = getFluidStored(stack);
         TranslationTextComponent fluidLabel = new TranslationTextComponent(getTranslationKey() + ".chat_fluidlabel");

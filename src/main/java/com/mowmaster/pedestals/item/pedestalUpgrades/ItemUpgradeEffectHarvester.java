@@ -43,6 +43,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -177,12 +178,11 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
                     if(itemList.size()>0)
                     {
-                        ItemStack coin = pedestal.getCoinOnPedestal();
-                        List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
+                        List<ItemStack> stackCurrent = readFilterQueueFromNBT(coinInPedestal);
                         if(!(stackCurrent.size()>0))
                         {
                             stackCurrent = buildFilterQueue(pedestal);
-                            writeFilterQueueToNBT(coin,stackCurrent);
+                            writeFilterQueueToNBT(coinInPedestal,stackCurrent);
                         }
 
                         upgradeActionFilteredMagnet(world,itemList, itemInPedestal, pedestalPos, stackCurrent, false);
@@ -231,6 +231,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                                         workQueue.remove(i);
                                     }
                                 }
+                                writeWorkQueueToNBT(coinInPedestal,workQueue);
                             }
                         }
                         else {
@@ -372,6 +373,21 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         {
             writeFilterQueueToNBT(coin,stackIn);
         }
+    }
+
+    @Override
+    public ItemStack getFilterReturnStack(List<ItemStack> stack, ItemStack incoming)
+    {
+        int range = stack.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stack)::get)//Function being applied to each interval
+                .filter(itemStack -> !itemStack.isEmpty())
+                .filter(itemStack -> itemStack.getItem().equals(incoming.getItem()))
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        return itemFromInv;
     }
 
     @Override

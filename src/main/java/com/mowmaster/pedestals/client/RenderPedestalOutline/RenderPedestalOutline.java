@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.client.RenderPedestalOutline;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.item.ItemLinkingTool;
 import com.mowmaster.pedestals.item.ItemUpgradeTool;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -24,8 +25,11 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class RenderPedestalOutline
 {
+
     public static void render(RenderWorldLastEvent event) {
         ClientPlayerEntity player = Minecraft.getInstance().player;
+
+
         ItemStack stack = (player.getHeldItemOffhand().getItem() instanceof ItemLinkingTool)?(player.getHeldItemOffhand()):(player.getHeldItemMainhand());
         if (stack.isEnchanted() && stack.getItem() instanceof ItemLinkingTool) {
             ItemLinkingTool LT = (ItemLinkingTool) stack.getItem();
@@ -47,11 +51,61 @@ public class RenderPedestalOutline
             {
                 UT.getPosFromNBT(stack);
                 BlockPos pos = UT.getStoredPosition(stack);
-                int[] getWorkArea = UT.getWorkPosFromNBT(stack);
-                showWorkArea(player, event.getMatrixStack(),pos,getWorkArea);
+                if(player.getEntityWorld().getBlockState(pos).getBlock() instanceof PedestalBlock)
+                {
+                    int[] getWorkArea = UT.getWorkPosFromNBT(stack);
+                    showWorkArea(player, event.getMatrixStack(),pos,getWorkArea);
+                }
             }
-
         }*/
+    }
+
+    public static BlockPos getNegRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
+    {
+        BlockState state = world.getBlockState(posOfPedestal);
+        Direction enumfacing = state.get(FACING);
+        BlockPos blockBelow = posOfPedestal;
+        switch (enumfacing)
+        {
+            case UP:
+                return blockBelow.add(-intWidth,0,-intWidth);
+            case DOWN:
+                return blockBelow.add(-intWidth,-intHeight,-intWidth);
+            case NORTH:
+                return blockBelow.add(-intWidth,-intWidth,-intHeight);
+            case SOUTH:
+                return blockBelow.add(-intWidth,-intWidth,0);
+            case EAST:
+                return blockBelow.add(0,-intWidth,-intWidth);
+            case WEST:
+                return blockBelow.add(-intHeight,-intWidth,-intWidth);
+            default:
+                return blockBelow;
+        }
+    }
+
+    public static BlockPos getPosRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
+    {
+        BlockState state = world.getBlockState(posOfPedestal);
+        Direction enumfacing = state.get(FACING);
+        BlockPos blockBelow = posOfPedestal;
+        switch (enumfacing)
+        {
+            case UP:
+                return blockBelow.add(intWidth+1,intHeight,intWidth+1);
+            case DOWN:
+                return blockBelow.add(intWidth+1,0,intWidth+1);
+            case NORTH:
+                return blockBelow.add(intWidth+1,intWidth,0+1);
+            case SOUTH:
+                return blockBelow.add(intWidth+1,intWidth,intHeight+1);
+            case EAST:
+                return blockBelow.add(intHeight+1,intWidth,intWidth+1);
+            case WEST:
+                return blockBelow.add(0+1,intWidth,intWidth+1);
+            default:
+                return blockBelow;
+        }
     }
 
     private static void blueLine(IVertexBuilder builder, Matrix4f positionMatrix, BlockPos pos, float dx1, float dy1, float dz1, float dx2, float dy2, float dz2) {
@@ -178,7 +232,6 @@ public class RenderPedestalOutline
         buffer.finish(RenderPedestalType.OVERLAY_LINES);
     }
 
-    //TODO: FIX ME!!!
     private static void showWorkArea(ClientPlayerEntity player, MatrixStack matrixStack,BlockPos storedPos, int[] workArea) {
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder = buffer.getBuffer(RenderPedestalType.OVERLAY_LINES);
@@ -199,81 +252,50 @@ public class RenderPedestalOutline
 
                 BlockState state = world.getBlockState(storedPos);
                 Direction enumfacing = state.get(FACING);
-                BlockPos negBlock = storedPos;
-                BlockPos posBlock = storedPos;
+                BlockPos negBlock = getNegRangePosEntity(world,storedPos,z,y);
+                BlockPos posBlock = getPosRangePosEntity(world,storedPos,z,y);
 
-                if(enumfacing.equals(Direction.UP))
-                {
-                    negBlock.add(-x,0,-z);
-                    posBlock.add(x,y,z);
-                }
-                else if(enumfacing.equals(Direction.DOWN))
-                {
-                    negBlock.add(-x,-y,-z);
-                    posBlock.add(x,0,z);
-                }
-                else if(enumfacing.equals(Direction.NORTH))
-                {
-                    negBlock.add(-x,-z,-y);
-                    posBlock.add(x,z,0);
-                }
-                else if(enumfacing.equals(Direction.SOUTH))
-                {
-                    negBlock.add(-x,-z,0);
-                    posBlock.add(x,z,y);
-                }
-                else if(enumfacing.equals(Direction.EAST))
-                {
-                    negBlock.add(0,-x,-z);
-                    posBlock.add(y,x,z);
-                }
-                else if(enumfacing.equals(Direction.WEST))
-                {
-                    negBlock.add(-y,-x,-z);
-                    posBlock.add(0,x,z);
-                }
 
                 /*switch (enumfacing)
                 {
                     case UP:
-
                     case DOWN:
-
                     case NORTH:
-
                     case SOUTH:
-
                     case EAST:
-
                     case WEST:
-
                     default:
                         negBlock.add(0,0,0);
                         posBlock.add(0,0,0);
                 }*/
 
-
                 int xdiff = posBlock.getX() - negBlock.getX();
                 int ydiff = posBlock.getY() - negBlock.getY();
                 int zdiff = posBlock.getZ() - negBlock.getZ();
 
+                System.out.print(xdiff);
+                System.out.print(" x ");
+                System.out.print(ydiff);
+                System.out.print(" x ");
+                System.out.print(zdiff);
+
                 int lineLength = zdiff + xdiff+1;
                 int lineLength2 = zdiff + xdiff+1;
 
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1),  0, 0, 0,-lineLength, 0, 0);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1),  0, -lineLength, 0,-lineLength, -lineLength, 0);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1),  0, 0, -lineLength,-lineLength, 0, -lineLength);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1),  0, -lineLength, -lineLength,-lineLength, -lineLength, -lineLength);
+                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff,zdiff+1),  0, 0, 0,-lineLength, 0, 0);
+                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff,zdiff+1),  0, lineLength, 0,-lineLength, lineLength, 0);
+                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff,zdiff+1),  0, 0, -lineLength,-lineLength, 0, -lineLength);
+                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff,zdiff+1),  0, lineLength, -lineLength,-lineLength, lineLength, -lineLength);
 
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), 0, 0, 0, 0, 0, -lineLength);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), -lineLength, 0, 0, -lineLength, 0, -lineLength);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), 0, -lineLength, 0, 0, -lineLength, -lineLength);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), -lineLength, -lineLength, 0, -lineLength, -lineLength, -lineLength);
+                //workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), 0, 0, 0, 0, 0, -lineLength);
+                //workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), -lineLength, 0, 0, -lineLength, 0, -lineLength);
+                //workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), 0, -lineLength, 0, 0, -lineLength, -lineLength);
+                //workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), -lineLength, -lineLength, 0, -lineLength, -lineLength, -lineLength);
 
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), 0, 0, 0, 0, -lineLength, 0);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), -lineLength, 0, 0, -lineLength, -lineLength, 0);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), 0, 0, -lineLength, 0, -lineLength, -lineLength);
-                workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), -lineLength, 0, -lineLength, -lineLength, -lineLength, -lineLength);
+                //workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), 0, 0, 0, 0, -lineLength, 0);
+                //workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), -lineLength, 0, 0, -lineLength, -lineLength, 0);
+                //workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), 0, 0, -lineLength, 0, -lineLength, -lineLength);
+                //workAreaLine(builder, matrix, negBlock.add(xdiff+1,ydiff+1,zdiff+1), -lineLength, 0, -lineLength, -lineLength, -lineLength, -lineLength);
             }
 
         }
@@ -283,4 +305,5 @@ public class RenderPedestalOutline
         RenderSystem.disableDepthTest();
         buffer.finish(RenderPedestalType.OVERLAY_LINES);
     }
+
 }

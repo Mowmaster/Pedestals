@@ -131,7 +131,6 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                         writeStoredIntTwoToNBT(coinInPedestal,val-1);
                     }
                     else {
-
                         //If work queue doesnt exist, try to make one
                         if(workQueueSize(coinInPedestal)<=0)
                         {
@@ -162,6 +161,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                                         workQueue.remove(i);
                                     }
                                 }
+                                writeWorkQueueToNBT(coinInPedestal,workQueue);
                             }
                         }
                         else {

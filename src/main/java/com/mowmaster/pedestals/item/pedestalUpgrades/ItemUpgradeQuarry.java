@@ -223,6 +223,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
                                                 workQueue.remove(i);
                                             }
                                         }
+                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
                                     }
                                 }
                             }
