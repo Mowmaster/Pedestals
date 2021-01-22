@@ -577,7 +577,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || GET_TOOLS.contains(stack.getItem())
                         ) && !GET_NOTTOOLS.contains(stack.getItem())
                         ) return true;
-                if (slot == 6 && stack.getItem().equals(ItemPedestalUpgrades.RANGE) && getRange()<5) return true;
+                if (slot == 6) return false;
                 return false;
             }
         };
