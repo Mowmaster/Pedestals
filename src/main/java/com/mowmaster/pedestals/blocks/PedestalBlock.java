@@ -16,6 +16,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.inventory.container.ChestContainer;
 import net.minecraft.item.*;
 import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.ChestTileEntity;
@@ -52,6 +53,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final IntegerProperty FILTER_STATUS = IntegerProperty.create("filter_status", 0, 2);
 
     protected static final VoxelShape CUP = VoxelShapes.or(Block.makeCuboidShape(3.0D, 0.0D, 3.0D, 13.0D, 2.0D, 13.0D),
             Block.makeCuboidShape(5.0D, 2.0D, 5.0D, 11.0D, 10.0D, 11.0D),
@@ -117,7 +119,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public PedestalBlock(Properties builder)
     {
         super(builder);
-        this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)));
+        this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)).with(FILTER_STATUS, 0));
     }
 
     /*https://github.com/progwml6/ironchest/blob/1.15/src/main/java/com/progwml6/ironchest/common/block/GenericIronChestBlock.java#L120-L133*/
@@ -176,6 +178,11 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         return state.get(LIT) ? state.getLightValue() : 0;
     }
 
+    public int getFilterStatus(BlockState state) {
+        return state.get(FILTER_STATUS);
+    }
+
+
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
         switch(state.get(FACING)) {
@@ -218,7 +225,10 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         PlayerEntity player = context.getPlayer();
         Direction direction = context.getFace();
         BlockState blockstate = context.getWorld().getBlockState(context.getPos().offset(direction.getOpposite()));
-        return blockstate.getBlock() == this && blockstate.get(FACING) == direction ? this.getDefaultState().with(FACING, direction.getOpposite()).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)) : this.getDefaultState().with(FACING, direction).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false));
+        return blockstate.getBlock() == this &&
+                blockstate.get(FACING) == direction ?
+                this.getDefaultState().with(FACING, direction.getOpposite()).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)).with(FILTER_STATUS, 0) :
+                this.getDefaultState().with(FACING, direction).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)).with(FILTER_STATUS,0);
     }
 
     //TODO: Needs fixed because method is dep. >:(
@@ -524,7 +534,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     }
 
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(FACING,WATERLOGGED,LIT);
+        builder.add(FACING,WATERLOGGED,LIT,FILTER_STATUS);
     }
 
     @Override

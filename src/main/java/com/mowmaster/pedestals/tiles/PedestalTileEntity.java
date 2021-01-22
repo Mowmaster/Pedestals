@@ -534,16 +534,16 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 10 slots to future proof things
-        return new ItemStackHandler(6) {
+        return new ItemStackHandler(7) {
 
             @Override
             protected void onLoad() {
-                if(getSlots()<6)
+                if(getSlots()<7)
                 {
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    setSize(6);
+                    setSize(7);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
                     }
@@ -577,6 +577,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || GET_TOOLS.contains(stack.getItem())
                         ) && !GET_NOTTOOLS.contains(stack.getItem())
                         ) return true;
+                if (slot == 6 && stack.getItem().equals(ItemPedestalUpgrades.RANGE) && getRange()<5) return true;
                 return false;
             }
         };

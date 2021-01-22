@@ -1,7 +1,0 @@
-{
-	"parent": "pedestals:block/pedestal_block",
-	"textures": {
-		"type": "pedestals:blocks/whitestone",
-		"typepart":"pedestals:blocks/whitestone"
-	}
-}
