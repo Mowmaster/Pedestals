@@ -277,6 +277,22 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
             }
         }
     }
+    //Can Harvest Hives (hives available to harvest)
+    @Override
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
+    {
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
+        Block blockToHarvest = blockToHarvestState.getBlock();
+        if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     //Can Harvest Hives (hives available to harvest)
     @Override
