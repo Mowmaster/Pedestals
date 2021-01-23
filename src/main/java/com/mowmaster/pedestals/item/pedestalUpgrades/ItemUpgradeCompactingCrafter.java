@@ -203,6 +203,13 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                             queueStack.shrink(itemsToRemove);
                                             stackCurrent.set(intGetNextIteration,queueStack);
                                             handler.extractItem(intGetNextIteration, itemsToRemove, false);
+                                            if (queueStack.getItem().hasContainerItem(queueStack)) {
+                                                ItemStack container = queueStack.getItem().getContainerItem(queueStack);
+                                                container.setCount(intBatchCraftingSize*intGridCount);
+                                                if (!world.isRemote) {
+                                                    world.addEntity(new ItemEntity(world, getPosOfBlockBelow(world, pedestalPos, -1).getX() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getY() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getZ() + 0.5, container));
+                                                }
+                                            }
 
                                             getRecipe.setCount(itemsToInsertToPedestal);
                                             world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.25F, 1.0F);
