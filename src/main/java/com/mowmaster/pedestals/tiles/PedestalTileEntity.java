@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.tiles;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
+import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
@@ -577,7 +578,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || GET_TOOLS.contains(stack.getItem())
                         ) && !GET_NOTTOOLS.contains(stack.getItem())
                         ) return true;
-                if (slot == 6) return false;
+                if (slot == 6 && stack.getItem() instanceof ItemFilterBase && !hasFilter()) return true;
                 return false;
             }
         };
@@ -733,6 +734,16 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         //return false;
     }
 
+    public boolean hasFilter()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(6).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
     public ItemStack getItemInPedestal()
     {
         IItemHandler h = handler.orElse(null);
@@ -781,14 +792,13 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public ItemStack getToolOnPedestal()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        //CompoundNBT nbt = this.serializeNBT();
-        //int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
-        //if(slotSize > 5)
-        //{
-            return ph.getStackInSlot(5);
-        //}
+        return ph.getStackInSlot(5);
+    }
 
-        //return ItemStack.EMPTY;
+    public ItemStack getFilterInPedestal()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(6);
     }
 
     public ItemStack setItemInPedestal(ItemStack itemToSet)
@@ -859,14 +869,24 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public ItemStack removeTool() {
         IItemHandler ph = privateHandler.orElse(null);
-        //CompoundNBT nbt = this.serializeNBT();
-        //int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
-        //if(slotSize > 5)
-        //{
-            return ph.extractItem(5,ph.getStackInSlot(5).getCount(),false);
-        //}
-        //else return ItemStack.EMPTY;
+        return ph.extractItem(5,ph.getStackInSlot(5).getCount(),false);
+    }
 
+    public ItemStack removeFilter(boolean updateBlock) {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(updateBlock)
+        {
+            BlockState state = world.getBlockState(pos);
+            int filterState = 0;
+            boolean watered = state.get(PedestalBlock.WATERLOGGED);
+            Direction dir = state.get(PedestalBlock.FACING);
+            boolean lit = state.get(PedestalBlock.LIT);
+            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
+            world.notifyBlockUpdate(pos,state,newstate,3);
+            world.setBlockState(pos,newstate,3);
+            world.markBlockRangeForRenderUpdate(pos,state,newstate);
+        }
+        return ph.extractItem(6,ph.getStackInSlot(6).getCount(),false);
     }
 
     public void spawnItemStack(World worldIn, double x, double y, double z, ItemStack stack) {
@@ -1170,7 +1190,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             BlockState state = world.getBlockState(pos);
             boolean watered = state.get(PedestalBlock.WATERLOGGED);
             Direction dir = state.get(PedestalBlock.FACING);
-            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,true);
+            int filterState = state.get(PedestalBlock.FILTER_STATUS);
+            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,true).with(PedestalBlock.FILTER_STATUS,filterState);
             IItemHandler ph = privateHandler.orElse(null);
             ph.insertItem(1,new ItemStack(Items.GLOWSTONE,1),false);
             world.notifyBlockUpdate(pos,state,newstate,3);
@@ -1197,7 +1218,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 boolean watered = state.get(PedestalBlock.WATERLOGGED);
                 Direction dir = state.get(PedestalBlock.FACING);
                 boolean lit = state.get(PedestalBlock.LIT);
-                BlockState newstate = replacestate.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit);
+                int filterState = state.get(PedestalBlock.FILTER_STATUS);
+                BlockState newstate = replacestate.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
                 world.notifyBlockUpdate(pos,state,newstate,3);
                 world.setBlockState(pos,newstate,3);
                 //update();
@@ -1228,6 +1250,88 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         //}
 
         //return false;
+    }
+
+    public boolean addFilter(ItemStack filter,boolean simulate)
+    {
+        if(hasFilter())
+        {
+            return false;
+        }
+        else
+        {
+            BlockState state = world.getBlockState(pos);
+            boolean watered = state.get(PedestalBlock.WATERLOGGED);
+            Direction dir = state.get(PedestalBlock.FACING);
+            boolean lit = state.get(PedestalBlock.LIT);
+            int filterState = state.get(PedestalBlock.FILTER_STATUS);
+            if(filter.getItem() instanceof ItemFilterBase)
+            {
+                //Blacklist = 1 , whitelist = 0
+                filterState = (((ItemFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
+            }
+            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
+
+            IItemHandler ph = privateHandler.orElse(null);
+            ItemStack filterItem = filter.copy();
+            filterItem.setCount(1);
+            if(!hasFilter() && ph.isItemValid(6,filterItem))
+            {
+                if(!simulate)
+                {
+                    ph.insertItem(6,filterItem,false);
+                    world.notifyBlockUpdate(pos,state,newstate,3);
+                    world.setBlockState(pos,newstate,3);
+                    world.markBlockRangeForRenderUpdate(pos,state,newstate);
+                }
+                return true;
+            }
+            else return false;
+        }
+    }
+
+    public boolean updateFilter(ItemStack filter,boolean updateBlock)
+    {
+        if(hasFilter())
+        {
+            //old filter needing updated
+            ItemStack oldStack = getFilterInPedestal().copy();
+
+            BlockState state = world.getBlockState(pos);
+            int filterState = state.get(PedestalBlock.FILTER_STATUS);
+            int newFilterState = filterState;
+            if(filter.getItem() instanceof ItemFilterBase)
+            {
+                //Blacklist = 1 , whitelist = 0
+                newFilterState = (((ItemFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
+
+                if(filter.hasTag())
+                {
+                    oldStack.setTag(filter.getTag());
+                }
+            }
+            IItemHandler ph = privateHandler.orElse(null);
+            if(ph.isItemValid(6,filter))
+            {
+                if(updateBlock) {
+                    removeFilter(false);
+                    ph.insertItem(6, oldStack, false);
+                    if(newFilterState != filterState)
+                    {
+                        boolean watered = state.get(PedestalBlock.WATERLOGGED);
+                        Direction dir = state.get(PedestalBlock.FACING);
+                        boolean lit = state.get(PedestalBlock.LIT);
+                        BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,newFilterState);
+                        world.notifyBlockUpdate(pos,state,newstate,3);
+                        world.setBlockState(pos,newstate,3);
+                        world.markBlockRangeForRenderUpdate(pos,state,newstate);
+                    }
+                }
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /*public boolean doItemsMatch(ItemStack itemStackIn)

@@ -12,6 +12,17 @@
     "pedestals.fluid_to_xp": "Fluid to XP Conversions",
   "pedestals.jei.fluid_to_xp": "Exp Count Returned",
 
+  "pedestals.filters.tooltip_filtertype": "Filter Type: ",
+  "pedestals.filters.tooltip_filterwhite": "Whitelist",
+  "pedestals.filters.tooltip_filterblack": "Blacklist",
+  "pedestals.filters.tooltip_filterlist": "Items In Filter: ",
+  "pedestals.filters.tooltip_filterchange": "Filter Type Switched to: ",
+  "pedestals.filters.insert_remove": "Filter Removed",
+  "pedestals.filters.insert_switch": "Filter Settings Copied Successfully",
+  "pedestals.filters.insert_insert": "Filter Insert Successfully",
+  "item.pedestals.filter.filteritem": "Filter (Item)",
+
+
 
     "pedestals.pedestal_block.add_tool": "Tool Added Successfully",
 

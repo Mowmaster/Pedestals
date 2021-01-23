@@ -1,26 +1,22 @@
 package com.mowmaster.pedestals.item.pedestalFilters;
 
-import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.AbstractRailBlock;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -38,10 +34,8 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
-import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 
 public class ItemFilterBase extends Item
@@ -51,8 +45,9 @@ public class ItemFilterBase extends Item
 
     public boolean getFilterType()
     {
-        //false = whitelist
-        //true = blacklist
+        //state 0|
+        //state 1|false = whitelist
+        //state 2|true = blacklist
         return filterType;
     }
 
@@ -73,6 +68,62 @@ public class ItemFilterBase extends Item
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         return true;
+    }
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
+        //Thankyou past self: https://github.com/Mowmaster/Ensorcelled/blob/main/src/main/java/com/mowmaster/ensorcelled/enchantments/handlers/HandlerAOEMiner.java#L53
+        //RayTraceResult result = player.pick(player.getLookVec().length(),0,false); results in MISS type returns
+        RayTraceResult result = p_77659_2_.pick(5,0,false);
+        if(result != null)
+        {
+            //Assuming it it hits a block it wont work???
+            if(result.getType() == RayTraceResult.Type.MISS)
+            {
+                if(p_77659_2_.isCrouching())
+                {
+                    ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
+                    if(itemInHand.getItem() instanceof ItemFilterBase)
+                    {
+                        boolean getCurrentType = getFilterType(itemInHand);
+                        setFilterType(itemInHand,!getCurrentType);
+                        TranslationTextComponent changed = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterchange");
+                        changed.mergeStyle(TextFormatting.GREEN);
+                        TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
+                        TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
+                        changed.append((!getCurrentType)?(black):(white));
+                        p_77659_2_.sendStatusMessage(changed,true);
+                        return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                    return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                }
+            }
+            //Assuming it it hits a block it wont work???
+            if(result.getType() == RayTraceResult.Type.BLOCK)
+            {
+                if(p_77659_2_.isCrouching())
+                {
+                    ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
+                    if(itemInHand.getItem() instanceof ItemFilterBase)
+                    {
+                        ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
+                        BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);
+                        BlockPos posBlock = res.getPos();
+
+                        List<ItemStack> buildQueue = buildFilterQueue(p_77659_1_,posBlock);
+
+                        if(buildQueue.size() > 0)
+                        {
+                            writeFilterQueueToNBT(itemInHand,buildQueue);
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
+                        return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                }
+            }
+        }
+
+        return super.onItemRightClick(p_77659_1_, p_77659_2_, p_77659_3_);
     }
 
     public void removeFilterQueueHandler(ItemStack stack)
@@ -107,14 +158,8 @@ public class ItemFilterBase extends Item
         return filterQueueSize;
     }
 
-    public List<ItemStack> buildFilterQueue(PedestalTileEntity pedestal, BlockPos invBlock)
+    public List<ItemStack> buildFilterQueue(World world, BlockPos invBlock)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        BlockState pedestalState = world.getBlockState(pedestalPos);
-
-
         List<ItemStack> filterQueue = new ArrayList<>();
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,invBlock,true);
@@ -246,28 +291,68 @@ public class ItemFilterBase extends Item
         stack.setTag(compound);
     }
 
-    public void getFilterTypeFromNBT(ItemStack stack)
+    public boolean getFilterTypeFromNBT(ItemStack stack)
     {
         if(stack.hasTag())
         {
             CompoundNBT getCompound = stack.getTag();
             this.filterType = getCompound.getBoolean("filter_type");
         }
+        return filterType;
     }
 
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
-        /*ItemStack stack = pedestal.getCoinOnPedestal();
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".chat_name");
-        TranslationTextComponent name2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.appendString(name2.getString());
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);*/
+        ItemStack filterStack = pedestal.getFilterInPedestal();
+
+        List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack);
+        if(filterQueue.size()>0)
+        {
+            TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant, Util.DUMMY_UUID);
+
+            for(int i=0;i<filterQueue.size();i++) {
+
+                if(!filterQueue.get(i).isEmpty())
+                {
+                    TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants, Util.DUMMY_UUID);
+                }
+            }
+        }
     }
 
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
+
+        boolean filterType = getFilterType(stack);
+        TranslationTextComponent filterList = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filtertype");
+        TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
+        TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
+        filterList.append((filterType)?(black):(white));
+        filterList.mergeStyle(TextFormatting.GOLD);
+        tooltip.add(filterList);
+
+        List<ItemStack> filterQueue = readFilterQueueFromNBT(stack);
+        if(filterQueue.size()>0)
+        {
+            TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            tooltip.add(enchant);
+
+            for(int i=0;i<filterQueue.size();i++) {
+
+                if(!filterQueue.get(i).isEmpty())
+                {
+                    TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    tooltip.add(enchants);
+                }
+            }
+        }
 
         /*TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
         speed.appendString();

@@ -49,7 +49,7 @@ public class ItemFilterItem extends ItemFilterBase
         return returner;
     }
 
-    public static final Item ITEMFILTER = new ItemFilterItem(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "filter/item"));
+    public static final Item ITEMFILTER = new ItemFilterItem(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "filter/filteritem"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

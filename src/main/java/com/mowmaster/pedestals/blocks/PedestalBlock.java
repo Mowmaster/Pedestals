@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.blocks;
 
 import com.mowmaster.pedestals.item.*;
+import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -53,6 +54,9 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    //0 = default
+    //1= whitelist
+    //2= blacklist
     public static final IntegerProperty FILTER_STATUS = IntegerProperty.create("filter_status", 0, 2);
 
     protected static final VoxelShape CUP = VoxelShapes.or(Block.makeCuboidShape(3.0D, 0.0D, 3.0D, 13.0D, 2.0D, 13.0D),
@@ -296,6 +300,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
             if (tileEntity instanceof PedestalTileEntity) {
                 PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
                 ItemStack getItemStackInHand = player.getHeldItemMainhand();
+                ItemStack getItemStackInOffHand = player.getHeldItemOffhand();
                 Item getItemInHand = getItemStackInHand.getItem();
                 boolean hasCoin = tilePedestal.hasCoin();
                 boolean isCreative = player.isCreative();
@@ -326,6 +331,61 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                             ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeTool());
                             return ActionResultType.SUCCESS;
                         }
+                        return ActionResultType.FAIL;
+                    }
+                    else if(getItemInHand instanceof ItemFilterSwapper)
+                    {
+                        if(player.isCrouching())
+                        {
+                            if(tilePedestal.hasFilter())
+                            {
+                                ItemFilterBase getFilter = (ItemFilterBase)tilePedestal.getFilterInPedestal().getItem();
+                                getFilter.chatDetails(player,tilePedestal);
+                                return ActionResultType.SUCCESS;
+                            }
+                            return ActionResultType.FAIL;
+                        }
+                        else
+                        {
+                            System.out.println("ISNT CROUCHED");
+                            TranslationTextComponent filterRemove = new TranslationTextComponent(Reference.MODID + ".filters.insert_remove");
+                            TranslationTextComponent filterSwitch = new TranslationTextComponent(Reference.MODID + ".filters.insert_switch");
+                            TranslationTextComponent filterInsert = new TranslationTextComponent(Reference.MODID + ".filters.insert_insert");
+                            if(getItemStackInOffHand.getItem() instanceof ItemFilterBase)
+                            {
+                                System.out.println("IS ITEM FILTER BASE");
+                                if(tilePedestal.hasFilter())
+                                {
+                                    System.out.println("HAS FILTER");
+                                    tilePedestal.updateFilter(player.getHeldItemOffhand(),true);
+                                    player.getHeldItemOffhand().shrink(1);
+                                    filterSwitch.mergeStyle(TextFormatting.WHITE);
+                                    player.sendStatusMessage(filterSwitch,true);
+                                    return ActionResultType.SUCCESS;
+                                }
+                                else
+                                {
+                                    System.out.println("DOESNT HAVE FILTER");
+                                    if(tilePedestal.addFilter(getItemStackInOffHand,true))
+                                    {
+                                        System.out.println("CAN ADD FILTER");
+                                        tilePedestal.addFilter(getItemStackInOffHand,false);
+                                        getItemStackInOffHand.shrink(1);
+                                        filterInsert.mergeStyle(TextFormatting.WHITE);
+                                        player.sendStatusMessage(filterInsert,true);
+                                    }
+                                }
+                            }
+                            else if(getItemStackInOffHand.isEmpty())
+                            {
+                                ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeFilter(true));
+
+                                filterRemove.mergeStyle(TextFormatting.WHITE);
+                                player.sendStatusMessage(filterRemove,true);
+                                return ActionResultType.SUCCESS;
+                            }
+                        }
+
                         return ActionResultType.FAIL;
                     }
                     else if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeBase)
