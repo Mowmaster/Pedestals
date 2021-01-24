@@ -20,14 +20,17 @@ public class EnchantmentRange extends Enchantment
         return 1 + (enchantmentLevel - 1) * 11;
     }
 
+    @Override
     public int getMaxEnchantability(int enchantmentLevel) {
-        return this.getMinEnchantability(enchantmentLevel) + 20;
+        return this.getMinEnchantability(enchantmentLevel) + 55;
     }
 
+    @Override
     public int getMaxLevel() {
         return 5;
     }
 
+    @Override
     public boolean canApply(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
@@ -44,6 +47,7 @@ public class EnchantmentRange extends Enchantment
         return false;
     }
 
+    @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
@@ -59,8 +63,19 @@ public class EnchantmentRange extends Enchantment
         return canApplyToUpgrade;
     }
 
+    @Override
     public boolean isAllowedOnBooks() {
         return true;
+    }
+
+    @Override
+    public boolean canGenerateInLoot() {
+        return true;
+    }
+
+    @Override
+    public boolean isTreasureEnchantment() {
+        return false;
     }
 }
 

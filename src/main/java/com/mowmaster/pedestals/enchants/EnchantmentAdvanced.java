@@ -16,12 +16,12 @@ public class EnchantmentAdvanced extends Enchantment
 
     @Override
     public int getMinEnchantability(int enchantmentLevel) {
-        return enchantmentLevel * 110;
+        return enchantmentLevel * 100;
     }
 
     @Override
     public int getMaxEnchantability(int enchantmentLevel) {
-        return this.getMinEnchantability(enchantmentLevel) + 50;
+        return this.getMinEnchantability(enchantmentLevel) + 10;
     }
 
     @Override
@@ -34,6 +34,7 @@ public class EnchantmentAdvanced extends Enchantment
         return 1;
     }
 
+    @Override
     public boolean canApply(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
@@ -45,6 +46,7 @@ public class EnchantmentAdvanced extends Enchantment
         return false;
     }
 
+    @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
@@ -75,7 +77,7 @@ public class EnchantmentAdvanced extends Enchantment
 
     @Override
     public boolean canGenerateInLoot() {
-        return false;
+        return true;
     }
 }
 
