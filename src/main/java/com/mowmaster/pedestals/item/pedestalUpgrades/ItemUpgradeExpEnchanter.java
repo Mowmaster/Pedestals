@@ -32,7 +32,6 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 {
-
     public ItemUpgradeExpEnchanter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override

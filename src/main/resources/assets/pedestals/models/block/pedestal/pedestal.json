@@ -1,7 +1,6 @@
 {
-  "parent": "pedestals:block/pedestal_block_filter",
+  "parent": "pedestals:block/pedestal_block",
   "textures": {
-    "filter": "pedestals:blocks/whitestone",
     "type": "pedestals:blocks/whitestone",
     "typepart":"pedestals:blocks/whitestone"
   }

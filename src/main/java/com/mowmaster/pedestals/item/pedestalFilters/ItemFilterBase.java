@@ -70,6 +70,11 @@ public class ItemFilterBase extends Item
         return true;
     }
 
+    public boolean canSendItem(PedestalTileEntity tile)
+    {
+        return true;
+    }
+
     @Override
     public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
         //Thankyou past self: https://github.com/Mowmaster/Ensorcelled/blob/main/src/main/java/com/mowmaster/ensorcelled/enchantments/handlers/HandlerAOEMiner.java#L53

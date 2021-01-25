@@ -2,7 +2,6 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/cube_all",
 	"textures": {
-		"0": "#filter",
 		"1": "#type",
 		"particle": "#typepart"
 	},
@@ -36,10 +35,10 @@
 			"to": [11, 4, 11],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8, 9, 8]},
 			"faces": {
-				"north": {"uv": [5, 15, 11, 16], "texture": "#0"},
-				"east": {"uv": [4, 15, 10, 16], "texture": "#0"},
-				"south": {"uv": [5, 15, 11, 16], "texture": "#0"},
-				"west": {"uv": [5, 15, 11, 16], "texture": "#0"}
+				"north": {"uv": [5, 15, 11, 16], "texture": "#1", "tintindex": 1},
+				"east": {"uv": [4, 15, 10, 16], "texture": "#1", "tintindex": 1},
+				"south": {"uv": [5, 15, 11, 16], "texture": "#1", "tintindex": 1},
+				"west": {"uv": [5, 15, 11, 16], "texture": "#1", "tintindex": 1}
 			}
 		},
 		{

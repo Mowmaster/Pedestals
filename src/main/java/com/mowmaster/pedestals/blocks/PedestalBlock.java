@@ -311,7 +311,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 }
                 else
                 {
-                    if(getItemInHand instanceof ItemLinkingTool || getItemInHand instanceof ItemUpgradeTool || getItemInHand instanceof ItemDevTool)
+                    if(getItemInHand instanceof ItemLinkingTool || getItemInHand instanceof ItemUpgradeTool || getItemInHand instanceof ItemDevTool || getItemInHand instanceof ItemFilterSwapper)
                     {
                         return ActionResultType.FAIL;
                     }
@@ -331,61 +331,6 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                             ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeTool());
                             return ActionResultType.SUCCESS;
                         }
-                        return ActionResultType.FAIL;
-                    }
-                    else if(getItemInHand instanceof ItemFilterSwapper)
-                    {
-                        if(player.isCrouching())
-                        {
-                            if(tilePedestal.hasFilter())
-                            {
-                                ItemFilterBase getFilter = (ItemFilterBase)tilePedestal.getFilterInPedestal().getItem();
-                                getFilter.chatDetails(player,tilePedestal);
-                                return ActionResultType.SUCCESS;
-                            }
-                            return ActionResultType.FAIL;
-                        }
-                        else
-                        {
-                            System.out.println("ISNT CROUCHED");
-                            TranslationTextComponent filterRemove = new TranslationTextComponent(Reference.MODID + ".filters.insert_remove");
-                            TranslationTextComponent filterSwitch = new TranslationTextComponent(Reference.MODID + ".filters.insert_switch");
-                            TranslationTextComponent filterInsert = new TranslationTextComponent(Reference.MODID + ".filters.insert_insert");
-                            if(getItemStackInOffHand.getItem() instanceof ItemFilterBase)
-                            {
-                                System.out.println("IS ITEM FILTER BASE");
-                                if(tilePedestal.hasFilter())
-                                {
-                                    System.out.println("HAS FILTER");
-                                    tilePedestal.updateFilter(player.getHeldItemOffhand(),true);
-                                    player.getHeldItemOffhand().shrink(1);
-                                    filterSwitch.mergeStyle(TextFormatting.WHITE);
-                                    player.sendStatusMessage(filterSwitch,true);
-                                    return ActionResultType.SUCCESS;
-                                }
-                                else
-                                {
-                                    System.out.println("DOESNT HAVE FILTER");
-                                    if(tilePedestal.addFilter(getItemStackInOffHand,true))
-                                    {
-                                        System.out.println("CAN ADD FILTER");
-                                        tilePedestal.addFilter(getItemStackInOffHand,false);
-                                        getItemStackInOffHand.shrink(1);
-                                        filterInsert.mergeStyle(TextFormatting.WHITE);
-                                        player.sendStatusMessage(filterInsert,true);
-                                    }
-                                }
-                            }
-                            else if(getItemStackInOffHand.isEmpty())
-                            {
-                                ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeFilter(true));
-
-                                filterRemove.mergeStyle(TextFormatting.WHITE);
-                                player.sendStatusMessage(filterRemove,true);
-                                return ActionResultType.SUCCESS;
-                            }
-                        }
-
                         return ActionResultType.FAIL;
                     }
                     else if(player.getHeldItemMainhand().getItem() instanceof ItemUpgradeBase)

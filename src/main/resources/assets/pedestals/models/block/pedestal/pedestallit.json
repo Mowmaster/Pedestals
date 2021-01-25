@@ -1,5 +1,5 @@
 {
-  "parent": "pedestals:block/pedestal_blocklit_filter",
+  "parent": "pedestals:block/pedestal_blocklit",
   "textures": {
     "filter": "pedestals:blocks/whitestone",
     "glow":"pedestals:blocks/ancientglowstone",
