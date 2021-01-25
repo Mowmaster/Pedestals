@@ -1433,10 +1433,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public boolean hasFilter(PedestalTileEntity pedestalSendingTo)
     {
         boolean returner = false;
-        if(pedestalSendingTo.hasCoin())
+        if(pedestalSendingTo.hasFilter())
         {
-            Item coinInPed = pedestalSendingTo.getCoinOnPedestal().getItem();
-            if(coinInPed instanceof ItemUpgradeBaseFilter)
+            Item filterInPedestal = pedestalSendingTo.getFilterInPedestal().getItem();
+            if(filterInPedestal instanceof ItemFilterBase)
             {
                 returner = true;
             }
@@ -1445,17 +1445,17 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return returner;
     }
 
+    //Checks to see if we can send an item from the pedestal, like in the case of the import energy/fluid upgrades
     public Boolean canSendItemInPedestal()
     {
         boolean returner = true;
 
         if(hasCoin())
         {
-            Item coinInPed = getCoinOnPedestal().getItem();
-            if(coinInPed instanceof ItemUpgradeBase)
+            Item coinInPedestal = getCoinOnPedestal().getItem();
+            if(coinInPedestal instanceof ItemUpgradeBase)
             {
-                return ((ItemUpgradeBase) coinInPed).canSendItem(this);
-                //return false;
+                return ((ItemUpgradeBase) coinInPedestal).canSendItem(this);
             }
         }
 
@@ -1480,7 +1480,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     {
         boolean returner = false;
 
-        //Method to check if we can send items FROM this pedestal???
+        //Checks to see if we can send an item from the pedestal, like in the case of the import energy/fluid upgrades
         if(canSendItemInPedestal())
         {
             //Check if Block is Loaded in World
@@ -1531,6 +1531,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                             }
                         }
                     }
+                    else
+                    {
+                        removeLocation(pedestalToSendTo);
+                    }
                 }
             }
         }
@@ -1538,6 +1542,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return returner;
     }
 
+    //Needed for filtered imports
     public boolean canSendToPedestal(BlockPos pedestalToSendTo, ItemStack itemStackIncoming)
     {
         boolean returner = false;
@@ -1585,6 +1590,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 }
                             }
                         }
+                    }
+                    else
+                    {
+                        removeLocation(pedestalToSendTo);
                     }
                 }
             }
