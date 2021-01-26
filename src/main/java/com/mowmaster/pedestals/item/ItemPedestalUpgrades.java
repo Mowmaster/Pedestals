@@ -17,6 +17,7 @@ public class ItemPedestalUpgrades extends Item {
     public static final Item SPEED = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradespeed"));
     public static final Item CAPACITY = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradecapacity"));
     public static final Item RANGE = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgraderange"));
+    public static final Item ROUNDROBIN = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgraderoundrobin"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
@@ -24,6 +25,7 @@ public class ItemPedestalUpgrades extends Item {
         event.getRegistry().register(SPEED);
         event.getRegistry().register(CAPACITY);
         event.getRegistry().register(RANGE);
+        event.getRegistry().register(ROUNDROBIN);
     }
 
 

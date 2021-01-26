@@ -163,6 +163,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemPedestalUpgrades.SPEED, "upgradespeed");
         addValueInfoPage(registration, ItemPedestalUpgrades.CAPACITY, "upgradecapacity");
         addValueInfoPage(registration, ItemPedestalUpgrades.RANGE, "upgraderange");
+        addValueInfoPage(registration, ItemPedestalUpgrades.ROUNDROBIN, "upgraderoundrobin");
         addValueInfoPage(registration, ItemTagTool.TAG, "tagtool");
         addValueInfoPage(registration, ItemUpgradeTool.UPGRADE, "upgradetool");
         addValueInfoPage(registration, ItemToolSwapper.QUARRYTOOL, "toolswapper");

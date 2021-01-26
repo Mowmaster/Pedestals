@@ -89,9 +89,12 @@
         "jei.pedestals.upgradecapacity.desc": "Use on a Pedestal to Increase the Amount of Items transferred at a time.",
     "item.pedestals.upgraderange": "Pedestal Range Augment",
         "jei.pedestals.upgraderange.desc": "Use on a Pedestal to Increase the Range it can send items to.",
+  "item.pedestals.upgraderoundrobin": "Pedestal Round Robin Transfer Upgrade",
+  "jei.pedestals.upgraderoundrobin.desc": "Use on a Pedestal to Switch it to 'Round Robin' Transfer Mode.",
 
 
-    "item.pedestals.bookspeed": "Enchantment Focused Book (Speed)",
+
+  "item.pedestals.bookspeed": "Enchantment Focused Book (Speed)",
     "jei.pedestals.bookspeed.desc": "Will only accept the Speed Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
     "item.pedestals.bookcapacity": "Enchantment Focused Book (Capacity)",
     "jei.pedestals.bookcapacity.desc": "Will only accept the Capacity Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",

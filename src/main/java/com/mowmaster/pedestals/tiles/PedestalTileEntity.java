@@ -374,6 +374,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
      **********************************
      *********************************/
 
+
+
     public void update()
     {
         this.markDirty();
@@ -535,16 +537,16 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 10 slots to future proof things
-        return new ItemStackHandler(7) {
+        return new ItemStackHandler(8) {
 
             @Override
             protected void onLoad() {
-                if(getSlots()<7)
+                if(getSlots()<8)
                 {
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    setSize(7);
+                    setSize(8);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
                     }
@@ -579,6 +581,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                         ) && !GET_NOTTOOLS.contains(stack.getItem())
                         ) return true;
                 if (slot == 6 && stack.getItem() instanceof ItemFilterBase && !hasFilter()) return true;
+                if (slot == 7 && stack.getItem().equals(Items.REDSTONE_TORCH) && !hasTorch()) return true;
                 return false;
             }
         };
@@ -599,294 +602,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return super.getCapability(cap, side);
     }
 
-    public int getNumberOfStoredLocations() {return storedLocations.size();}
-
-    public boolean storeNewLocation(BlockPos pos)
-    {
-        boolean returner = false;
-        if(getNumberOfStoredLocations() < 8)
-        {
-            storedLocations.add(pos);
-            returner=true;
-        }
-        update();
-        return returner;
-    }
-
-    public BlockPos getStoredPositionAt(int index)
-    {
-        BlockPos sendToPos = getPos();
-        if(index<getNumberOfStoredLocations())
-        {
-            sendToPos = storedLocations.get(index);
-        }
-
-        return sendToPos;
-    }
-
-    public boolean removeLocation(BlockPos pos)
-    {
-        boolean returner = false;
-        if(getNumberOfStoredLocations() >= 1)
-        {
-            storedLocations.remove(pos);
-            returner=true;
-        }
-        update();
-
-        return returner;
-    }
-
-    public boolean isAlreadyLinked(BlockPos pos) {
-        return storedLocations.contains(pos);
-    }
-
-    public List<BlockPos> getLocationList()
-    {
-        return storedLocations;
-    }
-
-    public int getStoredValueForUpgrades()
-    {
-        return storedValueForUpgrades;
-    }
-    public void setStoredValueForUpgrades(int value)
-    {
-        storedValueForUpgrades = value;
-        update();
-    }
-    public int getPedestalTransferRange(){return getRange();}
-
-    public boolean hasItem()
-    {
-        IItemHandler h = handler.orElse(null);
-        if(h.getStackInSlot(0).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
-    }
-
-    public boolean hasCoin()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(0).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
-    }
-
-    public boolean hasLight()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(1).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
-    }
-
-    public boolean hasSpeed()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(2).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
-    }
-
-    public boolean hasCapacity()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(3).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
-    }
-
-    public boolean hasRange()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(4).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
-    }
-
-    public boolean hasTool()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        /*CompoundNBT nbt = this.serializeNBT();
-        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
-        if(slotSize > 5)*/
-        //{
-            if(ph.getStackInSlot(5).isEmpty())
-            {
-                return false;
-            }
-            else  return true;
-        //}
-
-        //return false;
-    }
-
-    public boolean hasFilter()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(6).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
-    }
-
-    public ItemStack getItemInPedestal()
-    {
-        IItemHandler h = handler.orElse(null);
-        if(hasItem())
-        {
-            return h.getStackInSlot(0);
-        }
-        else return ItemStack.EMPTY;
-    }
-
-    public ItemStack getItemInPedestalOverride()
-    {
-        IItemHandler h = handler.orElse(null);
-        return h.getStackInSlot(-1);
-    }
-
-    public ItemStack getCoinOnPedestal()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(0);
-        /*if(hasCoin())
-        {
-            return ph.getStackInSlot(0);
-        }
-        else return ItemStack.EMPTY;*/
-    }
-
-    public int getSpeed()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(2).getCount();
-    }
-
-    public int getCapacity()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(3).getCount();
-    }
-
-    public int getRange()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(4).getCount();
-    }
-
-    public ItemStack getToolOnPedestal()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(5);
-    }
-
-    public ItemStack getFilterInPedestal()
-    {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(6);
-    }
-
-    public ItemStack setItemInPedestal(ItemStack itemToSet)
-    {
-        IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.insertItem(0,itemToSet,false);
-        return stack;
-    }
-
     public int getSlotSizeLimit() {
         IItemHandler h = handler.orElse(null);
         return h.getSlotLimit(0);
-    }
-
-    public ItemStack removeItem(int numToRemove) {
-        IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.extractItem(0,numToRemove,false);
-        //update();
-
-        return stack;
-    }
-
-    public ItemStack removeItemOverride(int numToRemove) {
-        IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.extractItem(-1,numToRemove,false);
-        //update();
-
-        return stack;
-    }
-
-    public ItemStack removeItem() {
-        IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.extractItem(0,getItemInPedestal().getMaxStackSize(),false);
-        //update();
-
-        return stack;
-    }
-
-    public ItemStack removeItemOverride() {
-        IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.extractItem(-1,h.getStackInSlot(0).getCount(),false);
-        //update();
-
-        return stack;
-    }
-
-    public ItemStack removeCoin() {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack stack = ph.getStackInSlot(0);
-        if(stack.getItem() instanceof ItemUpgradeBase){
-            ItemUpgradeBase coin = (ItemUpgradeBase)stack.getItem();
-            coin.removePlayerFromCoin(stack);
-            coin.removeWorkQueueFromCoin(stack);
-            coin.removeWorkQueueTwoFromCoin(stack);
-            coin.removeStoredIntFromCoin(stack);
-            coin.removeStoredIntTwoFromCoin(stack);
-            coin.removeFilterQueueHandler(stack);
-            coin.removeFilterBlock(stack);
-            coin.removeInventoryQueue(stack);
-            coin.removeCraftingQueue(stack);
-        }
-        ph.extractItem(0,stack.getCount(),false);
-        setStoredValueForUpgrades(0);
-        //update();
-
-        return stack;
-    }
-
-    public ItemStack removeTool() {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.extractItem(5,ph.getStackInSlot(5).getCount(),false);
-    }
-
-    public ItemStack removeFilter(boolean updateBlock) {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(updateBlock)
-        {
-            BlockState state = world.getBlockState(pos);
-            int filterState = 0;
-            boolean watered = state.get(PedestalBlock.WATERLOGGED);
-            Direction dir = state.get(PedestalBlock.FACING);
-            boolean lit = state.get(PedestalBlock.LIT);
-            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
-            world.notifyBlockUpdate(pos,state,newstate,3);
-            world.setBlockState(pos,newstate,3);
-            world.markBlockRangeForRenderUpdate(pos,state,newstate);
-        }
-        return ph.extractItem(6,ph.getStackInSlot(6).getCount(),false);
     }
 
     public void spawnItemStack(World worldIn, double x, double y, double z, ItemStack stack) {
@@ -934,62 +652,86 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
     }
 
-    public int getItemTransferRate()
-    {
-        int itemRate = 4;
-        switch (getCapacity())
-        {
-            case 0:
-                itemRate = (getCapacity()>0)?(4):(4);
-                break;
-            case 1:
-                itemRate= (getCapacity()>0)?(8):(4);
-                break;
-            case 2:
-                itemRate = (getCapacity()>0)?(16):(4);
-                break;
-            case 3:
-                itemRate = (getCapacity()>0)?(32):(4);
-                break;
-            case 4:
-                itemRate = (getCapacity()>0)?(48):(4);
-                break;
-            case 5:
-                itemRate=(getCapacity()>0)?(64):(4);
-                break;
-            default: itemRate=4;
-        }
+    public int getMaxStackSize(){return 64;}
 
-        return  itemRate;
+
+
+    /*============================================================================
+    ==============================================================================
+    =========================    STORED VALUE START    ===========================
+    ==============================================================================
+    ============================================================================*/
+
+    public int getStoredValueForUpgrades()
+    {
+        return storedValueForUpgrades;
     }
 
-    public int getOperationSpeed()
+    public void setStoredValueForUpgrades(int value)
     {
-        int speed = 20;
-        switch (getSpeed())
+        storedValueForUpgrades = value;
+        update();
+    }
+
+    /*============================================================================
+    ==============================================================================
+    =========================     STORED VALUE END     ===========================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     LINKING START    =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public int getNumberOfStoredLocations() {return storedLocations.size();}
+
+    public boolean storeNewLocation(BlockPos pos)
+    {
+        boolean returner = false;
+        if(getNumberOfStoredLocations() < 8)
         {
-            case 0:
-                speed = (getSpeed()>0)?(20):(20);//normal speed
-                break;
-            case 1:
-                speed=(getSpeed()>0)?(10):(20);//2x faster
-                break;
-            case 2:
-                speed = (getSpeed()>0)?(5):(20);;//4x faster
-                break;
-            case 3:
-                speed = (getSpeed()>0)?(3):(20);;//6x faster
-                break;
-            case 4:
-                speed = (getSpeed()>0)?(2):(20);;//10x faster
-                break;
-            case 5:
-                speed=(getSpeed()>0)?(1):(20);;//20x faster
-                break;
-            default: speed=20;
+            storedLocations.add(pos);
+            returner=true;
+        }
+        update();
+        return returner;
+    }
+
+    public BlockPos getStoredPositionAt(int index)
+    {
+        BlockPos sendToPos = getPos();
+        if(index<getNumberOfStoredLocations())
+        {
+            sendToPos = storedLocations.get(index);
         }
 
-        return  speed;
+        return sendToPos;
+    }
+
+    public boolean removeLocation(BlockPos pos)
+    {
+        boolean returner = false;
+        if(getNumberOfStoredLocations() >= 1)
+        {
+            storedLocations.remove(pos);
+            returner=true;
+        }
+        update();
+
+        return returner;
+    }
+
+    public boolean isAlreadyLinked(BlockPos pos) {
+        return storedLocations.contains(pos);
+    }
+
+    public List<BlockPos> getLocationList()
+    {
+        return storedLocations;
     }
 
     public int getLinkingRange()
@@ -1040,14 +782,84 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else return true;
     }
 
-    public int getMaxStackSize(){return 64;}
+    /*============================================================================
+    ==============================================================================
+    ===========================      LINKING END     =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     ITEM START       =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean hasItem()
+    {
+        IItemHandler h = handler.orElse(null);
+        if(h.getStackInSlot(0).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public ItemStack getItemInPedestal()
+    {
+        IItemHandler h = handler.orElse(null);
+        if(hasItem())
+        {
+            return h.getStackInSlot(0);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack getItemInPedestalOverride()
+    {
+        IItemHandler h = handler.orElse(null);
+        return h.getStackInSlot(-1);
+    }
+
+    public ItemStack removeItem(int numToRemove) {
+        IItemHandler h = handler.orElse(null);
+        ItemStack stack = h.extractItem(0,numToRemove,false);
+        //update();
+
+        return stack;
+    }
+
+    public ItemStack removeItemOverride(int numToRemove) {
+        IItemHandler h = handler.orElse(null);
+        ItemStack stack = h.extractItem(-1,numToRemove,false);
+        //update();
+
+        return stack;
+    }
+
+    public ItemStack removeItem() {
+        IItemHandler h = handler.orElse(null);
+        ItemStack stack = h.extractItem(0,getItemInPedestal().getMaxStackSize(),false);
+        //update();
+
+        return stack;
+    }
+
+    public ItemStack removeItemOverride() {
+        IItemHandler h = handler.orElse(null);
+        ItemStack stack = h.extractItem(-1,h.getStackInSlot(0).getCount(),false);
+        //update();
+
+        return stack;
+    }
 
     public boolean addItem(ItemStack itemFromBlock)
     {
         IItemHandler h = handler.orElse(null);
         if(hasItem())
         {
-            if(doItemsMatch(itemFromBlock))
+            if(ItemHandlerHelper.canItemStacksStack(getItemInPedestal(),itemFromBlock))
             {
                 h.insertItem(0, itemFromBlock.copy(), false);
             }
@@ -1086,7 +898,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         IItemHandler h = handler.orElse(null);
         if(hasItem())
         {
-            if(doItemsMatch(itemFromBlock))
+            if(ItemHandlerHelper.canItemStacksStack(getItemInPedestal(),itemFromBlock))
             {
                 if(!simulate)
                 {
@@ -1115,6 +927,109 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return h.insertItem(0, itemstackIn.copy(), simulate);
     }
 
+    public int getItemTransferRate()
+    {
+        int itemRate = 4;
+        switch (getCapacity())
+        {
+            case 0:
+                itemRate = (getCapacity()>0)?(4):(4);
+                break;
+            case 1:
+                itemRate= (getCapacity()>0)?(8):(4);
+                break;
+            case 2:
+                itemRate = (getCapacity()>0)?(16):(4);
+                break;
+            case 3:
+                itemRate = (getCapacity()>0)?(32):(4);
+                break;
+            case 4:
+                itemRate = (getCapacity()>0)?(48):(4);
+                break;
+            case 5:
+                itemRate=(getCapacity()>0)?(64):(4);
+                break;
+            default: itemRate=4;
+        }
+
+        return  itemRate;
+    }
+
+    public void collideWithPedestal(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
+    {
+        if(!world.isRemote) {
+            if(entityIn instanceof ItemEntity)
+            {
+                if(tilePedestal.hasCoin())
+                {
+                    Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
+                    if(coinInPed instanceof ItemUpgradeBase)
+                    {
+                        ((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(tilePedestal, entityIn);
+                    }
+                }
+            }
+        }
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      ITEM END        =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      COIN START      =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean hasCoin()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(0).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public ItemStack getCoinOnPedestal()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(0);
+        /*if(hasCoin())
+        {
+            return ph.getStackInSlot(0);
+        }
+        else return ItemStack.EMPTY;*/
+    }
+
+    public ItemStack removeCoin() {
+        IItemHandler ph = privateHandler.orElse(null);
+        ItemStack stack = ph.getStackInSlot(0);
+        if(stack.getItem() instanceof ItemUpgradeBase){
+            ItemUpgradeBase coin = (ItemUpgradeBase)stack.getItem();
+            coin.removePlayerFromCoin(stack);
+            coin.removeWorkQueueFromCoin(stack);
+            coin.removeWorkQueueTwoFromCoin(stack);
+            coin.removeStoredIntFromCoin(stack);
+            coin.removeStoredIntTwoFromCoin(stack);
+            coin.removeFilterQueueHandler(stack);
+            coin.removeFilterBlock(stack);
+            coin.removeInventoryQueue(stack);
+            coin.removeCraftingQueue(stack);
+        }
+        ph.extractItem(0,stack.getCount(),false);
+        setStoredValueForUpgrades(0);
+        //update();
+
+        return stack;
+    }
+
     public boolean addCoin(PlayerEntity player, ItemStack coinFromBlock,boolean simulate)
     {
         if(!hasCoin())
@@ -1136,6 +1051,20 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return false;
     }
 
+    /*============================================================================
+    ==============================================================================
+    ===========================       COIN END       =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     SPEED START      =============================
+    ==============================================================================
+    ============================================================================*/
+
     public boolean addSpeed(ItemStack speedUpgrade)
     {
         IItemHandler ph = privateHandler.orElse(null);
@@ -1150,6 +1079,65 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else return false;
     }
 
+    public boolean hasSpeed()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(2).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public int getSpeed()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(2).getCount();
+    }
+
+    public int getOperationSpeed()
+    {
+        int speed = 20;
+        switch (getSpeed())
+        {
+            case 0:
+                speed = (getSpeed()>0)?(20):(20);//normal speed
+                break;
+            case 1:
+                speed=(getSpeed()>0)?(10):(20);//2x faster
+                break;
+            case 2:
+                speed = (getSpeed()>0)?(5):(20);;//4x faster
+                break;
+            case 3:
+                speed = (getSpeed()>0)?(3):(20);;//6x faster
+                break;
+            case 4:
+                speed = (getSpeed()>0)?(2):(20);;//10x faster
+                break;
+            case 5:
+                speed=(getSpeed()>0)?(1):(20);;//20x faster
+                break;
+            default: speed=20;
+        }
+
+        return  speed;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      SPEED END       =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================    CAPACITY START    =============================
+    ==============================================================================
+    ============================================================================*/
+
     public boolean addCapacity(ItemStack capacityUpgrade)
     {
         IItemHandler ph = privateHandler.orElse(null);
@@ -1163,6 +1151,34 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
         else return false;
     }
+    public boolean hasCapacity()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(3).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+    public int getCapacity()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(3).getCount();
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     CAPACITY END     =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     RANGE START      =============================
+    ==============================================================================
+    ============================================================================*/
 
     public boolean addRange(ItemStack rangeUpgrade)
     {
@@ -1177,6 +1193,37 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
         else return false;
     }
+
+    public int getPedestalTransferRange(){return getRange();}
+
+    public boolean hasRange()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(4).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+    public int getRange()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(4).getCount();
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      RANGE END       =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      LIGHT START     =============================
+    ==============================================================================
+    ============================================================================*/
 
     public boolean addLight()
     {
@@ -1201,6 +1248,30 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             return true;
         }
     }
+
+    public boolean hasLight()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(1).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================       LIGHT END      =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     COLOR START      =============================
+    ==============================================================================
+    ============================================================================*/
 
     public boolean addColor(ItemStack stack)
     {
@@ -1232,6 +1303,20 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
     }
 
+    /*============================================================================
+    ==============================================================================
+    ===========================       COLOR END      =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      TOOL START      =============================
+    ==============================================================================
+    ============================================================================*/
+
     public boolean addTool(ItemStack tool,boolean simulate)
     {
         IItemHandler ph = privateHandler.orElse(null);
@@ -1239,17 +1324,92 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         //int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
         //if(slotSize > 5)
         //{
-            ItemStack itemFromBlock = tool.copy();
-            itemFromBlock.setCount(1);
-            if(!hasTool() && ph.isItemValid(5,itemFromBlock))
-            {
-                if(!simulate)ph.insertItem(5,itemFromBlock,false);
-                return true;
-            }
-            else return false;
+        ItemStack itemFromBlock = tool.copy();
+        itemFromBlock.setCount(1);
+        if(!hasTool() && ph.isItemValid(5,itemFromBlock))
+        {
+            if(!simulate)ph.insertItem(5,itemFromBlock,false);
+            return true;
+        }
+        else return false;
         //}
 
         //return false;
+    }
+
+    public boolean hasTool()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        /*CompoundNBT nbt = this.serializeNBT();
+        int slotSize = (nbt.getCompound("invp").contains("Size"))?(nbt.getCompound("invp").getInt("Size")):(5);
+        if(slotSize > 5)*/
+        //{
+        if(ph.getStackInSlot(5).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+        //}
+
+        //return false;
+    }
+
+    public ItemStack getToolOnPedestal()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(5);
+    }
+
+    public ItemStack removeTool() {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.extractItem(5,ph.getStackInSlot(5).getCount(),false);
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================       TOOL END       =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     FILTER START     =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean hasFilter()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(6).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public ItemStack getFilterInPedestal()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(6);
+    }
+
+    public ItemStack removeFilter(boolean updateBlock) {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(updateBlock)
+        {
+            BlockState state = world.getBlockState(pos);
+            int filterState = 0;
+            boolean watered = state.get(PedestalBlock.WATERLOGGED);
+            Direction dir = state.get(PedestalBlock.FACING);
+            boolean lit = state.get(PedestalBlock.LIT);
+            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
+            world.notifyBlockUpdate(pos,state,newstate,3);
+            world.setBlockState(pos,newstate,3);
+            world.markBlockRangeForRenderUpdate(pos,state,newstate);
+        }
+        return ph.extractItem(6,ph.getStackInSlot(6).getCount(),false);
     }
 
     public boolean addFilter(ItemStack filter,boolean simulate)
@@ -1334,25 +1494,143 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return false;
     }
 
-    /*public boolean doItemsMatch(ItemStack itemStackIn)
-    {
-        IItemHandler h = handler.orElse(null);
-        if(hasItem())
-        {
-            return ItemStack.areItemsEqual(h.getStackInSlot(0),itemStackIn);
-        }
-        else{return true;}
-    }*/
+    /*============================================================================
+    ==============================================================================
+    ===========================      FILTER END      =============================
+    ==============================================================================
+    ============================================================================*/
 
-    public boolean doItemsMatch(ItemStack itemStackIn)
+    /*============================================================================
+    ==============================================================================
+    ===========================    REDSTONE START    =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean hasTorch()
     {
-        IItemHandler h = handler.orElse(null);
-        if(hasItem())
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(7).isEmpty())
         {
-            return ItemHandlerHelper.canItemStacksStack(h.getStackInSlot(0),itemStackIn);
+            return false;
         }
-        else{return true;}
+        else  return true;
     }
+
+    public ItemStack getTorchPedestal()
+    {
+        if(hasTorch())return new ItemStack(Items.REDSTONE_TORCH,1);
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeTorch(boolean updateBlock) {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(updateBlock)
+        {
+            BlockState state = world.getBlockState(pos);
+            int filterState = 0;
+            boolean watered = state.get(PedestalBlock.WATERLOGGED);
+            Direction dir = state.get(PedestalBlock.FACING);
+            boolean lit = state.get(PedestalBlock.LIT);
+            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
+            world.notifyBlockUpdate(pos,state,newstate,3);
+            world.setBlockState(pos,newstate,3);
+            world.markBlockRangeForRenderUpdate(pos,state,newstate);
+        }
+        return ph.extractItem(7,ph.getStackInSlot(7).getCount(),false);
+    }
+
+    public boolean addTorch(ItemStack filter,boolean simulate)
+    {
+        if(hasTorch())
+        {
+            return false;
+        }
+        else
+        {
+            BlockState state = world.getBlockState(pos);
+            boolean watered = state.get(PedestalBlock.WATERLOGGED);
+            Direction dir = state.get(PedestalBlock.FACING);
+            boolean lit = state.get(PedestalBlock.LIT);
+            int filterState = state.get(PedestalBlock.FILTER_STATUS);
+            if(filter.getItem() instanceof ItemFilterBase)
+            {
+                //Blacklist = 1 , whitelist = 0
+                filterState = (((ItemFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
+            }
+            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
+
+            IItemHandler ph = privateHandler.orElse(null);
+            ItemStack filterItem = filter.copy();
+            filterItem.setCount(1);
+            if(!hasFilter() && ph.isItemValid(6,filterItem))
+            {
+                if(!simulate)
+                {
+                    ph.insertItem(6,filterItem,false);
+                    world.notifyBlockUpdate(pos,state,newstate,3);
+                    world.setBlockState(pos,newstate,3);
+                    world.markBlockRangeForRenderUpdate(pos,state,newstate);
+                }
+                return true;
+            }
+            else return false;
+        }
+    }
+
+    public boolean isPedestalBlockPowered(World world,BlockPos pos)
+    {
+        boolean returner = world.isBlockPowered(pos);
+        if(hasTorch())
+        {
+            return !returner;
+        }
+
+        return returner;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================    REDSTONE END      =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+    public boolean canSendItemInPedestal(PedestalTileEntity pedestal, boolean hasItem)
+    {
+        if(hasItem)
+        {
+            if(hasCoin())
+            {
+                Item coin = getCoinOnPedestal().getItem();
+                if(coin instanceof ItemUpgradeBase)
+                {
+                    return ((ItemUpgradeBase)coin).canSendItem(pedestal);
+                }
+            }
+            else return true;
+        }
+
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public boolean isSamePedestal(BlockPos pedestalToBeLinked)
@@ -1407,7 +1685,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
         else
         {
-            if(doItemsMatch(itemsIncoming))
+            if(ItemHandlerHelper.canItemStacksStack(getItemInPedestal(),itemsIncoming))
             {
                 //Two buckets match but cant be stacked since max stack size is 1
                 //BUT if its a tank, its cooler then this
@@ -1634,33 +1912,23 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
     }
 
-    public void collideWithPedestal(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
-    {
-        if(!world.isRemote) {
-            if(entityIn instanceof ItemEntity)
-            {
-                if(tilePedestal.hasCoin())
-                {
-                    Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
-                    if(coinInPed instanceof ItemUpgradeBase)
-                    {
-                        ((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(tilePedestal, entityIn);
-                    }
-                }
-            }
-        }
-    }
 
-    //Needed for Rendering Tile Stuff
-    public boolean isBlockUnder(int x,int y,int z)
-    {
-        TileEntity tileEntity = world.getTileEntity(pos.add(x,y,z));
-        if(tileEntity instanceof ICapabilityProvider)
-        {
-            return true;
-        }
-        return false;
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     int partTicker = 0;
     int impTicker = 0;
@@ -1668,38 +1936,13 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     @Override
     public void tick() {
 
-        if(!world.isRemote)
+        if(!world.isRemote && world.isAreaLoaded(pos,1))
         {
-            if(world.isAreaLoaded(pos,1))
+            if(hasItem() && getNumberOfStoredLocations() >0 && isPedestalBlockPowered(getWorld(),getPos()))
             {
-                int speed = getOperationSpeed();
-                if(speed<1){speed = 20;}
-                //dont bother unless pedestal has items in it.
-                if(!getItemInPedestal().isEmpty())
+                if(canSendItemInPedestal(getTile(),true))
                 {
-                    if(!world.isBlockPowered(pos))
-                    {
-                        if(getNumberOfStoredLocations()>0)
-                        {
-                            pedTicker++;
-                            if (pedTicker%speed == 0) {
-                                for(int i=0; i<getNumberOfStoredLocations();i++)
-                                {
-                                    if(getStoredPositionAt(i) != getPos())
-                                    {
-                                        //check for any slots that can accept items if not then keep trying
-                                        if(canSendToPedestal(getStoredPositionAt(i)))
-                                        {
-                                            //Once a slot is found and items transfered, stop loop(so it restarts next check)
-                                            sendItemsToPedestal(getStoredPositionAt(i));
-                                            break;
-                                        }
-                                    }
-                                }
-                                if(pedTicker >=20){pedTicker=0;}
-                            }
-                        }
-                    }
+
                 }
             }
         }
@@ -1757,7 +2000,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         this.lockCode = LockCode.read(nbt);
     }
 
-
     public CompoundNBT write(CompoundNBT tag) {
         super.write(tag);
         handler.ifPresent(h -> {
@@ -1794,7 +2036,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     }
 
     // TODO: When syncing data to the client, only update the two itemsstacks that get updated, not everything.
-
     @Nullable
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
