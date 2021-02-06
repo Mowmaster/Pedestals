@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -12,9 +13,13 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.*;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -33,10 +38,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -99,29 +101,27 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     {
         float damage = 2.0f;
 
-        if(toolInPedestal.getItem() instanceof SwordItem)
+        //By defalut accounts for any enchants that add attack damage (like sharpness)
+        Multimap<Attribute, AttributeModifier> attributes = toolInPedestal.getItem().getAttributeModifiers(EquipmentSlotType.MAINHAND,toolInPedestal);
+        if(attributes.containsKey(Attributes.ATTACK_DAMAGE))
         {
-            SwordItem sword = (SwordItem)toolInPedestal.getItem();
-            if(sword.getAttackDamage() > damage)damage += sword.getAttackDamage();
-        }
-        else if(toolInPedestal.getItem() instanceof ToolItem){
-            ToolItem tool = (ToolItem)toolInPedestal.getItem();
-            if(tool.getAttackDamage() > damage)damage += tool.getAttackDamage();
+            if(attributes.get(Attributes.ATTACK_DAMAGE).size()>0)
+            {
+                AttributeModifier collected = attributes.get(Attributes.ATTACK_DAMAGE).iterator().next();
+                if(collected.getAmount() > damage)damage += collected.getAmount();
+            }
+
         }
 
-        if(EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.SHARPNESS))
-        {
-            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS,toolInPedestal);
-            damage += 1+(lvl*0.5);
-        }
+        //Adds damage for enchants on the tool that effect mobs (vanilla enchants supported only)
         if(entityIn instanceof SpiderEntity && EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.BANE_OF_ARTHROPODS))
         {
             int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.BANE_OF_ARTHROPODS,toolInPedestal);
             damage += 1+(lvl*0.5);
         }
-        if(entityIn instanceof ZombieEntity || entityIn instanceof SkeletonEntity && EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.BANE_OF_ARTHROPODS))
+        if(entityIn instanceof ZombieEntity || entityIn instanceof SkeletonEntity && EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.SMITE))
         {
-            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.BANE_OF_ARTHROPODS,toolInPedestal);
+            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.SMITE,toolInPedestal);
             damage += 1+(lvl*0.5);
         }
 
