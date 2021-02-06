@@ -573,6 +573,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if (slot == 5 &&
                         (       stack.getItem() instanceof ToolItem
                                 || stack.getItem() instanceof SwordItem
+                                || stack.getToolTypes().contains(ToolType.get("sword"))
                                 || stack.getToolTypes().contains(ToolType.PICKAXE)
                                 || stack.getToolTypes().contains(ToolType.HOE)
                                 || stack.getToolTypes().contains(ToolType.AXE)
