@@ -111,6 +111,8 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                                 //Checks to see how many items are left in the slot IF ITS UNDER the allowedTransferRate then sent the max rate to that.
                                 if(itemCountInInv < allowedTransferRate) allowedTransferRate = itemCountInInv;
 
+                                //if(itemFromInv.getMaxStackSize() < allowedTransferRate) allowedTransferRate = itemFromInv.getMaxStackSize();
+
                                 ItemStack copyIncoming = itemFromInv.copy();
                                 copyIncoming.setCount(allowedTransferRate);
                                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);

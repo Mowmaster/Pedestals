@@ -131,7 +131,7 @@ public class ItemUpgradeBase extends Item {
         if(tile instanceof PedestalTileEntity)
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)tile;
-            return pedestal.getSlotSizeLimit();
+            return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
         }
         //int stackabe = itemStackIncoming.getMaxStackSize();
         return 0;
