@@ -65,7 +65,7 @@ public class ItemUpgradeFilterDurabilityLess extends ItemUpgradeBaseFilter
     }
 
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
 
     }

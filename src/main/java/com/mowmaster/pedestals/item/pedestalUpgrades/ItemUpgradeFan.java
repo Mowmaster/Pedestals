@@ -230,9 +230,8 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         return  intOperationalSpeed;
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockPos pedestalPos = pedestal.getPos();
         if(!world.isBlockPowered(pedestalPos))

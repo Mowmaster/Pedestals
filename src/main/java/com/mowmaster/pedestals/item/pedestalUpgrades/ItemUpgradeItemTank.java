@@ -408,15 +408,14 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         return  (storageBuffer>=Integer.MAX_VALUE)?(Integer.MAX_VALUE):(storageBuffer);
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
-        BlockPos pedestalPos = pedestal.getPos();
-
         if(!world.isRemote)
         {
+            ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+            ItemStack itemInPedestal = pedestal.getItemInPedestal();
+            BlockPos pedestalPos = pedestal.getPos();
+
             int getMaxStorageValue = getStorageBuffer(coinInPedestal);
             if(!hasMaxStorageSet(coinInPedestal) || readMaxStorageFromNBT(coinInPedestal) != getMaxStorageValue) {writeMaxStorageToNBT(coinInPedestal, getMaxStorageValue);}
 

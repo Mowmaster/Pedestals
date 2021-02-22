@@ -27,14 +27,14 @@ public class ItemUpgradeEnergyRelay extends ItemUpgradeBaseEnergy
         return false;
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
-        BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
+            ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+            ItemStack itemInPedestal = pedestal.getItemInPedestal();
+            BlockPos pedestalPos = pedestal.getPos();
+
             int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
             if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 

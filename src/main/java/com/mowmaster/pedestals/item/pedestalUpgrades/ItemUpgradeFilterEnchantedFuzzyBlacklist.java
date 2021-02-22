@@ -30,7 +30,7 @@ public class ItemUpgradeFilterEnchantedFuzzyBlacklist extends ItemUpgradeBaseFil
     @Override
     public Boolean canAcceptAdvanced() {return true;}
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
 
     }

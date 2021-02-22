@@ -58,7 +58,7 @@ public class ItemUpgradeRestriction extends ItemUpgradeBase
         return 0;
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
 
     }

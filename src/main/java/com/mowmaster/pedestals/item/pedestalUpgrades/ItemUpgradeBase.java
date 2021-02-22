@@ -2296,19 +2296,10 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-
-
-
-
     public void notifyTransferUpdate(PedestalTileEntity receiverTile)
     {
 
     }
-
-
-
-
-
 
     public void removeFilterBlock(ItemStack stack)
     {
@@ -2724,7 +2715,7 @@ public class ItemUpgradeBase extends Item {
         return intItem;
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
 
     }

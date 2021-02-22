@@ -93,16 +93,16 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
         return gridSize;
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        BlockPos pedestalPos = pedestal.getPos();
-        int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
-        int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
-
         if(!world.isRemote)
         {
+            ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+            ItemStack itemInPedestal = pedestal.getItemInPedestal();
+            BlockPos pedestalPos = pedestal.getPos();
+
+            int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
+            int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
             int getMaxFluidValue = getFluidbuffer(coinInPedestal);
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 

@@ -21,7 +21,7 @@ public class ItemUpgradeDefault extends ItemUpgradeBase
         return 64;
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
 
     }

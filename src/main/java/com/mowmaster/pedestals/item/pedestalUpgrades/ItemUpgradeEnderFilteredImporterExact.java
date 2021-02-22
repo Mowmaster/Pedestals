@@ -101,14 +101,14 @@ public class ItemUpgradeEnderFilteredImporterExact extends ItemUpgradeBaseFilter
         return returner;
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack itemInPedestal = pedestal.getItemInPedestal();
-        BlockPos pedestalPos = pedestal.getPos();
         if(!world.isRemote)
         {
+            ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+            ItemStack itemInPedestal = pedestal.getItemInPedestal();
+            BlockPos pedestalPos = pedestal.getPos();
+
             int speed = getOperationSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos))

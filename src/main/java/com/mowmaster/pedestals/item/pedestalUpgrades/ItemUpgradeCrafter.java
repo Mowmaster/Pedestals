@@ -56,16 +56,15 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
         return gridSize;
     }
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        BlockPos pedestalPos = pedestal.getPos();
-        int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
-        int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
-
         if(!world.isRemote)
         {
+            ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+            BlockPos pedestalPos = pedestal.getPos();
+            int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
+            int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
+
             int speed = getOperationSpeed(coinInPedestal);
 
             if(!world.isBlockPowered(pedestalPos))

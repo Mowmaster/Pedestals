@@ -20,7 +20,7 @@ public class ItemUpgradeFilterFood extends ItemUpgradeBaseFilter
     @Override
     public Boolean canAcceptAdvanced() {return true;}
 
-    public void updateAction(PedestalTileEntity pedestal)
+    public void updateAction(World world, PedestalTileEntity pedestal)
     {
 
     }
