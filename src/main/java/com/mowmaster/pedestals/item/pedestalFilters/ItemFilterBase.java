@@ -38,6 +38,49 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
 
+/*
+LIST OF ALL FILTERS:
+
+Filters needed to replace 'old system'
+1. ItemStack (Exact)
+2. Item (Fuzzy)
+3. Mod
+4. isEnchanted (is/isnt)
+5. isFood (is/isnt)
+6. Durability (Above/Below)
+7. Enchanted Count
+8. Tag (W/B)
+9. Enchanted Exact
+10. Enchanted Fuzzy
+
+
+AutoAttacker (Entity Filtering)
+Potion Diffuser (Entity Filtering)
+Fan (Entity Filtering)
+
+Breaker (NONE)[Could filter based on blocks it can mine, why?, so you could setup multiple breakers with differnt pickaxe effects???]
+Void {Energy Fluid Normal} (NONE) [Could have a filter to only allow some transfers???]
+
+Chopper/ChopperShrooms (Currently Filters For Blocks to not break) [If its a block filter for can break or not, but also filter doubles as magnet filter???]
+Harvester (Currently a whitelist for items to magnet up)
+Magnet (Currently does everything, there are specific magnets for other things) {ItemStack(W/B),Item(W/B),Mod (W/B)}
+EnderExport/Import {itemstack,item,mod,enchanted,food}
+Restock(Currenty very "Dumb", but we could make it only allow items in its inv???)
+Energy Quarry (Blacklist/Whitelist)
+Export (Has Filtered Varients Currently) {itemstack,item,mod,enchanted,food}
+Filtered Import (Currently scanns for inventories to send items to, then only pulls those items)[Turn into a "SMART IMPORT"???]
+Filtered Restock [Turn into SMART RESTOCK???]
+Filter (Normal) {Enchanted ItemStack(W/B),Enchanted Item(W/B)}
+Fluid Filter (W/B)
+Fluid Drain [Only allow fluids to be insert???]
+FluidExport/Import/Pump(W/B)/relays/tank
+Import [Only pull certian items out???]
+Placer [Only accept certian blocks???]
+Quarry Normal (W/B)
+Recycler???
+Restriction???
+ */
+
 public class ItemFilterBase extends Item
 {
     public boolean filterType = false;
