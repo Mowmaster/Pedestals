@@ -537,16 +537,16 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 10 slots to future proof things
-        return new ItemStackHandler(8) {
+        return new ItemStackHandler(9) {
 
             @Override
             protected void onLoad() {
-                if(getSlots()<8)
+                if(getSlots()<9)
                 {
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    setSize(8);
+                    setSize(9);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
                     }
@@ -583,6 +583,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                         ) return true;
                 if (slot == 6 && stack.getItem() instanceof ItemFilterBase && !hasFilter()) return true;
                 if (slot == 7 && stack.getItem().equals(Items.REDSTONE_TORCH) && !hasTorch()) return true;
+                //Need to add the rest of the methods to implement this properly
+                if (slot == 8 && stack.getItem().equals(ItemPedestalUpgrades.ROUNDROBIN)) return true;
                 return false;
             }
         };
@@ -1698,6 +1700,15 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                         canAccept = (getSlotSizeLimit() - getItemInPedestal().getCount());
                     }
                 }
+            }
+        }
+
+        if(hasFilter())
+        {
+            Item filterInPed = this.getFilterInPedestal().getItem();
+            if(filterInPed instanceof ItemFilterBase)
+            {
+                pedestalAccept = ((ItemFilterBase) filterInPed).canAcceptCount(worldIn, posPedestal, getItemInPedestal(), itemsIncoming);
             }
         }
 

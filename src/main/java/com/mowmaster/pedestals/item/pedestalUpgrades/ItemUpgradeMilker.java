@@ -80,7 +80,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
         //TODO: Maybe have a fluid recipe thingy for people to add other tiems that 'contain' fluids??? have an input, fluid, amount, and output for the recipe???
         if(FluidUtil.getFluidHandler(itemInPedestal).isPresent())
         {
-            FluidStack fluidInItem = FluidUtil.getFluidContained(itemInPedestal).get();
+            FluidStack fluidInItem = FluidUtil.getFluidContained(itemInPedestal).orElse(FluidStack.EMPTY);
             return fluidInItem;
         }
         return FluidStack.EMPTY;

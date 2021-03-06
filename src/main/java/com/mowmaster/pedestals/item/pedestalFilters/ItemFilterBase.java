@@ -54,6 +54,9 @@ Filters needed to replace 'old system'
 10. Enchanted Fuzzy
 
 
+NOTE: Fluid filtering upgrades will have to check specifically for fluid like items in the filter, as these will be combined
+
+
 AutoAttacker (Entity Filtering)
 Potion Diffuser (Entity Filtering)
 Fan (Entity Filtering)
@@ -79,6 +82,12 @@ Placer [Only accept certian blocks???]
 Quarry Normal (W/B)
 Recycler???
 Restriction???
+
+REMOVALS:
+Energy/Fluid/Exp Relay(blocked) - A blank whitelist filter would do the same thing
+
+
+
  */
 
 public class ItemFilterBase extends Item
@@ -116,6 +125,18 @@ public class ItemFilterBase extends Item
     public boolean canSendItem(PedestalTileEntity tile)
     {
         return true;
+    }
+
+    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
+    {
+        TileEntity tile = world.getTileEntity(posPedestal);
+        if(tile instanceof PedestalTileEntity)
+        {
+            PedestalTileEntity pedestal = (PedestalTileEntity)tile;
+            return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
+        }
+        //int stackabe = itemStackIncoming.getMaxStackSize();
+        return 0;
     }
 
     @Override
