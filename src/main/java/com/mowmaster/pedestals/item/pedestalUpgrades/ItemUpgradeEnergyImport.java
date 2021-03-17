@@ -34,7 +34,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
     @Override
     public boolean canSendItem(PedestalTileEntity tile)
     {
-        return tile.getStoredValueForUpgrades()>0;
+        return getStoredInt(tile.getCoinOnPedestal())>0;
     }
 
     public void updateAction(World world, PedestalTileEntity pedestal)
@@ -128,20 +128,20 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
                         int energyRemainingInUpgrade = getCurrentEnergy + transferRate;
                         setEnergyStored(coinInPedestal,energyRemainingInUpgrade);
                         extractEnergyFromStack(itemInPedestal,transferRate,false);
-                        ped.setStoredValueForUpgrades(0);
+                        writeStoredIntToNBT(coinInPedestal,0);
                         ped.update();
                     }
                 }
                 else
                 {
-                    ped.setStoredValueForUpgrades(1);
+                    writeStoredIntToNBT(coinInPedestal,1);
                     ped.update();
                 }
             }
         }
     }
 
-    @Override
+    /*@Override
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
         if(!world.isRemote)
@@ -161,7 +161,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
                 }
             }
         }
-    }
+    }*/
 
     public static final Item RFIMPORT = new ItemUpgradeEnergyImport(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfimport"));
 

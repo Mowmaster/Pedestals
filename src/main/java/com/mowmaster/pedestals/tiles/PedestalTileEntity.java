@@ -1027,7 +1027,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             coin.removeCraftingQueue(stack);
         }
         ph.extractItem(0,stack.getCount(),false);
-        setStoredValueForUpgrades(0);
         //update();
 
         return stack;
@@ -1045,7 +1044,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 //We know this is what the item is because of the pedestal block check
                 ((ItemUpgradeBase)itemFromBlock.getItem()).setPlayerOnCoin(itemFromBlock,player);
                 if(!hasCoin())ph.insertItem(0,itemFromBlock,false);
-                setStoredValueForUpgrades(0);
                 //if(coinFromBlock.getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)coinFromBlock.getItem()).onPedestalNeighborChanged(this);
                 //update();
             }
@@ -1598,9 +1596,59 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     ============================================================================*/
 
 
-    public boolean canSendItemInPedestal(PedestalTileEntity pedestal, boolean hasItem)
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     Robin START     ==============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean addRRobin(ItemStack roundRobin)
     {
-        if(hasItem)
+        IItemHandler ph = privateHandler.orElse(null);
+        ItemStack itemFromBlock = roundRobin.copy();
+        itemFromBlock.setCount(1);
+        if(getSpeed() < 1)
+        {
+            ph.insertItem(8,itemFromBlock,false);
+            //update();
+            return true;
+        }
+        else return false;
+    }
+
+    public boolean hasRRobin()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(8).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      Robin END      ==============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public boolean canSendItemInPedestal(PedestalTileEntity pedestal)
+    {
+        if(pedestal.hasItem())
         {
             if(hasCoin())
             {
@@ -1615,26 +1663,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
         return false;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public boolean isSamePedestal(BlockPos pedestalToBeLinked)
     {
@@ -1766,72 +1794,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return LazyOptional.empty();
     }
 
-    private boolean canSendToPedestal(BlockPos pedestalToSendTo)
-    {
-        boolean returner = false;
-
-        //Checks to see if we can send an item from the pedestal, like in the case of the import energy/fluid upgrades
-        if(canSendItemInPedestal())
-        {
-            //Check if Block is Loaded in World
-            if(world.isAreaLoaded(pedestalToSendTo,1))
-            {
-                //If block ISNT powered
-                if(!world.isBlockPowered(pedestalToSendTo))
-                {
-                    //Make sure its a pedestal before getting the tile
-                    if(world.getBlockState(pedestalToSendTo).getBlock() instanceof PedestalBlock)
-                    {
-                        //Make sure it is still part of the right network
-                        if(canLinkToPedestalNetwork(pedestalToSendTo))
-                        {
-                            //Get the tile before checking other things
-                            if(world.getTileEntity(pedestalToSendTo) instanceof PedestalTileEntity)
-                            {
-                                PedestalTileEntity tilePedestalToSendTo = (PedestalTileEntity)world.getTileEntity(pedestalToSendTo);
-                                LazyOptional<IItemHandler> cap = findItemHandlerPedestal(tilePedestalToSendTo);
-                                if(cap.isPresent())
-                                {
-                                    IItemHandler handler = cap.orElse(null);
-                                    if(handler.isItemValid(0,this.getItemInPedestal()))
-                                    {
-                                        //Checks if pedestal is empty or if not then checks if items match and how many can be insert
-                                        if(tilePedestalToSendTo.canAcceptItems(world,pedestalToSendTo,getItemInPedestal()) > 0)
-                                        {
-                                            //Check if it has filter, if not return true
-                                            if(hasFilter(tilePedestalToSendTo))
-                                            {
-                                                Item coinInPed = tilePedestalToSendTo.getCoinOnPedestal().getItem();
-                                                if(coinInPed instanceof ItemUpgradeBaseFilter)
-                                                {
-                                                    //Already checked if its a filter, so now check if it can accept items.
-                                                    if(((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,pedestalToSendTo,getItemInPedestal()))
-                                                    {
-                                                        returner = true;
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                returner = true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        removeLocation(pedestalToSendTo);
-                    }
-                }
-            }
-        }
-
-        return returner;
-    }
-
     //Needed for filtered imports
     public boolean canSendToPedestal(BlockPos pedestalToSendTo, ItemStack itemStackIncoming)
     {
@@ -1860,23 +1822,29 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 //Checks if pedestal is empty or if not then checks if items match and how many can be insert
                                 if(tilePedestalToSendTo.canAcceptItems(world,pedestalToSendTo,itemStackIncoming) > 0)
                                 {
+                                    boolean filter = true;
+                                    boolean coin = true;
                                     //Check if it has filter, if not return true
-                                    if(hasFilter(tilePedestalToSendTo))
+                                    if(tilePedestalToSendTo.hasFilter())
                                     {
-                                        Item coinInPed = tilePedestalToSendTo.getCoinOnPedestal().getItem();
-                                        if(coinInPed instanceof ItemUpgradeBaseFilter)
+                                        Item filterInPedestal = tilePedestalToSendTo.getFilterInPedestal().getItem();
+                                        if(filterInPedestal instanceof ItemFilterBase)
                                         {
-                                            //Already checked if its a filter, so now check if it can accept items.
-                                            if(((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,pedestalToSendTo,itemStackIncoming))
-                                            {
-                                                returner = true;
-                                            }
+                                            filter = ((ItemFilterBase) filterInPedestal).canAcceptItem(tilePedestalToSendTo,itemStackIncoming);
                                         }
                                     }
-                                    else
+
+                                    if(tilePedestalToSendTo.hasCoin())
                                     {
-                                        returner = true;
+                                        Item coinInPedestal = tilePedestalToSendTo.getCoinOnPedestal().getItem();
+                                        if(coinInPedestal instanceof ItemUpgradeBase)
+                                        {
+                                            coin = ((ItemUpgradeBase) coinInPedestal).canAcceptItem(getWorld(),pedestalToSendTo,itemStackIncoming);
+                                        }
                                     }
+
+                                    //Should return true by default, or fals eif a filter or coin blocks it???
+                                    returner = filter && coin;
                                 }
                             }
                         }
@@ -1892,6 +1860,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return returner;
     }
 
+
+
+
+    //The actual transfer methods for items
     public void sendItemsToPedestal(BlockPos pedestalToSendTo)
     {
         if(world.getTileEntity(pedestalToSendTo) instanceof PedestalTileEntity)
@@ -1924,22 +1896,42 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
     }
 
+    public void transferActionItems()
+    {
+        int locations = getNumberOfStoredLocations();
+        if(locations > 0)
+        {
+            if(hasRRobin())
+            {
+                int robinCount = getStoredValueForUpgrades();
+                if(robinCount >= locations)
+                {
+                    setStoredValueForUpgrades(0);
+                    robinCount=0;
+                }
+                BlockPos posReceiver = getStoredPositionAt(robinCount);
+                if(canSendToPedestal(posReceiver,getItemInPedestal()))
+                {
+                    sendItemsToPedestal(posReceiver);
+                }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                robinCount++;
+                setStoredValueForUpgrades(robinCount);
+            }
+            else
+            {
+                for(int i=0;i<locations;i++){
+                    BlockPos posReceiver = getStoredPositionAt(i);
+                    if(canSendToPedestal(posReceiver,getItemInPedestal()))
+                    {
+                        sendItemsToPedestal(posReceiver);
+                        break;
+                    }
+                    else continue;
+                }
+            }
+        }
+    }
 
 
     int partTicker = 0;
@@ -1950,11 +1942,15 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
         if(!world.isRemote && world.isAreaLoaded(pos,1))
         {
-            if(hasItem() && getNumberOfStoredLocations() >0 && isPedestalBlockPowered(getWorld(),getPos()))
+            if(getNumberOfStoredLocations() >0 && !isPedestalBlockPowered(getWorld(),getPos()) && hasItem())
             {
-                if(canSendItemInPedestal(getTile(),true))
-                {
+                pedTicker++;
+                if (pedTicker%getOperationSpeed() == 0) {
 
+                    transferActionItems();
+                    //Eventually have Energy, Fluids, XP in here too???
+
+                    if(pedTicker >=20){pedTicker=0;}
                 }
             }
         }

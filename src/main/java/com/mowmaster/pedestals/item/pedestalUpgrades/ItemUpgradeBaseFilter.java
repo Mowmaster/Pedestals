@@ -5,8 +5,10 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
@@ -41,6 +43,12 @@ public class ItemUpgradeBaseFilter extends ItemUpgradeBase {
     }
 
     public Boolean canAcceptAdvanced()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         return false;
     }

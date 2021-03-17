@@ -27,7 +27,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
     @Override
     public boolean canSendItem(PedestalTileEntity tile)
     {
-        return tile.getStoredValueForUpgrades()>0;
+        return getStoredInt(tile.getCoinOnPedestal())>0;
     }
 
     public void updateAction(World world, PedestalTileEntity pedestal)
@@ -119,13 +119,13 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
                         int energyRemainingInUpgrade = getCurrentEnergy - transferRate;
                         setEnergyStored(coinInPedestal,energyRemainingInUpgrade);
                         insertEnergyIntoStack(itemInPedestal, transferRate, false);
-                        ped.setStoredValueForUpgrades(0);
+                        writeStoredIntToNBT(coinInPedestal,0);
                         ped.update();
                     }
                 }
                 else
                 {
-                    ped.setStoredValueForUpgrades(1);
+                    writeStoredIntToNBT(coinInPedestal,1);
                     ped.update();
                 }
             }

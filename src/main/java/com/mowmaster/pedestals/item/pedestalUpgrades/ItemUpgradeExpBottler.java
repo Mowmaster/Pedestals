@@ -157,7 +157,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                 //If we can extract the correct amount of bottles(If it returns empty then it CANT work)
                                 if(!(handler.extractItem(i,modifier ,true ).equals(ItemStack.EMPTY)))
                                 {
-                                    int rate = (modifier * 11);
+                                    int rate = (modifier * 10);
                                     ItemStack getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
                                     TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                                     if(pedestalInv instanceof PedestalTileEntity) {

@@ -23,27 +23,24 @@ public class ItemFilterItem extends ItemFilterBase
     public ItemFilterItem(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
+    public boolean canAcceptItem(PedestalTileEntity pedestal, ItemStack itemStackIn)
     {
-        boolean returner = false;
+        boolean filterBool=getFilterType(pedestal.getFilterInPedestal());
+        boolean returner = filterBool;
 
-        if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
+        ItemStack filter = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem().equals(itemStackIn.getItem()))
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
         {
-            PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
-            int range = stackCurrent.size();
-
-            ItemStack itemFromInv = ItemStack.EMPTY;
-            itemFromInv = IntStream.range(0,range)//Int Range
-                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                    .filter(itemStack -> itemStack.getItem().equals(itemStackIn.getItem()))
-                    .findFirst().orElse(ItemStack.EMPTY);
-
-            if(!itemFromInv.isEmpty())
-            {
-                returner = true;
-            }
+            returner = !filterBool;
         }
 
         return returner;

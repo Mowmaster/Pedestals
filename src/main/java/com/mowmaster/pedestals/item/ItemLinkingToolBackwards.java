@@ -208,12 +208,53 @@ public class ItemLinkingToolBackwards extends ItemLinkingTool {
                     TileEntity tileEntity = worldIn.getTileEntity(pos);
                     if (tileEntity instanceof PedestalTileEntity) {
                         PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
-                        List<BlockPos> getLocations = tilePedestal.getLocationList();
 
+                        TranslationTextComponent rrobin = new TranslationTextComponent(getTranslationKey() + ".tool_rrobin");
+                        TranslationTextComponent rrobint = new TranslationTextComponent(getTranslationKey() + ".tool_rrobin_true");
+                        TranslationTextComponent rrobinf = new TranslationTextComponent(getTranslationKey() + ".tool_rrobin_false");
+                        TranslationTextComponent TransferTypeText = (tilePedestal.hasRRobin())?(rrobint):(rrobinf);
+                        rrobin.append(TransferTypeText);
+                        rrobin.mergeStyle(TextFormatting.LIGHT_PURPLE);
+                        player.sendMessage(rrobin,Util.DUMMY_UUID);
+
+                        if(tilePedestal.hasTool())
+                        {
+                            TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".tool_stored");
+                            tool.append(tilePedestal.getToolOnPedestal().getDisplayName());
+                            tool.mergeStyle(TextFormatting.WHITE);
+                            player.sendMessage(tool,Util.DUMMY_UUID);
+                        }
+
+                        if(tilePedestal.getSpeed()>0)
+                        {
+                            TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tool_speed");
+                            speed.appendString(""+tilePedestal.getSpeed()+"");
+                            speed.mergeStyle(TextFormatting.RED);
+                            player.sendMessage(speed,Util.DUMMY_UUID);
+                        }
+
+                        if(tilePedestal.getCapacity()>0)
+                        {
+                            TranslationTextComponent capacity = new TranslationTextComponent(getTranslationKey() + ".tool_capacity");
+                            capacity.appendString(""+tilePedestal.getCapacity()+"");
+                            capacity.mergeStyle(TextFormatting.BLUE);
+                            player.sendMessage(capacity,Util.DUMMY_UUID);
+                        }
+
+                        if(tilePedestal.getCapacity()>0)
+                        {
+                            TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_range");
+                            range.appendString(""+tilePedestal.getRange()+"");
+                            range.mergeStyle(TextFormatting.GREEN);
+                            player.sendMessage(range,Util.DUMMY_UUID);
+                        }
+
+
+                        List<BlockPos> getLocations = tilePedestal.getLocationList();
                         if(getLocations.size()>0)
                         {
                             TranslationTextComponent links = new TranslationTextComponent(getTranslationKey() + ".tool_linked");
-                            links.mergeStyle(TextFormatting.WHITE);
+                            links.mergeStyle(TextFormatting.GOLD);
                             player.sendMessage(links,Util.DUMMY_UUID);
 
                             for(int i = 0; i < getLocations.size();i++)
@@ -228,29 +269,6 @@ public class ItemLinkingToolBackwards extends ItemLinkingTool {
                                 player.sendMessage(linked,Util.DUMMY_UUID);
                             }
                         }
-
-                        if(tilePedestal.hasTool())
-                        {
-                            TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".tool_stored");
-                            tool.append(tilePedestal.getToolOnPedestal().getDisplayName());
-                            tool.mergeStyle(TextFormatting.LIGHT_PURPLE);
-                            player.sendMessage(tool,Util.DUMMY_UUID);
-                        }
-
-                        TranslationTextComponent capacity = new TranslationTextComponent(getTranslationKey() + ".tool_capacity");
-                        capacity.appendString(""+tilePedestal.getCapacity()+"");
-                        capacity.mergeStyle(TextFormatting.BLUE);
-                        player.sendMessage(capacity,Util.DUMMY_UUID);
-
-                        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tool_speed");
-                        speed.appendString(""+tilePedestal.getSpeed()+"");
-                        speed.mergeStyle(TextFormatting.RED);
-                        player.sendMessage(speed,Util.DUMMY_UUID);
-
-                        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_range");
-                        range.appendString(""+tilePedestal.getRange()+"");
-                        range.mergeStyle(TextFormatting.GREEN);
-                        player.sendMessage(range,Util.DUMMY_UUID);
                     }
                     return ActionResultType.SUCCESS;
                 }

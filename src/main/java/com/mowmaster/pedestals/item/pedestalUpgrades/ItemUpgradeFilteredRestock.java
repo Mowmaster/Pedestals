@@ -214,7 +214,7 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
     //only inserts into slots with items, will not fill blank slots
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        int i = getIntValueFromPedestal(world,posOfPedestal );
+        int i = getStoredInt(coinInPedestal);
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int upgradeTransferRate = getItemTransferRate(coinInPedestal);
         ItemStack itemFromPedestal = ItemStack.EMPTY;
@@ -273,12 +273,12 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
                                     if(handler.insertItem(i,itemFromPedestal,true ).equals(ItemStack.EMPTY)){
                                         removeFromPedestal(world,posOfPedestal ,allowedTransferRate);
                                         handler.insertItem(i,itemFromPedestal,false );
-                                        setIntValueToPedestal(world,posOfPedestal ,slotnext);
+                                        writeStoredIntToNBT(coinInPedestal,slotnext);
                                     }
                                 }
                                 else
                                 {
-                                    setIntValueToPedestal(world,posOfPedestal ,slotnext);
+                                    writeStoredIntToNBT(coinInPedestal,slotnext);
                                 }
 
                             }
@@ -286,7 +286,7 @@ public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
                         else
                         {
                             int slotnext = getSlotNumberNext(i,handler.getSlots(),itemFromPedestal,itemFromInventory);
-                            setIntValueToPedestal(world,posOfPedestal ,slotnext);
+                            writeStoredIntToNBT(coinInPedestal,slotnext);
                         }
                     }
                 }

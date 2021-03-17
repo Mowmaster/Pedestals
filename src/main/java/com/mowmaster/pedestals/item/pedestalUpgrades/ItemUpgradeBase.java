@@ -122,7 +122,7 @@ public class ItemUpgradeBase extends Item {
     //Will probably need overwritten
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
-        return false;
+        return true;
     }
 
     public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
@@ -250,25 +250,6 @@ public class ItemUpgradeBase extends Item {
         if(pedestalInventory instanceof PedestalTileEntity) {
             ((PedestalTileEntity) pedestalInventory).addItem(itemStackToAdd);
         }
-    }
-
-    public void setIntValueToPedestal(World world, BlockPos posOfPedestal, int value)
-    {
-        TileEntity pedestal = world.getTileEntity(posOfPedestal);
-        if(pedestal instanceof PedestalTileEntity) {
-            ((PedestalTileEntity) pedestal).setStoredValueForUpgrades(value);
-        }
-    }
-
-    public int getIntValueFromPedestal(World world, BlockPos posOfPedestal)
-    {
-        int value = 0;
-        TileEntity pedestal = world.getTileEntity(posOfPedestal);
-        if(pedestal instanceof PedestalTileEntity) {
-            value = ((PedestalTileEntity) pedestal).getStoredValueForUpgrades();
-        }
-
-        return value;
     }
 
     public int intSpaceLeftInStack (ItemStack stack)
@@ -2158,17 +2139,15 @@ public class ItemUpgradeBase extends Item {
         int matching = 0;
         if(stackIn.size() == stackCurrent.size())
         {
-            for(int i=0;i<stackIn.size();i++)
+            for(int i=0;i<stackCurrent.size();i++)
             {
+                if(stackIn.size()<i)break;
                 if(doItemsMatchWithEmpty(stackIn.get(i),stackCurrent.get(i)))
                 {
                     matching++;
                     continue;
                 }
-                else
-                {
-                    break;
-                }
+                else break;
             }
         }
 

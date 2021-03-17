@@ -45,6 +45,11 @@
     "item.pedestals.linkingtool.tool_capacity": "Capacity Upgrades: ",
     "item.pedestals.linkingtool.tool_speed": "Speed Upgrades: ",
     "item.pedestals.linkingtool.tool_range": "Range Upgrades: ",
+
+  "item.pedestals.linkingtool.tool_rrobin": "Transferring Mode: ",
+  "item.pedestals.linkingtool.tool_rrobin_true": "Round Robin: ",
+  "item.pedestals.linkingtool.tool_rrobin_false": "Linked Priority: ",
+
     "jei.pedestals.linkingtool.desc": "Shift-R-Click the pedestal Receiving items to select it, Shift-R-Click on the pedestal Sending Items to link the two pedestals. Used In crafting to create most base items in the mod.",
   "item.pedestals.linkingtoolbackwards": "Backwards Linking Tool",
   "item.pedestals.linkingtoolbackwards.tool_link_success": "Link Successful",
@@ -65,6 +70,9 @@
   "item.pedestals.linkingtoolbackwards.tool_capacity": "Capacity Upgrades: ",
   "item.pedestals.linkingtoolbackwards.tool_speed": "Speed Upgrades: ",
   "item.pedestals.linkingtoolbackwards.tool_range": "Range Upgrades: ",
+  "item.pedestals.linkingtoolbackwards.tool_rrobin": "Transferring Mode: ",
+  "item.pedestals.linkingtoolbackwards.tool_rrobin_true": "Round Robin: ",
+  "item.pedestals.linkingtoolbackwards.tool_rrobin_false": "Linked Priority: ",
   "jei.pedestals.linkingtoolbackwards.desc": "Shift-R-Click the pedestal Sending items to select it, Shift-R-Click on the pedestal Receiving Items to link the two pedestals. Used In crafting to create most base items in the mod.",
 
   "item.pedestals.tagtool": "Tag Tool",

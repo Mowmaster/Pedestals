@@ -55,7 +55,7 @@ public class ItemUpgradeEnergyGeneratorMob extends ItemUpgradeBaseEnergy
     @Override
     public boolean canSendItem(PedestalTileEntity tile)
     {
-        return tile.getStoredValueForUpgrades()>0;
+        return getStoredInt(tile.getCoinOnPedestal())>0;
     }
 
     public int getEnergyBuffer(ItemStack stack) {

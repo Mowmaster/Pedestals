@@ -117,7 +117,7 @@ public class ItemFilterBase extends Item
         writeFilterTypeToNBT(filterItem);
     }
 
-    public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
+    public boolean canAcceptItem(PedestalTileEntity pedestal, ItemStack itemStackIn)
     {
         return true;
     }
