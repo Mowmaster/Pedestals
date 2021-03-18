@@ -44,7 +44,7 @@ public class ItemUpgradeTool extends Item {
     public BlockPos storedPosition = defaultPos;
 
     public ItemUpgradeTool() {
-        super(new Properties().maxStackSize(1).containerItem(UPGRADE).group(PEDESTALS_TAB));
+        super(new Properties().stacksTo(1).containerItem(UPGRADE).tab(PEDESTALS_TAB));
     }
 
     @Override
@@ -64,11 +64,11 @@ public class ItemUpgradeTool extends Item {
 
     @Override
     public ActionResultType onItemUse(ItemUseContext context) {
-        World worldIn = context.getWorld();
+        World worldIn = context.getLevel();
         PlayerEntity player = context.getPlayer();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
 
-        if(!worldIn.isRemote)
+        if(!worldIn.isClientSide)
         {
             BlockState getBlockState = worldIn.getBlockState(pos);
             if(player.isCrouching())
@@ -163,7 +163,7 @@ public class ItemUpgradeTool extends Item {
             if (stack.isEnchanted() && isSelected || player.getHeldItemOffhand().getItem() instanceof ItemUpgradeTool)
             {
                 if (stack.hasTag()) {
-                    this.getPosFromNBT(stack);
+                    this.getBlockPosFromNBT(stack);
                     BlockPos pos = this.getStoredPosition(stack);
                     int[] getWorkArea = this.getWorkPosFromNBT(stack);
                     Random rand = new Random();
@@ -176,7 +176,7 @@ public class ItemUpgradeTool extends Item {
                         if(worldIn.getTileEntity(pos) instanceof PedestalTileEntity)
                         {
                             negNums = getNegRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);
-                            posNums = getPosRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);
+                            posNums = getBlockPosRangePos(worldIn,pos,getWorkArea[0],getWorkArea[1]);
                         }
                     }
 
@@ -185,7 +185,7 @@ public class ItemUpgradeTool extends Item {
                         if(isSelected)
                         {
                             //System.out.println("Tick: "+pos);
-                            if(worldIn.isRemote)
+                            if(worldIn.isClientSide)
                             {
                                 ticker++;
 
@@ -222,7 +222,7 @@ public class ItemUpgradeTool extends Item {
 
     public BlockPos getStoredPosition(ItemStack getWrenchItem)
     {
-        getPosFromNBT(getWrenchItem);
+        getBlockPosFromNBT(getWrenchItem);
         return storedPosition;
     }
 
@@ -253,7 +253,7 @@ public class ItemUpgradeTool extends Item {
         stack.setTag(compound);
     }
 
-    public void getPosFromNBT(ItemStack stack)
+    public void getBlockPosFromNBT(ItemStack stack)
     {
         if(stack.hasTag())
         {
@@ -306,7 +306,7 @@ public class ItemUpgradeTool extends Item {
         }
     }
 
-    public BlockPos getPosRangePos(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
+    public BlockPos getBlockPosRangePos(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
     {
         BlockState state = world.getBlockState(posOfPedestal);
         Direction enumfacing = state.get(FACING);
@@ -394,21 +394,21 @@ public class ItemUpgradeTool extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        //new TranslationTextComponent(getTranslationKey() + ".tool_speed", tilePedestal.getSpeed()).mergeStyle(TextFormatting.RED)
-        TranslationTextComponent selected = new TranslationTextComponent(getTranslationKey() + ".tool_block_selected");
-        TranslationTextComponent unselected = new TranslationTextComponent(getTranslationKey() + ".tool_block_unselected");
-        TranslationTextComponent cordX = new TranslationTextComponent(getTranslationKey() + ".tool_X");
-        TranslationTextComponent cordY = new TranslationTextComponent(getTranslationKey() + ".tool_Y");
-        TranslationTextComponent cordZ = new TranslationTextComponent(getTranslationKey() + ".tool_Z");
+        //new TranslationTextComponent(getDescriptionId() + ".tool_speed", tilePedestal.getSpeed()).withStyle(TextFormatting.RED)
+        TranslationTextComponent selected = new TranslationTextComponent(getDescriptionId() + ".tool_block_selected");
+        TranslationTextComponent unselected = new TranslationTextComponent(getDescriptionId() + ".tool_block_unselected");
+        TranslationTextComponent cordX = new TranslationTextComponent(getDescriptionId() + ".tool_X");
+        TranslationTextComponent cordY = new TranslationTextComponent(getDescriptionId() + ".tool_Y");
+        TranslationTextComponent cordZ = new TranslationTextComponent(getDescriptionId() + ".tool_Z");
         if(stack.getItem() instanceof ItemUpgradeTool) {
             if (stack.hasTag()) {
                 if (stack.isEnchanted()) {
-                    selected.appendString(cordX.getString());
-                    selected.appendString("" + this.getStoredPosition(stack).getX() + "");
-                    selected.appendString(cordY.getString());
-                    selected.appendString("" + this.getStoredPosition(stack).getY() + "");
-                    selected.appendString(cordZ.getString());
-                    selected.appendString("" + this.getStoredPosition(stack).getZ() + "");
+                    selected.append(cordX.getString());
+                    selected.append("" + this.getStoredPosition(stack).getX() + "");
+                    selected.append(cordY.getString());
+                    selected.append("" + this.getStoredPosition(stack).getY() + "");
+                    selected.append(cordZ.getString());
+                    selected.append("" + this.getStoredPosition(stack).getZ() + "");
                     tooltip.add(selected);
                 } else tooltip.add(unselected);
             } else tooltip.add(unselected);

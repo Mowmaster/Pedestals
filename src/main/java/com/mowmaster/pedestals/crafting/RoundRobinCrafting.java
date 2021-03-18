@@ -40,19 +40,19 @@ public class RoundRobinCrafting
         //Added to keep fake players from canning this every time?
         if(!(event.getPlayer() instanceof FakePlayer))
         {
-            World worldIn = event.getWorld();
+            World worldIn = event.getLevel();
             Hand hand = event.getHand();
-            BlockState state = worldIn.getBlockState(event.getPos());
+            BlockState state = worldIn.getBlockState(event.getBlockPos());
             PlayerEntity player = event.getPlayer();
-            BlockPos pos = event.getPos();
+            BlockPos pos = event.getBlockPos();
 
-            int posX = event.getPos().getX();
-            int posY = event.getPos().getY();
-            int posZ = event.getPos().getZ();
+            int posX = event.getBlockPos().getX();
+            int posY = event.getBlockPos().getY();
+            int posZ = event.getBlockPos().getZ();
 
             int paper=0;
 
-            if(!worldIn.isRemote) {
+            if(!worldIn.isClientSide) {
                 if ((player.getHeldItem(hand) != null)) {
                     if (player.getHeldItem(hand).getItem() instanceof ItemLinkingTool) {
                         //List<EntityItem> item = player.getEntityWorld().getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(posX-1, posY-1, posZ-1, posX+1, posY+1, posZ+1));

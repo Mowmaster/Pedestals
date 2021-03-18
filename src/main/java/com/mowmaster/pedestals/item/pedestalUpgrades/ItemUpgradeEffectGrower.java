@@ -38,7 +38,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 {
-    public ItemUpgradeEffectGrower(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeEffectGrower(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptArea() {
@@ -103,20 +103,20 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 int rangeWidth = getAreaWidth(coinInPedestal);
                 int rangeHeight = getHeight(coinInPedestal);
                 BlockState pedestalState = world.getBlockState(pedestalPos);
                 Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
                 if(world.isAreaLoaded(negNums,posNums))
                 {
@@ -145,14 +145,14 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                             if (world.getGameTime() % speed == 0) {
                                 for(int i = 0;i< workQueue.size(); i++)
                                 {
-                                    BlockPos targetPos = workQueue.get(i);
-                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                    BlockPos targetBlockPos = workQueue.get(i);
+                                    BlockPos blockToMinePos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
                                     BlockState targetBlock = world.getBlockState(blockToMinePos);
                                     if(canMineBlock(pedestal,blockToMinePos))
                                     {
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                        upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                                        upgradeAction(world, itemInPedestal, pedestalPos, targetBlockPos, targetBlock);
                                         break;
                                     }
                                     else
@@ -214,15 +214,15 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
-        World world = pedestal.getWorld();
-        BlockPos targetPos = blockToMinePos;
-        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        World world = pedestal.getLevel();
+        BlockPos targetBlockPos = blockToMinePos;
+        BlockPos blockToGrowPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
         BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
         Block blockToGrow = blockToGrowState.getBlock();
         if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
         {
             if (blockToGrow instanceof IGrowable) {
-                if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
+                if (((IGrowable) blockToGrow).canGrow(world, targetBlockPos, blockToGrowState, false)) {
                     return true;
                 }
             }
@@ -233,15 +233,15 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getWorld();
-        BlockPos targetPos = blockToMinePos;
-        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        World world = pedestal.getLevel();
+        BlockPos targetBlockPos = blockToMinePos;
+        BlockPos blockToGrowPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
         BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
         Block blockToGrow = blockToGrowState.getBlock();
         if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
         {
             if (blockToGrow instanceof IGrowable) {
-                if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
+                if (((IGrowable) blockToGrow).canGrow(world, targetBlockPos, blockToGrowState, false)) {
                     return true;
                 }
             }
@@ -254,9 +254,9 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     @Override
     public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getWorld();
-        BlockPos targetPos = blockToMinePos;
-        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+        World world = pedestal.getLevel();
+        BlockPos targetBlockPos = blockToMinePos;
+        BlockPos blockToGrowPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
         BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
         Block blockToGrow = blockToGrowState.getBlock();
         if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
@@ -272,31 +272,31 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.NIL_UUID);
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString("" + getHeight(stack) + "");
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.DUMMY_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append("" + getHeight(stack) + "");
+        area.append(areax.getString());
+        area.append(tr);
+        area.withStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.NIL_UUID);
 
-        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + workQueueSize(stack) + "");
-        btm.mergeStyle(TextFormatting.YELLOW);
-        player.sendMessage(btm,Util.DUMMY_UUID);
+        TranslationTextComponent btm = new TranslationTextComponent(getDescriptionId() + ".chat_btm");
+        btm.append("" + workQueueSize(stack) + "");
+        btm.withStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.NIL_UUID);
     }
 
     @Override
@@ -305,24 +305,24 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString("" + getHeight(stack) + "");
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append("" + getHeight(stack) + "");
+        area.append(areax.getString());
+        area.append(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        area.mergeStyle(TextFormatting.WHITE);
-        speed.mergeStyle(TextFormatting.RED);
+        area.withStyle(TextFormatting.WHITE);
+        speed.withStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(speed);
     }
 
-    public static final Item GROWER = new ItemUpgradeEffectGrower(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/grower"));
+    public static final Item GROWER = new ItemUpgradeEffectGrower(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/grower"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

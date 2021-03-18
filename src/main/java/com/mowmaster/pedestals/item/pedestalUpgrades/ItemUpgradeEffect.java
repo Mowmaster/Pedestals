@@ -37,7 +37,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 {
-    public ItemUpgradeEffect(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeEffect(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -87,17 +87,17 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(pedestal);
@@ -180,14 +180,14 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
     public void upgradeAction(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        BlockPos posOfPedestal = pedestal.getPos();
+        BlockPos posOfPedestal = pedestal.getBlockPos();
         int width = getAreaWidth(coinInPedestal);
         int height = getHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
-        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getBlockPosRangePosEntity(world,posOfPedestal,width,height);
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
         if(!hasFilterBlock(coinInPedestal)) {writeFilterBlockToNBT(pedestal);}
         Block filterBlock = readFilterBlockFromNBT(coinInPedestal);
@@ -229,7 +229,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
 
     public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
     {
-        BlockPos blockBelow = getPosOfBlockBelow(pedestal.getWorld(),pedestal.getPos(),1);
+        BlockPos blockBelow = getBlockPosOfBlockBelow(pedestal.getLevel(),pedestal.getBlockPos(),1);
         if(blockBelow.equals(blockChangedPos))
         {
             writeFilterBlockToNBT(pedestal);
@@ -294,7 +294,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!world.hasNeighborSignal(pos))
         {
             int fuelValue = getFuelStored(pedestal.getCoinOnPedestal());
 
@@ -314,85 +314,85 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.NIL_UUID);
 
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString("" + getHeight(stack) + "");
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.DUMMY_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append("" + getHeight(stack) + "");
+        area.append(areax.getString());
+        area.append(tr);
+        area.withStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.NIL_UUID);
 
 
         //Display Fuel Left
         int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
-        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.appendString("" + fuelLeft + "");
-        fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,Util.DUMMY_UUID);
+        TranslationTextComponent fuel = new TranslationTextComponent(getDescriptionId() + ".chat_fuel");
+        fuel.append("" + fuelLeft + "");
+        fuel.withStyle(TextFormatting.GREEN);
+        player.sendMessage(fuel,Util.NIL_UUID);
 
         //Displays what effects are in pedestal
         List<EffectInstance> instance = getEffectFromPedestal(pedestal.getItemInPedestal(),1);
-        TranslationTextComponent effect = new TranslationTextComponent(getTranslationKey() + ".chat_effect");
-        effect.mergeStyle(TextFormatting.AQUA);
-        player.sendMessage(effect,Util.DUMMY_UUID);
+        TranslationTextComponent effect = new TranslationTextComponent(getDescriptionId() + ".chat_effect");
+        effect.withStyle(TextFormatting.AQUA);
+        player.sendMessage(effect,Util.NIL_UUID);
         for(int i = 0; i < instance.size();i++)
         {
             TranslationTextComponent effects = new TranslationTextComponent(instance.get(i).getPotion().getDisplayName().getString());
-            effects.mergeStyle(TextFormatting.GRAY);
-            player.sendMessage(effects,Util.DUMMY_UUID);
+            effects.withStyle(TextFormatting.GRAY);
+            player.sendMessage(effects,Util.NIL_UUID);
         }
 
-        TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
-        entityType.appendString(getTargetEntity(filterBlock));
-        entityType.mergeStyle(TextFormatting.YELLOW);
-        player.sendMessage(entityType,Util.DUMMY_UUID);
+        TranslationTextComponent entityType = new TranslationTextComponent(getDescriptionId() + ".chat_entity");
+        entityType.append(getTargetEntity(filterBlock));
+        entityType.withStyle(TextFormatting.YELLOW);
+        player.sendMessage(entityType,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.NIL_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.mergeStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        t.withStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString("" + getHeight(stack) + "");
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append("" + getHeight(stack) + "");
+        area.append(areax.getString());
+        area.append(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        area.mergeStyle(TextFormatting.WHITE);
-        speed.mergeStyle(TextFormatting.RED);
+        area.withStyle(TextFormatting.WHITE);
+        speed.withStyle(TextFormatting.RED);
 
         tooltip.add(area);
 
-        TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
-        fuelStored.appendString(""+ getFuelStored(stack) +"");
-        fuelStored.mergeStyle(TextFormatting.GREEN);
+        TranslationTextComponent fuelStored = new TranslationTextComponent(getDescriptionId() + ".tooltip_fuelstored");
+        fuelStored.append(""+ getFuelStored(stack) +"");
+        fuelStored.withStyle(TextFormatting.GREEN);
         tooltip.add(fuelStored);
 
         tooltip.add(speed);
     }
 
-    public static final Item EFFECT = new ItemUpgradeEffect(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/effect"));
+    public static final Item EFFECT = new ItemUpgradeEffect(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/effect"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

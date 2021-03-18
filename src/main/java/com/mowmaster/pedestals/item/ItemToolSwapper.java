@@ -12,7 +12,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemToolSwapper extends Item {
 
     public ItemToolSwapper() {
-        super(new Properties().maxStackSize(1).containerItem(QUARRYTOOL).group(PEDESTALS_TAB));
+        super(new Properties().stacksTo(1).containerItem(QUARRYTOOL).tab(PEDESTALS_TAB));
     }
 
     @Override

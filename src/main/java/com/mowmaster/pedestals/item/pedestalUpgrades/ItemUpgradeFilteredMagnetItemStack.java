@@ -31,7 +31,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFilteredMagnetItemStack extends ItemUpgradeBase
 {
-    public ItemUpgradeFilteredMagnetItemStack(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilteredMagnetItemStack(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptArea() {
@@ -95,14 +95,14 @@ public class ItemUpgradeFilteredMagnetItemStack extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(pedestal);
@@ -113,14 +113,14 @@ public class ItemUpgradeFilteredMagnetItemStack extends ItemUpgradeBase
 
     public void upgradeAction(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        BlockPos posOfPedestal = pedestal.getPos();
+        BlockPos posOfPedestal = pedestal.getBlockPos();
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
-        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getBlockPosRangePosEntity(world,posOfPedestal,width,height);
 
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
@@ -202,28 +202,28 @@ public class ItemUpgradeFilteredMagnetItemStack extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + getRangeHeight(stack) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString(trr);
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area, Util.DUMMY_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append(trr);
+        area.append(areax.getString());
+        area.append(tr);
+        area.withStyle(TextFormatting.WHITE);
+        player.sendMessage(area, Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.NIL_UUID);
     }
 
     @Override
@@ -234,24 +234,24 @@ public class ItemUpgradeFilteredMagnetItemStack extends ItemUpgradeBase
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + getRangeHeight(stack) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString(trr);
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append(trr);
+        area.append(areax.getString());
+        area.append(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        area.mergeStyle(TextFormatting.WHITE);
-        speed.mergeStyle(TextFormatting.RED);
+        area.withStyle(TextFormatting.WHITE);
+        speed.withStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(speed);
     }
 
-    public static final Item FMAGNETITEMSTACK = new ItemUpgradeFilteredMagnetItemStack(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fmagnetitemstack"));
+    public static final Item FMAGNETITEMSTACK = new ItemUpgradeFilteredMagnetItemStack(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fmagnetitemstack"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -40,7 +40,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 {
-    public ItemUpgradeTeleporter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeTeleporter(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -64,7 +64,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
             {
                 BlockPos posBlock = ((PedestalTileEntity)tile).getStoredPositionAt(0);
 
-                posOfBlock = getPosOfBlockBelow(world, posBlock, range);
+                posOfBlock = getBlockPosOfBlockBelow(world, posBlock, range);
 
             }
         }
@@ -84,7 +84,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
             {
                 BlockPos posBlock = ((PedestalTileEntity)tile).getStoredPositionAt(0);
 
-                posOfBlock = getPosOfBlockBelow(world, posBlock, range);
+                posOfBlock = getBlockPosOfBlockBelow(world, posBlock, range);
 
             }
         }
@@ -103,7 +103,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
             if(((PedestalTileEntity)tile).getNumberOfStoredLocations()>0)
             {
                 BlockPos posBlock = ((PedestalTileEntity)tile).getStoredPositionAt(0);
-                posOfBlock = getPosOfBlockBelow(world, posBlock, range);
+                posOfBlock = getBlockPosOfBlockBelow(world, posBlock, range);
             }
         }
 
@@ -112,17 +112,17 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
@@ -136,7 +136,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         int width = 0;
         int height = 1;
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
-        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getBlockPosRangePosEntity(world,posOfPedestal,width,height);
         BlockState state = world.getBlockState(posOfPedestal);
         if(state.getBlock() instanceof PedestalBlock)
         {
@@ -203,7 +203,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
     public boolean doTeleport(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn, boolean isItemEntity)
     {
-        if(!world.isBlockPowered(posPedestal))
+        if(!world.hasNeighborSignal(posPedestal))
         {
             if(tilePedestal.getNumberOfStoredLocations()>0)
             {
@@ -225,7 +225,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                         {
                             int range = getRangeSmall(tilePedestal.getCoinOnPedestal());
                             int remainingFuel = getFuelStored(tilePedestal.getCoinOnPedestal());
-                            BlockPos randomPos = world.getBlockRandomPos((int)entityIn.getPosX(),(int)entityIn.getPosY(),(int)entityIn.getPosZ(),range*remainingFuel);
+                            BlockPos randomPos = world.getBlockRandomPos((int)entityIn.getBlockPosX(),(int)entityIn.getBlockPosY(),(int)entityIn.getBlockPosZ(),range*remainingFuel);
                             if(teleportEntityRandom(world, randomPos, entityIn))
                             {
                                 world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 0.25F, 1.0F);
@@ -245,7 +245,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         if(world.isAreaLoaded(posDestPedestal,1))
         {
             //If block ISNT powered
-            if(!world.isBlockPowered(posDestPedestal))
+            if(!world.hasNeighborSignal(posDestPedestal))
             {
                 //Make sure its a pedestal before getting the tile
                 if(world.getBlockState(posDestPedestal).getBlock() instanceof PedestalBlock)
@@ -256,7 +256,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                         if(getTeleportDistance(posOrigPedestal,posDestPedestal) <= getFuelStored(tilePedestal.getCoinOnPedestal()))
                         {
                             int range = getRangeSmall(tilePedestal.getCoinOnPedestal());
-                            BlockPos posDestBlock = getPosOfBlockBelow(world,posDestPedestal,range);
+                            BlockPos posDestBlock = getBlockPosOfBlockBelow(world,posDestPedestal,range);
                             BlockState blocktoTPto = world.getBlockState(posDestBlock);
                             if(isItemEntity)
                             {
@@ -287,12 +287,12 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     public boolean teleportEntity(World world, PedestalTileEntity tilePedestal, BlockPos posPedestalDest, Entity entityIn)
     {
         int range = getRangeSmall(tilePedestal.getCoinOnPedestal());
-        BlockPos pos = getPosOfBlockBelow(world,posPedestalDest,range);
+        BlockPos pos = getBlockPosOfBlockBelow(world,posPedestalDest,range);
         if(entityIn instanceof PlayerEntity)
         {
             ((PlayerEntity)entityIn).stopRiding();
             ((ServerPlayerEntity)entityIn).connection.setPlayerLocation(pos.getX()+0.5D, pos.getY(), pos.getZ()+0.5D, entityIn.rotationYaw, entityIn.rotationPitch);
-            world.playSound(null, entityIn.getPosX(), entityIn.getPosY(), entityIn.getPosZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            world.playSound(null, entityIn.getBlockPosX(), entityIn.getBlockPosY(), entityIn.getBlockPosZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
         else if(entityIn instanceof CreatureEntity) {
@@ -318,7 +318,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         {
             ((PlayerEntity)entityIn).stopRiding();
             ((ServerPlayerEntity)entityIn).connection.setPlayerLocation(posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), entityIn.rotationYaw, entityIn.rotationPitch);
-            world.playSound(null, entityIn.getPosX()+0.5D, entityIn.getPosY(), entityIn.getPosZ()+0.5D, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            world.playSound(null, entityIn.getBlockPosX()+0.5D, entityIn.getBlockPosY(), entityIn.getBlockPosZ()+0.5D, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
         else if(entityIn instanceof CreatureEntity) {
@@ -380,7 +380,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!world.hasNeighborSignal(pos))
         {
             int fuelValue = getFuelStored(pedestal.getCoinOnPedestal());
 
@@ -397,57 +397,57 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
-        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.appendString(""+getRangeSmall(stack)+"");
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".chat_range");
+        range.append(""+getRangeSmall(stack)+"");
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        range.mergeStyle(TextFormatting.WHITE);
-        speed.mergeStyle(TextFormatting.RED);
+        range.withStyle(TextFormatting.WHITE);
+        speed.withStyle(TextFormatting.RED);
 
-        player.sendMessage(range,Util.DUMMY_UUID);
+        player.sendMessage(range,Util.NIL_UUID);
 
 
         //Display Fuel Left
         int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
-        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.appendString("" + fuelLeft + "");
-        fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,Util.DUMMY_UUID);
+        TranslationTextComponent fuel = new TranslationTextComponent(getDescriptionId() + ".chat_fuel");
+        fuel.append("" + fuelLeft + "");
+        fuel.withStyle(TextFormatting.GREEN);
+        player.sendMessage(fuel,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        player.sendMessage(speed, Util.DUMMY_UUID);
+        player.sendMessage(speed, Util.NIL_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
-        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.mergeStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        t.withStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
-        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.appendString("" + getRangeSmall(stack) + "");
-        range.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".tooltip_range");
+        range.append("" + getRangeSmall(stack) + "");
+        range.withStyle(TextFormatting.WHITE);
         tooltip.add(range);
 
-        TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
-        fuelStored.appendString(""+ getFuelStored(stack) +"");
-        fuelStored.mergeStyle(TextFormatting.GREEN);
+        TranslationTextComponent fuelStored = new TranslationTextComponent(getDescriptionId() + ".tooltip_fuelstored");
+        fuelStored.append(""+ getFuelStored(stack) +"");
+        fuelStored.withStyle(TextFormatting.GREEN);
         tooltip.add(fuelStored);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 
-    public static final Item TELEPORTER = new ItemUpgradeTeleporter(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/teleporter"));
+    public static final Item TELEPORTER = new ItemUpgradeTeleporter(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/teleporter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

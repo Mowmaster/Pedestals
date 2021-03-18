@@ -27,7 +27,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
 {
 
-    public ItemUpgradeExpRelay(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeExpRelay(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -41,14 +41,14 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
                 if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
@@ -72,19 +72,19 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
-        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,Util.DUMMY_UUID);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".chat_xp");
+        xpstored.append(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.withStyle(TextFormatting.GREEN);
+        player.sendMessage(xpstored,Util.NIL_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString(getExpTransferRateString(stack));
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        rate.append(getExpTransferRateString(stack));
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
     }
 
     @Override
@@ -92,13 +92,13 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString(getExpTransferRateString(stack));
-        rate.mergeStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append(getExpTransferRateString(stack));
+        rate.withStyle(TextFormatting.GRAY);
         tooltip.add(rate);
     }
 
-    public static final Item XPRELAY = new ItemUpgradeExpRelay(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xprelay"));
+    public static final Item XPRELAY = new ItemUpgradeExpRelay(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xprelay"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

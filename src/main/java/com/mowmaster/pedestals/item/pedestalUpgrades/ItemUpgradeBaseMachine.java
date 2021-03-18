@@ -37,7 +37,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
 
     public final int burnTimeCostPerItemSmelted = 200;
 
-    public ItemUpgradeBaseMachine(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeBaseMachine(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -409,7 +409,7 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!world.hasNeighborSignal(pos))
         {
             int fuelValue = getFuelStored(pedestal.getCoinOnPedestal());
 
@@ -425,27 +425,27 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.NIL_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString(""+getItemTransferRate(stack)+"");
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        rate.append(""+getItemTransferRate(stack)+"");
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
 
         //Display Fuel Left
         int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
-        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.appendString("" + fuelLeft/200 + "");
-        fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,Util.DUMMY_UUID);
+        TranslationTextComponent fuel = new TranslationTextComponent(getDescriptionId() + ".chat_fuel");
+        fuel.append("" + fuelLeft/200 + "");
+        fuel.withStyle(TextFormatting.GREEN);
+        player.sendMessage(fuel,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.NIL_UUID);
     }
 
     @Override
@@ -454,19 +454,19 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s2 = getItemTransferRate(stack);
         String trr = getOperationSpeedString(stack);
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString(""+s2+"");
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(trr);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append(""+s2+"");
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(trr);
 
-        rate.mergeStyle(TextFormatting.GRAY);
+        rate.withStyle(TextFormatting.GRAY);
 
-        TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
-        fuelStored.appendString(""+ getFuelStored(stack) +"");
-        fuelStored.mergeStyle(TextFormatting.GREEN);
+        TranslationTextComponent fuelStored = new TranslationTextComponent(getDescriptionId() + ".tooltip_fuelstored");
+        fuelStored.append(""+ getFuelStored(stack) +"");
+        fuelStored.withStyle(TextFormatting.GREEN);
         tooltip.add(fuelStored);
 
-        speed.mergeStyle(TextFormatting.RED);
+        speed.withStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);

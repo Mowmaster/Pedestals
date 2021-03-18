@@ -32,7 +32,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFilteredImport extends ItemUpgradeBase
 {
-    public ItemUpgradeFilteredImport(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilteredImport(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -46,15 +46,15 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
@@ -65,7 +65,7 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
-        BlockPos senderBelowInvPos = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos senderBelowInvPos = getBlockPosOfBlockBelow(world,posOfPedestal,1);
         int transferRate = getItemTransferRate(coinInPedestal);
         ItemStack senderBelowInvStack = ItemStack.EMPTY;
 
@@ -148,17 +148,17 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                                 int i = getSlotWithMatchingStackExact(senderBelowInvCap,toImport);
                                 if(i>=0)
                                 {
-                                    int maxStackSizeAllowedInPedestal = 0;
+                                    int stacksToAllowedInPedestal = 0;
                                     int roomLeftInPedestal = 0;
                                     senderBelowInvStack = senderBelowInvHandler.getStackInSlot(i);
                                     ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                                     if(senderBelowInvStack != null && !senderBelowInvStack.isEmpty() && senderBelowInvStack.getItem() != Items.AIR)
                                     {
                                         if(itemFromPedestal.isEmpty() || itemFromPedestal.equals(ItemStack.EMPTY))
-                                        {maxStackSizeAllowedInPedestal = 64;}
+                                        {stacksToAllowedInPedestal = 64;}
                                         else
-                                        {maxStackSizeAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
-                                        roomLeftInPedestal = maxStackSizeAllowedInPedestal-itemFromPedestal.getCount();
+                                        {stacksToAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
+                                        roomLeftInPedestal = stacksToAllowedInPedestal-itemFromPedestal.getCount();
                                         int itemCountInInv = senderBelowInvStack.getCount();
                                         //int itemSpaceinInv = senderBelowInvStack.getMaxStackSize() - itemCountInInv;
                                         int allowedTransferRate = transferRate;
@@ -187,20 +187,20 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString(""+getItemTransferRate(stack)+"");
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        rate.append(""+getItemTransferRate(stack)+"");
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.NIL_UUID);
     }
 
     @Override
@@ -208,19 +208,19 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString("" + getItemTransferRate(stack) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append("" + getItemTransferRate(stack) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        rate.mergeStyle(TextFormatting.GRAY);
-        speed.mergeStyle(TextFormatting.RED);
+        rate.withStyle(TextFormatting.GRAY);
+        speed.withStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);
     }
 
-    public static final Item FIMPORT = new ItemUpgradeFilteredImport(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fimport"));
+    public static final Item FIMPORT = new ItemUpgradeFilteredImport(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fimport"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

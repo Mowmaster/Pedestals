@@ -32,7 +32,7 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
 public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
 
-    public ItemUpgradeBaseExpFilter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeBaseExpFilter(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -222,9 +222,9 @@ public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
 
     public void upgradeActionSendExp(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         ItemStack coinMainPedestal = pedestal.getCoinOnPedestal();
-        BlockPos posMainPedestal = pedestal.getPos();
+        BlockPos posMainPedestal = pedestal.getBlockPos();
 
         int xpMainPedestal = getXPStored(coinMainPedestal);
         if(xpMainPedestal>0)
@@ -236,7 +236,7 @@ public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
                 {
                     BlockPos posStoredPedestal = pedestal.getStoredPositionAt(i);
                     //Make sure pedestal ISNOT powered and IS loaded in world
-                    if(!world.isBlockPowered(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
+                    if(!world.hasNeighborSignal(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
                     {
                         if(posStoredPedestal != posMainPedestal)
                         {
@@ -462,7 +462,7 @@ public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!world.hasNeighborSignal(pos))
         {
             if(getXPStored(pedestal.getCoinOnPedestal())>0)
             {
@@ -476,19 +476,19 @@ public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.NIL_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
-        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,Util.DUMMY_UUID);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".chat_xp");
+        xpstored.append(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.withStyle(TextFormatting.GREEN);
+        player.sendMessage(xpstored,Util.NIL_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString(getExpTransferRateString(stack));
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        rate.append(getExpTransferRateString(stack));
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
     }
 
     @Override
@@ -496,20 +496,20 @@ public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpstored");
-        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".tooltip_xpstored");
+        xpstored.append(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.withStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
-        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacity");
-        TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacitylvl");
-        xpcapacity.appendString(""+ getExpBuffer(stack) +"");
-        xpcapacity.appendString(xpcapacitylvl.getString());
-        xpcapacity.mergeStyle(TextFormatting.AQUA);
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_xpcapacity");
+        TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getDescriptionId() + ".tooltip_xpcapacitylvl");
+        xpcapacity.append(""+ getExpBuffer(stack) +"");
+        xpcapacity.append(xpcapacitylvl.getString());
+        xpcapacity.withStyle(TextFormatting.AQUA);
         tooltip.add(xpcapacity);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString(getExpTransferRateString(stack));
-        rate.mergeStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append(getExpTransferRateString(stack));
+        rate.withStyle(TextFormatting.GRAY);
         tooltip.add(rate);
     }
 

@@ -57,7 +57,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
     public int range = 1;
 
-    public ItemUpgradeBreaker(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeBreaker(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -76,7 +76,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRange(coin);
-        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
+        BlockPos posOfBlock = getBlockPosOfBlockBelow(world, pos, range);
         return posOfBlock.getX();
     }
 
@@ -84,7 +84,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRange(coin);
-        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
+        BlockPos posOfBlock = getBlockPosOfBlockBelow(world, pos, range);
         return new int[]{posOfBlock.getY(),1};
     }
 
@@ -92,27 +92,27 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRange(coin);
-        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
+        BlockPos posOfBlock = getBlockPosOfBlockBelow(world, pos, range);
         return posOfBlock.getZ();
     }
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 //Should disable magneting when its not needed
                 int range = getRange(coinInPedestal);
                 BlockState pedestalState = world.getBlockState(pedestalPos);
                 Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
+                BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
                 AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
                 List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
                 if(itemList.size()>0)
@@ -129,18 +129,18 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     }
 
     public void upgradeAction(PedestalTileEntity pedestal) {
-        World world = pedestal.getWorld();
-        BlockPos posOfPedestal = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos posOfPedestal = pedestal.getBlockPos();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
         int range = getRange(coinInPedestal);
 
-        //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile((((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal)) !=null)?(getPlayerFromCoin(coinInPedestal)):(Util.DUMMY_UUID),"[Pedestals]"));
+        //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile((((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal)) !=null)?(getPlayerFromCoin(coinInPedestal)):(Util.NIL_UUID),"[Pedestals]"));
         //FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(world.getServer().func_241755_D_());
         FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
-        if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+        if(!fakePlayer.blockPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
-        BlockPos posOfBlock = getPosOfBlockBelow(world, posOfPedestal, range);
+        BlockPos posOfBlock = getBlockPosOfBlockBelow(world, posOfPedestal, range);
         BlockState blockToBreak = world.getBlockState(posOfBlock);
 
         /*
@@ -172,7 +172,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                         if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
                         world.removeBlock(posOfBlock, false);
                     }
-                    //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());
+                    //world.setBlockState(posOfBlock, Blocks.AIR.defaultBlockState());
                 }
                 //tool = blockToBreak.getHarvestTool();
                 //toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToBreak);
@@ -196,13 +196,13 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
-        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
-        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        ITag<Block> ADVANCED = BlockTags.getAllTags().getTag(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getAllTags().getTag(new ResourceLocation("pedestals", "quarry/blacklist"));
         //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
         boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
@@ -223,13 +223,13 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
-        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
-        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        ITag<Block> ADVANCED = BlockTags.getAllTags().getTag(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getAllTags().getTag(new ResourceLocation("pedestals", "quarry/blacklist"));
         //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
         boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
@@ -260,20 +260,20 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
-        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
-        range.appendString(""+getRange(stack)+"");
-        range.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(range,Util.DUMMY_UUID);
+        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".chat_range");
+        range.append(""+getRange(stack)+"");
+        range.withStyle(TextFormatting.WHITE);
+        player.sendMessage(range,Util.NIL_UUID);
 
         ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE));
-        TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
+        TranslationTextComponent tool = new TranslationTextComponent(getDescriptionId() + ".chat_tool");
         tool.append(toolStack.getDisplayName());
-        tool.mergeStyle(TextFormatting.BLUE);
-        player.sendMessage(tool,Util.DUMMY_UUID);
+        tool.withStyle(TextFormatting.BLUE);
+        player.sendMessage(tool,Util.NIL_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
         if(hasAdvancedInventoryTargeting(stack))
@@ -282,9 +282,9 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         }
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.DUMMY_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_enchants");
+            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.NIL_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -292,36 +292,36 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,Util.DUMMY_UUID);
+                    enchants.withStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.NIL_UUID);
                 }
             }
         }
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.NIL_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
-        range.appendString("" + getRange(stack) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".tooltip_range");
+        range.append("" + getRange(stack) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        range.mergeStyle(TextFormatting.WHITE);
+        range.withStyle(TextFormatting.WHITE);
         tooltip.add(range);
 
-        speed.mergeStyle(TextFormatting.RED);
+        speed.withStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 
-    public static final Item BREAKER = new ItemUpgradeBreaker(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/breaker"));
+    public static final Item BREAKER = new ItemUpgradeBreaker(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/breaker"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

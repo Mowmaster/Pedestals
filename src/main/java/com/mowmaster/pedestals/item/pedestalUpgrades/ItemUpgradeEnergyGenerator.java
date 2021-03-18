@@ -38,7 +38,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
 {
 
-    public ItemUpgradeEnergyGenerator(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeEnergyGenerator(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -104,16 +104,16 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(pedestal);
@@ -121,7 +121,7 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
                     if(getFuelStored(coinInPedestal)>0 && getEnergyStored(coinInPedestal) < getEnergyBuffer(coinInPedestal))
                     {
                         if (world.getGameTime()%5 == 0) {
-                            BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,-1);
+                            BlockPos directionalPos = getBlockPosOfBlockBelow(world,pedestalPos,-1);
                             PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
                         }
 
@@ -324,9 +324,9 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
     @Override
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
-            if(!world.isBlockPowered(posPedestal))
+            if(!world.hasNeighborSignal(posPedestal))
             {
                 if(entityIn instanceof ItemEntity)
                 {
@@ -360,89 +360,89 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.NIL_UUID);
 
         //Display Fuel Left
         int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
-        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.appendString("" + fuelLeft + "");
-        fuel.mergeStyle(TextFormatting.DARK_GREEN);
-        player.sendMessage(fuel,Util.DUMMY_UUID);
+        TranslationTextComponent fuel = new TranslationTextComponent(getDescriptionId() + ".chat_fuel");
+        fuel.append("" + fuelLeft + "");
+        fuel.withStyle(TextFormatting.DARK_GREEN);
+        player.sendMessage(fuel,Util.NIL_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_rfstored");
-        xpstored.appendString(""+ getEnergyStored(stack) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,Util.DUMMY_UUID);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".chat_rfstored");
+        xpstored.append(""+ getEnergyStored(stack) +"");
+        xpstored.withStyle(TextFormatting.GREEN);
+        player.sendMessage(xpstored,Util.NIL_UUID);
 
         int opSpeed = getOperationSpeed(stack);
         double capacityRate = getCapicityModifier(stack);
         double speedMultiplier = (20/opSpeed);
         int rfPerTick = (int) (12.5 * speedMultiplier);
-        TranslationTextComponent energyRate = new TranslationTextComponent(getTranslationKey() + ".chat_rfrate");
-        energyRate.appendString(""+ rfPerTick +"");
-        energyRate.mergeStyle(TextFormatting.AQUA);
-        player.sendMessage(energyRate,Util.DUMMY_UUID);
+        TranslationTextComponent energyRate = new TranslationTextComponent(getDescriptionId() + ".chat_rfrate");
+        energyRate.append(""+ rfPerTick +"");
+        energyRate.withStyle(TextFormatting.AQUA);
+        player.sendMessage(energyRate,Util.NIL_UUID);
 
         int capacityRateModified = (int)(Math.round((1.0 - getCapicityModifier(stack))* 100));
-        TranslationTextComponent rate2 = new TranslationTextComponent(getTranslationKey() + ".chat_rfrate2");
-        rate2.appendString("" + capacityRateModified + "%");
-        rate2.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate2,Util.DUMMY_UUID);
+        TranslationTextComponent rate2 = new TranslationTextComponent(getDescriptionId() + ".chat_rfrate2");
+        rate2.append("" + capacityRateModified + "%");
+        rate2.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate2,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.NIL_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
         tooltip.add(name);
 
-        TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
-        fuelStored.appendString(""+ getFuelStored(stack) +"");
-        fuelStored.mergeStyle(TextFormatting.DARK_GREEN);
+        TranslationTextComponent fuelStored = new TranslationTextComponent(getDescriptionId() + ".tooltip_fuelstored");
+        fuelStored.append(""+ getFuelStored(stack) +"");
+        fuelStored.withStyle(TextFormatting.DARK_GREEN);
         tooltip.add(fuelStored);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfstored");
-        //xpstored.appendString()
-        xpstored.appendString(""+ getEnergyStored(stack) +"");
-        //xpstored.mergeStyle(TextFormatting.GREEN)
-        xpstored.mergeStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".tooltip_rfstored");
+        //xpstored.append()
+        xpstored.append(""+ getEnergyStored(stack) +"");
+        //xpstored.withStyle(TextFormatting.GREEN)
+        xpstored.withStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
 
-        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfcapacity");
-        xpcapacity.appendString(""+ getEnergyBuffer(stack) +"");
-        xpcapacity.mergeStyle(TextFormatting.AQUA);
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_rfcapacity");
+        xpcapacity.append(""+ getEnergyBuffer(stack) +"");
+        xpcapacity.withStyle(TextFormatting.AQUA);
         tooltip.add(xpcapacity);
 
         int opSpeed = getOperationSpeed(stack);
         double speedMultiplier = (20/opSpeed);
         int rfPerTick = (int) (12.5 * speedMultiplier);
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString("" + rfPerTick + "");
-        rate.mergeStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append("" + rfPerTick + "");
+        rate.withStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
         int capacityRate = (int)(Math.round((1.0 - getCapicityModifier(stack))* 100));
-        TranslationTextComponent rate2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate2");
-        rate2.appendString("" + capacityRate + "%");
-        rate2.mergeStyle(TextFormatting.DARK_GRAY);
+        TranslationTextComponent rate2 = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate2");
+        rate2.append("" + capacityRate + "%");
+        rate2.withStyle(TextFormatting.DARK_GRAY);
         tooltip.add(rate2);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 
-    public static final Item RFFUELGEN = new ItemUpgradeEnergyGenerator(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rffuelgen"));
+    public static final Item RFFUELGEN = new ItemUpgradeEnergyGenerator(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rffuelgen"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

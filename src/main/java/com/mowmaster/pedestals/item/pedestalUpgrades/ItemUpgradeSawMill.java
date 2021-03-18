@@ -28,7 +28,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
 {
-    public ItemUpgradeSawMill(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeSawMill(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {
@@ -47,18 +47,18 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int speed = getSmeltingSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,coinInPedestal);
@@ -69,7 +69,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world,posOfPedestal,1);
         int itemsPerSmelt = getItemTransferRate(coinInPedestal);
 
         ItemStack itemFromInv = ItemStack.EMPTY;
@@ -178,7 +178,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
         }
     }
 
-    public static final Item SAWMILL = new ItemUpgradeSawMill(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/sawmill"));
+    public static final Item SAWMILL = new ItemUpgradeSawMill(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/sawmill"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

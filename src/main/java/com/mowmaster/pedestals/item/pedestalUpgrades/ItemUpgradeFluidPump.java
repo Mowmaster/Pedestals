@@ -48,7 +48,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
 {
-    public ItemUpgradeFluidPump(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFluidPump(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -69,15 +69,15 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
     }
 
     //Riped Straight from ItemUpgradePlacer
-    public void placeBlock(PedestalTileEntity pedestal, BlockPos targetPos)
+    public void placeBlock(PedestalTileEntity pedestal, BlockPos targetBlockPos)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedPos = pedestal.getBlockPos();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinOnPedestal = pedestal.getCoinOnPedestal();
         if(!itemInPedestal.isEmpty())
         {
-            Block blockBelow = world.getBlockState(targetPos).getBlock();
+            Block blockBelow = world.getBlockState(targetBlockPos).getBlock();
             Item singleItemInPedestal = itemInPedestal.getItem();
 
             if(blockBelow.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
@@ -88,14 +88,14 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                         if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof Block) {
 
                             FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinOnPedestal),pedPos,itemInPedestal);
-                            if(!fakePlayer.getPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPosition(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
+                            if(!fakePlayer.blockPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPos(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
 
-                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));
+                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetBlockPos, false));
 
                             ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                             if (result == ActionResultType.CONSUME) {
                                 this.removeFromPedestal(world,pedPos,1);
-                                world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                world.playSound((PlayerEntity) null, targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             }
                         }
                     }
@@ -152,18 +152,18 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int getMaxFluidValue = getFluidbuffer(coinInPedestal);
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos)) {
+            if(!world.hasNeighborSignal(pedestalPos)) {
                 if(hasFluidInCoin(coinInPedestal) && world.getGameTime() % speed == 0)
                 {
                     upgradeActionSendFluid(pedestal);
@@ -175,7 +175,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                 BlockState pedestalState = world.getBlockState(pedestalPos);
                 Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
                 if(world.isAreaLoaded(negNums,posNums))
                 {
@@ -202,15 +202,15 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                                 if (world.getGameTime() % speed == 0) {
                                     for(int i = 0;i< workQueue.size(); i++)
                                     {
-                                        BlockPos targetPos = workQueue.get(i);
-                                        BlockPos blockToPumpPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                        BlockPos targetBlockPos = workQueue.get(i);
+                                        BlockPos blockToPumpPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
                                         BlockState targetFluidState = world.getBlockState(blockToPumpPos);
                                         Block targetFluidBlock = targetFluidState.getBlock();
                                         if(canMineBlock(pedestal,blockToPumpPos))
                                         {
                                             workQueue.remove(i);
                                             writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                            upgradeAction(pedestal, targetPos, itemInPedestal, coinInPedestal);
+                                            upgradeAction(pedestal, targetBlockPos, itemInPedestal, coinInPedestal);
                                             break;
                                         }
                                         else
@@ -231,11 +231,11 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         }
     }
 
-    public void upgradeAction(PedestalTileEntity pedestal, BlockPos targetPos, ItemStack itemInPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, BlockPos targetBlockPos, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
-        BlockState targetFluidState = world.getBlockState(targetPos);
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
+        BlockState targetFluidState = world.getBlockState(targetBlockPos);
         Block targetFluidBlock = targetFluidState.getBlock();
         FluidStack fluidToStore = FluidStack.EMPTY;
         if (targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0) {
@@ -246,33 +246,33 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                 fluidToStore = fluidToPickup.copy();
                 if(!fluidToStore.isEmpty() && addFluid(pedestal,coinInPedestal,fluidToStore,true))
                 {
-                    world.setBlockState(targetPos, Blocks.AIR.getDefaultState(), 11);
+                    world.setBlockState(targetBlockPos, Blocks.AIR.defaultBlockState(), 11);
                     addFluid(pedestal,coinInPedestal,fluidToStore,false);
                     if(itemInPedestal.isEmpty())
                     {
                         int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
-                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
+                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetBlockPos.getX(),targetBlockPos.getY(),targetBlockPos.getZ(),rgb[0],rgb[1],rgb[2]));
                     }
-                    else {placeBlock(pedestal,targetPos);}
+                    else {placeBlock(pedestal,targetBlockPos);}
                 }
             }
         }
         else if (targetFluidBlock instanceof IFluidBlock) {
             IFluidBlock fluidBlock = (IFluidBlock) targetFluidBlock;
 
-            if (fluidBlock.canDrain(world, targetPos)) {
-                fluidToStore =  fluidBlock.drain(world, targetPos, IFluidHandler.FluidAction.SIMULATE);
+            if (fluidBlock.canDrain(world, targetBlockPos)) {
+                fluidToStore =  fluidBlock.drain(world, targetBlockPos, IFluidHandler.FluidAction.SIMULATE);
                 if(!fluidToStore.isEmpty() && addFluid(pedestal,coinInPedestal,fluidToStore,true))
                 {
-                    fluidToStore =  fluidBlock.drain(world, targetPos, IFluidHandler.FluidAction.EXECUTE);
+                    fluidToStore =  fluidBlock.drain(world, targetBlockPos, IFluidHandler.FluidAction.EXECUTE);
                     addFluid(pedestal,coinInPedestal,fluidToStore,false);
                     if(itemInPedestal.isEmpty())
                     {
                         int[] rgb = CalculateColor.getRGBColorFromInt(fluidToStore.getFluid().getAttributes().getColor());
-                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetPos.getX(),targetPos.getY(),targetPos.getZ(),rgb[0],rgb[1],rgb[2]));
+                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,targetBlockPos.getX(),targetBlockPos.getY(),targetBlockPos.getZ(),rgb[0],rgb[1],rgb[2]));
 
                     }
-                    else {placeBlock(pedestal,targetPos);}
+                    else {placeBlock(pedestal,targetBlockPos);}
                 }
             }
         }
@@ -282,7 +282,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         BlockPos blockToPumpPos = new BlockPos(blockToMinePos.getX(), blockToMinePos.getY(), blockToMinePos.getZ());
         BlockState targetFluidState = world.getBlockState(blockToPumpPos);
         Block targetFluidBlock = targetFluidState.getBlock();
@@ -297,7 +297,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         BlockPos blockToPumpPos = new BlockPos(blockToMinePos.getX(), blockToMinePos.getY(), blockToMinePos.getZ());
         BlockState targetFluidState = world.getBlockState(blockToPumpPos);
         Block targetFluidBlock = targetFluidState.getBlock();
@@ -315,75 +315,75 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
         int s3 = getWidth(stack);
         int s4 = getHeight(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + s4 + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString(trr);
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.DUMMY_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append(trr);
+        area.append(areax.getString());
+        area.append(tr);
+        area.withStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.NIL_UUID);
 
         FluidStack fluidStored = getFluidStored(stack);
-        TranslationTextComponent fluidLabel = new TranslationTextComponent(getTranslationKey() + ".chat_fluidlabel");
+        TranslationTextComponent fluidLabel = new TranslationTextComponent(getDescriptionId() + ".chat_fluidlabel");
         if(!fluidStored.isEmpty())
         {
-            TranslationTextComponent fluid = new TranslationTextComponent(getTranslationKey() + ".chat_fluid");
-            TranslationTextComponent fluidSplit = new TranslationTextComponent(getTranslationKey() + ".chat_fluidseperator");
-            fluid.appendString("" + fluidStored.getDisplayName().getString() + "");
-            fluid.appendString(fluidSplit.getString());
-            fluid.appendString("" + fluidStored.getAmount() + "");
-            fluid.appendString(fluidLabel.getString());
-            fluid.mergeStyle(TextFormatting.BLUE);
-            player.sendMessage(fluid,Util.DUMMY_UUID);
+            TranslationTextComponent fluid = new TranslationTextComponent(getDescriptionId() + ".chat_fluid");
+            TranslationTextComponent fluidSplit = new TranslationTextComponent(getDescriptionId() + ".chat_fluidseperator");
+            fluid.append("" + fluidStored.getDisplayName().getString() + "");
+            fluid.append(fluidSplit.getString());
+            fluid.append("" + fluidStored.getAmount() + "");
+            fluid.append(fluidLabel.getString());
+            fluid.withStyle(TextFormatting.BLUE);
+            player.sendMessage(fluid,Util.NIL_UUID);
         }
 
-        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
-        btm.mergeStyle(TextFormatting.YELLOW);
-        player.sendMessage(btm,Util.DUMMY_UUID);
+        TranslationTextComponent btm = new TranslationTextComponent(getDescriptionId() + ".chat_btm");
+        btm.append("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
+        btm.withStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.NIL_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString("" +  getFluidTransferRate(stack) + "");
-        rate.appendString(fluidLabel.getString());
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        rate.append("" +  getFluidTransferRate(stack) + "");
+        rate.append(fluidLabel.getString());
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.NIL_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 
-        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.mergeStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        t.withStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         FluidStack fluidStored = getFluidStored(stack);
-        TranslationTextComponent fluidLabel = new TranslationTextComponent(getTranslationKey() + ".chat_fluidlabel");
+        TranslationTextComponent fluidLabel = new TranslationTextComponent(getDescriptionId() + ".chat_fluidlabel");
         if(!fluidStored.isEmpty())
         {
-            TranslationTextComponent fluid = new TranslationTextComponent(getTranslationKey() + ".chat_fluid");
-            TranslationTextComponent fluidSplit = new TranslationTextComponent(getTranslationKey() + ".chat_fluidseperator");
-            fluid.appendString("" + fluidStored.getDisplayName().getString() + "");
-            fluid.appendString(fluidSplit.getString());
-            fluid.appendString("" + fluidStored.getAmount() + "");
-            fluid.appendString(fluidLabel.getString());
-            fluid.mergeStyle(TextFormatting.BLUE);
+            TranslationTextComponent fluid = new TranslationTextComponent(getDescriptionId() + ".chat_fluid");
+            TranslationTextComponent fluidSplit = new TranslationTextComponent(getDescriptionId() + ".chat_fluidseperator");
+            fluid.append("" + fluidStored.getDisplayName().getString() + "");
+            fluid.append(fluidSplit.getString());
+            fluid.append("" + fluidStored.getAmount() + "");
+            fluid.append(fluidLabel.getString());
+            fluid.withStyle(TextFormatting.BLUE);
             tooltip.add(fluid);
         }
 
@@ -391,35 +391,35 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         int s4 = getHeight(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + s4 + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString(trr);
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        area.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append(trr);
+        area.append(areax.getString());
+        area.append(tr);
+        area.withStyle(TextFormatting.WHITE);
         tooltip.add(area);
 
-        TranslationTextComponent fluidcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_fluidcapacity");
-        fluidcapacity.appendString(""+ getFluidbuffer(stack) +"");
-        fluidcapacity.appendString(fluidLabel.getString());
-        fluidcapacity.mergeStyle(TextFormatting.AQUA);
+        TranslationTextComponent fluidcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_fluidcapacity");
+        fluidcapacity.append(""+ getFluidbuffer(stack) +"");
+        fluidcapacity.append(fluidLabel.getString());
+        fluidcapacity.withStyle(TextFormatting.AQUA);
         tooltip.add(fluidcapacity);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString("" + getFluidTransferRate(stack) + "");
-        rate.appendString(fluidLabel.getString());
-        rate.mergeStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append("" + getFluidTransferRate(stack) + "");
+        rate.append(fluidLabel.getString());
+        rate.withStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 
-    public static final Item FLUIDPUMP = new ItemUpgradeFluidPump(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fluidpump"));
+    public static final Item FLUIDPUMP = new ItemUpgradeFluidPump(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fluidpump"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

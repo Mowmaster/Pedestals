@@ -30,7 +30,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
 {
-    public ItemUpgradeEnergyFurnace(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeEnergyFurnace(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {
@@ -64,7 +64,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
     {
         if(xp >= 1)
         {
-            ExperienceOrbEntity expEntity = new ExperienceOrbEntity(world,getPosOfBlockBelow(world,posOfPedestal,-1).getX() + 0.5,getPosOfBlockBelow(world,posOfPedestal,-1).getY(),getPosOfBlockBelow(world,posOfPedestal,-1).getZ() + 0.5,xp);
+            ExperienceOrbEntity expEntity = new ExperienceOrbEntity(world,getBlockPosOfBlockBelow(world,posOfPedestal,-1).getX() + 0.5,getBlockPosOfBlockBelow(world,posOfPedestal,-1).getY(),getBlockPosOfBlockBelow(world,posOfPedestal,-1).getZ() + 0.5,xp);
             expEntity.setMotion(0D,0D,0D);
             world.addEntity(expEntity);
         }
@@ -72,15 +72,15 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int speed = getSmeltingSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals
@@ -96,7 +96,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world,posOfPedestal,1);
         int itemsPerSmelt = getItemTransferRate(coinInPedestal);
 
         ItemStack itemFromInv = ItemStack.EMPTY;
@@ -203,7 +203,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
         }
     }
 
-    public static final Item RFSMELTER = new ItemUpgradeEnergyFurnace(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfsmelter"));
+    public static final Item RFSMELTER = new ItemUpgradeEnergyFurnace(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfsmelter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

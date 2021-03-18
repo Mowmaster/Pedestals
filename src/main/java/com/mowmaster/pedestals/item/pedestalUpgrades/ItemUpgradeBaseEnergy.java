@@ -34,7 +34,7 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
 public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
-    public ItemUpgradeBaseEnergy(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeBaseEnergy(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
@@ -263,9 +263,9 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
     public void upgradeActionSendEnergy(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         ItemStack coinMainPedestal = pedestal.getCoinOnPedestal();
-        BlockPos posMainPedestal = pedestal.getPos();
+        BlockPos posMainPedestal = pedestal.getBlockPos();
 
         int energyMainPedestal = getEnergyStored(coinMainPedestal);
         if(energyMainPedestal>0)
@@ -277,7 +277,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
                 {
                     BlockPos posStoredPedestal = pedestal.getStoredPositionAt(i);
                     //Make sure pedestal ISNOT powered and IS loaded in world
-                    if(!world.isBlockPowered(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
+                    if(!world.hasNeighborSignal(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
                     {
                         if(posStoredPedestal != posMainPedestal)
                         {
@@ -513,7 +513,7 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!world.hasNeighborSignal(pos))
         {
             if(hasEnergy(pedestal.getCoinOnPedestal()))
             {
@@ -527,25 +527,25 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_rfstored");
-        xpstored.appendString(""+ getEnergyStored(stack) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,Util.DUMMY_UUID);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".chat_rfstored");
+        xpstored.append(""+ getEnergyStored(stack) +"");
+        xpstored.withStyle(TextFormatting.GREEN);
+        player.sendMessage(xpstored,Util.NIL_UUID);
 
-        TranslationTextComponent energyRate = new TranslationTextComponent(getTranslationKey() + ".chat_rfrate");
-        energyRate.appendString(""+ getEnergyTransferRate(stack) +"");
-        energyRate.mergeStyle(TextFormatting.AQUA);
-        player.sendMessage(energyRate,Util.DUMMY_UUID);
+        TranslationTextComponent energyRate = new TranslationTextComponent(getDescriptionId() + ".chat_rfrate");
+        energyRate.append(""+ getEnergyTransferRate(stack) +"");
+        energyRate.withStyle(TextFormatting.AQUA);
+        player.sendMessage(energyRate,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.NIL_UUID);
     }
 
     @Override
@@ -553,24 +553,24 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfstored");
-        xpstored.appendString(""+ getEnergyStored(stack) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".tooltip_rfstored");
+        xpstored.append(""+ getEnergyStored(stack) +"");
+        xpstored.withStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
 
-        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfcapacity");
-        xpcapacity.appendString(""+ getEnergyBuffer(stack) +"");
-        xpcapacity.mergeStyle(TextFormatting.AQUA);
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_rfcapacity");
+        xpcapacity.append(""+ getEnergyBuffer(stack) +"");
+        xpcapacity.withStyle(TextFormatting.AQUA);
         tooltip.add(xpcapacity);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString("" + getEnergyTransferRate(stack) + "");
-        rate.mergeStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append("" + getEnergyTransferRate(stack) + "");
+        rate.withStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 

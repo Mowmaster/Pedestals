@@ -25,7 +25,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 //Filters by number of enchants on an item
 public class ItemUpgradeFilterEnchantedExact extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterEnchantedExact(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilterEnchantedExact(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {return true;}
@@ -109,7 +109,7 @@ public class ItemUpgradeFilterEnchantedExact extends ItemUpgradeBaseFilter
         }
     }
 
-    public static final Item ENCHANTEDSPECIFIC= new ItemUpgradeFilterEnchantedExact(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedexact"));
+    public static final Item ENCHANTEDSPECIFIC= new ItemUpgradeFilterEnchantedExact(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedexact"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

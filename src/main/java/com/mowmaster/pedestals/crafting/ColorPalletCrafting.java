@@ -34,15 +34,15 @@ public class ColorPalletCrafting
         //Added to keep fake players from canning this every time?
         if(!(event.getPlayer() instanceof FakePlayer))
         {
-            World worldIn = event.getWorld();
+            World worldIn = event.getLevel();
             Hand hand = event.getHand();
-            BlockState state = worldIn.getBlockState(event.getPos());
+            BlockState state = worldIn.getBlockState(event.getBlockPos());
             PlayerEntity player = event.getPlayer();
-            BlockPos pos = event.getPos();
+            BlockPos pos = event.getBlockPos();
 
-            int posX = event.getPos().getX();
-            int posY = event.getPos().getY();
-            int posZ = event.getPos().getZ();
+            int posX = event.getBlockPos().getX();
+            int posY = event.getBlockPos().getY();
+            int posZ = event.getBlockPos().getZ();
 
             double r = 0;
             double g = 0;
@@ -63,7 +63,7 @@ public class ColorPalletCrafting
             int pallet=0;
             ItemStack trapped = ItemStack.EMPTY;
 
-            if(!worldIn.isRemote) {
+            if(!worldIn.isClientSide) {
                 ItemStack coined = ItemStack.EMPTY;
                 if ((player.getHeldItem(hand) != null)) {
                     if (player.getHeldItem(hand).getItem() instanceof ItemLinkingTool) {
@@ -86,9 +86,9 @@ public class ColorPalletCrafting
                         /*ITag.INamedTag<Item> RED_DYE = ItemTags.createOptional(grabRed);
                         ITag.INamedTag<Item> GREEN_DYE = ItemTags.createOptional(grabGreen);
                         ITag.INamedTag<Item> BLUE_DYE = ItemTags.createOptional(grabBlue);*/
-                            ITag<Item> RED_DYE = ItemTags.getCollection().get(grabRed);
-                            ITag<Item> GREEN_DYE = ItemTags.getCollection().get(grabGreen);
-                            ITag<Item> BLUE_DYE = ItemTags.getCollection().get(grabBlue);
+                            ITag<Item> RED_DYE = ItemTags.getAllTags().getTag(grabRed);
+                            ITag<Item> GREEN_DYE = ItemTags.getAllTags().getTag(grabGreen);
+                            ITag<Item> BLUE_DYE = ItemTags.getAllTags().getTag(grabBlue);
 
                             if(stack.getItem() instanceof DyeItem)
                             {

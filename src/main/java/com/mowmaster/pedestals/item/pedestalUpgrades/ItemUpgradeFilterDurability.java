@@ -33,7 +33,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterDurability(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilterDurability(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -149,7 +149,7 @@ public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         boolean returner = true;
-        BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world, posPedestal, 1);
         int capacity = 0;
 
         TileEntity tile = world.getTileEntity(posPedestal);
@@ -176,17 +176,17 @@ public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.NIL_UUID);
 
         int overEnchanted = (getCapacityModifierOver(stack));
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        TranslationTextComponent rate2 = new TranslationTextComponent(getTranslationKey() + ".chat_rate2");
-        rate.appendString("" + getCapacityTarget(overEnchanted) + "");
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        TranslationTextComponent rate2 = new TranslationTextComponent(getDescriptionId() + ".chat_rate2");
+        rate.append("" + getCapacityTarget(overEnchanted) + "");
         rate.append(rate2);
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
     }
 
     @Override
@@ -195,15 +195,15 @@ public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         int overEnchanted = (getCapacityModifierOver(stack));
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        TranslationTextComponent rate2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate2");
-        rate.appendString("" + getCapacityTarget(overEnchanted) + "");
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        TranslationTextComponent rate2 = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate2");
+        rate.append("" + getCapacityTarget(overEnchanted) + "");
         rate.append(rate2);
-        rate.mergeStyle(TextFormatting.GRAY);
+        rate.withStyle(TextFormatting.GRAY);
         tooltip.add(rate);
     }
 
-    public static final Item DURABILITY = new ItemUpgradeFilterDurability(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterdurability"));
+    public static final Item DURABILITY = new ItemUpgradeFilterDurability(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterdurability"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

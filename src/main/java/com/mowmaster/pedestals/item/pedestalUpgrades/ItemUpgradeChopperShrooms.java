@@ -54,7 +54,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
 {
-    public ItemUpgradeChopperShrooms(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeChopperShrooms(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -122,13 +122,13 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 int rangeWidth = getAreaWidth(coinInPedestal);
                 int rangeHeight = getRangeHeight(coinInPedestal);
@@ -137,7 +137,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 BlockState pedestalState = world.getBlockState(pedestalPos);
                 Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
                 //Should disable magneting when its not needed
                 AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
@@ -167,14 +167,14 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                         if (world.getGameTime() % speed == 0) {
                             for(int i = 0;i< workQueue.size(); i++)
                             {
-                                BlockPos targetPos = workQueue.get(i);
-                                BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                BlockPos targetBlockPos = workQueue.get(i);
+                                BlockPos blockToMinePos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
                                 BlockState targetBlock = world.getBlockState(blockToMinePos);
                                 if(canMineBlock(pedestal,blockToMinePos))
                                 {
                                     workQueue.remove(i);
                                     writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                    upgradeAction(pedestal, targetPos, targetBlock);
+                                    upgradeAction(pedestal, targetBlockPos, targetBlock);
                                     break;
                                 }
                                 else
@@ -195,15 +195,15 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
 
     public void upgradeAction(PedestalTileEntity pedestal, BlockPos blockToChopPos, BlockState blockToChop)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         //ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
-        BlockPos posOfPedestal = pedestal.getPos();
+        BlockPos posOfPedestal = pedestal.getBlockPos();
         //wart blocks*, warped stems*, crimson stems*, shroomlight*, mushroom stems, mushroom brown and mushroom red
         FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
         //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-        if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+        if(!fakePlayer.blockPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
         ItemStack choppingAxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
 
         if(!pedestal.hasTool())
@@ -236,7 +236,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
         BlockState blockStateToChop = world.getBlockState(blockToMinePos);
         Block blockToChop = blockStateToChop.getBlock();
@@ -256,7 +256,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                     || blockToChop.equals(Blocks.BROWN_MUSHROOM_BLOCK)
                     || blockToChop.equals(Blocks.RED_MUSHROOM_BLOCK)
                     )
-                    && passesFilter(world, pedestal.getPos(), blockToChop)
+                    && passesFilter(world, pedestal.getBlockPos(), blockToChop)
               )
             {
                 return true;
@@ -268,7 +268,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
         BlockState blockStateToChop = world.getBlockState(blockToMinePos);
         Block blockToChop = blockStateToChop.getBlock();
@@ -288,7 +288,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                                     || blockToChop.equals(Blocks.BROWN_MUSHROOM_BLOCK)
                                     || blockToChop.equals(Blocks.RED_MUSHROOM_BLOCK)
                     )
-                            && passesFilter(world, pedestal.getPos(), blockToChop)
+                            && passesFilter(world, pedestal.getBlockPos(), blockToChop)
                     )
             {
                 return true;
@@ -352,34 +352,34 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + (getRangeHeight(stack)+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString(trr);
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.DUMMY_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append(trr);
+        area.append(areax.getString());
+        area.append(tr);
+        area.withStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.NIL_UUID);
 
         //Display Blocks To Mine Left
-        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
-        btm.mergeStyle(TextFormatting.YELLOW);
-        player.sendMessage(btm,Util.DUMMY_UUID);
+        TranslationTextComponent btm = new TranslationTextComponent(getDescriptionId() + ".chat_btm");
+        btm.append("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
+        btm.withStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.NIL_UUID);
 
         ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE));
-        TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
+        TranslationTextComponent tool = new TranslationTextComponent(getDescriptionId() + ".chat_tool");
         tool.append(toolStack.getDisplayName());
-        tool.mergeStyle(TextFormatting.BLUE);
-        player.sendMessage(tool,Util.DUMMY_UUID);
+        tool.withStyle(TextFormatting.BLUE);
+        player.sendMessage(tool,Util.NIL_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
         /*if(hasAdvancedInventoryTargeting(stack))
@@ -388,9 +388,9 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         }*/
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.DUMMY_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_enchants");
+            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.NIL_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -398,17 +398,17 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,Util.DUMMY_UUID);
+                    enchants.withStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.NIL_UUID);
                 }
             }
         }
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.NIL_UUID);
     }
 
     @Override
@@ -421,24 +421,24 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + (s4+1) + "";
 
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString(trr);
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append(trr);
+        area.append(areax.getString());
+        area.append(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        area.mergeStyle(TextFormatting.WHITE);
+        area.withStyle(TextFormatting.WHITE);
         tooltip.add(area);
 
-        speed.mergeStyle(TextFormatting.RED);
+        speed.withStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 
-    public static final Item CHOPPER = new ItemUpgradeChopperShrooms(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/choppershrooms"));
+    public static final Item CHOPPER = new ItemUpgradeChopperShrooms(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/choppershrooms"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

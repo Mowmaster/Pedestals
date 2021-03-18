@@ -38,7 +38,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 {
-    public ItemUpgradeCrafter(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeCrafter(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {
@@ -58,16 +58,16 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
             int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
             int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 //Dont run if theres nothing queued
                 if (world.getGameTime()%speed == 0) {
@@ -92,14 +92,14 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
 
     public void upgradeAction(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
         int gridSize = getGridSize(coin);
         int intBatchCraftingSize = getItemTransferRate(coin);
         ItemStack itemFromInv = ItemStack.EMPTY;
-        BlockPos posInventory = getPosOfBlockBelow(world,pedestalPos,1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world,pedestalPos,1);
         int intGridCount = gridSize*gridSize;
 
         List<ItemStack> stackCurrent = readInventoryQueueFromNBT(coin);
@@ -245,8 +245,8 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                                     //Will Now Hold All Container items if set with advanced enchant
                                                     if (!hasAdvancedInventoryTargeting(coin)) {
                                                         ItemStack container = stackInRecipe.getItem().getContainerItem(stackInRecipe);
-                                                        if (!world.isRemote) {
-                                                            world.addEntity(new ItemEntity(world, getPosOfBlockBelow(world, pedestalPos, -1).getX() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getY() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getZ() + 0.5, container));
+                                                        if (!world.isClientSide) {
+                                                            world.addEntity(new ItemEntity(world, getBlockPosOfBlockBelow(world, pedestalPos, -1).getX() + 0.5, getBlockPosOfBlockBelow(world, pedestalPos, -1).getY() + 0.5, getBlockPosOfBlockBelow(world, pedestalPos, -1).getZ() + 0.5, container));
                                                         }
 
                                                         ItemStack queueStack = stackCurrent.get(s);
@@ -385,62 +385,62 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.NIL_UUID);
 
         List<ItemStack> list = readCraftingQueueFromNBT(stack);
         if(list.size()>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_recipes");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.DUMMY_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_recipes");
+            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.NIL_UUID);
 
             for(int i=0;i<list.size();i++) {
 
                 TranslationTextComponent enchants = new TranslationTextComponent((list.get(i).isEmpty())?(" - "):(" - " + list.get(i).getDisplayName().getString()));
-                enchants.mergeStyle(TextFormatting.GRAY);
-                player.sendMessage(enchants,Util.DUMMY_UUID);
+                enchants.withStyle(TextFormatting.GRAY);
+                player.sendMessage(enchants,Util.NIL_UUID);
             }
         }
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString(""+getItemTransferRate(stack)+"");
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        rate.append(""+getItemTransferRate(stack)+"");
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.NIL_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.mergeStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        t.withStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         int s2 = getItemTransferRate(stack);
         String trr = getOperationSpeedString(stack);
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString(""+s2+"");
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(trr);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append(""+s2+"");
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(trr);
 
-        rate.mergeStyle(TextFormatting.GRAY);
+        rate.withStyle(TextFormatting.GRAY);
 
-        speed.mergeStyle(TextFormatting.RED);
+        speed.withStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);
     }
 
-    public static final Item CRAFTER_ONE = new ItemUpgradeCrafter(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter1"));
-    public static final Item CRAFTER_TWO = new ItemUpgradeCrafter(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter2"));
-    public static final Item CRAFTER_THREE = new ItemUpgradeCrafter(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter3"));
+    public static final Item CRAFTER_ONE = new ItemUpgradeCrafter(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter1"));
+    public static final Item CRAFTER_TWO = new ItemUpgradeCrafter(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter2"));
+    public static final Item CRAFTER_THREE = new ItemUpgradeCrafter(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter3"));
 
 
     @SubscribeEvent

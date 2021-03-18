@@ -11,7 +11,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemDust extends Item {
 
     public ItemDust() {
-        super(new Properties().maxStackSize(64).group(PEDESTALS_TAB));
+        super(new Properties().stacksTo(64).tab(PEDESTALS_TAB));
     }
 
     public static final Item IRON = new ItemDust().setRegistryName(new ResourceLocation(MODID, "dustiron"));

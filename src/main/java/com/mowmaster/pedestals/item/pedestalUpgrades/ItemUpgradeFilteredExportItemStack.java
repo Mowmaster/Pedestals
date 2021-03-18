@@ -34,7 +34,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFilteredExportItemStack extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilteredExportItemStack(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilteredExportItemStack(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -78,7 +78,7 @@ public class ItemUpgradeFilteredExportItemStack extends ItemUpgradeBaseFilter
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         boolean returner = false;
-        BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world, posPedestal, 1);
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
         if(cap.isPresent())
@@ -149,15 +149,15 @@ public class ItemUpgradeFilteredExportItemStack extends ItemUpgradeBaseFilter
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,coinInPedestal);
@@ -168,7 +168,7 @@ public class ItemUpgradeFilteredExportItemStack extends ItemUpgradeBaseFilter
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world,posOfPedestal,1);
         int upgradeTransferRate = getItemTransferRate(coinInPedestal);
         ItemStack itemFromPedestal = ItemStack.EMPTY;
         //Checks to make sure a TE exists
@@ -233,20 +233,20 @@ public class ItemUpgradeFilteredExportItemStack extends ItemUpgradeBaseFilter
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString(""+getItemTransferRate(stack)+"");
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        rate.append(""+getItemTransferRate(stack)+"");
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.NIL_UUID);
     }
 
     @Override
@@ -254,19 +254,19 @@ public class ItemUpgradeFilteredExportItemStack extends ItemUpgradeBaseFilter
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString("" + getItemTransferRate(stack) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append("" + getItemTransferRate(stack) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        rate.mergeStyle(TextFormatting.GRAY);
-        speed.mergeStyle(TextFormatting.RED);
+        rate.withStyle(TextFormatting.GRAY);
+        speed.withStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);
     }
 
-    public static final Item FEXPORTITEMSTACK = new ItemUpgradeFilteredExportItemStack(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fexportitemstack"));
+    public static final Item FEXPORTITEMSTACK = new ItemUpgradeFilteredExportItemStack(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fexportitemstack"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -57,7 +57,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachine
 {
-    public ItemUpgradeEnergyQuarryBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeEnergyQuarryBlacklist(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -146,11 +146,11 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             //Set Default Energy Buffer
             int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
@@ -163,11 +163,11 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
             BlockState pedestalState = world.getBlockState(pedestalPos);
             Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
             BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
             if(world.isAreaLoaded(negNums,posNums))
             {
-                if(!world.isBlockPowered(pedestalPos)) {
+                if(!world.hasNeighborSignal(pedestalPos)) {
 
                     if(hasEnergy(coinInPedestal))
                     {
@@ -183,7 +183,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                         if(val>0)
                         {
                             if (world.getGameTime()%5 == 0) {
-                                BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,0);
+                                BlockPos directionalPos = getBlockPosOfBlockBelow(world,pedestalPos,0);
                                 PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
                             }
                             writeStoredIntTwoToNBT(coinInPedestal,val-1);
@@ -206,14 +206,14 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                                     if (world.getGameTime() % speed == 0) {
                                         for(int i = 0;i< workQueue.size(); i++)
                                         {
-                                            BlockPos targetPos = workQueue.get(i);
-                                            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                            BlockState targetBlock = world.getBlockState(targetPos);
+                                            BlockPos targetBlockPos = workQueue.get(i);
+                                            BlockPos blockToMinePos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+                                            BlockState targetBlock = world.getBlockState(targetBlockPos);
                                             if(canMineBlock(pedestal,blockToMinePos))
                                             {
                                                 workQueue.remove(i);
                                                 writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                                upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                                upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetBlockPos, targetBlock, pedestalPos);
                                                 break;
                                             }
                                             else
@@ -243,7 +243,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         {
             ItemStack pick = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
             FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,pick.copy());
-            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+            if(!fakePlayer.blockPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
 
             if(!pedestal.hasTool())
             {
@@ -274,7 +274,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
     public boolean passesFilter(World world, BlockPos posPedestal, Block blockIn)
     {
         boolean returner = true;
-        BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world, posPedestal, 1);
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
         if(cap.isPresent())
@@ -341,42 +341,42 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.NIL_UUID);
 
         int s3 = getAreaWidth(stack);
         int s4 = getRangeHeight(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + s4 + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString(trr);
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.DUMMY_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append(trr);
+        area.append(areax.getString());
+        area.append(tr);
+        area.withStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.NIL_UUID);
 
         //Display Blocks To Mine Left
-        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
-        btm.appendString("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
-        btm.mergeStyle(TextFormatting.YELLOW);
-        player.sendMessage(btm,Util.DUMMY_UUID);
+        TranslationTextComponent btm = new TranslationTextComponent(getDescriptionId() + ".chat_btm");
+        btm.append("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
+        btm.withStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.NIL_UUID);
 
         //Display Fuel Left
         int fuelValue = getEnergyStored(pedestal.getCoinOnPedestal());
-        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        fuel.appendString("" + fuelValue/2500 + "");
-        fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,Util.DUMMY_UUID);
+        TranslationTextComponent fuel = new TranslationTextComponent(getDescriptionId() + ".chat_fuel");
+        fuel.append("" + fuelValue/2500 + "");
+        fuel.withStyle(TextFormatting.GREEN);
+        player.sendMessage(fuel,Util.NIL_UUID);
 
         ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE));
-        TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
+        TranslationTextComponent tool = new TranslationTextComponent(getDescriptionId() + ".chat_tool");
         tool.append(toolStack.getDisplayName());
-        tool.mergeStyle(TextFormatting.BLUE);
-        player.sendMessage(tool,Util.DUMMY_UUID);
+        tool.withStyle(TextFormatting.BLUE);
+        player.sendMessage(tool,Util.NIL_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
         if(hasAdvancedInventoryTargeting(stack))
@@ -385,9 +385,9 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
         }
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.DUMMY_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_enchants");
+            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.NIL_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -395,17 +395,17 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea) && !(enchantment instanceof EnchantmentCapacity))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,Util.DUMMY_UUID);
+                    enchants.withStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.NIL_UUID);
                 }
             }
         }
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.NIL_UUID);
     }
 
     @Override
@@ -413,41 +413,41 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.mergeStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        t.withStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         int s3 = getAreaWidth(stack);
         int s4 = getRangeHeight(stack);
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + s4 + "";
-        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
-        area.appendString(tr);
-        area.appendString(areax.getString());
-        area.appendString(trr);
-        area.appendString(areax.getString());
-        area.appendString(tr);
-        area.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
+        area.append(tr);
+        area.append(areax.getString());
+        area.append(trr);
+        area.append(areax.getString());
+        area.append(tr);
+        area.withStyle(TextFormatting.WHITE);
         tooltip.add(area);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfstored");
-        xpstored.appendString(""+ getEnergyStored(stack) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".tooltip_rfstored");
+        xpstored.append(""+ getEnergyStored(stack) +"");
+        xpstored.withStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
 
-        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfcapacity");
-        xpcapacity.appendString(""+ getEnergyBuffer(stack) +"");
-        xpcapacity.mergeStyle(TextFormatting.AQUA);
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_rfcapacity");
+        xpcapacity.append(""+ getEnergyBuffer(stack) +"");
+        xpcapacity.withStyle(TextFormatting.AQUA);
         tooltip.add(xpcapacity);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 
-    public static final Item RFQUARRYB = new ItemUpgradeEnergyQuarryBlacklist(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfquarryb"));
+    public static final Item RFQUARRYB = new ItemUpgradeEnergyQuarryBlacklist(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfquarryb"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

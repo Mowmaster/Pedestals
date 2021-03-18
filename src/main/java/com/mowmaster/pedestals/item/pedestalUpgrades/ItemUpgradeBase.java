@@ -70,7 +70,7 @@ public class ItemUpgradeBase extends Item {
 
     public int maxStored = 2000000000;
     public int maxLVLStored = 20000;
-    public ItemUpgradeBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeBase(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public boolean isPiglinCurrency(ItemStack stack) {
@@ -301,8 +301,8 @@ public class ItemUpgradeBase extends Item {
 //Info Used to create this goes to https://github.com/BluSunrize/ImmersiveEngineering/blob/f40a49da570c991e51dd96bba1d529e20da6caa6/src/main/java/blusunrize/immersiveengineering/api/ApiUtils.java#L338
     public static LazyOptional<IItemHandler> findItemHandlerPedestal(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        BlockPos pos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pos = pedestal.getBlockPos();
         TileEntity neighbourTile = world.getTileEntity(pos);
         if(neighbourTile!=null)
         {
@@ -1090,7 +1090,7 @@ public class ItemUpgradeBase extends Item {
     public int getAdvancedModifier(ItemStack stack)
     {
         ResourceLocation disabled = new ResourceLocation("pedestals", "enchant_limits/advanced_blacklist");
-        ITag<Item> BLACKLISTED = ItemTags.getCollection().get(disabled);
+        ITag<Item> BLACKLISTED = ItemTags.getAllTags().getTag(disabled);
 
         int advanced = 0;
         if(hasEnchant(stack) && !BLACKLISTED.contains(stack.getItem()))
@@ -1128,7 +1128,7 @@ public class ItemUpgradeBase extends Item {
 
     public Block getBaseBlockBelow(World world, BlockPos pedestalPos)
     {
-        Block block = world.getBlockState(getPosOfBlockBelow(world,pedestalPos,1)).getBlock();
+        Block block = world.getBlockState(getBlockPosOfBlockBelow(world,pedestalPos,1)).getBlock();
 
         /*ITag.INamedTag<Block> BLOCK_EMERALD = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/emerald"));
         ITag.INamedTag<Block> BLOCK_DIAMOND = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/diamond"));
@@ -1136,14 +1136,14 @@ public class ItemUpgradeBase extends Item {
         ITag.INamedTag<Block> BLOCK_LAPIS = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/lapis"));
         ITag.INamedTag<Block> BLOCK_IRON = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/iron"));
         ITag.INamedTag<Block> BLOCK_COAL = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/coal"));*/
-        ITag<Block> BLOCK_EMERALD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/emerald"));
-        ITag<Block> BLOCK_DIAMOND = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/diamond"));
-        ITag<Block> BLOCK_GOLD = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/gold"));
-        ITag<Block> BLOCK_LAPIS = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/lapis"));
-        ITag<Block> BLOCK_IRON = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/iron"));
-        ITag<Block> BLOCK_COAL = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/coal"));
-        ITag<Block> BLOCK_QUARTZ = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/quartz"));
-        //ITag<Block> BLOCK_SLIME = BlockTags.getCollection().get(new ResourceLocation("forge", "storage_blocks/slime"));
+        ITag<Block> BLOCK_EMERALD = BlockTags.getAllTags().getTag(new ResourceLocation("forge", "storage_blocks/emerald"));
+        ITag<Block> BLOCK_DIAMOND = BlockTags.getAllTags().getTag(new ResourceLocation("forge", "storage_blocks/diamond"));
+        ITag<Block> BLOCK_GOLD = BlockTags.getAllTags().getTag(new ResourceLocation("forge", "storage_blocks/gold"));
+        ITag<Block> BLOCK_LAPIS = BlockTags.getAllTags().getTag(new ResourceLocation("forge", "storage_blocks/lapis"));
+        ITag<Block> BLOCK_IRON = BlockTags.getAllTags().getTag(new ResourceLocation("forge", "storage_blocks/iron"));
+        ITag<Block> BLOCK_COAL = BlockTags.getAllTags().getTag(new ResourceLocation("forge", "storage_blocks/coal"));
+        ITag<Block> BLOCK_QUARTZ = BlockTags.getAllTags().getTag(new ResourceLocation("forge", "storage_blocks/quartz"));
+        //ITag<Block> BLOCK_SLIME = BlockTags.getAllTags().getTag(new ResourceLocation("forge", "storage_blocks/slime"));
 
         //Netherite
         if(block.equals(Blocks.NETHERITE_BLOCK)) return Blocks.NETHERITE_BLOCK;
@@ -1159,7 +1159,7 @@ public class ItemUpgradeBase extends Item {
         return block;
     }
 
-    public BlockPos getPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
+    public BlockPos getBlockPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
     {
         BlockState state = world.getBlockState(posOfPedestal);
 
@@ -1208,7 +1208,7 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-    public BlockPos getPosRangePos(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
+    public BlockPos getBlockPosRangePos(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
     {
         BlockState state = world.getBlockState(posOfPedestal);
         Direction enumfacing = state.get(FACING);
@@ -1233,7 +1233,7 @@ public class ItemUpgradeBase extends Item {
     }
 
     //Trying to work on a way to do better block checks
-    public BlockPos getPosOfNextBlock(int currentPosition, BlockPos negCorner, BlockPos posCorner)
+    public BlockPos getBlockPosOfNextBlock(int currentPosition, BlockPos negCorner, BlockPos posCorner)
     {
         int xRange = Math.abs(posCorner.getX() - negCorner.getX());
         int yRange = Math.abs(posCorner.getY() - negCorner.getY());
@@ -1266,18 +1266,18 @@ public class ItemUpgradeBase extends Item {
 
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
         FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),pedestalPos,pickaxe.copy());
-        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
+        if(!fakePlayer.blockPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
         if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
-        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
-        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        ITag<Block> ADVANCED = BlockTags.getAllTags().getTag(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getAllTags().getTag(new ResourceLocation("pedestals", "quarry/blacklist"));
         //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
         boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
@@ -1304,18 +1304,18 @@ public class ItemUpgradeBase extends Item {
 
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
-        player.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+        player.setPos(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
         if(!doItemsMatch(player.getHeldItemMainhand(),pickaxe))player.setHeldItem(Hand.MAIN_HAND,pickaxe);
 
-        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
-        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+        ITag<Block> ADVANCED = BlockTags.getAllTags().getTag(new ResourceLocation("pedestals", "quarry/advanced"));
+        ITag<Block> BLACKLIST = BlockTags.getAllTags().getTag(new ResourceLocation("pedestals", "quarry/blacklist"));
         //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
         boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
@@ -1472,7 +1472,7 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
-    public BlockPos getPosRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
+    public BlockPos getBlockPosRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
     {
         BlockState state = world.getBlockState(posOfPedestal);
         Direction enumfacing = state.get(FACING);
@@ -1658,7 +1658,7 @@ public class ItemUpgradeBase extends Item {
                 return playerID;
             }
         }
-        return Util.DUMMY_UUID;
+        return Util.NIL_UUID;
     }
 
     public void setPlayerOnCoin(ItemStack stack, PlayerEntity player)
@@ -1755,16 +1755,16 @@ public class ItemUpgradeBase extends Item {
 
     public void buildWorkQueue(PedestalTileEntity pedestal, int width, int height)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         ItemStack pickaxe = pedestal.getToolOnPedestal();
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
         BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
         FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coin),pedestalPos,pickaxe.copy());
-        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
+        if(!fakePlayer.blockPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
         if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
 
 
@@ -1772,8 +1772,8 @@ public class ItemUpgradeBase extends Item {
 
         for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockPos targetBlockPos = getBlockPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToMinePos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
             if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
             {
                 workQueue.add(blockToMinePos);
@@ -1866,19 +1866,19 @@ public class ItemUpgradeBase extends Item {
 
     public void buildWorkQueueTwo(PedestalTileEntity pedestal, int width, int height)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
         BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
         List<BlockPos> workQueueTwo = new ArrayList<>();
 
         for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+            BlockPos targetBlockPos = getBlockPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+            BlockPos blockToMinePos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
             if(canMineBlockTwo(pedestal, blockToMinePos))
             {
                 workQueueTwo.add(blockToMinePos);
@@ -1969,12 +1969,12 @@ public class ItemUpgradeBase extends Item {
 
     public List<ItemStack> buildFilterQueue(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos posInventory = getPosOfBlockBelow(world, pedestalPos, 1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world, pedestalPos, 1);
 
         List<ItemStack> filterQueue = new ArrayList<>();
 
@@ -2070,12 +2070,12 @@ public class ItemUpgradeBase extends Item {
 
     public List<ItemStack> buildInventoryQueue(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos posInventory = getPosOfBlockBelow(world, pedestalPos, 1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world, pedestalPos, 1);
 
         List<ItemStack> filterQueue = new ArrayList<>();
 
@@ -2173,7 +2173,7 @@ public class ItemUpgradeBase extends Item {
     //Write recipes in order as they appear in the inventory, and since we check for changed, we should be able to get which recipe is which
     public void buildAndWriteCraftingQueue(PedestalTileEntity pedestal, List<ItemStack> inventoryQueue)
     {
-        World world = pedestal.getWorld();
+        World world = pedestal.getLevel();
         ItemStack coin = pedestal.getCoinOnPedestal();
         int gridSize = getGridSize(coin);
         int intGridCount = gridSize*gridSize;
@@ -2311,8 +2311,8 @@ public class ItemUpgradeBase extends Item {
 
     public void writeFilterBlockToNBT(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getWorld();
-        BlockPos pedestalPos = pedestal.getPos();
+        World world = pedestal.getLevel();
+        BlockPos pedestalPos = pedestal.getBlockPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         Block blockBelow = getBaseBlockBelow(world,pedestalPos);
 
@@ -2660,8 +2660,8 @@ public class ItemUpgradeBase extends Item {
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.mergeStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        t.withStyle(TextFormatting.GOLD);
         tooltip.add(t);
     }
     /***************************************
@@ -2701,8 +2701,8 @@ public class ItemUpgradeBase extends Item {
 
     public void actionOnCollideWithBlock(PedestalTileEntity tilePedestal, Entity entityIn)
     {
-        World world = tilePedestal.getWorld();
-        BlockPos posPedestal = tilePedestal.getPos();
+        World world = tilePedestal.getLevel();
+        BlockPos posPedestal = tilePedestal.getBlockPos();
         BlockState state = world.getBlockState(posPedestal);
         actionOnCollideWithBlock(world, tilePedestal, posPedestal, state, entityIn);
     }

@@ -93,7 +93,7 @@ Energy/Fluid/Exp Relay(blocked) - A blank whitelist filter would do the same thi
 public class ItemFilterBase extends Item
 {
     public boolean filterType = false;
-    public ItemFilterBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemFilterBase(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     public boolean getFilterType()
     {
@@ -157,7 +157,7 @@ public class ItemFilterBase extends Item
                         boolean getCurrentType = getFilterType(itemInHand);
                         setFilterType(itemInHand,!getCurrentType);
                         TranslationTextComponent changed = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterchange");
-                        changed.mergeStyle(TextFormatting.GREEN);
+                        changed.withStyle(TextFormatting.GREEN);
                         TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
                         TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
                         changed.append((!getCurrentType)?(black):(white));
@@ -176,8 +176,8 @@ public class ItemFilterBase extends Item
                     if(itemInHand.getItem() instanceof ItemFilterBase)
                     {
                         ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
-                        BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);
-                        BlockPos posBlock = res.getPos();
+                        BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getBlockPos(), false);
+                        BlockPos posBlock = res.getBlockPos();
 
                         List<ItemStack> buildQueue = buildFilterQueue(p_77659_1_,posBlock);
 
@@ -378,16 +378,16 @@ public class ItemFilterBase extends Item
         if(filterQueue.size()>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant, Util.DUMMY_UUID);
+            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant, Util.NIL_UUID);
 
             for(int i=0;i<filterQueue.size();i++) {
 
                 if(!filterQueue.get(i).isEmpty())
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
-                    enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants, Util.DUMMY_UUID);
+                    enchants.withStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants, Util.NIL_UUID);
                 }
             }
         }
@@ -402,14 +402,14 @@ public class ItemFilterBase extends Item
         TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
         TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
         filterList.append((filterType)?(black):(white));
-        filterList.mergeStyle(TextFormatting.GOLD);
+        filterList.withStyle(TextFormatting.GOLD);
         tooltip.add(filterList);
 
         List<ItemStack> filterQueue = readFilterQueueFromNBT(stack);
         if(filterQueue.size()>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
             tooltip.add(enchant);
 
             for(int i=0;i<filterQueue.size();i++) {
@@ -417,15 +417,15 @@ public class ItemFilterBase extends Item
                 if(!filterQueue.get(i).isEmpty())
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
-                    enchants.mergeStyle(TextFormatting.GRAY);
+                    enchants.withStyle(TextFormatting.GRAY);
                     tooltip.add(enchants);
                 }
             }
         }
 
-        /*TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString();
-        speed.mergeStyle(TextFormatting.RED);
+        /*TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append();
+        speed.withStyle(TextFormatting.RED);
         tooltip.add(speed);*/
     }
 }

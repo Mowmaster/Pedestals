@@ -32,7 +32,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 {
-    public ItemUpgradeExpEnchanter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeExpEnchanter(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -77,14 +77,14 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
@@ -97,7 +97,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     {
         int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
         if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getBlockPosOfBlockBelow(world,posOfPedestal,1);
         ItemStack itemFromInv = ItemStack.EMPTY;
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
@@ -294,7 +294,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
         int expNeeded = (xpAtEnchantingLevel-xpAtLevelsBelowRequired<7)?(7):(xpAtEnchantingLevel-xpAtLevelsBelowRequired);
 
 
-        if(!world.isBlockPowered(pos))
+        if(!world.hasNeighborSignal(pos))
         {
             for (int i = -2; i <= 2; ++i)
             {
@@ -331,7 +331,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
             //To show when the enchanting table has enough XP to enchant an item at the current level
             if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
             {
-                BlockPos directionalPos = getPosOfBlockBelow(world,pos,0);
+                BlockPos directionalPos = getBlockPosOfBlockBelow(world,pos,0);
                 spawnParticleAbovePedestal(world,directionalPos,0.94f,0.8f,0.95f,1.0f);
             }
         }
@@ -342,26 +342,26 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
-        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,Util.DUMMY_UUID);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".chat_xp");
+        xpstored.append(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.withStyle(TextFormatting.GREEN);
+        player.sendMessage(xpstored,Util.NIL_UUID);
 
-        float enchanting = getEnchantmentPowerFromSorroundings(pedestal.getWorld(),pedestal.getPos(),pedestal.getCoinOnPedestal());
-        TranslationTextComponent enchantlvl = new TranslationTextComponent(getTranslationKey() + ".chat_enchant");
-        enchantlvl.appendString(""+ (int)(enchanting*2) +"");
-        enchantlvl.mergeStyle(TextFormatting.LIGHT_PURPLE);
-        player.sendMessage(enchantlvl,Util.DUMMY_UUID);
+        float enchanting = getEnchantmentPowerFromSorroundings(pedestal.getLevel(),pedestal.getBlockPos(),pedestal.getCoinOnPedestal());
+        TranslationTextComponent enchantlvl = new TranslationTextComponent(getDescriptionId() + ".chat_enchant");
+        enchantlvl.append(""+ (int)(enchanting*2) +"");
+        enchantlvl.withStyle(TextFormatting.LIGHT_PURPLE);
+        player.sendMessage(enchantlvl,Util.NIL_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
-        speed.appendString(getOperationSpeedString(stack));
-        speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.DUMMY_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
+        speed.append(getOperationSpeedString(stack));
+        speed.withStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.NIL_UUID);
     }
 
     @Override
@@ -369,15 +369,15 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString(getOperationSpeedString(stack));
+        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
+        speed.append(getOperationSpeedString(stack));
 
-        speed.mergeStyle(TextFormatting.RED);
+        speed.withStyle(TextFormatting.RED);
 
         tooltip.add(speed);
     }
 
-    public static final Item XPENCHANTER = new ItemUpgradeExpEnchanter(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpenchanter"));
+    public static final Item XPENCHANTER = new ItemUpgradeExpEnchanter(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpenchanter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

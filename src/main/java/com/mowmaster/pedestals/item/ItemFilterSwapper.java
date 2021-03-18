@@ -26,7 +26,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemFilterSwapper extends Item {
 
     public ItemFilterSwapper() {
-        super(new Properties().maxStackSize(1).containerItem(FILTERTOOL).group(PEDESTALS_TAB));
+        super(new Properties().stacksTo(1).containerItem(FILTERTOOL).tab(PEDESTALS_TAB));
     }
 
     @Override
@@ -41,13 +41,13 @@ public class ItemFilterSwapper extends Item {
 
     @Override
     public ActionResultType onItemUse(ItemUseContext context) {
-        World worldIn = context.getWorld();
+        World worldIn = context.getLevel();
         PlayerEntity player = context.getPlayer();
-        BlockPos pos = context.getPos();
+        BlockPos pos = context.getBlockPos();
         ItemStack stackInMainHand = player.getHeldItemMainhand();
         ItemStack stackInOffHand = player.getHeldItemOffhand();
 
-        if(!worldIn.isRemote)
+        if(!worldIn.isClientSide)
         {
             BlockState getBlockState = worldIn.getBlockState(pos);
             if(player.isCrouching())
@@ -88,7 +88,7 @@ public class ItemFilterSwapper extends Item {
                             {
                                 pedestal.updateFilter(player.getHeldItemOffhand(),true);
                                 player.getHeldItemOffhand().shrink(1);
-                                filterSwitch.mergeStyle(TextFormatting.WHITE);
+                                filterSwitch.withStyle(TextFormatting.WHITE);
                                 player.sendStatusMessage(filterSwitch,true);
                                 return ActionResultType.SUCCESS;
                             }
@@ -98,7 +98,7 @@ public class ItemFilterSwapper extends Item {
                                 {
                                     pedestal.addFilter(stackInOffHand,false);
                                     stackInOffHand.shrink(1);
-                                    filterInsert.mergeStyle(TextFormatting.WHITE);
+                                    filterInsert.withStyle(TextFormatting.WHITE);
                                     player.sendStatusMessage(filterInsert,true);
                                 }
                             }
@@ -107,7 +107,7 @@ public class ItemFilterSwapper extends Item {
                         {
                             ItemHandlerHelper.giveItemToPlayer(player,pedestal.removeFilter(true));
 
-                            filterRemove.mergeStyle(TextFormatting.WHITE);
+                            filterRemove.withStyle(TextFormatting.WHITE);
                             player.sendStatusMessage(filterRemove,true);
                             return ActionResultType.SUCCESS;
                         }

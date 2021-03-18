@@ -37,7 +37,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 {
     private int maxStored = 2000000000;
 
-    public ItemUpgradeItemTank(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeItemTank(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -410,16 +410,16 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int getMaxStorageValue = getStorageBuffer(coinInPedestal);
             if(!hasMaxStorageSet(coinInPedestal) || readMaxStorageFromNBT(coinInPedestal) != getMaxStorageValue) {writeMaxStorageToNBT(coinInPedestal, getMaxStorageValue);}
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 if (world.getGameTime()%20 == 0) {
                     //Keep Pedestal Full at all times
@@ -491,35 +491,35 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
         ItemStack storedStack = getItemStored(pedestal);
-        TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
+        TranslationTextComponent stored = new TranslationTextComponent(getDescriptionId() + ".chat_stored");
         if(!storedStack.isEmpty())
         {
-            stored.appendString("" +  storedStack.getDisplayName().getString() + " - ");
-            stored.appendString("" +  (storedStack.getCount()+pedestal.getItemInPedestalOverride().getCount()) + "");
-            stored.mergeStyle(TextFormatting.GREEN);
-            player.sendMessage(stored, Util.DUMMY_UUID);
+            stored.append("" +  storedStack.getDisplayName().getString() + " - ");
+            stored.append("" +  (storedStack.getCount()+pedestal.getItemInPedestalOverride().getCount()) + "");
+            stored.withStyle(TextFormatting.GREEN);
+            player.sendMessage(stored, Util.NIL_UUID);
         }
         else
         {
             if(!pedestal.getItemInPedestalOverride().isEmpty())
             {
-                stored.appendString("" +  pedestal.getItemInPedestalOverride().getDisplayName().getString() + " - ");
-                stored.appendString("" +  (pedestal.getItemInPedestalOverride().getCount()) + "");
-                stored.mergeStyle(TextFormatting.GREEN);
-                player.sendMessage(stored, Util.DUMMY_UUID);
+                stored.append("" +  pedestal.getItemInPedestalOverride().getDisplayName().getString() + " - ");
+                stored.append("" +  (pedestal.getItemInPedestalOverride().getCount()) + "");
+                stored.withStyle(TextFormatting.GREEN);
+                player.sendMessage(stored, Util.NIL_UUID);
             }
         }
 
 
-        TranslationTextComponent buffer = new TranslationTextComponent(getTranslationKey() + ".chat_buffer");
-        buffer.appendString("" + readMaxStorageFromNBT(stack) + "");
-        buffer.mergeStyle(TextFormatting.AQUA);
-        player.sendMessage(buffer, Util.DUMMY_UUID);
+        TranslationTextComponent buffer = new TranslationTextComponent(getDescriptionId() + ".chat_buffer");
+        buffer.append("" + readMaxStorageFromNBT(stack) + "");
+        buffer.withStyle(TextFormatting.AQUA);
+        player.sendMessage(buffer, Util.NIL_UUID);
     }
 
     @Override
@@ -530,20 +530,20 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
         ItemStack storedStack = getItemStored(stack);
         if(!storedStack.isEmpty())
         {
-            TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
-            stored.appendString("" +  storedStack.getDisplayName().getString() + " - ");
-            stored.appendString("" +  (storedStack.getCount()) + "");
-            stored.mergeStyle(TextFormatting.GREEN);
+            TranslationTextComponent stored = new TranslationTextComponent(getDescriptionId() + ".chat_stored");
+            stored.append("" +  storedStack.getDisplayName().getString() + " - ");
+            stored.append("" +  (storedStack.getCount()) + "");
+            stored.withStyle(TextFormatting.GREEN);
             tooltip.add(stored);
         }
 
-        TranslationTextComponent buffer = new TranslationTextComponent(getTranslationKey() + ".chat_buffer");
-        buffer.appendString("" + getStorageBuffer(stack) + "");
-        buffer.mergeStyle(TextFormatting.AQUA);
+        TranslationTextComponent buffer = new TranslationTextComponent(getDescriptionId() + ".chat_buffer");
+        buffer.append("" + getStorageBuffer(stack) + "");
+        buffer.withStyle(TextFormatting.AQUA);
         tooltip.add(buffer);
     }
 
-    public static final Item ITEMTANK = new ItemUpgradeItemTank(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/itemtank"));
+    public static final Item ITEMTANK = new ItemUpgradeItemTank(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/itemtank"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -20,7 +20,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFilterTagBlacklist extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterTagBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilterTagBlacklist(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {return true;}
@@ -85,7 +85,7 @@ public class ItemUpgradeFilterTagBlacklist extends ItemUpgradeBaseFilter
         }
     }
 
-    public static final Item TAG = new ItemUpgradeFilterTagBlacklist(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filtertagb"));
+    public static final Item TAG = new ItemUpgradeFilterTagBlacklist(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filtertagb"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

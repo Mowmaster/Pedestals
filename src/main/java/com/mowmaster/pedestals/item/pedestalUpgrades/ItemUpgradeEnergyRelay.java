@@ -14,7 +14,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeEnergyRelay extends ItemUpgradeBaseEnergy
 {
-    public ItemUpgradeEnergyRelay(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeEnergyRelay(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -29,16 +29,16 @@ public class ItemUpgradeEnergyRelay extends ItemUpgradeBaseEnergy
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
             if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!world.hasNeighborSignal(pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(pedestal);
@@ -46,7 +46,7 @@ public class ItemUpgradeEnergyRelay extends ItemUpgradeBaseEnergy
         }
     }
 
-    public static final Item RFRELAY = new ItemUpgradeEnergyRelay(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfrelay"));
+    public static final Item RFRELAY = new ItemUpgradeEnergyRelay(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfrelay"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

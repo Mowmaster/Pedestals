@@ -35,7 +35,7 @@ public class RenderPedestalOutline
             ItemLinkingTool LT = (ItemLinkingTool) stack.getItem();
             if(stack.hasTag())
             {
-                LT.getPosFromNBT(stack);
+                LT.getBlockPosFromNBT(stack);
                 BlockPos pos = LT.getStoredPosition(stack);
                 List<BlockPos> storedRecievers = LT.getStoredPositionList(stack);
 
@@ -49,7 +49,7 @@ public class RenderPedestalOutline
             ItemUpgradeTool UT = (ItemUpgradeTool) stackUpgrade.getItem();
             if(stackUpgrade.hasTag())
             {
-                UT.getPosFromNBT(stack);
+                UT.getBlockPosFromNBT(stack);
                 BlockPos pos = UT.getStoredPosition(stack);
                 if(player.getEntityWorld().getBlockState(pos).getBlock() instanceof PedestalBlock)
                 {
@@ -84,7 +84,7 @@ public class RenderPedestalOutline
         }
     }
 
-    public static BlockPos getPosRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
+    public static BlockPos getBlockPosRangePosEntity(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
     {
         BlockState state = world.getBlockState(posOfPedestal);
         Direction enumfacing = state.get(FACING);
@@ -253,7 +253,7 @@ public class RenderPedestalOutline
                 BlockState state = world.getBlockState(storedPos);
                 Direction enumfacing = state.get(FACING);
                 BlockPos negBlock = getNegRangePosEntity(world,storedPos,z,y);
-                BlockPos posBlock = getPosRangePosEntity(world,storedPos,z,y);
+                BlockPos posBlock = getBlockPosRangePosEntity(world,storedPos,z,y);
 
 
                 /*switch (enumfacing)

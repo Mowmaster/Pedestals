@@ -104,7 +104,7 @@ public class Crusher
     public void addCrusherTagRecipe(String tagIn, ItemStack stackOut)
     {
         ResourceLocation grabTags = new ResourceLocation(tagIn.split(":")[0], tagIn.split(":")[1]);
-        List<Item> itemList = ItemTags.getCollection().getOrCreate(grabTags).getAllElements();
+        List<Item> itemList = ItemTags.getAllTags().getTagOrCreate(grabTags).getAllElements();
         for(Item item : itemList)
         {
             if (getResult(item) != ItemStack.EMPTY) { return;}

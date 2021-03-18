@@ -16,7 +16,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFilterEnchantedBlacklist extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterEnchantedBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilterEnchantedBlacklist(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {return true;}
@@ -44,7 +44,7 @@ public class ItemUpgradeFilterEnchantedBlacklist extends ItemUpgradeBaseFilter
 
     }
 
-    public static final Item ENCHANTED = new ItemUpgradeFilterEnchantedBlacklist(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedb"));
+    public static final Item ENCHANTED = new ItemUpgradeFilterEnchantedBlacklist(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedb"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

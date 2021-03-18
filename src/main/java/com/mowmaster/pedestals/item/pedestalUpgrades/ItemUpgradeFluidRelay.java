@@ -26,7 +26,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFluidRelay extends ItemUpgradeBaseFluid
 {
-    public ItemUpgradeFluidRelay(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFluidRelay(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -58,16 +58,16 @@ public class ItemUpgradeFluidRelay extends ItemUpgradeBaseFluid
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        if(!world.isClientSide)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
+            BlockPos pedestalPos = pedestal.getBlockPos();
 
             int getMaxFluidValue = getFluidbuffer(coinInPedestal);
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 
-            if(!world.isBlockPowered(pedestalPos)) {
+            if(!world.hasNeighborSignal(pedestalPos)) {
                 if(hasFluidInCoin(coinInPedestal))
                 {
                     upgradeActionSendFluid(pedestal);
@@ -81,67 +81,67 @@ public class ItemUpgradeFluidRelay extends ItemUpgradeBaseFluid
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        name.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.DUMMY_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        name.withStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.NIL_UUID);
 
         FluidStack fluidStored = getFluidStored(stack);
-        TranslationTextComponent fluidLabel = new TranslationTextComponent(getTranslationKey() + ".chat_fluidlabel");
+        TranslationTextComponent fluidLabel = new TranslationTextComponent(getDescriptionId() + ".chat_fluidlabel");
         if(!fluidStored.isEmpty())
         {
-            TranslationTextComponent fluid = new TranslationTextComponent(getTranslationKey() + ".chat_fluid");
-            TranslationTextComponent fluidSplit = new TranslationTextComponent(getTranslationKey() + ".chat_fluidseperator");
-            fluid.appendString("" + fluidStored.getDisplayName().getString() + "");
-            fluid.appendString(fluidSplit.getString());
-            fluid.appendString("" + fluidStored.getAmount() + "");
-            fluid.appendString(fluidLabel.getString());
-            fluid.mergeStyle(TextFormatting.BLUE);
-            player.sendMessage(fluid,Util.DUMMY_UUID);
+            TranslationTextComponent fluid = new TranslationTextComponent(getDescriptionId() + ".chat_fluid");
+            TranslationTextComponent fluidSplit = new TranslationTextComponent(getDescriptionId() + ".chat_fluidseperator");
+            fluid.append("" + fluidStored.getDisplayName().getString() + "");
+            fluid.append(fluidSplit.getString());
+            fluid.append("" + fluidStored.getAmount() + "");
+            fluid.append(fluidLabel.getString());
+            fluid.withStyle(TextFormatting.BLUE);
+            player.sendMessage(fluid,Util.NIL_UUID);
         }
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString("" +  getFluidTransferRate(stack) + "");
-        rate.appendString(fluidLabel.getString());
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
+        rate.append("" +  getFluidTransferRate(stack) + "");
+        rate.append(fluidLabel.getString());
+        rate.withStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.NIL_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 
-        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
-        t.mergeStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
+        t.withStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         FluidStack fluidStored = getFluidStored(stack);
-        TranslationTextComponent fluidLabel = new TranslationTextComponent(getTranslationKey() + ".chat_fluidlabel");
+        TranslationTextComponent fluidLabel = new TranslationTextComponent(getDescriptionId() + ".chat_fluidlabel");
         if(!fluidStored.isEmpty())
         {
-            TranslationTextComponent fluid = new TranslationTextComponent(getTranslationKey() + ".chat_fluid");
-            TranslationTextComponent fluidSplit = new TranslationTextComponent(getTranslationKey() + ".chat_fluidseperator");
-            fluid.appendString("" + fluidStored.getDisplayName().getString() + "");
-            fluid.appendString(fluidSplit.getString());
-            fluid.appendString("" + fluidStored.getAmount() + "");
-            fluid.appendString(fluidLabel.getString());
-            fluid.mergeStyle(TextFormatting.BLUE);
+            TranslationTextComponent fluid = new TranslationTextComponent(getDescriptionId() + ".chat_fluid");
+            TranslationTextComponent fluidSplit = new TranslationTextComponent(getDescriptionId() + ".chat_fluidseperator");
+            fluid.append("" + fluidStored.getDisplayName().getString() + "");
+            fluid.append(fluidSplit.getString());
+            fluid.append("" + fluidStored.getAmount() + "");
+            fluid.append(fluidLabel.getString());
+            fluid.withStyle(TextFormatting.BLUE);
             tooltip.add(fluid);
         }
 
-        TranslationTextComponent fluidcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_fluidcapacity");
-        fluidcapacity.appendString(""+ getFluidbuffer(stack) +"");
-        fluidcapacity.appendString(fluidLabel.getString());
-        fluidcapacity.mergeStyle(TextFormatting.AQUA);
+        TranslationTextComponent fluidcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_fluidcapacity");
+        fluidcapacity.append(""+ getFluidbuffer(stack) +"");
+        fluidcapacity.append(fluidLabel.getString());
+        fluidcapacity.withStyle(TextFormatting.AQUA);
         tooltip.add(fluidcapacity);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
-        rate.appendString("" + getFluidTransferRate(stack) + "");
-        rate.appendString(fluidLabel.getString());
-        rate.mergeStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
+        rate.append("" + getFluidTransferRate(stack) + "");
+        rate.append(fluidLabel.getString());
+        rate.withStyle(TextFormatting.GRAY);
         tooltip.add(rate);
     }
 
-    public static final Item FLUIDRELAY = new ItemUpgradeFluidRelay(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fluidrelay"));
+    public static final Item FLUIDRELAY = new ItemUpgradeFluidRelay(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fluidrelay"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
