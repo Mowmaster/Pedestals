@@ -35,7 +35,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 {
-    public ItemUpgradeExpCollector(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeExpCollector(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -130,14 +130,14 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
                 if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getMaxXpValue);}
@@ -156,7 +156,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
-        BlockPos posBlockPos = getBlockPosRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
 
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
@@ -181,7 +181,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         int widthP = 0;
         int heightP = 1;
         BlockPos negBlockPosP = getNegRangePosEntity(world,posOfPedestal,widthP,heightP);
-        BlockPos posBlockPosP = getBlockPosRangePosEntity(world,posOfPedestal,widthP,heightP);
+        BlockPos posBlockPosP = getPosRangePosEntity(world,posOfPedestal,widthP,heightP);
         BlockState state = world.getBlockState(posOfPedestal);
         if(state.getBlock() instanceof PedestalBlock)
         {
@@ -249,38 +249,38 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".chat_xp");
-        xpstored.append(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.withStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,Util.NIL_UUID);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
+        player.sendMessage(xpstored,Util.DUMMY_UUID);
 
         int s3 = getAreaWidth(stack);
         String trr = "" + (s3+s3+1) + "";
         String trrr = "" + getRangeHeight(stack) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
-        area.append(trr);
-        area.append(areax.getString());
-        area.append(trrr);
-        area.append(areax.getString());
-        area.append(trr);
-        area.withStyle(TextFormatting.WHITE);
-        player.sendMessage(area, Util.NIL_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.appendString(trr);
+        area.appendString(areax.getString());
+        area.appendString(trrr);
+        area.appendString(areax.getString());
+        area.appendString(trr);
+        area.mergeStyle(TextFormatting.WHITE);
+        player.sendMessage(area, Util.DUMMY_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        rate.append(getExpTransferRateString(stack));
-        rate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.NIL_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.appendString(getExpTransferRateString(stack));
+        rate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
@@ -291,28 +291,28 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         int s3 = getAreaWidth(stack);
         String trr = "" + (s3+s3+1) + "";
         String trrr = "" + getRangeHeight(stack) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
-        area.append(trr);
-        area.append(areax.getString());
-        area.append(trrr);
-        area.append(areax.getString());
-        area.append(trr);
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
+        area.appendString(trr);
+        area.appendString(areax.getString());
+        area.appendString(trrr);
+        area.appendString(areax.getString());
+        area.appendString(trr);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.withStyle(TextFormatting.WHITE);
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append(getExpTransferRateString(stack));
-        rate.withStyle(TextFormatting.GRAY);
-        speed.withStyle(TextFormatting.RED);
+        area.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString(getExpTransferRateString(stack));
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(rate);
         tooltip.add(speed);
     }
 
-    public static final Item XPMAGNET = new ItemUpgradeExpCollector(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpmagnet"));
+    public static final Item XPMAGNET = new ItemUpgradeExpCollector(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpmagnet"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -32,7 +32,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFluidVoid extends ItemUpgradeBaseFluid
 {
-    public ItemUpgradeFluidVoid(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeFluidVoid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -41,14 +41,14 @@ public class ItemUpgradeFluidVoid extends ItemUpgradeBaseFluid
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
@@ -74,7 +74,7 @@ public class ItemUpgradeFluidVoid extends ItemUpgradeBaseFluid
         int width = 0;
         int height = 1;
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
-        BlockPos posBlockPos = getBlockPosRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
         BlockState state = world.getBlockState(posOfPedestal);
         float damage = getDamageDelt(coinInPedestal);
         if(state.getBlock() instanceof PedestalBlock)
@@ -111,42 +111,42 @@ public class ItemUpgradeFluidVoid extends ItemUpgradeBaseFluid
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        rate.append("" + (int)(getDamageDelt(stack)/2) + "");
-        rate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.NIL_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.appendString("" + (int)(getDamageDelt(stack)/2) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        t.withStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append("" + (int)(getDamageDelt(stack)/2) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString("" + (int)(getDamageDelt(stack)/2) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        rate.withStyle(TextFormatting.GRAY);
-        speed.withStyle(TextFormatting.RED);
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);
     }
 
-    public static final Item VOIDFLUID = new ItemUpgradeFluidVoid(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/voidfluid"));
+    public static final Item VOIDFLUID = new ItemUpgradeFluidVoid(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/voidfluid"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

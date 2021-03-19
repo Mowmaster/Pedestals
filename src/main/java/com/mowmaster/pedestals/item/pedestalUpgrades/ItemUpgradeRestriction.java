@@ -26,7 +26,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeRestriction extends ItemUpgradeBase
 {
-    public ItemUpgradeRestriction(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeRestriction(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -73,15 +73,15 @@ public class ItemUpgradeRestriction extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.DUMMY_UUID);
 
         int overEnchanted = (getCapacityModifierOver(stack)*4);
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        rate.append("" + ((overEnchanted>0)?(overEnchanted):(1)) + "");
-        rate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.NIL_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.appendString("" + ((overEnchanted>0)?(overEnchanted):(1)) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.DUMMY_UUID);
     }
 
     @Override
@@ -90,14 +90,14 @@ public class ItemUpgradeRestriction extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
         int overEnchanted = (getCapacityModifierOver(stack)*4);
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append("" + ((overEnchanted>0)?(overEnchanted):(1)) + "");
-        rate.withStyle(TextFormatting.GRAY);
-        rate.withStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString("" + ((overEnchanted>0)?(overEnchanted):(1)) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
+        rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
     }
 
-    public static final Item DEFAULT = new ItemUpgradeRestriction(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/restriction"));
+    public static final Item DEFAULT = new ItemUpgradeRestriction(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/restriction"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

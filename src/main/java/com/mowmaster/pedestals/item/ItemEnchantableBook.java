@@ -16,7 +16,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemEnchantableBook extends Item {
 
     public ItemEnchantableBook() {
-        super(new Properties().stacksTo(64).tab(PEDESTALS_TAB));
+        super(new Properties().maxStackSize(64).group(PEDESTALS_TAB));
     }
 
     public static final Item CAPACITY = new ItemEnchantableBook().setRegistryName(new ResourceLocation(MODID, "bookcapacity"));

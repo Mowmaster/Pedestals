@@ -52,7 +52,7 @@ if none exist, or it cant leave 1 item in the slot, it will skip and move to the
  */
 public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
 {
-    public ItemUpgradeCompactingCrafter(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeCompactingCrafter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {
@@ -71,15 +71,15 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
             int storedTwo = readStoredIntTwoFromNBT(coinInPedestal);
             int craftingCount = readCraftingQueueFromNBT(coinInPedestal).size();
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 //Dont run if theres nothing queued
                 if (world.getGameTime()%speed == 0) {
@@ -104,14 +104,14 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
 
     public void upgradeAction(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getLevel();
-        BlockPos pedestalPos = pedestal.getBlockPos();
+        World world = pedestal.getWorld();
+        BlockPos pedestalPos = pedestal.getPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
         int gridSize = getGridSize(coin);
         int intBatchCraftingSize = getItemTransferRate(coin);
         ItemStack itemFromInv = ItemStack.EMPTY;
-        BlockPos posInventory = getBlockPosOfBlockBelow(world,pedestalPos,1);
+        BlockPos posInventory = getPosOfBlockBelow(world,pedestalPos,1);
         int intGridCount = gridSize*gridSize;
 
         List<ItemStack> stackCurrent = readInventoryQueueFromNBT(coin);
@@ -204,8 +204,8 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                             if (queueStack.getItem().hasContainerItem(queueStack)) {
                                                 ItemStack container = queueStack.getItem().getContainerItem(queueStack);
                                                 container.setCount(intBatchCraftingSize*intGridCount);
-                                                if (!world.isClientSide) {
-                                                    world.addEntity(new ItemEntity(world, getBlockPosOfBlockBelow(world, pedestalPos, -1).getX() + 0.5, getBlockPosOfBlockBelow(world, pedestalPos, -1).getY() + 0.5, getBlockPosOfBlockBelow(world, pedestalPos, -1).getZ() + 0.5, container));
+                                                if (!world.isRemote) {
+                                                    world.addEntity(new ItemEntity(world, getPosOfBlockBelow(world, pedestalPos, -1).getX() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getY() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getZ() + 0.5, container));
                                                 }
                                             }
 
@@ -249,7 +249,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
     @Override
     public void buildAndWriteCraftingQueue(PedestalTileEntity pedestal, List<ItemStack> inventoryQueue)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         ItemStack coin = pedestal.getCoinOnPedestal();
         int gridSize = getGridSize(coin);
         int intGridCount = gridSize*gridSize;
@@ -272,7 +272,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
             ItemStack getStack = invQueue.get(s).copy();
             getStack.setCount(1);
             //If the item Stack has enough items to craft with
-            //stack.getCount()>=2 ||  stack.getMaxStackSize()==1 ||
+            //stack.getCount()>=2 ||  stack.maxStackSize()==1 ||
             if(!getStack.isEmpty())
             {
                 for(int r=0;r < intGridCount;r++)
@@ -377,36 +377,36 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.DUMMY_UUID);
 
         List<ItemStack> list = readCraftingQueueFromNBT(stack);
         if(list.size()>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_recipes");
-            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.NIL_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_recipes");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(int i=0;i<list.size();i++) {
                 if(list.get(i).isEmpty())continue;
                 TranslationTextComponent enchants = new TranslationTextComponent(i +": " + list.get(i).getDisplayName().getString());
-                enchants.withStyle(TextFormatting.GRAY);
-                player.sendMessage(enchants,Util.NIL_UUID);
+                enchants.mergeStyle(TextFormatting.GRAY);
+                player.sendMessage(enchants,Util.DUMMY_UUID);
             }
         }
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        rate.append(""+getItemTransferRate(stack)+"");
-        rate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.NIL_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.appendString(""+getItemTransferRate(stack)+"");
+        rate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_enchants");
-            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.NIL_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -414,43 +414,43 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.withStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,Util.NIL_UUID);
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        t.withStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
         int s2 = getItemTransferRate(stack);
         String trr = getOperationSpeedString(stack);
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append(""+s2+"");
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(trr);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString(""+s2+"");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(trr);
 
-        rate.withStyle(TextFormatting.GRAY);
+        rate.mergeStyle(TextFormatting.GRAY);
 
-        speed.withStyle(TextFormatting.RED);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);
     }
 
-    public static final Item COMPACTOR_TWO = new ItemUpgradeCompactingCrafter(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/compactor2"));
-    public static final Item COMPACTOR_THREE = new ItemUpgradeCompactingCrafter(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/compactor3"));
+    public static final Item COMPACTOR_TWO = new ItemUpgradeCompactingCrafter(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/compactor2"));
+    public static final Item COMPACTOR_THREE = new ItemUpgradeCompactingCrafter(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/compactor3"));
 
 
     @SubscribeEvent

@@ -19,7 +19,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemColorPallet extends Item {
     public ItemColorPallet(Properties builder) {
-        super(builder.tab(PEDESTALS_TAB));
+        super(builder.group(PEDESTALS_TAB));
     }
 
     //Will Need Custom Recipe Handler to make this item: SuspiciousStewRecipe

@@ -18,7 +18,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemTagTool extends Item {
 
     public ItemTagTool() {
-        super(new Properties().stacksTo(1).containerItem(TAG).tab(PEDESTALS_TAB));
+        super(new Properties().maxStackSize(1).containerItem(TAG).group(PEDESTALS_TAB));
     }
 
     @Override
@@ -34,13 +34,13 @@ public class ItemTagTool extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
         String tags = p_77659_2_.getHeldItemOffhand().getItem().getTags().toString();
-        if(p_77659_1_.isClientSide)
+        if(p_77659_1_.isRemote)
         {
             if(!p_77659_2_.getHeldItemOffhand().isEmpty())
             {
                 TranslationTextComponent output = new TranslationTextComponent("Tags: ");
-                output.append(tags);
-                output.withStyle(TextFormatting.WHITE);
+                output.appendString(tags);
+                output.mergeStyle(TextFormatting.WHITE);
                 p_77659_2_.sendMessage(output,p_77659_2_.getUniqueID());
             }
         }

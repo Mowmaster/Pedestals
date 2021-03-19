@@ -25,7 +25,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 //Filters by number of enchants on an item
 public class ItemUpgradeFilterEnchantedFuzzy extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterEnchantedFuzzy(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeFilterEnchantedFuzzy(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {return true;}
@@ -76,7 +76,7 @@ public class ItemUpgradeFilterEnchantedFuzzy extends ItemUpgradeBaseFilter
         /*int countAnyMatches = 0;
         if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
         {
-            BlockPos posInventory = getBlockPosOfBlockBelow(world, posPedestal, 1);
+            BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
 
             LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
             if(cap.isPresent())
@@ -133,7 +133,7 @@ public class ItemUpgradeFilterEnchantedFuzzy extends ItemUpgradeBaseFilter
         }
     }
 
-    public static final Item ENCHANTEDFUZZY = new ItemUpgradeFilterEnchantedFuzzy(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedfuzzy"));
+    public static final Item ENCHANTEDFUZZY = new ItemUpgradeFilterEnchantedFuzzy(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedfuzzy"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

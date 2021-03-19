@@ -22,7 +22,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemGuideBook extends Item {
 
     public ItemGuideBook() {
-        super(new Properties().stacksTo(64).tab(PEDESTALS_TAB));
+        super(new Properties().maxStackSize(64).group(PEDESTALS_TAB));
     }
 
     public static final Item DEFAULT = new ItemGuideBook().setRegistryName(new ResourceLocation(MODID, "bookguide"));
@@ -30,11 +30,11 @@ public class ItemGuideBook extends Item {
     /*@Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
 
-        if(worldIn.isClientSide)
+        if(worldIn.isRemote)
         {
-            TranslationTextComponent link = new TranslationTextComponent(getDescriptionId() + ".link");
-            link.withStyle(TextFormatting.WHITE);
-            playerIn.sendMessage(link, Util.NIL_UUID);
+            TranslationTextComponent link = new TranslationTextComponent(getTranslationKey() + ".link");
+            link.mergeStyle(TextFormatting.WHITE);
+            playerIn.sendMessage(link, Util.DUMMY_UUID);
         }
 
         return super.onItemRightClick(worldIn, playerIn, handIn);

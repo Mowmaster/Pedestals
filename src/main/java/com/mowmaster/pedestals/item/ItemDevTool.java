@@ -29,7 +29,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemDevTool extends Item {
 
     public ItemDevTool() {
-        super(new Properties().stacksTo(1).containerItem(DEV).tab(PEDESTALS_TAB));
+        super(new Properties().maxStackSize(1).containerItem(DEV).group(PEDESTALS_TAB));
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ItemDevTool extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
 
-        if(!p_77659_1_.isClientSide)
+        if(!p_77659_1_.isRemote)
         {
             RayTraceResult result = p_77659_2_.pick(5,0,false);
             if(result != null)
@@ -60,7 +60,7 @@ public class ItemDevTool extends Item {
                         if(p_77659_2_.getHeldItemOffhand().hasTag())
                         {
                             TranslationTextComponent name = new TranslationTextComponent(""+p_77659_2_.getHeldItemOffhand().getTag().toString()+"");
-                            name.withStyle(TextFormatting.GOLD);
+                            name.mergeStyle(TextFormatting.GOLD);
                             p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
                             return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                         }
@@ -70,8 +70,8 @@ public class ItemDevTool extends Item {
                 else if(result.getType() == RayTraceResult.Type.BLOCK)
                 {
                     ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
-                    BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getBlockPos(), false);
-                    BlockPos hit = res.getBlockPos();
+                    BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);
+                    BlockPos hit = res.getPos();
 
                     if(p_77659_1_.getTileEntity(hit) instanceof PedestalTileEntity)
                     {
@@ -81,7 +81,7 @@ public class ItemDevTool extends Item {
                             if(pedestal.getCoinOnPedestal().hasTag())
                             {
                                 TranslationTextComponent name = new TranslationTextComponent(""+pedestal.getCoinOnPedestal().getTag().toString()+"");
-                                name.withStyle(TextFormatting.GOLD);
+                                name.mergeStyle(TextFormatting.GOLD);
                                 p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
                                 return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                             }
@@ -91,7 +91,7 @@ public class ItemDevTool extends Item {
                                 if(nbt.contains("inv"))
                                 {
                                     TranslationTextComponent name = new TranslationTextComponent(""+ nbt.toString() +"");
-                                    name.withStyle(TextFormatting.WHITE);
+                                    name.mergeStyle(TextFormatting.WHITE);
                                     p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
                                     return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                                 }

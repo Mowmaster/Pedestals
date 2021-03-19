@@ -149,7 +149,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     @Override
     public boolean receiveFluid(IWorld worldIn, BlockPos pos, BlockState state, FluidState fluidStateIn) {
         if (!state.get(BlockStateProperties.WATERLOGGED) && fluidStateIn.getFluid() == Fluids.WATER) {
-            if (!worldIn.isClientSide()) {
+            if (!worldIn.isRemote()) {
                 worldIn.setBlockState(pos, state.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf(true)), 3);
                 worldIn.getPendingFluidTicks().scheduleTick(pos, fluidStateIn.getFluid(), fluidStateIn.getFluid().getTickRate(worldIn));
             }
@@ -228,11 +228,11 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public BlockState getStateForPlacement(BlockItemUseContext context) {
         PlayerEntity player = context.getPlayer();
         Direction direction = context.getFace();
-        BlockState blockstate = context.getLevel().getBlockState(context.getBlockPos().offset(direction.getOpposite()));
+        BlockState blockstate = context.getWorld().getBlockState(context.getPos().offset(direction.getOpposite()));
         return blockstate.getBlock() == this &&
                 blockstate.get(FACING) == direction ?
-                this.defaultBlockState().with(FACING, direction.getOpposite()).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)).with(FILTER_STATUS, 0) :
-                this.defaultBlockState().with(FACING, direction).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)).with(FILTER_STATUS,0);
+                this.getDefaultState().with(FACING, direction.getOpposite()).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)).with(FILTER_STATUS, 0) :
+                this.getDefaultState().with(FACING, direction).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)).with(FILTER_STATUS,0);
     }
 
     //TODO: Needs fixed because method is dep. >:(
@@ -244,7 +244,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         {
             PedestalTileEntity tilePedestal = (PedestalTileEntity) tileentity;
 
-            if(!worldIn.isClientSide)
+            if(!worldIn.isRemote)
             {
                 tilePedestal.collideWithPedestal(worldIn, tilePedestal, pos, state, entityIn);
             }
@@ -263,7 +263,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
 
     public ActionResultType insertToPedestal(World worldIn, BlockPos pos, PlayerEntity player)
     {
-        if(!worldIn.isClientSide) {
+        if(!worldIn.isRemote) {
             TileEntity tileEntity = worldIn.getTileEntity(pos);
             if (tileEntity instanceof PedestalTileEntity) {
                 PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
@@ -295,7 +295,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     }
 
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {
-        if(!worldIn.isClientSide) {
+        if(!worldIn.isRemote) {
             TileEntity tileEntity = worldIn.getTileEntity(pos);
             if (tileEntity instanceof PedestalTileEntity) {
                 PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
@@ -322,7 +322,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                             tilePedestal.addTool(player.getHeldItemOffhand(),false);
                             player.getHeldItemOffhand().shrink(1);
                             TranslationTextComponent settool = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".add_tool");
-                            settool.withStyle(TextFormatting.WHITE);
+                            settool.mergeStyle(TextFormatting.WHITE);
                             player.sendStatusMessage(settool,true);
                             return ActionResultType.SUCCESS;
                         }
@@ -355,7 +355,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                         else
                         {
                             TranslationTextComponent cantsetcolor = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".cant_color");
-                            cantsetcolor.withStyle(TextFormatting.WHITE);
+                            cantsetcolor.mergeStyle(TextFormatting.WHITE);
                             player.sendStatusMessage(cantsetcolor,true);
                             return ActionResultType.FAIL;
                         }
@@ -423,7 +423,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         //super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
 
-        if(!worldIn.isClientSide)
+        if(!worldIn.isRemote)
         {
             if(placer instanceof PlayerEntity)
             {
@@ -432,18 +432,18 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 if(offhand.getItem().equals(ItemLinkingTool.DEFAULT))
                 {
                     ItemLinkingTool linkingTool = ((ItemLinkingTool)offhand.getItem());
-                    TranslationTextComponent linksucess = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_success");
-                    linksucess.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linkunsuccess = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_unsucess");
-                    linkunsuccess.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linkremoved = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_removed");
-                    linkremoved.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linkitsself = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_itsself");
-                    linkitsself.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linknetwork = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_network");
-                    linknetwork.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linkdistance = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_distance");
-                    linkdistance.withStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linksucess = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_success");
+                    linksucess.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkunsuccess = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_unsucess");
+                    linkunsuccess.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkremoved = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_removed");
+                    linkremoved.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkitsself = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_itsself");
+                    linkitsself.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linknetwork = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_network");
+                    linknetwork.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkdistance = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_distance");
+                    linkdistance.mergeStyle(TextFormatting.WHITE);
                     if(offhand.hasTag() && offhand.isEnchanted())
                     {
                         //Checks if clicked blocks is a Pedestal
@@ -470,14 +470,14 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                                 //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                 if(tilePedestal.storeNewLocation(linkingTool.getStoredPosition(offhand)))
                                                 {
-                                                    player.sendMessage(linksucess,Util.NIL_UUID);
+                                                    player.sendMessage(linksucess,Util.DUMMY_UUID);
                                                 }
                                             }
                                         }
                                     }
-                                    else player.sendMessage(linknetwork,Util.NIL_UUID);
+                                    else player.sendMessage(linknetwork,Util.DUMMY_UUID);
                                 }
-                                else player.sendMessage(linkdistance, Util.NIL_UUID);
+                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);
                             }
                         }
                     }
@@ -485,18 +485,18 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 else if(offhand.getItem().equals(ItemLinkingToolBackwards.DEFAULT))
                 {
                     ItemLinkingTool linkingTool = ((ItemLinkingTool)offhand.getItem());
-                    TranslationTextComponent linksucess = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_success");
-                    linksucess.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linkunsuccess = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_unsucess");
-                    linkunsuccess.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linkremoved = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_removed");
-                    linkremoved.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linkitsself = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_itsself");
-                    linkitsself.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linknetwork = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_network");
-                    linknetwork.withStyle(TextFormatting.WHITE);
-                    TranslationTextComponent linkdistance = new TranslationTextComponent(linkingTool.getDescriptionId() + ".tool_link_distance");
-                    linkdistance.withStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linksucess = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_success");
+                    linksucess.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkunsuccess = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_unsucess");
+                    linkunsuccess.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkremoved = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_removed");
+                    linkremoved.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkitsself = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_itsself");
+                    linkitsself.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linknetwork = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_network");
+                    linknetwork.mergeStyle(TextFormatting.WHITE);
+                    TranslationTextComponent linkdistance = new TranslationTextComponent(linkingTool.getTranslationKey() + ".tool_link_distance");
+                    linkdistance.mergeStyle(TextFormatting.WHITE);
                     if(offhand.hasTag() && offhand.isEnchanted())
                     {
                         //Checks if clicked blocks is a Pedestal
@@ -523,17 +523,17 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                                 //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                 if(tilePedestalSender.storeNewLocation(pos))
                                                 {
-                                                    player.sendMessage(linksucess,Util.NIL_UUID);
+                                                    player.sendMessage(linksucess,Util.DUMMY_UUID);
                                                 }
-                                                else player.sendMessage(linkunsuccess,Util.NIL_UUID);
+                                                else player.sendMessage(linkunsuccess,Util.DUMMY_UUID);
                                             }
 
                                         }
-                                        else player.sendMessage(linkitsself,Util.NIL_UUID);
+                                        else player.sendMessage(linkitsself,Util.DUMMY_UUID);
                                     }
-                                    else player.sendMessage(linknetwork,Util.NIL_UUID);
+                                    else player.sendMessage(linknetwork,Util.DUMMY_UUID);
                                 }
-                                else player.sendMessage(linkdistance, Util.NIL_UUID);
+                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);
                             }
                         }
                     }
@@ -553,11 +553,11 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
 
     @Override
     public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-        if(!world.isClientSide())
+        if(!world.isRemote())
         {
             if(state.getBlock() instanceof PedestalBlock)
             {
-                BlockPos blockBelow = getBlockPosOfBlockBelow((ServerWorld)world,pos,1);
+                BlockPos blockBelow = getPosOfBlockBelow((ServerWorld)world,pos,1);
                 if(blockBelow.equals(neighbor))
                 {
                     TileEntity tile = world.getTileEntity(pos);
@@ -578,13 +578,13 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     //Found this beauty inside of the observer block class :D
     @Override
     public BlockState updatePostPlacement(BlockState p_196271_1_, Direction p_196271_2_, BlockState p_196271_3_, IWorld p_196271_4_, BlockPos p_196271_5_, BlockPos p_196271_6_) {
-        if(!p_196271_4_.isClientSide())
+        if(!p_196271_4_.isRemote())
         {
             if(p_196271_1_.getBlock() instanceof PedestalBlock)
             {
                 BlockPos blockBelowPos = p_196271_6_;
                 BlockState blockBelow = p_196271_3_;
-                if(getBlockPosOfBlockBelow((ServerWorld)p_196271_4_,p_196271_5_,1).equals(blockBelowPos))
+                if(getPosOfBlockBelow((ServerWorld)p_196271_4_,p_196271_5_,1).equals(blockBelowPos))
                 {
                     TileEntity tile = p_196271_4_.getTileEntity(p_196271_5_);
                     if(tile instanceof PedestalTileEntity)
@@ -603,7 +603,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         return super.updatePostPlacement(p_196271_1_, p_196271_2_, p_196271_3_, p_196271_4_, p_196271_5_, p_196271_6_);
     }
 
-    public BlockPos getBlockPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
+    public BlockPos getPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
     {
         BlockState state = world.getBlockState(posOfPedestal);
 
@@ -642,7 +642,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
             }
             if(!itemstack.isEmpty())
             {
-                float f = (float)itemstack.getCount()/(float)Math.min(pedestal.getMaxStackSize(), itemstack.getMaxStackSize());
+                float f = (float)itemstack.getCount()/(float)Math.min(pedestal.maxStackSize(), itemstack.getMaxStackSize());
                 hasItem = MathHelper.floor(f*14.0F)+1;
             }
         }
@@ -1130,71 +1130,71 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     public static final Block PEDESTAL_332 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_332);
     public static final Block PEDESTAL_333 = new PedestalBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED_TERRACOTTA).hardnessAndResistance(2.0F, 10.0F).sound(SoundType.STONE)).setRegistryName(R_PEDESTAL_333);
 
-    public static final Item I_PEDESTAL_000 = new BlockItem(PEDESTAL_000, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_000);
-    public static final Item I_PEDESTAL_001 = new BlockItem(PEDESTAL_001, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_001);
-    public static final Item I_PEDESTAL_002 = new BlockItem(PEDESTAL_002, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_002);
-    public static final Item I_PEDESTAL_003 = new BlockItem(PEDESTAL_003, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_003);
-    public static final Item I_PEDESTAL_010 = new BlockItem(PEDESTAL_010, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_010);
-    public static final Item I_PEDESTAL_011 = new BlockItem(PEDESTAL_011, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_011);
-    public static final Item I_PEDESTAL_012 = new BlockItem(PEDESTAL_012, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_012);
-    public static final Item I_PEDESTAL_013 = new BlockItem(PEDESTAL_013, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_013);
-    public static final Item I_PEDESTAL_020 = new BlockItem(PEDESTAL_020, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_020);
-    public static final Item I_PEDESTAL_021 = new BlockItem(PEDESTAL_021, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_021);
-    public static final Item I_PEDESTAL_022 = new BlockItem(PEDESTAL_022, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_022);
-    public static final Item I_PEDESTAL_023 = new BlockItem(PEDESTAL_023, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_023);
-    public static final Item I_PEDESTAL_030 = new BlockItem(PEDESTAL_030, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_030);
-    public static final Item I_PEDESTAL_031 = new BlockItem(PEDESTAL_031, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_031);
-    public static final Item I_PEDESTAL_032 = new BlockItem(PEDESTAL_032, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_032);
-    public static final Item I_PEDESTAL_033 = new BlockItem(PEDESTAL_033, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_033);
+    public static final Item I_PEDESTAL_000 = new BlockItem(PEDESTAL_000, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_000);
+    public static final Item I_PEDESTAL_001 = new BlockItem(PEDESTAL_001, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_001);
+    public static final Item I_PEDESTAL_002 = new BlockItem(PEDESTAL_002, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_002);
+    public static final Item I_PEDESTAL_003 = new BlockItem(PEDESTAL_003, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_003);
+    public static final Item I_PEDESTAL_010 = new BlockItem(PEDESTAL_010, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_010);
+    public static final Item I_PEDESTAL_011 = new BlockItem(PEDESTAL_011, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_011);
+    public static final Item I_PEDESTAL_012 = new BlockItem(PEDESTAL_012, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_012);
+    public static final Item I_PEDESTAL_013 = new BlockItem(PEDESTAL_013, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_013);
+    public static final Item I_PEDESTAL_020 = new BlockItem(PEDESTAL_020, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_020);
+    public static final Item I_PEDESTAL_021 = new BlockItem(PEDESTAL_021, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_021);
+    public static final Item I_PEDESTAL_022 = new BlockItem(PEDESTAL_022, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_022);
+    public static final Item I_PEDESTAL_023 = new BlockItem(PEDESTAL_023, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_023);
+    public static final Item I_PEDESTAL_030 = new BlockItem(PEDESTAL_030, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_030);
+    public static final Item I_PEDESTAL_031 = new BlockItem(PEDESTAL_031, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_031);
+    public static final Item I_PEDESTAL_032 = new BlockItem(PEDESTAL_032, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_032);
+    public static final Item I_PEDESTAL_033 = new BlockItem(PEDESTAL_033, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_033);
 
-    public static final Item I_PEDESTAL_100 = new BlockItem(PEDESTAL_100, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_100);
-    public static final Item I_PEDESTAL_101 = new BlockItem(PEDESTAL_101, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_101);
-    public static final Item I_PEDESTAL_102 = new BlockItem(PEDESTAL_102, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_102);
-    public static final Item I_PEDESTAL_103 = new BlockItem(PEDESTAL_103, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_103);
-    public static final Item I_PEDESTAL_110 = new BlockItem(PEDESTAL_110, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_110);
-    public static final Item I_PEDESTAL_111 = new BlockItem(PEDESTAL_111, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_111);
-    public static final Item I_PEDESTAL_112 = new BlockItem(PEDESTAL_112, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_112);
-    public static final Item I_PEDESTAL_113 = new BlockItem(PEDESTAL_113, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_113);
-    public static final Item I_PEDESTAL_120 = new BlockItem(PEDESTAL_120, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_120);
-    public static final Item I_PEDESTAL_121 = new BlockItem(PEDESTAL_121, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_121);
-    public static final Item I_PEDESTAL_122 = new BlockItem(PEDESTAL_122, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_122);
-    public static final Item I_PEDESTAL_123 = new BlockItem(PEDESTAL_123, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_123);
-    public static final Item I_PEDESTAL_130 = new BlockItem(PEDESTAL_130, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_130);
-    public static final Item I_PEDESTAL_131 = new BlockItem(PEDESTAL_131, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_131);
-    public static final Item I_PEDESTAL_132 = new BlockItem(PEDESTAL_132, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_132);
-    public static final Item I_PEDESTAL_133 = new BlockItem(PEDESTAL_133, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_133);
+    public static final Item I_PEDESTAL_100 = new BlockItem(PEDESTAL_100, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_100);
+    public static final Item I_PEDESTAL_101 = new BlockItem(PEDESTAL_101, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_101);
+    public static final Item I_PEDESTAL_102 = new BlockItem(PEDESTAL_102, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_102);
+    public static final Item I_PEDESTAL_103 = new BlockItem(PEDESTAL_103, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_103);
+    public static final Item I_PEDESTAL_110 = new BlockItem(PEDESTAL_110, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_110);
+    public static final Item I_PEDESTAL_111 = new BlockItem(PEDESTAL_111, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_111);
+    public static final Item I_PEDESTAL_112 = new BlockItem(PEDESTAL_112, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_112);
+    public static final Item I_PEDESTAL_113 = new BlockItem(PEDESTAL_113, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_113);
+    public static final Item I_PEDESTAL_120 = new BlockItem(PEDESTAL_120, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_120);
+    public static final Item I_PEDESTAL_121 = new BlockItem(PEDESTAL_121, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_121);
+    public static final Item I_PEDESTAL_122 = new BlockItem(PEDESTAL_122, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_122);
+    public static final Item I_PEDESTAL_123 = new BlockItem(PEDESTAL_123, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_123);
+    public static final Item I_PEDESTAL_130 = new BlockItem(PEDESTAL_130, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_130);
+    public static final Item I_PEDESTAL_131 = new BlockItem(PEDESTAL_131, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_131);
+    public static final Item I_PEDESTAL_132 = new BlockItem(PEDESTAL_132, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_132);
+    public static final Item I_PEDESTAL_133 = new BlockItem(PEDESTAL_133, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_133);
 
-    public static final Item I_PEDESTAL_200 = new BlockItem(PEDESTAL_200, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_200);
-    public static final Item I_PEDESTAL_201 = new BlockItem(PEDESTAL_201, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_201);
-    public static final Item I_PEDESTAL_202 = new BlockItem(PEDESTAL_202, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_202);
-    public static final Item I_PEDESTAL_203 = new BlockItem(PEDESTAL_203, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_203);
-    public static final Item I_PEDESTAL_210 = new BlockItem(PEDESTAL_210, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_210);
-    public static final Item I_PEDESTAL_211 = new BlockItem(PEDESTAL_211, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_211);
-    public static final Item I_PEDESTAL_212 = new BlockItem(PEDESTAL_212, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_212);
-    public static final Item I_PEDESTAL_213 = new BlockItem(PEDESTAL_213, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_213);
-    public static final Item I_PEDESTAL_220 = new BlockItem(PEDESTAL_220, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_220);
-    public static final Item I_PEDESTAL_221 = new BlockItem(PEDESTAL_221, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_221);
-    public static final Item I_PEDESTAL_222 = new BlockItem(PEDESTAL_222, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_222);
-    public static final Item I_PEDESTAL_223 = new BlockItem(PEDESTAL_223, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_223);
-    public static final Item I_PEDESTAL_230 = new BlockItem(PEDESTAL_230, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_230);
-    public static final Item I_PEDESTAL_231 = new BlockItem(PEDESTAL_231, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_231);
-    public static final Item I_PEDESTAL_232 = new BlockItem(PEDESTAL_232, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_232);
-    public static final Item I_PEDESTAL_233 = new BlockItem(PEDESTAL_233, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_233);
+    public static final Item I_PEDESTAL_200 = new BlockItem(PEDESTAL_200, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_200);
+    public static final Item I_PEDESTAL_201 = new BlockItem(PEDESTAL_201, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_201);
+    public static final Item I_PEDESTAL_202 = new BlockItem(PEDESTAL_202, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_202);
+    public static final Item I_PEDESTAL_203 = new BlockItem(PEDESTAL_203, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_203);
+    public static final Item I_PEDESTAL_210 = new BlockItem(PEDESTAL_210, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_210);
+    public static final Item I_PEDESTAL_211 = new BlockItem(PEDESTAL_211, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_211);
+    public static final Item I_PEDESTAL_212 = new BlockItem(PEDESTAL_212, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_212);
+    public static final Item I_PEDESTAL_213 = new BlockItem(PEDESTAL_213, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_213);
+    public static final Item I_PEDESTAL_220 = new BlockItem(PEDESTAL_220, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_220);
+    public static final Item I_PEDESTAL_221 = new BlockItem(PEDESTAL_221, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_221);
+    public static final Item I_PEDESTAL_222 = new BlockItem(PEDESTAL_222, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_222);
+    public static final Item I_PEDESTAL_223 = new BlockItem(PEDESTAL_223, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_223);
+    public static final Item I_PEDESTAL_230 = new BlockItem(PEDESTAL_230, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_230);
+    public static final Item I_PEDESTAL_231 = new BlockItem(PEDESTAL_231, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_231);
+    public static final Item I_PEDESTAL_232 = new BlockItem(PEDESTAL_232, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_232);
+    public static final Item I_PEDESTAL_233 = new BlockItem(PEDESTAL_233, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_233);
 
-    public static final Item I_PEDESTAL_300 = new BlockItem(PEDESTAL_300, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_300);
-    public static final Item I_PEDESTAL_301 = new BlockItem(PEDESTAL_301, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_301);
-    public static final Item I_PEDESTAL_302 = new BlockItem(PEDESTAL_302, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_302);
-    public static final Item I_PEDESTAL_303 = new BlockItem(PEDESTAL_303, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_303);
-    public static final Item I_PEDESTAL_310 = new BlockItem(PEDESTAL_310, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_310);
-    public static final Item I_PEDESTAL_311 = new BlockItem(PEDESTAL_311, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_311);
-    public static final Item I_PEDESTAL_312 = new BlockItem(PEDESTAL_312, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_312);
-    public static final Item I_PEDESTAL_313 = new BlockItem(PEDESTAL_313, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_313);
-    public static final Item I_PEDESTAL_320 = new BlockItem(PEDESTAL_320, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_320);
-    public static final Item I_PEDESTAL_321 = new BlockItem(PEDESTAL_321, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_321);
-    public static final Item I_PEDESTAL_322 = new BlockItem(PEDESTAL_322, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_322);
-    public static final Item I_PEDESTAL_323 = new BlockItem(PEDESTAL_323, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_323);
-    public static final Item I_PEDESTAL_330 = new BlockItem(PEDESTAL_330, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_330);
-    public static final Item I_PEDESTAL_331 = new BlockItem(PEDESTAL_331, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_331);
-    public static final Item I_PEDESTAL_332 = new BlockItem(PEDESTAL_332, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_332);
-    public static final Item I_PEDESTAL_333 = new BlockItem(PEDESTAL_333, new Item.Properties().tab(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_333);
+    public static final Item I_PEDESTAL_300 = new BlockItem(PEDESTAL_300, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_300);
+    public static final Item I_PEDESTAL_301 = new BlockItem(PEDESTAL_301, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_301);
+    public static final Item I_PEDESTAL_302 = new BlockItem(PEDESTAL_302, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_302);
+    public static final Item I_PEDESTAL_303 = new BlockItem(PEDESTAL_303, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_303);
+    public static final Item I_PEDESTAL_310 = new BlockItem(PEDESTAL_310, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_310);
+    public static final Item I_PEDESTAL_311 = new BlockItem(PEDESTAL_311, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_311);
+    public static final Item I_PEDESTAL_312 = new BlockItem(PEDESTAL_312, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_312);
+    public static final Item I_PEDESTAL_313 = new BlockItem(PEDESTAL_313, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_313);
+    public static final Item I_PEDESTAL_320 = new BlockItem(PEDESTAL_320, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_320);
+    public static final Item I_PEDESTAL_321 = new BlockItem(PEDESTAL_321, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_321);
+    public static final Item I_PEDESTAL_322 = new BlockItem(PEDESTAL_322, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_322);
+    public static final Item I_PEDESTAL_323 = new BlockItem(PEDESTAL_323, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_323);
+    public static final Item I_PEDESTAL_330 = new BlockItem(PEDESTAL_330, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_330);
+    public static final Item I_PEDESTAL_331 = new BlockItem(PEDESTAL_331, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_331);
+    public static final Item I_PEDESTAL_332 = new BlockItem(PEDESTAL_332, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_332);
+    public static final Item I_PEDESTAL_333 = new BlockItem(PEDESTAL_333, new Item.Properties().group(PEDESTALS_TAB)) {}.setRegistryName(R_PEDESTAL_333);
 }

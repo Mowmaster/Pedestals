@@ -28,7 +28,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
 
     public final int rfCostPerItemSmelted = 2500;
 
-    public ItemUpgradeBaseEnergyMachine(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeBaseEnergyMachine(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -260,7 +260,7 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.hasNeighborSignal(pos))
+        if(!world.isBlockPowered(pos))
         {
             int fuelValue = getEnergyStored(pedestal.getCoinOnPedestal());
 
@@ -277,55 +277,55 @@ public class ItemUpgradeBaseEnergyMachine extends ItemUpgradeBaseEnergy {
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         //Display Fuel Left
         int fuelValue = getEnergyStored(pedestal.getCoinOnPedestal());
-        TranslationTextComponent fuel = new TranslationTextComponent(getDescriptionId() + ".chat_fuel");
-        fuel.append("" + fuelValue/2500 + "");
-        fuel.withStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,Util.NIL_UUID);
+        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
+        fuel.appendString("" + fuelValue/2500 + "");
+        fuel.mergeStyle(TextFormatting.GREEN);
+        player.sendMessage(fuel,Util.DUMMY_UUID);
 
-        TranslationTextComponent energyRate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        energyRate.append(""+ getItemTransferRate(stack) +"");
-        energyRate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(energyRate, Util.NIL_UUID);
+        TranslationTextComponent energyRate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        energyRate.appendString(""+ getItemTransferRate(stack) +"");
+        energyRate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(energyRate, Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
-        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        t.withStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".tooltip_rfstored");
-        xpstored.append(""+ getEnergyStored(stack) +"");
-        xpstored.withStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfstored");
+        xpstored.appendString(""+ getEnergyStored(stack) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
 
-        TranslationTextComponent xpcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_rfcapacity");
-        xpcapacity.append(""+ getEnergyBuffer(stack) +"");
-        xpcapacity.withStyle(TextFormatting.AQUA);
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_rfcapacity");
+        xpcapacity.appendString(""+ getEnergyBuffer(stack) +"");
+        xpcapacity.mergeStyle(TextFormatting.AQUA);
         tooltip.add(xpcapacity);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append("" + getItemTransferRate(stack) + "");
-        rate.withStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString("" + getItemTransferRate(stack) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 

@@ -34,7 +34,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
 {
 
-    public ItemUpgradeExpBottler(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeExpBottler(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -106,14 +106,14 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world, coinInPedestal, pedestalPos);
@@ -126,7 +126,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
     {
         int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
         if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
-        BlockPos posInventory = getBlockPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         ItemStack itemFromInv = ItemStack.EMPTY;
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
@@ -193,7 +193,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         ItemStack coin = pedestal.getCoinOnPedestal();
         int modifier = getBottlingRate(coin);
         int rate = (modifier * 11);
-        if(!world.hasNeighborSignal(pos))
+        if(!world.isBlockPowered(pos))
         {
             if(getXPStored(coin)>=rate)
             {
@@ -207,25 +207,25 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".chat_xp");
-        xpstored.append(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.withStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,Util.NIL_UUID);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
+        player.sendMessage(xpstored,Util.DUMMY_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        rate.append("" + getBottlingRate(stack) + "");
-        rate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.NIL_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.appendString("" + getBottlingRate(stack) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -233,19 +233,19 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append("" + getBottlingRate(stack) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString("" + getBottlingRate(stack) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        rate.withStyle(TextFormatting.GRAY);
-        speed.withStyle(TextFormatting.RED);
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(speed);
     }
 
-    public static final Item XPBOTTLER = new ItemUpgradeExpBottler(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpbottler"));
+    public static final Item XPBOTTLER = new ItemUpgradeExpBottler(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpbottler"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

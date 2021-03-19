@@ -51,7 +51,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 {
-    public ItemUpgradeEffectHarvester(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeEffectHarvester(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptArea() {
@@ -156,20 +156,20 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 int rangeWidth = getAreaWidth(coinInPedestal);
                 int rangeHeight = getHeight(coinInPedestal);
                 BlockState pedestalState = world.getBlockState(pedestalPos);
                 Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-                BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
                 if(world.isAreaLoaded(negNums,posNums))
                 {
@@ -193,7 +193,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     if(val>0)
                     {
                         if (world.getGameTime()%5 == 0) {
-                            BlockPos directionalPos = getBlockPosOfBlockBelow(world,pedestalPos,0);
+                            BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,0);
                             PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
                         }
                         writeStoredIntTwoToNBT(coinInPedestal,val-1);
@@ -215,14 +215,14 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                             if (world.getGameTime() % speed == 0) {
                                 for(int i = 0;i< workQueue.size(); i++)
                                 {
-                                    BlockPos targetBlockPos = workQueue.get(i);
-                                    BlockPos blockToMinePos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+                                    BlockPos targetPos = workQueue.get(i);
+                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
                                     BlockState targetBlock = world.getBlockState(blockToMinePos);
                                     if(canMineBlock(pedestal,blockToMinePos))
                                     {
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                        upgradeAction(pedestal, targetBlockPos, targetBlock);
+                                        upgradeAction(pedestal, targetPos, targetBlock);
                                         break;
                                     }
                                     else
@@ -245,17 +245,17 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
     public void upgradeAction(PedestalTileEntity pedestal, BlockPos posTarget, BlockState target)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         //ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
-        BlockPos posOfPedestal = pedestal.getBlockPos();
+        BlockPos posOfPedestal = pedestal.getPos();
 
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
             FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
             //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            if(!fakePlayer.blockPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
             //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...
             ItemStack harvestingHoe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_HOE,1));
             if (!fakePlayer.getHeldItemMainhand().equals(harvestingHoe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, harvestingHoe);}
@@ -310,9 +310,9 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
-        World world = pedestal.getLevel();
-        BlockPos targetBlockPos = blockToMinePos;
-        BlockPos blockToHarvestPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
         Block blockToHarvest = blockToHarvestState.getBlock();
         if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
@@ -326,9 +326,9 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getLevel();
-        BlockPos targetBlockPos = blockToMinePos;
-        BlockPos blockToHarvestPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToHarvestPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToHarvestState = world.getBlockState(blockToHarvestPos);
         Block blockToHarvest = blockToHarvestState.getBlock();
         if(canHarvest(world,blockToHarvestState) && !blockToHarvest.isAir(blockToHarvestState,world,blockToHarvestPos))
@@ -343,9 +343,9 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
     @Override
     public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getLevel();
-        BlockPos targetBlockPos = blockToMinePos;
-        BlockPos blockToGrowPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+        World world = pedestal.getWorld();
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
         Block blockToGrow = blockToGrowState.getBlock();
         if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
@@ -394,33 +394,33 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
-        area.append(tr);
-        area.append(areax.getString());
-        area.append("" + getHeight(stack) + "");
-        area.append(areax.getString());
-        area.append(tr);
-        area.withStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.NIL_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString("" + getHeight(stack) + "");
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.mergeStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.DUMMY_UUID);
 
-        TranslationTextComponent btm = new TranslationTextComponent(getDescriptionId() + ".chat_btm");
-        btm.append("" + workQueueSize(stack) + "");
-        btm.withStyle(TextFormatting.YELLOW);
-        player.sendMessage(btm,Util.NIL_UUID);
+        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
+        btm.appendString("" + workQueueSize(stack) + "");
+        btm.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.DUMMY_UUID);
 
         //Hoe isnt actually used, but lets just pretend
         ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_HOE));
-        TranslationTextComponent tool = new TranslationTextComponent(getDescriptionId() + ".chat_tool");
+        TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
         tool.append(toolStack.getDisplayName());
-        tool.withStyle(TextFormatting.BLUE);
-        player.sendMessage(tool,Util.NIL_UUID);
+        tool.mergeStyle(TextFormatting.BLUE);
+        player.sendMessage(tool,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
         if(hasAdvancedInventoryTargeting(stack))
@@ -429,9 +429,9 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         }
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_enchants");
-            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.NIL_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -439,17 +439,17 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.withStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,Util.NIL_UUID);
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
     
 
@@ -459,24 +459,24 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
-        area.append(tr);
-        area.append(areax.getString());
-        area.append("" + getHeight(stack) + "");
-        area.append(areax.getString());
-        area.append(tr);
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString("" + getHeight(stack) + "");
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.withStyle(TextFormatting.WHITE);
-        speed.withStyle(TextFormatting.RED);
+        area.mergeStyle(TextFormatting.WHITE);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(speed);
     }
 
-    public static final Item HARVESTER = new ItemUpgradeEffectHarvester(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvester"));
+    public static final Item HARVESTER = new ItemUpgradeEffectHarvester(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/harvester"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

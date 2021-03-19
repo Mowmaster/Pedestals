@@ -40,7 +40,7 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
 {
 
-    public ItemUpgradeExpAnvil(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeExpAnvil(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -177,14 +177,14 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
@@ -198,7 +198,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
         if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
 
-        BlockPos posInventory = getBlockPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         ItemStack itemFromInv = ItemStack.EMPTY;
         ArrayList<ItemStack> stackToCombine = doSorroundingPedestalsHaveItemsToCombine(world,posOfPedestal);
         String strNameToChangeTo = "";
@@ -369,25 +369,25 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".chat_xp");
-        xpstored.append(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.withStyle(TextFormatting.GREEN);
-        player.sendMessage(xpstored,Util.NIL_UUID);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".chat_xp");
+        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
+        player.sendMessage(xpstored,Util.DUMMY_UUID);
 
-        TranslationTextComponent sorround = new TranslationTextComponent(getDescriptionId() + ".chat_sorround");
-        sorround.append(""+ correctlyPlacedSorroundingPedestals(pedestal.getLevel(),pedestal.getBlockPos()) +"");
-        sorround.withStyle(TextFormatting.AQUA);
-        player.sendMessage(sorround,Util.NIL_UUID);
+        TranslationTextComponent sorround = new TranslationTextComponent(getTranslationKey() + ".chat_sorround");
+        sorround.appendString(""+ correctlyPlacedSorroundingPedestals(pedestal.getWorld(),pedestal.getPos()) +"");
+        sorround.mergeStyle(TextFormatting.AQUA);
+        player.sendMessage(sorround,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -395,15 +395,15 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        speed.withStyle(TextFormatting.RED);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(speed);
     }
 
-    public static final Item XPANVIL = new ItemUpgradeExpAnvil(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpanvil"));
+    public static final Item XPANVIL = new ItemUpgradeExpAnvil(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xpanvil"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

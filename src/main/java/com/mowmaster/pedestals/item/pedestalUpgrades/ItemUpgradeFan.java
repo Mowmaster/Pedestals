@@ -40,7 +40,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeFan extends ItemUpgradeBase
 {
-    public ItemUpgradeFan(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeFan(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -84,8 +84,8 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     }
 
     protected void useFanOnEntities(PedestalTileEntity pedestal,Block filterBlock, double speed, AxisAlignedBB getBox) {
-        World world = pedestal.getLevel();
-        BlockPos posOfPedestal = pedestal.getBlockPos();
+        World world = pedestal.getWorld();
+        BlockPos posOfPedestal = pedestal.getPos();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class, getBox);
         if(entityList.size()==0)writeStoredIntToNBT(coinInPedestal,0);
@@ -119,8 +119,8 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     }
 
     protected void useFanOnEntitiesAdvanced(PedestalTileEntity pedestal,Block filterBlock, double speed, AxisAlignedBB getBox) {
-        World world = pedestal.getLevel();
-        BlockPos posOfPedestal = pedestal.getBlockPos();
+        World world = pedestal.getWorld();
+        BlockPos posOfPedestal = pedestal.getPos();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         List<Entity> entityList = world.getEntitiesWithinAABB(Entity.class, getBox);
         if(entityList.size()==0)writeStoredIntToNBT(coinInPedestal,0);
@@ -233,8 +233,8 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        BlockPos pedestalPos = pedestal.getBlockPos();
-        if(!world.hasNeighborSignal(pedestalPos))
+        BlockPos pedestalPos = pedestal.getPos();
+        if(!world.isBlockPowered(pedestalPos))
         {
             upgradeAction(pedestal);
             if(readStoredIntFromNBT(coinInPedestal) > 0)
@@ -255,17 +255,17 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         IF SOMETHING DOESNT WORK, MAKE SURE BOTH THE CLIENT AND SERVER CAN ACCESS THE SAME SORT OF INFO
         USE THE filterBlock AS AN EXAMPLE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          */
-        World world = pedestal.getLevel();
-        BlockPos posOfPedestal = pedestal.getBlockPos();
+        World world = pedestal.getWorld();
+        BlockPos posOfPedestal = pedestal.getPos();
         ItemStack coin = pedestal.getCoinOnPedestal();
         int width = getAreaWidth(coin);
         int height = getHeight(coin);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
-        BlockPos posBlockPos = getBlockPosRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
         double speed = getFanSpeed(coin);
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
         if(!hasFilterBlock(coin)) {writeFilterBlockToNBT(pedestal);}
-        Block filterBlock = (!world.isClientSide)?(readFilterBlockFromNBT(coin)):(getBaseBlockBelow(world,posOfPedestal));
+        Block filterBlock = (!world.isRemote)?(readFilterBlockFromNBT(coin)):(getBaseBlockBelow(world,posOfPedestal));
 
         if(filterBlock.equals(Blocks.NETHERITE_BLOCK)) {speed *= 2;}
         if(hasAdvancedInventoryTargeting(coin)) {useFanOnEntitiesAdvanced(pedestal,filterBlock,speed,getBox);}
@@ -276,7 +276,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     @Override
     public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
     {
-        BlockPos blockBelow = getBlockPosOfBlockBelow(pedestal.getLevel(),pedestal.getBlockPos(),1);
+        BlockPos blockBelow = getPosOfBlockBelow(pedestal.getWorld(),pedestal.getPos(),1);
         if(blockBelow.equals(blockChangedPos))
         {
             writeFilterBlockToNBT(pedestal);
@@ -289,29 +289,29 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         ItemStack stack = pedestal.getCoinOnPedestal();
         Block filterBlock = (hasFilterBlock(stack))?(readFilterBlockFromNBT(stack)):(Blocks.AIR);
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
         int s3 = getAreaWidth(stack);
         int s4 = getHeight(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
-        area.append(tr);
-        area.append(areax.getString());
-        area.append("" + s4 + "");
-        area.append(areax.getString());
-        area.append(tr);
-        area.withStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.NIL_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString("" + s4 + "");
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.mergeStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_enchants");
-            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.NIL_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -319,29 +319,29 @@ public class ItemUpgradeFan extends ItemUpgradeBase
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.withStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,Util.NIL_UUID);
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }
 
-        TranslationTextComponent entityType = new TranslationTextComponent(getDescriptionId() + ".chat_entity");
+        TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
         if(hasAdvancedInventoryTargeting(stack))
         {
-            entityType.append(getTargetEntityAdvanced(filterBlock));
+            entityType.appendString(getTargetEntityAdvanced(filterBlock));
         }
         else
         {
-            entityType.append(getTargetEntity(filterBlock));
+            entityType.appendString(getTargetEntity(filterBlock));
         }
-        entityType.withStyle(TextFormatting.YELLOW);
-        player.sendMessage(entityType,Util.NIL_UUID);
+        entityType.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(entityType,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
@@ -354,24 +354,24 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         String tr = "" + (s3+s3+1) + "";
         String trr = "" + (s4) + "";
 
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
-        area.append(tr);
-        area.append(areax.getString());
-        area.append(trr);
-        area.append(areax.getString());
-        area.append(tr);
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString(trr);
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.withStyle(TextFormatting.WHITE);
+        area.mergeStyle(TextFormatting.WHITE);
         tooltip.add(area);
 
-        speed.withStyle(TextFormatting.RED);
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 
-    public static final Item FAN = new ItemUpgradeFan(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fan"));
+    public static final Item FAN = new ItemUpgradeFan(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fan"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -26,7 +26,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeDropper extends ItemUpgradeBase
 {
-    public ItemUpgradeDropper(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeDropper(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -42,33 +42,33 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRangeSmall(coin);
-        return getBlockPosOfBlockBelow(world,pos,-range).getX();
+        return getPosOfBlockBelow(world,pos,-range).getX();
     }
 
     @Override
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRangeSmall(coin);
-        return new int[]{getBlockPosOfBlockBelow(world,pos,-range).getY(),1};
+        return new int[]{getPosOfBlockBelow(world,pos,-range).getY(),1};
     }
 
     @Override
     public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRangeSmall(coin);
-        return getBlockPosOfBlockBelow(world,pos,-range).getZ();
+        return getPosOfBlockBelow(world,pos,-range).getZ();
     }
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
@@ -87,7 +87,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
         {
             ItemStack itemToSummon = getStackInPedestal(world,posOfPedestal).copy();
             itemToSummon.setCount(actualRate);
-            ItemEntity itemEntity = new ItemEntity(world,getBlockPosOfBlockBelow(world,posOfPedestal,-range).getX() + 0.5,getBlockPosOfBlockBelow(world,posOfPedestal,-range).getY(),getBlockPosOfBlockBelow(world,posOfPedestal,-range).getZ() + 0.5,itemToSummon);
+            ItemEntity itemEntity = new ItemEntity(world,getPosOfBlockBelow(world,posOfPedestal,-range).getX() + 0.5,getPosOfBlockBelow(world,posOfPedestal,-range).getY(),getPosOfBlockBelow(world,posOfPedestal,-range).getZ() + 0.5,itemToSummon);
             itemEntity.setMotion(0,0,0);
             world.addEntity(itemEntity);
             this.removeFromPedestal(world,posOfPedestal,itemToSummon.getCount());
@@ -99,25 +99,25 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".chat_range");
-        range.append("" +  getRangeSmall(stack) + "");
-        range.withStyle(TextFormatting.WHITE);
-        player.sendMessage(range,Util.NIL_UUID);
+        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
+        range.appendString("" +  getRangeSmall(stack) + "");
+        range.mergeStyle(TextFormatting.WHITE);
+        player.sendMessage(range,Util.DUMMY_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        rate.append("" +  getItemTransferRate(stack) + "");
-        rate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.NIL_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.appendString("" +  getItemTransferRate(stack) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -125,23 +125,23 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append("" + getItemTransferRate(stack) + "");
-        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".tooltip_range");
-        range.append("" + getRangeSmall(stack) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString("" + getItemTransferRate(stack) + "");
+        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
+        range.appendString("" + getRangeSmall(stack) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        rate.withStyle(TextFormatting.GRAY);
-        range.withStyle(TextFormatting.WHITE);
-        speed.withStyle(TextFormatting.RED);
+        rate.mergeStyle(TextFormatting.GRAY);
+        range.mergeStyle(TextFormatting.WHITE);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(rate);
         tooltip.add(range);
         tooltip.add(speed);
     }
 
-    public static final Item DROPPER = new ItemUpgradeDropper(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/dropper"));
+    public static final Item DROPPER = new ItemUpgradeDropper(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/dropper"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

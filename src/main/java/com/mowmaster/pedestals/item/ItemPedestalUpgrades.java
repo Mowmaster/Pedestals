@@ -11,7 +11,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemPedestalUpgrades extends Item {
 
     public ItemPedestalUpgrades() {
-        super(new Properties().stacksTo(64).tab(PEDESTALS_TAB));
+        super(new Properties().maxStackSize(64).group(PEDESTALS_TAB));
     }
 
     public static final Item SPEED = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradespeed"));

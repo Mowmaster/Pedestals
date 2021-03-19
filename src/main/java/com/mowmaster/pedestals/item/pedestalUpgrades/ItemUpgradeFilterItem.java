@@ -20,7 +20,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFilterItem extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterItem(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeFilterItem(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {return true;}
@@ -87,7 +87,7 @@ public class ItemUpgradeFilterItem extends ItemUpgradeBaseFilter
     }
     //Save the inv of the filter to a thing, normally use it to check for the right filtered stuff, when the block updates, check to see if the inv actually changed anything, if so then build a new list
 
-    public static final Item ITEM = new ItemUpgradeFilterItem(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filteritem"));
+    public static final Item ITEM = new ItemUpgradeFilterItem(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filteritem"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

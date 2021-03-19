@@ -45,7 +45,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeAttacker extends ItemUpgradeBase
 {
-    public ItemUpgradeAttacker(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeAttacker(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     //For damage
     @Override
@@ -163,16 +163,16 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int width = getAreaWidth(coinInPedestal);
             int height = getRangeHeight(coinInPedestal);
             BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
-            BlockPos posBlockPos = getBlockPosRangePosEntity(world,pedestalPos,width,height);
+            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
             AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
             List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
             if(itemList.size()>0)
@@ -181,7 +181,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
             }
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(pedestal);
@@ -192,15 +192,15 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
     public void upgradeAction(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         //ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         ItemStack toolInPedestal = pedestal.getToolOnPedestal().copy();
-        BlockPos posOfPedestal = pedestal.getBlockPos();
+        BlockPos posOfPedestal = pedestal.getPos();
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
         BlockPos negBlockPos = getNegRangePosEntity(world,posOfPedestal,width,height);
-        BlockPos posBlockPos = getBlockPosRangePosEntity(world,posOfPedestal,width,height);
+        BlockPos posBlockPos = getPosRangePosEntity(world,posOfPedestal,width,height);
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
         if(!hasFilterBlock(coinInPedestal)) {writeFilterBlockToNBT(pedestal);}
         Block filterBlock = readFilterBlockFromNBT(coinInPedestal);
@@ -216,7 +216,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
             if(selectedEntity != null)
             {
                 FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
-                if(!fakePlayer.blockPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+                if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
                 if (pedestal.hasTool() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, toolInPedestal);}
                 if (toolInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}
                 //Using the custom pedestal one this should work fine now...
@@ -235,7 +235,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     @Override
     public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
     {
-        BlockPos blockBelow = getBlockPosOfBlockBelow(pedestal.getLevel(),pedestal.getBlockPos(),1);
+        BlockPos blockBelow = getPosOfBlockBelow(pedestal.getWorld(),pedestal.getPos(),1);
         if(blockBelow.equals(blockChangedPos))
         {
             writeFilterBlockToNBT(pedestal);
@@ -251,32 +251,32 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
-        area.append(tr);
-        area.append(areax.getString());
-        area.append("" + getRangeHeight(stack) + "");
-        area.append(areax.getString());
-        area.append(tr);
-        area.withStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.NIL_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString("" + getRangeHeight(stack) + "");
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.mergeStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.DUMMY_UUID);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        rate.append("" + getMostlyDamage(pedestal) + "");
-        rate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.NIL_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.appendString("" + getMostlyDamage(pedestal) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
         ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY);
         if(!toolStack.isEmpty())
         {
-            TranslationTextComponent tool = new TranslationTextComponent(getDescriptionId() + ".chat_tool");
+            TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
             tool.append(toolStack.getDisplayName());
-            tool.withStyle(TextFormatting.BLUE);
-            player.sendMessage(tool,Util.NIL_UUID);
+            tool.mergeStyle(TextFormatting.BLUE);
+            player.sendMessage(tool,Util.DUMMY_UUID);
         }
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((pedestal.hasTool())?(pedestal.getToolOnPedestal()):(stack));
@@ -287,9 +287,9 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         }*/
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_enchants");
-            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.NIL_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -297,22 +297,22 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.withStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,Util.NIL_UUID);
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }
 
-        TranslationTextComponent entityType = new TranslationTextComponent(getDescriptionId() + ".chat_entity");
-        entityType.append(getTargetEntity(filterBlock));
-        entityType.withStyle(TextFormatting.YELLOW);
-        player.sendMessage(entityType,Util.NIL_UUID);
+        TranslationTextComponent entityType = new TranslationTextComponent(getTranslationKey() + ".chat_entity");
+        entityType.appendString(getTargetEntity(filterBlock));
+        entityType.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(entityType,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
@@ -322,28 +322,28 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
-        area.append(tr);
-        area.append(areax.getString());
-        area.append("" + getRangeHeight(stack) + "");
-        area.append(areax.getString());
-        area.append(tr);
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append("" + (int)((getCapacityModifier(stack) + 2.0F)) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString("" + getRangeHeight(stack) + "");
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString("" + (int)((getCapacityModifier(stack) + 2.0F)) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.withStyle(TextFormatting.WHITE);
-        rate.withStyle(TextFormatting.GRAY);
-        speed.withStyle(TextFormatting.RED);
+        area.mergeStyle(TextFormatting.WHITE);
+        rate.mergeStyle(TextFormatting.GRAY);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(rate);
         tooltip.add(speed);
     }
 
-    public static final Item ATTACK = new ItemUpgradeAttacker(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/attack"));
+    public static final Item ATTACK = new ItemUpgradeAttacker(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/attack"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

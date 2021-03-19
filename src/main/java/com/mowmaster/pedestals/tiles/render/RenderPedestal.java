@@ -34,7 +34,7 @@ public class RenderPedestal extends TileEntityRenderer<PedestalTileEntity> {
             Direction facing = tileEntityIn.getBlockState().get(FACING);
             ItemStack stack = tileEntityIn.getItemInPedestalOverride();
             ItemStack coin = tileEntityIn.getCoinOnPedestal();
-            World world = tileEntityIn.getLevel();
+            World world = tileEntityIn.getWorld();
 
             if(facing== Direction.UP)//when placed on ground
             {

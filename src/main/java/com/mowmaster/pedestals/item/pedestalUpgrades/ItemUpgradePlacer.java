@@ -30,7 +30,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradePlacer extends ItemUpgradeBase
 {
-    public ItemUpgradePlacer(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradePlacer(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptRange() {
@@ -39,16 +39,16 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
 
     public BlockState getState(Block getBlock, ItemStack itemForBlock)
     {
-        BlockState stated = Blocks.AIR.defaultBlockState();
+        BlockState stated = Blocks.AIR.getDefaultState();
 
         //Redstone
         if(itemForBlock.getItem() == Items.REDSTONE)
         {
-            stated = Blocks.REDSTONE_WIRE.defaultBlockState();
+            stated = Blocks.REDSTONE_WIRE.getDefaultState();
         }
         else
         {
-            stated = getBlock.defaultBlockState();
+            stated = getBlock.getDefaultState();
         }
 
         return stated;
@@ -58,7 +58,7 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
     public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRangeSmall(coin);
-        BlockPos posOfBlock = getBlockPosOfBlockBelow(world, pos, range);
+        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
         return posOfBlock.getX();
     }
 
@@ -66,7 +66,7 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
     public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRangeSmall(coin);
-        BlockPos posOfBlock = getBlockPosOfBlockBelow(world, pos, range);
+        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
         return new int[]{posOfBlock.getY(),1};
     }
 
@@ -74,39 +74,39 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
     public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
     {
         int range = getRangeSmall(coin);
-        BlockPos posOfBlock = getBlockPosOfBlockBelow(world, pos, range);
+        BlockPos posOfBlock = getPosOfBlockBelow(world, pos, range);
         return posOfBlock.getZ();
     }
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     int range = getRangeSmall(coinInPedestal);
-                    BlockPos blockPosBelow = getBlockPosOfBlockBelow(world,pedestalPos,range);
+                    BlockPos blockPosBelow = getPosOfBlockBelow(world,pedestalPos,range);
                     placeBlock(pedestal,blockPosBelow);
                 }
             }
         }
     }
 
-    public void placeBlock(PedestalTileEntity pedestal, BlockPos targetBlockPos)
+    public void placeBlock(PedestalTileEntity pedestal, BlockPos targetPos)
     {
-        World world = pedestal.getLevel();
-        BlockPos pedPos = pedestal.getBlockPos();
+        World world = pedestal.getWorld();
+        BlockPos pedPos = pedestal.getPos();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinOnPedestal = pedestal.getCoinOnPedestal();
         if(!itemInPedestal.isEmpty())
         {
-            Block blockBelow = world.getBlockState(targetBlockPos).getBlock();
+            Block blockBelow = world.getBlockState(targetPos).getBlock();
             Item singleItemInPedestal = itemInPedestal.getItem();
 
             if(blockBelow.equals(Blocks.AIR) && !singleItemInPedestal.equals(Items.AIR)) {
@@ -117,14 +117,14 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
                         if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof Block) {
 
                             FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinOnPedestal),pedPos,itemInPedestal);
-                            if(!fakePlayer.blockPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPos(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
+                            if(!fakePlayer.getPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPosition(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
 
-                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetBlockPos, false));
+                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));
 
                             ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                             if (result == ActionResultType.CONSUME) {
                                 this.removeFromPedestal(world,pedPos,1);
-                                world.playSound((PlayerEntity) null, targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ(), SoundEvents.STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             }
                         }
                     }
@@ -152,20 +152,20 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".chat_range");
-        range.append(""+getRangeSmall(stack)+"");
-        range.withStyle(TextFormatting.WHITE);
-        player.sendMessage(range,Util.NIL_UUID);
+        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".chat_range");
+        range.appendString(""+getRangeSmall(stack)+"");
+        range.mergeStyle(TextFormatting.WHITE);
+        player.sendMessage(range,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
@@ -173,19 +173,19 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".tooltip_range");
-        range.append("" + getRangeSmall(stack) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
+        range.appendString("" + getRangeSmall(stack) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        range.withStyle(TextFormatting.WHITE);
-        speed.withStyle(TextFormatting.RED);
+        range.mergeStyle(TextFormatting.WHITE);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(range);
         tooltip.add(speed);
     }
 
-    public static final Item PLACER = new ItemUpgradePlacer(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/placer"));
+    public static final Item PLACER = new ItemUpgradePlacer(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/placer"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

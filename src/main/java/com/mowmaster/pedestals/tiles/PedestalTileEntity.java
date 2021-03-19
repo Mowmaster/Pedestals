@@ -70,7 +70,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public PedestalTileEntity()
     {
         super(PEDESTALTYPE);
-        this.lockCode = LockCode.NO_LOCK;
+        this.lockCode = LockCode.EMPTY_CODE;
     }
 
     /**********************************
@@ -323,12 +323,12 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                     if(coin.getItem() instanceof ItemUpgradeBaseFluid)
                     {
                         FluidStack inCoin = ((ItemUpgradeBaseFluid) coin.getItem()).getFluidStored(coin);
-                        return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluid) coin.getItem()).canRecieveFluid(getLevel(), getBlockPos(), fluidStack);
+                        return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluid) coin.getItem()).canRecieveFluid(getWorld(), getPos(), fluidStack);
                     }
                     else
                     {
                         FluidStack inCoin = ((ItemUpgradeBaseFluidFilter) coin.getItem()).getFluidStored(coin);
-                        return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluidFilter) coin.getItem()).canRecieveFluid(getLevel(), getBlockPos(), fluidStack);
+                        return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluidFilter) coin.getItem()).canRecieveFluid(getWorld(), getPos(), fluidStack);
                     }
                 }
 
@@ -345,7 +345,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                     int storedCoinFluidSpace = coinFluid.availableFluidSpaceInCoin(coin);
                     int getMainTransferRate = coinFluid.getFluidTransferRate(coin);
                     int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
-                    if(coinFluidStored.isFluidEqual(fluidStack) || coinFluidStored.isEmpty() && coinFluid.canRecieveFluid(getLevel(), getBlockPos(), fluidStack))
+                    if(coinFluidStored.isFluidEqual(fluidStack) || coinFluidStored.isEmpty() && coinFluid.canRecieveFluid(getWorld(), getPos(), fluidStack))
                     {
                         if(storedCoinFluidSpace > 0)
                         {
@@ -530,10 +530,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     }
 
     ResourceLocation grabTools = new ResourceLocation("pedestals", "pedestal_tool_whitelist");
-    ITag<Item> GET_TOOLS = ItemTags.getAllTags().getTag(grabTools);
+    ITag<Item> GET_TOOLS = ItemTags.getCollection().get(grabTools);
 
     ResourceLocation grabNotTools = new ResourceLocation("pedestals", "pedestal_tool_blacklist");
-    ITag<Item> GET_NOTTOOLS = ItemTags.getAllTags().getTag(grabNotTools);
+    ITag<Item> GET_NOTTOOLS = ItemTags.getCollection().get(grabNotTools);
 
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 10 slots to future proof things
@@ -655,7 +655,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
     }
 
-    public int getMaxStackSize(){return 64;}
+    public int maxStackSize(){return 64;}
 
 
 
@@ -706,7 +706,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public BlockPos getStoredPositionAt(int index)
     {
-        BlockPos sendToPos = getBlockPos();
+        BlockPos sendToPos = getPos();
         if(index<getNumberOfStoredLocations())
         {
             sendToPos = storedLocations.get(index);
@@ -771,9 +771,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         int x = pedestalToBeLinked.getX();
         int y = pedestalToBeLinked.getY();
         int z = pedestalToBeLinked.getZ();
-        int x1 = pedestalCurrent.getBlockPos().getX();
-        int y1 = pedestalCurrent.getBlockPos().getY();
-        int z1 = pedestalCurrent.getBlockPos().getZ();
+        int x1 = pedestalCurrent.getPos().getX();
+        int y1 = pedestalCurrent.getPos().getY();
+        int z1 = pedestalCurrent.getPos().getZ();
         int xF = Math.abs(Math.subtractExact(x,x1));
         int yF = Math.abs(Math.subtractExact(y,y1));
         int zF = Math.abs(Math.subtractExact(z,z1));
@@ -961,7 +961,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public void collideWithPedestal(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {
-        if(!world.isClientSide) {
+        if(!world.isRemote) {
             if(entityIn instanceof ItemEntity)
             {
                 if(tilePedestal.hasCoin())
@@ -1428,7 +1428,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             int filterState = state.get(PedestalBlock.FILTER_STATUS);
             if(filter.getItem() instanceof ItemFilterBase)
             {
-                //Blacklist = 1 , whitelist = 0
+                //Blacklist = 2 , whitelist = 1
                 filterState = (((ItemFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
             }
             BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
@@ -1463,7 +1463,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             int newFilterState = filterState;
             if(filter.getItem() instanceof ItemFilterBase)
             {
-                //Blacklist = 1 , whitelist = 0
+                //Blacklist = 2 , whitelist = 1
                 newFilterState = (((ItemFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
 
                 if(filter.hasTag())
@@ -1580,7 +1580,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public boolean isPedestalBlockPowered(World world,BlockPos pos)
     {
-        boolean returner = world.hasNeighborSignal(pos);
+        boolean returner = world.isBlockPowered(pos);
         if(hasTorch())
         {
             return !returner;
@@ -1666,7 +1666,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public boolean isSamePedestal(BlockPos pedestalToBeLinked)
     {
-        BlockPos thisPedestal = this.getBlockPos();
+        BlockPos thisPedestal = this.getPos();
 
         if(thisPedestal.equals(pedestalToBeLinked))
         {
@@ -1782,8 +1782,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public static LazyOptional<IItemHandler> findItemHandlerPedestal(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getLevel();
-        BlockPos pos = pedestal.getBlockPos();
+        World world = pedestal.getWorld();
+        BlockPos pos = pedestal.getPos();
         TileEntity neighbourTile = world.getTileEntity(pos);
         if(neighbourTile!=null)
         {
@@ -1806,7 +1806,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             if(world.isAreaLoaded(pedestalToSendTo,1))
             {
                 //If block ISNT powered
-                if(!world.hasNeighborSignal(pedestalToSendTo))
+                if(!world.isBlockPowered(pedestalToSendTo))
                 {
                     //Make sure its a pedestal before getting the tile
                     if(world.getBlockState(pedestalToSendTo).getBlock() instanceof PedestalBlock)
@@ -1839,7 +1839,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                         Item coinInPedestal = tilePedestalToSendTo.getCoinOnPedestal().getItem();
                                         if(coinInPedestal instanceof ItemUpgradeBase)
                                         {
-                                            coin = ((ItemUpgradeBase) coinInPedestal).canAcceptItem(getLevel(),pedestalToSendTo,itemStackIncoming);
+                                            coin = ((ItemUpgradeBase) coinInPedestal).canAcceptItem(getWorld(),pedestalToSendTo,itemStackIncoming);
                                         }
                                     }
 
@@ -1940,9 +1940,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     @Override
     public void tick() {
 
-        if(!world.isClientSide && world.isAreaLoaded(pos,1))
+        if(!world.isRemote && world.isAreaLoaded(pos,1))
         {
-            if(getNumberOfStoredLocations() >0 && !isPedestalBlockPowered(getLevel(),getBlockPos()) && hasItem())
+            if(getNumberOfStoredLocations() >0 && !isPedestalBlockPowered(getWorld(),getPos()) && hasItem())
             {
                 pedTicker++;
                 if (pedTicker%getOperationSpeed() == 0) {
@@ -1968,7 +1968,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 }
             }
         }
-        if(world.isClientSide)
+        if(world.isRemote)
         {
             if(hasCoin())
             {
@@ -1977,7 +1977,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 {
                     partTicker++;
                     Random rand = new Random();
-                    ((ItemUpgradeBase) coinInPed).onRandomDisplayTick(this,partTicker, world.getBlockState(getBlockPos()), world, getBlockPos(), rand);
+                    ((ItemUpgradeBase) coinInPed).onRandomDisplayTick(this,partTicker, world.getBlockState(getPos()), world, getPos(), rand);
                     if(partTicker >=Integer.MAX_VALUE-100){partTicker=0;}
                 }
             }

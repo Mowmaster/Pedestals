@@ -29,7 +29,7 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
 public class ItemUpgradeBaseExp extends ItemUpgradeBase {
 
-    public ItemUpgradeBaseExp(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeBaseExp(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
@@ -169,9 +169,9 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
 
     public void upgradeActionSendExp(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         ItemStack coinMainPedestal = pedestal.getCoinOnPedestal();
-        BlockPos posMainPedestal = pedestal.getBlockPos();
+        BlockPos posMainPedestal = pedestal.getPos();
 
         int xpMainPedestal = getXPStored(coinMainPedestal);
         if(xpMainPedestal>0)
@@ -183,7 +183,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                 {
                     BlockPos posStoredPedestal = pedestal.getStoredPositionAt(i);
                     //Make sure pedestal ISNOT powered and IS loaded in world
-                    if(!world.hasNeighborSignal(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
+                    if(!world.isBlockPowered(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
                     {
                         if(posStoredPedestal != posMainPedestal)
                         {
@@ -417,7 +417,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.hasNeighborSignal(pos))
+        if(!world.isBlockPowered(pos))
         {
             if(getXPStored(pedestal.getCoinOnPedestal())>0)
             {
@@ -430,15 +430,15 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".tooltip_xpstored");
-        xpstored.append(""+ getExpLevelFromCount(getXPStored(stack)) +"");
-        xpstored.withStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpstored");
+        xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
-        TranslationTextComponent xpcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_xpcapacity");
-        TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getDescriptionId() + ".tooltip_xpcapacitylvl");
-        xpcapacity.append(""+ getExpBuffer(stack) +"");
-        xpcapacity.append(xpcapacitylvl.getString());
-        xpcapacity.withStyle(TextFormatting.AQUA);
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacity");
+        TranslationTextComponent xpcapacitylvl = new TranslationTextComponent(getTranslationKey() + ".tooltip_xpcapacitylvl");
+        xpcapacity.appendString(""+ getExpBuffer(stack) +"");
+        xpcapacity.appendString(xpcapacitylvl.getString());
+        xpcapacity.mergeStyle(TextFormatting.AQUA);
         tooltip.add(xpcapacity);
     }
 

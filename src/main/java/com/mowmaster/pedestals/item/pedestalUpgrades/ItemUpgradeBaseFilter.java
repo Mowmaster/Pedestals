@@ -14,7 +14,7 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
 public class ItemUpgradeBaseFilter extends ItemUpgradeBase {
 
-    public ItemUpgradeBaseFilter(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeBaseFilter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
@@ -58,10 +58,10 @@ public class ItemUpgradeBaseFilter extends ItemUpgradeBase {
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".chat_name");
-        TranslationTextComponent name2 = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.append(name2.getString());
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name, Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".chat_name");
+        TranslationTextComponent name2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.appendString(name2.getString());
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name, Util.DUMMY_UUID);
     }
 }

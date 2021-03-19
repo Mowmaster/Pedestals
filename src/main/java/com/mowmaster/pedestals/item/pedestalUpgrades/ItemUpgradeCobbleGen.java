@@ -44,7 +44,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 {
     private int maxStored = 2000000000;
 
-    public ItemUpgradeCobbleGen(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeCobbleGen(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -117,7 +117,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public Item getItemToSpawn(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         if(!hasFilterBlock(coinInPedestal)) {writeFilterBlockToNBT(pedestal);}
         Block filterBlock = readFilterBlockFromNBT(coinInPedestal);
@@ -173,7 +173,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             //Fm in e6 discord pinged me an issue where mek was spamming the console
             //#BlameMek
             //https://github.com/mekanism/Mekanism/blob/99f3b1e517a58f825349772cfd981d15f1c40e8f/src/main/java/mekanism/common/lib/inventory/TileTransitRequest.java#L67
-            //return new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+            //return new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.maxStackSize())?(itemStackToExtract.maxStackSize()):(amountOut));
         }
         else
         {
@@ -333,14 +333,14 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 //Keep Pedestal Full at all times
                 ItemStack stackInPed = pedestal.getItemInPedestalOverride();
@@ -436,7 +436,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     @Override
     public void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos)
     {
-        BlockPos blockBelow = getBlockPosOfBlockBelow(pedestal.getLevel(),pedestal.getBlockPos(),1);
+        BlockPos blockBelow = getPosOfBlockBelow(pedestal.getWorld(),pedestal.getPos(),1);
         if(blockBelow.equals(blockChangedPos))
         {
             writeFilterBlockToNBT(pedestal);
@@ -448,27 +448,27 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".chat_rate");
-        rate.append("" +  getItemTransferRate(stack) + "");
-        rate.withStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.NIL_UUID);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
+        rate.appendString("" +  getItemTransferRate(stack) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
+        player.sendMessage(rate,Util.DUMMY_UUID);
 
-        TranslationTextComponent stored = new TranslationTextComponent(getDescriptionId() + ".chat_stored");
-        stored.append("" +  (getCobbleStored(pedestal)+pedestal.getItemInPedestalOverride().getCount()) + "");
-        stored.withStyle(TextFormatting.GREEN);
-        player.sendMessage(stored, Util.NIL_UUID);
+        TranslationTextComponent stored = new TranslationTextComponent(getTranslationKey() + ".chat_stored");
+        stored.appendString("" +  (getCobbleStored(pedestal)+pedestal.getItemInPedestalOverride().getCount()) + "");
+        stored.mergeStyle(TextFormatting.GREEN);
+        player.sendMessage(stored, Util.DUMMY_UUID);
 
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         if(map.size() > 0 && getNumNonPedestalEnchants(map)>0)
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(getDescriptionId() + ".chat_enchants");
-            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant,Util.NIL_UUID);
+            TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".chat_enchants");
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant,Util.DUMMY_UUID);
 
             for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
                 Enchantment enchantment = entry.getKey();
@@ -476,17 +476,17 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                 if(!(enchantment instanceof EnchantmentCapacity) && !(enchantment instanceof EnchantmentRange) && !(enchantment instanceof EnchantmentOperationSpeed) && !(enchantment instanceof EnchantmentArea))
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
-                    enchants.withStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants,Util.NIL_UUID);
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
                 }
             }
         }
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
@@ -494,19 +494,19 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append("" + getCobbleGenSpawnRate(stack) + "");
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString("" + getCobbleGenSpawnRate(stack) + "");
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        rate.withStyle(TextFormatting.GRAY);
+        rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
-        speed.withStyle(TextFormatting.RED);
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 
-    public static final Item COBBLE = new ItemUpgradeCobbleGen(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/cobble"));
+    public static final Item COBBLE = new ItemUpgradeCobbleGen(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/cobble"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

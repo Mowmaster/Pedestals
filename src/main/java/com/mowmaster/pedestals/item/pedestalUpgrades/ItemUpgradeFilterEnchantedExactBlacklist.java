@@ -25,7 +25,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 //Filters by number of enchants on an item
 public class ItemUpgradeFilterEnchantedExactBlacklist extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterEnchantedExactBlacklist(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeFilterEnchantedExactBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {return true;}
@@ -85,7 +85,7 @@ public class ItemUpgradeFilterEnchantedExactBlacklist extends ItemUpgradeBaseFil
         /*int countAnyMatches = 0;
         if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
         {
-            BlockPos posInventory = getBlockPosOfBlockBelow(world, posPedestal, 1);
+            BlockPos posInventory = getPosOfBlockBelow(world, posPedestal, 1);
 
             //Filter is in inventory
             LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posPedestal),true);
@@ -152,7 +152,7 @@ public class ItemUpgradeFilterEnchantedExactBlacklist extends ItemUpgradeBaseFil
         }
     }
 
-    public static final Item ENCHANTEDSPECIFICB= new ItemUpgradeFilterEnchantedExactBlacklist(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedexactb"));
+    public static final Item ENCHANTEDSPECIFICB= new ItemUpgradeFilterEnchantedExactBlacklist(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedexactb"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

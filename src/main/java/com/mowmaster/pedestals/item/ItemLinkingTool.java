@@ -44,7 +44,7 @@ public class ItemLinkingTool extends Item {
     public List<BlockPos> storedPositionList = new ArrayList<>();
 
     public ItemLinkingTool() {
-        super(new Item.Properties().stacksTo(1).containerItem(DEFAULT).tab(PEDESTALS_TAB));
+        super(new Item.Properties().maxStackSize(1).containerItem(DEFAULT).group(PEDESTALS_TAB));
     }
 
     @Override
@@ -59,25 +59,25 @@ public class ItemLinkingTool extends Item {
 
     @Override
     public ActionResultType onItemUse(ItemUseContext context) {
-        World worldIn = context.getLevel();
+        World worldIn = context.getWorld();
         PlayerEntity player = context.getPlayer();
-        BlockPos pos = context.getBlockPos();
+        BlockPos pos = context.getPos();
 
-        //new TranslationTextComponent(getDescriptionId() + ".tool_speed", tilePedestal.getSpeed()).withStyle(TextFormatting.RED)
-        TranslationTextComponent linksucess = new TranslationTextComponent(getDescriptionId() + ".tool_link_success");
-        linksucess.withStyle(TextFormatting.WHITE);
-        TranslationTextComponent linkunsuccess = new TranslationTextComponent(getDescriptionId() + ".tool_link_unsucess");
-        linkunsuccess.withStyle(TextFormatting.WHITE);
-        TranslationTextComponent linkremoved = new TranslationTextComponent(getDescriptionId() + ".tool_link_removed");
-        linkremoved.withStyle(TextFormatting.WHITE);
-        TranslationTextComponent linkitsself = new TranslationTextComponent(getDescriptionId() + ".tool_link_itsself");
-        linkitsself.withStyle(TextFormatting.WHITE);
-        TranslationTextComponent linknetwork = new TranslationTextComponent(getDescriptionId() + ".tool_link_network");
-        linknetwork.withStyle(TextFormatting.WHITE);
-        TranslationTextComponent linkdistance = new TranslationTextComponent(getDescriptionId() + ".tool_link_distance");
-        linkdistance.withStyle(TextFormatting.WHITE);
+        //new TranslationTextComponent(getTranslationKey() + ".tool_speed", tilePedestal.getSpeed()).mergeStyle(TextFormatting.RED)
+        TranslationTextComponent linksucess = new TranslationTextComponent(getTranslationKey() + ".tool_link_success");
+        linksucess.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linkunsuccess = new TranslationTextComponent(getTranslationKey() + ".tool_link_unsucess");
+        linkunsuccess.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linkremoved = new TranslationTextComponent(getTranslationKey() + ".tool_link_removed");
+        linkremoved.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linkitsself = new TranslationTextComponent(getTranslationKey() + ".tool_link_itsself");
+        linkitsself.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linknetwork = new TranslationTextComponent(getTranslationKey() + ".tool_link_network");
+        linknetwork.mergeStyle(TextFormatting.WHITE);
+        TranslationTextComponent linkdistance = new TranslationTextComponent(getTranslationKey() + ".tool_link_distance");
+        linkdistance.mergeStyle(TextFormatting.WHITE);
 
-        if(!worldIn.isClientSide)
+        if(!worldIn.isRemote)
         {
             BlockState getBlockState = worldIn.getBlockState(pos);
             if(player.isCrouching())
@@ -145,9 +145,9 @@ public class ItemLinkingTool extends Item {
                                                             EnchantmentHelper.setEnchantments(enchantsNone,player.getHeldItemMainhand());
                                                         }
                                                     }
-                                                    player.sendMessage(linksucess,Util.NIL_UUID);
+                                                    player.sendMessage(linksucess,Util.DUMMY_UUID);
                                                 }
-                                                else player.sendMessage(linkunsuccess,Util.NIL_UUID);
+                                                else player.sendMessage(linkunsuccess,Util.DUMMY_UUID);
                                             }
                                             else
                                             {
@@ -160,14 +160,14 @@ public class ItemLinkingTool extends Item {
                                                         EnchantmentHelper.setEnchantments(enchantsNone,player.getHeldItemMainhand());
                                                     }
                                                 }
-                                                player.sendMessage(linkremoved,Util.NIL_UUID);
+                                                player.sendMessage(linkremoved,Util.DUMMY_UUID);
                                             }
                                         }
-                                        else player.sendMessage(linkitsself,Util.NIL_UUID);
+                                        else player.sendMessage(linkitsself,Util.DUMMY_UUID);
                                     }
-                                    else player.sendMessage(linknetwork,Util.NIL_UUID);
+                                    else player.sendMessage(linknetwork,Util.DUMMY_UUID);
                                 }
-                                else player.sendMessage(linkdistance, Util.NIL_UUID);
+                                else player.sendMessage(linkdistance, Util.DUMMY_UUID);
                             }
                         }
                     }
@@ -197,64 +197,64 @@ public class ItemLinkingTool extends Item {
                     if (tileEntity instanceof PedestalTileEntity) {
                         PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
 
-                        TranslationTextComponent rrobin = new TranslationTextComponent(getDescriptionId() + ".tool_rrobin");
-                        TranslationTextComponent rrobint = new TranslationTextComponent(getDescriptionId() + ".tool_rrobin_true");
-                        TranslationTextComponent rrobinf = new TranslationTextComponent(getDescriptionId() + ".tool_rrobin_false");
+                        TranslationTextComponent rrobin = new TranslationTextComponent(getTranslationKey() + ".tool_rrobin");
+                        TranslationTextComponent rrobint = new TranslationTextComponent(getTranslationKey() + ".tool_rrobin_true");
+                        TranslationTextComponent rrobinf = new TranslationTextComponent(getTranslationKey() + ".tool_rrobin_false");
                         TranslationTextComponent TransferTypeText = (tilePedestal.hasRRobin())?(rrobint):(rrobinf);
                         rrobin.append(TransferTypeText);
-                        rrobin.withStyle(TextFormatting.LIGHT_PURPLE);
-                        player.sendMessage(rrobin,Util.NIL_UUID);
+                        rrobin.mergeStyle(TextFormatting.LIGHT_PURPLE);
+                        player.sendMessage(rrobin,Util.DUMMY_UUID);
 
                         if(tilePedestal.hasTool())
                         {
-                            TranslationTextComponent tool = new TranslationTextComponent(getDescriptionId() + ".tool_stored");
+                            TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".tool_stored");
                             tool.append(tilePedestal.getToolOnPedestal().getDisplayName());
-                            tool.withStyle(TextFormatting.WHITE);
-                            player.sendMessage(tool,Util.NIL_UUID);
+                            tool.mergeStyle(TextFormatting.WHITE);
+                            player.sendMessage(tool,Util.DUMMY_UUID);
                         }
 
                         if(tilePedestal.getSpeed()>0)
                         {
-                            TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tool_speed");
-                            speed.append(""+tilePedestal.getSpeed()+"");
-                            speed.withStyle(TextFormatting.RED);
-                            player.sendMessage(speed,Util.NIL_UUID);
+                            TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tool_speed");
+                            speed.appendString(""+tilePedestal.getSpeed()+"");
+                            speed.mergeStyle(TextFormatting.RED);
+                            player.sendMessage(speed,Util.DUMMY_UUID);
                         }
 
                         if(tilePedestal.getCapacity()>0)
                         {
-                            TranslationTextComponent capacity = new TranslationTextComponent(getDescriptionId() + ".tool_capacity");
-                            capacity.append(""+tilePedestal.getCapacity()+"");
-                            capacity.withStyle(TextFormatting.BLUE);
-                            player.sendMessage(capacity,Util.NIL_UUID);
+                            TranslationTextComponent capacity = new TranslationTextComponent(getTranslationKey() + ".tool_capacity");
+                            capacity.appendString(""+tilePedestal.getCapacity()+"");
+                            capacity.mergeStyle(TextFormatting.BLUE);
+                            player.sendMessage(capacity,Util.DUMMY_UUID);
                         }
 
                         if(tilePedestal.getCapacity()>0)
                         {
-                            TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".tool_range");
-                            range.append(""+tilePedestal.getRange()+"");
-                            range.withStyle(TextFormatting.GREEN);
-                            player.sendMessage(range,Util.NIL_UUID);
+                            TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_range");
+                            range.appendString(""+tilePedestal.getRange()+"");
+                            range.mergeStyle(TextFormatting.GREEN);
+                            player.sendMessage(range,Util.DUMMY_UUID);
                         }
 
 
                         List<BlockPos> getLocations = tilePedestal.getLocationList();
                         if(getLocations.size()>0)
                         {
-                            TranslationTextComponent links = new TranslationTextComponent(getDescriptionId() + ".tool_linked");
-                            links.withStyle(TextFormatting.GOLD);
-                            player.sendMessage(links,Util.NIL_UUID);
+                            TranslationTextComponent links = new TranslationTextComponent(getTranslationKey() + ".tool_linked");
+                            links.mergeStyle(TextFormatting.GOLD);
+                            player.sendMessage(links,Util.DUMMY_UUID);
 
                             for(int i = 0; i < getLocations.size();i++)
                             {
                                 TranslationTextComponent linked = new TranslationTextComponent("   " + getLocations.get(i).getX() + "");
-                                TranslationTextComponent seperator = new TranslationTextComponent(getDescriptionId() + ".tool_seperator");
-                                linked.append(seperator.getString());
-                                linked.append("" + getLocations.get(i).getY() + "");
-                                linked.append(seperator.getString());
-                                linked.append("" + getLocations.get(i).getZ() + "");
-                                linked.withStyle(TextFormatting.GRAY);
-                                player.sendMessage(linked,Util.NIL_UUID);
+                                TranslationTextComponent seperator = new TranslationTextComponent(getTranslationKey() + ".tool_seperator");
+                                linked.appendString(seperator.getString());
+                                linked.appendString("" + getLocations.get(i).getY() + "");
+                                linked.appendString(seperator.getString());
+                                linked.appendString("" + getLocations.get(i).getZ() + "");
+                                linked.mergeStyle(TextFormatting.GRAY);
+                                player.sendMessage(linked,Util.DUMMY_UUID);
                             }
                         }
                     }
@@ -282,8 +282,8 @@ public class ItemLinkingTool extends Item {
                     if(heldItem.getItem().equals(ItemLinkingTool.DEFAULT) && !heldItem.isEnchanted())
                     {
                         p_77659_2_.setHeldItem(p_77659_3_,new ItemStack(ItemLinkingToolBackwards.DEFAULT));
-                        TranslationTextComponent range = new TranslationTextComponent(getDescriptionId() + ".tool_change");
-                        range.withStyle(TextFormatting.GREEN);
+                        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_change");
+                        range.mergeStyle(TextFormatting.GREEN);
                         p_77659_2_.sendStatusMessage(range,true);
                         return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                     }
@@ -307,7 +307,7 @@ public class ItemLinkingTool extends Item {
             if(stack.isEnchanted() && isSelected)
             {
                 if (stack.hasTag()) {
-                    this.getBlockPosFromNBT(stack);
+                    this.getPosFromNBT(stack);
                     /*BlockPos pos = this.getStoredPosition(stack);
                     Random rand = new Random();*/
 
@@ -343,7 +343,7 @@ public class ItemLinkingTool extends Item {
                     {
                         if(isSelected)
                         {
-                            if(worldIn.isClientSide)
+                            if(worldIn.isRemote)
                             {
                                 ticker++;
 
@@ -380,9 +380,9 @@ public class ItemLinkingTool extends Item {
         int x = pedestalToBeLinked.getX();
         int y = pedestalToBeLinked.getY();
         int z = pedestalToBeLinked.getZ();
-        int x1 = pedestal.getBlockPos().getX();
-        int y1 = pedestal.getBlockPos().getY();
-        int z1 = pedestal.getBlockPos().getZ();
+        int x1 = pedestal.getPos().getX();
+        int y1 = pedestal.getPos().getY();
+        int z1 = pedestal.getPos().getZ();
         int xF = Math.abs(Math.subtractExact(x,x1));
         int yF = Math.abs(Math.subtractExact(y,y1));
         int zF = Math.abs(Math.subtractExact(z,z1));
@@ -396,13 +396,13 @@ public class ItemLinkingTool extends Item {
 
     public BlockPos getStoredPosition(ItemStack getWrenchItem)
     {
-        getBlockPosFromNBT(getWrenchItem);
+        getPosFromNBT(getWrenchItem);
         return storedPosition;
     }
 
     public List<BlockPos> getStoredPositionList(ItemStack getWrenchItem)
     {
-        getBlockPosListFromNBT(getWrenchItem);
+        getPosListFromNBT(getWrenchItem);
         return storedPositionList;
     }
 
@@ -441,7 +441,7 @@ public class ItemLinkingTool extends Item {
         stack.setTag(compound);
     }
 
-    public void getBlockPosFromNBT(ItemStack stack)
+    public void getPosFromNBT(ItemStack stack)
     {
         if(stack.hasTag())
         {
@@ -453,7 +453,7 @@ public class ItemLinkingTool extends Item {
         }
     }
 
-    public void getBlockPosListFromNBT(ItemStack stack)
+    public void getPosListFromNBT(ItemStack stack)
     {
         List<BlockPos> posStored = new ArrayList<>();
         if(stack.hasTag())
@@ -535,21 +535,21 @@ public class ItemLinkingTool extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        //new TranslationTextComponent(getDescriptionId() + ".tool_speed", tilePedestal.getSpeed()).withStyle(TextFormatting.RED)
-        TranslationTextComponent selected = new TranslationTextComponent(getDescriptionId() + ".tool_block_selected");
-        TranslationTextComponent unselected = new TranslationTextComponent(getDescriptionId() + ".tool_block_unselected");
-        TranslationTextComponent cordX = new TranslationTextComponent(getDescriptionId() + ".tool_X");
-        TranslationTextComponent cordY = new TranslationTextComponent(getDescriptionId() + ".tool_Y");
-        TranslationTextComponent cordZ = new TranslationTextComponent(getDescriptionId() + ".tool_Z");
+        //new TranslationTextComponent(getTranslationKey() + ".tool_speed", tilePedestal.getSpeed()).mergeStyle(TextFormatting.RED)
+        TranslationTextComponent selected = new TranslationTextComponent(getTranslationKey() + ".tool_block_selected");
+        TranslationTextComponent unselected = new TranslationTextComponent(getTranslationKey() + ".tool_block_unselected");
+        TranslationTextComponent cordX = new TranslationTextComponent(getTranslationKey() + ".tool_X");
+        TranslationTextComponent cordY = new TranslationTextComponent(getTranslationKey() + ".tool_Y");
+        TranslationTextComponent cordZ = new TranslationTextComponent(getTranslationKey() + ".tool_Z");
         if(stack.getItem() instanceof ItemLinkingTool) {
             if (stack.hasTag()) {
                 if (stack.isEnchanted()) {
-                    selected.append(cordX.getString());
-                    selected.append("" + this.getStoredPosition(stack).getX() + "");
-                    selected.append(cordY.getString());
-                    selected.append("" + this.getStoredPosition(stack).getY() + "");
-                    selected.append(cordZ.getString());
-                    selected.append("" + this.getStoredPosition(stack).getZ() + "");
+                    selected.appendString(cordX.getString());
+                    selected.appendString("" + this.getStoredPosition(stack).getX() + "");
+                    selected.appendString(cordY.getString());
+                    selected.appendString("" + this.getStoredPosition(stack).getY() + "");
+                    selected.appendString(cordZ.getString());
+                    selected.appendString("" + this.getStoredPosition(stack).getZ() + "");
                     tooltip.add(selected);
                 } else tooltip.add(unselected);
             } else tooltip.add(unselected);

@@ -12,10 +12,10 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemCraftingPlaceholder extends ItemUpgradeBase
 {
 
-    public ItemCraftingPlaceholder(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemCraftingPlaceholder(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
-    public static final Item PLACEHOLDER = new ItemCraftingPlaceholder(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/placeholder"));
-    public static final Item PLACEHOLDER_BUCKET = new ItemCraftingPlaceholder(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/placeholderbucket"));
+    public static final Item PLACEHOLDER = new ItemCraftingPlaceholder(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/placeholder"));
+    public static final Item PLACEHOLDER_BUCKET = new ItemCraftingPlaceholder(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/placeholderbucket"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

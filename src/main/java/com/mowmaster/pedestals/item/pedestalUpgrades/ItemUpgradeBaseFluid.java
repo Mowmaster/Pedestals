@@ -36,7 +36,7 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
 public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
 
-    public ItemUpgradeBaseFluid(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeBaseFluid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
@@ -155,10 +155,10 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
 
     public void upgradeActionSendFluid(PedestalTileEntity pedestal)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         PedestalTileEntity mainPedestalTile = pedestal;
         ItemStack mainPedestalCoin = mainPedestalTile.getCoinOnPedestal();
-        BlockPos mainPedestalPos = mainPedestalTile.getBlockPos();
+        BlockPos mainPedestalPos = mainPedestalTile.getPos();
 
         FluidStack mainPedestalFluid = getFluidStored(mainPedestalCoin);
         int mainPedestalFluidAmount = mainPedestalFluid.getAmount();
@@ -172,7 +172,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                 {
                     BlockPos posStoredPedestal = mainPedestalTile.getStoredPositionAt(i);
                     //Make sure pedestal ISNOT powered and IS loaded in world
-                    if(!world.hasNeighborSignal(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
+                    if(!world.isBlockPowered(posStoredPedestal) && world.isBlockLoaded(posStoredPedestal))
                     {
                         if(posStoredPedestal != mainPedestalPos)
                         {
@@ -295,7 +295,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
-        if(!p_77659_1_.isClientSide)
+        if(!p_77659_1_.isRemote)
         {
             ItemStack wand = p_77659_2_.getHeldItemOffhand();
             ItemStack coin = p_77659_2_.getHeldItemMainhand();
@@ -307,11 +307,11 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                     if(removeFluidFromItem(coin,fluidIn.getAmount(),true))
                     {
                         removeFluidFromItem(coin,fluidIn.getAmount(),false);
-                        p_77659_1_.playSound(p_77659_2_,p_77659_2_.getBlockPosition().getX(), p_77659_2_.getBlockPosition().getY(), p_77659_2_.getBlockPosition().getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                        p_77659_1_.playSound(p_77659_2_,p_77659_2_.getPosition().getX(), p_77659_2_.getPosition().getY(), p_77659_2_.getPosition().getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.25F, 1.0F);
 
                         //TODO: localize this text
                         TranslationTextComponent output = new TranslationTextComponent("Fluid Cleared");
-                        output.withStyle(TextFormatting.WHITE);
+                        output.mergeStyle(TextFormatting.WHITE);
                         p_77659_2_.sendMessage(output,p_77659_2_.getUniqueID());
                     }
                 }
@@ -565,7 +565,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.hasNeighborSignal(pos))
+        if(!world.isBlockPowered(pos))
         {
             if(hasFluidInCoin(pedestal.getCoinOnPedestal()))
             {
@@ -581,29 +581,29 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent fluid = new TranslationTextComponent(getDescriptionId() + ".chat_fluid");
+        TranslationTextComponent fluid = new TranslationTextComponent(getTranslationKey() + ".chat_fluid");
         FluidStack fluidStored = getFluidStored(stack);
-        fluid.append("" + fluidStored.getDisplayName().toString() + "");
-        fluid.append(" : ");
-        fluid.append("" + fluidStored.getAmount() + "");
-        fluid.append("mb");
-        fluid.withStyle(TextFormatting.BLUE);
-        player.sendMessage(fluid,Util.NIL_UUID);
+        fluid.appendString("" + fluidStored.getDisplayName().toString() + "");
+        fluid.appendString(" : ");
+        fluid.appendString("" + fluidStored.getAmount() + "");
+        fluid.appendString("mb");
+        fluid.mergeStyle(TextFormatting.BLUE);
+        player.sendMessage(fluid,Util.DUMMY_UUID);
 
-        TranslationTextComponent energyRate = new TranslationTextComponent(getDescriptionId() + ".chat_fluidrate");
-        energyRate.append(""+ getFluidTransferRate(stack) +"");
-        energyRate.withStyle(TextFormatting.AQUA);
-        player.sendMessage(energyRate,Util.NIL_UUID);
+        TranslationTextComponent energyRate = new TranslationTextComponent(getTranslationKey() + ".chat_fluidrate");
+        energyRate.appendString(""+ getFluidTransferRate(stack) +"");
+        energyRate.mergeStyle(TextFormatting.AQUA);
+        player.sendMessage(energyRate,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed, Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -611,26 +611,26 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".tooltip_fluidstored");
-        //xpstored.append()
-        xpstored.append(""+ getFluidStored(stack).getAmount() +"");
-        //xpstored.withStyle(TextFormatting.GREEN)
-        xpstored.withStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fluidstored");
+        //xpstored.appendString()
+        xpstored.appendString(""+ getFluidStored(stack).getAmount() +"");
+        //xpstored.mergeStyle(TextFormatting.GREEN)
+        xpstored.mergeStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
 
-        TranslationTextComponent xpcapacity = new TranslationTextComponent(getDescriptionId() + ".tooltip_fluidcapacity");
-        xpcapacity.append(""+ getFluidbuffer(stack) +"");
-        xpcapacity.withStyle(TextFormatting.AQUA);
+        TranslationTextComponent xpcapacity = new TranslationTextComponent(getTranslationKey() + ".tooltip_fluidcapacity");
+        xpcapacity.appendString(""+ getFluidbuffer(stack) +"");
+        xpcapacity.mergeStyle(TextFormatting.AQUA);
         tooltip.add(xpcapacity);
 
-        TranslationTextComponent rate = new TranslationTextComponent(getDescriptionId() + ".tooltip_rate");
-        rate.append("" + getFluidTransferRate(stack) + "");
-        rate.withStyle(TextFormatting.GRAY);
+        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
+        rate.appendString("" + getFluidTransferRate(stack) + "");
+        rate.mergeStyle(TextFormatting.GRAY);
         tooltip.add(rate);
 
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);
     }
 

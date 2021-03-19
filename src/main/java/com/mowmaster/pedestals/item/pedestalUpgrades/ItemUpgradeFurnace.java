@@ -31,7 +31,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
 {
-    public ItemUpgradeFurnace(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeFurnace(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {
@@ -65,7 +65,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
     {
         if(xp >= 1)
         {
-            ExperienceOrbEntity expEntity = new ExperienceOrbEntity(world,getBlockPosOfBlockBelow(world,posOfPedestal,-1).getX() + 0.5,getBlockPosOfBlockBelow(world,posOfPedestal,-1).getY(),getBlockPosOfBlockBelow(world,posOfPedestal,-1).getZ() + 0.5,xp);
+            ExperienceOrbEntity expEntity = new ExperienceOrbEntity(world,getPosOfBlockBelow(world,posOfPedestal,-1).getX() + 0.5,getPosOfBlockBelow(world,posOfPedestal,-1).getY(),getPosOfBlockBelow(world,posOfPedestal,-1).getZ() + 0.5,xp);
             expEntity.setMotion(0D,0D,0D);
             world.addEntity(expEntity);
         }
@@ -73,18 +73,18 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int speed = getSmeltingSpeed(coinInPedestal);
 
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,coinInPedestal);
@@ -95,7 +95,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        BlockPos posInventory = getBlockPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int itemsPerSmelt = getItemTransferRate(coinInPedestal);
 
         ItemStack itemFromInv = ItemStack.EMPTY;
@@ -204,7 +204,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
         }
     }
 
-    public static final Item SMELTER = new ItemUpgradeFurnace(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/smelter"));
+    public static final Item SMELTER = new ItemUpgradeFurnace(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/smelter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

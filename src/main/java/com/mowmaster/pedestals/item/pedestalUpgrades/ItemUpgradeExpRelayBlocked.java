@@ -16,7 +16,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
 {
 
-    public ItemUpgradeExpRelayBlocked(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeExpRelayBlocked(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -42,13 +42,13 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
                 if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
@@ -68,7 +68,7 @@ public class ItemUpgradeExpRelayBlocked extends ItemUpgradeBaseExpFilter
         return  (overEnchanted>=maxLVLStored)?(maxLVLStored):(overEnchanted);
     }
 
-    public static final Item XPRELAYBLOCKED = new ItemUpgradeExpRelayBlocked(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xprelayblocked"));
+    public static final Item XPRELAYBLOCKED = new ItemUpgradeExpRelayBlocked(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/xprelayblocked"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

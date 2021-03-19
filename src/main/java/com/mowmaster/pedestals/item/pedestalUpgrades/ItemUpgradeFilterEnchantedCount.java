@@ -33,7 +33,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 //Filters by number of enchants on an item
 public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterEnchantedCount(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeFilterEnchantedCount(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptAdvanced() {return true;}
@@ -131,42 +131,42 @@ public class ItemUpgradeFilterEnchantedCount extends ItemUpgradeBaseFilter
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".chat_name");
-        TranslationTextComponent name2 = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.append(name2.getString());
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".chat_name");
+        TranslationTextComponent name2 = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.appendString(name2.getString());
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
 
-        TranslationTextComponent enchantsize = new TranslationTextComponent(getDescriptionId() + ".chat_size");
-        enchantsize.append(""+ getSize(stack) +"");
-        enchantsize.withStyle(TextFormatting.GREEN);
-        player.sendMessage(enchantsize, Util.NIL_UUID);
+        TranslationTextComponent enchantsize = new TranslationTextComponent(getTranslationKey() + ".chat_size");
+        enchantsize.appendString(""+ getSize(stack) +"");
+        enchantsize.mergeStyle(TextFormatting.GREEN);
+        player.sendMessage(enchantsize, Util.DUMMY_UUID);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         //super.addInformation(stack, worldIn, tooltip, flagIn);
-        TranslationTextComponent t = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        t.withStyle(TextFormatting.GOLD);
+        TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
-        TranslationTextComponent xpstored = new TranslationTextComponent(getDescriptionId() + ".tooltip_size");
-        xpstored.append(""+ getSize(stack) +"");
-        xpstored.withStyle(TextFormatting.GREEN);
+        TranslationTextComponent xpstored = new TranslationTextComponent(getTranslationKey() + ".tooltip_size");
+        xpstored.appendString(""+ getSize(stack) +"");
+        xpstored.mergeStyle(TextFormatting.GREEN);
         tooltip.add(xpstored);
     }
 
-    public static final Item ENCHANTEDCOUNT1 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount"));
-    /*public static final Item ENCHANTEDCOUNT2 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount2"));
-    public static final Item ENCHANTEDCOUNT3 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount3"));
-    public static final Item ENCHANTEDCOUNT4 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount4"));
-    public static final Item ENCHANTEDCOUNT5 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount5"));
-    public static final Item ENCHANTEDCOUNT6 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount6"));
-    public static final Item ENCHANTEDCOUNT7 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount7"));
-    public static final Item ENCHANTEDCOUNT8 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount8"));
-    public static final Item ENCHANTEDCOUNT9 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount9"));
-    public static final Item ENCHANTEDCOUNT10 = new ItemUpgradeFilterEnchantedCount(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount10"));
+    public static final Item ENCHANTEDCOUNT1 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount"));
+    /*public static final Item ENCHANTEDCOUNT2 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount2"));
+    public static final Item ENCHANTEDCOUNT3 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount3"));
+    public static final Item ENCHANTEDCOUNT4 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount4"));
+    public static final Item ENCHANTEDCOUNT5 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount5"));
+    public static final Item ENCHANTEDCOUNT6 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount6"));
+    public static final Item ENCHANTEDCOUNT7 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount7"));
+    public static final Item ENCHANTEDCOUNT8 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount8"));
+    public static final Item ENCHANTEDCOUNT9 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount9"));
+    public static final Item ENCHANTEDCOUNT10 = new ItemUpgradeFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterenchantedcount10"));
     */
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

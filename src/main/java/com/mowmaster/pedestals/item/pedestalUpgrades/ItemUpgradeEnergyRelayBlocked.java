@@ -18,7 +18,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeEnergyRelayBlocked extends ItemUpgradeBaseEnergyFilter
 {
-    public ItemUpgradeEnergyRelayBlocked(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeEnergyRelayBlocked(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -70,16 +70,16 @@ public class ItemUpgradeEnergyRelayBlocked extends ItemUpgradeBaseEnergyFilter
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
             if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(pedestal);
@@ -87,7 +87,7 @@ public class ItemUpgradeEnergyRelayBlocked extends ItemUpgradeBaseEnergyFilter
         }
     }
 
-    public static final Item RFRELAYBLOCKED = new ItemUpgradeEnergyRelayBlocked(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfrelayblocked"));
+    public static final Item RFRELAYBLOCKED = new ItemUpgradeEnergyRelayBlocked(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfrelayblocked"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

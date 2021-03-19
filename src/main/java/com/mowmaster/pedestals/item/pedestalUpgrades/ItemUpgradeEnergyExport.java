@@ -17,7 +17,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
 {
-    public ItemUpgradeEnergyExport(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeEnergyExport(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -32,16 +32,16 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
             //Still Needed as we want to limit energy transfer from PEN to world
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals
@@ -57,7 +57,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 
-        BlockPos posInventory = getBlockPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         ItemStack itemFromPedestal = ItemStack.EMPTY;
 
         LazyOptional<IEnergyStorage> cap = findEnergyHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
@@ -133,7 +133,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
 
     }
 
-    public static final Item RFEXPORT = new ItemUpgradeEnergyExport(new Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfexport"));
+    public static final Item RFEXPORT = new ItemUpgradeEnergyExport(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/rfexport"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -23,7 +23,7 @@ public class PedestalFakePlayer extends FakePlayer
     private ItemStack heldItem;
 
     public PedestalFakePlayer(ServerWorld world, @Nullable UUID getplayerUUID, @Nullable BlockPos setPos, @Nullable ItemStack toolHeld) {
-        super(world, new GameProfile((getplayerUUID != null)?(getplayerUUID):(Util.NIL_UUID),"[Pedestals]"));
+        super(world, new GameProfile((getplayerUUID != null)?(getplayerUUID):(Util.DUMMY_UUID),"[Pedestals]"));
         this.fakePos = (setPos !=null)?(setPos):(BlockPos.ZERO);
         this.heldItem = (toolHeld !=null )?(toolHeld):(ItemStack.EMPTY);
     }
@@ -34,12 +34,12 @@ public class PedestalFakePlayer extends FakePlayer
     }
 
     @Override
-    public BlockPos getBlockPosition() {
+    public BlockPos getPosition() {
         return fakePos;
     }
 
     @Override
-    public Vector3d getBlockPositionVec() {
+    public Vector3d getPositionVec() {
         return new Vector3d(fakePos.getX(), fakePos.getY(), fakePos.getZ());
     }
 

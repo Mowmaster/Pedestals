@@ -93,7 +93,7 @@ Energy/Fluid/Exp Relay(blocked) - A blank whitelist filter would do the same thi
 public class ItemFilterBase extends Item
 {
     public boolean filterType = false;
-    public ItemFilterBase(Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemFilterBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     public boolean getFilterType()
     {
@@ -135,7 +135,7 @@ public class ItemFilterBase extends Item
             PedestalTileEntity pedestal = (PedestalTileEntity)tile;
             return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
         }
-        //int stackabe = itemStackIncoming.getMaxStackSize();
+        //int stackabe = itemStackIncoming.maxStackSize();
         return 0;
     }
 
@@ -157,7 +157,7 @@ public class ItemFilterBase extends Item
                         boolean getCurrentType = getFilterType(itemInHand);
                         setFilterType(itemInHand,!getCurrentType);
                         TranslationTextComponent changed = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterchange");
-                        changed.withStyle(TextFormatting.GREEN);
+                        changed.mergeStyle(TextFormatting.GREEN);
                         TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
                         TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
                         changed.append((!getCurrentType)?(black):(white));
@@ -176,8 +176,8 @@ public class ItemFilterBase extends Item
                     if(itemInHand.getItem() instanceof ItemFilterBase)
                     {
                         ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
-                        BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getBlockPos(), false);
-                        BlockPos posBlock = res.getBlockPos();
+                        BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);
+                        BlockPos posBlock = res.getPos();
 
                         List<ItemStack> buildQueue = buildFilterQueue(p_77659_1_,posBlock);
 
@@ -378,16 +378,16 @@ public class ItemFilterBase extends Item
         if(filterQueue.size()>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
-            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant, Util.NIL_UUID);
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(enchant, Util.DUMMY_UUID);
 
             for(int i=0;i<filterQueue.size();i++) {
 
                 if(!filterQueue.get(i).isEmpty())
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
-                    enchants.withStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants, Util.NIL_UUID);
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants, Util.DUMMY_UUID);
                 }
             }
         }
@@ -402,14 +402,14 @@ public class ItemFilterBase extends Item
         TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
         TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
         filterList.append((filterType)?(black):(white));
-        filterList.withStyle(TextFormatting.GOLD);
+        filterList.mergeStyle(TextFormatting.GOLD);
         tooltip.add(filterList);
 
         List<ItemStack> filterQueue = readFilterQueueFromNBT(stack);
         if(filterQueue.size()>0)
         {
             TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
-            enchant.withStyle(TextFormatting.LIGHT_PURPLE);
+            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
             tooltip.add(enchant);
 
             for(int i=0;i<filterQueue.size();i++) {
@@ -417,15 +417,15 @@ public class ItemFilterBase extends Item
                 if(!filterQueue.get(i).isEmpty())
                 {
                     TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
-                    enchants.withStyle(TextFormatting.GRAY);
+                    enchants.mergeStyle(TextFormatting.GRAY);
                     tooltip.add(enchants);
                 }
             }
         }
 
-        /*TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append();
-        speed.withStyle(TextFormatting.RED);
+        /*TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString();
+        speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);*/
     }
 }

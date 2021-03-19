@@ -41,7 +41,7 @@ import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
 public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 {
-    public ItemUpgradeEffectPlanter(Item.Properties builder) {super(builder.tab(PEDESTALS_TAB));}
+    public ItemUpgradeEffectPlanter(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptArea() {
@@ -106,20 +106,20 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isClientSide)
+        if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getBlockPos();
+            BlockPos pedestalPos = pedestal.getPos();
 
-            if(!world.hasNeighborSignal(pedestalPos))
+            if(!world.isBlockPowered(pedestalPos))
             {
                 int rangeWidth = getAreaWidth(coinInPedestal);
                 int rangeHeight = getHeight(coinInPedestal);
                 BlockState pedestalState = world.getBlockState(pedestalPos);
                 Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-                BlockPos posNums = getBlockPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
 
                 if(world.isAreaLoaded(negNums,posNums))
                 {
@@ -148,14 +148,14 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                             if (world.getGameTime() % speed == 0) {
                                 for(int i = 0;i< workQueue.size(); i++)
                                 {
-                                    BlockPos targetBlockPos = workQueue.get(i);
-                                    BlockPos blockToMinePos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+                                    BlockPos targetPos = workQueue.get(i);
+                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
                                     BlockState targetBlock = world.getBlockState(blockToMinePos);
                                     if(canMineBlock(pedestal,blockToMinePos))
                                     {
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                        upgradeAction(world, pedestal, itemInPedestal, pedestalPos, targetBlockPos, targetBlock);
+                                        upgradeAction(world, pedestal, itemInPedestal, pedestalPos, targetPos, targetBlock);
                                         break;
                                     }
                                     else
@@ -197,7 +197,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                             //Use item in pedestal because, we're planting it
                             FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,itemInPedestal.copy());
                             //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-                            if(!fakePlayer.blockPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+                            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
 
                             BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget.down(), false));
 
@@ -217,10 +217,10 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
-        BlockPos targetBlockPos = blockToMinePos;
-        BlockPos blockToPlantPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
         Block blockToPlant = blockToPlantState.getBlock();
         Item singleItemInPedestal = itemInPedestal.getItem();
@@ -244,10 +244,10 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
     @Override
     public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
-        BlockPos targetBlockPos = blockToMinePos;
-        BlockPos blockToPlantPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
         Block blockToPlant = blockToPlantState.getBlock();
         Item singleItemInPedestal = itemInPedestal.getItem();
@@ -272,10 +272,10 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
     @Override
     public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
     {
-        World world = pedestal.getLevel();
+        World world = pedestal.getWorld();
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
-        BlockPos targetBlockPos = blockToMinePos;
-        BlockPos blockToPlantPos = new BlockPos(targetBlockPos.getX(), targetBlockPos.getY(), targetBlockPos.getZ());
+        BlockPos targetPos = blockToMinePos;
+        BlockPos blockToPlantPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToPlantState = world.getBlockState(blockToPlantPos);
         Block blockToPlant = blockToPlantState.getBlock();
         Item singleItemInPedestal = itemInPedestal.getItem();
@@ -301,31 +301,31 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
     {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
-        TranslationTextComponent name = new TranslationTextComponent(getDescriptionId() + ".tooltip_name");
-        name.withStyle(TextFormatting.GOLD);
-        player.sendMessage(name,Util.NIL_UUID);
+        TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
+        name.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(name,Util.DUMMY_UUID);
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".chat_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".chat_areax");
-        area.append(tr);
-        area.append(areax.getString());
-        area.append("" + getHeight(stack) + "");
-        area.append(areax.getString());
-        area.append(tr);
-        area.withStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.NIL_UUID);
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString("" + getHeight(stack) + "");
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        area.mergeStyle(TextFormatting.WHITE);
+        player.sendMessage(area,Util.DUMMY_UUID);
 
-        TranslationTextComponent btm = new TranslationTextComponent(getDescriptionId() + ".chat_btm");
-        btm.append("" + workQueueSize(stack) + "");
-        btm.withStyle(TextFormatting.YELLOW);
-        player.sendMessage(btm,Util.NIL_UUID);
+        TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
+        btm.appendString("" + workQueueSize(stack) + "");
+        btm.mergeStyle(TextFormatting.YELLOW);
+        player.sendMessage(btm,Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".chat_speed");
-        speed.append(getOperationSpeedString(stack));
-        speed.withStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.NIL_UUID);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
+        speed.appendString(getOperationSpeedString(stack));
+        speed.mergeStyle(TextFormatting.RED);
+        player.sendMessage(speed,Util.DUMMY_UUID);
     }
 
     @Override
@@ -334,24 +334,24 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";
-        TranslationTextComponent area = new TranslationTextComponent(getDescriptionId() + ".tooltip_area");
-        TranslationTextComponent areax = new TranslationTextComponent(getDescriptionId() + ".tooltip_areax");
-        area.append(tr);
-        area.append(areax.getString());
-        area.append("" + getHeight(stack) + "");
-        area.append(areax.getString());
-        area.append(tr);
-        TranslationTextComponent speed = new TranslationTextComponent(getDescriptionId() + ".tooltip_speed");
-        speed.append(getOperationSpeedString(stack));
+        TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
+        TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
+        area.appendString(tr);
+        area.appendString(areax.getString());
+        area.appendString("" + getHeight(stack) + "");
+        area.appendString(areax.getString());
+        area.appendString(tr);
+        TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
+        speed.appendString(getOperationSpeedString(stack));
 
-        area.withStyle(TextFormatting.WHITE);
-        speed.withStyle(TextFormatting.RED);
+        area.mergeStyle(TextFormatting.WHITE);
+        speed.mergeStyle(TextFormatting.RED);
 
         tooltip.add(area);
         tooltip.add(speed);
     }
 
-    public static final Item PLANTER = new ItemUpgradeEffectPlanter(new Item.Properties().stacksTo(64).tab(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/planter"));
+    public static final Item PLANTER = new ItemUpgradeEffectPlanter(new Item.Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/planter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
