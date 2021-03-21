@@ -87,6 +87,9 @@
   "item.pedestals.toolswapper": "Tool Swapper",
   "jei.pedestals.toolswapper.desc": "R-click the Tool Swapper on a pedestal. If your offhand has a tool in it, the tool will be added to the pedestal. If your off hand is empty AND a tool exists in the pedestal, you'll get the tool back.",
 
+  "item.pedestals.filterswapper": "Filter Swapper",
+  "jei.pedestals.filterswapper.desc": "R-click the Filter Swapper on a pedestal. If your offhand has a Filter in it, the Filter will be added to the pedestal. Right clicking on a pedestal that has a filter will give you a list of whats being filtered, Crouch + Right clicking a pedestal with a filter will give you the filter back.",
+
   "item.pedestals.itemcolorpallet": "Colored Pallet",
         "jei.pedestals.itemcolorpallet.desc": "Crafted from Color Pallets and Red/Green/Blue dyes. Can be re-colored.",
     "item.pedestals.itemcolorpalletdefault": "Color Pallet",
@@ -103,15 +106,17 @@
 
 
   "item.pedestals.bookspeed": "Enchantment Focused Book (Speed)",
-    "jei.pedestals.bookspeed.desc": "Will only accept the Speed Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+    "jei.pedestals.bookspeed.desc": "Will only accept the Pedestal Speed Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
     "item.pedestals.bookcapacity": "Enchantment Focused Book (Capacity)",
-    "jei.pedestals.bookcapacity.desc": "Will only accept the Capacity Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+    "jei.pedestals.bookcapacity.desc": "Will only accept the Pedestal Capacity Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
     "item.pedestals.bookrange": "Enchantment Focused Book (Range Book)",
-    "jei.pedestals.bookrange.desc": "Will only accept the Range Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+    "jei.pedestals.bookrange.desc": "Will only accept the Pedestal Range Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
     "item.pedestals.bookarea": "Enchantment Focused Book (Area Book)",
-    "jei.pedestals.bookarea.desc": "Will only accept the Area Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+    "jei.pedestals.bookarea.desc": "Will only accept the Pedestal Area Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
     "item.pedestals.bookadvanced": "Enchantment Focused Book (Advanced Book)",
-    "jei.pedestals.bookadvanced.desc": "Will only accept the Advanced Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+    "jei.pedestals.bookadvanced.desc": "Will only accept the Pedestal Advanced Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
+  "item.pedestals.bookmagnet": "Enchantment Focused Book (Magnet Book)",
+  "jei.pedestals.bookmagnet.desc": "Will only accept the Pedestal Magnet Enchant when being enchanted. Can only add enchant from book to upgrades with the Anvil Upgrade.",
 
     "pedestals.upgrade_tooltips.speed_0": "Normal Speed",
     "pedestals.upgrade_tooltips.speed_1": "2x Speed",
@@ -1622,15 +1627,17 @@
 
   "enchantment.level.-1": "",
     "enchantment.pedestals.upgradecapacity": "Pedestal Capacity",
-    "enchantment.pedestals.upgradecapacity.desc": "Upgrades the transfer rate and/or buffer capacity of upgrades.",
+    "enchantment.pedestals.upgradecapacity.desc": "Upgrades the transfer rate and/or buffer capacity of pedestal upgrades.",
     "enchantment.pedestals.upgradespeed": "Pedestal Speed",
-    "enchantment.pedestals.upgradespeed.desc": "Modifies the upgrades base speed up to 20 times faster",
+    "enchantment.pedestals.upgradespeed.desc": "Modifies the pedestal upgrades base speed up to 20 times faster",
     "enchantment.pedestals.upgraderange": "Pedestal Range",
-    "enchantment.pedestals.upgraderange.desc": "Modifies the 'vertical' / 'Y' range of an upgrades work area",
+    "enchantment.pedestals.upgraderange.desc": "Modifies the 'vertical' / 'Y' range of a pedestal upgrades work area",
     "enchantment.pedestals.upgradearea": "Pedestal Area",
-    "enchantment.pedestals.upgradearea.desc": "Modifies the AOE area of a pedestals 'work' area",
+    "enchantment.pedestals.upgradearea.desc": "Modifies the AOE area of a pedestal upgrades 'work' area",
     "enchantment.pedestals.upgradeadvanced": "Pedestal Advanced",
-    "enchantment.pedestals.upgradeadvanced.desc": "Can be applied to pedestals that can use an inventory below for inputs or outputs, will allow ANY entities inventory to use used",
+    "enchantment.pedestals.upgradeadvanced.desc": "Can be applied to pedestal upgrades that can use an inventory below for inputs or outputs, will allow ANY entities inventory to use used",
+  "enchantment.pedestals.upgrademagnet": "Pedestal Magnet",
+  "enchantment.pedestals.upgrademagnet.desc": "Can be applied to pedestal upgrades that dont normally use the items in the pedestal. Giving them the ability to magnet up items in their work area (magnet is non filtered)",
 
 
   "advancements.main.root.title": "Pedestals", "advancements.main.root.description":"The Start to Everything Pedestals!",

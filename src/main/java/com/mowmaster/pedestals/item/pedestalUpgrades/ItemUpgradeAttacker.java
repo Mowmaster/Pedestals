@@ -61,6 +61,11 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptMagnet() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
@@ -165,24 +170,27 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     {
         if(!world.isRemote)
         {
-            ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-            ItemStack itemInPedestal = pedestal.getItemInPedestal();
             BlockPos pedestalPos = pedestal.getPos();
-
-            int width = getAreaWidth(coinInPedestal);
-            int height = getRangeHeight(coinInPedestal);
-            BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
-            BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
-            AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
-            List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-            if(itemList.size()>0)
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
-                upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
-            }
+                ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+                ItemStack itemInPedestal = pedestal.getItemInPedestal();
 
-            int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
-            {
+                int width = getAreaWidth(coinInPedestal);
+                int height = getRangeHeight(coinInPedestal);
+                if(hasMagnetEnchant(coinInPedestal))
+                {
+                    BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
+                    BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
+                    AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                    if(itemList.size()>0)
+                    {
+                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
+                    }
+                }
+
+                int speed = getOperationSpeed(coinInPedestal);
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(pedestal);
                 }

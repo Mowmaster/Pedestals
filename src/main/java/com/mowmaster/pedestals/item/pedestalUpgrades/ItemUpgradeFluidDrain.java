@@ -125,7 +125,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
             {
                 if(world.isAreaLoaded(negNums,posNums))
                 {
-                    if(!world.isBlockPowered(pedestalPos)) {
+                    if(!pedestal.isPedestalBlockPowered(world,pedestalPos)) {
 
                         int val = readStoredIntTwoFromNBT(coinInPedestal);
                         if(val>0)

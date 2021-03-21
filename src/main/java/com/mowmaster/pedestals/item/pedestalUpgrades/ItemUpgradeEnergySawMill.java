@@ -55,7 +55,7 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
 
             int speed = getSmeltingSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals

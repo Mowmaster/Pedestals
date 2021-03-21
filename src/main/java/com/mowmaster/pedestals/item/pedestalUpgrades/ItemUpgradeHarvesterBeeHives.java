@@ -171,7 +171,7 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
             BlockPos pedestalPos = pedestal.getPos();
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 int rangeWidth = getAreaWidth(coinInPedestal);
                 int rangeHeight = getRangeHeight(coinInPedestal);

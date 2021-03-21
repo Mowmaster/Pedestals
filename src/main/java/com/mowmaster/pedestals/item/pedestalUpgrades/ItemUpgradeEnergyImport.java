@@ -48,7 +48,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
             //Still Needed as we want to limit energy transfer from world to PEN
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(pedestal);

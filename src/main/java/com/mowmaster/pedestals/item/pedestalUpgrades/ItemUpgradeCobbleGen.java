@@ -340,7 +340,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 //Keep Pedestal Full at all times
                 ItemStack stackInPed = pedestal.getItemInPedestalOverride();

@@ -234,7 +234,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     {
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockPos pedestalPos = pedestal.getPos();
-        if(!world.isBlockPowered(pedestalPos))
+        if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
         {
             upgradeAction(pedestal);
             if(readStoredIntFromNBT(coinInPedestal) > 0)

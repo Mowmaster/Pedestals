@@ -97,7 +97,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(pedestal);

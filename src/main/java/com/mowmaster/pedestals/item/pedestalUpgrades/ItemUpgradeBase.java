@@ -639,6 +639,18 @@ public class ItemUpgradeBase extends Item {
         return false;
     }
 
+    public Boolean canAcceptMagnet()
+    {
+        return true;
+    }
+
+    public Boolean hasMagnetEnchant(ItemStack stack)
+    {
+        return (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.MAGNET,stack)>=1)?(true):(false);
+    }
+
+
+
     public Boolean canAcceptRange()
     {
         return false;

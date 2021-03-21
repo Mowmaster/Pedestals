@@ -74,7 +74,7 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
             BlockPos pedestalPos = pedestal.getPos();
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
                 if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}

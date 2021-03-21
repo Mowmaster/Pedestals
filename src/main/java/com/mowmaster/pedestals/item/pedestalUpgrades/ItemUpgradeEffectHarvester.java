@@ -63,6 +63,11 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptMagnet() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
@@ -162,7 +167,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
             BlockPos pedestalPos = pedestal.getPos();
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 int rangeWidth = getAreaWidth(coinInPedestal);
                 int rangeHeight = getHeight(coinInPedestal);
@@ -173,19 +178,24 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
                 if(world.isAreaLoaded(negNums,posNums))
                 {
-                    AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                    if(itemList.size()>0)
-                    {
-                        List<ItemStack> stackCurrent = readFilterQueueFromNBT(coinInPedestal);
-                        if(!(stackCurrent.size()>0))
-                        {
-                            stackCurrent = buildFilterQueue(pedestal);
-                            writeFilterQueueToNBT(coinInPedestal,stackCurrent);
-                        }
 
-                        upgradeActionFilteredMagnet(world,itemList, itemInPedestal, pedestalPos, stackCurrent, false);
+                    if(hasMagnetEnchant(coinInPedestal))
+                    {
+                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                        if(itemList.size()>0)
+                        {
+                            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coinInPedestal);
+                            if(!(stackCurrent.size()>0))
+                            {
+                                stackCurrent = buildFilterQueue(pedestal);
+                                writeFilterQueueToNBT(coinInPedestal,stackCurrent);
+                            }
+
+                            upgradeActionFilteredMagnet(world,itemList, itemInPedestal, pedestalPos, stackCurrent, false);
+                        }
                     }
+
 
                     int speed = getOperationSpeed(coinInPedestal);
 

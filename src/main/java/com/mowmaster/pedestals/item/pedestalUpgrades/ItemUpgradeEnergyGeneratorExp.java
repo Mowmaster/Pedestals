@@ -117,7 +117,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
             int getMaxFuelValue = 2000000000;
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(pedestal);

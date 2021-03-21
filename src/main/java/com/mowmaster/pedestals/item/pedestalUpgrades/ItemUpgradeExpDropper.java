@@ -109,7 +109,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
             if(!hasMaxXpSet(coinInPedestal)) {setMaxXP(coinInPedestal,getMaxXpValue);}
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0 && getXPStored(coinInPedestal)>0) {
                     upgradeAction(world, coinInPedestal, pedestalPos);

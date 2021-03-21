@@ -66,6 +66,11 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptMagnet() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
@@ -128,24 +133,26 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
             BlockPos pedestalPos = pedestal.getPos();
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 int rangeWidth = getAreaWidth(coinInPedestal);
                 int rangeHeight = getRangeHeight(coinInPedestal);
                 int speed = getOperationSpeed(coinInPedestal);
 
-                BlockState pedestalState = world.getBlockState(pedestalPos);
-                Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-
-                //Should disable magneting when its not needed
-                AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                if(itemList.size()>0)
+                if(hasMagnetEnchant(coinInPedestal))
                 {
-                    upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
+                    BlockState pedestalState = world.getBlockState(pedestalPos);
+                    Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+                    BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                    BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+                    AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                    if(itemList.size()>0)
+                    {
+                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
+                    }
                 }
+
 
                 int val = readStoredIntTwoFromNBT(coinInPedestal);
                 if(val>0)

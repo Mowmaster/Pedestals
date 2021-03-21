@@ -74,6 +74,11 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
     @Override
     public Boolean canAcceptAdvanced() {return true;}
 
+    @Override
+    public Boolean canAcceptMagnet() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
@@ -167,16 +172,19 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
 
             if(world.isAreaLoaded(negNums,posNums))
             {
-                if(!world.isBlockPowered(pedestalPos)) {
+                if(!pedestal.isPedestalBlockPowered(world,pedestalPos)) {
 
                     if(hasEnergy(coinInPedestal))
                     {
-                        //Should disable magneting when its not needed
-                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                        if(itemList.size()>0)
+                        if(hasMagnetEnchant(coinInPedestal))
                         {
-                            upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
+                            //Should disable magneting when its not needed
+                            AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                            List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                            if(itemList.size()>0)
+                            {
+                                upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
+                            }
                         }
 
                         int val = readStoredIntTwoFromNBT(coinInPedestal);

@@ -67,6 +67,11 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     @Override
     public Boolean canAcceptAdvanced() {return true;}
 
+    @Override
+    public Boolean canAcceptMagnet() {
+        return true;
+    }
+
     public int getRange(ItemStack stack)
     {
         return  getRangeSmall(stack);
@@ -105,19 +110,22 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
             BlockPos pedestalPos = pedestal.getPos();
 
             int speed = getOperationSpeed(coinInPedestal);
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
-                //Should disable magneting when its not needed
-                int range = getRange(coinInPedestal);
-                BlockState pedestalState = world.getBlockState(pedestalPos);
-                Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
-                AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                if(itemList.size()>0)
+                if(hasMagnetEnchant(coinInPedestal))
                 {
-                    upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
+                    //Should disable magneting when its not needed
+                    int range = getRange(coinInPedestal);
+                    BlockState pedestalState = world.getBlockState(pedestalPos);
+                    Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
+                    BlockPos negNums = getNegRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
+                    BlockPos posNums = getPosRangePosEntity(world,pedestalPos,1,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(-range-1):(-range));
+                    AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                    if(itemList.size()>0)
+                    {
+                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
+                    }
                 }
 
                 if (world.getGameTime()%speed == 0) {

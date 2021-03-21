@@ -108,7 +108,7 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 //Dont run if theres nothing queued
                 if (world.getGameTime()%speed == 0) {

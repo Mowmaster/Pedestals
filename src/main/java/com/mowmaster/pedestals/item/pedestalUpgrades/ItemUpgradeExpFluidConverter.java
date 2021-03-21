@@ -147,7 +147,7 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
                 upgradeActionSendExp(pedestal);
             }
 
-            if(!world.isBlockPowered(pedestalPos)) {
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos)) {
 
                 if (world.getGameTime() % speed == 0) {
 
