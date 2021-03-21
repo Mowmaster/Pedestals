@@ -1523,59 +1523,23 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else return ItemStack.EMPTY;
     }
 
-    public ItemStack removeTorch(boolean updateBlock) {
+    public ItemStack removeTorch() {
         IItemHandler ph = privateHandler.orElse(null);
-        if(updateBlock)
-        {
-            BlockState state = world.getBlockState(pos);
-            int filterState = 0;
-            boolean watered = state.get(PedestalBlock.WATERLOGGED);
-            Direction dir = state.get(PedestalBlock.FACING);
-            boolean lit = state.get(PedestalBlock.LIT);
-            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
-            world.notifyBlockUpdate(pos,state,newstate,3);
-            world.setBlockState(pos,newstate,3);
-            world.markBlockRangeForRenderUpdate(pos,state,newstate);
-        }
         return ph.extractItem(7,ph.getStackInSlot(7).getCount(),false);
     }
 
-    public boolean addTorch(ItemStack filter,boolean simulate)
+    public boolean addTorch()
     {
-        if(hasTorch())
-        {
-            return false;
-        }
-        else
-        {
-            BlockState state = world.getBlockState(pos);
-            boolean watered = state.get(PedestalBlock.WATERLOGGED);
-            Direction dir = state.get(PedestalBlock.FACING);
-            boolean lit = state.get(PedestalBlock.LIT);
-            int filterState = state.get(PedestalBlock.FILTER_STATUS);
-            if(filter.getItem() instanceof ItemFilterBase)
-            {
-                //Blacklist = 1 , whitelist = 0
-                filterState = (((ItemFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
-            }
-            BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
+        IItemHandler ph = privateHandler.orElse(null);
 
-            IItemHandler ph = privateHandler.orElse(null);
-            ItemStack filterItem = filter.copy();
-            filterItem.setCount(1);
-            if(!hasFilter() && ph.isItemValid(6,filterItem))
-            {
-                if(!simulate)
-                {
-                    ph.insertItem(6,filterItem,false);
-                    world.notifyBlockUpdate(pos,state,newstate,3);
-                    world.setBlockState(pos,newstate,3);
-                    world.markBlockRangeForRenderUpdate(pos,state,newstate);
-                }
-                return true;
-            }
-            else return false;
+        ItemStack itemFromBlock = new ItemStack(Items.REDSTONE_TORCH);
+        itemFromBlock.setCount(1);
+        if(!hasTorch() && ph.isItemValid(7,itemFromBlock))
+        {
+            ph.insertItem(7,itemFromBlock,false);
+            return true;
         }
+        else return false;
     }
 
     public boolean isPedestalBlockPowered(World world,BlockPos pos)

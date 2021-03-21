@@ -134,7 +134,7 @@ public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
             int getMaxFluidValue = getFluidbuffer(coinInPedestal);
             if(!hasMaxFluidSet(coinInPedestal) || readMaxFluidFromNBT(coinInPedestal) != getMaxFluidValue) {setMaxFluid(coinInPedestal, getMaxFluidValue);}
 
-            if(!world.isBlockPowered(pedestalPos)) {
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos)) {
                 if(hasFluidInCoin(coinInPedestal))
                 {
                     upgradeActionSendFluid(pedestal);

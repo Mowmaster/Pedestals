@@ -1,13 +1,10 @@
 package com.mowmaster.pedestals.item.pedestalFilters;
 
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -44,6 +41,10 @@ public class ItemFilterItem extends ItemFilterBase
         }
 
         return returner;
+    }
+
+    public static void handleItemColors(ColorHandlerEvent.Item event) {
+        event.getItemColors().register((itemstack, tintIndex) -> {if (tintIndex == 1){return getColorFromNBT(itemstack);} else {return -1;}},ITEMFILTER);
     }
 
     public static final Item ITEMFILTER = new ItemFilterItem(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "filter/filteritem"));

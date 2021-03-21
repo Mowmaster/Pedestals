@@ -1,3 +1,8 @@
 {
-"parent": "pedestals:item/itemcolorpalletdefault"
+"parent": "pedestals:item/itemfilter",
+  "textures": {
+    "0": "pedestals:items/filteritem",
+    "1": "pedestals:items/models/filters/filteritem",
+    "particle": "pedestals:items/filteritem"
+  }
 }

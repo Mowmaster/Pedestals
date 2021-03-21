@@ -419,7 +419,7 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             int getMaxStorageValue = getStorageBuffer(coinInPedestal);
             if(!hasMaxStorageSet(coinInPedestal) || readMaxStorageFromNBT(coinInPedestal) != getMaxStorageValue) {writeMaxStorageToNBT(coinInPedestal, getMaxStorageValue);}
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%20 == 0) {
                     //Keep Pedestal Full at all times

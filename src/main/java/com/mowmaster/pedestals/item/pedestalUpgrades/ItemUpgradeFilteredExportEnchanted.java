@@ -140,7 +140,7 @@ public class ItemUpgradeFilteredExportEnchanted extends ItemUpgradeBaseFilter
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,coinInPedestal);

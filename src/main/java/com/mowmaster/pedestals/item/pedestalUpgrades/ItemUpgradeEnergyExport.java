@@ -41,7 +41,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
             //Still Needed as we want to limit energy transfer from PEN to world
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals

@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.item;
 
 import com.mowmaster.pedestals.blocks.*;
-import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterItem;
+import com.mowmaster.pedestals.item.pedestalFilters.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -28,6 +28,11 @@ public class ItemRegistry
         ItemUpgradeDefault.onItemRegistryReady(e);
 
         ItemFilterItem.onItemRegistryReady(e);
+        ItemFilterItemStack.onItemRegistryReady(e);
+        ItemFilterMod.onItemRegistryReady(e);
+        ItemFilterTag.onItemRegistryReady(e);
+        ItemFilterFood.onItemRegistryReady(e);
+        ItemFilterEnchanted.onItemRegistryReady(e);
 
         ItemUpgradeRestriction.onItemRegistryReady(e);
         ItemUpgradeDropper.onItemRegistryReady(e);
@@ -155,7 +160,12 @@ public class ItemRegistry
     public static void onItemColorsReady(ColorHandlerEvent.Item event)
     {
         PedestalBlock.handleItemColors(event);
-        //PedestalBlock.handleItemColors(event);
         ItemColorPallet.handleItemColors(event);
+        ItemFilterItem.handleItemColors(event);
+        ItemFilterItemStack.handleItemColors(event);
+        ItemFilterMod.handleItemColors(event);
+        ItemFilterTag.handleItemColors(event);
+        ItemFilterFood.handleItemColors(event);
+        ItemFilterEnchanted.handleItemColors(event);
     }
 }

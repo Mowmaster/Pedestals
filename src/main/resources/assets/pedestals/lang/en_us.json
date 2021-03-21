@@ -20,7 +20,15 @@
   "pedestals.filters.insert_remove": "Filter Removed",
   "pedestals.filters.insert_switch": "Filter Settings Copied Successfully",
   "pedestals.filters.insert_insert": "Filter Insert Successfully",
+
+
+
   "item.pedestals.filter.filteritem": "Filter (Item)",
+  "item.pedestals.filter.filteritemstack": "Filter (ItemStack)",
+  "item.pedestals.filter.filtermod": "Filter (Mod)",
+  "item.pedestals.filter.filtertag": "Filter (Tag)",
+  "item.pedestals.filter.filterfood": "Filter (Food)",
+  "item.pedestals.filter.filterenchanted": "Filter (Enchanted)",
 
 
 
@@ -1092,52 +1100,52 @@
     "item.pedestals.coin.filterenchantedfuzzyb.chat_name": "Filter Type: ",
     "jei.pedestals.filterenchantedfuzzyb.desc": "Compares Incoming Items to those in the inventory below. Checks if the enchants on the incoming item do not match any enchanted item, regardless of level, in the filter.",
 
-    "item.pedestals.coin.filterfood": "Pedestal Filter",
+    "item.pedestals.coin.filterfood": "Deprecated Filter",
     "item.pedestals.coin.filterfood.tooltip_name": "Food",
     "item.pedestals.coin.filterfood.chat_name": "Filter Type: ",
     "jei.pedestals.filterfood.desc": "Only accepts Items that are food to pass through the pedestal.",
 
-    "item.pedestals.coin.filterfoodb": "Pedestal Filter",
+    "item.pedestals.coin.filterfoodb": "Deprecated Filter",
     "item.pedestals.coin.filterfoodb.tooltip_name": "Food Blacklist",
     "item.pedestals.coin.filterfoodb.chat_name": "Filter Type: ",
     "jei.pedestals.filterfoodb.desc": "Only accepts Items that are NOT food to pass through the pedestal.",
 
-    "item.pedestals.coin.filteritem": "Pedestal Filter",
+    "item.pedestals.coin.filteritem": "Deprecated Filter",
     "item.pedestals.coin.filteritem.tooltip_name": "Item",
     "item.pedestals.coin.filteritem.chat_name": "Filter Type: ",
     "jei.pedestals.filteritem.desc": "Compares Incoming Items to those in the inventory below. Only allows matching Items to pass through the pedestal.",
 
-    "item.pedestals.coin.filteritemb": "Pedestal Filter",
+    "item.pedestals.coin.filteritemb": "Deprecated Filter",
     "item.pedestals.coin.filteritemb.tooltip_name": "Item Blacklist",
     "item.pedestals.coin.filteritemb.chat_name": "Filter Type: ",
     "jei.pedestals.filteritemb.desc": "Compares Incoming Items to those in the inventory below. Only allows not matching Items to pass through the pedestal.",
 
-    "item.pedestals.coin.filteritemstack": "Pedestal Filter",
+    "item.pedestals.coin.filteritemstack": "Deprecated Filter",
     "item.pedestals.coin.filteritemstack.tooltip_name": "ItemStack",
     "item.pedestals.coin.filteritemstack.chat_name": "Filter Type: ",
     "jei.pedestals.filteritemstack.desc": "Compares Incoming Items to those in the inventory below. Only allows Matching ItemStacks to pass through the pedestal.",
 
-    "item.pedestals.coin.filteritemstackb": "Pedestal Filter",
+    "item.pedestals.coin.filteritemstackb": "Deprecated Filter",
     "item.pedestals.coin.filteritemstackb.tooltip_name": "ItemStack Blacklist",
     "item.pedestals.coin.filteritemstackb.chat_name": "Filter Type: ",
     "jei.pedestals.filteritemstackb.desc": "Compares Incoming Items to those in the inventory below. Only allows UnMatching ItemStacks to pass through the pedestal.",
 
-    "item.pedestals.coin.filtermod": "Pedestal Filter",
+    "item.pedestals.coin.filtermod": "Deprecated Filter",
     "item.pedestals.coin.filtermod.tooltip_name": "Mod",
     "item.pedestals.coin.filtermod.chat_name": "Filter Type: ",
     "jei.pedestals.filtermod.desc": "Compares Incoming Items to those in the inventory below. Only allows Items from the same mod to pass through the pedestal.",
 
-    "item.pedestals.coin.filtermodb": "Pedestal Filter",
+    "item.pedestals.coin.filtermodb": "Deprecated Filter",
     "item.pedestals.coin.filtermodb.tooltip_name": "Mod Blacklist",
     "item.pedestals.coin.filtermodb.chat_name": "Filter Type: ",
     "jei.pedestals.filtermodb.desc": "Compares Incoming Items to those in the inventory below. Only allows Items NOT from the same mod to pass through the pedestal.",
 
-    "item.pedestals.coin.filtertag": "Pedestal Filter",
+    "item.pedestals.coin.filtertag": "Deprecated Filter",
     "item.pedestals.coin.filtertag.tooltip_name": "Tag",
     "item.pedestals.coin.filtertag.chat_name": "Filter Type: ",
     "jei.pedestals.filtertag.desc": "Compares Incoming Items to those in the inventory below. Only allows Items that match the tag name of renamed items to pass through the pedestal.",
 
-    "item.pedestals.coin.filtertagb": "Pedestal Filter",
+    "item.pedestals.coin.filtertagb": "Deprecated Filter",
     "item.pedestals.coin.filtertagb.tooltip_name": "Tag Blacklist",
     "item.pedestals.coin.filtertagb.chat_name": "Filter Type: ",
     "jei.pedestals.filtertagb.desc": "Compares Incoming Items to those in the inventory below. Only allows Items that DO NOT match the tag name of renamed items to pass through the pedestal.",

@@ -23,6 +23,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -115,6 +116,20 @@ public class ItemFilterBase extends Item
     {
         filterType = filterSet;
         writeFilterTypeToNBT(filterItem);
+    }
+
+    public static int getColorFromNBT(ItemStack stack)
+    {
+        if(stack.hasTag())
+        {
+            if(stack.getTag().contains("filter_type"))
+            {
+                CompoundNBT getCompound = stack.getTag();
+                return (getCompound.getBoolean("filter_type"))?(0):(16777215);
+            }
+        }
+
+        return 16777215;
     }
 
     public boolean canAcceptItem(PedestalTileEntity pedestal, ItemStack itemStackIn)
@@ -370,9 +385,17 @@ public class ItemFilterBase extends Item
         return filterType;
     }
 
+    public boolean doItemsMatch(ItemStack stackPedestal, ItemStack itemStackIn)
+    {
+        return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
+    }
+
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack filterStack = pedestal.getFilterInPedestal();
+        TranslationTextComponent filterList = new TranslationTextComponent(filterStack.getDisplayName().getString());
+        filterList.mergeStyle(TextFormatting.GOLD);
+        player.sendMessage(filterList, Util.DUMMY_UUID);
 
         List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack);
         if(filterQueue.size()>0)

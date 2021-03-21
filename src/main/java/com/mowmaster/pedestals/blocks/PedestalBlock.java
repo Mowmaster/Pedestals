@@ -302,11 +302,51 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 ItemStack getItemStackInHand = player.getHeldItemMainhand();
                 ItemStack getItemStackInOffHand = player.getHeldItemOffhand();
                 Item getItemInHand = getItemStackInHand.getItem();
+                Item getItemInOffHand = getItemStackInOffHand.getItem();
                 boolean hasCoin = tilePedestal.hasCoin();
                 boolean isCreative = player.isCreative();
 
                 if(getItemStackInHand.isEmpty())
                 {
+                    if(!getItemStackInOffHand.isEmpty())
+                    {
+                        if(getItemInOffHand.equals(Items.REDSTONE_TORCH))
+                        {
+                            if(player.isCrouching())
+                            {
+                                //remove Item
+                                if(tilePedestal.hasTorch())
+                                {
+                                    ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeTorch());
+                                }
+                            }
+                            else
+                            {
+                                if(!tilePedestal.hasTorch())
+                                {
+                                    tilePedestal.addTorch();
+                                    if(!isCreative)getItemStackInOffHand.shrink(1);
+                                    return ActionResultType.SUCCESS;
+                                }
+                            }
+                        }
+                        else if(getItemInHand.equals(Items.GLOWSTONE))
+                        {
+                            if(player.isCrouching())
+                            {
+                                //remove Item
+                            }
+                            else
+                            {
+                                if(!tilePedestal.hasLight())
+                                {
+                                    tilePedestal.addLight();
+                                    if(!isCreative)getItemStackInOffHand.shrink(1);
+                                    return ActionResultType.SUCCESS;
+                                }
+                            }
+                        }
+                    }
                     ItemHandlerHelper.giveItemToPlayer(player,(player.isCrouching())?(tilePedestal.removeCoin()):(tilePedestal.removeItem()));
                 }
                 else
@@ -360,16 +400,6 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                             return ActionResultType.FAIL;
                         }
                     }
-                    else if(getItemInHand.equals(Items.GLOWSTONE))
-                    {
-                        if(!tilePedestal.hasLight())
-                        {
-                            tilePedestal.addLight();
-                            if(!isCreative)getItemStackInHand.shrink(1);
-                            return ActionResultType.SUCCESS;
-                        }
-                        else return insertToPedestal(worldIn,pos,player);
-                    }
                     else if(getItemInHand instanceof ItemPedestalUpgrades)
                     {
                         if(getItemInHand.equals(ItemPedestalUpgrades.SPEED))
@@ -416,8 +446,6 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         }
         return ActionResultType.SUCCESS;
     }
-
-
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {

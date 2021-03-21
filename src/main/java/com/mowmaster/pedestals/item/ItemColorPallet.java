@@ -22,8 +22,6 @@ public class ItemColorPallet extends Item {
         super(builder.group(PEDESTALS_TAB));
     }
 
-    //Will Need Custom Recipe Handler to make this item: SuspiciousStewRecipe
-
     public static void handleItemColors(ColorHandlerEvent.Item event) {
         event.getItemColors().register((itemstack, tintIndex) -> {if (tintIndex == 1){return getColorFromNBT(itemstack);} else {return -1;}},COLORPALLET);
     }

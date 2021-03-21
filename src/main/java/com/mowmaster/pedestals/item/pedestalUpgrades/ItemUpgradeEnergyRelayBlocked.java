@@ -79,7 +79,7 @@ public class ItemUpgradeEnergyRelayBlocked extends ItemUpgradeBaseEnergyFilter
             int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
             if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 //Always send energy, as fast as we can within the Pedestal Energy Network
                 upgradeActionSendEnergy(pedestal);

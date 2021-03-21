@@ -95,7 +95,7 @@ public class ItemUpgradeEnderFilteredImporterEnchanted extends ItemUpgradeBaseFi
 
             int speed = getOperationSpeed(coinInPedestal);
 
-            if(!world.isBlockPowered(pedestalPos))
+            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
                     upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
