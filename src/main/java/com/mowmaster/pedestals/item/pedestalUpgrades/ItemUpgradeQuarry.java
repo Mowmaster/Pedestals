@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
+import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.references.Reference;
@@ -56,7 +57,7 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
-public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
+public class ItemUpgradeQuarry extends ItemUpgradeBase
 {
     public ItemUpgradeQuarry(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
@@ -148,9 +149,54 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
         int rate = 0;
         if(hasEnchant(stack))
         {
-            rate = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack));
+            rate = (intOperationalSpeedModifierOverride(stack) > 10)?(10):(intOperationalSpeedModifierOverride(stack));
         }
         return rate;
+    }
+
+    @Override
+    public int getOperationSpeed(ItemStack stack)
+    {
+        int intOperationalSpeed = 128;
+        switch (intOperationalSpeedModifier(stack))
+        {
+            case 0:
+                intOperationalSpeed = 128;//normal speed
+                break;
+            case 1:
+                intOperationalSpeed=112;//0.25x faster
+                break;
+            case 2:
+                intOperationalSpeed = 96;//0.5x faster
+                break;
+            case 3:
+                intOperationalSpeed = 80;//0.75x faster
+                break;
+            case 4:
+                intOperationalSpeed = 64;//2x faster
+                break;
+            case 5:
+                intOperationalSpeed=32;//4x faster
+                break;
+            case 6:
+                intOperationalSpeed=16;//8x faster
+                break;
+            case 7:
+                intOperationalSpeed=8;//16x faster
+                break;
+            case 8:
+                intOperationalSpeed=4;//32x faster
+                break;
+            case 9:
+                intOperationalSpeed=2;//64x faster
+                break;
+            case 10:
+                intOperationalSpeed=1;//128x faster
+                break;
+            default: intOperationalSpeed=128;
+        }
+
+        return  intOperationalSpeed;
     }
 
     public void updateAction(World world, PedestalTileEntity pedestal)
@@ -160,9 +206,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
             BlockPos pedestalPos = pedestal.getPos();
-
-            int getMaxFuelValue = 2000000000;
-            if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int rangeWidth = getAreaWidth(coinInPedestal);
             int rangeHeight = getRangeHeight(coinInPedestal);
@@ -177,68 +220,62 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
             {
                 if(!pedestal.isPedestalBlockPowered(world,pedestalPos)) {
 
-                    if(hasFuel(coinInPedestal))
+                    if(hasMagnetEnchant(coinInPedestal))
                     {
-                        if(hasMagnetEnchant(coinInPedestal))
+                        //Should disable magneting when its not needed
+                        AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
+                        List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                        if(itemList.size()>0)
                         {
-                            //Should disable magneting when its not needed
-                            AxisAlignedBB getBox = new AxisAlignedBB(negNums,posNums);
-                            List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-                            if(itemList.size()>0)
-                            {
-                                upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
-                            }
+                            upgradeActionMagnet(pedestal, world, itemList, itemInPedestal, pedestalPos);
+                        }
+                    }
+
+                    int val = readStoredIntTwoFromNBT(coinInPedestal);
+                    if(val>0)
+                    {
+                        if (world.getGameTime()%5 == 0) {
+                            BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,0);
+                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
+                        }
+                        writeStoredIntTwoToNBT(coinInPedestal,val-1);
+                    }
+                    else {
+
+                        //If work queue doesnt exist, try to make one
+                        if(workQueueSize(coinInPedestal)<=0)
+                        {
+                            buildWorkQueue(pedestal,rangeWidth,rangeHeight);
                         }
 
-                        int val = readStoredIntTwoFromNBT(coinInPedestal);
-                        if(val>0)
+                        //
+                        if(workQueueSize(coinInPedestal) > 0)
                         {
-                            if (world.getGameTime()%5 == 0) {
-                                BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,0);
-                                PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
-                            }
-                            writeStoredIntTwoToNBT(coinInPedestal,val-1);
-                        }
-                        else {
-
-                            //If work queue doesnt exist, try to make one
-                            if(workQueueSize(coinInPedestal)<=0)
-                            {
-                                buildWorkQueue(pedestal,rangeWidth,rangeHeight);
-                            }
-
-                            //
-                            if(workQueueSize(coinInPedestal) > 0)
-                            {
-                                List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
-                                if(removeFuel(pedestal,200,true))
+                            List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+                            if (world.getGameTime() % speed == 0) {
+                                for(int i = 0;i< workQueue.size(); i++)
                                 {
-                                    if (world.getGameTime() % speed == 0) {
-                                        for(int i = 0;i< workQueue.size(); i++)
-                                        {
-                                            BlockPos targetPos = workQueue.get(i);
-                                            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                            BlockState targetBlock = world.getBlockState(blockToMinePos);
-                                            if(canMineBlock(pedestal,blockToMinePos))
-                                            {
-                                                workQueue.remove(i);
-                                                writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                                upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                                break;
-                                            }
-                                            else
-                                            {
-                                                workQueue.remove(i);
-                                            }
-                                        }
+                                    BlockPos targetPos = workQueue.get(i);
+                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                                    BlockState targetBlock = world.getBlockState(blockToMinePos);
+                                    if(canMineBlock(pedestal,blockToMinePos))
+                                    {
+                                        workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
+                                        upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        workQueue.remove(i);
                                     }
                                 }
+                                writeWorkQueueToNBT(coinInPedestal,workQueue);
                             }
-                            else {
-                                int delay = rangeWidth*rangeWidth*rangeHeight;
-                                writeStoredIntTwoToNBT(coinInPedestal,(delay<100)?(100):(delay));
-                            }
+                        }
+                        else {
+                            int delay = rangeWidth*rangeWidth*rangeHeight;
+                            writeStoredIntTwoToNBT(coinInPedestal,(delay<100)?(100):(delay));
                         }
                     }
                 }
@@ -257,26 +294,22 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
             pick = getToolDefaultEnchanted(coinInPedestal,pick);
         }
 
-        if(removeFuel(pedestal,200,true))
-        {
-            if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
-            ToolType tool = blockToMine.getHarvestTool();
-            int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToMine);
+        if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+        ToolType tool = blockToMine.getHarvestTool();
+        int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToMine);
 
-            if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
-            {
-                //ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,toolLevel >= blockToMine.getHarvestLevel())
-                if (ForgeHooks.canHarvestBlock(blockToMine,fakePlayer,world,blockToMinePos)) {
-                    blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
-                    blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
-                    int expdrop = blockToMine.getBlock().getExpDrop(blockToMine,world,blockToMinePos,
-                            (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
-                            (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
-                    if(expdrop>0)blockToMine.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
-                    removeFuel(pedestal,200,false);
-                    world.removeBlock(blockToMinePos, false);
-                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
-                }
+        if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
+        {
+            //ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,toolLevel >= blockToMine.getHarvestLevel())
+            if (ForgeHooks.canHarvestBlock(blockToMine,fakePlayer,world,blockToMinePos)) {
+                blockToMine.getBlock().harvestBlock(world, fakePlayer, blockToMinePos, blockToMine, null, fakePlayer.getHeldItemMainhand());
+                blockToMine.getBlock().onBlockHarvested(world, blockToMinePos, blockToMine, fakePlayer);
+                int expdrop = blockToMine.getBlock().getExpDrop(blockToMine,world,blockToMinePos,
+                        (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
+                        (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
+                if(expdrop>0)blockToMine.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
+                world.removeBlock(blockToMinePos, false);
+                PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
             }
         }
     }
@@ -284,29 +317,17 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
     @Override
     public boolean passesFilter(World world, BlockPos posPedestal, Block blockIn)
     {
-        boolean returner = false;
+        boolean returner = true;
         if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
         {
-            PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
-            if(!(stackCurrent.size()>0))
+            PedestalTileEntity pedestal = ((PedestalTileEntity)world.getTileEntity(posPedestal));
+            if(pedestal.hasFilter())
             {
-                stackCurrent = buildFilterQueue(pedestal);
-                writeFilterQueueToNBT(coin,stackCurrent);
-            }
-
-            int range = stackCurrent.size();
-
-            ItemStack itemFromInv = ItemStack.EMPTY;
-            itemFromInv = IntStream.range(0,range)//Int Range
-                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                    .filter(itemStack -> Block.getBlockFromItem(itemStack.getItem()).equals(blockIn))
-                    .findFirst().orElse(ItemStack.EMPTY);
-
-            if(!itemFromInv.isEmpty())
-            {
-                returner = true;
+                Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
+                if(filterInPedestal instanceof ItemFilterBase)
+                {
+                    returner = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,new ItemStack(blockIn));
+                }
             }
         }
 
@@ -314,54 +335,56 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
     }
 
     @Override
-    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        List<ItemStack> stackIn = buildFilterQueue(pedestal);
-        if(filterQueueSize(coin)>0)
-        {
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
-            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
-            {
-                writeFilterQueueToNBT(coin,stackIn);
-            }
-        }
-        else
-        {
-            writeFilterQueueToNBT(coin,stackIn);
-        }
-    }
-
-    @Override
     public String getOperationSpeedString(ItemStack stack)
     {
-        TranslationTextComponent normal = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_0");
-        TranslationTextComponent twox = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_1");
-        TranslationTextComponent fourx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_2");
-        TranslationTextComponent sixx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_3");
-        TranslationTextComponent tenx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_4");
-        TranslationTextComponent twentyx = new TranslationTextComponent(Reference.MODID + ".upgrade_tooltips" + ".speed_5");
-        String str = normal.getString();
+        TranslationTextComponent zero = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_0");
+        TranslationTextComponent one = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_1");
+        TranslationTextComponent two = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_2");
+        TranslationTextComponent three = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_3");
+        TranslationTextComponent four = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_4");
+        TranslationTextComponent five = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_5");
+        TranslationTextComponent six = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_6");
+        TranslationTextComponent seven = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_7");
+        TranslationTextComponent eight = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_8");
+        TranslationTextComponent nine = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_9");
+        TranslationTextComponent ten = new TranslationTextComponent(Reference.MODID + ".quarry_tooltips" + ".speed_10");
+        String str = zero.getString();
         switch (intOperationalSpeedModifier(stack))
         {
             case 0:
-                str = normal.getString();//normal speed
+                str = zero.getString();
                 break;
             case 1:
-                str = twox.getString();//2x faster
+                str = one.getString();
                 break;
             case 2:
-                str = fourx.getString();//4x faster
+                str = two.getString();
                 break;
             case 3:
-                str = sixx.getString();//6x faster
+                str = three.getString();
                 break;
             case 4:
-                str = tenx.getString();//10x faster
+                str = four.getString();
                 break;
             case 5:
-                str = twentyx.getString();//20x faster
+                str = five.getString();
                 break;
-            default: str = normal.getString();;
+            case 6:
+                str = six.getString();
+                break;
+            case 7:
+                str = seven.getString();
+                break;
+            case 8:
+                str = eight.getString();
+                break;
+            case 9:
+                str = nine.getString();
+                break;
+            case 10:
+                str = ten.getString();
+                break;
+            default: str = zero.getString();
         }
 
         return  str;
@@ -395,15 +418,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
         btm.appendString("" + ((workQueueSize(stack)>0)?(workQueueSize(stack)):(0)) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
         player.sendMessage(btm,Util.DUMMY_UUID);
-
-        //Display Fuel Left
-        int fuelLeft = getFuelStored(pedestal.getCoinOnPedestal());
-        TranslationTextComponent fuel = new TranslationTextComponent(getTranslationKey() + ".chat_fuel");
-        TranslationTextComponent fuel2 = new TranslationTextComponent(getTranslationKey() + ".chat_fuel2");
-        fuel.appendString("" + fuelLeft/200 + "");
-        fuel.appendString(fuel2.getString());
-        fuel.mergeStyle(TextFormatting.GREEN);
-        player.sendMessage(fuel,Util.DUMMY_UUID);
 
         ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE));
         TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".chat_tool");
@@ -467,11 +481,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBaseMachine
 
         area.mergeStyle(TextFormatting.WHITE);
         tooltip.add(area);
-
-        TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
-        fuelStored.appendString(""+ getFuelStored(stack) +"");
-        fuelStored.mergeStyle(TextFormatting.GREEN);
-        tooltip.add(fuelStored);
 
         speed.mergeStyle(TextFormatting.RED);
         tooltip.add(speed);

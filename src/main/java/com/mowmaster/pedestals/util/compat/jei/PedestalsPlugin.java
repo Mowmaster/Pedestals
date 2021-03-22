@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.util.compat.jei;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.item.*;
+import com.mowmaster.pedestals.item.deprecated.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import com.mowmaster.pedestals.recipes.*;
 import com.mowmaster.pedestals.references.Reference;

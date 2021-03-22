@@ -192,7 +192,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                                 writeFilterQueueToNBT(coinInPedestal,stackCurrent);
                             }
 
-                            upgradeActionFilteredMagnet(world,itemList, itemInPedestal, pedestalPos, stackCurrent, false);
+                            upgradeActionMagnet(pedestal, world,itemList, itemInPedestal, pedestalPos);
                         }
                     }
 

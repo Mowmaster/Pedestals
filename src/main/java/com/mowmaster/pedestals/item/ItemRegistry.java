@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item;
 
 import com.mowmaster.pedestals.blocks.*;
+import com.mowmaster.pedestals.item.deprecated.*;
 import com.mowmaster.pedestals.item.pedestalFilters.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import net.minecraft.item.Item;
@@ -33,6 +34,9 @@ public class ItemRegistry
         ItemFilterTag.onItemRegistryReady(e);
         ItemFilterFood.onItemRegistryReady(e);
         ItemFilterEnchanted.onItemRegistryReady(e);
+        ItemFilterEnchantedFuzzy.onItemRegistryReady(e);
+        ItemFilterEnchantedExact.onItemRegistryReady(e);
+        ItemFilterEnchantedCount.onItemRegistryReady(e);
 
         ItemUpgradeRestriction.onItemRegistryReady(e);
         ItemUpgradeDropper.onItemRegistryReady(e);
@@ -167,5 +171,8 @@ public class ItemRegistry
         ItemFilterTag.handleItemColors(event);
         ItemFilterFood.handleItemColors(event);
         ItemFilterEnchanted.handleItemColors(event);
+        ItemFilterEnchantedFuzzy.handleItemColors(event);
+        ItemFilterEnchantedExact.handleItemColors(event);
+        ItemFilterEnchantedCount.handleItemColors(event);
     }
 }

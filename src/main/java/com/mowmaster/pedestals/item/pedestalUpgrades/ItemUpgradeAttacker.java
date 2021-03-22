@@ -186,7 +186,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                     List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
                     if(itemList.size()>0)
                     {
-                        upgradeActionMagnet(world, itemList, itemInPedestal, pedestalPos);
+                        upgradeActionMagnet(pedestal, world, itemList, itemInPedestal, pedestalPos);
                     }
                 }
 

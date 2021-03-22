@@ -85,13 +85,13 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
             if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
+                    upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, pedestalPos);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
         int height = getHeight(coinInPedestal);
@@ -102,37 +102,10 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
         List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
-        upgradeActionMagnet(world, itemList, itemInPedestal, posOfPedestal);
-        /*if(itemList.size() > 0)
+        if(itemList.size()>0)
         {
-            for(ItemEntity getItemFromList : itemList)
-            {
-                ItemStack copyStack = getItemFromList.getItem().copy();
-                int maxStackSize = copyStack.maxStackSize();
-                if (itemInPedestal.equals(ItemStack.EMPTY))
-                {
-                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                    TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                    if(pedestalInv instanceof PedestalTileEntity) {
-                        if(copyStack.getCount() <=maxStackSize)
-                        {
-                            getItemFromList.setItem(ItemStack.EMPTY);
-                            getItemFromList.remove();
-                            ((PedestalTileEntity) pedestalInv).addItem(copyStack);
-                        }
-                        else
-                        {
-                            //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
-                            int count = getItemFromList.getItem().getCount();
-                            getItemFromList.getItem().setCount(count-maxStackSize);
-                            copyStack.setCount(maxStackSize);
-                            ((PedestalTileEntity) pedestalInv).addItem(copyStack);
-                        }
-                    }
-                    break;
-                }
-            }
-        }*/
+            upgradeActionMagnet(pedestal, world, itemList, itemInPedestal, posOfPedestal);
+        }
     }
 
     @Override
@@ -142,7 +115,7 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
         {
             ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
             ItemStack itemFromPedestal = getStackInPedestal(world,posPedestal);
-            if(itemFromPedestal.isEmpty())
+            if(itemFromPedestal.isEmpty() && canThisPedestalReceiveItemStack(tilePedestal,world,posPedestal,getItemStack))
             {
                 TileEntity pedestalInv = world.getTileEntity(posPedestal);
                 if(pedestalInv instanceof PedestalTileEntity) {
