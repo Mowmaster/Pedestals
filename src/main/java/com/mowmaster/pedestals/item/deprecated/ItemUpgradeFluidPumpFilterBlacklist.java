@@ -1,7 +1,7 @@
-package com.mowmaster.pedestals.item.pedestalUpgrades;
+package com.mowmaster.pedestals.item.deprecated;
 
-import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.crafting.CalculateColor;
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFluid;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -29,7 +29,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

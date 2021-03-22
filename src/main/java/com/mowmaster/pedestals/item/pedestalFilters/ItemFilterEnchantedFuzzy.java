@@ -8,11 +8,14 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Items;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -103,7 +106,25 @@ public class ItemFilterEnchantedFuzzy extends ItemFilterBase
             //Assuming it it hits a block it wont work???
             if(result.getType() == RayTraceResult.Type.BLOCK)
             {
-                return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                if(p_77659_2_.isCrouching())
+                {
+                    ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
+                    if(itemInHand.getItem() instanceof ItemFilterBase)
+                    {
+                        ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
+                        BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);
+                        BlockPos posBlock = res.getPos();
+
+                        List<ItemStack> buildQueue = buildFilterQueue(p_77659_1_,posBlock);
+
+                        if(buildQueue.size() > 0)
+                        {
+                            writeFilterQueueToNBT(itemInHand,buildQueue);
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
+                        return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                }
             }
         }
 

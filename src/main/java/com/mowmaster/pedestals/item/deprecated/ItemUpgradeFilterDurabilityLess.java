@@ -1,6 +1,8 @@
-package com.mowmaster.pedestals.item.pedestalUpgrades;
+package com.mowmaster.pedestals.item.deprecated;
 
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFilter;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
@@ -8,7 +10,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -19,21 +20,18 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
+public class ItemUpgradeFilterDurabilityLess extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterDurability(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilterDurabilityLess(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -163,7 +161,7 @@ public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
         int percentDurabilityCurrent = getPercentDamaged(itemStackIn);
         int percentToBeat = getCapacityTarget(capacity);
 
-        return (itemStackIn.isDamageable())?((percentDurabilityCurrent>=percentToBeat)?(true):(false)):(false);
+        return (itemStackIn.isDamageable())?((percentDurabilityCurrent<=percentToBeat)?(true):(false)):(false);
     }
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
@@ -203,12 +201,12 @@ public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
         tooltip.add(rate);
     }
 
-    public static final Item DURABILITY = new ItemUpgradeFilterDurability(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterdurability"));
+    public static final Item DURABILITYLESS = new ItemUpgradeFilterDurabilityLess(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterdurabilityless"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(DURABILITY);
+        event.getRegistry().register(DURABILITYLESS);
     }
 
 

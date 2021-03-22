@@ -1,6 +1,8 @@
-package com.mowmaster.pedestals.item.pedestalUpgrades;
+package com.mowmaster.pedestals.item.deprecated;
 
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFilter;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
@@ -27,9 +29,9 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeFilterDurabilityLess extends ItemUpgradeBaseFilter
+public class ItemUpgradeFilterDurability extends ItemUpgradeBaseFilter
 {
-    public ItemUpgradeFilterDurabilityLess(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFilterDurability(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
@@ -159,7 +161,7 @@ public class ItemUpgradeFilterDurabilityLess extends ItemUpgradeBaseFilter
         int percentDurabilityCurrent = getPercentDamaged(itemStackIn);
         int percentToBeat = getCapacityTarget(capacity);
 
-        return (itemStackIn.isDamageable())?((percentDurabilityCurrent<=percentToBeat)?(true):(false)):(false);
+        return (itemStackIn.isDamageable())?((percentDurabilityCurrent>=percentToBeat)?(true):(false)):(false);
     }
 
     public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
@@ -199,12 +201,12 @@ public class ItemUpgradeFilterDurabilityLess extends ItemUpgradeBaseFilter
         tooltip.add(rate);
     }
 
-    public static final Item DURABILITYLESS = new ItemUpgradeFilterDurabilityLess(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterdurabilityless"));
+    public static final Item DURABILITY = new ItemUpgradeFilterDurability(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/filterdurability"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(DURABILITYLESS);
+        event.getRegistry().register(DURABILITY);
     }
 
 

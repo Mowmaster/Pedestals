@@ -286,10 +286,23 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         BlockPos blockToPumpPos = new BlockPos(blockToMinePos.getX(), blockToMinePos.getY(), blockToMinePos.getZ());
         BlockState targetFluidState = world.getBlockState(blockToPumpPos);
         Block targetFluidBlock = targetFluidState.getBlock();
+
         if(targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0
                 || targetFluidBlock instanceof IFluidBlock)
         {
-            return true;
+            FluidStack fluidToPickup = FluidStack.EMPTY;
+            if (targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0)
+            {
+                Fluid fluid = ((FlowingFluidBlock) targetFluidBlock).getFluid();
+                fluidToPickup = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
+            }
+            else if (targetFluidBlock instanceof IFluidBlock)
+            {
+                IFluidBlock fluidBlock = (IFluidBlock) targetFluidBlock;
+                fluidToPickup = new FluidStack(fluidBlock.getFluid(), FluidAttributes.BUCKET_VOLUME);
+            }
+
+            return fluidMatchFilter(pedestal,fluidToPickup);
         }
 
         return false;
@@ -304,7 +317,19 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
         if(targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0
                 || targetFluidBlock instanceof IFluidBlock)
         {
-            return true;
+            FluidStack fluidToPickup = FluidStack.EMPTY;
+            if (targetFluidBlock instanceof FlowingFluidBlock && targetFluidState.get(FlowingFluidBlock.LEVEL) == 0)
+            {
+                Fluid fluid = ((FlowingFluidBlock) targetFluidBlock).getFluid();
+                fluidToPickup = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
+            }
+            else if (targetFluidBlock instanceof IFluidBlock)
+            {
+                IFluidBlock fluidBlock = (IFluidBlock) targetFluidBlock;
+                fluidToPickup = new FluidStack(fluidBlock.getFluid(), FluidAttributes.BUCKET_VOLUME);
+            }
+
+            return fluidMatchFilter(pedestal,fluidToPickup);
         }
 
         return false;

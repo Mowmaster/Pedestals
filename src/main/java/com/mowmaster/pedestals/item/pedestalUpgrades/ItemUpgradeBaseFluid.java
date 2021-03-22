@@ -2,12 +2,14 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.item.ItemUpgradeTool;
+import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
@@ -112,6 +114,23 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
         return false;
     }
 
+    public boolean fluidMatchFilter(PedestalTileEntity pedestalReceiving, FluidStack incomingFluidStack)
+    {
+        if(pedestalReceiving.hasFilter())
+        {
+            ItemStack filter = pedestalReceiving.getFilterInPedestal();
+            //Bucket Item with incoming fluid in it.
+            Item item = incomingFluidStack.getFluid().getFilledBucket();
+            ItemStack incomingBucket = new ItemStack(item);
+
+            if(filter.getItem() instanceof ItemFilterBase)
+            {
+                return ((ItemFilterBase)filter.getItem()).canAcceptItem(pedestalReceiving,incomingBucket);
+            }
+        }
+        return true;
+    }
+
     public static LazyOptional<IFluidHandler> findFluidHandlerAtPos(World world, BlockPos pos, Direction side, boolean allowCart)
     {
         TileEntity neighbourTile = world.getTileEntity(pos);
@@ -189,51 +208,54 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                     //Make Sure Fluids Match or destination is empty
                                     if(storedCoinFluid.isFluidEqual(mainPedestalFluid) || storedCoinFluid.isEmpty() && storedCoinItem.canRecieveFluid(world, posStoredPedestal, mainPedestalFluid))
                                     {
-                                        int storedCoinFluidSpace = storedCoinItem.availableFluidSpaceInCoin(storedPedestalCoin);
-                                        int storedCoinFluidAmount = storedCoinFluid.getAmount();
-
-                                        if(storedCoinFluidSpace > 0)
+                                        if(fluidMatchFilter(storedPedestalTile,mainPedestalFluid))
                                         {
-                                            int getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
-                                            int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
-                                            FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate,mainPedestalFluid.getTag());
-                                            if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,transferRate,true))
+                                            int storedCoinFluidSpace = storedCoinItem.availableFluidSpaceInCoin(storedPedestalCoin);
+                                            int storedCoinFluidAmount = storedCoinFluid.getAmount();
+
+                                            if(storedCoinFluidSpace > 0)
                                             {
-                                                removeFluid(pedestal, mainPedestalCoin,transferRate,false);
-                                                mainPedestalTile.update();
-                                                addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
-                                                storedPedestalTile.update();
-                                                if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
-                                            }
-                                            else
-                                            {
-                                                mainPedestalFluid = getFluidStored(mainPedestalCoin);
-                                                mainPedestalFluidAmount = mainPedestalFluid.getAmount();
-                                                storedCoinFluid = storedCoinItem.getFluidStored(storedPedestalCoin);
-                                                storedCoinFluidSpace = storedCoinItem.availableFluidSpaceInCoin(storedPedestalCoin);
-                                                storedCoinFluidAmount = storedCoinFluid.getAmount();
-                                                getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
-                                                transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
-                                                //IF transfer rate is greater then main pedestal (then empty main pedestal)
-                                                int storedFluidRemaining = storedCoinFluidAmount + transferRate;
-                                                int fluidLeftToSend = (mainPedestalFluidAmount<=transferRate)?(mainPedestalFluidAmount):(transferRate);
-                                                fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend,mainPedestalFluid.getTag());
-                                                if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,true))
+                                                int getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
+                                                int transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
+                                                FluidStack fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),transferRate,mainPedestalFluid.getTag());
+                                                if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,transferRate,true))
                                                 {
-                                                    removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,false);
+                                                    removeFluid(pedestal, mainPedestalCoin,transferRate,false);
                                                     mainPedestalTile.update();
                                                     addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                     storedPedestalTile.update();
                                                     if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                                 }
-                                            }
-                                            //}
+                                                else
+                                                {
+                                                    mainPedestalFluid = getFluidStored(mainPedestalCoin);
+                                                    mainPedestalFluidAmount = mainPedestalFluid.getAmount();
+                                                    storedCoinFluid = storedCoinItem.getFluidStored(storedPedestalCoin);
+                                                    storedCoinFluidSpace = storedCoinItem.availableFluidSpaceInCoin(storedPedestalCoin);
+                                                    storedCoinFluidAmount = storedCoinFluid.getAmount();
+                                                    getMainTransferRate = getFluidTransferRate(mainPedestalCoin);
+                                                    transferRate = (getMainTransferRate <= storedCoinFluidSpace)?(getMainTransferRate):(storedCoinFluidSpace);
+                                                    //IF transfer rate is greater then main pedestal (then empty main pedestal)
+                                                    int storedFluidRemaining = storedCoinFluidAmount + transferRate;
+                                                    int fluidLeftToSend = (mainPedestalFluidAmount<=transferRate)?(mainPedestalFluidAmount):(transferRate);
+                                                    fluidToStore = new FluidStack(mainPedestalFluid.getFluid(),fluidLeftToSend,mainPedestalFluid.getTag());
+                                                    if(addFluid(pedestal, storedPedestalCoin,fluidToStore,true) && removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,true))
+                                                    {
+                                                        removeFluid(pedestal, mainPedestalCoin,fluidLeftToSend,false);
+                                                        mainPedestalTile.update();
+                                                        addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
+                                                        storedPedestalTile.update();
+                                                        if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
+                                                    }
+                                                }
+                                                //}
 
-                                            continue;
+                                                continue;
+                                            }
                                         }
                                     }
                                 }
-                                else if(storedPedestalCoin.getItem() instanceof ItemUpgradeBaseFluidFilter)
+                                /*else if(storedPedestalCoin.getItem() instanceof ItemUpgradeBaseFluidFilter)
                                 {
                                     ItemUpgradeBaseFluidFilter storedCoinItem = ((ItemUpgradeBaseFluidFilter)storedPedestalCoin.getItem());
                                     FluidStack storedCoinFluid = storedCoinItem.getFluidStored(storedPedestalCoin);
@@ -284,7 +306,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                             continue;
                                         }
                                     }
-                                }
+                                }*/
                             }
                         }
                     }

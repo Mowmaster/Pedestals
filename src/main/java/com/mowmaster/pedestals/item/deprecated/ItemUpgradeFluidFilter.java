@@ -1,5 +1,6 @@
-package com.mowmaster.pedestals.item.pedestalUpgrades;
+package com.mowmaster.pedestals.item.deprecated;
 
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBaseFluid;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +23,6 @@ import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -31,18 +31,13 @@ import java.util.stream.IntStream;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
+public class ItemUpgradeFluidFilter extends ItemUpgradeBaseFluid
 {
-    public ItemUpgradeFluidFilterBlacklist(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemUpgradeFluidFilter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
     public Boolean canAcceptCapacity() {
         return true;
-    }
-
-    @Override
-    public Boolean canAcceptOpSpeed() {
-        return false;
     }
 
     @Override
@@ -94,7 +89,7 @@ public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
     @Override
     public boolean canRecieveFluid(World world, BlockPos posPedestal, FluidStack fluidIncoming)
     {
-        boolean returner = true;
+        boolean returner = false;
         if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
@@ -116,7 +111,7 @@ public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
 
             if(!itemFromInv.isEmpty())
             {
-                returner = false;
+                returner = true;
             }
         }
 
@@ -141,6 +136,11 @@ public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
                 }
             }
         }
+    }
+
+    public void upgradeAction(World world, BlockPos pedestalPos, BlockPos targetPos, ItemStack coinInPedestal)
+    {
+
     }
 
     @Override
@@ -226,12 +226,12 @@ public class ItemUpgradeFluidFilterBlacklist extends ItemUpgradeBaseFluid
         tooltip.add(rate);
     }
 
-    public static final Item FLUIDFILTERBLACKLIST = new ItemUpgradeFluidFilterBlacklist(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fluidfilterblacklist"));
+    public static final Item FLUIDFILTER = new ItemUpgradeFluidFilter(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/fluidfilter"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(FLUIDFILTERBLACKLIST);
+        event.getRegistry().register(FLUIDFILTER);
     }
 
 

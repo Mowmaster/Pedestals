@@ -37,6 +37,7 @@ public class ItemRegistry
         ItemFilterEnchantedFuzzy.onItemRegistryReady(e);
         ItemFilterEnchantedExact.onItemRegistryReady(e);
         ItemFilterEnchantedCount.onItemRegistryReady(e);
+        ItemFilterDurability.onItemRegistryReady(e);
 
         ItemUpgradeRestriction.onItemRegistryReady(e);
         ItemUpgradeDropper.onItemRegistryReady(e);
@@ -174,5 +175,6 @@ public class ItemRegistry
         ItemFilterEnchantedFuzzy.handleItemColors(event);
         ItemFilterEnchantedExact.handleItemColors(event);
         ItemFilterEnchantedCount.handleItemColors(event);
+        ItemFilterDurability.handleItemColors(event);
     }
 }
