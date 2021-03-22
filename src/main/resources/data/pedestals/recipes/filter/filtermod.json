@@ -5,10 +5,10 @@
       "item": "pedestals:filter/filterbase"
     },
     {
-      "tag": "minecraft:wool"
+      "tag": "forge:glass"
     }
   ],
   "result": {
-    "item": "pedestals:filter/filteritem"
+    "item": "pedestals:filter/filtermod"
   }
 }

@@ -5,10 +5,10 @@
       "item": "pedestals:filter/filterbase"
     },
     {
-      "tag": "minecraft:wool"
+      "item": "pedestals:tagtool"
     }
   ],
   "result": {
-    "item": "pedestals:filter/filteritem"
+    "item": "pedestals:filter/filtertag"
   }
 }

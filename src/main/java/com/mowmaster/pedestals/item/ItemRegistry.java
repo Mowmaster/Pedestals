@@ -17,7 +17,6 @@ public class ItemRegistry
 
         ItemLinkingTool.onItemRegistryReady(e);
         ItemLinkingToolBackwards.onItemRegistryReady(e);
-        ItemDevTool.onItemRegistryReady(e);
         ItemTagTool.onItemRegistryReady(e);
         ItemUpgradeTool.onItemRegistryReady(e);
         ItemToolSwapper.onItemRegistryReady(e);
@@ -26,8 +25,8 @@ public class ItemRegistry
         ItemColorPallet.onItemRegistryReady(e);
         ItemEnchantableBook.onItemRegistryReady(e);
         ItemPedestalUpgrades.onItemRegistryReady(e);
-        ItemUpgradeDefault.onItemRegistryReady(e);
 
+        ItemFilterBase.onItemRegistryReady(e);
         ItemFilterItem.onItemRegistryReady(e);
         ItemFilterItemStack.onItemRegistryReady(e);
         ItemFilterMod.onItemRegistryReady(e);
@@ -39,7 +38,9 @@ public class ItemRegistry
         ItemFilterEnchantedCount.onItemRegistryReady(e);
         ItemFilterDurability.onItemRegistryReady(e);
 
+        ItemUpgradeDefault.onItemRegistryReady(e);
         ItemUpgradeRestriction.onItemRegistryReady(e);
+
         ItemUpgradeDropper.onItemRegistryReady(e);
         ItemUpgradePlacer.onItemRegistryReady(e);
         ItemUpgradeBreaker.onItemRegistryReady(e);
@@ -48,19 +49,12 @@ public class ItemRegistry
 
         ItemUpgradeEffectGrower.onItemRegistryReady(e);
         ItemUpgradeEffectHarvester.onItemRegistryReady(e);
-        ItemUpgradeHarvesterBeeHives.onItemRegistryReady(e);
         ItemUpgradeEffectPlanter.onItemRegistryReady(e);
+        ItemUpgradeHarvesterBeeHives.onItemRegistryReady(e);
         ItemUpgradeEffectMagnet.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetItem.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetItemBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetItemStack.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetItemStackBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetMod.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetModBlacklist.onItemRegistryReady(e);
 
         ItemUpgradeExpCollector.onItemRegistryReady(e);
         ItemUpgradeExpRelay.onItemRegistryReady(e);
-        ItemUpgradeExpRelayBlocked.onItemRegistryReady(e);
         ItemUpgradeExpTank.onItemRegistryReady(e);
         ItemUpgradeExpBottler.onItemRegistryReady(e);
         ItemUpgradeExpDropper.onItemRegistryReady(e);
@@ -74,35 +68,22 @@ public class ItemRegistry
         ItemUpgradeEnergyImport.onItemRegistryReady(e);
         ItemUpgradeEnergyExport.onItemRegistryReady(e);
         ItemUpgradeEnergyRelay.onItemRegistryReady(e);
-        ItemUpgradeEnergyRelayBlocked.onItemRegistryReady(e);
         ItemUpgradeEnergyTank.onItemRegistryReady(e);
         ItemUpgradeEnergyCrusher.onItemRegistryReady(e);
         ItemUpgradeEnergyFurnace.onItemRegistryReady(e);
         ItemUpgradeEnergySawMill.onItemRegistryReady(e);
-        ItemUpgradeEnergyQuarry.onItemRegistryReady(e);
-        ItemUpgradeEnergyQuarryBlacklist.onItemRegistryReady(e);
 
         ItemUpgradeFluidImport.onItemRegistryReady(e);
+        ItemUpgradeFluidFilteredImport.onItemRegistryReady(e);
         ItemUpgradeFluidExport.onItemRegistryReady(e);
         ItemUpgradeFluidPump.onItemRegistryReady(e);
         ItemUpgradeFluidDrain.onItemRegistryReady(e);
         ItemUpgradeFluidTank.onItemRegistryReady(e);
         ItemUpgradeFluidRelay.onItemRegistryReady(e);
-        ItemUpgradeFluidRelayBlocked.onItemRegistryReady(e);
-        ItemUpgradeFluidFilter.onItemRegistryReady(e);
-        ItemUpgradeFluidFilterBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFluidFilteredImport.onItemRegistryReady(e);
-        ItemUpgradeFluidPumpFilter.onItemRegistryReady(e);
-        ItemUpgradeFluidPumpFilterBlacklist.onItemRegistryReady(e);
         ItemUpgradeFluidCrafter.onItemRegistryReady(e);
         ItemUpgradeMilker.onItemRegistryReady(e);
         ItemUpgradeExpFluidConverter.onItemRegistryReady(e);
 
-        ItemUpgradeEnderFilteredImporterFood.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterEnchanted.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterMod.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterFuzzy.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterExact.onItemRegistryReady(e);
         ItemUpgradeEnderFilteredExporter.onItemRegistryReady(e);
         ItemUpgradeEnderImporter.onItemRegistryReady(e);
         ItemUpgradeEnderExporter.onItemRegistryReady(e);
@@ -111,15 +92,33 @@ public class ItemRegistry
         ItemUpgradeImport.onItemRegistryReady(e);
         ItemUpgradeFilteredImport.onItemRegistryReady(e);
         ItemUpgradeExport.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportItem.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportItemStack.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportMod.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportFood.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportEnchanted.onItemRegistryReady(e);
         ItemUpgradeRestock.onItemRegistryReady(e);
         ItemUpgradeFilteredRestock.onItemRegistryReady(e);
         ItemUpgradeItemTank.onItemRegistryReady(e);
 
+        ItemUpgradeFurnace.onItemRegistryReady(e);
+        ItemUpgradeCrusher.onItemRegistryReady(e);
+        ItemUpgradeSawMill.onItemRegistryReady(e);
+        ItemUpgradeQuarry.onItemRegistryReady(e);
+        ItemUpgradeCompactingCrafter.onItemRegistryReady(e);
+        ItemUpgradeCrafter.onItemRegistryReady(e);
+        ItemCraftingPlaceholder.onItemRegistryReady(e);
+
+        ItemUpgradeVoid.onItemRegistryReady(e);
+        ItemUpgradeEnergyVoid.onItemRegistryReady(e);
+        ItemUpgradeFluidVoid.onItemRegistryReady(e);
+        ItemUpgradeRecycler.onItemRegistryReady(e);
+        ItemUpgradeTeleporter.onItemRegistryReady(e);
+        ItemUpgradeCobbleGen.onItemRegistryReady(e);
+        ItemUpgradeAttacker.onItemRegistryReady(e);
+        ItemUpgradeFan.onItemRegistryReady(e);
+        ItemUpgradeEffect.onItemRegistryReady(e);
+        ItemUpgradeShearer.onItemRegistryReady(e);
+
+        ItemDust.onItemRegistryReady(e);
+
+//Deprecated in 0.8s - Removed in 0.8t
+        ItemUpgradeQuarryBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterItem.onItemRegistryReady(e);
         ItemUpgradeFilterItemBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterItemStack.onItemRegistryReady(e);
@@ -139,33 +138,38 @@ public class ItemRegistry
         ItemUpgradeFilterEnchantedExact.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedExactBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterEnchantedCount.onItemRegistryReady(e);
-
-        ItemUpgradeTeleporter.onItemRegistryReady(e);
-        ItemUpgradeFurnace.onItemRegistryReady(e);
-        ItemUpgradeCrusher.onItemRegistryReady(e);
-        ItemUpgradeSawMill.onItemRegistryReady(e);
-        ItemUpgradeQuarry.onItemRegistryReady(e);
-        ItemUpgradeQuarryBlacklist.onItemRegistryReady(e);
-        ItemUpgradeCompactingCrafter.onItemRegistryReady(e);
-        ItemUpgradeCrafter.onItemRegistryReady(e);
-        ItemUpgradeRecycler.onItemRegistryReady(e);
-        ItemCraftingPlaceholder.onItemRegistryReady(e);
-        ItemUpgradeCobbleGen.onItemRegistryReady(e);
-        ItemUpgradeVoid.onItemRegistryReady(e);
-        ItemUpgradeEnergyVoid.onItemRegistryReady(e);
-        ItemUpgradeFluidVoid.onItemRegistryReady(e);
-        ItemUpgradeAttacker.onItemRegistryReady(e);
-        ItemUpgradeEffect.onItemRegistryReady(e);
-        ItemUpgradeFan.onItemRegistryReady(e);
-        ItemUpgradeShearer.onItemRegistryReady(e);
-
-        ItemDust.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportItem.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportItemStack.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportMod.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportFood.onItemRegistryReady(e);
+        ItemUpgradeFilteredExportEnchanted.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterFood.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterEnchanted.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterMod.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterFuzzy.onItemRegistryReady(e);
+        ItemUpgradeEnderFilteredImporterExact.onItemRegistryReady(e);
+        ItemUpgradeFluidFilter.onItemRegistryReady(e);
+        ItemUpgradeFluidFilterBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFluidPumpFilter.onItemRegistryReady(e);
+        ItemUpgradeFluidPumpFilterBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFluidRelayBlocked.onItemRegistryReady(e);
+        ItemUpgradeEnergyQuarry.onItemRegistryReady(e);
+        ItemUpgradeEnergyQuarryBlacklist.onItemRegistryReady(e);
+        ItemUpgradeEnergyRelayBlocked.onItemRegistryReady(e);
+        ItemUpgradeExpRelayBlocked.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetItem.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetItemBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetItemStack.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetItemStackBlacklist.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetMod.onItemRegistryReady(e);
+        ItemUpgradeFilteredMagnetModBlacklist.onItemRegistryReady(e);
     }
 
     public static void onItemColorsReady(ColorHandlerEvent.Item event)
     {
         PedestalBlock.handleItemColors(event);
         ItemColorPallet.handleItemColors(event);
+        ItemFilterBase.handleItemColors(event);
         ItemFilterItem.handleItemColors(event);
         ItemFilterItemStack.handleItemColors(event);
         ItemFilterMod.handleItemColors(event);

@@ -5,10 +5,13 @@
       "item": "pedestals:filter/filterbase"
     },
     {
+      "item": "minecraft:book"
+    },
+    {
       "tag": "minecraft:wool"
     }
   ],
   "result": {
-    "item": "pedestals:filter/filteritem"
+    "item": "pedestals:filter/filterenchantedfuzzy"
   }
 }

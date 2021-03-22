@@ -25,6 +25,7 @@
   "pedestals.filters.insert_switch": "Filter Settings Copied Successfully",
   "pedestals.filters.insert_insert": "Filter Insert Successfully",
 
+  "item.pedestals.filter.filterbase": "Filter",
   "item.pedestals.filter.filteritem": "Filter (Item)",
   "item.pedestals.filter.filteritemstack": "Filter (ItemStack)",
   "item.pedestals.filter.filtermod": "Filter (Mod)",
@@ -643,7 +644,7 @@
   "jei.pedestals.fluidimport.desc": "Imports Fluids from items in the pedestal, or tanks below the pedestal, into the Pedestal Fluid Network. This can transfer fluid into the Pedestal Fluid Network. To Clear Fluid From Upgrade, Hold the Upgrade Tool in your off hand, then shift+right click the coin in your main hand on any block.",
 
   "item.pedestals.coin.fluidfilteredimport": "Pedestal Upgrade",
-  "item.pedestals.coin.fluidfilteredimport.tooltip_name": "Fluid Filtered Import Upgrade",
+  "item.pedestals.coin.fluidfilteredimport.tooltip_name": "Fluid Smart Import Upgrade",
   "item.pedestals.coin.fluidfilteredimport.tooltip_fluidcapacity": "Fluid Buffer Size: ",
   "item.pedestals.coin.fluidfilteredimport.tooltip_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidfilteredimport.tooltip_speed": "Operational Speed: ",

@@ -27,6 +27,8 @@ import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.common.extensions.IForgeEntityMinecart;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
+import static com.mowmaster.pedestals.references.Reference.MODID;
 
 
 /*
@@ -445,10 +448,17 @@ public class ItemFilterBase extends Item
                 }
             }
         }
+    }
 
-        /*TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tooltip_speed");
-        speed.appendString();
-        speed.mergeStyle(TextFormatting.RED);
-        tooltip.add(speed);*/
+    public static void handleItemColors(ColorHandlerEvent.Item event) {
+        event.getItemColors().register((itemstack, tintIndex) -> {if (tintIndex == 1){return getColorFromNBT(itemstack);} else {return -1;}},BASEFILTER);
+    }
+
+    public static final Item BASEFILTER = new ItemFilterItem(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "filter/filterbase"));
+
+    @SubscribeEvent
+    public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
+    {
+        event.getRegistry().register(BASEFILTER);
     }
 }
