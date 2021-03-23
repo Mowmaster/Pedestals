@@ -302,8 +302,8 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                                 }
                                                 else if (stackInRecipe.getItem().hasContainerItem(stackInRecipe)) {
                                                     //Will Now Hold All Container items if set with advanced enchant
+                                                    ItemStack container = stackInRecipe.getItem().getContainerItem(stackInRecipe);
                                                     if (!hasAdvancedInventoryTargeting(coin)) {
-                                                        ItemStack container = stackInRecipe.getItem().getContainerItem(stackInRecipe);
                                                         if (!world.isRemote) {
                                                             world.addEntity(new ItemEntity(world, getPosOfBlockBelow(world, pedestalPos, -1).getX() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getY() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getZ() + 0.5, container));
                                                         }
@@ -315,6 +315,18 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                                     }
                                                     else
                                                     {
+                                                        if(!(container.getItem().equals(stackInRecipe.getItem())))
+                                                        {
+                                                            if (!world.isRemote) {
+                                                                world.addEntity(new ItemEntity(world, getPosOfBlockBelow(world, pedestalPos, -1).getX() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getY() + 0.5, getPosOfBlockBelow(world, pedestalPos, -1).getZ() + 0.5, container));
+                                                            }
+
+                                                            ItemStack queueStack = stackCurrent.get(s);
+                                                            queueStack.shrink(intBatchCraftingSize);
+                                                            stackCurrent.set(s,queueStack);
+                                                            handler.extractItem(s, intBatchCraftingSize, false);
+                                                        }
+
                                                         ItemStack queueStack = stackCurrent.get(s);
                                                         if(queueStack.isDamageable())
                                                         {
