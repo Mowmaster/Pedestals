@@ -152,7 +152,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                                     {
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                        upgradeAction(world, itemInPedestal, pedestalPos, targetPos, targetBlock);
+                                        upgradeAction(pedestal, world, itemInPedestal, pedestalPos, targetPos, targetBlock);
                                         break;
                                     }
                                     else
@@ -173,7 +173,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         }
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
     {
         ServerWorld sworld = world.getServer().func_241755_D_();
         ItemStack bonemeal = new ItemStack(Items.BONE_MEAL);
@@ -190,12 +190,12 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                         if(pedestalInv instanceof PedestalTileEntity) {
                             ((PedestalTileEntity) pedestalInv).removeItem(1);
-                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),0,255,0));
+                            if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),0,255,0));
                         }
                     }
                     else
                     {
-                        PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,255,255));
+                        if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,255,255));
                         target.randomTick((ServerWorld) world, posTarget, rand);
                         world.notifyBlockUpdate(posTarget, target, target, 2);
                     }
@@ -203,7 +203,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             }
             else
             {
-                PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,255,255));
+                if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,255,255));
                 target.randomTick((ServerWorld) world, posTarget, rand);
                 world.notifyBlockUpdate(posTarget, target, target, 2);
             }

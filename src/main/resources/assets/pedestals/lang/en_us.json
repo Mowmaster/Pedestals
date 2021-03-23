@@ -36,8 +36,7 @@
   "item.pedestals.filter.filterenchantedexact": "Filter (Enchanted Exact)",
   "item.pedestals.filter.filterenchantedcount": "Filter (Enchanted Count)",
   "item.pedestals.filter.filterdurability": "Filter (Durability)",
-
-
+  "item.pedestals.filter.filterrestriction": "Filter (Restricted)",
 
     "pedestals.pedestal_block.add_tool": "Tool Added Successfully",
 
@@ -117,6 +116,10 @@
         "jei.pedestals.upgraderange.desc": "Use on a Pedestal to Increase the Range it can send items to.",
   "item.pedestals.upgraderoundrobin": "Pedestal Round Robin Transfer Upgrade",
   "jei.pedestals.upgraderoundrobin.desc": "Use on a Pedestal to Switch it to 'Round Robin' Transfer Mode.",
+  "item.pedestals.upgradesoundmuffler": "Pedestal Sound Muffler Upgrade",
+  "jei.pedestals.upgradesoundmuffler.desc": "Use on a Pedestal to Disable any sounds it makes.",
+  "item.pedestals.upgradeparticlediffuser": "Pedestal Particle Diffuser Upgrade",
+  "jei.pedestals.upgradeparticlediffuser.desc": "Use on a Pedestal to disable any particles it makes.",
 
 
 
@@ -210,12 +213,6 @@
 
     "death.attack.pedestal11": "%1$s has kicked the bucket",
     "death.attack.pedestal12": "%1$s, We told you not to play around with sharp things!",
-
-  "item.pedestals.coin.restriction": "Pedestal Upgrade",
-  "item.pedestals.coin.restriction.tooltip_name": "Restriction Upgrade",
-  "item.pedestals.coin.restriction.tooltip_rate": "Flow Rate: ",
-  "item.pedestals.coin.restriction.chat_rate": "Flow Rate: ",
-  "jei.pedestals.restriction.desc": "This upgrade will restrict how many items can be sent to it at once, and if full, wont allow any more items to be sent.",
 
   "item.pedestals.coin.recycler": "Pedestal Upgrade",
   "item.pedestals.coin.recycler.tooltip_name": "Recycler Upgrade",
@@ -1690,6 +1687,12 @@
   "item.pedestals.coin.fluidpumpfilterblacklist.chat_rate": "Fluid Transfer Rate: ",
   "item.pedestals.coin.fluidpumpfilterblacklist.chat_speed": "Operational Speed: ",
   "jei.pedestals.fluidpumpfilterblacklist.desc": "Pumps Fluids from its Work Area into an internal tank. Checks an Inventory Below for buckets of fluid, will only allow non matching fluids to be transferred or pumped into this pedestal. Blocks in the pedestal will be used to fill the spaces where fluid is pumped from. This can transfer fluids into the Pedestal Fluid Network. To Clear Fluid From Upgrade, Hold the Upgrade Tool in your off hand, then shift+right click the coin in your main hand on any block.",
+
+  "item.pedestals.coin.restriction": "Deprecated Upgrade",
+  "item.pedestals.coin.restriction.tooltip_name": "Restriction Upgrade",
+  "item.pedestals.coin.restriction.tooltip_rate": "Flow Rate: ",
+  "item.pedestals.coin.restriction.chat_rate": "Flow Rate: ",
+  "jei.pedestals.restriction.desc": "This upgrade will restrict how many items can be sent to it at once, and if full, wont allow any more items to be sent.",
 
 
 

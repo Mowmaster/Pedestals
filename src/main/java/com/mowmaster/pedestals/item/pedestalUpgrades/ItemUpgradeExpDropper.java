@@ -125,6 +125,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
 
         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
         if(pedestalInv instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = ((PedestalTileEntity) pedestalInv);
             int currentlyStoredExp = getXPStored(coinInPedestal);
             if(currentlyStoredExp > 0)
             {
@@ -137,7 +138,7 @@ public class ItemUpgradeExpDropper extends ItemUpgradeBaseExp
                 expEntity.setMotion(0D,0D,0D);
 
                 int getExpLeftInPedestal = currentlyStoredExp - rate;
-                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                 setXPStored(coinInPedestal,getExpLeftInPedestal);
                 world.addEntity(expEntity);
             }

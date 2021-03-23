@@ -58,8 +58,8 @@ public class ItemEnchantableBook extends Item {
         event.getRegistry().register(RANGE);
         event.getRegistry().register(AREA);
         event.getRegistry().register(CAPACITY);
-        event.getRegistry().register(ADVANCED);
         event.getRegistry().register(MAGNET);
+        event.getRegistry().register(ADVANCED);
     }
 
 

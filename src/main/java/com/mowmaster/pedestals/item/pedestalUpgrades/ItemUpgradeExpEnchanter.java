@@ -121,7 +121,8 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                             int slotCount = itemFromInv.getCount();
                             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                             if(pedestalInv instanceof PedestalTileEntity) {
-                                if(!((PedestalTileEntity) pedestalInv).hasItem())
+                                PedestalTileEntity pedestal = ((PedestalTileEntity) pedestalInv);
+                                if(!pedestal.hasItem())
                                 {
                                     if(itemFromInv.isEnchantable() || itemFromInv.getItem().equals(Items.BOOK))
                                     {
@@ -149,8 +150,8 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                                 int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
                                                 setXPStored(coinInPedestal,getExpLeftInPedestal);
                                                 handler.extractItem(i,stackToReturn.getCount() ,false );
-                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
-                                                ((PedestalTileEntity) pedestalInv).addItem(stackToReturn);
+                                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
+                                                pedestal.addItem(stackToReturn);
                                             }
                                         }
                                     }
@@ -158,7 +159,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                     {
                                         ItemStack toReturn = itemFromInv.copy();
                                         handler.extractItem(i,toReturn.getCount() ,false );
-                                        ((PedestalTileEntity) pedestalInv).addItem(toReturn);
+                                        pedestal.addItem(toReturn);
                                     }
                                 }
                             }
@@ -316,7 +317,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                     break;
                                 }
 
-                                world.addParticle(ParticleTypes.ENCHANT, (double)pos.getX() + 0.5D, (double)pos.getY() + 2.0D, (double)pos.getZ() + 0.5D, (double)((float)i + rand.nextFloat()) - 0.5D, (double)((float)k - rand.nextFloat() - 1.0F), (double)((float)j + rand.nextFloat()) - 0.5D);
+                                if(!pedestal.hasParticleDiffuser())world.addParticle(ParticleTypes.ENCHANT, (double)pos.getX() + 0.5D, (double)pos.getY() + 2.0D, (double)pos.getZ() + 0.5D, (double)((float)i + rand.nextFloat()) - 0.5D, (double)((float)k - rand.nextFloat() - 1.0F), (double)((float)j + rand.nextFloat()) - 0.5D);
                             }
                         }
                     }
@@ -325,14 +326,14 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 
             if(getXPStored(pedestal.getCoinOnPedestal())>0)
             {
-                spawnParticleAroundPedestalBase(world,tick,pos,0.1f,0.9f,0.1f,1.f);
+                if(!pedestal.hasParticleDiffuser())spawnParticleAroundPedestalBase(world,tick,pos,0.1f,0.9f,0.1f,1.f);
             }
 
             //To show when the enchanting table has enough XP to enchant an item at the current level
             if(currentlyStoredExp >= expNeeded && currentLevelFromStoredXp >= actualEnchantingLevel)
             {
                 BlockPos directionalPos = getPosOfBlockBelow(world,pos,0);
-                spawnParticleAbovePedestal(world,directionalPos,0.94f,0.8f,0.95f,1.0f);
+                if(!pedestal.hasParticleDiffuser())spawnParticleAbovePedestal(world,directionalPos,0.94f,0.8f,0.95f,1.0f);
             }
         }
     }

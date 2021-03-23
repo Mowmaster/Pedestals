@@ -537,16 +537,16 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 10 slots to future proof things
-        return new ItemStackHandler(9) {
+        return new ItemStackHandler(11) {
 
             @Override
             protected void onLoad() {
-                if(getSlots()<9)
+                if(getSlots()<11)
                 {
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    setSize(9);
+                    setSize(11);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
                     }
@@ -579,12 +579,12 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || stack.getToolTypes().contains(ToolType.AXE)
                                 || stack.getToolTypes().contains(ToolType.SHOVEL)
                                 || GET_TOOLS.contains(stack.getItem())
-                        ) && !GET_NOTTOOLS.contains(stack.getItem())
-                        ) return true;
+                        ) && !GET_NOTTOOLS.contains(stack.getItem()) && !hasTool()) return true;
                 if (slot == 6 && stack.getItem() instanceof ItemFilterBase && !hasFilter()) return true;
                 if (slot == 7 && stack.getItem().equals(Items.REDSTONE_TORCH) && !hasTorch()) return true;
-                //Need to add the rest of the methods to implement this properly
-                if (slot == 8 && stack.getItem().equals(ItemPedestalUpgrades.ROUNDROBIN)) return true;
+                if (slot == 8 && stack.getItem().equals(ItemPedestalUpgrades.ROUNDROBIN) && !hasRRobin()) return true;
+                if (slot == 9 && stack.getItem().equals(ItemPedestalUpgrades.SOUNDMUFFLER)) return true;
+                if (slot == 10 && stack.getItem().equals(ItemPedestalUpgrades.PARTICLEDIFFUSER)) return true;
                 return false;
             }
         };
@@ -1572,7 +1572,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         IItemHandler ph = privateHandler.orElse(null);
         ItemStack itemFromBlock = roundRobin.copy();
         itemFromBlock.setCount(1);
-        if(getSpeed() < 1)
+        if(!hasRRobin())
         {
             ph.insertItem(8,itemFromBlock,false);
             //update();
@@ -1594,6 +1594,82 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     /*============================================================================
     ==============================================================================
     ===========================      Robin END      ==============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================    MUFFLER START    ==============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean addMuffler(ItemStack muffler)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        ItemStack itemFromBlock = muffler.copy();
+        itemFromBlock.setCount(1);
+        if(!hasMuffler())
+        {
+            ph.insertItem(9,itemFromBlock,false);
+            //update();
+            return true;
+        }
+        else return false;
+    }
+
+    public boolean hasMuffler()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(9).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     MUFFLER END     ==============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================   PARTICLE START    ==============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean addParticleDiffuser(ItemStack particle)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        ItemStack itemFromBlock = particle.copy();
+        itemFromBlock.setCount(1);
+        if(!hasParticleDiffuser())
+        {
+            ph.insertItem(10,itemFromBlock,false);
+            //update();
+            return true;
+        }
+        else return false;
+    }
+
+    public boolean hasParticleDiffuser()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(10).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================    PARTICLE END     ==============================
     ==============================================================================
     ============================================================================*/
 
@@ -1704,7 +1780,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             }
         }
 
-        if(canAccept > pedestalAccept && hasCoin())
+        if((canAccept > pedestalAccept) && (hasFilter() || hasCoin()))
         {
             canAccept = pedestalAccept;
         }

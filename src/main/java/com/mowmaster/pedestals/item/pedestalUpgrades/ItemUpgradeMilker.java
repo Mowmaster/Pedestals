@@ -124,13 +124,13 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                 }
 
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world, itemInPedestal, coinInPedestal, pedestalPos);
+                    upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, pedestalPos);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
         int height = getHeight(coinInPedestal);
@@ -177,8 +177,8 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                                         if (!moomoo.isChild() && itemInPedestal.equals(ItemStack.EMPTY))
                                         {
                                             BlockPos mooie = moomoo.getPosition();
-                                            PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                            if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
                                             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                                             if(pedestalInv instanceof PedestalTileEntity) {
                                                 handler.extractItem(i,1 ,false );
@@ -206,23 +206,19 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                     {
                         for(CowEntity moomoo : moo)
                         {
-                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                            if(pedestalInv instanceof PedestalTileEntity) {
-                                PedestalTileEntity pedestal = (PedestalTileEntity)pedestalInv;
-                                if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
-                                {
-                                    fakePlayer.setHeldItem(Hand.MAIN_HAND,itemForHand);
-                                }
-                                ActionResultType result = moomoo.func_230254_b_(fakePlayer,Hand.MAIN_HAND);
-                                fluid = getFluidInItem(fakePlayer.getHeldItemMainhand());
-                                if (result.isSuccessOrConsume() && addFluid(pedestal,coinInPedestal,fluid,true))
-                                {
-                                    BlockPos mooie = moomoo.getPosition();
-                                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
-                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                                    addFluid(pedestal,coinInPedestal,fluid,false);
-                                    break;
-                                }
+                            if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
+                            {
+                                fakePlayer.setHeldItem(Hand.MAIN_HAND,itemForHand);
+                            }
+                            ActionResultType result = moomoo.func_230254_b_(fakePlayer,Hand.MAIN_HAND);
+                            fluid = getFluidInItem(fakePlayer.getHeldItemMainhand());
+                            if (result.isSuccessOrConsume() && addFluid(pedestal,coinInPedestal,fluid,true))
+                            {
+                                BlockPos mooie = moomoo.getPosition();
+                                if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
+                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                addFluid(pedestal,coinInPedestal,fluid,false);
+                                break;
                             }
                         }
                     }

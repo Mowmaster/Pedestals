@@ -1,5 +1,6 @@
-package com.mowmaster.pedestals.item.pedestalUpgrades;
+package com.mowmaster.pedestals.item.deprecated;
 
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;

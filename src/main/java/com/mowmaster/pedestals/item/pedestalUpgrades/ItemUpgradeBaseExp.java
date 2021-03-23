@@ -205,10 +205,10 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                                         {
                                             int xpRemainingMainPedestal = xpMainPedestal - transferRate;
                                             int xpRemainingStoredPedestal = xpStoredPedestal + transferRate;
-                                            world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
                                             setXPStored(coinMainPedestal,xpRemainingMainPedestal);
                                             pedestal.update();
-                                            world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
                                             setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
                                             tileStoredPedestal.update();
                                         }
@@ -217,10 +217,10 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                                             //If we have less then X levels, just send them all.
                                             int xpRemainingMainPedestal = 0;
                                             int xpRemainingStoredPedestal = xpStoredPedestal + xpMainPedestal;
-                                            world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
                                             setXPStored(coinMainPedestal,xpRemainingMainPedestal);
                                             pedestal.update();
-                                            world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
                                             setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
                                             tileStoredPedestal.update();
                                         }
@@ -241,10 +241,10 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                                         {
                                             int xpRemainingMainPedestal = xpMainPedestal - transferRate;
                                             int xpRemainingStoredPedestal = xpStoredPedestal + transferRate;
-                                            world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
                                             setXPStored(coinMainPedestal,xpRemainingMainPedestal);
                                             pedestal.update();
-                                            world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
                                             setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
                                             tileStoredPedestal.update();
                                         }
@@ -253,10 +253,10 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
                                             //If we have less then X levels, just send them all.
                                             int xpRemainingMainPedestal = 0;
                                             int xpRemainingStoredPedestal = xpStoredPedestal + xpMainPedestal;
-                                            world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posMainPedestal.getX(), posMainPedestal.getY(), posMainPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.BLOCKS, 0.05F, 1.0F);
                                             setXPStored(coinMainPedestal,xpRemainingMainPedestal);
                                             pedestal.update();
-                                            world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posStoredPedestal.getX(), posStoredPedestal.getY(), posStoredPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.05F, 1.0F);
                                             setXPStored(coinStoredPedestal,xpRemainingStoredPedestal);
                                             tileStoredPedestal.update();
                                         }
@@ -278,7 +278,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         {
             ItemStack coin = tilePedestal.getCoinOnPedestal();
             ExperienceOrbEntity getXPFromList = ((ExperienceOrbEntity)entityIn);
-            world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
+            if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
             int currentlyStoredExp = getXPStored(coin);
             if(currentlyStoredExp < readMaxXpFromNBT(coin))
             {
@@ -421,7 +421,7 @@ public class ItemUpgradeBaseExp extends ItemUpgradeBase {
         {
             if(getXPStored(pedestal.getCoinOnPedestal())>0)
             {
-                spawnParticleAroundPedestalBase(world,tick,pos,0.2f,0.95f,0.2f,1.0f);
+                if(!pedestal.hasParticleDiffuser())spawnParticleAroundPedestalBase(world,tick,pos,0.2f,0.95f,0.2f,1.0f);
             }
         }
     }

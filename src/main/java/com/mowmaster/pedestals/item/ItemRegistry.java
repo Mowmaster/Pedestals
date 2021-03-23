@@ -37,9 +37,9 @@ public class ItemRegistry
         ItemFilterEnchantedExact.onItemRegistryReady(e);
         ItemFilterEnchantedCount.onItemRegistryReady(e);
         ItemFilterDurability.onItemRegistryReady(e);
+        ItemFilterRestricted.onItemRegistryReady(e);
 
         ItemUpgradeDefault.onItemRegistryReady(e);
-        ItemUpgradeRestriction.onItemRegistryReady(e);
 
         ItemUpgradeDropper.onItemRegistryReady(e);
         ItemUpgradePlacer.onItemRegistryReady(e);
@@ -118,6 +118,7 @@ public class ItemRegistry
         ItemDust.onItemRegistryReady(e);
 
 //Deprecated in 0.8s - Removed in 0.8t
+        ItemUpgradeRestriction.onItemRegistryReady(e);
         ItemUpgradeQuarryBlacklist.onItemRegistryReady(e);
         ItemUpgradeFilterItem.onItemRegistryReady(e);
         ItemUpgradeFilterItemBlacklist.onItemRegistryReady(e);
@@ -180,5 +181,6 @@ public class ItemRegistry
         ItemFilterEnchantedExact.handleItemColors(event);
         ItemFilterEnchantedCount.handleItemColors(event);
         ItemFilterDurability.handleItemColors(event);
+        ItemFilterRestricted.handleItemColors(event);
     }
 }

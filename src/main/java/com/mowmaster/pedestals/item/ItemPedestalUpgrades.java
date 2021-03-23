@@ -18,6 +18,10 @@ public class ItemPedestalUpgrades extends Item {
     public static final Item CAPACITY = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradecapacity"));
     public static final Item RANGE = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgraderange"));
     public static final Item ROUNDROBIN = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgraderoundrobin"));
+    public static final Item SOUNDMUFFLER = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradesoundmuffler"));
+    public static final Item PARTICLEDIFFUSER = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradeparticlediffuser"));
+
+
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
@@ -26,6 +30,8 @@ public class ItemPedestalUpgrades extends Item {
         event.getRegistry().register(CAPACITY);
         event.getRegistry().register(RANGE);
         event.getRegistry().register(ROUNDROBIN);
+        event.getRegistry().register(SOUNDMUFFLER);
+        event.getRegistry().register(PARTICLEDIFFUSER);
     }
 
 

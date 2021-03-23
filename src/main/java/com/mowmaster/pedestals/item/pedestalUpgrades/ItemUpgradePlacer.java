@@ -124,7 +124,7 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
                             ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                             if (result == ActionResultType.CONSUME) {
                                 this.removeFromPedestal(world,pedPos,1);
-                                world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
                             }
                         }
                     }

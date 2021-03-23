@@ -161,7 +161,8 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                     ItemStack getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
                                     TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                                     if(pedestalInv instanceof PedestalTileEntity) {
-                                        if(((PedestalTileEntity) pedestalInv).canAcceptItems(world,posOfPedestal,getBottle)>=rate)
+                                        PedestalTileEntity pedestal = ((PedestalTileEntity) pedestalInv);
+                                        if(pedestal.canAcceptItems(world,posOfPedestal,getBottle)>=rate)
                                         {
                                             int currentlyStoredExp = getXPStored(coinInPedestal);
                                             if(currentlyStoredExp > 0)
@@ -169,7 +170,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                                 if(currentlyStoredExp >= rate)
                                                 {
                                                     int getExpLeftInPedestal = currentlyStoredExp - rate;
-                                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                     setXPStored(coinInPedestal,getExpLeftInPedestal);
                                                     handler.extractItem(i,modifier ,false );
                                                     ((PedestalTileEntity) pedestalInv).addItem(getBottle);
@@ -197,7 +198,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
         {
             if(getXPStored(coin)>=rate)
             {
-                spawnParticleAroundPedestalBase(world,tick,pos,0.2f,0.95f,0.2f,1.0f);
+                if(!pedestal.hasParticleDiffuser())spawnParticleAroundPedestalBase(world,tick,pos,0.2f,0.95f,0.2f,1.0f);
             }
         }
     }

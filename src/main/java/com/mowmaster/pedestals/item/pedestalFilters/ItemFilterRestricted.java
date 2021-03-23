@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Items;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -36,60 +37,37 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
 
-public class ItemFilterEnchantedCount extends ItemFilterBase
+public class ItemFilterRestricted extends ItemFilterBase
 {
-    public ItemFilterEnchantedCount(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+    public ItemFilterRestricted(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public boolean getFilterType()
+    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
-        //state 0|
-        //state 1|false = whitelist
-        //state 2|true = blacklist
-        return false;
-    }
-
-    @Override
-    public boolean getFilterType(ItemStack filterItem)
-    {
-        //false = whitelist
-        //true = blacklist
-        return getFilterType();
-    }
-
-    @Override
-    public boolean canAcceptItem(PedestalTileEntity pedestal, ItemStack itemStackIn)
-    {
-        //This only works one way regardless of white or blacklist
-        boolean returner = false;
-
-        ItemStack filter = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter);
-        int range = stackCurrent.size();
-
-
-        int count = 0;
-        for(int i=0;i<range;i++)
+        if(inPedestal.isEmpty())
         {
-            ItemStack stackGet = stackCurrent.get(i);
-            if(stackGet.isEnchanted() || stackGet.getItem().equals(Items.ENCHANTED_BOOK))
+            TileEntity tile = world.getTileEntity(posPedestal);
+            if(tile instanceof PedestalTileEntity)
             {
-                Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stackGet);
-                count +=map.size();
-            }
-        }
-        count = (count>0)?(count):(1);
+                PedestalTileEntity pedestal = (PedestalTileEntity)tile;
+                ItemStack filter = pedestal.getFilterInPedestal();
+                List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter);
+                int range = stackCurrent.size();
+                int count = 0;
+                int maxIncomming = itemStackIncoming.getMaxStackSize();
+                for(int i=0;i<range;i++)
+                {
+                    count +=stackCurrent.get(i).getCount();
+                    if(count>=maxIncomming)break;
+                }
 
-        if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
-        {
-            Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(itemStackIn);
-            if(map.size() == count)
-            {
-                returner = true;
+                return (count>0)?((count>maxIncomming)?(maxIncomming):(count)):(1);
             }
+
+            return 1;
         }
 
-        return returner;
+        return 0;
     }
 
     @Override
@@ -141,20 +119,17 @@ public class ItemFilterEnchantedCount extends ItemFilterBase
 
         TranslationTextComponent enchants = new TranslationTextComponent(""+1+"");
         List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack);
-        if(filterQueue.size()>0)
+        int range = filterQueue.size();
+        if(range>0)
         {
-
             int count = 0;
-            for(int i=0;i<filterQueue.size();i++)
+            for(int i=0;i<range;i++)
             {
-                ItemStack stackGet = filterQueue.get(i);
-                if(stackGet.isEnchanted() || stackGet.getItem().equals(Items.ENCHANTED_BOOK))
-                {
-                    Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stackGet);
-                    count +=map.size();
-                }
+                count +=filterQueue.get(i).getCount();
+                if(count>=64)break;
             }
-            enchants = new TranslationTextComponent(""+((count>0)?(count):(1))+"");
+
+            enchants = new TranslationTextComponent(""+((count>0)?((count>64)?(64):(count)):(1))+"");
         }
         enchants.mergeStyle(TextFormatting.GRAY);
         player.sendMessage(enchants, Util.DUMMY_UUID);
@@ -170,35 +145,32 @@ public class ItemFilterEnchantedCount extends ItemFilterBase
 
         TranslationTextComponent enchants = new TranslationTextComponent(""+1+"");
         List<ItemStack> filterQueue = readFilterQueueFromNBT(stack);
-        if(filterQueue.size()>0)
+        int range = filterQueue.size();
+        if(range>0)
         {
-
-
             int count = 0;
-            for(int i=0;i<filterQueue.size();i++)
+            for(int i=0;i<range;i++)
             {
-                ItemStack stackGet = filterQueue.get(i);
-                if(stackGet.isEnchanted() || stackGet.getItem().equals(Items.ENCHANTED_BOOK))
-                {
-                    Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stackGet);
-                    count +=map.size();
-                }
+                count +=filterQueue.get(i).getCount();
+                if(count>=64)break;
             }
-            enchants = new TranslationTextComponent(""+((count>0)?(count):(1))+"");
+
+            enchants = new TranslationTextComponent(""+((count>0)?((count>64)?(64):(count)):(1))+"");
+
         }
         enchants.mergeStyle(TextFormatting.GRAY);
         tooltip.add(enchants);
     }
 
     public static void handleItemColors(ColorHandlerEvent.Item event) {
-        event.getItemColors().register((itemstack, tintIndex) -> {if (tintIndex == 1){return 8388736;} else {return -1;}},ENCHANTEDCOUNTFILTER);
+        event.getItemColors().register((itemstack, tintIndex) -> {if (tintIndex == 1){return 65280;} else {return -1;}},RESTRICTIONFILTER);
     }
 
-    public static final Item ENCHANTEDCOUNTFILTER = new ItemFilterEnchantedCount(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "filter/filterenchantedcount"));
+    public static final Item RESTRICTIONFILTER = new ItemFilterRestricted(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "filter/filterrestriction"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(ENCHANTEDCOUNTFILTER);
+        event.getRegistry().register(RESTRICTIONFILTER);
     }
 }

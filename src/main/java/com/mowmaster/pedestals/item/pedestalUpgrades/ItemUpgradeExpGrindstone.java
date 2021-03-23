@@ -138,7 +138,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
 
                                     ItemStack toReturn = stackToReturn.copy();
                                     handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
-                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     pedestal.addItem(toReturn);
                                 }
                             }

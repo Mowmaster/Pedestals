@@ -5,7 +5,7 @@
   ],
   "key": {
     "C": {
-      "item": "pedestals:coin/default"
+      "item": "pedestals:filter/filterbase"
     },
     "I": {
       "tag": "forge:ingots/iron"
@@ -15,6 +15,6 @@
     }
   },
   "result": {
-    "item": "pedestals:coin/restriction"
+    "item": "pedestals:filter/filterrestriction"
   }
 }

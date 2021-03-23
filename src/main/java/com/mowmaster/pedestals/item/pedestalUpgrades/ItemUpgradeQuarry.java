@@ -236,7 +236,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                     {
                         if (world.getGameTime()%5 == 0) {
                             BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,0);
-                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
+                            if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
                         }
                         writeStoredIntTwoToNBT(coinInPedestal,val-1);
                     }
@@ -309,7 +309,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                         (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
                 if(expdrop>0)blockToMine.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
                 world.removeBlock(blockToMinePos, false);
-                PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
+                if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
             }
         }
     }

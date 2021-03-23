@@ -438,6 +438,24 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                             }
                             else return insertToPedestal(worldIn,pos,player);
                         }
+                        else if(getItemInHand.equals(ItemPedestalUpgrades.SOUNDMUFFLER))
+                        {
+                            if(tilePedestal.addMuffler(player.getHeldItemMainhand()))
+                            {
+                                if(!isCreative)getItemStackInHand.shrink(1);
+                                return ActionResultType.SUCCESS;
+                            }
+                            else return insertToPedestal(worldIn,pos,player);
+                        }
+                        else if(getItemInHand.equals(ItemPedestalUpgrades.PARTICLEDIFFUSER))
+                        {
+                            if(tilePedestal.addParticleDiffuser(player.getHeldItemMainhand()))
+                            {
+                                if(!isCreative)getItemStackInHand.shrink(1);
+                                return ActionResultType.SUCCESS;
+                            }
+                            else return insertToPedestal(worldIn,pos,player);
+                        }
                         else return insertToPedestal(worldIn,pos,player);
                     }
                     else return insertToPedestal(worldIn,pos,player);

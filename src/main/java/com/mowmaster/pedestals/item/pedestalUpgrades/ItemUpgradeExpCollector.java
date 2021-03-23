@@ -205,7 +205,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
                             int value = removeXp(getPlayer, transferRate);
                             if(value > 0)
                             {
-                                world.playSound((PlayerEntity)null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity)null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.15F, 1.0F);
                                 setXPStored(coin, currentlyStoredExp + value);
                             }
                         }
@@ -222,7 +222,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         {
             ItemStack coin = tilePedestal.getCoinOnPedestal();
             ExperienceOrbEntity getXPFromList = ((ExperienceOrbEntity)entityIn);
-            world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
+            if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
             int currentlyStoredExp = getXPStored(coin);
             if(currentlyStoredExp < readMaxXpFromNBT(coin))
             {
