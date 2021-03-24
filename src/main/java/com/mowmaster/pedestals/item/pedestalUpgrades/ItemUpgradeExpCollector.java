@@ -145,13 +145,13 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
 
                 //added check to make sure it has room for exp before pulling it.
                 if (world.getGameTime()%speed == 0 && spaceForXP(coinInPedestal)>0) {
-                    upgradeAction(world, coinInPedestal, pedestalPos);
+                    upgradeAction(pedestal, world, coinInPedestal, pedestalPos);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
@@ -163,7 +163,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         List<ExperienceOrbEntity> xpList = world.getEntitiesWithinAABB(ExperienceOrbEntity.class,getBox);
         for(ExperienceOrbEntity getXPFromList : xpList)
         {
-            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
+            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.15F, 1.0F);
             TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
             if(pedestalInv instanceof PedestalTileEntity) {
                 int currentlyStoredExp = getXPStored(coinInPedestal);
@@ -182,32 +182,26 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
         int heightP = 1;
         BlockPos negBlockPosP = getNegRangePosEntity(world,posOfPedestal,widthP,heightP);
         BlockPos posBlockPosP = getPosRangePosEntity(world,posOfPedestal,widthP,heightP);
-        BlockState state = world.getBlockState(posOfPedestal);
-        if(state.getBlock() instanceof PedestalBlock)
+        AxisAlignedBB getBoxP = new AxisAlignedBB(negBlockPosP,posBlockPosP);
+
+        List<Entity> entityList = world.getEntitiesWithinAABB(Entity.class,getBoxP);
+        for(Entity getFromList : entityList)
         {
-            PedestalTileEntity pedestal = ((PedestalTileEntity)world.getTileEntity(posOfPedestal));
-
-            AxisAlignedBB getBoxP = new AxisAlignedBB(negBlockPosP,posBlockPosP);
-
-            List<Entity> entityList = world.getEntitiesWithinAABB(Entity.class,getBoxP);
-            for(Entity getFromList : entityList)
+            if(getFromList instanceof PlayerEntity)
             {
-                if(getFromList instanceof PlayerEntity)
+                PlayerEntity getPlayer = ((PlayerEntity)getFromList);
+                ItemStack coin = pedestal.getCoinOnPedestal();
+                if(!getPlayer.isCrouching())
                 {
-                    PlayerEntity getPlayer = ((PlayerEntity)getFromList);
-                    ItemStack coin = pedestal.getCoinOnPedestal();
-                    if(!getPlayer.isCrouching())
+                    int currentlyStoredExp = getXPStored(coin);
+                    if(currentlyStoredExp < readMaxXpFromNBT(coin))
                     {
-                        int currentlyStoredExp = getXPStored(coin);
-                        if(currentlyStoredExp < readMaxXpFromNBT(coin))
+                        int transferRate = getExpCountByLevel(getSuckiRate(coin));
+                        int value = removeXp(getPlayer, transferRate);
+                        if(value > 0)
                         {
-                            int transferRate = getExpCountByLevel(getSuckiRate(coin));
-                            int value = removeXp(getPlayer, transferRate);
-                            if(value > 0)
-                            {
-                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity)null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                setXPStored(coin, currentlyStoredExp + value);
-                            }
+                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity)null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                            setXPStored(coin, currentlyStoredExp + value);
                         }
                     }
                 }

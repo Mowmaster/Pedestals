@@ -155,7 +155,7 @@ public class ItemUpgradeEnergyImport extends ItemUpgradeBaseEnergy
                         ItemStack itemCollided = ((ItemEntity) entityIn).getItem();
                         tilePedestal.addItem(itemCollided);
                         tilePedestal.update();
-                        world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
                         entityIn.remove();
                     }
                 }

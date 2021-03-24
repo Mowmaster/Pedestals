@@ -215,7 +215,7 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
                                 {
                                     if(getTargetEntity(filterBlock,getEntityFromList).addPotionEffect(instance.get(i)))
                                     {
-                                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                         removeFuel(world,posOfPedestal,(instance.get(i).getAmplifier()+1),false);
                                     }
                                 }

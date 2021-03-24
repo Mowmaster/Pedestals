@@ -184,7 +184,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                         {
                             if (world.getGameTime()%5 == 0) {
                                 BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,0);
-                                PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
+                                if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
                             }
                             writeStoredIntTwoToNBT(coinInPedestal,val-1);
                         }
@@ -264,7 +264,7 @@ public class ItemUpgradeEnergyQuarryBlacklist extends ItemUpgradeBaseEnergyMachi
                     if(expdrop>0)blockToMine.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
                     removeEnergyFuel(pedestal,fuelToConsume,false);
                     world.removeBlock(blockToMinePos, false);
-                    PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
+                    if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
                 }
             }
         }

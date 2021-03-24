@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.util;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Hand;
@@ -13,6 +14,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.UUID;
 
 public class PedestalFakePlayer extends FakePlayer
@@ -23,9 +25,13 @@ public class PedestalFakePlayer extends FakePlayer
     private ItemStack heldItem;
 
     public PedestalFakePlayer(ServerWorld world, @Nullable UUID getplayerUUID, @Nullable BlockPos setPos, @Nullable ItemStack toolHeld) {
-        super(world, new GameProfile((getplayerUUID != null)?(getplayerUUID):(Util.DUMMY_UUID),"[Pedestals]"));
+        //Think might fix some issues with players showing up as "Pedestals"???
+        super(world, new GameProfile((getplayerUUID != null)?(getplayerUUID):(Util.DUMMY_UUID),(world.getPlayerByUuid(getplayerUUID) !=null)?((world.getPlayerByUuid(getplayerUUID).getDisplayName().toString().toLowerCase().equals("[Pedestals]".toLowerCase()))?(world.getPlayerByUuid(getplayerUUID).getDisplayName().toString()):("[Pedestals]")):("[Pedestals]")));
+        //super(world, new GameProfile((getplayerUUID != null)?(getplayerUUID):(Util.DUMMY_UUID),"[Pedestals]"));
         this.fakePos = (setPos !=null)?(setPos):(BlockPos.ZERO);
         this.heldItem = (toolHeld !=null )?(toolHeld):(ItemStack.EMPTY);
+
+
     }
 
     @Override

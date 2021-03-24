@@ -215,7 +215,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                         {
                             if(teleportEntity(world, tilePedestal, tilePedestal.getStoredPositionAt(i), entityIn))
                             {
-                                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                 removeFuel(tilePedestal,getTeleportDistance(posPedestal,tilePedestal.getStoredPositionAt(i)),false);
                             }
                             break;
@@ -226,9 +226,9 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
                             int range = getRangeSmall(tilePedestal.getCoinOnPedestal());
                             int remainingFuel = getFuelStored(tilePedestal.getCoinOnPedestal());
                             BlockPos randomPos = world.getBlockRandomPos((int)entityIn.getPosX(),(int)entityIn.getPosY(),(int)entityIn.getPosZ(),range*remainingFuel);
-                            if(teleportEntityRandom(world, randomPos, entityIn))
+                            if(teleportEntityRandom(tilePedestal, world, randomPos, entityIn))
                             {
-                                world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                 removeFuel(tilePedestal,remainingFuel,false);
                             }
                             break;
@@ -292,40 +292,40 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         {
             ((PlayerEntity)entityIn).stopRiding();
             ((ServerPlayerEntity)entityIn).connection.setPlayerLocation(pos.getX()+0.5D, pos.getY(), pos.getZ()+0.5D, entityIn.rotationYaw, entityIn.rotationPitch);
-            world.playSound(null, entityIn.getPosX(), entityIn.getPosY(), entityIn.getPosZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            if(!tilePedestal.hasMuffler())world.playSound(null, entityIn.getPosX(), entityIn.getPosY(), entityIn.getPosZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
         else if(entityIn instanceof CreatureEntity) {
             ((CreatureEntity) entityIn).stopRiding();
             ((CreatureEntity) entityIn).teleportKeepLoaded(pos.getX()+0.5D, pos.getY(), pos.getZ()+0.5D);
-            world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            if(!tilePedestal.hasMuffler())world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
         else if(entityIn instanceof ItemEntity)
         {
             ((ItemEntity)entityIn).stopRiding();
             ((ItemEntity)entityIn).teleportKeepLoaded(pos.getX()+0.5D, pos.getY(), pos.getZ()+0.5D);
-            world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            if(!tilePedestal.hasMuffler())world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
 
         return false;
     }
 
-    public boolean teleportEntityRandom(World world, BlockPos posPedestalDest, Entity entityIn)
+    public boolean teleportEntityRandom(PedestalTileEntity pedestal, World world, BlockPos posPedestalDest, Entity entityIn)
     {
         if(entityIn instanceof PlayerEntity)
         {
             ((PlayerEntity)entityIn).stopRiding();
             ((ServerPlayerEntity)entityIn).connection.setPlayerLocation(posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), entityIn.rotationYaw, entityIn.rotationPitch);
-            world.playSound(null, entityIn.getPosX()+0.5D, entityIn.getPosY(), entityIn.getPosZ()+0.5D, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            if(!pedestal.hasMuffler())world.playSound(null, entityIn.getPosX()+0.5D, entityIn.getPosY(), entityIn.getPosZ()+0.5D, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
         else if(entityIn instanceof CreatureEntity) {
             ((CreatureEntity) entityIn).stopRiding();
             if (((CreatureEntity) entityIn).attemptTeleport(posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), true)) {
 
-                world.playSound(null, posPedestalDest.getX()+0.5D, posPedestalDest.getY(), posPedestalDest.getZ()+0.5D, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                if(!pedestal.hasMuffler())world.playSound(null, posPedestalDest.getX()+0.5D, posPedestalDest.getY(), posPedestalDest.getZ()+0.5D, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
                 return true;
             }
         }
@@ -333,7 +333,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         {
             ((ItemEntity)entityIn).stopRiding();
             ((ItemEntity)entityIn).teleportKeepLoaded(posPedestalDest.getX()+0.5D, posPedestalDest.getY(), posPedestalDest.getZ()+0.5D);
-            world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            if(!pedestal.hasMuffler())world.playSound(null, posPedestalDest.getX(), posPedestalDest.getY(), posPedestalDest.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             return true;
         }
 

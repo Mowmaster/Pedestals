@@ -1,30 +1,24 @@
 package com.mowmaster.pedestals.crafting;
 
-import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.item.ItemLinkingTool;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
-import com.mowmaster.pedestals.item.ItemRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.ParrotEntity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.ExplosionContext;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -34,10 +28,10 @@ import java.util.List;
 
 
 @Mod.EventBusSubscriber
-public class RoundRobinCrafting
+public class ParticleDiffuserCrafting
 {
     @SubscribeEvent()
-    public static void RoundRobinUpgrade(PlayerInteractEvent.RightClickBlock event)
+    public static void ParticleDiffuserUpgrade(PlayerInteractEvent.RightClickBlock event)
     {
         //Added to keep fake players from canning this every time?
         if(!(event.getPlayer() instanceof FakePlayer))
@@ -59,13 +53,11 @@ public class RoundRobinCrafting
                     if (player.getHeldItem(hand).getItem() instanceof ItemLinkingTool) {
                         //List<EntityItem> item = player.getEntityWorld().getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(posX-1, posY-1, posZ-1, posX+1, posY+1, posZ+1));
                         List<ItemEntity> items = player.getEntityWorld().getEntitiesWithinAABB(ItemEntity.class, new AxisAlignedBB(posX - 3, posY - 3, posZ - 3, posX + 3, posY + 3, posZ + 3));
-                        List<ParrotEntity> parrotsList = player.getEntityWorld().getEntitiesWithinAABB(ParrotEntity.class, new AxisAlignedBB(posX - 3, posY - 3, posZ - 3, posX + 3, posY + 3, posZ + 3));
-                        //Tyler489 approved!
-                        List<ChickenEntity> cockList = player.getEntityWorld().getEntitiesWithinAABB(ChickenEntity.class, new AxisAlignedBB(posX - 3, posY - 3, posZ - 3, posX + 3, posY + 3, posZ + 3));
                         List<SheepEntity> sheepList = player.getEntityWorld().getEntitiesWithinAABB(SheepEntity.class, new AxisAlignedBB(posX - 3, posY - 3, posZ - 3, posX + 3, posY + 3, posZ + 3));
+                        List<ParrotEntity> parrotsList = player.getEntityWorld().getEntitiesWithinAABB(ParrotEntity.class, new AxisAlignedBB(posX - 3, posY - 3, posZ - 3, posX + 3, posY + 3, posZ + 3));
+                        List<ChickenEntity> cockList = player.getEntityWorld().getEntitiesWithinAABB(ChickenEntity.class, new AxisAlignedBB(posX - 3, posY - 3, posZ - 3, posX + 3, posY + 3, posZ + 3));
 
-
-                        if(parrotsList.size()>0 || cockList.size()>0 && !(sheepList.size()>0))
+                        if(worldIn.isRaining() && player.isWet() && !(sheepList.size()>0) && !(parrotsList.size()>0) && !(cockList.size()>0))
                         {
                             for (ItemEntity item : items) {
                                 ItemStack stack = item.getItem();
@@ -82,12 +74,22 @@ public class RoundRobinCrafting
                                 worldIn.createExplosion(new ItemEntity(worldIn, posX, posY, posZ),(DamageSource)null,(ExplosionContext)null, posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Explosion.Mode.NONE);
                                 if(paper>0)
                                 {
-                                    //NEED TO ADD ANOTHER TAG TO ITEM TO MAKE IT NOT USEABLE IN COMBINING AGAIN!!!
-                                    ItemStack stacked = new ItemStack(ItemPedestalUpgrades.ROUNDROBIN,paper);
+                                    float rainValue = (worldIn.rainingStrength>1f)?(worldIn.rainingStrength):(1f);
+                                    if((rainValue-(float) paper)>0)worldIn.setRainStrength(rainValue);
+                                    else worldIn.getWorldInfo().setRaining(false);
 
-                                    ItemEntity itemEn = new ItemEntity(worldIn,posX,posY+1,posZ,stacked);
+                                    ItemEntity itemEn = new ItemEntity(worldIn,posX,posY+1,posZ,new ItemStack(ItemPedestalUpgrades.PARTICLEDIFFUSER,(int)rainValue));
                                     itemEn.setInvulnerable(true);
                                     worldIn.addEntity(itemEn);
+
+                                    int paperdiff = paper-(int)rainValue;
+                                    if(paperdiff>0)
+                                    {
+                                        ItemEntity itemEn2 = new ItemEntity(worldIn,posX,posY+1,posZ,new ItemStack(Items.PAPER,paperdiff));
+                                        itemEn2.setInvulnerable(true);
+                                        worldIn.addEntity(itemEn2);
+                                    }
+
                                 }
                             }
                         }

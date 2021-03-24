@@ -126,7 +126,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
                 {
                     if (world.getGameTime()%5 == 0) {
                         BlockPos directionalPos = getPosOfBlockBelow(world,pedestalPos,-1);
-                        PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
+                        if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,directionalPos.getX(),directionalPos.getY(),directionalPos.getZ(),145,145,145));
                     }
 
                     if (world.getGameTime()%20 == 0) {
@@ -367,7 +367,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
                                 if(addFuel(tilePedestal,getBurnTimeForStack,true) && tilePedestal.addItem(stackToReturn,true))
                                 {
                                     addFuel(tilePedestal,getBurnTimeForStack,false);
-                                    world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                    if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posPedestal.getX(), posPedestal.getY(), posPedestal.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                     entityIn.remove();
                                     tilePedestal.addItem(stackToReturn,false);
                                 }

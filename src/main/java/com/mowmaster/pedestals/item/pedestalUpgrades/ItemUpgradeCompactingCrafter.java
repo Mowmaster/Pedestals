@@ -210,7 +210,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                             }
 
                                             getRecipe.setCount(itemsToInsertToPedestal);
-                                            world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             addToPedestal(world, pedestalPos, getRecipe);
                                             onPedestalNeighborChanged(pedestal);
                                             writeStoredIntToNBT(coin,intGetNextIteration+1);

@@ -1551,7 +1551,7 @@ public class ItemUpgradeBase extends Item {
                             getItemFromList.getItem().setCount(itemInCount-countToAdd);
                             copyStack.setCount(countToAdd);
                             pedestal.addItem(copyStack);
-                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                         }
                         else break;
                     }
@@ -1560,7 +1560,7 @@ public class ItemUpgradeBase extends Item {
                         getItemFromList.setItem(ItemStack.EMPTY);
                         getItemFromList.remove();
                         pedestal.addItem(copyStack);
-                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
 
                     }
                     else
@@ -1570,7 +1570,7 @@ public class ItemUpgradeBase extends Item {
                         getItemFromList.getItem().setCount(count-maxSize);
                         copyStack.setCount(maxSize);
                         pedestal.addItem(copyStack);
-                        world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                     }
                     break;
                 }

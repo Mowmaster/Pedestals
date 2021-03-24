@@ -133,7 +133,7 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
                                         {
                                             handler.extractItem(i,itemInputsPerSmelt ,false );
                                             removeEnergyFuel(ped,fuelToConsume,false);
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             ped.addItem(copyIncoming);
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
@@ -149,7 +149,7 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
 
                                                 handler.extractItem(i,itemInputsPerSmelt ,false );
                                                 removeEnergyFuel(ped,fuelToConsume,false);
-                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                 ped.addItem(copyIncoming);
                                             }
                                         }

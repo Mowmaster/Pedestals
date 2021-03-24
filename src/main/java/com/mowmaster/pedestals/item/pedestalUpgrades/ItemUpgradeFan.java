@@ -241,7 +241,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
             {
                 int speedSound = getOperationSpeed(coinInPedestal);
                 if (world.getGameTime()%speedSound == 0) {
-                    world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.BLOCKS, 0.25F, 1.0F);
                 }
             }
         }

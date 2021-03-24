@@ -89,13 +89,13 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
             if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world, itemInPedestal,pedestalPos, coinInPedestal);
+                    upgradeAction(pedestal, world, itemInPedestal,pedestalPos, coinInPedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, ItemStack itemInPedestal, BlockPos pedestalPos, ItemStack coinInPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, BlockPos pedestalPos, ItemStack coinInPedestal)
     {
         int width = getAreaWidth(coinInPedestal);
         int height = getHeight(coinInPedestal);
@@ -128,9 +128,9 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
                                         if(itemInPedestal.isEmpty() || drops.get(d).equals(itemInPedestal) && canAddToPedestal(world,pedestalPos,drops.get(d)) >= drops.get(d).getCount())
                                         {
                                             BlockPos sheerie = baaaaaa.getPosition();
-                                            PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,sheerie.getX(),sheerie.getY()+0.5,sheerie.getZ(),145,145,145));
-                                            world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_SHEEP_SHEAR, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            addToPedestal(world,pedestalPos,drops.get(d));
+                                            if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,sheerie.getX(),sheerie.getY()+0.5,sheerie.getZ(),145,145,145));
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_SHEEP_SHEAR, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            pedestal.addItem(drops.get(d));
                                         }
                                     }
                                 }

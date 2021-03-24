@@ -1931,7 +1931,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 copyStackToSend.setCount(countToSend);
                 removeItem(copyStackToSend.getCount());
                 tileToSendTo.addItem(copyStackToSend);
-                PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),pos.getX(),pos.getY(),pos.getZ()));
+                if(!hasParticleDiffuser())PacketHandler.sendToNearby(world,pos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),pos.getX(),pos.getY(),pos.getZ()));
             }
         }
     }

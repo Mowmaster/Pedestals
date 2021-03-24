@@ -155,7 +155,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                             handler.extractItem(i,itemInputsPerSmelt ,false );
                                             removeFuel(ped,fuelToConsume,false);
                                             spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             ped.addItem(copyIncoming);
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
@@ -176,7 +176,7 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                                     handler.extractItem(i,itemInputsPerSmelt ,false );
                                                     removeFuel(ped,fuelToConsume,false);
                                                     spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
-                                                    world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                    if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                     ped.addItem(copyIncoming);
                                                 }
                                             }

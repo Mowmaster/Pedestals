@@ -309,7 +309,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                     {
                         removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
                         placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,false);
-                        world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
                     }
                 }
             }

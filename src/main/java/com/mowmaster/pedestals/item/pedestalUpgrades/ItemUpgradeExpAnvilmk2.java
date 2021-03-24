@@ -434,7 +434,7 @@ VANISHING_CURSE:
                                                 itemFromInvCopy.setDisplayName(new TranslationTextComponent(strNameToChangeTo));
                                             }
                                             handler.extractItem(i,itemFromInvCopy.getCount(),false);
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             tilePedestal.addItem(itemFromInvCopy);
                                         }
                                     }

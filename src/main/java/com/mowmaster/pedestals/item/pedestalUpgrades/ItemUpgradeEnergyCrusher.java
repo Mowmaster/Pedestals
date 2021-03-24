@@ -144,7 +144,7 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
                                         {
                                             handler.extractItem(i,itemInputsPerSmelt ,false );
                                             removeEnergyFuel(ped,fuelToConsume,false);
-                                            world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             ped.addItem(copyIncoming);
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
@@ -160,7 +160,7 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
 
                                                 handler.extractItem(i,itemInputsPerSmelt ,false );
                                                 removeEnergyFuel(ped,fuelToConsume,false);
-                                                world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                 ped.addItem(copyIncoming);
                                             }
                                         }

@@ -354,7 +354,7 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                             }
 
                                             getRecipe.setCount(intBatchCraftedAmount);
-                                            world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             addToPedestal(world, pedestalPos, getRecipe);
                                             onPedestalNeighborChanged(pedestal);
                                             writeStoredIntToNBT(coin,intGetNextIteration+1);
