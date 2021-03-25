@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
+import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.Block;
@@ -256,11 +257,24 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         return false;
     }
 
-    //No filter here, Jokes on YOU!
     @Override
     public boolean passesFilter(World world, BlockPos posPedestal, Block blockIn)
     {
-        return true;
+        boolean returner = true;
+        if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
+        {
+            PedestalTileEntity pedestal = ((PedestalTileEntity)world.getTileEntity(posPedestal));
+            if(pedestal.hasFilter())
+            {
+                Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
+                if(filterInPedestal instanceof ItemFilterBase)
+                {
+                    returner = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,new ItemStack(blockIn));
+                }
+            }
+        }
+
+        return returner;
     }
 
     @Override

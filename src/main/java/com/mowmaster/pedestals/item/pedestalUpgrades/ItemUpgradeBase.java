@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
@@ -28,6 +29,7 @@ import net.minecraft.item.*;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tags.BlockTags;
@@ -415,6 +417,86 @@ public class ItemUpgradeBase extends Item {
         }
 
         return slot.get();
+    }
+
+    public int getNextSlotWithItemsCapFiltered(PedestalTileEntity pedestal, LazyOptional<IItemHandler> cap, ItemStack stackInPedestal)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        if(cap.isPresent()) {
+
+            cap.ifPresent(itemHandler -> {
+                int range = itemHandler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    //find a slot with items
+                    if(!stackInSlot.isEmpty())
+                    {
+                        //check if it could pull the item out or not
+                        if(!itemHandler.extractItem(i,1 ,true ).equals(ItemStack.EMPTY))
+                        {
+                            //If pedestal is empty accept any items
+                            if(passesItemFilter(pedestal,stackInSlot))
+                            {
+                                if(stackInPedestal.isEmpty())
+                                {
+                                    slot.set(i);
+                                    break;
+                                }
+                                //if stack in pedestal matches items in slot
+                                else if(doItemsMatch(stackInPedestal,stackInSlot))
+                                {
+                                    slot.set(i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }});
+
+
+        }
+
+        return slot.get();
+    }
+
+    public boolean passesItemFilter(PedestalTileEntity pedestal, ItemStack stackIn)
+    {
+        boolean returner = true;
+        if(pedestal.hasFilter())
+        {
+            Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
+            if(filterInPedestal instanceof ItemFilterBase)
+            {
+                returner = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,stackIn);
+            }
+        }
+
+        return returner;
+    }
+
+    public boolean hasEnoughInInv(LazyOptional<IItemHandler> cap, ItemStack stackToFind, int stopAfter)
+    {
+        int counter = 0;
+        if(cap.isPresent()) {
+            IItemHandler handler = cap.orElse(null);
+            int range = handler.getSlots();
+            for(int i=0;i<range;i++)
+            {
+                ItemStack stackInSlot = handler.getStackInSlot(i);
+                //find a slot with items
+                if(!stackInSlot.isEmpty())
+                {
+                    //check if it could pull the item out or not
+                    if(stackInSlot.isItemEqual(stackToFind))
+                    {
+                        counter+=stackInSlot.getCount();
+                        if(counter>=stopAfter)break;
+                    }
+                }
+            }
+        }
+        return counter>=stopAfter;
     }
 
     public int getSlotWithMatchingStack(LazyOptional<IItemHandler> cap, ItemStack stackToFind)
@@ -2196,6 +2278,210 @@ public class ItemUpgradeBase extends Item {
             }
         }
         writeCraftingQueueToNBT(coin, recipeQueue);
+    }
+
+    public void buildOutputIngredientMapFromPattern(PedestalTileEntity pedestal)
+    {
+        if(pedestal.hasFilter())
+        {
+            ItemStack patternStack = pedestal.getFilterInPedestal();
+            if(patternStack.getItem() instanceof ItemFilterBase)
+            {
+                ItemFilterBase filterClassItem = ((ItemFilterBase)patternStack.getItem());
+                List<ItemStack> patternList = filterClassItem.readFilterQueueFromNBT(patternStack);
+                Map<ItemStack, List<ItemStack>> mappedOutputIngredients = buildIngredientList(pedestal, patternList);
+                writeOutputIngredientMapToNBT(pedestal.getCoinOnPedestal(),mappedOutputIngredients);
+            }
+        }
+    }
+
+    public Map<ItemStack, List<ItemStack>> buildIngredientList(PedestalTileEntity pedestal, List<ItemStack> inventoryQueue)
+    {
+        World world = pedestal.getWorld();
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        int gridSize = getGridSize(coin);
+        int intGridCount = gridSize*gridSize;
+        List<ItemStack> invQueue = inventoryQueue;
+        int recipeCount = Math.floorDiv(invQueue.size(),intGridCount);
+
+        //The Result is the Key, and the List is the ingredients
+        Map<ItemStack, List<ItemStack>> ingredientMap = Maps.<ItemStack, List<ItemStack>>newLinkedHashMap();
+
+        CraftingInventory craft = new CraftingInventory(new Container(null, -1) {
+            @Override
+            public boolean canInteractWith(PlayerEntity playerIn) {
+                return false;
+            }
+        }, gridSize, gridSize);
+
+        for(int r=1;r<= recipeCount; r++)
+        {
+            List<ItemStack> ingredientQueue = new ArrayList<>();
+            for(int s=0;s<intGridCount; s++)
+            {
+                int getActualIndex = ((r*intGridCount)-intGridCount)+s;
+                ItemStack getStack = invQueue.get(getActualIndex);
+                //If the item Stack has enough items to craft with
+                //stack.getCount()>=2 ||  stack.maxStackSize()==1 ||
+                if(getStack.isEmpty() || getStack.getItem() instanceof ItemCraftingPlaceholder)
+                {
+                    craft.setInventorySlotContents(s, ItemStack.EMPTY);
+                }
+                else
+                {
+                    //Add to current queue
+                    if(ingredientQueue.contains(getStack))
+                    {
+                        int index = ingredientQueue.indexOf(getStack);
+                        ItemStack current = ingredientQueue.get(index);
+                        ItemStack remakeQueuedStack = current.copy();
+                        remakeQueuedStack.setCount(current.getCount() + getStack.getCount());
+                        ingredientQueue.set(index,remakeQueuedStack);
+                    }
+                    else ingredientQueue.add(getStack);
+                    craft.setInventorySlotContents(s,getStack);
+                }
+            }
+            //Checks to make sure we have enough slots set for out recipe
+            if(craft.getSizeInventory() >= intGridCount)
+            {
+                IRecipe recipe = findRecipe(craft,world);
+                if(recipe  != null &&  recipe.matches(craft, world)) {
+                    //Set ItemStack with recipe result
+                    ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
+                    ingredientMap.put(stackRecipeResult,ingredientQueue);
+                    System.out.println(stackRecipeResult);
+                    System.out.println(ingredientQueue);
+                }
+            }
+        }
+
+        return ingredientMap;
+    }
+
+    public void writeOutputIngredientMapToNBT(ItemStack coin, Map<ItemStack, List<ItemStack>> mapIn)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        CompoundNBT tag = new CompoundNBT();
+        if(coin.hasTag()){tag = coin.getTag();}
+
+        ListNBT nbtList = new ListNBT();
+        int counter = 0;
+        for(Map.Entry<ItemStack, List<ItemStack>> entry : mapIn.entrySet())
+        {
+            ItemStack key = entry.getKey();
+            if (key != null) {
+                List<ItemStack> ingredientList = entry.getValue();
+                int handlerSize = ingredientList.size() +1;
+
+                ItemStackHandler handler = new ItemStackHandler();
+                handler.setSize(handlerSize);
+
+                //Store Key in slot 0
+                handler.setStackInSlot(0,key);
+                //Store Ingredients in slots 1+
+                for(int i=0;i<ingredientList.size();i++) {handler.setStackInSlot(i+1,ingredientList.get(i));}
+                compound = ((INBTSerializable<CompoundNBT>) handler).serializeNBT();
+                nbtList.add(counter, compound);
+                counter++;
+            }
+        }
+
+        coin.setTagInfo("outputIngredientMap", nbtList);
+    }
+
+    public Map<ItemStack, List<ItemStack>> readOutputIngredientMapFromNBT(ItemStack coin)
+    {
+        Map<ItemStack, List<ItemStack>> craftingQueue = Maps.<ItemStack, List<ItemStack>>newLinkedHashMap();
+        List<ItemStack> filterQueue = new ArrayList<>();
+        if(coin.hasTag())
+        {
+            if(coin.getTag().contains("outputIngredientMap"))
+            {
+                ListNBT getList = coin.getTag().getList("outputIngredientMap",10);
+
+                for(int m=0;m<getList.size();m++)
+                {
+                    CompoundNBT compoundnbt = getList.getCompound(m);
+                    ItemStackHandler handler = new ItemStackHandler();
+                    ((INBTSerializable<CompoundNBT>) handler).deserializeNBT(compoundnbt);
+
+                    //start at 1 since 0 is our key item
+                    for(int i=1;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
+                    craftingQueue.put(handler.getStackInSlot(1),filterQueue);
+                }
+            }
+        }
+
+        return craftingQueue;
+    }
+
+    public void removeOutputIngredientMap(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("outputIngredientMap"))
+            {
+                compound.remove("outputIngredientMap");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+    public boolean getFilterChangeStatus(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+            if(compound.contains("filterChange"))
+            {
+                return compound.getBoolean("filterChange");
+            }
+        }
+
+        return false;
+    }
+
+    public void setFilterChangeUpdate(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+            compound.putBoolean("filterChange",true);
+        }
+        else compound.putBoolean("filterChange",true);
+
+        coin.setTag(compound);
+    }
+
+    public void setFilterChangeUpdated(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+            compound.putBoolean("filterChange",false);
+        }
+
+        coin.setTag(compound);
+    }
+
+    public void removeFilterChangeUpdated(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+            if(compound.contains("filterChange"))
+            {
+                compound.remove("filterChange");
+                coin.setTag(compound);
+            }
+        }
     }
 
     public void writeCraftingQueueToNBT(ItemStack stack, List<ItemStack> listIn)

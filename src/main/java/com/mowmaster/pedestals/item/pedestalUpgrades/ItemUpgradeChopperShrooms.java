@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.enchants.*;
+import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -310,48 +311,18 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         boolean returner = true;
         if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
         {
-            PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
-            if(!(stackCurrent.size()>0))
+            PedestalTileEntity pedestal = ((PedestalTileEntity)world.getTileEntity(posPedestal));
+            if(pedestal.hasFilter())
             {
-                stackCurrent = buildFilterQueue(pedestal);
-                writeFilterQueueToNBT(coin,stackCurrent);
-            }
-
-            int range = stackCurrent.size();
-
-            ItemStack itemFromInv = ItemStack.EMPTY;
-            itemFromInv = IntStream.range(0,range)//Int Range
-                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                    .filter(itemStack -> Block.getBlockFromItem(itemStack.getItem()).equals(blockIn))
-                    .findFirst().orElse(ItemStack.EMPTY);
-
-            if(!itemFromInv.isEmpty())
-            {
-                returner = false;
+                Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
+                if(filterInPedestal instanceof ItemFilterBase)
+                {
+                    returner = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,new ItemStack(blockIn));
+                }
             }
         }
 
         return returner;
-    }
-
-    @Override
-    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        List<ItemStack> stackIn = buildFilterQueue(pedestal);
-        if(filterQueueSize(coin)>0)
-        {
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
-            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
-            {
-                writeFilterQueueToNBT(coin,stackIn);
-            }
-        }
-        else
-        {
-            writeFilterQueueToNBT(coin,stackIn);
-        }
     }
 
     @Override

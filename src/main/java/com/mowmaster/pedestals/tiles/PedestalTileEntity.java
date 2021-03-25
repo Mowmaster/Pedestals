@@ -1025,6 +1025,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             coin.removeFilterBlock(stack);
             coin.removeInventoryQueue(stack);
             coin.removeCraftingQueue(stack);
+            coin.removeOutputIngredientMap(stack);
+            coin.removeFilterChangeUpdated(stack);
         }
         ph.extractItem(0,stack.getCount(),false);
         //update();
@@ -1410,6 +1412,15 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             world.setBlockState(pos,newstate,3);
             world.markBlockRangeForRenderUpdate(pos,state,newstate);
         }
+
+        if(hasCoin())
+        {
+            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+            {
+                ItemUpgradeBase coin = ((ItemUpgradeBase)getCoinOnPedestal().getItem());
+                coin.setFilterChangeUpdate(getCoinOnPedestal());
+            }
+        }
         return ph.extractItem(6,ph.getStackInSlot(6).getCount(),false);
     }
 
@@ -1444,6 +1455,15 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                     world.notifyBlockUpdate(pos,state,newstate,3);
                     world.setBlockState(pos,newstate,3);
                     world.markBlockRangeForRenderUpdate(pos,state,newstate);
+
+                    if(hasCoin())
+                    {
+                        if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                        {
+                            ItemUpgradeBase coin = ((ItemUpgradeBase)getCoinOnPedestal().getItem());
+                            coin.setFilterChangeUpdate(getCoinOnPedestal());
+                        }
+                    }
                 }
                 return true;
             }
@@ -1469,6 +1489,15 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if(filter.hasTag())
                 {
                     oldStack.setTag(filter.getTag());
+
+                    if(hasCoin())
+                    {
+                        if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                        {
+                            ItemUpgradeBase coin = ((ItemUpgradeBase)getCoinOnPedestal().getItem());
+                            coin.setFilterChangeUpdate(getCoinOnPedestal());
+                        }
+                    }
                 }
             }
             IItemHandler ph = privateHandler.orElse(null);
@@ -1486,6 +1515,15 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                         world.notifyBlockUpdate(pos,state,newstate,3);
                         world.setBlockState(pos,newstate,3);
                         world.markBlockRangeForRenderUpdate(pos,state,newstate);
+
+                        if(hasCoin())
+                        {
+                            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                            {
+                                ItemUpgradeBase coin = ((ItemUpgradeBase)getCoinOnPedestal().getItem());
+                                coin.setFilterChangeUpdate(getCoinOnPedestal());
+                            }
+                        }
                     }
                 }
                 return true;

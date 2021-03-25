@@ -59,13 +59,13 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
             {
                 if (world.getGameTime()%speed == 0) {
                     //Just receives Energy, then exports it to machines, not other pedestals
-                    upgradeAction(world,pedestalPos,coinInPedestal);
+                    upgradeAction(pedestal, world,pedestalPos,coinInPedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
         //Set Default Energy Buffer
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
@@ -89,7 +89,7 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
                 else {
                     if(handler != null)
                     {
-                        int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
+                        int i = getNextSlotWithItemsCapFiltered(pedestal,cap,getStackInPedestal(world,posOfPedestal));
                         if(i>=0)
                         {
                             int maxInSlot = handler.getSlotLimit(i);

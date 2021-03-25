@@ -283,12 +283,12 @@ public class ItemFilterBase extends Item
         stack.setTag(compound);
     }
 
-    public List<ItemStack> readFilterQueueFromNBT(ItemStack coin)
+    public List<ItemStack> readFilterQueueFromNBT(ItemStack filter)
     {
         List<ItemStack> filterQueue = new ArrayList<>();
-        if(coin.hasTag())
+        if(filter.hasTag())
         {
-            CompoundNBT getCompound = coin.getTag();
+            CompoundNBT getCompound = filter.getTag();
             if(getCompound.contains("filterqueue"))
             {
                 CompoundNBT invTag = getCompound.getCompound("filterqueue");

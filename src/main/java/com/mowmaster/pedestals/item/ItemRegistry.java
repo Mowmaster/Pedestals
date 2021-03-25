@@ -13,6 +13,10 @@ public class ItemRegistry
     public static void onItemRegistryReady(RegistryEvent.Register<Item> e)
     {
         //ItemGuideBook.onItemRegistryReady(e);
+        ItemUpgradeCraftermk2.onItemRegistryReady(e);
+        ItemCraftingPattern.onItemRegistryReady(e);
+
+
         PedestalBlock.onItemRegistryReady(e);
 
         ItemLinkingTool.onItemRegistryReady(e);
@@ -168,6 +172,10 @@ public class ItemRegistry
 
     public static void onItemColorsReady(ColorHandlerEvent.Item event)
     {
+        ItemCraftingPattern.handleItemColors(event);
+
+
+
         PedestalBlock.handleItemColors(event);
         ItemColorPallet.handleItemColors(event);
         ItemFilterBase.handleItemColors(event);
