@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
 import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.references.Reference;
@@ -32,6 +33,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -111,18 +113,8 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
             setFilterChangeUpdated(pedestal.getCoinOnPedestal());
         }
 
-
         if(pedestal.hasFilter())
         {
-            Map<ItemStack, List<ItemStack>> craftingMap = readOutputIngredientMapFromNBT(coin);
-            if(!(craftingMap.size()>0))
-            {
-                buildOutputIngredientMapFromPattern(pedestal);
-                setFilterChangeUpdated(pedestal.getCoinOnPedestal());
-            }
-
-            craftingMap = readOutputIngredientMapFromNBT(coin);
-
             if(itemInPedestal.isEmpty())
             {
                 LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
@@ -141,21 +133,35 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
                         {
                             if(handler != null)
                             {
-                                int intGetNextIteration = getStoredInt(coin);
+                                //Slot || count to remove
+                                Map<Integer, Integer> itemExtractionMap = Maps.<Integer, Integer>newLinkedHashMap();
+                                Map<ItemStack, List<ItemStack>> craftingMap = readOutputIngredientMapFromNBT(coin);
+                                if(!(craftingMap.size()>0))
+                                {
+                                    buildOutputIngredientMapFromPattern(pedestal);
+                                    setFilterChangeUpdated(pedestal.getCoinOnPedestal());
+                                    craftingMap = readOutputIngredientMapFromNBT(coin);
+                                }
 
                                 int counter = 0;
                                 for(Map.Entry<ItemStack, List<ItemStack>> entry : craftingMap.entrySet())
                                 {
+                                    if(counter>=craftingMap.size())break;
+                                    int intGetNextIteration = getStoredInt(coin);
+                                    if(intGetNextIteration>=craftingMap.size())intGetNextIteration = 0;
+
+System.out.println(counter);
+System.out.println(intGetNextIteration);
                                     if(intGetNextIteration==counter)
                                     {
                                         ItemStack result = entry.getKey();
-                                        System.out.println(result);
+System.out.println(result);
                                         if(result != null) {
                                             List<ItemStack> ingredientList = entry.getValue();
-                                            System.out.println(ingredientList);
+System.out.println(ingredientList);
                                             int hasIngredents = 0;
 
-                                            /*if(intBatchCraftingSize > 0)
+                                            if(intBatchCraftingSize > 0)
                                             {
                                                 int intRecipeResultCount = result.getCount();
                                                 int intBatchCraftedAmount = intRecipeResultCount * intBatchCraftingSize;
@@ -178,29 +184,42 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
                                                     else
                                                     {
                                                         int sizeNeeded = intBatchCraftingSize*ingredientList.get(ing).getCount();
-                                                        if(hasEnoughInInv(cap,stackIngredent,intBatchCraftingSize)) {
+                                                        if(hasEnoughInInv(cap,stackIngredent,intBatchCraftingSize)>=sizeNeeded) {
                                                             int slotToFind = getSlotWithMatchingStack(cap,stackIngredent);
                                                             ItemStack stackInSlot = handler.getStackInSlot(slotToFind);
                                                             if(stackInSlot.getCount()>sizeNeeded) {
-                                                                handler.extractItem(slotToFind, sizeNeeded, false);
-                                                                hasIngredents++;
-                                                                continue;
+                                                                ItemStack toCheck = handler.extractItem(slotToFind,sizeNeeded,true);
+                                                                if(!toCheck.isEmpty() && toCheck.getCount()>= sizeNeeded)
+                                                                {
+                                                                    itemExtractionMap.put(slotToFind,sizeNeeded);
+                                                                    hasIngredents++;
+                                                                    continue;
+                                                                }
                                                             }
                                                             else {
                                                                 while (sizeNeeded>0)
                                                                 {
                                                                     slotToFind = getSlotWithMatchingStack(cap,stackIngredent);
+                                                                    if(slotToFind==-1)break;
                                                                     stackInSlot = handler.getStackInSlot(slotToFind);
                                                                     if(stackInSlot.getCount()>intBatchCraftedAmount) {
-                                                                        handler.extractItem(slotToFind, sizeNeeded, false);
-                                                                        sizeNeeded=0;
+                                                                        ItemStack toCheck = handler.extractItem(slotToFind,sizeNeeded,true);
+                                                                        if(!toCheck.isEmpty() && toCheck.getCount()>= sizeNeeded)
+                                                                        {
+                                                                            itemExtractionMap.put(slotToFind,sizeNeeded);
+                                                                            sizeNeeded=0;
+                                                                        }
                                                                     }
                                                                     else {
-                                                                        handler.extractItem(slotToFind, sizeNeeded, false);
-                                                                        sizeNeeded-=stackInSlot.getCount();
+                                                                        ItemStack toCheck = handler.extractItem(slotToFind,sizeNeeded,true);
+                                                                        if(!toCheck.isEmpty() && toCheck.getCount()>= sizeNeeded)
+                                                                        {
+                                                                            itemExtractionMap.put(slotToFind,sizeNeeded);
+                                                                            sizeNeeded-=stackInSlot.getCount();
+                                                                        }
                                                                     }
                                                                 }
-                                                                hasIngredents++;
+                                                                if(sizeNeeded<=0)hasIngredents++;
                                                             }
                                                         }
                                                     }
@@ -209,15 +228,20 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
                                                 if(hasIngredents==ingredientList.size())
                                                 {
                                                     result.setCount(intBatchCraftedAmount);
+                                                    //Remove items if all ingredients exist
+                                                    itemExtractionMap.forEach((integer, integer2) -> handler.extractItem(integer,integer2,false));
                                                     if (!pedestal.hasMuffler()) world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                     addToPedestal(world, pedestalPos, result);
                                                     writeStoredIntToNBT(coin, intGetNextIteration + 1);
                                                     break;
                                                 }
-                                            }*/
+                                                else {
+                                                    writeStoredIntToNBT(coin, intGetNextIteration + 1);
+                                                }
+                                            }
                                         }
                                     }
-                                    counter++;
+                                    else counter++;
                                 }
                             }
                         }

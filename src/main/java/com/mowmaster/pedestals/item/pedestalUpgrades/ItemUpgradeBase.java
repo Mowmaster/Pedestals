@@ -475,7 +475,7 @@ public class ItemUpgradeBase extends Item {
         return returner;
     }
 
-    public boolean hasEnoughInInv(LazyOptional<IItemHandler> cap, ItemStack stackToFind, int stopAfter)
+    public int hasEnoughInInv(LazyOptional<IItemHandler> cap, ItemStack stackToFind, int stopAfter)
     {
         int counter = 0;
         if(cap.isPresent()) {
@@ -488,7 +488,7 @@ public class ItemUpgradeBase extends Item {
                 if(!stackInSlot.isEmpty())
                 {
                     //check if it could pull the item out or not
-                    if(stackInSlot.isItemEqual(stackToFind))
+                    if(doItemsMatch(stackInSlot,stackToFind))
                     {
                         counter+=stackInSlot.getCount();
                         if(counter>=stopAfter)break;
@@ -496,7 +496,7 @@ public class ItemUpgradeBase extends Item {
                 }
             }
         }
-        return counter>=stopAfter;
+        return counter;
     }
 
     public int getSlotWithMatchingStack(LazyOptional<IItemHandler> cap, ItemStack stackToFind)
@@ -2330,15 +2330,22 @@ public class ItemUpgradeBase extends Item {
                 else
                 {
                     //Add to current queue
-                    if(ingredientQueue.contains(getStack))
+                    ItemStack itemInList=ItemStack.EMPTY;
+                    itemInList = ingredientQueue.stream().filter(itemStack -> doItemsMatch(getStack,itemStack)).findFirst().orElse(ItemStack.EMPTY);
+                    if(!itemInList.isEmpty())
                     {
-                        int index = ingredientQueue.indexOf(getStack);
-                        ItemStack current = ingredientQueue.get(index);
-                        ItemStack remakeQueuedStack = current.copy();
-                        remakeQueuedStack.setCount(current.getCount() + getStack.getCount());
-                        ingredientQueue.set(index,remakeQueuedStack);
+                        int index = ingredientQueue.lastIndexOf(itemInList);
+                        if(index>-1)
+                        {
+                            ItemStack current = ingredientQueue.remove(index);
+                            int countAdded =current.getCount()+getStack.getCount();
+                            current.setCount(countAdded);
+                            ingredientQueue.add(current);
+                        }
+                        else ingredientQueue.add(getStack);
                     }
                     else ingredientQueue.add(getStack);
+
                     craft.setInventorySlotContents(s,getStack);
                 }
             }
@@ -2350,8 +2357,6 @@ public class ItemUpgradeBase extends Item {
                     //Set ItemStack with recipe result
                     ItemStack stackRecipeResult = recipe.getCraftingResult(craft);
                     ingredientMap.put(stackRecipeResult,ingredientQueue);
-                    System.out.println(stackRecipeResult);
-                    System.out.println(ingredientQueue);
                 }
             }
         }
@@ -2393,7 +2398,6 @@ public class ItemUpgradeBase extends Item {
     public Map<ItemStack, List<ItemStack>> readOutputIngredientMapFromNBT(ItemStack coin)
     {
         Map<ItemStack, List<ItemStack>> craftingQueue = Maps.<ItemStack, List<ItemStack>>newLinkedHashMap();
-        List<ItemStack> filterQueue = new ArrayList<>();
         if(coin.hasTag())
         {
             if(coin.getTag().contains("outputIngredientMap"))
@@ -2402,13 +2406,14 @@ public class ItemUpgradeBase extends Item {
 
                 for(int m=0;m<getList.size();m++)
                 {
+                    List<ItemStack> filterQueue = new ArrayList<>();
                     CompoundNBT compoundnbt = getList.getCompound(m);
                     ItemStackHandler handler = new ItemStackHandler();
                     ((INBTSerializable<CompoundNBT>) handler).deserializeNBT(compoundnbt);
 
                     //start at 1 since 0 is our key item
                     for(int i=1;i<handler.getSlots();i++) {filterQueue.add(handler.getStackInSlot(i));}
-                    craftingQueue.put(handler.getStackInSlot(1),filterQueue);
+                    craftingQueue.put(handler.getStackInSlot(0),filterQueue);
                 }
             }
         }
