@@ -116,13 +116,13 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
             if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world, coinInPedestal, pedestalPos);
+                    upgradeAction(pedestal, world, coinInPedestal, pedestalPos);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
         if(!hasMaxXpSet(coinInPedestal) || readMaxXpFromNBT(coinInPedestal) != getMaxXpValue) {setMaxXP(coinInPedestal, getMaxXpValue);}
@@ -152,30 +152,35 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                             {
                                 //BottlingCodeHere
                                 //11 exp per bottle
+                                int xpCost = 11;
                                 int modifier = getBottlingRate(coinInPedestal);
 
                                 //If we can extract the correct amount of bottles(If it returns empty then it CANT work)
                                 if(!(handler.extractItem(i,modifier ,true ).equals(ItemStack.EMPTY)))
                                 {
-                                    int rate = (modifier * 10);
+                                    int rate = (modifier * xpCost);
                                     ItemStack getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
-                                    TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                    if(pedestalInv instanceof PedestalTileEntity) {
-                                        PedestalTileEntity pedestal = ((PedestalTileEntity) pedestalInv);
-                                        if(pedestal.canAcceptItems(world,posOfPedestal,getBottle)>=rate)
+                                    if(pedestal.canAcceptItems(world,posOfPedestal,getBottle)>=rate)
+                                    {
+                                        int currentlyStoredExp = getXPStored(coinInPedestal);
+                                        if(currentlyStoredExp >= rate)
                                         {
-                                            int currentlyStoredExp = getXPStored(coinInPedestal);
-                                            if(currentlyStoredExp > 0)
-                                            {
-                                                if(currentlyStoredExp >= rate)
-                                                {
-                                                    int getExpLeftInPedestal = currentlyStoredExp - rate;
-                                                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                    setXPStored(coinInPedestal,getExpLeftInPedestal);
-                                                    handler.extractItem(i,modifier ,false );
-                                                    ((PedestalTileEntity) pedestalInv).addItem(getBottle);
-                                                }
-                                            }
+                                            int getExpLeftInPedestal = currentlyStoredExp - rate;
+                                            setXPStored(coinInPedestal,getExpLeftInPedestal);
+                                            handler.extractItem(i,modifier ,false );
+                                            pedestal.addItem(getBottle);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                        }
+                                        else
+                                        {
+                                            modifier = Math.floorDiv(currentlyStoredExp,xpCost);
+                                            rate = (modifier * xpCost);
+                                            getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
+                                            int getExpLeftInPedestal = currentlyStoredExp - rate;
+                                            setXPStored(coinInPedestal,getExpLeftInPedestal);
+                                            handler.extractItem(i,modifier ,false );
+                                            pedestal.addItem(getBottle);
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                         }
                                     }
                                 }

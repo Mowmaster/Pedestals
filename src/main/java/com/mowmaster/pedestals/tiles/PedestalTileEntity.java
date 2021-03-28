@@ -1027,6 +1027,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             coin.removeCraftingQueue(stack);
             coin.removeOutputIngredientMap(stack);
             coin.removeFilterChangeUpdated(stack);
+            coin.removeToolChangeUpdated(stack);
         }
         ph.extractItem(0,stack.getCount(),false);
         //update();

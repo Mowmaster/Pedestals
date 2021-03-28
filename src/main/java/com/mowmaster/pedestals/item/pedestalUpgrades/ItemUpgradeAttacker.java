@@ -203,7 +203,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         World world = pedestal.getWorld();
         //ItemStack itemInPedestal = pedestal.getItemInPedestal();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        ItemStack toolInPedestal = pedestal.getToolOnPedestal().copy();
+        ItemStack toolInPedestal = pedestal.getToolOnPedestal();
         BlockPos posOfPedestal = pedestal.getPos();
         int width = getAreaWidth(coinInPedestal);
         int height = getRangeHeight(coinInPedestal);
@@ -223,7 +223,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
             if(selectedEntity != null)
             {
-                FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
+                FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal);
                 if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
                 if (pedestal.hasTool() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, toolInPedestal);}
                 if (toolInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}

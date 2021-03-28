@@ -2742,6 +2742,61 @@ public class ItemUpgradeBase extends Item {
     {
 
     }
+
+
+    public boolean getToolChangeStatus(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+            if(compound.contains("toolChange"))
+            {
+                return compound.getBoolean("toolChange");
+            }
+        }
+
+        return false;
+    }
+
+    public void setToolChangeUpdate(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+            compound.putBoolean("toolChange",true);
+        }
+        else compound.putBoolean("toolChange",true);
+
+        coin.setTag(compound);
+    }
+
+    public void setToolChangeUpdated(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+            compound.putBoolean("toolChange",false);
+        }
+
+        coin.setTag(compound);
+    }
+
+    public void removeToolChangeUpdated(ItemStack coin)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(coin.hasTag())
+        {
+            compound = coin.getTag();
+            if(compound.contains("toolChange"))
+            {
+                compound.remove("toolChange");
+                coin.setTag(compound);
+            }
+        }
+    }
     /***************************************
      ****************************************
      **      End of UpgradeTool Stuff      **

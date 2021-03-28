@@ -253,7 +253,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                                 else returnedMaxCount = 1;
                             }
 
-                            ItemStack repairIngredientStack = repairIngredient.getMatchingStacks()[0];
+                            ItemStack repairIngredientStack = (repairIngredient.getMatchingStacks().length>0)?(repairIngredient.getMatchingStacks()[0]):(new ItemStack(Items.STICK));
                             int maxdamage = nextItemToGrind.getMaxDamage();
                             int damage = nextItemToGrind.getDamage();
                             int durability = maxdamage - damage;
@@ -296,7 +296,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                                 else returnedMaxCount = 1;
                             }
 
-                            ItemStack repairIngredientStack = repairIngredient.getMatchingStacks()[0];
+                            ItemStack repairIngredientStack = (repairIngredient.getMatchingStacks().length>0)?(repairIngredient.getMatchingStacks()[0]):(new ItemStack(Items.PAPER).setDisplayName(new TranslationTextComponent(getTranslationKey() + ".cloth")));
                             int maxdamage = nextItemToGrind.getMaxDamage();
                             int damage = nextItemToGrind.getDamage();
                             int durability = maxdamage - damage;

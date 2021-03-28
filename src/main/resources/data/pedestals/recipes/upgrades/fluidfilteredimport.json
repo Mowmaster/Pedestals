@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "tag": "pedestals:filters"
+      "item": "pedestals:filter/filterbase"
     },
     {
       "item": "pedestals:coin/fluidimport"
