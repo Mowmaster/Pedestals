@@ -98,6 +98,8 @@
     "item.pedestals.upgradetool.tool_Y": " Y:",
     "item.pedestals.upgradetool.tool_Z": " Z:",
         "jei.pedestals.upgradetool.desc": "Right Click, with this in hand, on an upgraded pedestal to get details about the upgrade.",
+  "item.pedestals.toolswapper.tool_stored": "Tool In Pedestal: ",
+  "item.pedestals.toolswapper.tool_enchants": "Enchants On Tool",
   "item.pedestals.toolswapper": "Tool Swapper",
   "jei.pedestals.toolswapper.desc": "R-click the Tool Swapper on a pedestal. If your offhand has a tool in it, the tool will be added to the pedestal. If your off hand is empty AND a tool exists in the pedestal, you'll get the tool back.",
 

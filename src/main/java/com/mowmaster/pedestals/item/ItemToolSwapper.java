@@ -1,10 +1,33 @@
 package com.mowmaster.pedestals.item;
 
+import com.mowmaster.pedestals.blocks.PedestalBlock;
+import com.mowmaster.pedestals.enchants.EnchantmentArea;
+import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
+import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
+import com.mowmaster.pedestals.enchants.EnchantmentRange;
+import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
+import com.mowmaster.pedestals.references.Reference;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.BlockState;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -23,6 +46,68 @@ public class ItemToolSwapper extends Item {
     @Override
     public ItemStack getContainerItem(ItemStack itemStack) {
         return new ItemStack(this.getItem());
+    }
+
+    @Override
+    public ActionResultType onItemUse(ItemUseContext context) {
+        World worldIn = context.getWorld();
+        PlayerEntity player = context.getPlayer();
+        BlockPos pos = context.getPos();
+        ItemStack stackInMainHand = player.getHeldItemMainhand();
+        ItemStack stackInOffHand = player.getHeldItemOffhand();
+
+        TranslationTextComponent filterRemove = new TranslationTextComponent(Reference.MODID + ".filters.insert_remove");
+        TranslationTextComponent filterSwitch = new TranslationTextComponent(Reference.MODID + ".filters.insert_switch");
+        TranslationTextComponent filterInsert = new TranslationTextComponent(Reference.MODID + ".filters.insert_insert");
+
+        if(!worldIn.isRemote)
+        {
+            BlockState getBlockState = worldIn.getBlockState(pos);
+            if(getBlockState.getBlock() instanceof PedestalBlock) {
+                TileEntity tile = worldIn.getTileEntity(pos);
+                if(tile instanceof PedestalTileEntity)
+                {
+                    PedestalTileEntity pedestal = ((PedestalTileEntity)worldIn.getTileEntity(pos));
+                    if(pedestal.hasTool())
+                    {
+                        chatDetails(player,pedestal);
+                        return ActionResultType.SUCCESS;
+                    }
+
+                    return ActionResultType.FAIL;
+                }
+            }
+        }
+
+        return super.onItemUse(context);
+    }
+
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
+    {
+        if(pedestal.hasTool())
+        {
+            ItemStack itemTool = pedestal.getToolOnPedestal();
+            TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".tool_stored");
+            tool.append(itemTool.getDisplayName());
+            tool.mergeStyle(TextFormatting.WHITE);
+            player.sendMessage(tool,Util.DUMMY_UUID);
+
+            Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(pedestal.getToolOnPedestal());
+            if(map.size() > 0)
+            {
+                TranslationTextComponent enchant = new TranslationTextComponent(getTranslationKey() + ".tool_enchants");
+                enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+                player.sendMessage(enchant,Util.DUMMY_UUID);
+
+                for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
+                    Enchantment enchantment = entry.getKey();
+                    Integer integer = entry.getValue();
+                    TranslationTextComponent enchants = new TranslationTextComponent(" - " + enchantment.getDisplayName(integer).getString());
+                    enchants.mergeStyle(TextFormatting.GRAY);
+                    player.sendMessage(enchants,Util.DUMMY_UUID);
+                }
+            }
+        }
     }
 
 

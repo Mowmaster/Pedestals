@@ -54,62 +54,19 @@ public class ItemFilterSwapper extends Item {
         if(!worldIn.isRemote)
         {
             BlockState getBlockState = worldIn.getBlockState(pos);
-            if(player.isCrouching())
-            {
-                if(worldIn.getBlockState(pos).getBlock() instanceof PedestalBlock) {
-                    //Checks Tile at location to make sure its a TilePedestal
-                    TileEntity tileEntity = worldIn.getTileEntity(pos);
-                    if (tileEntity instanceof PedestalTileEntity) {
-                        PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
-                        ItemHandlerHelper.giveItemToPlayer(player,pedestal.removeFilter(true));
-
-                        filterRemove.mergeStyle(TextFormatting.WHITE);
-                        player.sendStatusMessage(filterRemove,true);
+            if(getBlockState.getBlock() instanceof PedestalBlock) {
+                TileEntity tile = worldIn.getTileEntity(pos);
+                if(tile instanceof PedestalTileEntity)
+                {
+                    PedestalTileEntity pedestal = ((PedestalTileEntity)worldIn.getTileEntity(pos));
+                    if(pedestal.hasFilter())
+                    {
+                        ItemFilterBase getFilter = (ItemFilterBase)pedestal.getFilterInPedestal().getItem();
+                        getFilter.chatDetails(player,pedestal);
                         return ActionResultType.SUCCESS;
                     }
-                }
-            }
-            else
-            {
-                if(getBlockState.getBlock() instanceof PedestalBlock) {
-                    TileEntity tile = worldIn.getTileEntity(pos);
-                    if(tile instanceof PedestalTileEntity)
-                    {
-                        PedestalTileEntity pedestal = ((PedestalTileEntity)worldIn.getTileEntity(pos));
-                        if(pedestal.hasFilter())
-                        {
-                            if(stackInOffHand.getItem() instanceof ItemFilterBase)
-                            {
-                                if(pedestal.updateFilter(player.getHeldItemOffhand(),true))
-                                {
-                                    //player.getHeldItemOffhand().shrink(1);
-                                    filterSwitch.mergeStyle(TextFormatting.WHITE);
-                                    player.sendStatusMessage(filterSwitch,true);
-                                    return ActionResultType.SUCCESS;
-                                }
-                                else return ActionResultType.FAIL;
 
-                            }
-                            else
-                            {
-                                ItemFilterBase getFilter = (ItemFilterBase)pedestal.getFilterInPedestal().getItem();
-                                getFilter.chatDetails(player,pedestal);
-                                return ActionResultType.SUCCESS;
-                            }
-                        }
-                        else
-                        {
-                            if(pedestal.addFilter(stackInOffHand,true))
-                            {
-                                pedestal.addFilter(stackInOffHand,false);
-                                stackInOffHand.shrink(1);
-                                filterInsert.mergeStyle(TextFormatting.WHITE);
-                                player.sendStatusMessage(filterInsert,true);
-                            }
-                        }
-
-                        return ActionResultType.FAIL;
-                    }
+                    return ActionResultType.FAIL;
                 }
             }
         }

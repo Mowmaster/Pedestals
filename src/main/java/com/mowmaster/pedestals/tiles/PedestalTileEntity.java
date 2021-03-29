@@ -51,8 +51,9 @@ import java.util.List;
 import java.util.Random;
 
 import static com.mowmaster.pedestals.references.Reference.MODID;
-
-public class PedestalTileEntity extends TileEntity implements ITickableTileEntity, IEnergyStorage {
+//Idk if the implement is needed??? IF so then have to uncomment the other energy methods
+//public class PedestalTileEntity extends TileEntity implements ITickableTileEntity, IEnergyStorage {
+public class PedestalTileEntity extends TileEntity implements ITickableTileEntity {
 
     private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandler);
     private LazyOptional<IItemHandler> privateHandler = LazyOptional.of(this::createHandlerPedestalPrivate);
@@ -147,7 +148,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         };
     }
 
-    @Override
+    /*@Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
 
         if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyImport))
@@ -158,13 +159,34 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 //Return input power if it can be insert???
                 return maxReceive;
             }
+            //Else return availablespace???
+            else return itemE.availableEnergySpaceInCoin(getCoinOnPedestal());
         }
+        *//*if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyImport))
+        {
+            ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+            if(itemE.addEnergy(getCoinOnPedestal(),maxReceive,simulate))
+            {
+                //Return input power if it can be insert???
+                return maxReceive;
+            }
+        }*//*
 
         return 0;
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
+        *//*if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyExport))
+        {
+            ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
+            if(itemE.removeEnergy(getCoinOnPedestal(),maxExtract,simulate))
+            {
+                //Return output power if it can be taken???
+                return maxExtract;
+            }
+        }
+        return 0;*//*
         if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyExport))
         {
             ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
@@ -173,6 +195,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 //Return output power if it can be taken???
                 return maxExtract;
             }
+            //Else return currently stored energy???
+            else return itemE.getEnergyStored(getCoinOnPedestal());
         }
         return 0;
     }
@@ -216,7 +240,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public int getMaxEnergyExtract()
     {
         return this.getEnergyStored();
-    }
+    }*/
+
+
 
     /**********************************
      **********************************
@@ -1083,6 +1109,28 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else return false;
     }
 
+    public ItemStack removeSpeed(int count)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasSpeed())
+        {
+            //update();
+            return ph.extractItem(2,count,false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeSpeed()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasSpeed())
+        {
+            //update();
+            return ph.extractItem(2,ph.getStackInSlot(2).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
     public boolean hasSpeed()
     {
         IItemHandler ph = privateHandler.orElse(null);
@@ -1155,6 +1203,29 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         }
         else return false;
     }
+
+    public ItemStack removeCapacity(int count)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasCapacity())
+        {
+            //update();
+            return ph.extractItem(3,count,false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeCapacity()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasCapacity())
+        {
+            //update();
+            return ph.extractItem(3,ph.getStackInSlot(3).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
     public boolean hasCapacity()
     {
         IItemHandler ph = privateHandler.orElse(null);
@@ -1196,6 +1267,28 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             return true;
         }
         else return false;
+    }
+
+    public ItemStack removeRange(int count)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasRange())
+        {
+            //update();
+            return ph.extractItem(4,count,false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeRange()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasRange())
+        {
+            //update();
+            return ph.extractItem(4,ph.getStackInSlot(4).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
     }
 
     public int getPedestalTransferRange(){return getRange();}
@@ -1556,12 +1649,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else  return true;
     }
 
-    public ItemStack getTorchPedestal()
-    {
-        if(hasTorch())return new ItemStack(Items.REDSTONE_TORCH,1);
-        else return ItemStack.EMPTY;
-    }
-
     public ItemStack removeTorch() {
         IItemHandler ph = privateHandler.orElse(null);
         return ph.extractItem(7,ph.getStackInSlot(7).getCount(),false);
@@ -1620,6 +1707,17 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else return false;
     }
 
+    public ItemStack removeRRobin()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasRRobin())
+        {
+            //update();
+            return ph.extractItem(8,ph.getStackInSlot(8).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
     public boolean hasRRobin()
     {
         IItemHandler ph = privateHandler.orElse(null);
@@ -1658,6 +1756,17 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         else return false;
     }
 
+    public ItemStack removeMuffler()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasMuffler())
+        {
+            //update();
+            return ph.extractItem(9,ph.getStackInSlot(9).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
     public boolean hasMuffler()
     {
         IItemHandler ph = privateHandler.orElse(null);
@@ -1682,18 +1791,28 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     ==============================================================================
     ============================================================================*/
 
-    public boolean addParticleDiffuser(ItemStack particle)
+    public ItemStack addParticleDiffuser(ItemStack particle)
     {
         IItemHandler ph = privateHandler.orElse(null);
         ItemStack itemFromBlock = particle.copy();
         itemFromBlock.setCount(1);
         if(!hasParticleDiffuser())
         {
-            ph.insertItem(10,itemFromBlock,false);
             //update();
-            return true;
+            return ph.insertItem(10,itemFromBlock,false);
         }
-        else return false;
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeParticleDiffuser()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasParticleDiffuser())
+        {
+            //update();
+            return ph.extractItem(10,ph.getStackInSlot(10).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
     }
 
     public boolean hasParticleDiffuser()

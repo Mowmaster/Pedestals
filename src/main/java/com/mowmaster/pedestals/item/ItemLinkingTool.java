@@ -205,14 +205,6 @@ public class ItemLinkingTool extends Item {
                         rrobin.mergeStyle(TextFormatting.LIGHT_PURPLE);
                         player.sendMessage(rrobin,Util.DUMMY_UUID);
 
-                        if(tilePedestal.hasTool())
-                        {
-                            TranslationTextComponent tool = new TranslationTextComponent(getTranslationKey() + ".tool_stored");
-                            tool.append(tilePedestal.getToolOnPedestal().getDisplayName());
-                            tool.mergeStyle(TextFormatting.WHITE);
-                            player.sendMessage(tool,Util.DUMMY_UUID);
-                        }
-
                         if(tilePedestal.getSpeed()>0)
                         {
                             TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".tool_speed");
