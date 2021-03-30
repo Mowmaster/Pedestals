@@ -1,11 +1,11 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mojang.authlib.GameProfile;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import com.mowmaster.pedestals.util.PedestalFakePlayer;
+import com.mowmaster.pedestals.util.PedestalUtils;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
@@ -15,7 +15,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -34,7 +33,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -253,6 +251,19 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         }
     }
 
+    public Item getSeed(World world, BlockState targetState, BlockPos targetPos)
+    {
+        Item seed = null;
+        if (targetState.getBlock() instanceof CropsBlock) {
+            CropsBlock crop = (CropsBlock) targetState.getBlock();
+            ItemStack getSeedDropped = crop.getItem(world, targetPos, targetState);
+            if (!getSeedDropped.isEmpty()) {
+                seed = getSeedDropped.getItem();
+            }
+        }
+        return seed;
+    }
+
     public void upgradeAction(PedestalTileEntity pedestal, BlockPos posTarget, BlockState target)
     {
         World world = pedestal.getWorld();
@@ -277,25 +288,44 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
             ToolType tool = target.getHarvestTool();
             int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, target);
-            /*System.out.println(tool.getName());
-            System.out.println(toolLevel);
-            System.out.println(target.getHarvestLevel());*/
 
             if(hasAdvancedInventoryTargeting(coinInPedestal))
             {
-                //TODO: Make this do gentle harvesting SOMEDAY
                 //https://github.com/Lothrazar/Cyclic/blob/trunk/1.16/src/main/java/com/lothrazar/cyclic/block/harvester/TileHarvester.java
-                //toolLevel >= target.getHarvestLevel()
                 if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                 {
-                    //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
-                    //if (!MinecraftForge.EVENT_BUS.post(e)) {
-                        target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
-                        target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
-                        //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
+                    Item targetSeed = getSeed(world,target,posTarget);
+                    List<ItemStack> targetDrops = Block.getDrops(target, (ServerWorld) world, posTarget, null);
+                    IntegerProperty propInt = getBlockPropertyAge(target);
+                    int min = Collections.min(propInt.getAllowedValues());
+                    /*
+                    world.setBlockState(posTarget,target.with(propInt,min));
+                    Sets a block state into this world.
+                    Flags are as follows:
+                        1 will cause a block update.
+                        2 will send the change to clients.
+                        4 will prevent the block from being re-rendered.
+                        8 will force any re-renders to run on the main thread instead
+                        16 will prevent neighbor reactions (e.g. fences connecting, observers pulsing).
+                        32 will prevent neighbor reactions from spawning drops.
+                        64 will signify the block is being moved.
+                     Flags can be OR-ed
+                     */
+
+                    target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
+                    for(ItemStack itemStack : targetDrops)
+                    {
+                        if(targetSeed !=null && itemStack.getItem().equals(targetSeed))
+                        {
+                            itemStack.shrink(1);
+                            targetSeed =null;
+                        }
+                        PedestalUtils.spawnItemStackInWorld(world,posTarget,itemStack);
+                    }
+                    //Do additional world drops, like silverfish
+                    if (world instanceof ServerWorld)target.spawnAdditionalDrops((ServerWorld) world, posTarget, ItemStack.EMPTY);
+                    world.setBlockState(posTarget,target.with(propInt,min));
                     if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
-                        world.removeBlock(posTarget, false);
-                    //}
                 }
             }
             else
