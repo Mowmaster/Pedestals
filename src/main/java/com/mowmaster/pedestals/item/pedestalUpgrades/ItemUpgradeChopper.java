@@ -74,7 +74,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
     {
         int areaWidth = 0;
         int aW = getAreaModifier(stack);
-        areaWidth = ((aW)+1);
+        areaWidth = ((aW)+3);
         return  areaWidth;
     }
 

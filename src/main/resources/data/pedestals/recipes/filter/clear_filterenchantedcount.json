@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:filter/filterenchantedcount"
+    }
+  ],
+  "result": {
+    "item": "pedestals:filter/filterenchantedcount"
+  }
+}

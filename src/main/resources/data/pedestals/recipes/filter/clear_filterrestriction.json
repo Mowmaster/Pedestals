@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICN"
+  ],
+  "key": {
+    "C": {
+      "item": "pedestals:filter/filterrestriction"
+    }
+  },
+  "result": {
+    "item": "pedestals:filter/filterrestriction"
+  }
+}
