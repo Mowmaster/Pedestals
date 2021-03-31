@@ -76,7 +76,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
     {
         int areaWidth = 0;
         int aW = getAreaModifier(stack);
-        areaWidth = ((aW)+1);
+        areaWidth = ((aW)+2);
         return  areaWidth;
     }
 

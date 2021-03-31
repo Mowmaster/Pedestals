@@ -1148,7 +1148,7 @@ public class ItemUpgradeBase extends Item {
         int rangeOver = getRangeModifier(stack);
         int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
 
-        return  ((advancedAllowed*6)+4);
+        return  ((advancedAllowed*6)+6);
     }
     /***************************************
      ****************************************
