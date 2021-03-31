@@ -288,6 +288,28 @@ public class ItemUpgradeBase extends Item {
     {
         return true;
     }
+
+
+    //nerfed technically, but also give the ability to set storage to a nice number
+    public int getStorageBuffer(ItemStack coin) {
+        int capacityOver = getCapacityModifierOverEnchanted(coin);
+        //1728 = 27*64 (size of double chest)
+        int storageBuffer = (int)(Math.pow(4,(capacityOver>=33)?(33):(capacityOver)+1)*1728);
+
+        return  (storageBuffer>=Integer.MAX_VALUE)?(Integer.MAX_VALUE):(storageBuffer);
+    }
+
+    //nerfed technically, but also give the ability to set storage to a nice number
+    public int getFuelBuffer(ItemStack coin) {
+        int capacityOver = getCapacityModifierOverEnchanted(coin);
+        //1728 = 27*64 (size of double chest)
+        int storageBuffer = (int)(Math.pow(4,(capacityOver>=33)?(33):(capacityOver)+1)*1728);
+        int value = (storageBuffer>=Integer.MAX_VALUE)?(Integer.MAX_VALUE):(storageBuffer);
+        int fuelToBuffer = Math.multiplyExact(Math.floorDiv(value,8),1600);
+
+
+        return  (fuelToBuffer<=maxStored)?(fuelToBuffer):(maxStored);
+    }
     /***************************************
      ****************************************
      **       End of Inventory Stuff       **

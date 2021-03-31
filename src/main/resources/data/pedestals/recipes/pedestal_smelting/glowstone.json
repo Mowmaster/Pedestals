@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_smelting_advanced",
+  "ingredient": {
+    "item": "minecraft:redstone"
+  },
+  "result": {
+    "item": "minecraft:glowstone_dust",
+    "count": 1
+  }
+}

@@ -11,12 +11,21 @@ public final class PedestalsSerializers {
 
     public static final DeferredRegister<IRecipeSerializer<?>> RECIPES = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, Reference.MODID);
 
+    public static final RegistryObject<IRecipeSerializer<?>> SMELTING_ADVANCED = RECIPES.register("pedestal_smelting_advanced", () ->
+            SmeltingRecipeAdvanced.serializer);
+
     //registry name is what type should be used in json recipes
     public static final RegistryObject<IRecipeSerializer<?>> CRUSHING = RECIPES.register("pedestal_crushing", () ->
             CrusherRecipe.serializer);
 
+    public static final RegistryObject<IRecipeSerializer<?>> CRUSHING_ADVANCED = RECIPES.register("pedestal_crushing_advanced", () ->
+            CrusherRecipeAdvanced.serializer);
+
     public static final RegistryObject<IRecipeSerializer<?>> SAWING = RECIPES.register("pedestal_sawing", () ->
             SawMillRecipe.serializer);
+
+    public static final RegistryObject<IRecipeSerializer<?>> SAWING_ADVANCED = RECIPES.register("pedestal_sawing_advanced", () ->
+            SawMillRecipeAdvanced.serializer);
 
     public static final RegistryObject<IRecipeSerializer<?>> COBBLEGEN = RECIPES.register("pedestal_cobblegen", () ->
             CobbleGenRecipe.serializer);

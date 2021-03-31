@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_sawing_advanced",
+  "ingredient": {
+    "item": "minecraft:stone"
+  },
+  "result": {
+    "item": "minecraft:stone_slab",
+    "count": 2
+  }
+}

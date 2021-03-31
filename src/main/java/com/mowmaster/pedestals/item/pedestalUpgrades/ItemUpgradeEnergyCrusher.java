@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.recipes.CrusherRecipe;
+import com.mowmaster.pedestals.recipes.CrusherRecipeAdvanced;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -43,6 +44,17 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
         return true;
     }
 
+
+    @Nullable
+    protected CrusherRecipeAdvanced getRecipeAdvanced(World world, ItemStack stackIn) {
+        Inventory inv = new Inventory(stackIn);
+        return world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipeAdvanced.recipeType, inv, world).orElse(null);
+    }
+
+    protected Collection<ItemStack> getProcessResultsAdvanced(CrusherRecipeAdvanced recipe) {
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
+    }
+
     //Recipe Bits like normal crusher
     @Nullable
     protected CrusherRecipe getRecipe(World world, ItemStack stackIn) {
@@ -78,6 +90,7 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
     //Crusher Normal Action
     public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
+        Boolean isAdvanced = hasAdvancedInventoryTargeting(coinInPedestal);
         //Set Default Energy Buffer
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
@@ -88,14 +101,14 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
         ItemStack itemFromInv = ItemStack.EMPTY;
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(isAdvanced)cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(!isInventoryEmpty(cap))
         {
             if(cap.isPresent())
             {
                 IItemHandler handler = cap.orElse(null);
                 TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
+                if (((isAdvanced && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
                     itemFromInv = ItemStack.EMPTY;
                 }
                 else {
@@ -107,8 +120,7 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
                             int maxInSlot = handler.getSlotLimit(i);
                             itemFromInv = handler.getStackInSlot(i);
                             //Should work without catch since we null check this in our GetNextSlotFunction
-                            Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
-                            //Just check to make sure our recipe output isnt air
+                            Collection<ItemStack> jsonResults = (isAdvanced && getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv)).size()>0)?(getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv))):(getProcessResults(getRecipe(world,itemFromInv)));                            //Just check to make sure our recipe output isnt air
                             ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
                             ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                             if(!resultSmelted.equals(ItemStack.EMPTY))

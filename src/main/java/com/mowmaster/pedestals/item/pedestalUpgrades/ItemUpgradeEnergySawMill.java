@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.recipes.SawMillRecipe;
+import com.mowmaster.pedestals.recipes.SawMillRecipeAdvanced;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -36,6 +37,16 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
     }
 
     @Nullable
+    protected SawMillRecipeAdvanced getRecipeAdvanced(World world, ItemStack stackIn) {
+        Inventory inv = new Inventory(stackIn);
+        return world == null ? null : world.getRecipeManager().getRecipe(SawMillRecipeAdvanced.recipeType, inv, world).orElse(null);
+    }
+
+    protected Collection<ItemStack> getProcessResultsAdvanced(SawMillRecipeAdvanced recipe) {
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
+    }
+
+    @Nullable
     protected SawMillRecipe getRecipe(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
         return world == null ? null : world.getRecipeManager().getRecipe(SawMillRecipe.recipeType, inv, world).orElse(null);
@@ -67,6 +78,7 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
 
     public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
+        Boolean isAdvanced = hasAdvancedInventoryTargeting(coinInPedestal);
         //Set Default Energy Buffer
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
@@ -76,14 +88,14 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
 
         ItemStack itemFromInv = ItemStack.EMPTY;
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(isAdvanced)cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(!isInventoryEmpty(cap))
         {
             if(cap.isPresent())
             {
                 IItemHandler handler = cap.orElse(null);
                 TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
+                if (((isAdvanced && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
                     itemFromInv = ItemStack.EMPTY;
                 }
                 else {
@@ -95,7 +107,7 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
                             int maxInSlot = handler.getSlotLimit(i);
                             itemFromInv = handler.getStackInSlot(i);
                             //Should work without catch since we null check this in our GetNextSlotFunction\
-                            Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
+                            Collection<ItemStack> jsonResults = (isAdvanced && getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv)).size()>0)?(getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv))):(getProcessResults(getRecipe(world,itemFromInv)));
                             //Just check to make sure our recipe output isnt air
                             ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
                             //ItemStack resultSmelted = SawMill.instance().getResult(itemFromInv.getItem());

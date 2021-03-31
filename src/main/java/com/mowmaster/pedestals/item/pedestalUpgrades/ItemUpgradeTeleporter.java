@@ -49,7 +49,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
 
     @Override
     public Boolean canAcceptCapacity() {
-        return false;
+        return true;
     }
 
     @Override
@@ -118,7 +118,7 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
             BlockPos pedestalPos = pedestal.getPos();
 
-            int getMaxFuelValue = 2000000000;
+            int getMaxFuelValue = getFuelBuffer(coinInPedestal);
             if(!hasMaxFuelSet(coinInPedestal) || readMaxFuelFromNBT(coinInPedestal) != getMaxFuelValue) {setMaxFuel(coinInPedestal, getMaxFuelValue);}
 
             int speed = getOperationSpeed(coinInPedestal);

@@ -1,11 +1,16 @@
 package com.mowmaster.pedestals.util.compat.jei;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
+import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.item.*;
 import com.mowmaster.pedestals.item.deprecated.*;
+import com.mowmaster.pedestals.item.pedestalFilters.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import com.mowmaster.pedestals.recipes.*;
 import com.mowmaster.pedestals.references.Reference;
+import com.mowmaster.pedestals.util.compat.jei.advancedprocessing.CrusherAdvancedRecipeCategory;
+import com.mowmaster.pedestals.util.compat.jei.advancedprocessing.SawmillAdvancedRecipeCategory;
+import com.mowmaster.pedestals.util.compat.jei.advancedprocessing.SmeltingAdvancedRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.cobblegen.CobbleGenRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.cobblegensilk.CobbleGenSilkRecipeCategory;
 import com.mowmaster.pedestals.util.compat.jei.color_pallet.ColorPalletRecipeCategory;
@@ -70,6 +75,9 @@ public class PedestalsPlugin implements IModPlugin {
         return ingredient.getMatchingStacks()[0].getItem();
     }
 
+    public static final IRecipeType<SmeltingRecipeAdvanced> SMELTING_ADVANCED_TYPE = SmeltingRecipeAdvanced.recipeType;
+    public static final IRecipeType<CrusherRecipeAdvanced> CRUSHER_ADVANCED_TYPE = CrusherRecipeAdvanced.recipeType;
+    public static final IRecipeType<SawMillRecipeAdvanced> SAWING_ADVANCED_TYPE = SawMillRecipeAdvanced.recipeType;
     public static final IRecipeType<CrusherRecipe> CRUSHER_TYPE = CrusherRecipe.recipeType;
     public static final IRecipeType<SawMillRecipe> SAWING_TYPE = SawMillRecipe.recipeType;
     public static final IRecipeType<CobbleGenRecipe> COBBLEGEN_TYPE = CobbleGenRecipe.recipeType;
@@ -79,6 +87,9 @@ public class PedestalsPlugin implements IModPlugin {
     public static final IRecipeType<FluidtoExpConverterRecipe> FLUIDTOXP_TYPE = FluidtoExpConverterRecipe.recipeType;
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(SMELTING_ADVANCED_TYPE), SmeltingAdvancedRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(CRUSHER_ADVANCED_TYPE), CrusherAdvancedRecipeCategory.UID);
+        registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(SAWING_ADVANCED_TYPE), SawmillAdvancedRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(CRUSHER_TYPE), CrusherRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(SAWING_TYPE), SawMillRecipeCategory.UID);
         registration.addRecipes(Minecraft.getInstance().world.getRecipeManager().getRecipesForType(COBBLEGEN_TYPE), CobbleGenRecipeCategory.UID);
@@ -165,6 +176,8 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemPedestalUpgrades.CAPACITY, "upgradecapacity");
         addValueInfoPage(registration, ItemPedestalUpgrades.RANGE, "upgraderange");
         addValueInfoPage(registration, ItemPedestalUpgrades.ROUNDROBIN, "upgraderoundrobin");
+        addValueInfoPage(registration, ItemPedestalUpgrades.SOUNDMUFFLER, "upgradesoundmuffler");
+        addValueInfoPage(registration, ItemPedestalUpgrades.PARTICLEDIFFUSER, "upgradeparticlediffuser");
         addValueInfoPage(registration, ItemTagTool.TAG, "tagtool");
         addValueInfoPage(registration, ItemUpgradeTool.UPGRADE, "upgradetool");
         addValueInfoPage(registration, ItemToolSwapper.QUARRYTOOL, "toolswapper");
@@ -173,6 +186,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemEnchantableBook.RANGE, "bookrange");
         addValueInfoPage(registration, ItemEnchantableBook.AREA, "bookarea");
         addValueInfoPage(registration, ItemEnchantableBook.ADVANCED, "bookadvanced");
+        addValueInfoPage(registration, ItemEnchantableBook.MAGNET, "bookmagnet");
 
         //Upgrades
         addValueInfoPage(registration, ItemUpgradeBreaker.BREAKER, "breaker");
@@ -289,10 +303,27 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeRestriction.DEFAULT, "restriction");
         addValueInfoPage(registration, ItemUpgradeFilterDurability.DURABILITY, "filterdurability");
         addValueInfoPage(registration, ItemUpgradeFilterDurabilityLess.DURABILITYLESS, "filterdurabilityless");
+
+        addValueInfoPage(registration, ItemFilterSwapper.FILTERTOOL, "filterswapper");
+        addValueInfoPage(registration, ItemFilterBase.BASEFILTER, "filterbase");
+        addValueInfoPage(registration, ItemFilterItem.ITEMFILTER, "filteritem");
+        addValueInfoPage(registration, ItemFilterItemStack.ITEMSTACKFILTER, "filteritemstack");
+        addValueInfoPage(registration, ItemFilterMod.MODFILTER, "filtermod");
+        addValueInfoPage(registration, ItemFilterTag.TAGFILTER, "filtertag");
+        addValueInfoPage(registration, ItemFilterFood.FOODFILTER, "filterfood");
+        addValueInfoPage(registration, ItemFilterEnchanted.ENCHANTEDFILTER, "filterenchanted");
+        addValueInfoPage(registration, ItemFilterEnchantedFuzzy.ENCHANTEDFUZZYFILTER, "filterenchantedfuzzy");
+        addValueInfoPage(registration, ItemFilterEnchantedExact.ENCHANTEDEXACTFILTER, "filterenchantedexact");
+        addValueInfoPage(registration, ItemFilterEnchantedCount.ENCHANTEDCOUNTFILTER, "filterenchantedcount");
+        addValueInfoPage(registration, ItemFilterDurability.DURABILITYFILTER, "filterdurability");
+        addValueInfoPage(registration, ItemFilterRestricted.RESTRICTIONFILTER, "filterrestriction");
     }
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registry) {
+        registry.addRecipeCategories(new SmeltingAdvancedRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new CrusherAdvancedRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new SawmillAdvancedRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new CrusherRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new SawMillRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
         registry.addRecipeCategories(new CobbleGenRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
@@ -305,17 +336,36 @@ public class PedestalsPlugin implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration)
     {
+        //Crafting-Anvil
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeCrafter.CRAFTER_THREE), VanillaRecipeCategoryUid.CRAFTING);
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeExpAnvil.XPANVIL), VanillaRecipeCategoryUid.ANVIL);
         //Crusher
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeCrusher.CRUSHER), CrusherRecipeCategory.UID);
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeEnergyCrusher.RFCRUSHER), CrusherRecipeCategory.UID);
+            ItemStack getCrusher = new ItemStack(ItemUpgradeCrusher.CRUSHER.getItem());
+            getCrusher.addEnchantment(EnchantmentRegistry.ADVANCED,1);
+        registration.addRecipeCatalyst(getCrusher, CrusherAdvancedRecipeCategory.UID);
+            ItemStack getCrusherRF = new ItemStack(ItemUpgradeEnergyCrusher.RFCRUSHER.getItem());
+            getCrusherRF.addEnchantment(EnchantmentRegistry.ADVANCED,1);
+        registration.addRecipeCatalyst(getCrusherRF, CrusherAdvancedRecipeCategory.UID);
         //Sawmill
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeSawMill.SAWMILL), SawMillRecipeCategory.UID);
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeEnergySawMill.RFSAWMILL), SawMillRecipeCategory.UID);
+            ItemStack getSawmill = new ItemStack(ItemUpgradeSawMill.SAWMILL.getItem());
+            getSawmill.addEnchantment(EnchantmentRegistry.ADVANCED,1);
+        registration.addRecipeCatalyst(getSawmill, SawmillAdvancedRecipeCategory.UID);
+            ItemStack getSawmillRF = new ItemStack(ItemUpgradeEnergySawMill.RFSAWMILL.getItem());
+            getSawmillRF.addEnchantment(EnchantmentRegistry.ADVANCED,1);
+        registration.addRecipeCatalyst(getSawmillRF, SawmillAdvancedRecipeCategory.UID);
         //Smelter
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeFurnace.SMELTER), VanillaRecipeCategoryUid.FURNACE);
         registration.addRecipeCatalyst(new ItemStack(ItemUpgradeEnergyFurnace.RFSMELTER), VanillaRecipeCategoryUid.FURNACE);
+            ItemStack getSmelter = new ItemStack(ItemUpgradeFurnace.SMELTER.getItem());
+            getSmelter.addEnchantment(EnchantmentRegistry.ADVANCED,1);
+        registration.addRecipeCatalyst(getSmelter, SmeltingAdvancedRecipeCategory.UID);
+            ItemStack getSmelterRF = new ItemStack(ItemUpgradeEnergyFurnace.RFSMELTER.getItem());
+            getSmelterRF.addEnchantment(EnchantmentRegistry.ADVANCED,1);
+        registration.addRecipeCatalyst(getSmelterRF, SmeltingAdvancedRecipeCategory.UID);
         //Colored Pedestals
         registration.addRecipeCatalyst(new ItemStack(ItemColorPallet.COLORPALLET), ColorPedestalRecipeCategory.UID);
         //Color Pallets

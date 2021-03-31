@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_crushing_advanced",
+  "ingredient": {
+    "tag": "forge:ores/iron"
+  },
+  "result": {
+    "item": "pedestals:dustiron",
+    "count": 3
+  }
+}

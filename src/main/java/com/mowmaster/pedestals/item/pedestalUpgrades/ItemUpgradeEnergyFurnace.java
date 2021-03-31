@@ -1,5 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.recipes.CrusherRecipeAdvanced;
+import com.mowmaster.pedestals.recipes.SmeltingRecipeAdvanced;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,6 +37,21 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
     @Override
     public Boolean canAcceptAdvanced() {
         return true;
+    }
+
+    @Nullable
+    protected SmeltingRecipeAdvanced getRecipeAdvanced(World world, ItemStack stackIn) {
+        Inventory inv = new Inventory(stackIn);
+        return world == null ? null : world.getRecipeManager().getRecipe(SmeltingRecipeAdvanced.recipeType, inv, world).orElse(null);
+    }
+
+    protected Collection<ItemStack> getProcessResultsAdvanced(SmeltingRecipeAdvanced recipe) {
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResult()));
+    }
+
+    protected float getProcessResultsXPAdvanced() {
+        //My custom recipe doesnt have any xp to give, so default to 1xp point per
+        return 1.0f;
     }
 
     @Nullable
@@ -92,6 +109,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
 
     public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
+        Boolean isAdvanced = hasAdvancedInventoryTargeting(coinInPedestal);
         //Set Default Energy Buffer
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}
@@ -102,14 +120,14 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
         ItemStack itemFromInv = ItemStack.EMPTY;
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-        if(hasAdvancedInventoryTargeting(coinInPedestal))cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(isAdvanced)cap = findItemHandlerAtPosAdvanced(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
         if(!isInventoryEmpty(cap))
         {
             if(cap.isPresent())
             {
                 IItemHandler handler = cap.orElse(null);
                 TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
+                if (((isAdvanced && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
                     itemFromInv = ItemStack.EMPTY;
                 }
                 else {
@@ -121,8 +139,10 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                             int maxInSlot = handler.getSlotLimit(i);
                             itemFromInv = handler.getStackInSlot(i);
                             //Need to null check invalid recipes
-                            Collection<ItemStack> smeltedResults = getProcessResults(getRecipe(world,itemFromInv),itemFromInv);
-                            float xp = getProcessResultsXP(getRecipe(world,itemFromInv));
+                            Collection<ItemStack> smeltedResults = (isAdvanced && getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv)).size()>0)?(getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv))):(getProcessResults(getRecipe(world,itemFromInv),itemFromInv));
+                            //Collection<ItemStack> smeltedResults = getProcessResults(getRecipe(world,itemFromInv),itemFromInv);
+                            float xp = (isAdvanced && getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv)).size()>0)?(getProcessResultsXPAdvanced()):(getProcessResultsXP(getRecipe(world,itemFromInv)));
+                            //float xp = getProcessResultsXP(getRecipe(world,itemFromInv));
                             //Make sure recipe output isnt empty
                             ItemStack resultSmelted = (smeltedResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(smeltedResults.iterator().next());
                             ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
