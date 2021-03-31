@@ -105,7 +105,7 @@ public class ItemUpgradeEnderImporter extends ItemUpgradeBase
         {
             ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
             ItemStack itemFromPedestal = getStackInPedestal(world,posPedestal);
-            if(itemFromPedestal.isEmpty())
+            if(itemFromPedestal.isEmpty() && canThisPedestalReceiveItemStack(tilePedestal,world,posPedestal,getItemStack))
             {
                 TileEntity pedestalInv = world.getTileEntity(posPedestal);
                 if(pedestalInv instanceof PedestalTileEntity) {

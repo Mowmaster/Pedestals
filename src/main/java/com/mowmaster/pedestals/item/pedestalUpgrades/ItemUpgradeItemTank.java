@@ -462,18 +462,19 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
             ItemStack stored = getItemStored(tilePedestal);
             ItemStack stackCollidedItem = ((ItemEntity) entityIn).getItem();
             //if completely empty OR matching
-            if(tilePedestal.addItemCustom(stackCollidedItem,true).isEmpty())
+            if(canThisPedestalReceiveItemStack(tilePedestal,world,posPedestal,stackCollidedItem))
             {
-                tilePedestal.addItemCustom(stackCollidedItem,false);
-                ((ItemEntity) entityIn).remove();
+                if(tilePedestal.addItemCustom(stackCollidedItem,true).isEmpty())
+                {
+                    tilePedestal.addItemCustom(stackCollidedItem,false);
+                    ((ItemEntity) entityIn).remove();
+                }
+                else
+                {
+                    ItemStack unused = tilePedestal.addItemCustom(stackCollidedItem,false).copy();
+                    ((ItemEntity) entityIn).setItem(unused);
+                }
             }
-            else
-            {
-                ItemStack unused = tilePedestal.addItemCustom(stackCollidedItem,false).copy();
-                ((ItemEntity) entityIn).setItem(unused);
-            }
-
-
         }
     }
 

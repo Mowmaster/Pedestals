@@ -101,7 +101,12 @@ public class ItemUpgradeEnergyVoid extends ItemUpgradeBaseEnergy
     {
         if(entityIn instanceof ItemEntity)
         {
-            entityIn.remove();
+            if(entityIn instanceof ItemEntity)
+            {
+                ItemStack stackCollidedItem = ((ItemEntity) entityIn).getItem();
+                if(canThisPedestalReceiveItemStack(tilePedestal,world,posPedestal,stackCollidedItem))entityIn.remove();
+            }
+            else entityIn.remove();
         }
     }
 

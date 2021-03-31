@@ -137,10 +137,13 @@ public class ItemUpgradeImport extends ItemUpgradeBase
             ItemStack itemFromPedestal = getStackInPedestal(world,posPedestal);
             if(itemFromPedestal.isEmpty())
             {
-                TileEntity pedestalInv = world.getTileEntity(posPedestal);
-                if(pedestalInv instanceof PedestalTileEntity) {
-                    entityIn.remove();
-                    ((PedestalTileEntity) pedestalInv).addItem(getItemStack);
+                if(canThisPedestalReceiveItemStack(tilePedestal,world,posPedestal,getItemStack))
+                {
+                    TileEntity pedestalInv = world.getTileEntity(posPedestal);
+                    if(pedestalInv instanceof PedestalTileEntity) {
+                        entityIn.remove();
+                        ((PedestalTileEntity) pedestalInv).addItem(getItemStack);
+                    }
                 }
             }
         }

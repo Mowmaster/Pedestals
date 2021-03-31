@@ -355,7 +355,7 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
                     if(entityIn instanceof ItemEntity)
                     {
                         ItemStack getItemStack = ((ItemEntity) entityIn).getItem();
-                        if(getItemFuelBurnTime(getItemStack)>0)
+                        if(getItemFuelBurnTime(getItemStack)>0 && canThisPedestalReceiveItemStack(tilePedestal,world,posPedestal,getItemStack))
                         {
                             int getBurnTimeForStack = getItemFuelBurnTime(getItemStack) * getItemStack.getCount();
                             Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();

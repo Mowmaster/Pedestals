@@ -96,8 +96,10 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
     {
         if(entityIn instanceof ItemEntity)
         {
-            entityIn.remove();
+            ItemStack stackCollidedItem = ((ItemEntity) entityIn).getItem();
+            if(canThisPedestalReceiveItemStack(tilePedestal,world,posPedestal,stackCollidedItem))entityIn.remove();
         }
+        else entityIn.remove();
     }
 
     @Override
