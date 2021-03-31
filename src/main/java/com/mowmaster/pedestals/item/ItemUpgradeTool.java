@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item;
 import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
+import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -19,11 +20,11 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.event.RegistryEvent;
@@ -149,6 +150,39 @@ public class ItemUpgradeTool extends Item {
         }
 
         return super.onItemUse(context);
+    }
+
+    //Thanks to TheBoo on the e6 Discord for this suggestion
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
+        //Thankyou past self: https://github.com/Mowmaster/Ensorcelled/blob/main/src/main/java/com/mowmaster/ensorcelled/enchantments/handlers/HandlerAOEMiner.java#L53
+        //RayTraceResult result = player.pick(player.getLookVec().length(),0,false); results in MISS type returns
+        RayTraceResult result = p_77659_2_.pick(5,0,false);
+        if(result != null)
+        {
+            //Assuming it it hits a block it wont work???
+            if(result.getType() == RayTraceResult.Type.MISS)
+            {
+                if(p_77659_1_.isRemote)
+                {
+                    if(p_77659_2_.isCrouching())
+                    {
+                        ItemStack heldItem = p_77659_2_.getHeldItem(p_77659_3_);
+                        if(heldItem.getItem().equals(ItemUpgradeTool.UPGRADE) && !heldItem.isEnchanted())
+                        {
+                            p_77659_2_.setHeldItem(p_77659_3_,new ItemStack(ItemToolSwapper.QUARRYTOOL));
+                            TranslationTextComponent range = new TranslationTextComponent(MODID + ".tool_change");
+                            range.mergeStyle(TextFormatting.GREEN);
+                            p_77659_2_.sendStatusMessage(range,true);
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
+                        return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                }
+            }
+        }
+
+        return super.onItemRightClick(p_77659_1_, p_77659_2_, p_77659_3_);
     }
 
     int ticker=0;

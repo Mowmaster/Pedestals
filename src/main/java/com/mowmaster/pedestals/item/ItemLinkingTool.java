@@ -274,7 +274,7 @@ public class ItemLinkingTool extends Item {
                     if(heldItem.getItem().equals(ItemLinkingTool.DEFAULT) && !heldItem.isEnchanted())
                     {
                         p_77659_2_.setHeldItem(p_77659_3_,new ItemStack(ItemLinkingToolBackwards.DEFAULT));
-                        TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_change");
+                        TranslationTextComponent range = new TranslationTextComponent(MODID + ".tool_change");
                         range.mergeStyle(TextFormatting.GREEN);
                         p_77659_2_.sendStatusMessage(range,true);
                         return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
