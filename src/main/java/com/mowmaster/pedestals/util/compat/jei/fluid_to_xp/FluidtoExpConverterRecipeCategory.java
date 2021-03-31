@@ -71,7 +71,7 @@ public class FluidtoExpConverterRecipeCategory implements IRecipeCategory<Fluidt
         recipeLayout.getItemStacks().init(0, true, 5, 14);
         recipeLayout.getItemStacks().set(0, ingredients.getInputs(VanillaTypes.ITEM).get(0));
         recipeLayout.getItemStacks().init(1, false, 50, 14);
-        ItemStack CustomExpBottle = new ItemStack(Items.EXPERIENCE_BOTTLE);
+        ItemStack CustomExpBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,recipe.getResult().getCount());
         CustomExpBottle.setDisplayName(new TranslationTextComponent(Reference.MODID + ".jei.fluid_to_xp"));
         recipeLayout.getItemStacks().set(1, CustomExpBottle);
     }
