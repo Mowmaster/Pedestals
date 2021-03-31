@@ -164,11 +164,15 @@ public class ItemFilterEnchantedExact extends ItemFilterBase
                         Enchantment enchantment = entry.getKey();
                         int level = entry.getValue();
 
-                        TranslationTextComponent enchants = new TranslationTextComponent(enchantment.getName() + " " + level);
+                        TranslationTextComponent enchants = new TranslationTextComponent(enchantment.getName());
+                        enchants.appendString(" "+level+"");
                         enchants.mergeStyle(TextFormatting.GRAY);
                         player.sendMessage(enchants, Util.DUMMY_UUID);
                     }
                 }
+                TranslationTextComponent enchants = new TranslationTextComponent("--------------------");
+                enchants.mergeStyle(TextFormatting.GRAY);
+                player.sendMessage(enchants, Util.DUMMY_UUID);
             }
         }
     }
@@ -200,11 +204,15 @@ public class ItemFilterEnchantedExact extends ItemFilterBase
                         Enchantment enchantment = entry.getKey();
                         int level = entry.getValue();
 
-                        TranslationTextComponent enchants = new TranslationTextComponent(enchantment.getName() + " " + level);
+                        TranslationTextComponent enchants = new TranslationTextComponent(enchantment.getName());
+                        enchants.appendString(" "+level+"");
                         enchants.mergeStyle(TextFormatting.GRAY);
                         tooltip.add(enchants);
                     }
                 }
+                TranslationTextComponent enchants = new TranslationTextComponent("--------------------");
+                enchants.mergeStyle(TextFormatting.GRAY);
+                tooltip.add(enchants);
             }
         }
     }
