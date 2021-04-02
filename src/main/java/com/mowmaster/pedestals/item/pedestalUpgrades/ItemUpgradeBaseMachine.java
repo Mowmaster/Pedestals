@@ -57,10 +57,11 @@ public class ItemUpgradeBaseMachine extends ItemUpgradeBase {
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
-            if(hasFuel(coin))
+            int fuelStored = getFuelStored(coin);
+            if(fuelStored>0)
             {
-                float f = (float)getFuelStored(coin)/(float)readMaxFuelFromNBT(coin);
-                intItem = MathHelper.floor(f*14.0F)+1;
+                float f = (float)fuelStored/(float)getMaxFuelDeviderBasedOnFuelStored(fuelStored);
+                intItem = MathHelper.floor(f*15.0F);
             }
         }
 

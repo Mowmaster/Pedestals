@@ -78,12 +78,6 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         return  intModifier;
     }
 
-    public int getEnergyBuffer(ItemStack stack) {
-        int capacityOver = getCapacityModifierOverEnchanted(stack);
-        int buffer = (capacityOver*2000)+20000;
-        return  (buffer>maxStored)?(maxStored):(buffer);
-    }
-
     @Override
     public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
     {
@@ -92,10 +86,11 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         if(tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
-            if(getFuelStored(coin)>0)
+            int fuelStored = getFuelStored(coin);
+            if(fuelStored>0)
             {
-                float f = (float)getFuelStored(coin)/(float)readMaxFuelFromNBT(coin);
-                intItem = MathHelper.floor(f*14.0F)+1;
+                float f = (float)fuelStored/(float)getMaxFuelDeviderBasedOnFuelStored(fuelStored);
+                intItem = MathHelper.floor(f*15.0F);
             }
         }
 

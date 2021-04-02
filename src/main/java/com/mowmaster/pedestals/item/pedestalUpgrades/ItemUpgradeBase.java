@@ -301,15 +301,59 @@ public class ItemUpgradeBase extends Item {
 
     //nerfed technically, but also give the ability to set storage to a nice number
     public int getFuelBuffer(ItemStack coin) {
-        int capacityOver = getCapacityModifierOverEnchanted(coin);
+        /*int capacityOver = getCapacityModifierOverEnchanted(coin);
         //1728 = 27*64 (size of double chest)
         int storageBuffer = (int)(Math.pow(4,(capacityOver>=33)?(33):(capacityOver)+1)*1728);
         int value = (storageBuffer>=Integer.MAX_VALUE)?(Integer.MAX_VALUE):(storageBuffer);
         int fuelToBuffer = Math.multiplyExact(Math.floorDiv(value,8),1600);
 
 
-        return  (fuelToBuffer<=maxStored)?(fuelToBuffer):(maxStored);
+        return  (fuelToBuffer<=maxStored)?(fuelToBuffer):(maxStored);*/
+
+        //changed back because ill now change how the redstone comparator bit works (below)
+        int getMaxFuelValue = 2000000000;
+        return getMaxFuelValue;
     }
+
+    public int getMaxFuelDeviderBasedOnFuelStored(int currentFuelStored)
+    {
+        int returner = 10;
+
+        while(currentFuelStored > returner)
+        {
+            if(currentFuelStored >= 2000000000)
+            {
+                returner = Integer.MAX_VALUE;
+                break;
+            }
+            returner *= 10;
+        }
+
+        return returner;
+    }
+
+    /*
+
+    Used for upgrades that have 2billion max fuel storage
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            int fuelStored = getFuelStored(coin);
+            if(fuelStored>0)
+            {
+                float f = (float)fuelStored/(float)getMaxFuelDeviderBasedOnFuelStored(fuelStored);
+                intItem = MathHelper.floor(f*14.0F)+1;
+            }
+        }
+
+        return intItem;
+    }
+     */
     /***************************************
      ****************************************
      **       End of Inventory Stuff       **
