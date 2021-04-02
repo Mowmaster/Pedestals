@@ -179,12 +179,11 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                                             BlockPos mooie = moomoo.getPosition();
                                             if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
                                             if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                                            TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                            if(pedestalInv instanceof PedestalTileEntity) {
+                                            if(!handler.extractItem(i,1 ,true ).isEmpty()){
                                                 handler.extractItem(i,1 ,false );
-                                                ((PedestalTileEntity) pedestalInv).addItem(milkBucket);
+                                                pedestal.addItem(milkBucket);
+                                                break;
                                             }
-                                            break;
                                         }
                                     }
                                 }

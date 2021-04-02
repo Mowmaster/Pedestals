@@ -29,6 +29,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -223,6 +224,8 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                         if(intBatchCraftingSize > 0)
                                         {
 
+                                            List<ItemStack> extractedItemsList = new ArrayList<>();
+                                            ItemStack returnedStack = ItemStack.EMPTY;
                                             int intRecipeResultCount = getRecipe.getCount();
                                             int intBatchCraftedAmount = intRecipeResultCount * intBatchCraftingSize;
 
@@ -253,7 +256,8 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                                         ItemStack queueStack = stackCurrent.get(s);
                                                         queueStack.shrink(intBatchCraftingSize);
                                                         stackCurrent.set(s,queueStack);
-                                                        handler.extractItem(s, intBatchCraftingSize, false);
+                                                        returnedStack = handler.extractItem(s, intBatchCraftingSize, false);
+                                                        if(!returnedStack.isEmpty())extractedItemsList.add(returnedStack);
                                                     }
                                                     else
                                                     {
@@ -266,7 +270,8 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                                             ItemStack queueStack = stackCurrent.get(s);
                                                             queueStack.shrink(intBatchCraftingSize);
                                                             stackCurrent.set(s,queueStack);
-                                                            handler.extractItem(s, intBatchCraftingSize, false);
+                                                            returnedStack = handler.extractItem(s, intBatchCraftingSize, false);
+                                                            if(!returnedStack.isEmpty())extractedItemsList.add(returnedStack);
                                                         }
                                                         ItemStack queueStack = stackCurrent.get(s);
                                                         if(queueStack.isDamageable())
@@ -274,7 +279,8 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                                             if(queueStack.getDamage() > queueStack.getMaxDamage())
                                                             {
                                                                 stackCurrent.set(s,ItemStack.EMPTY);
-                                                                handler.extractItem(s, intBatchCraftingSize, false);
+                                                                returnedStack = handler.extractItem(s, intBatchCraftingSize, false);
+                                                                if(!returnedStack.isEmpty())extractedItemsList.add(returnedStack);
                                                             }
                                                             else {
                                                                 int damage = queueStack.getDamage();
@@ -291,15 +297,19 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                                     ItemStack queueStack = stackCurrent.get(s);
                                                     queueStack.shrink(intBatchCraftingSize);
                                                     stackCurrent.set(s,queueStack);
-                                                    handler.extractItem(s, intBatchCraftingSize, false);
+                                                    returnedStack = handler.extractItem(s, intBatchCraftingSize, false);
+                                                    if(!returnedStack.isEmpty())extractedItemsList.add(returnedStack);
                                                 }
                                             }
 
-                                            getRecipe.setCount(intBatchCraftedAmount);
-                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            addToPedestal(world, pedestalPos, getRecipe);
-                                            onPedestalNeighborChanged(pedestal);
-                                            writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                            if(extractedItemsList.size()>0)
+                                            {
+                                                getRecipe.setCount(intBatchCraftedAmount);
+                                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                addToPedestal(world, pedestalPos, getRecipe);
+                                                onPedestalNeighborChanged(pedestal);
+                                                writeStoredIntToNBT(coin,intGetNextIteration+1);
+                                            }
                                         }
                                         else
                                         {

@@ -174,24 +174,33 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                             {
                                 ItemStack toReturn = resultSmelted.copy();
                                 toReturn.setCount(1);
-                                handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
-                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                pedestal.addItem(toReturn);
+                                if(!handler.extractItem(slotItemToGrind,toReturn.getCount(),true).isEmpty()){
+                                    handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
+                                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                    pedestal.addItem(toReturn);
+                                }
+
                             }
                             else
                             {
                                 ItemStack toReturn = nextItemToGrind.copy();
-                                handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
-                                //if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                                pedestal.addItem(toReturn);
+                                if(!handler.extractItem(slotItemToGrind,toReturn.getCount(),true).isEmpty()){
+                                    handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
+                                    //if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                    pedestal.addItem(toReturn);
+                                }
+
                             }
                         }
                         else
                         {
                             ItemStack toReturn = nextItemToGrind.copy();
-                            handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
-                            //if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 0.15F, 1.0F);
-                            pedestal.addItem(toReturn);
+                            if(!handler.extractItem(slotItemToGrind,toReturn.getCount(),true).isEmpty()){
+                                handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
+                                //if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 0.15F, 1.0F);
+                                pedestal.addItem(toReturn);
+                            }
+
                         }
                     }
                 }
@@ -236,6 +245,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                         Item getItemResultRecycler = resultRecycler.getItem();
                         int slotItemToGrind = getSlotWithMatchingStackExact(cap,nextItemToGrind);
 
+
                         if((input instanceof TieredItem || !resultRecycler.isEmpty()) && !BLACKLISTED.contains(nextItemToGrind.getItem()))
                         {
                             //Assume its from the recipe, but if not, then set to another itemstack
@@ -277,9 +287,12 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                             ItemStack toReturn = repairIngredientStack.copy();
                             toReturn.setCount(countToReturn);
                             repairIngredientStack.setCount(countToReturn);
-                            handler.extractItem(slotItemToGrind,1,false);
-                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                            pedestal.addItem(toReturn);
+                            if(!handler.extractItem(slotItemToGrind,1,true).isEmpty()){
+                                handler.extractItem(slotItemToGrind,1,false);
+                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                pedestal.addItem(toReturn);
+                            }
+
                         }
                         else if((input instanceof ArmorItem || !resultRecycler.isEmpty()) && !getItemResultRecycler.equals(Items.BARRIER))
                         {
@@ -320,9 +333,12 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                             ItemStack toReturn = repairIngredientStack.copy();
                             toReturn.setCount(countToReturn);
                             repairIngredientStack.setCount(countToReturn);
-                            handler.extractItem(slotItemToGrind,1,false);
-                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                            pedestal.addItem(toReturn);
+                            if(!handler.extractItem(slotItemToGrind,1,true).isEmpty()){
+                                handler.extractItem(slotItemToGrind,1,false);
+                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                pedestal.addItem(toReturn);
+                            }
+
                         }
                         else
                         {

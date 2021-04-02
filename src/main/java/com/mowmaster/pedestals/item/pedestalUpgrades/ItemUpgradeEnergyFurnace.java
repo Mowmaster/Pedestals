@@ -176,11 +176,14 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                                         int fuelLeft = getEnergyStored(ped.getCoinOnPedestal());
                                         if(hasEnergy(coinInPedestal) && removeEnergyFuel(ped,fuelToConsume,true)>=0)
                                         {
-                                            handler.extractItem(i,itemInputsPerSmelt ,false );
-                                            removeEnergyFuel(ped,fuelToConsume,false);
-                                            spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
-                                            if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            ped.addItem(copyIncoming);
+                                            if(!handler.extractItem(i,itemInputsPerSmelt ,true ).isEmpty())
+                                            {
+                                                handler.extractItem(i,itemInputsPerSmelt ,false );
+                                                removeEnergyFuel(ped,fuelToConsume,false);
+                                                spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
+                                                if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                ped.addItem(copyIncoming);
+                                            }
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
                                         else
@@ -192,12 +195,14 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                                                 fuelToConsume = rfCostPerItemSmelted * itemInputsPerSmelt;
                                                 itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                                 copyIncoming.setCount(itemsOutputWhenStackSmelted);
-
-                                                handler.extractItem(i,itemInputsPerSmelt ,false );
-                                                removeEnergyFuel(ped,fuelToConsume,false);
-                                                spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
-                                                if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                ped.addItem(copyIncoming);
+                                                if(!handler.extractItem(i,itemInputsPerSmelt ,true ).isEmpty())
+                                                {
+                                                    handler.extractItem(i,itemInputsPerSmelt ,false );
+                                                    removeEnergyFuel(ped,fuelToConsume,false);
+                                                    spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
+                                                    if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                    ped.addItem(copyIncoming);
+                                                }
                                             }
                                         }
                                     }
@@ -211,8 +216,11 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                                     if(ped.getItemInPedestal().equals(ItemStack.EMPTY))
                                     {
                                         ItemStack copyItemFromInv = itemFromInv.copy();
-                                        handler.extractItem(i,itemFromInv.getCount(),false);
-                                        ped.addItem(copyItemFromInv);
+                                        if(!handler.extractItem(i,itemFromInv.getCount(),true).isEmpty())
+                                        {
+                                            handler.extractItem(i,itemFromInv.getCount(),false);
+                                            ped.addItem(copyItemFromInv);
+                                        }
                                     }
                                 }
                             }

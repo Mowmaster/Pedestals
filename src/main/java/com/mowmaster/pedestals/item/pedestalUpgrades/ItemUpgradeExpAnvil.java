@@ -335,25 +335,31 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                         {
                                             ItemStack itemFromInvCopy = itemFromInv.copy();
                                             itemFromInvCopy.setCount(1);
-                                            //Charge Exp Cost
-                                            setXPStored(coinInPedestal,(intExpInCoin-intExpCostToCombine));
-                                            //Delete Items On Pedestals
-                                            deleteItemsOnPedestals(world,posOfPedestal,crystalsToRemoveCount);
-                                            EnchantmentHelper.setEnchantments(enchantsMap,itemFromInvCopy);
-                                            if(strNameToChangeTo != "")
+                                            if(!handler.extractItem(i,itemFromInvCopy.getCount(),true).isEmpty())
                                             {
-                                                itemFromInvCopy.setDisplayName(new TranslationTextComponent(strNameToChangeTo));
+                                                //Charge Exp Cost
+                                                setXPStored(coinInPedestal,(intExpInCoin-intExpCostToCombine));
+                                                //Delete Items On Pedestals
+                                                deleteItemsOnPedestals(world,posOfPedestal,crystalsToRemoveCount);
+                                                EnchantmentHelper.setEnchantments(enchantsMap,itemFromInvCopy);
+                                                if(strNameToChangeTo != "")
+                                                {
+                                                    itemFromInvCopy.setDisplayName(new TranslationTextComponent(strNameToChangeTo));
+                                                }
+                                                handler.extractItem(i,itemFromInvCopy.getCount(),false);
+                                                if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                tilePedestal.addItem(itemFromInvCopy);
                                             }
-                                            handler.extractItem(i,itemFromInvCopy.getCount(),false);
-                                            if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            tilePedestal.addItem(itemFromInvCopy);
                                         }
                                     }
                                     else
                                     {
                                         ItemStack itemFromInvCopy = itemFromInv.copy();
-                                        handler.extractItem(i,itemFromInvCopy.getCount(),false);
-                                        tilePedestal.addItem(itemFromInvCopy);
+                                        if(!handler.extractItem(i,itemFromInvCopy.getCount(),true).isEmpty())
+                                        {
+                                            handler.extractItem(i,itemFromInvCopy.getCount(),false);
+                                            tilePedestal.addItem(itemFromInvCopy);
+                                        }
                                     }
                                 }
                             }

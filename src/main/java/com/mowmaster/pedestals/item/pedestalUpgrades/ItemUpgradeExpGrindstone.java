@@ -137,9 +137,12 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                     setXPStored(coinInPedestal,getExpLeftInPedestal);
 
                                     ItemStack toReturn = stackToReturn.copy();
-                                    handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
-                                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                    pedestal.addItem(toReturn);
+                                    if(!handler.extractItem(slotItemToGrind,toReturn.getCount(),true).isEmpty())
+                                    {
+                                        handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
+                                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                        pedestal.addItem(toReturn);
+                                    }
                                 }
                             }
                         }
@@ -153,8 +156,11 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
 
                             int slotItemToRemove = getSlotWithMatchingStackExact(cap,nextItemToRemove);
                             ItemStack toReturn = nextItemToRemove.copy();
-                            handler.extractItem(slotItemToRemove,toReturn.getCount(),false);
-                            pedestal.addItem(toReturn);
+                            if(!handler.extractItem(slotItemToRemove,toReturn.getCount(),true).isEmpty())
+                            {
+                                handler.extractItem(slotItemToRemove,toReturn.getCount(),false);
+                                pedestal.addItem(toReturn);
+                            }
                         }
                     }
                 }

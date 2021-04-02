@@ -147,19 +147,24 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                             ItemStack stackToReturn = EnchantmentHelper.addRandomEnchantment(rand,itemToEnchant ,actualEnchantingLevel ,true );
                                             if(!stackToReturn.isEmpty() && stackToReturn.isEnchanted() || stackToReturn.getItem().equals(Items.ENCHANTED_BOOK))
                                             {
+                                                if(!handler.extractItem(i,stackToReturn.getCount() ,true ).isEmpty()){
                                                 int getExpLeftInPedestal = currentlyStoredExp - expNeeded;
                                                 setXPStored(coinInPedestal,getExpLeftInPedestal);
                                                 handler.extractItem(i,stackToReturn.getCount() ,false );
                                                 if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
                                                 pedestal.addItem(stackToReturn);
+                                                }
                                             }
                                         }
                                     }
                                     else
                                     {
                                         ItemStack toReturn = itemFromInv.copy();
-                                        handler.extractItem(i,toReturn.getCount() ,false );
-                                        pedestal.addItem(toReturn);
+                                        if(!handler.extractItem(i,toReturn.getCount() ,true ).isEmpty()){
+                                            handler.extractItem(i,toReturn.getCount() ,false );
+                                            pedestal.addItem(toReturn);
+                                        }
+
                                     }
                                 }
                             }

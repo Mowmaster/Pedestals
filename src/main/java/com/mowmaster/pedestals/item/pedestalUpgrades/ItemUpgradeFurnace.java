@@ -169,11 +169,14 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                         //Checks to make sure we have fuel to smelt everything
                                         if(removeFuel(ped,fuelToConsume,true))
                                         {
-                                            handler.extractItem(i,itemInputsPerSmelt ,false );
-                                            removeFuel(ped,fuelToConsume,false);
-                                            spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
-                                            if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            ped.addItem(copyIncoming);
+                                            if(!handler.extractItem(i,itemInputsPerSmelt ,true ).isEmpty())
+                                            {
+                                                handler.extractItem(i,itemInputsPerSmelt ,false );
+                                                removeFuel(ped,fuelToConsume,false);
+                                                spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
+                                                if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                ped.addItem(copyIncoming);
+                                            }
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
                                         else
@@ -190,11 +193,14 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                                     itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                                     copyIncoming.setCount(itemsOutputWhenStackSmelted);
 
-                                                    handler.extractItem(i,itemInputsPerSmelt ,false );
-                                                    removeFuel(ped,fuelToConsume,false);
-                                                    spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
-                                                    if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                    ped.addItem(copyIncoming);
+                                                    if(!handler.extractItem(i,itemInputsPerSmelt ,true ).isEmpty())
+                                                    {
+                                                        handler.extractItem(i,itemInputsPerSmelt ,false );
+                                                        removeFuel(ped,fuelToConsume,false);
+                                                        spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
+                                                        if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                        ped.addItem(copyIncoming);
+                                                    }
                                                 }
                                             }
                                         }
@@ -209,8 +215,11 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
                                     if(ped.getItemInPedestal().equals(ItemStack.EMPTY))
                                     {
                                         ItemStack copyItemFromInv = itemFromInv.copy();
-                                        handler.extractItem(i,itemFromInv.getCount(),false);
-                                        ped.addItem(copyItemFromInv);
+                                        if(!handler.extractItem(i,itemFromInv.getCount(),true).isEmpty())
+                                        {
+                                            handler.extractItem(i,itemFromInv.getCount(),false);
+                                            ped.addItem(copyItemFromInv);
+                                        }
                                     }
                                 }
                             }

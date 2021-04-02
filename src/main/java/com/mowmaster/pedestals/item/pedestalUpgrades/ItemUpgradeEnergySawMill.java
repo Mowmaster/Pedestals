@@ -136,17 +136,18 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
                                     copyIncoming.setCount(itemsOutputWhenStackSmelted);
                                     //RFFuel Cost
                                     int fuelToConsume = rfCostPerItemSmelted * itemInputsPerSmelt;
-                                    TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                    if(pedestalInv instanceof PedestalTileEntity) {
-                                        PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
+
                                         //Checks to make sure we have rffuel to smelt everything
-                                        int fuelLeft = getEnergyStored(ped.getCoinOnPedestal());
-                                        if(hasEnergy(coinInPedestal) && removeEnergyFuel(ped,fuelToConsume,true)>=0)
+                                        int fuelLeft = getEnergyStored(pedestal.getCoinOnPedestal());
+                                        if(hasEnergy(coinInPedestal) && removeEnergyFuel(pedestal,fuelToConsume,true)>=0)
                                         {
-                                            handler.extractItem(i,itemInputsPerSmelt ,false );
-                                            removeEnergyFuel(ped,fuelToConsume,false);
-                                            if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            ped.addItem(copyIncoming);
+                                            if(!handler.extractItem(i,itemInputsPerSmelt ,true ).isEmpty())
+                                            {
+                                                handler.extractItem(i,itemInputsPerSmelt ,false );
+                                                removeEnergyFuel(pedestal,fuelToConsume,false);
+                                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                pedestal.addItem(copyIncoming);
+                                            }
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
                                         else
@@ -159,27 +160,30 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
                                                 itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                                 copyIncoming.setCount(itemsOutputWhenStackSmelted);
 
-                                                handler.extractItem(i,itemInputsPerSmelt ,false );
-                                                removeEnergyFuel(ped,fuelToConsume,false);
-                                                if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                ped.addItem(copyIncoming);
+                                                if(!handler.extractItem(i,itemInputsPerSmelt ,true ).isEmpty())
+                                                {
+                                                    handler.extractItem(i,itemInputsPerSmelt ,false );
+                                                    removeEnergyFuel(pedestal,fuelToConsume,false);
+                                                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 0.25F, 1.0F);
+                                                    pedestal.addItem(copyIncoming);
+                                                }
                                             }
                                         }
-                                    }
                                 }
                             }
                             else
                             {
-                                TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                                if(pedestalInv instanceof PedestalTileEntity) {
-                                    PedestalTileEntity ped = ((PedestalTileEntity) pedestalInv);
-                                    if(ped.getItemInPedestal().equals(ItemStack.EMPTY))
+
+                                    if(pedestal.getItemInPedestal().equals(ItemStack.EMPTY))
                                     {
                                         ItemStack copyItemFromInv = itemFromInv.copy();
-                                        handler.extractItem(i,itemFromInv.getCount(),false);
-                                        ped.addItem(copyItemFromInv);
+                                        if(!handler.extractItem(i,itemFromInv.getCount(),true).isEmpty())
+                                        {
+                                            handler.extractItem(i,itemFromInv.getCount(),false);
+                                            pedestal.addItem(copyItemFromInv);
+                                        }
                                     }
-                                }
+
                             }
                         }
                     }

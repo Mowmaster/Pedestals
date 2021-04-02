@@ -117,8 +117,12 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                                 copyIncoming.setCount(allowedTransferRate);
                                 TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
                                 if(pedestalInv instanceof PedestalTileEntity) {
-                                    handler.extractItem(i,allowedTransferRate ,false );
-                                    ((PedestalTileEntity) pedestalInv).addItem(copyIncoming);
+                                    if(!handler.extractItem(i,allowedTransferRate ,true ).isEmpty())
+                                    {
+                                        handler.extractItem(i,allowedTransferRate ,false );
+                                        ((PedestalTileEntity) pedestalInv).addItem(copyIncoming);
+                                    }
+
                                 }
                             }
                         }
