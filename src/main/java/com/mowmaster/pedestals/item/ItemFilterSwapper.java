@@ -88,7 +88,7 @@ public class ItemFilterSwapper extends Item {
             //Assuming it it hits a block it wont work???
             if(result.getType() == RayTraceResult.Type.MISS)
             {
-                if(p_77659_1_.isRemote)
+                if(!p_77659_1_.isRemote)
                 {
                     if(p_77659_2_.isCrouching())
                     {

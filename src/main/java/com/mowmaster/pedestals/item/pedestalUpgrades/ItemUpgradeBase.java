@@ -746,15 +746,8 @@ public class ItemUpgradeBase extends Item {
 
     public Boolean canAcceptMagnet()
     {
-        return true;
+        return false;
     }
-
-    public Boolean hasMagnetEnchant(ItemStack stack)
-    {
-        return (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.MAGNET,stack)>=1)?(true):(false);
-    }
-
-
 
     public Boolean canAcceptRange()
     {
@@ -769,6 +762,11 @@ public class ItemUpgradeBase extends Item {
     public Boolean canAcceptArea()
     {
         return false;
+    }
+
+    public Boolean hasMagnetEnchant(ItemStack stack)
+    {
+        return (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.MAGNET,stack)>=1)?(true):(false);
     }
 
     /***************************************

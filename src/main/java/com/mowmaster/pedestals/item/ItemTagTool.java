@@ -43,17 +43,8 @@ public class ItemTagTool extends Item {
             //Assuming it it hits a block it wont work???
             if(result.getType() == RayTraceResult.Type.MISS)
             {
-                if(p_77659_1_.isRemote)
+                if(!p_77659_1_.isRemote)
                 {
-                    String tags = p_77659_2_.getHeldItemOffhand().getItem().getTags().toString();
-                    if(!p_77659_2_.getHeldItemOffhand().isEmpty())
-                    {
-                        TranslationTextComponent output = new TranslationTextComponent("Tags: ");
-                        output.appendString(tags);
-                        output.mergeStyle(TextFormatting.WHITE);
-                        p_77659_2_.sendMessage(output,p_77659_2_.getUniqueID());
-                    }
-
                     if(p_77659_2_.isCrouching())
                     {
                         ItemStack heldItem = p_77659_2_.getHeldItem(p_77659_3_);
@@ -66,6 +57,17 @@ public class ItemTagTool extends Item {
                             return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                         }
                         return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                }
+                else
+                {
+                    String tags = p_77659_2_.getHeldItemOffhand().getItem().getTags().toString();
+                    if(!p_77659_2_.getHeldItemOffhand().isEmpty())
+                    {
+                        TranslationTextComponent output = new TranslationTextComponent("Tags: ");
+                        output.appendString(tags);
+                        output.mergeStyle(TextFormatting.WHITE);
+                        p_77659_2_.sendMessage(output,p_77659_2_.getUniqueID());
                     }
                 }
             }
