@@ -164,12 +164,16 @@ public class ItemFilterBase extends Item
         RayTraceResult result = p_77659_2_.pick(5,0,false);
         if(result != null)
         {
+            if(p_77659_2_.getHeldItem(p_77659_3_).getItem().equals(ItemFilterBase.BASEFILTER))return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+
             //Assuming it it hits a block it wont work???
             if(result.getType() == RayTraceResult.Type.MISS)
             {
                 if(p_77659_2_.isCrouching())
                 {
                     ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
+                    //Should prevent it from its nbt changing???
+
                     if(itemInHand.getItem() instanceof ItemFilterBase)
                     {
                         boolean getCurrentType = getFilterType(itemInHand);
