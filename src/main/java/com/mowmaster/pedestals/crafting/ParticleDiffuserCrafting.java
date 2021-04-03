@@ -82,14 +82,12 @@ public class ParticleDiffuserCrafting
                                     itemEn.setInvulnerable(true);
                                     worldIn.addEntity(itemEn);
 
-                                    int paperdiff = paper-(int)rainValue;
-                                    if(paperdiff>0)
+                                    if(paper>0)
                                     {
-                                        ItemEntity itemEn2 = new ItemEntity(worldIn,posX,posY+1,posZ,new ItemStack(Items.PAPER,paperdiff));
+                                        ItemEntity itemEn2 = new ItemEntity(worldIn,posX,posY+1,posZ,new ItemStack(Items.PAPER,paper));
                                         itemEn2.setInvulnerable(true);
                                         worldIn.addEntity(itemEn2);
                                     }
-
                                 }
                             }
                         }
