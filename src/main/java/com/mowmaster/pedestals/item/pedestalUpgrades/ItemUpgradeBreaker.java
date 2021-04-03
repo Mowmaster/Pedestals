@@ -130,7 +130,10 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                 }
 
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(pedestal);
+                    int maxsize = (pedestal.hasItem())?(pedestal.getItemInPedestal().getMaxStackSize()):(64);
+                    int inPed = (pedestal.hasItem())?(pedestal.getItemInPedestal().getCount()):(0);
+                    //Stop if pedestal is full
+                    if(inPed<maxsize)upgradeAction(pedestal);
                 }
             }
         }
