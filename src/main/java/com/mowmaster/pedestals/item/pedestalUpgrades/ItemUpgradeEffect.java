@@ -294,13 +294,16 @@ public class ItemUpgradeEffect extends ItemUpgradeBaseMachine
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!pedestal.hasParticleDiffuser())
         {
-            int fuelValue = getFuelStored(pedestal.getCoinOnPedestal());
-
-            if(fuelValue > 0)
+            if(!world.isBlockPowered(pos))
             {
-                spawnParticleAroundPedestalBase(world,tick,pos, ParticleTypes.EFFECT);
+                int fuelValue = getFuelStored(pedestal.getCoinOnPedestal());
+
+                if(fuelValue > 0)
+                {
+                    spawnParticleAroundPedestalBase(world,tick,pos, ParticleTypes.EFFECT);
+                }
             }
         }
     }

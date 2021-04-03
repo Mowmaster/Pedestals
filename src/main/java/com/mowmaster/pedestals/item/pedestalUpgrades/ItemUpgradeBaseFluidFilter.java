@@ -617,13 +617,16 @@ public class ItemUpgradeBaseFluidFilter extends ItemUpgradeBaseFilter {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!pedestal.hasParticleDiffuser())
         {
-            if(hasFluidInCoin(pedestal.getCoinOnPedestal()))
+            if(!world.isBlockPowered(pos))
             {
-                int color = getFluidStored(pedestal.getCoinOnPedestal()).getFluid().getAttributes().getColor();
-                int[] rgb = CalculateColor.getRGBColorFromInt(color);
-                spawnParticleAroundPedestalBase(world,tick,pos,(float)rgb[0]/255,(float)rgb[1]/255,(float)rgb[2]/255,1.0f);
+                if(hasFluidInCoin(pedestal.getCoinOnPedestal()))
+                {
+                    int color = getFluidStored(pedestal.getCoinOnPedestal()).getFluid().getAttributes().getColor();
+                    int[] rgb = CalculateColor.getRGBColorFromInt(color);
+                    spawnParticleAroundPedestalBase(world,tick,pos,(float)rgb[0]/255,(float)rgb[1]/255,(float)rgb[2]/255,1.0f);
+                }
             }
         }
     }

@@ -462,11 +462,14 @@ public class ItemUpgradeBaseExpFilter extends ItemUpgradeBaseFilter {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!pedestal.hasParticleDiffuser())
         {
-            if(getXPStored(pedestal.getCoinOnPedestal())>0)
+            if(!world.isBlockPowered(pos))
             {
-                spawnParticleAroundPedestalBase(world,tick,pos,0.2f,0.95f,0.2f,1.0f);
+                if(getXPStored(pedestal.getCoinOnPedestal())>0)
+                {
+                    spawnParticleAroundPedestalBase(world,tick,pos,0.2f,0.95f,0.2f,1.0f);
+                }
             }
         }
     }

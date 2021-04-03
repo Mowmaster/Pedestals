@@ -559,11 +559,14 @@ public class ItemUpgradeBaseEnergyFilter extends ItemUpgradeBaseFilter {
     @OnlyIn(Dist.CLIENT)
     public void onRandomDisplayTick(PedestalTileEntity pedestal, int tick, BlockState stateIn, World world, BlockPos pos, Random rand)
     {
-        if(!world.isBlockPowered(pos))
+        if(!pedestal.hasParticleDiffuser())
         {
-            if(hasEnergy(pedestal.getCoinOnPedestal()))
+            if(!world.isBlockPowered(pos))
             {
-                spawnParticleAroundPedestalBase(world,tick,pos,1.0f,0.0f,0.0f,1.0f);
+                if(hasEnergy(pedestal.getCoinOnPedestal()))
+                {
+                    spawnParticleAroundPedestalBase(world,tick,pos,1.0f,0.0f,0.0f,1.0f);
+                }
             }
         }
     }

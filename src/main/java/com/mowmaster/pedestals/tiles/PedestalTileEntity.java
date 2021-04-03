@@ -2166,7 +2166,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 }
             }
         }
-        if(world.isRemote)
+        //Check at the source if the particles have been turned off???
+        if(world.isRemote && !hasParticleDiffuser())
         {
             if(hasCoin())
             {

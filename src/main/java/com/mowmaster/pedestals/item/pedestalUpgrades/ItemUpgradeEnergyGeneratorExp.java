@@ -386,30 +386,32 @@ public class ItemUpgradeEnergyGeneratorExp extends ItemUpgradeBaseEnergy
         super.onRandomDisplayTick(pedestal,tick,stateIn,world,pos,rand);
         ItemStack coin = pedestal.getCoinOnPedestal();
         float level = getEnchantmentPowerFromSorroundings(pedestal);
-
-        if(!world.isBlockPowered(pos))
+        if(!pedestal.hasParticleDiffuser())
         {
-            for (int i = -2; i <= 2; ++i)
+            if(!world.isBlockPowered(pos))
             {
-                for (int j = -2; j <= 2; ++j)
+                for (int i = -2; i <= 2; ++i)
                 {
-                    if (i > -2 && i < 2 && j == -1)
+                    for (int j = -2; j <= 2; ++j)
                     {
-                        j = 2;
-                    }
-
-                    if (rand.nextInt(16) == 0)
-                    {
-                        for (int k = 0; k <= 2; ++k)
+                        if (i > -2 && i < 2 && j == -1)
                         {
-                            BlockPos blockpos = pos.add(i, k, j);
+                            j = 2;
+                        }
 
-                            if (world.getBlockState(blockpos).getEnchantPowerBonus(world, pos) > 0) {
-                                if (!world.isAirBlock(pos.add(i / 2, 0, j / 2))) {
-                                    break;
+                        if (rand.nextInt(16) == 0)
+                        {
+                            for (int k = 0; k <= 2; ++k)
+                            {
+                                BlockPos blockpos = pos.add(i, k, j);
+
+                                if (world.getBlockState(blockpos).getEnchantPowerBonus(world, pos) > 0) {
+                                    if (!world.isAirBlock(pos.add(i / 2, 0, j / 2))) {
+                                        break;
+                                    }
+
+                                    world.addParticle(ParticleTypes.ENCHANT, (double)pos.getX() + 0.5D, (double)pos.getY() + 2.0D, (double)pos.getZ() + 0.5D, (double)((float)i + rand.nextFloat()) - 0.5D, (double)((float)k - rand.nextFloat() - 1.0F), (double)((float)j + rand.nextFloat()) - 0.5D);
                                 }
-
-                                world.addParticle(ParticleTypes.ENCHANT, (double)pos.getX() + 0.5D, (double)pos.getY() + 2.0D, (double)pos.getZ() + 0.5D, (double)((float)i + rand.nextFloat()) - 0.5D, (double)((float)k - rand.nextFloat() - 1.0F), (double)((float)j + rand.nextFloat()) - 0.5D);
                             }
                         }
                     }
