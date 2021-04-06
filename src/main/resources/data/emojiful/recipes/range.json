@@ -2,5 +2,11 @@
   "category": "Pedestals",
   "name": "range_enchant",
   "url": "https://cdn.discordapp.com/emojis/800947101692723240.png",
-  "type": "emojiful:emoji_recipe"
+  "type": "emojiful:emoji_recipe",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "emojiful"
+    }
+  ]
 }

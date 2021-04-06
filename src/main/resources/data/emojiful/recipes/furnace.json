@@ -2,5 +2,11 @@
   "category": "Pedestals",
   "name": "furnace_upgrade",
   "url": "https://cdn.discordapp.com/emojis/800642264492802088.png",
-  "type": "emojiful:emoji_recipe"
+  "type": "emojiful:emoji_recipe",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "emojiful"
+    }
+  ]
 }

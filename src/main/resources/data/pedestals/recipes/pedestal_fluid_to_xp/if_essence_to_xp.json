@@ -6,5 +6,11 @@
   "result": {
     "item": "minecraft:experience_bottle",
     "count": 15
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "industrialforegoing"
+    }
+  ]
 }

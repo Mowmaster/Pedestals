@@ -2,5 +2,11 @@
   "category": "Pedestals",
   "name": "planter_upgrade",
   "url": "https://cdn.discordapp.com/emojis/800642263859724318.png",
-  "type": "emojiful:emoji_recipe"
+  "type": "emojiful:emoji_recipe",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "emojiful"
+    }
+  ]
 }

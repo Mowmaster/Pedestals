@@ -2,5 +2,11 @@
   "category": "Pedestals",
   "name": "magnet_upgrade",
   "url": "https://cdn.discordapp.com/emojis/800642263566123049.png",
-  "type": "emojiful:emoji_recipe"
+  "type": "emojiful:emoji_recipe",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "emojiful"
+    }
+  ]
 }

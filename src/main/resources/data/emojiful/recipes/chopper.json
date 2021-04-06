@@ -2,5 +2,11 @@
   "category": "Pedestals",
   "name": "chopper_upgrade",
   "url": "https://cdn.discordapp.com/emojis/800642261985394699.png",
-  "type": "emojiful:emoji_recipe"
+  "type": "emojiful:emoji_recipe",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "emojiful"
+    }
+  ]
 }
