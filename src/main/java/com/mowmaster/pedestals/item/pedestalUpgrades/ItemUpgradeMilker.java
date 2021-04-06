@@ -145,7 +145,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
         ItemStack itemMilkBucket = new ItemStack(Items.MILK_BUCKET);
 
 
-        FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+        FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
         fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
 
         LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);

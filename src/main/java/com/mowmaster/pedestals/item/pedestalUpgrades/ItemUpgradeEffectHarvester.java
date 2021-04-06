@@ -274,7 +274,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
 
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
-            FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
+            FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
             //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
             //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...

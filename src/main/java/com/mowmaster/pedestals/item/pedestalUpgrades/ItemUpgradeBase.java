@@ -62,6 +62,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -1210,6 +1211,18 @@ public class ItemUpgradeBase extends Item {
         int area = 0;
         if(hasEnchant(stack))
         {
+            int capacityOver = getAreaModifierUnRestricted(stack);
+            int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(capacityOver):((capacityOver>5)?(5):(capacityOver));
+            return advancedAllowed;
+        }
+        return area;
+    }
+
+    public int getAreaModifierUnRestricted(ItemStack stack)
+    {
+        int area = 0;
+        if(hasEnchant(stack))
+        {
             area = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.AREA,stack);
         }
         return area;
@@ -1432,7 +1445,7 @@ public class ItemUpgradeBase extends Item {
         Block blockToMine = blockToMineState.getBlock();
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
-        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),pedestalPos,pickaxe.copy());
+        FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
         if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
         if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
         ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
@@ -1779,6 +1792,12 @@ public class ItemUpgradeBase extends Item {
         return Util.DUMMY_UUID;
     }
 
+    public WeakReference<FakePlayer> fakePedestalPlayer(PedestalTileEntity pedestal)
+    {
+        return new WeakReference<FakePlayer>(new PedestalFakePlayer((ServerWorld) pedestal.getWorld(),getPlayerFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),(pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY)));
+    }
+
+
     public void setPlayerOnCoin(ItemStack stack, PlayerEntity player)
     {
         writeUUIDToNBT(stack,player.getUniqueID());
@@ -1881,7 +1900,7 @@ public class ItemUpgradeBase extends Item {
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
         BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
         BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coin),pedestalPos,pickaxe.copy());
+        FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
         if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
         if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
 

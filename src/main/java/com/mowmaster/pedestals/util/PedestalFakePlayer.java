@@ -34,6 +34,15 @@ public class PedestalFakePlayer extends FakePlayer
 
     }
 
+
+    //Set all sounds to silent???
+    //Thanks again Loth: https://github.com/Lothrazar/Cyclic/blob/4ce8b97b8851d207af7712425f9f58506829583e/src/main/java/com/lothrazar/cyclic/util/UtilFakePlayer.java#L66
+    //Didnt know that was a thing :D
+    @Override
+    public void setSilent(boolean isSilent) {
+        super.setSilent(true);
+    }
+
     @Override
     public boolean isPotionApplicable(@Nonnull EffectInstance effect) {
         return false;

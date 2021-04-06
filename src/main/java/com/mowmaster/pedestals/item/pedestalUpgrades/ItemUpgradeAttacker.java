@@ -223,7 +223,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
             if(selectedEntity != null)
             {
-                FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal);
+                FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
                 if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
                 if (pedestal.hasTool() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, toolInPedestal);}
                 if (toolInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}

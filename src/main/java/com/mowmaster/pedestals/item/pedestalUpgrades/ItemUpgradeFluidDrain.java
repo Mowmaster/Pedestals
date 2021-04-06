@@ -300,7 +300,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
             if(canPlaceFluidBlock(world,targetPos)) {
                 if(removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
                 {
-                    FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                    FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
                     fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
                     ItemStack getBucketOfFluid = getBucket(fluidInCoin);
                     fakePlayer.setHeldItem(Hand.MAIN_HAND,getBucketOfFluid);
@@ -332,7 +332,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
         {
             BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
             BlockPos blockToFillPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+            FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
             fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
 
             if(world.isBlockModifiable(fakePlayer,blockToFillPos) && placeFluid(pedestal,fakePlayer,blockToFillPos,fluidInCoin,true))

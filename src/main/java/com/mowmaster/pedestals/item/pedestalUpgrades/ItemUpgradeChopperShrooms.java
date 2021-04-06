@@ -209,7 +209,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
         BlockPos posOfPedestal = pedestal.getPos();
         //wart blocks*, warped stems*, crimson stems*, shroomlight*, mushroom stems, mushroom brown and mushroom red
-        FakePlayer fakePlayer = new PedestalFakePlayer((ServerWorld) world,getPlayerFromCoin(coinInPedestal),posOfPedestal,toolInPedestal.copy());
+        FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
         //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
         if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
         ItemStack choppingAxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
