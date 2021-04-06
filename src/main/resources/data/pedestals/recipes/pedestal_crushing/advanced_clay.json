@@ -1,10 +1,10 @@
 {
   "type": "pedestals:pedestal_crushing_advanced",
   "ingredient": {
-    "tag": "forge:ores/iron"
+    "item": "minecraft:clay"
   },
   "result": {
-    "item": "pedestals:dustiron",
-    "count": 3
+    "item": "minecraft:clay_ball",
+    "count": 4
   }
 }

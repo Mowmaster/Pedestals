@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_smelting_advanced",
+  "ingredient": {
+    "item": "minecraft:gunpowder"
+  },
+  "result": {
+    "item": "minecraft:redstone",
+    "count": 1
+  }
+}

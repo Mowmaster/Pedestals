@@ -1,0 +1,10 @@
+{
+  "type": "pedestals:pedestal_smelting_advanced",
+  "ingredient": {
+    "item": "minecraft:glowstone_dust"
+  },
+  "result": {
+    "item": "minecraft:gunpowder",
+    "count": 1
+  }
+}

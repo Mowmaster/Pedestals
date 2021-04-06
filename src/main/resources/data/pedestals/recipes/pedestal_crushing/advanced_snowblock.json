@@ -1,10 +1,10 @@
 {
   "type": "pedestals:pedestal_crushing_advanced",
   "ingredient": {
-    "tag": "forge:ores/gold"
+    "item": "minecraft:ice"
   },
   "result": {
-    "item": "pedestals:dustgold",
-    "count": 3
+    "item": "minecraft:snow_block",
+    "count": 1
   }
 }
