@@ -139,13 +139,17 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                             int maxInSlot = handler.getSlotLimit(i);
                             itemFromInv = handler.getStackInSlot(i);
                             //Need to null check invalid recipes
-                            Collection<ItemStack> smeltedResults = (isAdvanced && getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv)).size()>0)?(getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv))):(getProcessResults(getRecipe(world,itemFromInv),itemFromInv));
                             //Collection<ItemStack> smeltedResults = getProcessResults(getRecipe(world,itemFromInv),itemFromInv);
                             float xp = (isAdvanced && getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv)).size()>0)?(getProcessResultsXPAdvanced()):(getProcessResultsXP(getRecipe(world,itemFromInv)));
                             //float xp = getProcessResultsXP(getRecipe(world,itemFromInv));
                             //Make sure recipe output isnt empty
-                            ItemStack resultSmelted = (smeltedResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(smeltedResults.iterator().next());
-                            ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
+                            Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv),itemFromInv);
+                            Collection<ItemStack> jsonResultsAdvanced = getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv));
+
+                            //Just check to make sure our recipe output isnt air
+                            ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+                            ItemStack resultSmeltedAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
+                            if(isAdvanced && !resultSmeltedAdvanced.equals(ItemStack.EMPTY))resultSmelted=resultSmeltedAdvanced;ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                             if(!resultSmelted.equals(ItemStack.EMPTY))
                             {
                                 //Null check our slot again, which is probably redundant

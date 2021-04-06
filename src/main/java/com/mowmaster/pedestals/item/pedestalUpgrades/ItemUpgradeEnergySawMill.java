@@ -107,11 +107,13 @@ public class ItemUpgradeEnergySawMill extends ItemUpgradeBaseEnergyMachine
                             int maxInSlot = handler.getSlotLimit(i);
                             itemFromInv = handler.getStackInSlot(i);
                             //Should work without catch since we null check this in our GetNextSlotFunction\
-                            Collection<ItemStack> jsonResults = (isAdvanced && getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv)).size()>0)?(getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv))):(getProcessResults(getRecipe(world,itemFromInv)));
+                            Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
+                            Collection<ItemStack> jsonResultsAdvanced = getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv));
+
                             //Just check to make sure our recipe output isnt air
                             ItemStack resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-                            //ItemStack resultSmelted = SawMill.instance().getResult(itemFromInv.getItem());
-                            ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
+                            ItemStack resultSmeltedAdvanced = (jsonResultsAdvanced.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResultsAdvanced.iterator().next());
+                            if(isAdvanced && !resultSmeltedAdvanced.equals(ItemStack.EMPTY))resultSmelted=resultSmeltedAdvanced;ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
                             if(!resultSmelted.equals(ItemStack.EMPTY))
                             {
                                 //Null check our slot again, which is probably redundant
