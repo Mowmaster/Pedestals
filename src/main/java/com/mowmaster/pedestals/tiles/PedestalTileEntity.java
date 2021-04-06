@@ -435,6 +435,15 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
                 //System.out.println("Is Valid");
+
+                ItemStack filterOnPedestal = getFilterInPedestal();
+                if(filterOnPedestal.getItem() instanceof ItemFilterBase)
+                {
+                    ItemFilterBase IFB = (ItemFilterBase)filterOnPedestal.getItem();
+                    //System.out.println(IUB.customSlotLimit(getTile(),stack));
+                    return IFB.canAcceptItem(getTile(),stack);
+                }
+
                 ItemStack coinOnPedestal = getCoinOnPedestal();
                 if(coinOnPedestal.getItem() instanceof ItemUpgradeBase)
                 {
@@ -453,6 +462,15 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
             @Override
             protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
+
+                ItemStack filterOnPedestal = getFilterInPedestal();
+                if(filterOnPedestal.getItem() instanceof ItemFilterBase)
+                {
+                    ItemFilterBase IFB = (ItemFilterBase)filterOnPedestal.getItem();
+                    //System.out.println(IUB.customSlotLimit(getTile(),stack));
+                    return IFB.canAcceptCount(getWorld(),getPos(),getItemInPedestal(),stack);
+                }
+
                 ItemStack coinOnPedestal = getCoinOnPedestal();
                 if(coinOnPedestal.getItem() instanceof ItemUpgradeBase)
                 {
