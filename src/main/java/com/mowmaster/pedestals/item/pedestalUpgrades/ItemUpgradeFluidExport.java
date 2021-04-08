@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -398,6 +399,13 @@ public class ItemUpgradeFluidExport extends ItemUpgradeBaseFluid
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
+
+        if(getAdvancedModifier(stack)<=0 && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
+        {
+            TranslationTextComponent warning = new TranslationTextComponent(Reference.MODID + ".advanced_warning");
+            warning.mergeStyle(TextFormatting.RED);
+            tooltip.add(warning);
+        }
 
         FluidStack fluidStored = getFluidStored(stack);
         TranslationTextComponent fluidLabel = new TranslationTextComponent(getTranslationKey() + ".chat_fluidlabel");

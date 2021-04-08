@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -399,6 +400,13 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         tooltip.add(name);
+
+        if(getAdvancedModifier(stack)<=0 && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
+        {
+            TranslationTextComponent warning = new TranslationTextComponent(Reference.MODID + ".advanced_warning");
+            warning.mergeStyle(TextFormatting.RED);
+            tooltip.add(warning);
+        }
 
         TranslationTextComponent fuelStored = new TranslationTextComponent(getTranslationKey() + ".tooltip_fuelstored");
         fuelStored.appendString(""+ getFuelStored(stack) +"");

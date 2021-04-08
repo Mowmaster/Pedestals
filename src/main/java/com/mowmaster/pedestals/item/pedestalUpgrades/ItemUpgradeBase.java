@@ -837,6 +837,16 @@ public class ItemUpgradeBase extends Item {
         return rate;
     }
 
+    public int intOperationalSpeedOver(ItemStack stack)
+    {
+        int rate = 0;
+        if(hasEnchant(stack))
+        {
+            rate = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.OPERATIONSPEED,stack);
+        }
+        return rate;
+    }
+
     public int intOperationalSpeedModifierOverride(ItemStack stack)
     {
 
@@ -3064,6 +3074,13 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
+
+        if(getAdvancedModifier(stack)<=0 && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
+        {
+            TranslationTextComponent warning = new TranslationTextComponent(Reference.MODID + ".advanced_warning");
+            warning.mergeStyle(TextFormatting.RED);
+            tooltip.add(warning);
+        }
     }
     /***************************************
      ****************************************

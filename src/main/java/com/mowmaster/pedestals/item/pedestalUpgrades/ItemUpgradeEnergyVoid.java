@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -137,6 +138,13 @@ public class ItemUpgradeEnergyVoid extends ItemUpgradeBaseEnergy
         TranslationTextComponent t = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
+
+        if(getAdvancedModifier(stack)<=0 && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
+        {
+            TranslationTextComponent warning = new TranslationTextComponent(Reference.MODID + ".advanced_warning");
+            warning.mergeStyle(TextFormatting.RED);
+            tooltip.add(warning);
+        }
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");
         rate.appendString("" + (int)(getDamageDelt(stack)/2) + "");

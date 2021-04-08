@@ -202,6 +202,10 @@
   "pedestals.target_entities.entity_glass_black": "Raiders",
   "pedestals.target_entities.entity_all": "All",
 
+  "pedestals.advanced_warning": "Your upgrade isnt running at peak efficiency, to unlock its full potential, apply the Advanced Enchantment to it.",
+
+
+
     "item.pedestals.coin.attack": "Pedestal Upgrade",
     "item.pedestals.coin.attack.tooltip_name": "Auto Attacker",
     "item.pedestals.coin.attack.tooltip_area": "Effected Area: ",

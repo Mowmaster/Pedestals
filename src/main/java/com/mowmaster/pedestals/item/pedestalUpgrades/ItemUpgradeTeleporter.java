@@ -435,6 +435,13 @@ public class ItemUpgradeTeleporter extends ItemUpgradeBaseMachine
         t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
+        if(getAdvancedModifier(stack)<=0 && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
+        {
+            TranslationTextComponent warning = new TranslationTextComponent(Reference.MODID + ".advanced_warning");
+            warning.mergeStyle(TextFormatting.RED);
+            tooltip.add(warning);
+        }
+
         TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tooltip_range");
         range.appendString("" + getRangeSmall(stack) + "");
         range.mergeStyle(TextFormatting.WHITE);

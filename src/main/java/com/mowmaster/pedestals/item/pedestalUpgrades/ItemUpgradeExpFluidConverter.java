@@ -823,6 +823,13 @@ public class ItemUpgradeExpFluidConverter extends ItemUpgradeBaseFluid
         t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
+        if(getAdvancedModifier(stack)<=0 && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
+        {
+            TranslationTextComponent warning = new TranslationTextComponent(Reference.MODID + ".advanced_warning");
+            warning.mergeStyle(TextFormatting.RED);
+            tooltip.add(warning);
+        }
+
         FluidStack fluidStored = getFluidStored(stack);
         TranslationTextComponent fluidLabel = new TranslationTextComponent(getTranslationKey() + ".chat_fluidlabel");
         if(!fluidStored.isEmpty())
