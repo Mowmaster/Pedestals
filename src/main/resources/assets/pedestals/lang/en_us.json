@@ -53,7 +53,44 @@
   "item.pedestals.filter.filterrestriction": "Filter (Restricted)",
   "jei.pedestals.filterrestriction.desc": "This Restricts more then X items from being in the pedestal, when setting up the filter, the total count of all items in the inventory is used, the value cannot exceed 64.",
 
-    "pedestals.pedestal_block.add_tool": "Tool Added Successfully",
+
+
+
+  "item.pedestals.filter.craftingpattern": "Smart Crafting (Pattern)",
+  "jei.pedestals.craftingpattern.desc": "Set patterns by putting recipes in an inventory, then recording the recipes in the pattern with crouch+right click on the inventory",
+
+  "item.pedestals.coin.crafter1mk2": "Pedestal Upgrade",
+  "item.pedestals.coin.crafter1mk2.tooltip_name": "Smart Crafter Upgrade (1x1)",
+  "item.pedestals.coin.crafter1mk2.tooltip_rate": "Recipes Crafted Per Operation: ",
+  "item.pedestals.coin.crafter1mk2.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.crafter1mk2.chat_recipes": "Current Recipes: ",
+  "item.pedestals.coin.crafter1mk2.chat_rate": "Recipes Crafted Per Operation: ",
+  "item.pedestals.coin.crafter1mk2.chat_speed": "Operational Speed: ",
+  "jei.pedestals.crafter1mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterened recipe.",
+
+  "item.pedestals.coin.crafter2mk2": "Pedestal Upgrade",
+  "item.pedestals.coin.crafter2mk2.tooltip_name": "Smart Crafter Upgrade (2x2)",
+  "item.pedestals.coin.crafter2mk2.tooltip_rate": "Recipes Crafted Per Operation: ",
+  "item.pedestals.coin.crafter2mk2.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.crafter2mk2.chat_recipes": "Current Recipes: ",
+  "item.pedestals.coin.crafter2mk2.chat_rate": "Recipes Crafted Per Operation: ",
+  "item.pedestals.coin.crafter2mk2.chat_speed": "Operational Speed: ",
+  "jei.pedestals.crafter2mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterened recipe.",
+
+  "item.pedestals.coin.crafter3mk2": "Pedestal Upgrade",
+  "item.pedestals.coin.crafter3mk2.tooltip_name": "Smart Crafter Upgrade (3x3)",
+  "item.pedestals.coin.crafter3mk2.tooltip_rate": "Recipes Crafted Per Operation: ",
+  "item.pedestals.coin.crafter3mk2.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.crafter3mk2.chat_recipes": "Current Recipes: ",
+  "item.pedestals.coin.crafter3mk2.chat_rate": "Recipes Crafted Per Operation: ",
+  "item.pedestals.coin.crafter3mk2.chat_speed": "Operational Speed: ",
+  "jei.pedestals.crafter3mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterened recipe.",
+
+
+
+
+
+  "pedestals.pedestal_block.add_tool": "Tool Added Successfully",
     "pedestals.tool_change": "Tool Changed Successfully",
 
     "item.pedestals.linkingtool": "Linking Tool",

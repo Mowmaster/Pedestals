@@ -64,10 +64,9 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
     public int getGridSize(ItemStack itemStack)
     {
         int gridSize = 0;
-        //if(itemStack.getItem().equals(ItemUpgradeCraftermk2.CRAFTER_ONE)){gridSize = 1;}
-        //else if(itemStack.getItem().equals(ItemUpgradeCraftermk2.CRAFTER_TWO)){gridSize = 2;}
-        //else
-        if(itemStack.getItem().equals(ItemUpgradeCraftermk2.CRAFTER_THREE)){gridSize = 3;}
+        if(itemStack.getItem().equals(ItemUpgradeCraftermk2.CRAFTER_ONE)){gridSize = 1;}
+        else if(itemStack.getItem().equals(ItemUpgradeCraftermk2.CRAFTER_TWO)){gridSize = 2;}
+        else if(itemStack.getItem().equals(ItemUpgradeCraftermk2.CRAFTER_THREE)){gridSize = 3;}
         else{gridSize = 1;}
 
         return gridSize;
@@ -365,16 +364,16 @@ System.out.println(ingredientList);
         tooltip.add(speed);
     }
 
-    //public static final Item CRAFTER_ONE = new ItemUpgradeCraftermk2(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter1"));
-    //public static final Item CRAFTER_TWO = new ItemUpgradeCraftermk2(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter2"));
+    public static final Item CRAFTER_ONE = new ItemUpgradeCraftermk2(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter1mk2"));
+    public static final Item CRAFTER_TWO = new ItemUpgradeCraftermk2(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter2mk2"));
     public static final Item CRAFTER_THREE = new ItemUpgradeCraftermk2(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/crafter3mk2"));
 
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
-        //event.getRegistry().register(CRAFTER_ONE);
-        //event.getRegistry().register(CRAFTER_TWO);
+        event.getRegistry().register(CRAFTER_ONE);
+        event.getRegistry().register(CRAFTER_TWO);
         event.getRegistry().register(CRAFTER_THREE);
     }
 
