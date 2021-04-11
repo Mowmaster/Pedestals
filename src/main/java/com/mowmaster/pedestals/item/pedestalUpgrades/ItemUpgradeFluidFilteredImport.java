@@ -115,51 +115,13 @@ public class ItemUpgradeFluidFilteredImport extends ItemUpgradeBaseFluid
     @Override
     public boolean canRecieveFluid(World world, BlockPos posPedestal, FluidStack fluidIncoming)
     {
-        boolean returner = false;
         if(world.getTileEntity(posPedestal) instanceof PedestalTileEntity)
         {
             PedestalTileEntity pedestal = (PedestalTileEntity)world.getTileEntity(posPedestal);
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
-            if(!(stackCurrent.size()>0))
-            {
-                stackCurrent = buildFilterQueue(pedestal);
-                writeFilterQueueToNBT(coin,stackCurrent);
-            }
-
-            int range = stackCurrent.size();
-
-            ItemStack itemFromInv = ItemStack.EMPTY;
-            itemFromInv = IntStream.range(0,range)//Int Range
-                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                    .filter(itemStack -> doesFluidBucketMatch(itemStack,fluidIncoming))
-                    .findFirst().orElse(ItemStack.EMPTY);
-
-            if(!itemFromInv.isEmpty())
-            {
-                returner = true;
-            }
+            return fluidMatchFilter(pedestal,fluidIncoming);
         }
 
-        return returner;
-    }
-
-    @Override
-    public void onPedestalNeighborChanged(PedestalTileEntity pedestal) {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        List<ItemStack> stackIn = buildFilterQueue(pedestal);
-        if(filterQueueSize(coin)>0)
-        {
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(coin);
-            if(!doesFilterAndQueueMatch(stackIn,stackCurrent))
-            {
-                writeFilterQueueToNBT(coin,stackIn);
-            }
-        }
-        else
-        {
-            writeFilterQueueToNBT(coin,stackIn);
-        }
+        return false;
     }
 
     public boolean doesFluidBucketMatch(ItemStack bucketIn, FluidStack fluidIn)
