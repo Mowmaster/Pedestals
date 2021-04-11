@@ -468,7 +468,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 {
                     ItemFilterBase IFB = (ItemFilterBase)filterOnPedestal.getItem();
                     //System.out.println(IUB.customSlotLimit(getTile(),stack));
-                    return IFB.canAcceptCount(getWorld(),getPos(),getItemInPedestal(),stack);
+                    return IFB.canAcceptCount(getTile(), getWorld(),getPos(),getItemInPedestal(),stack);
                 }
 
                 ItemStack coinOnPedestal = getCoinOnPedestal();
@@ -1952,7 +1952,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             Item filterInPed = this.getFilterInPedestal().getItem();
             if(filterInPed instanceof ItemFilterBase)
             {
-                pedestalAccept = ((ItemFilterBase) filterInPed).canAcceptCount(worldIn, posPedestal, getItemInPedestal(), itemsIncoming);
+                pedestalAccept = ((ItemFilterBase) filterInPed).canAcceptCount(getTile(), worldIn, posPedestal, getItemInPedestal(), itemsIncoming);
             }
         }
 

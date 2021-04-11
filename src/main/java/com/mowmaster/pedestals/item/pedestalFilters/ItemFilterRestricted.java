@@ -42,29 +42,22 @@ public class ItemFilterRestricted extends ItemFilterBase
     public ItemFilterRestricted(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
+    public int canAcceptCount(PedestalTileEntity pedestal, World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
         if(inPedestal.isEmpty())
         {
-            TileEntity tile = world.getTileEntity(posPedestal);
-            if(tile instanceof PedestalTileEntity)
+            ItemStack filter = pedestal.getFilterInPedestal();
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter);
+            int range = stackCurrent.size();
+            int count = 0;
+            int maxIncomming = itemStackIncoming.getMaxStackSize();
+            for(int i=0;i<range;i++)
             {
-                PedestalTileEntity pedestal = (PedestalTileEntity)tile;
-                ItemStack filter = pedestal.getFilterInPedestal();
-                List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter);
-                int range = stackCurrent.size();
-                int count = 0;
-                int maxIncomming = itemStackIncoming.getMaxStackSize();
-                for(int i=0;i<range;i++)
-                {
-                    count +=stackCurrent.get(i).getCount();
-                    if(count>=maxIncomming)break;
-                }
-
-                return (count>0)?((count>maxIncomming)?(maxIncomming):(count)):(1);
+                count +=stackCurrent.get(i).getCount();
+                if(count>=maxIncomming)break;
             }
 
-            return 1;
+            return (count>0)?((count>maxIncomming)?(maxIncomming):(count)):(1);
         }
 
         return 0;

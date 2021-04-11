@@ -145,16 +145,9 @@ public class ItemFilterBase extends Item
         return true;
     }
 
-    public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
+    public int canAcceptCount(PedestalTileEntity pedestal, World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
-        TileEntity tile = world.getTileEntity(posPedestal);
-        if(tile instanceof PedestalTileEntity)
-        {
-            PedestalTileEntity pedestal = (PedestalTileEntity)tile;
-            return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
-        }
-        //int stackabe = itemStackIncoming.maxStackSize();
-        return 0;
+        return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
     }
 
     @Override
