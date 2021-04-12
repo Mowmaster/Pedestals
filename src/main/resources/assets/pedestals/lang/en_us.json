@@ -66,7 +66,7 @@
   "item.pedestals.coin.crafter1mk2.chat_recipes": "Current Recipes: ",
   "item.pedestals.coin.crafter1mk2.chat_rate": "Recipes Crafted Per Operation: ",
   "item.pedestals.coin.crafter1mk2.chat_speed": "Operational Speed: ",
-  "jei.pedestals.crafter1mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterened recipe.",
+  "jei.pedestals.crafter1mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterned recipe.",
 
   "item.pedestals.coin.crafter2mk2": "Pedestal Upgrade",
   "item.pedestals.coin.crafter2mk2.tooltip_name": "Smart Crafter Upgrade (2x2)",
@@ -75,7 +75,7 @@
   "item.pedestals.coin.crafter2mk2.chat_recipes": "Current Recipes: ",
   "item.pedestals.coin.crafter2mk2.chat_rate": "Recipes Crafted Per Operation: ",
   "item.pedestals.coin.crafter2mk2.chat_speed": "Operational Speed: ",
-  "jei.pedestals.crafter2mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterened recipe.",
+  "jei.pedestals.crafter2mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterned recipe.",
 
   "item.pedestals.coin.crafter3mk2": "Pedestal Upgrade",
   "item.pedestals.coin.crafter3mk2.tooltip_name": "Smart Crafter Upgrade (3x3)",
@@ -84,8 +84,9 @@
   "item.pedestals.coin.crafter3mk2.chat_recipes": "Current Recipes: ",
   "item.pedestals.coin.crafter3mk2.chat_rate": "Recipes Crafted Per Operation: ",
   "item.pedestals.coin.crafter3mk2.chat_speed": "Operational Speed: ",
-  "jei.pedestals.crafter3mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterened recipe.",
+  "jei.pedestals.crafter3mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterned recipe.",
 
+  "pedestals.wip": "[WIP] This is a Work In Progress Upgrade, it currently will not be able to craft recipes with 'Container' Items in them.",
 
 
 

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:coin/crafter2mk2"
+    }
+  ],
+  "result": {
+    "item": "pedestals:coin/crafter3mk2"
+  }
+}

@@ -196,6 +196,9 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeCrafter.CRAFTER_ONE, "crafter1");
         addValueInfoPage(registration, ItemUpgradeCrafter.CRAFTER_TWO, "crafter2");
         addValueInfoPage(registration, ItemUpgradeCrafter.CRAFTER_THREE, "crafter3");
+        addValueInfoPage(registration, ItemUpgradeCraftermk2.CRAFTER_ONE, "crafter1mk2");
+        addValueInfoPage(registration, ItemUpgradeCraftermk2.CRAFTER_TWO, "crafter2mk2");
+        addValueInfoPage(registration, ItemUpgradeCraftermk2.CRAFTER_THREE, "crafter3mk2");
         addValueInfoPage(registration, ItemUpgradeCompactingCrafter.COMPACTOR_TWO, "compactor2");
         addValueInfoPage(registration, ItemUpgradeCompactingCrafter.COMPACTOR_THREE, "compactor3");
         addValueInfoPage(registration, ItemUpgradeCrusher.CRUSHER, "crusher");
@@ -317,6 +320,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemFilterEnchantedCount.ENCHANTEDCOUNTFILTER, "filterenchantedcount");
         addValueInfoPage(registration, ItemFilterDurability.DURABILITYFILTER, "filterdurability");
         addValueInfoPage(registration, ItemFilterRestricted.RESTRICTIONFILTER, "filterrestriction");
+        addValueInfoPage(registration, ItemCraftingPattern.CRAFTINGPATTERN, "craftingpattern");
     }
 
     @Override
