@@ -10,6 +10,8 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tags.ITag;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -137,11 +139,22 @@ public class ItemUpgradeFluidVoid extends ItemUpgradeBaseFluid
         t.mergeStyle(TextFormatting.GOLD);
         tooltip.add(t);
 
-        if(getAdvancedModifier(stack)<=0 && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
+        ResourceLocation disabled = new ResourceLocation("pedestals", "enchant_limits/advanced_blacklist");
+        ITag<Item> BLACKLISTED = ItemTags.getCollection().get(disabled);
+
+        if(getAdvancedModifier(stack)<=0 && (BLACKLISTED !=null)?(!BLACKLISTED.contains(stack.getItem())):(true) && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
         {
             TranslationTextComponent warning = new TranslationTextComponent(Reference.MODID + ".advanced_warning");
             warning.mergeStyle(TextFormatting.RED);
             tooltip.add(warning);
+        }
+
+        //Checks if this has disabled
+        if((BLACKLISTED !=null)?(BLACKLISTED.contains(stack.getItem())):(false))
+        {
+            TranslationTextComponent disabled_warning = new TranslationTextComponent(Reference.MODID + ".advanced_disabled_warning");
+            disabled_warning.mergeStyle(TextFormatting.DARK_RED);
+            tooltip.add(disabled_warning);
         }
 
         TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".tooltip_rate");

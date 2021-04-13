@@ -87,8 +87,8 @@
   "jei.pedestals.crafter3mk2.desc": "Place an Inventory Below the Pedestal, The crafter will look at the pattern, if enough items exist for the craft, it will craft the recipe,if not itll skip it, then move on to the next patterned recipe.",
 
   "pedestals.wip": "[WIP] This is a Work In Progress Upgrade, it currently will not be able to craft recipes with 'Container' Items in them.",
-
-
+  "pedestals.advanced_warning": "Your upgrade isnt running at peak efficiency, to unlock its full potential, apply the Advanced Enchantment to it.",
+  "pedestals.advanced_disabled_warning": "This Upgrade has been deemed unworthy of the Advanced Enchant, and thus, none of its effects can be activated.",
 
 
   "pedestals.pedestal_block.add_tool": "Tool Added Successfully",
@@ -239,10 +239,6 @@
   "pedestals.target_entities.entity_glass_lime": "Villagers",
   "pedestals.target_entities.entity_glass_black": "Raiders",
   "pedestals.target_entities.entity_all": "All",
-
-  "pedestals.advanced_warning": "Your upgrade isnt running at peak efficiency, to unlock its full potential, apply the Advanced Enchantment to it.",
-
-
 
     "item.pedestals.coin.attack": "Pedestal Upgrade",
     "item.pedestals.coin.attack.tooltip_name": "Auto Attacker",
