@@ -605,6 +605,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
 
     @Override
     public boolean removedByPlayer (BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
+
         if (player.isCreative()) {
             if (player.inventory.hasItemStack(new ItemStack(ItemDevTool.DEV)))
                 return willHarvest || super.removedByPlayer(state, world, pos, player, false, fluid);
@@ -615,6 +616,12 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
         }
 
         return willHarvest || super.removedByPlayer(state, world, pos, player, false, fluid);
+    }
+
+    @Override
+    public void harvestBlock (World worldIn, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
+        super.harvestBlock(worldIn, player, pos, state, te, stack);
+        worldIn.removeBlock(pos, false);
     }
 
     @Override
