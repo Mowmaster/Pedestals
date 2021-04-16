@@ -1,22 +1,18 @@
 {
   "category": "gettingstarted",
-  "name": "Pedestal Aesthetics",
+  "name": "[WIP] Check out Videos for now",
   "subtitle": "",
-  "icon": "pedestals:itemcolorpalletdefault",
-  "sortnum": 4,
+  "icon": "pedestals:linkingtool",
+  "sortnum": 0,
   "priority": true,
   "pages": [
     {
       "type": "text",
-      "text": "$(l:https://github.com/Mowmaster/Pedestals/wiki/Pedestal-Basic-Use)Pedestal Aesthetics/$ $(li)To color a pedestal, right click any pedestal with a Colored Pallet right after you've just placed it down.(Once Colored it will Keep its color when broken).$(br) $(l:https://github.com/Mowmaster/Pedestals/wiki/Colored-Pedestals#making-colored-pedestals)Making Colored Pedestals/$ $(li)To start you'll need a normal Pedestal, or if you already have a Colored Pedestal, that will work as well."
+      "text": "$(l:https://youtu.be/N3Doz6OKjmY?t=455)How to Interact with Pedestals/$ $(br) $(l:https://youtu.be/N3Doz6OKjmY)Recent Updates/$  $(br) $(l:https://www.youtube.com/playlist?list=PLGf2GqfaSfvenNQMkkfqjaOV13FU_hhNY)Old, But somewhat useful Getting Started Info/$ $(br) $(l:https://www.youtube.com/playlist?list=PLGf2GqfaSfvcxixIW__Dqoz6ogQoVEAcx)Dev Playthrough using Pedestals in a Pack/$"
     },
     {
       "type": "text",
-      "text": "$(li)Then, Place the pedestal down somewhere. $(li)Make yourself some Color Pallets. (You can re-use Colored Pallets too)$(li2)First throw up to 3 of each color on the ground.$(li2)Next throw however many Pallets you want to make colored onto the ground.$(li2)Lastly r-click the ground nearby with the Linking Tool to make Colored Pallets."
-    },
-    {
-      "type": "text",
-      "text": "$(li)Lastly, use Colored Pallets on Pedestals by using right click.(Once Colored it will Keep its color when broken) $(li)To make a Pedestal Light Up, R-Click on it with a block of Glowstone.(You'll get the glowstone back when you break the pedestal)$(li)To Waterlog a Pedestal in water, Place it in water, Or Place a water bucket in the same block space as the pedestal.(This is really useful for farms as it is a water source block)"
+      "text": "$(l:https://discord.gg/TGZSt7k)Join the Discord!/$"
     }
   ]
 }
