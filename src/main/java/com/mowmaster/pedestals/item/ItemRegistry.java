@@ -1,7 +1,6 @@
 package com.mowmaster.pedestals.item;
 
 import com.mowmaster.pedestals.blocks.*;
-import com.mowmaster.pedestals.item.deprecated.*;
 import com.mowmaster.pedestals.item.pedestalFilters.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import net.minecraft.item.Item;
@@ -119,54 +118,6 @@ public class ItemRegistry
         ItemUpgradeShearer.onItemRegistryReady(e);
 
         ItemDust.onItemRegistryReady(e);
-
-//Deprecated in 0.8s - Removed in 0.8t
-        ItemUpgradeRestriction.onItemRegistryReady(e);
-        ItemUpgradeQuarryBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterItem.onItemRegistryReady(e);
-        ItemUpgradeFilterItemBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterItemStack.onItemRegistryReady(e);
-        ItemUpgradeFilterItemStackBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterTag.onItemRegistryReady(e);
-        ItemUpgradeFilterTagBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterMod.onItemRegistryReady(e);
-        ItemUpgradeFilterModBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterFood.onItemRegistryReady(e);
-        ItemUpgradeFilterFoodBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterDurability.onItemRegistryReady(e);
-        ItemUpgradeFilterDurabilityLess.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchanted.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchantedBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchantedFuzzy.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchantedFuzzyBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchantedExact.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchantedExactBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilterEnchantedCount.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportItem.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportItemStack.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportMod.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportFood.onItemRegistryReady(e);
-        ItemUpgradeFilteredExportEnchanted.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterFood.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterEnchanted.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterMod.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterFuzzy.onItemRegistryReady(e);
-        ItemUpgradeEnderFilteredImporterExact.onItemRegistryReady(e);
-        ItemUpgradeFluidFilter.onItemRegistryReady(e);
-        ItemUpgradeFluidFilterBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFluidPumpFilter.onItemRegistryReady(e);
-        ItemUpgradeFluidPumpFilterBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFluidRelayBlocked.onItemRegistryReady(e);
-        ItemUpgradeEnergyQuarry.onItemRegistryReady(e);
-        ItemUpgradeEnergyQuarryBlacklist.onItemRegistryReady(e);
-        ItemUpgradeEnergyRelayBlocked.onItemRegistryReady(e);
-        ItemUpgradeExpRelayBlocked.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetItem.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetItemBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetItemStack.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetItemStackBlacklist.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetMod.onItemRegistryReady(e);
-        ItemUpgradeFilteredMagnetModBlacklist.onItemRegistryReady(e);
     }
 
     public static void onItemColorsReady(ColorHandlerEvent.Item event)

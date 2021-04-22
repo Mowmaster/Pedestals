@@ -262,7 +262,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             @Override
             public FluidStack getFluidInTank(int i) {
                 ItemStack coin = getCoinOnPedestal();
-                return (coin.getItem() instanceof ItemUpgradeBaseFluid || coin.getItem() instanceof ItemUpgradeBaseFluidFilter)?((coin.getItem() instanceof ItemUpgradeBaseFluid)?(((ItemUpgradeBaseFluid)coin.getItem()).getFluidStored(coin)):(((ItemUpgradeBaseFluidFilter)coin.getItem()).getFluidStored(coin))):(FluidStack.EMPTY);
+                return (coin.getItem() instanceof ItemUpgradeBaseFluid)?(((ItemUpgradeBaseFluid)coin.getItem()).getFluidStored(coin)):(FluidStack.EMPTY);
             }
 
             @Override
@@ -338,24 +338,16 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             @Override
             public int getTankCapacity(int i) {
                 ItemStack coin = getCoinOnPedestal();
-                return (coin.getItem() instanceof ItemUpgradeBaseFluid || coin.getItem() instanceof ItemUpgradeBaseFluidFilter)?((coin.getItem() instanceof ItemUpgradeBaseFluid)?(((ItemUpgradeBaseFluid)coin.getItem()).getFluidbuffer(coin)):(((ItemUpgradeBaseFluidFilter)coin.getItem()).getFluidbuffer(coin))):(0);
+                return (coin.getItem() instanceof ItemUpgradeBaseFluid)?(((ItemUpgradeBaseFluid)coin.getItem()).getFluidbuffer(coin)):(0);
             }
 
             @Override
             public boolean isFluidValid(int i, @Nonnull FluidStack fluidStack) {
                 ItemStack coin = getCoinOnPedestal();
-                if(coin.getItem() instanceof ItemUpgradeBaseFluid || coin.getItem() instanceof ItemUpgradeBaseFluidFilter)
+                if(coin.getItem() instanceof ItemUpgradeBaseFluid)
                 {
-                    if(coin.getItem() instanceof ItemUpgradeBaseFluid)
-                    {
-                        FluidStack inCoin = ((ItemUpgradeBaseFluid) coin.getItem()).getFluidStored(coin);
-                        return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluid) coin.getItem()).canRecieveFluid(getWorld(), getPos(), fluidStack);
-                    }
-                    else
-                    {
-                        FluidStack inCoin = ((ItemUpgradeBaseFluidFilter) coin.getItem()).getFluidStored(coin);
-                        return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluidFilter) coin.getItem()).canRecieveFluid(getWorld(), getPos(), fluidStack);
-                    }
+                    FluidStack inCoin = ((ItemUpgradeBaseFluid) coin.getItem()).getFluidStored(coin);
+                    return inCoin.isFluidEqual(fluidStack)  || inCoin.isEmpty() && ((ItemUpgradeBaseFluid) coin.getItem()).canRecieveFluid(getWorld(), getPos(), fluidStack);
                 }
 
                 return false;
@@ -640,10 +632,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return handler.cast();
         }
-        if ((cap == CapabilityEnergy.ENERGY) && (getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergy || getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergyFilter)) {
+        if ((cap == CapabilityEnergy.ENERGY) && (getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseEnergy)) {
             return energyHandler.cast();
         }
-        if ((cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) && (getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseFluid || getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseFluidFilter)) {
+        if ((cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) && (getCoinOnPedestal().getItem() instanceof ItemUpgradeBaseFluid)) {
             return fluidHandler.cast();
         }
         return super.getCapability(cap, side);

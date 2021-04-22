@@ -31,7 +31,7 @@ import java.util.stream.IntStream;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
-public class ItemUpgradeFilteredRestock extends ItemUpgradeBaseFilter
+public class ItemUpgradeFilteredRestock extends ItemUpgradeBase
 {
     public ItemUpgradeFilteredRestock(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 

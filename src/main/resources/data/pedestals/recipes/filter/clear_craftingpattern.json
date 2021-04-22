@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:filter/craftingpattern"
+    }
+  ],
+  "result": {
+    "item": "pedestals:filter/craftingpattern"
+  }
+}

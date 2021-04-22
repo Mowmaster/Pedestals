@@ -90,21 +90,18 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
                                     if(receiverPedestal.hasFilter(senderPedestal))
                                     {
                                         Item coinInPed = receiverPedestal.getCoinOnPedestal().getItem();
-                                        if(coinInPed instanceof ItemUpgradeBaseFilter)
+                                        int range = player.inventory.getSizeInventory();
+                                        ItemStack itemInInv = ItemStack.EMPTY;
+                                        itemInInv = IntStream.range(0,range)
+                                                .mapToObj((player.inventory)::getStackInSlot)
+                                                .filter(itemStack -> !itemStack.isEmpty())
+                                                .filter(itemStack -> canAcceptItem(world,receiverConnection,itemStack))
+                                                .filter(itemStack -> canAcceptCount(world,receiverConnection,((PedestalTileEntity)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
+                                                .findFirst().orElse(ItemStack.EMPTY);
+                                        if(!itemInInv.isEmpty())
                                         {
-                                            int range = player.inventory.getSizeInventory();
-                                            ItemStack itemInInv = ItemStack.EMPTY;
-                                            itemInInv = IntStream.range(0,range)
-                                                    .mapToObj((player.inventory)::getStackInSlot)
-                                                    .filter(itemStack -> !itemStack.isEmpty())
-                                                    .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,receiverConnection,itemStack))
-                                                    .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptCount(world,receiverConnection,((PedestalTileEntity)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
-                                                    .findFirst().orElse(ItemStack.EMPTY);
-                                            if(!itemInInv.isEmpty())
-                                            {
-                                                toImport = itemInInv.copy();
-                                                break;
-                                            }
+                                            toImport = itemInInv.copy();
+                                            break;
                                         }
                                     }
                                     else
@@ -179,21 +176,18 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
                                     if(receiverPedestal.hasFilter(senderPedestal))
                                     {
                                         Item coinInPed = receiverPedestal.getCoinOnPedestal().getItem();
-                                        if(coinInPed instanceof ItemUpgradeBaseFilter)
+                                        int range = player.getInventoryEnderChest().getSizeInventory();
+                                        ItemStack itemInInv = ItemStack.EMPTY;
+                                        itemInInv = IntStream.range(0,range)
+                                                .mapToObj((player.getInventoryEnderChest())::getStackInSlot)
+                                                .filter(itemStack -> !itemStack.isEmpty())
+                                                .filter(itemStack -> canAcceptItem(world,receiverConnection,itemStack))
+                                                .filter(itemStack -> canAcceptCount(world,receiverConnection,((PedestalTileEntity)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
+                                                .findFirst().orElse(ItemStack.EMPTY);
+                                        if(!itemInInv.isEmpty())
                                         {
-                                            int range = player.getInventoryEnderChest().getSizeInventory();
-                                            ItemStack itemInInv = ItemStack.EMPTY;
-                                            itemInInv = IntStream.range(0,range)
-                                                    .mapToObj((player.getInventoryEnderChest())::getStackInSlot)
-                                                    .filter(itemStack -> !itemStack.isEmpty())
-                                                    .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptItem(world,receiverConnection,itemStack))
-                                                    .filter(itemStack -> ((ItemUpgradeBaseFilter) coinInPed).canAcceptCount(world,receiverConnection,((PedestalTileEntity)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
-                                                    .findFirst().orElse(ItemStack.EMPTY);
-                                            if(!itemInInv.isEmpty())
-                                            {
-                                                toImport = itemInInv.copy();
-                                                break;
-                                            }
+                                            toImport = itemInInv.copy();
+                                            break;
                                         }
                                     }
                                     else

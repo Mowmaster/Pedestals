@@ -3078,7 +3078,7 @@ public class ItemUpgradeBase extends Item {
         ResourceLocation disabled = new ResourceLocation("pedestals", "enchant_limits/advanced_blacklist");
         ITag<Item> BLACKLISTED = ItemTags.getCollection().get(disabled);
 
-         if(getAdvancedModifier(stack)<=0 && (BLACKLISTED !=null)?(!BLACKLISTED.contains(stack.getItem())):(true) && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
+         if(getAdvancedModifier(stack)<=0 && (BLACKLISTED !=null)?(!BLACKLISTED.contains(stack.getItem())):(false) && (intOperationalSpeedOver(stack) >5 || getCapacityModifierOver(stack) >5 || getAreaModifierUnRestricted(stack) >5 || getRangeModifier(stack) >5))
         {
             TranslationTextComponent warning = new TranslationTextComponent(Reference.MODID + ".advanced_warning");
             warning.mergeStyle(TextFormatting.RED);
