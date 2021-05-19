@@ -33,6 +33,7 @@ minecraft {
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
+
     runs {
         client {
             workingDirectory project.file('run')
@@ -40,6 +41,10 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
             mods {
                 examplemod {
                     source sourceSets.main
@@ -85,10 +90,10 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
-    // maven {
-    //      name = "Patchouli"
-    //      url 'https://maven.blamejared.com'
-    // }
+     maven {
+          name = "Patchouli"
+          url 'https://maven.blamejared.com'
+     }
 }
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
@@ -99,6 +104,10 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api")
     // at runtime, use the full JEI jar
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
+
+
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"

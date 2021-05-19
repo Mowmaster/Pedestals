@@ -1,0 +1,6 @@
+{
+  "name": "Pedestal Networks",
+  "description": "Handling Items, Fluids, Energy, and XP.",
+  "icon": "minecraft:bucket",
+  "sortnum": 1
+}

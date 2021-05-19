@@ -1,0 +1,6 @@
+{
+  "name": "Upgrade Index",
+  "description": "A list of all upgrades in the mod",
+  "icon": "pedestals:coin/default",
+  "sortnum": 4
+}
