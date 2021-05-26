@@ -175,7 +175,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
     public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
     {
-        ServerWorld sworld = world.getServer().func_241755_D_();
+        ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
         ItemStack bonemeal = new ItemStack(Items.BONE_MEAL);
         Random rand = new Random();
 

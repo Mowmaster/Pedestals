@@ -42,6 +42,8 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nullable;
 
 
+import java.util.Random;
+
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
@@ -119,6 +121,11 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
     {
         super(builder);
         this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(WATERLOGGED, Boolean.valueOf(false)).with(LIT, Boolean.valueOf(false)).with(FILTER_STATUS, 0));
+    }
+
+    @Override
+    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+        super.tick(state, worldIn, pos, rand);
     }
 
     /*https://github.com/progwml6/ironchest/blob/1.15/src/main/java/com/progwml6/ironchest/common/block/GenericIronChestBlock.java#L120-L133*/
