@@ -1783,11 +1783,21 @@ public class ItemUpgradeBase extends Item {
                 if(compound.contains("player"))
                 {
                     compound.remove("player");
-                    stack.setTag(compound);
                 }
+
+                if(compound.contains("playername"))
+                {
+                    compound.remove("playername");
+                }
+
+                stack.setTag(compound);
             }
         }
     }
+
+    //
+    //UUID HANDLING
+    //
 
     public UUID getPlayerFromCoin(ItemStack stack)
     {
@@ -1804,13 +1814,14 @@ public class ItemUpgradeBase extends Item {
 
     public WeakReference<FakePlayer> fakePedestalPlayer(PedestalTileEntity pedestal)
     {
-        return new WeakReference<FakePlayer>(new PedestalFakePlayer((ServerWorld) pedestal.getWorld(),getPlayerFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),(pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY)));
+        //ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
+        return new WeakReference<FakePlayer>(new PedestalFakePlayer((ServerWorld) pedestal.getWorld(),getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),(pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY)));
     }
-
 
     public void setPlayerOnCoin(ItemStack stack, PlayerEntity player)
     {
         writeUUIDToNBT(stack,player.getUniqueID());
+        writeNameToNBT(stack,player.getDisplayName().getString());
     }
 
     public boolean hasPlayerSet(ItemStack stack)
@@ -1849,6 +1860,60 @@ public class ItemUpgradeBase extends Item {
         {
             CompoundNBT getCompound = stack.getTag();
             return getCompound.getUniqueId("player");
+        }
+
+        return null;
+    }
+
+    //
+    //PLAYER NAME HANDLING
+    //
+
+    public String getPlayerNameFromCoin(ItemStack stack)
+    {
+        if(hasPlayerNameSet(stack))
+        {
+            return readNameFromNBT(stack);
+        }
+        return null;
+    }
+
+    public boolean hasPlayerNameSet(ItemStack stack)
+    {
+        boolean returner = false;
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("playername"))
+            {
+                if(readNameFromNBT(stack) !=null)
+                {
+                    returner = true;
+                }
+            }
+        }
+        return returner;
+    }
+
+    public void writeNameToNBT(ItemStack stack, String name)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putString("playername",name);
+        stack.setTag(compound);
+    }
+
+    public String readNameFromNBT(ItemStack stack)
+    {
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            return getCompound.getString("playername");
         }
 
         return null;
