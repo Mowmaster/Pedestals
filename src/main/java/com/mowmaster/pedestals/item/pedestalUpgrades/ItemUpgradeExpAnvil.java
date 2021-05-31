@@ -329,6 +329,10 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                         }
 
                                         //System.out.println("Level To Combine: "+ intLevelCostToCombine);
+                                        if(getStoredInt(coinInPedestal) != intLevelCostToCombine)
+                                        {
+                                            writeStoredIntToNBT(coinInPedestal,intLevelCostToCombine);
+                                        }
                                         int intExpCostToCombine = getExpCountByLevel(intLevelCostToCombine);
                                         //System.out.println("XP To Combine: "+ intExpCostToCombine);
                                         if(intExpInCoin >= intExpCostToCombine)
@@ -349,6 +353,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                                 handler.extractItem(i,itemFromInvCopy.getCount(),false);
                                                 if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                                 tilePedestal.addItem(itemFromInvCopy);
+                                                removeStoredIntFromCoin(coinInPedestal);
                                             }
                                         }
                                     }
@@ -383,6 +388,15 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         xpstored.appendString(""+ getExpLevelFromCount(getXPStored(stack)) +"");
         xpstored.mergeStyle(TextFormatting.GREEN);
         player.sendMessage(xpstored,Util.DUMMY_UUID);
+
+        if(getStoredInt(stack) >0)
+        {
+            TranslationTextComponent xpLevelCost = new TranslationTextComponent(getTranslationKey() + ".chat_xpcost");
+            //xpLevelCost.appendString(""+ costToCombine +" ("+ getExpCountByLevel(costToCombine) +"xp)");
+            xpLevelCost.appendString(""+ getStoredInt(stack) +"");
+            xpLevelCost.mergeStyle(TextFormatting.LIGHT_PURPLE);
+            player.sendMessage(xpLevelCost,Util.DUMMY_UUID);
+        }
 
         TranslationTextComponent sorround = new TranslationTextComponent(getTranslationKey() + ".chat_sorround");
         sorround.appendString(""+ correctlyPlacedSorroundingPedestals(pedestal.getWorld(),pedestal.getPos()) +"");

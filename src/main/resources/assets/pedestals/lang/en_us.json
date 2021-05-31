@@ -606,6 +606,7 @@
   "item.pedestals.coin.xpanvil.tooltip_xpcapacitylvl": " Levels",
   "item.pedestals.coin.xpanvil.tooltip_speed": "Operational Speed: ",
   "item.pedestals.coin.xpanvil.chat_xp": "Exp Levels Stored: ",
+  "item.pedestals.coin.xpanvil.chat_xpcost": "Exp Levels Needed to Combine: ",
   "item.pedestals.coin.xpanvil.chat_sorround": "Correctly Placed Sorrounding Pedestals: ",
   "item.pedestals.coin.xpanvil.chat_speed": "Operational Speed: ",
   "jei.pedestals.xpanvil.desc": "Needs XP. Place an inventory below the pedestal for items needing repair and items getting combined. Place pedestals around the upgraded one, NESW with one space in between. Items placed on these 4 pedestals will be combined with the item in the inventory below the upgraded pedestal.",
