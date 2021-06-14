@@ -1558,6 +1558,7 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {if(entityIn instanceof FlyingEntity) {return (FlyingEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {if(entityIn instanceof CreatureEntity) {return (CreatureEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {if(entityIn instanceof MobEntity) {return (MobEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.HAY_BLOCK)) {if(entityIn.isChild()) {return entityIn;}}
         else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {if(entityIn instanceof VillagerEntity) {return (VillagerEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {if(entityIn instanceof AbstractRaiderEntity) {return (AbstractRaiderEntity)entityIn;}}
         else {return (LivingEntity)entityIn;}
@@ -1572,6 +1573,7 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {if(entityIn instanceof FlyingEntity) {return (FlyingEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {if(entityIn instanceof CreatureEntity) {return (CreatureEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {if(entityIn instanceof MobEntity) {return (MobEntity)entityIn;}}
+        else if(filterBlock.equals(Blocks.HAY_BLOCK)) {if(entityIn instanceof LivingEntity) {if(((LivingEntity) entityIn).isChild())return entityIn;}}
         else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {if(entityIn instanceof VillagerEntity) {return (VillagerEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {if(entityIn instanceof AbstractRaiderEntity) {return (AbstractRaiderEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.QUARTZ_BLOCK)) {if(entityIn instanceof ItemEntity) {return (ItemEntity)entityIn;}}
@@ -1588,6 +1590,7 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent LAPIS = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_lapis");
         TranslationTextComponent IRON = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_iron");
         TranslationTextComponent COAL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_coal");
+        TranslationTextComponent HAY = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_hay");
         TranslationTextComponent GLASS_LIME = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_lime");
         TranslationTextComponent GLASS_BLACK = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_black");
         TranslationTextComponent ALL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_all");
@@ -1598,6 +1601,7 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.LAPIS_BLOCK)) {return LAPIS.getString();}
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {return IRON.getString();}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {return COAL.getString();}
+        else if(filterBlock.equals(Blocks.HAY_BLOCK)) {return HAY.getString();}
         else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {return GLASS_LIME.getString();}
         else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {return GLASS_BLACK.getString();}
         else {return ALL.getString();}
@@ -1612,6 +1616,7 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent IRON = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_iron");
         TranslationTextComponent COAL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_coal");
         TranslationTextComponent ALL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_all");
+        TranslationTextComponent HAY = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_hay");
         TranslationTextComponent GLASS_LIME = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_lime");
         TranslationTextComponent GLASS_BLACK = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_black");
         TranslationTextComponent SLIME = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_slime");
@@ -1625,6 +1630,7 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {return COAL.getString();}
         else if(filterBlock.equals(Blocks.SLIME_BLOCK)) {return SLIME.getString();}
         else if(filterBlock.equals(Blocks.QUARTZ_BLOCK)) {return QUARTZ.getString();}
+        else if(filterBlock.equals(Blocks.HAY_BLOCK)) {return HAY.getString();}
         else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {return GLASS_LIME.getString();}
         else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {return GLASS_BLACK.getString();}
         else {return ALL.getString();}

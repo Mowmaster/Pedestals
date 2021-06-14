@@ -21,6 +21,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -91,6 +92,11 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         if(entityList.size()==0)writeStoredIntToNBT(coinInPedestal,0);
         if(entityList.size()>0)
         {
+            if(readStoredIntTwoFromNBT(coinInPedestal)!=entityList.size())
+            {
+                writeStoredIntTwoToNBT(coinInPedestal,entityList.size());
+                pedestal.update();
+            }
             BlockState state = world.getBlockState(posOfPedestal);
             Direction enumfacing = state.get(FACING);
             for (LivingEntity entity : entityList) {
@@ -126,6 +132,11 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         if(entityList.size()==0)writeStoredIntToNBT(coinInPedestal,0);
         if(entityList.size()>0)
         {
+            if(readStoredIntTwoFromNBT(coinInPedestal)!=entityList.size())
+            {
+                writeStoredIntTwoToNBT(coinInPedestal,entityList.size());
+                pedestal.update();
+            }
             BlockState state = world.getBlockState(posOfPedestal);
             Direction enumfacing = state.get(FACING);
             for (Entity entity : entityList) {
@@ -228,6 +239,26 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         }
 
         return  intOperationalSpeed;
+    }
+
+    @Override
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
+    {
+        int intItem=0;
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof PedestalTileEntity) {
+            PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            int entityCount = readStoredIntTwoFromNBT(coin);
+            if(entityCount>0)
+            {
+                //Reused from Generators, But basically scales the total by factors of 10 so a dynamic redstone control is possible
+                float f = (float)entityCount/(float)getMaxFuelDeviderBasedOnFuelStored(entityCount);
+                intItem = MathHelper.floor(f*15.0F);
+            }
+        }
+
+        return intItem;
     }
 
     public void updateAction(World world, PedestalTileEntity pedestal)
