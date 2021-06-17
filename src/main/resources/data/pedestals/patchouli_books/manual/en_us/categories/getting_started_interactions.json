@@ -1,6 +1,6 @@
 {
   "name": "Interations",
-  "description": "There are many ways to Interact with a pedestal. $(br)$(li)Placing or grabbing items. $(br)$(li)Inserting upgrades, filters, augments, color pallets, glowstone, or redstone torches. $(br)$(li)Tools have their own interactions too.",
+  "description": "There are many ways to Interact with a pedestal. $(li)Inserting or Extracting Items. $(li)Inserting/Extracting upgrades, filters, tools, augments, color pallets, glowstone, or redstone torches. $(br)Click on a topic to learn more about that specific type of interaction.",
   "icon": "pedestals:linkingtool",
   "sortnum": 0,
   "parent": "getting_started"
