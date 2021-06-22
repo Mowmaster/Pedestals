@@ -209,7 +209,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                                             workQueue.remove(i);
                                             writeWorkQueueToNBT(coinInPedestal,workQueue);
                                             upgradeAction(pedestal, targetPos, itemInPedestal, coinInPedestal);
-                                            break;
+                                            if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                                         }
                                         else
                                         {

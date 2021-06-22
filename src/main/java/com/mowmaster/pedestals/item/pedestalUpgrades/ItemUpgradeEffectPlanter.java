@@ -156,7 +156,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
                                         upgradeAction(world, pedestal, itemInPedestal, pedestalPos, targetPos, targetBlock);
-                                        break;
+                                        if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                                     }
                                     else
                                     {

@@ -183,7 +183,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                                     workQueue.remove(i);
                                     writeWorkQueueToNBT(coinInPedestal,workQueue);
                                     upgradeAction(pedestal, targetPos, targetBlock);
-                                    break;
+                                    if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                                 }
                                 else
                                 {

@@ -1286,6 +1286,11 @@ public class ItemUpgradeBase extends Item {
     {
         return getAdvancedModifier(stack)>=1;
     }
+
+    public boolean hasAdvancedInventoryTargetingTwo(ItemStack stack)
+    {
+        return getAdvancedModifier(stack)>=2;
+    }
     /***************************************
      ****************************************
      **        End of Advanced Stuff       **

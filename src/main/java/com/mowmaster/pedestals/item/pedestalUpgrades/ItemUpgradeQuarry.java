@@ -266,7 +266,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
                                         upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, targetPos, targetBlock, pedestalPos);
-                                        break;
+                                        if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                                     }
                                     else
                                     {

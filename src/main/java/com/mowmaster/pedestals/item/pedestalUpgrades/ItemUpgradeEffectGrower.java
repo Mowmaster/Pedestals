@@ -50,6 +50,11 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
@@ -152,8 +157,8 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                                     {
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                        upgradeAction(pedestal, world, itemInPedestal, pedestalPos, targetPos, targetBlock);
-                                        break;
+                                        upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, pedestalPos, targetPos, targetBlock);
+                                        if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                                     }
                                     else
                                     {
@@ -173,7 +178,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         }
     }
 
-    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
     {
         ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
         ItemStack bonemeal = new ItemStack(Items.BONE_MEAL);

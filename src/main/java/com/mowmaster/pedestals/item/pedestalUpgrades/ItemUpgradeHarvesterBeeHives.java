@@ -218,7 +218,7 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
                                         upgradeAction(pedestal, world, itemInPedestal,coinInPedestal, pedestalPos, targetPos, targetBlock);
-                                        break;
+                                        if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                                     }
                                     else
                                     {

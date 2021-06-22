@@ -66,6 +66,11 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         return true;
     }
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
@@ -231,7 +236,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                                         workQueue.remove(i);
                                         writeWorkQueueToNBT(coinInPedestal,workQueue);
                                         upgradeAction(pedestal, targetPos, targetBlock);
-                                        break;
+                                        if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                                     }
                                     else
                                     {
