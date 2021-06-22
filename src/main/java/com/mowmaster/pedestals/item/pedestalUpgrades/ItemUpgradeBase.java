@@ -1289,7 +1289,7 @@ public class ItemUpgradeBase extends Item {
 
     public boolean hasAdvancedInventoryTargetingTwo(ItemStack stack)
     {
-        return getAdvancedModifier(stack)>=2;
+        return EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.ADVANCED,stack)>=2;
     }
     /***************************************
      ****************************************
