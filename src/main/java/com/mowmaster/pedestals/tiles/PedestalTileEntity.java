@@ -80,6 +80,12 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
      **********************************
      *********************************/
 
+    /*
+    For eventual conversion to handlers within the pedestal and not using upgrades to transfer energy/fluids/xp...
+    Base transfer speed needs to be 5000/s (250/t)
+    With storage of 10k base
+     */
+
     public IEnergyStorage createHandlerEnergy() {
         return new IEnergyStorage() {
             @Override
@@ -1920,7 +1926,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
         if(getItemInPedestal().isEmpty() || getItemInPedestal().equals(ItemStack.EMPTY))
         {
-            canAccept = 64;
+            canAccept = itemsIncoming.getMaxStackSize();
         }
         else
         {
@@ -1931,9 +1937,11 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if(itemsIncoming.getMaxStackSize() > 1 || isTank)
                 {
                     //If i did this right, slot limit should default to stack max size, or custom allowed
-                    if(getItemInPedestal().getCount() < getSlotSizeLimit())
+                    int allowed = getSlotSizeLimit();
+                    if(allowed> itemsIncoming.getMaxStackSize())allowed=itemsIncoming.getMaxStackSize();
+                    if(getItemInPedestal().getCount() < allowed)
                     {
-                        canAccept = (getSlotSizeLimit() - getItemInPedestal().getCount());
+                        canAccept = (allowed - getItemInPedestal().getCount());
                     }
                 }
             }

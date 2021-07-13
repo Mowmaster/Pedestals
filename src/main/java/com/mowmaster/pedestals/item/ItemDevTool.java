@@ -64,6 +64,19 @@ public class ItemDevTool extends Item {
                             p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
                             return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                         }
+                        else if(p_77659_2_.getHeldItemOffhand().getItem() instanceof ItemColorPallet)
+                        {
+                            int color = 0;
+                            if(p_77659_2_.getHeldItemOffhand().getTag().contains("color"))
+                            {
+                                color=p_77659_2_.getHeldItemOffhand().getTag().getInt("color");
+                            }
+
+                            TranslationTextComponent colored = new TranslationTextComponent(""+color+"");
+                            colored.mergeStyle(TextFormatting.LIGHT_PURPLE);
+                            p_77659_2_.sendMessage(colored,p_77659_2_.getUniqueID());
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
                         return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
                     }
                 }
