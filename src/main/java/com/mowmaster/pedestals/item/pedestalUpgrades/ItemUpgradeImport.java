@@ -57,13 +57,13 @@ public class ItemUpgradeImport extends ItemUpgradeBase
             if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,coinInPedestal);
+                    upgradeAction(pedestal, world,pedestalPos,coinInPedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int transferRate = getItemTransferRate(coinInPedestal);
@@ -85,7 +85,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                 else {
                     if(handler != null)
                     {
-                        int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
+                        int i = getNextSlotWithItemsCapFiltered(pedestal,cap,getStackInPedestal(world,posOfPedestal));
                         if(i>=0)
                         {
                             int maxStackSizeAllowedInPedestal = 0;

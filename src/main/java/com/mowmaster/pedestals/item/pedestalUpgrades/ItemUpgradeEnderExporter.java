@@ -55,13 +55,13 @@ public class ItemUpgradeEnderExporter extends ItemUpgradeBase
             if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
+                    upgradeAction(pedestal, world,pedestalPos,itemInPedestal,coinInPedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
         PlayerEntity player = ((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
         if(player != null)
@@ -74,6 +74,7 @@ public class ItemUpgradeEnderExporter extends ItemUpgradeBase
                     itemInPlayer = IntStream.range(0,player.inventory.getSizeInventory())//Int Range
                             .mapToObj((player.inventory)::getStackInSlot)//Function being applied to each interval
                             .filter(itemStack -> !itemStack.isEmpty())
+                            .filter(itemStack -> passesItemFilter(pedestal,itemStack))
                             .findFirst().orElse(ItemStack.EMPTY);
 
                     if(!itemInPlayer.isEmpty())
@@ -89,6 +90,7 @@ public class ItemUpgradeEnderExporter extends ItemUpgradeBase
                     itemInEnderChest = IntStream.range(0,player.getInventoryEnderChest().getSizeInventory())//Int Range
                             .mapToObj((player.getInventoryEnderChest())::getStackInSlot)//Function being applied to each interval
                             .filter(itemStack -> !itemStack.isEmpty())
+                            .filter(itemStack -> passesItemFilter(pedestal,itemStack))
                             .findFirst().orElse(ItemStack.EMPTY);
 
                     if(!itemInEnderChest.isEmpty())

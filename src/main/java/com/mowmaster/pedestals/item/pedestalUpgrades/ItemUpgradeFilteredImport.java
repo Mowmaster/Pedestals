@@ -142,7 +142,8 @@ public class ItemUpgradeFilteredImport extends ItemUpgradeBase
                             //After an Item Allowed to be sent is found. Make sure the sender pedestal can import items into the pedestal
                             if(senderPedestal.getItemInPedestal().isEmpty() || doItemsMatch(senderPedestal.getItemInPedestal(),toImport))
                             {
-                                int i = getSlotWithMatchingStackExact(senderBelowInvCap,toImport);
+                                int i = getSlotWithMatchingStackExactFiltered(senderPedestal,senderBelowInvCap,toImport);
+
                                 if(i>=0)
                                 {
                                     int maxStackSizeAllowedInPedestal = 0;

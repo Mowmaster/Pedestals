@@ -1938,7 +1938,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 {
                     //If i did this right, slot limit should default to stack max size, or custom allowed
                     int allowed = getSlotSizeLimit();
-                    if(allowed> itemsIncoming.getMaxStackSize())allowed=itemsIncoming.getMaxStackSize();
+                    if(allowed> itemsIncoming.getMaxStackSize() && !isTank)allowed=itemsIncoming.getMaxStackSize();
                     if(getItemInPedestal().getCount() < allowed)
                     {
                         canAccept = (allowed - getItemInPedestal().getCount());

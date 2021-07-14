@@ -537,6 +537,7 @@ public class ItemUpgradeBase extends Item {
             {
                 returner = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,stackIn);
             }
+
         }
 
         return returner;
@@ -617,6 +618,35 @@ public class ItemUpgradeBase extends Item {
                 }});
 
 
+        }
+
+        return slot.get();
+    }
+
+    public int getSlotWithMatchingStackExactFiltered(PedestalTileEntity pedestal, LazyOptional<IItemHandler> cap, ItemStack stackToFind)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        if(cap.isPresent()) {
+
+            cap.ifPresent(itemHandler -> {
+                int range = itemHandler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    //find a slot with items
+                    if(!stackInSlot.isEmpty())
+                    {
+                        //check if it could pull the item out or not
+                        if(ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToFind))//stackInSlot.isItemEqual(stackToFind)
+                        {
+                            if(passesItemFilter(pedestal,stackInSlot))
+                            {
+                                slot.set(i);
+                                break;
+                            }
+                        }
+                    }
+                }});
         }
 
         return slot.get();

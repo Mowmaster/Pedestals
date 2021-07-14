@@ -57,13 +57,13 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
             if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
                 if (world.getGameTime()%speed == 0) {
-                    upgradeAction(world,pedestalPos,itemInPedestal,coinInPedestal);
+                    upgradeAction(pedestal,world,pedestalPos,itemInPedestal,coinInPedestal);
                 }
             }
         }
     }
 
-    public void upgradeAction(World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
         PlayerEntity player = ((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
         if(player != null)
@@ -97,6 +97,7 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
                                                 .filter(itemStack -> !itemStack.isEmpty())
                                                 .filter(itemStack -> canAcceptItem(world,receiverConnection,itemStack))
                                                 .filter(itemStack -> canAcceptCount(world,receiverConnection,((PedestalTileEntity)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
+                                                .filter(itemStack -> passesItemFilter(pedestal,itemStack))
                                                 .findFirst().orElse(ItemStack.EMPTY);
                                         if(!itemInInv.isEmpty())
                                         {
@@ -112,6 +113,7 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
                                                 .mapToObj((player.inventory)::getStackInSlot)//Function being applied to each interval
                                                 .filter(itemStack -> !itemStack.isEmpty())
                                                 .filter(itemStack -> senderPedestal.canSendToPedestal(receiverConnection,itemStack))
+                                                .filter(itemStack -> passesItemFilter(pedestal,itemStack))
                                                 .findFirst().orElse(ItemStack.EMPTY);
                                         if(!itemInInv.isEmpty())
                                         {
@@ -183,6 +185,7 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
                                                 .filter(itemStack -> !itemStack.isEmpty())
                                                 .filter(itemStack -> canAcceptItem(world,receiverConnection,itemStack))
                                                 .filter(itemStack -> canAcceptCount(world,receiverConnection,((PedestalTileEntity)world.getTileEntity(receiverConnection)).getItemInPedestal(),itemStack)>0)
+                                                .filter(itemStack -> passesItemFilter(pedestal,itemStack))
                                                 .findFirst().orElse(ItemStack.EMPTY);
                                         if(!itemInInv.isEmpty())
                                         {
@@ -198,6 +201,7 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
                                                 .mapToObj((player.getInventoryEnderChest())::getStackInSlot)//Function being applied to each interval
                                                 .filter(itemStack -> !itemStack.isEmpty())
                                                 .filter(itemStack -> senderPedestal.canSendToPedestal(receiverConnection,itemStack))
+                                                .filter(itemStack -> passesItemFilter(pedestal,itemStack))
                                                 .findFirst().orElse(ItemStack.EMPTY);
                                         if(!itemInInv.isEmpty())
                                         {
