@@ -116,6 +116,7 @@ public class ItemRegistry
         ItemUpgradeFan.onItemRegistryReady(e);
         ItemUpgradeEffect.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);
+        ItemUpgradeBabyMaker.onItemRegistryReady(e);
 
         ItemDust.onItemRegistryReady(e);
     }

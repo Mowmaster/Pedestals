@@ -21,6 +21,7 @@ import net.minecraft.entity.merchant.villager.VillagerEntity;
 import net.minecraft.entity.monster.AbstractRaiderEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.*;
@@ -1585,6 +1586,18 @@ public class ItemUpgradeBase extends Item {
      **       Start of Entity Stuff        **
      ****************************************
      ***************************************/
+    //https://github.com/gigabit101/Shrink/blob/8fb45f28a1d77500f4f9431f68e78196d11828c8/src/main/java/net/gigabit101/shrink/items/ItemModBottle.java#L74
+    //https://github.com/gigabit101/Shrink/blob/8fb45f28a1d77500f4f9431f68e78196d11828c8/src/main/java/net/gigabit101/shrink/items/ItemModBottle.java#L47
+    /*
+    EntityType.byKey("entity name here")
+
+    if(entityIn.getType().getClassification().equals(EntityClassification.MONSTER))return entityIn;
+    if(entityIn.getType().getClassification().equals(EntityClassification.CREATURE))return entityIn;
+    if(entityIn.getType().getClassification().equals(EntityClassification.AMBIENT))return entityIn;
+    if(entityIn.getType().getClassification().equals(EntityClassification.WATER_CREATURE))return entityIn;
+    if(entityIn.getType().getClassification().equals(EntityClassification.WATER_AMBIENT))return entityIn;
+    if(entityIn.getType().getClassification().equals(EntityClassification.MISC))return entityIn;
+     */
     public LivingEntity getTargetEntity(Block filterBlock, LivingEntity entityIn)
     {
         if(filterBlock.equals(Blocks.EMERALD_BLOCK)) {if(entityIn instanceof PlayerEntity) {return (PlayerEntity)entityIn;}}
@@ -1857,6 +1870,12 @@ public class ItemUpgradeBase extends Item {
     {
         //ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
         return new WeakReference<FakePlayer>(new PedestalFakePlayer((ServerWorld) pedestal.getWorld(),getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),(pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY)));
+    }
+
+    public WeakReference<FakePlayer> fakePedestalPlayer(PedestalTileEntity pedestal, ItemStack itemInHand)
+    {
+        //ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
+        return new WeakReference<FakePlayer>(new PedestalFakePlayer((ServerWorld) pedestal.getWorld(),getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),itemInHand));
     }
 
     public void setPlayerOnCoin(ItemStack stack, PlayerEntity player)

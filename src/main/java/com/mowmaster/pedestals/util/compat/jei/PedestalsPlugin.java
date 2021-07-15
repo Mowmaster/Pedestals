@@ -247,6 +247,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeQuarry.QUARRY, "quarry");
         addValueInfoPage(registration, ItemUpgradeMilker.MILKER, "milker");
         addValueInfoPage(registration, ItemUpgradeShearer.SHEARER, "shearer");
+        addValueInfoPage(registration, ItemUpgradeBabyMaker.BABYMAKER, "babymaker");
         addValueInfoPage(registration, ItemUpgradePlacer.PLACER, "placer");
         addValueInfoPage(registration, ItemUpgradeTeleporter.TELEPORTER, "teleporter");
         addValueInfoPage(registration, ItemUpgradeVoid.VOID, "void");

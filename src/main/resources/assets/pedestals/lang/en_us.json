@@ -831,6 +831,16 @@
   "item.pedestals.coin.milker.chat_speed": "Operational Speed: ",
   "jei.pedestals.milker.desc": "Place an inventory below the pedestal for buckets. Will milk any cows in the area around it, storing the milk buckets in the pedestal. If milk is a placeable liquid, having the upgrade on a pedestal with no inventory below the pedestal, will milk cows nearby, storing the fluid in the pedestal's fluid buffer.",
 
+  "item.pedestals.coin.babymaker": "Pedestal Upgrade",
+  "item.pedestals.coin.babymaker.tooltip_name": "Breeder Upgrade",
+  "item.pedestals.coin.babymaker.tooltip_area": "Affected Area: ",
+  "item.pedestals.coin.babymaker.tooltip_areax": "x",
+  "item.pedestals.coin.babymaker.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.babymaker.chat_area": "Affected Area: ",
+  "item.pedestals.coin.babymaker.chat_areax": "x",
+  "item.pedestals.coin.babymaker.chat_speed": "Operational Speed: ",
+  "jei.pedestals.babymaker.desc": "Place near Animals you want to breed, insert into the pedestal the items required to breed them. Profit!",
+
   "item.pedestals.coin.export": "Pedestal Upgrade",
   "item.pedestals.coin.export.tooltip_name": "Export Upgrade",
   "item.pedestals.coin.export.tooltip_rate": "Transfer Rate: ",
