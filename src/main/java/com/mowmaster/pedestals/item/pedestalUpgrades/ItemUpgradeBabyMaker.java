@@ -133,13 +133,13 @@ public class ItemUpgradeBabyMaker extends ItemUpgradeBase
                     {
                         pedestal.removeItem(1);
                         getAnimalFromList.setInLove(fakePlayer);
-
                     }
 
                     if(hasAdvancedInventoryTargeting(coinInPedestal))
                     {
                         if (getAnimalFromList.isChild()) {
                             pedestal.removeItem(1);
+                            if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,getAnimalFromList.getPosX(),getAnimalFromList.getPosY()+0.5,getAnimalFromList.getPosZ(),76,255,0));
                             getAnimalFromList.ageUp((int)((float)(-getAnimalFromList.getGrowingAge() / 20) * 0.1F), true);
                         }
                     }

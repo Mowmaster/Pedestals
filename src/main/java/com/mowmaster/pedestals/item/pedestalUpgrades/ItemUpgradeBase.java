@@ -21,7 +21,6 @@ import net.minecraft.entity.merchant.villager.VillagerEntity;
 import net.minecraft.entity.monster.AbstractRaiderEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.*;
@@ -1597,6 +1596,129 @@ public class ItemUpgradeBase extends Item {
     if(entityIn.getType().getClassification().equals(EntityClassification.WATER_CREATURE))return entityIn;
     if(entityIn.getType().getClassification().equals(EntityClassification.WATER_AMBIENT))return entityIn;
     if(entityIn.getType().getClassification().equals(EntityClassification.MISC))return entityIn;
+
+    Full list of entities sorted by classification:
+    ***    EntityClassification.MONSTER    ***
+    EntityType<RavagerEntity>           RAVAGER         "ravager",           size(1.95F, 2.2F).trackingRange(10));
+    EntityType<ShulkerEntity>           SHULKER         "shulker",           immuneToFire().func_225435_d().size(1.0F, 1.0F).trackingRange(10));
+    EntityType<SilverfishEntity>        SILVERFISH      "silverfish",        size(0.4F, 0.3F).trackingRange(8));
+    EntityType<SkeletonEntity>          SKELETON        "skeleton",          size(0.6F, 1.99F).trackingRange(8));
+    EntityType<SlimeEntity>             SLIME           "slime",             size(2.04F, 2.04F).trackingRange(10));
+    EntityType<SpiderEntity>            SPIDER          "spider",            size(1.4F, 0.9F).trackingRange(8));
+    EntityType<StrayEntity>             STRAY           "stray",             size(0.6F, 1.99F).trackingRange(8));
+    EntityType<VexEntity>               VEX             "vex",               immuneToFire().size(0.4F, 0.8F).trackingRange(8));
+    EntityType<VindicatorEntity>        VINDICATOR      "vindicator",        size(0.6F, 1.95F).trackingRange(8));
+    EntityType<WitchEntity>             WITCH           "witch",             size(0.6F, 1.95F).trackingRange(8));
+    EntityType<WitherEntity>            WITHER          "wither",            immuneToFire().func_233607_a_(Blocks.WITHER_ROSE).size(0.9F, 3.5F).trackingRange(10));
+    EntityType<WitherSkeletonEntity>    WITHER_SKELETON "wither_skeleton",   immuneToFire().func_233607_a_(Blocks.WITHER_ROSE).size(0.7F, 2.4F).trackingRange(8));
+    EntityType<ZoglinEntity>            ZOGLIN          "zoglin",            immuneToFire().size(1.3964844F, 1.4F).trackingRange(8));
+    EntityType<ZombieEntity>            ZOMBIE          "zombie",            size(0.6F, 1.95F).trackingRange(8));
+    EntityType<ZombieVillagerEntity>    ZOMBIE_VILLAGER "zombie_villager",   size(0.6F, 1.95F).trackingRange(8));
+    EntityType<ZombifiedPiglinEntity>   ZOMBIFIED_PIGLIN"zombified_piglin",  immuneToFire().size(0.6F, 1.95F).trackingRange(8));
+    EntityType<PillagerEntity>          PILLAGER        "pillager",          func_225435_d().size(0.6F, 1.95F).trackingRange(8));
+    EntityType<PiglinBruteEntity>       field_242287_aj "piglin_brute",      size(0.6F, 1.95F).trackingRange(8));
+    EntityType<PiglinEntity>            PIGLIN          "piglin",            size(0.6F, 1.95F).trackingRange(8));
+    EntityType<PhantomEntity>           PHANTOM         "phantom",           size(0.9F, 0.5F).trackingRange(8));
+    EntityType<BlazeEntity>             BLAZE           "blaze",             immuneToFire().size(0.6F, 1.8F).trackingRange(8));
+    EntityType<CaveSpiderEntity>        CAVE_SPIDER     "cave_spider",       size(0.7F, 0.5F).trackingRange(8));
+    EntityType<CreeperEntity>           CREEPER         "creeper",           size(0.6F, 1.7F).trackingRange(8));
+    EntityType<DrownedEntity>           DROWNED         "drowned",           size(0.6F, 1.95F).trackingRange(8));
+    EntityType<ElderGuardianEntity>     ELDER_GUARDIAN  "elder_guardian",    size(1.9975F, 1.9975F).trackingRange(10));
+    EntityType<EnderDragonEntity>       ENDER_DRAGON    "ender_dragon",      immuneToFire().size(16.0F, 8.0F).trackingRange(10));
+    EntityType<EndermanEntity>          ENDERMAN        "enderman",          size(0.6F, 2.9F).trackingRange(8));
+    EntityType<EndermiteEntity>         ENDERMITE       "endermite",         size(0.4F, 0.3F).trackingRange(8));
+    EntityType<EvokerEntity>            EVOKER          "evoker",            size(0.6F, 1.95F).trackingRange(8));
+    EntityType<GhastEntity>             GHAST           "ghast",             immuneToFire().size(4.0F, 4.0F).trackingRange(10));
+    EntityType<GiantEntity>             GIANT           "giant",             size(3.6F, 12.0F).trackingRange(10));
+    EntityType<GuardianEntity>          GUARDIAN        "guardian",          size(0.85F, 0.85F).trackingRange(8));
+    EntityType<HoglinEntity>            HOGLIN          "hoglin",            size(1.3964844F, 1.4F).trackingRange(8));
+    EntityType<HuskEntity>              HUSK            "husk",              size(0.6F, 1.95F).trackingRange(8));
+    EntityType<IllusionerEntity>        ILLUSIONER      "illusioner",        size(0.6F, 1.95F).trackingRange(8));
+    EntityType<MagmaCubeEntity>         MAGMA_CUBE      "magma_cube",        immuneToFire().size(2.04F, 2.04F).trackingRange(8));
+
+    ***    EntityClassification.CREATURE    ***
+    EntityType<SheepEntity> SHEEP "sheep", EntityType.Builder.<SheepEntity>create(SheepEntity::new, size(0.9F, 1.3F).trackingRange(10));
+    EntityType<SkeletonHorseEntity> SKELETON_HORSE "skeleton_horse", EntityType.Builder.<SkeletonHorseEntity>create(SkeletonHorseEntity::new, size(1.3964844F, 1.6F).trackingRange(10));
+    EntityType<StriderEntity> STRIDER "strider", EntityType.Builder.<StriderEntity>create(StriderEntity::new, immuneToFire().size(0.9F, 1.7F).trackingRange(10));
+    EntityType<TraderLlamaEntity> TRADER_LLAMA "trader_llama", EntityType.Builder.<TraderLlamaEntity>create(TraderLlamaEntity::new, size(0.9F, 1.87F).trackingRange(10));
+    EntityType<TurtleEntity> TURTLE "turtle", EntityType.Builder.<TurtleEntity>create(TurtleEntity::new, size(1.2F, 0.4F).trackingRange(10));
+    EntityType<WanderingTraderEntity> WANDERING_TRADER "wandering_trader", EntityType.Builder.<WanderingTraderEntity>create(WanderingTraderEntity::new, size(0.6F, 1.95F).trackingRange(10));
+    EntityType<WolfEntity> WOLF "wolf", EntityType.Builder.<WolfEntity>create(WolfEntity::new, size(0.6F, 0.85F).trackingRange(10));
+    EntityType<ZombieHorseEntity> ZOMBIE_HORSE "zombie_horse", EntityType.Builder.<ZombieHorseEntity>create(ZombieHorseEntity::new, size(1.3964844F, 1.6F).trackingRange(10));
+    EntityType<RabbitEntity> RABBIT "rabbit", EntityType.Builder.<RabbitEntity>create(RabbitEntity::new, size(0.4F, 0.5F).trackingRange(8));
+    EntityType<PolarBearEntity> POLAR_BEAR "polar_bear", EntityType.Builder.<PolarBearEntity>create(PolarBearEntity::new, size(1.4F, 1.4F).trackingRange(10));
+    EntityType<PigEntity> PIG "pig", EntityType.Builder.<PigEntity>create(PigEntity::new, size(0.9F, 0.9F).trackingRange(10));
+    EntityType<ParrotEntity> PARROT "parrot", EntityType.Builder.<ParrotEntity>create(ParrotEntity::new, size(0.5F, 0.9F).trackingRange(8));
+    EntityType<PandaEntity> PANDA "panda", EntityType.Builder.<PandaEntity>create(PandaEntity::new, size(1.3F, 1.25F).trackingRange(10));
+    EntityType<OcelotEntity> OCELOT "ocelot", EntityType.Builder.<OcelotEntity>create(OcelotEntity::new, size(0.6F, 0.7F).trackingRange(10));
+    EntityType<MooshroomEntity> MOOSHROOM "mooshroom", EntityType.Builder.<MooshroomEntity>create(MooshroomEntity::new, size(0.9F, 1.4F).trackingRange(10));
+    EntityType<BeeEntity> BEE "bee", EntityType.Builder.<BeeEntity>create(BeeEntity::new, size(0.7F, 0.6F).trackingRange(8));
+    EntityType<CatEntity> CAT "cat", EntityType.Builder.<CatEntity>create(CatEntity::new, size(0.6F, 0.7F).trackingRange(8));
+    EntityType<ChickenEntity> CHICKEN "chicken", EntityType.Builder.<ChickenEntity>create(ChickenEntity::new, size(0.4F, 0.7F).trackingRange(10));
+    EntityType<CowEntity> COW "cow", EntityType.Builder.<CowEntity>create(CowEntity::new, size(0.9F, 1.4F).trackingRange(10));
+    EntityType<DonkeyEntity> DONKEY "donkey", EntityType.Builder.<DonkeyEntity>create(DonkeyEntity::new, size(1.3964844F, 1.5F).trackingRange(10));
+    EntityType<FoxEntity> FOX "fox", EntityType.Builder.<FoxEntity>create(FoxEntity::new, size(0.6F, 0.7F).trackingRange(8).func_233607_a_(Blocks.SWEET_BERRY_BUSH));
+    EntityType<HorseEntity> HORSE "horse", EntityType.Builder.<HorseEntity>create(HorseEntity::new, size(1.3964844F, 1.6F).trackingRange(10));
+    EntityType<LlamaEntity> LLAMA "llama", EntityType.Builder.<LlamaEntity>create(LlamaEntity::new, size(0.9F, 1.87F).trackingRange(10));
+    EntityType<MuleEntity> MULE "mule", EntityType.Builder.<MuleEntity>create(MuleEntity::new, size(1.3964844F, 1.6F).trackingRange(8));
+
+    ***    EntityClassification.AMBIENT    ***
+    EntityType<BatEntity> BAT "bat", EntityType.Builder.<BatEntity>create(BatEntity::new, size(0.5F, 0.9F).trackingRange(5));
+
+    ***    EntityClassification.WATER_CREATURE    ***
+    EntityType<SquidEntity> SQUID "squid", EntityType.Builder.<SquidEntity>create(SquidEntity::new, size(0.8F, 0.8F).trackingRange(8));
+    EntityType<DolphinEntity> DOLPHIN "dolphin", EntityType.Builder.<DolphinEntity>create(DolphinEntity::new, size(0.9F, 0.6F));
+
+    ***    EntityClassification.WATER_AMBIENT    ***
+    EntityType<SalmonEntity> SALMON "salmon", EntityType.Builder.<SalmonEntity>create(SalmonEntity::new, size(0.7F, 0.4F).trackingRange(4));
+    EntityType<TropicalFishEntity> TROPICAL_FISH "tropical_fish", size(0.5F, 0.4F).trackingRange(4));
+    EntityType<PufferfishEntity> PUFFERFISH "pufferfish", size(0.7F, 0.7F).trackingRange(4));
+    EntityType<CodEntity> COD "cod", size(0.5F, 0.3F).trackingRange(4));
+
+    ***    EntityClassification.MISC    ***
+    EntityType<IronGolemEntity> IRON_GOLEM "iron_golem", EntityType.Builder.<IronGolemEntity>create(IronGolemEntity::new, size(1.4F, 2.7F).trackingRange(10));
+    EntityType<SnowGolemEntity> SNOW_GOLEM "snow_golem", EntityType.Builder.<SnowGolemEntity>create(SnowGolemEntity::new, size(0.7F, 1.9F).trackingRange(8));
+    EntityType<VillagerEntity> VILLAGER "villager", EntityType.Builder.<VillagerEntity>create(VillagerEntity::new, size(0.6F, 1.95F).trackingRange(10));
+    EntityType<PlayerEntity> PLAYER "player", EntityType.Builder.<PlayerEntity>create(disableSerialization().disableSummoning().size(0.6F, 1.8F).trackingRange(32).func_233608_b_(2));
+    --- Entities not mobs ---
+    EntityType<SmallFireballEntity> SMALL_FIREBALL "small_fireball", EntityType.Builder.<SmallFireballEntity>create(SmallFireballEntity::new, size(0.3125F, 0.3125F).trackingRange(4).func_233608_b_(10));
+    EntityType<SnowballEntity> SNOWBALL "snowball", EntityType.Builder.<SnowballEntity>create(SnowballEntity::new, size(0.25F, 0.25F).trackingRange(4).func_233608_b_(10));
+    EntityType<SpectralArrowEntity> SPECTRAL_ARROW "spectral_arrow", EntityType.Builder.<SpectralArrowEntity>create(SpectralArrowEntity::new, size(0.5F, 0.5F).trackingRange(4).func_233608_b_(20));
+    EntityType<EggEntity> EGG "egg", EntityType.Builder.<EggEntity>create(EggEntity::new, size(0.25F, 0.25F).trackingRange(4).func_233608_b_(10));
+    EntityType<EnderPearlEntity> ENDER_PEARL "ender_pearl", EntityType.Builder.<EnderPearlEntity>create(EnderPearlEntity::new, size(0.25F, 0.25F).trackingRange(4).func_233608_b_(10));
+    EntityType<ExperienceBottleEntity> EXPERIENCE_BOTTLE "experience_bottle", EntityType.Builder.<ExperienceBottleEntity>create(ExperienceBottleEntity::new, size(0.25F, 0.25F).trackingRange(4).func_233608_b_(10));
+    EntityType<PotionEntity> POTION "potion", EntityType.Builder.<PotionEntity>create(PotionEntity::new, size(0.25F, 0.25F).trackingRange(4).func_233608_b_(10));
+    EntityType<TridentEntity> TRIDENT "trident", EntityType.Builder.<TridentEntity>create(TridentEntity::new, size(0.5F, 0.5F).trackingRange(4).func_233608_b_(20));
+    EntityType<WitherSkullEntity> WITHER_SKULL "wither_skull", EntityType.Builder.<WitherSkullEntity>create(WitherSkullEntity::new, size(0.3125F, 0.3125F).trackingRange(4).func_233608_b_(10));
+    EntityType<FishingBobberEntity> FISHING_BOBBER "fishing_bobber", EntityType.Builder.<FishingBobberEntity>create(disableSerialization().disableSummoning().size(0.25F, 0.25F).trackingRange(4).func_233608_b_(5));
+    EntityType<TNTEntity> TNT "tnt", EntityType.Builder.<TNTEntity>create(TNTEntity::new, immuneToFire().size(0.98F, 0.98F).trackingRange(10).func_233608_b_(10));
+    EntityType<PaintingEntity> PAINTING "painting", EntityType.Builder.<PaintingEntity>create(PaintingEntity::new, size(0.5F, 0.5F).trackingRange(10).func_233608_b_(Integer.MAX_VALUE));
+    EntityType<AreaEffectCloudEntity> AREA_EFFECT_CLOUD "area_effect_cloud", EntityType.Builder.<AreaEffectCloudEntity>create(AreaEffectCloudEntity::new, immuneToFire().size(6.0F, 0.5F).trackingRange(10).func_233608_b_(Integer.MAX_VALUE));
+    EntityType<ArmorStandEntity> ARMOR_STAND "armor_stand", EntityType.Builder.<ArmorStandEntity>create(ArmorStandEntity::new, size(0.5F, 1.975F).trackingRange(10));
+    EntityType<ArrowEntity> ARROW "arrow", EntityType.Builder.<ArrowEntity>create(ArrowEntity::new, size(0.5F, 0.5F).trackingRange(4).func_233608_b_(20));
+    EntityType<ShulkerBulletEntity> SHULKER_BULLET "shulker_bullet", EntityType.Builder.<ShulkerBulletEntity>create(ShulkerBulletEntity::new, size(0.3125F, 0.3125F).trackingRange(8));
+    EntityType<BoatEntity> BOAT "boat", EntityType.Builder.<BoatEntity>create(BoatEntity::new, size(1.375F, 0.5625F).trackingRange(10));
+    EntityType<DragonFireballEntity> DRAGON_FIREBALL "dragon_fireball", EntityType.Builder.<DragonFireballEntity>create(DragonFireballEntity::new, size(1.0F, 1.0F).trackingRange(4).func_233608_b_(10));
+    EntityType<EnderCrystalEntity> END_CRYSTAL "end_crystal", EntityType.Builder.<EnderCrystalEntity>create(EnderCrystalEntity::new, size(2.0F, 2.0F).trackingRange(16).func_233608_b_(Integer.MAX_VALUE));
+    EntityType<EvokerFangsEntity> EVOKER_FANGS "evoker_fangs", EntityType.Builder.<EvokerFangsEntity>create(EvokerFangsEntity::new, size(0.5F, 0.8F).trackingRange(6).func_233608_b_(2));
+    EntityType<ExperienceOrbEntity> EXPERIENCE_ORB "experience_orb", EntityType.Builder.<ExperienceOrbEntity>create(ExperienceOrbEntity::new, size(0.5F, 0.5F).trackingRange(6).func_233608_b_(20));
+    EntityType<EyeOfEnderEntity> EYE_OF_ENDER "eye_of_ender", EntityType.Builder.<EyeOfEnderEntity>create(EyeOfEnderEntity::new, size(0.25F, 0.25F).trackingRange(4).func_233608_b_(4));
+    EntityType<FallingBlockEntity> FALLING_BLOCK "falling_block", EntityType.Builder.<FallingBlockEntity>create(FallingBlockEntity::new, size(0.98F, 0.98F).trackingRange(10).func_233608_b_(20));
+    EntityType<FireworkRocketEntity> FIREWORK_ROCKET "firework_rocket", EntityType.Builder.<FireworkRocketEntity>create(FireworkRocketEntity::new, size(0.25F, 0.25F).trackingRange(4).func_233608_b_(10));
+    EntityType<ItemEntity> ITEM "item", EntityType.Builder.<ItemEntity>create(ItemEntity::new, size(0.25F, 0.25F).trackingRange(6).func_233608_b_(20));
+    EntityType<ItemFrameEntity> ITEM_FRAME "item_frame", EntityType.Builder.<ItemFrameEntity>create(ItemFrameEntity::new, size(0.5F, 0.5F).trackingRange(10).func_233608_b_(Integer.MAX_VALUE));
+    EntityType<FireballEntity> FIREBALL "fireball", EntityType.Builder.<FireballEntity>create(FireballEntity::new, size(1.0F, 1.0F).trackingRange(4).func_233608_b_(10));
+    EntityType<LeashKnotEntity> LEASH_KNOT "leash_knot", EntityType.Builder.<LeashKnotEntity>create(LeashKnotEntity::new, disableSerialization().size(0.5F, 0.5F).trackingRange(10).func_233608_b_(Integer.MAX_VALUE));
+    EntityType<LightningBoltEntity> LIGHTNING_BOLT "lightning_bolt", EntityType.Builder.<LightningBoltEntity>create(LightningBoltEntity::new, disableSerialization().size(0.0F, 0.0F).trackingRange(16).func_233608_b_(Integer.MAX_VALUE));
+    EntityType<LlamaSpitEntity> LLAMA_SPIT "llama_spit", EntityType.Builder.<LlamaSpitEntity>create(LlamaSpitEntity::new, size(0.25F, 0.25F).trackingRange(4).func_233608_b_(10));
+    EntityType<MinecartEntity> MINECART "minecart", EntityType.Builder.<MinecartEntity>create(MinecartEntity::new, size(0.98F, 0.7F).trackingRange(8));
+    EntityType<ChestMinecartEntity> CHEST_MINECART "chest_minecart", EntityType.Builder.<ChestMinecartEntity>create(ChestMinecartEntity::new, size(0.98F, 0.7F).trackingRange(8));
+    EntityType<CommandBlockMinecartEntity> COMMAND_BLOCK_MINECART "command_block_minecart", EntityType.Builder.<CommandBlockMinecartEntity>create(CommandBlockMinecartEntity::new, size(0.98F, 0.7F).trackingRange(8));
+    EntityType<FurnaceMinecartEntity> FURNACE_MINECART "furnace_minecart", EntityType.Builder.<FurnaceMinecartEntity>create(FurnaceMinecartEntity::new, size(0.98F, 0.7F).trackingRange(8));
+    EntityType<HopperMinecartEntity> HOPPER_MINECART "hopper_minecart", EntityType.Builder.<HopperMinecartEntity>create(HopperMinecartEntity::new, size(0.98F, 0.7F).trackingRange(8));
+    EntityType<SpawnerMinecartEntity> SPAWNER_MINECART "spawner_minecart", EntityType.Builder.<SpawnerMinecartEntity>create(SpawnerMinecartEntity::new, size(0.98F, 0.7F).trackingRange(8));
+    EntityType<TNTMinecartEntity> TNT_MINECART "tnt_minecart", EntityType.Builder.<TNTMinecartEntity>create(TNTMinecartEntity::new, size(0.98F, 0.7F).trackingRange(8));
+
      */
     public LivingEntity getTargetEntity(Block filterBlock, LivingEntity entityIn)
     {
@@ -1607,6 +1729,7 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {if(entityIn instanceof CreatureEntity) {return (CreatureEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {if(entityIn instanceof MobEntity) {return (MobEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.HAY_BLOCK)) {if(entityIn.isChild()) {return entityIn;}}
+        else if(filterBlock.equals(Blocks.DRIED_KELP_BLOCK)) {if(!entityIn.isChild()) {return entityIn;}}
         else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {if(entityIn instanceof VillagerEntity) {return (VillagerEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {if(entityIn instanceof AbstractRaiderEntity) {return (AbstractRaiderEntity)entityIn;}}
         else {return (LivingEntity)entityIn;}
@@ -1622,6 +1745,7 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {if(entityIn instanceof CreatureEntity) {return (CreatureEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {if(entityIn instanceof MobEntity) {return (MobEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.HAY_BLOCK)) {if(entityIn instanceof LivingEntity) {if(((LivingEntity) entityIn).isChild())return entityIn;}}
+        else if(filterBlock.equals(Blocks.DRIED_KELP_BLOCK)) {if(entityIn instanceof LivingEntity) {if(!((LivingEntity) entityIn).isChild())return entityIn;}}
         else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {if(entityIn instanceof VillagerEntity) {return (VillagerEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {if(entityIn instanceof AbstractRaiderEntity) {return (AbstractRaiderEntity)entityIn;}}
         else if(filterBlock.equals(Blocks.QUARTZ_BLOCK)) {if(entityIn instanceof ItemEntity) {return (ItemEntity)entityIn;}}
@@ -1639,6 +1763,7 @@ public class ItemUpgradeBase extends Item {
         TranslationTextComponent IRON = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_iron");
         TranslationTextComponent COAL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_coal");
         TranslationTextComponent HAY = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_hay");
+        TranslationTextComponent KELP = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_kelp");
         TranslationTextComponent GLASS_LIME = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_lime");
         TranslationTextComponent GLASS_BLACK = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_glass_black");
         TranslationTextComponent ALL = new TranslationTextComponent(Reference.MODID + ".target_entities" + ".entity_all");
@@ -1650,6 +1775,7 @@ public class ItemUpgradeBase extends Item {
         else if(filterBlock.equals(Blocks.IRON_BLOCK)) {return IRON.getString();}
         else if(filterBlock.equals(Blocks.COAL_BLOCK)) {return COAL.getString();}
         else if(filterBlock.equals(Blocks.HAY_BLOCK)) {return HAY.getString();}
+        else if(filterBlock.equals(Blocks.DRIED_KELP_BLOCK)) {return KELP.getString();}
         else if(filterBlock.equals(Blocks.LIME_STAINED_GLASS)) {return GLASS_LIME.getString();}
         else if(filterBlock.equals(Blocks.BLACK_STAINED_GLASS)) {return GLASS_BLACK.getString();}
         else {return ALL.getString();}

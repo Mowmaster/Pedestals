@@ -230,8 +230,12 @@
   "pedestals.target_entities.entity_lapis": "Flying Types",
   "pedestals.target_entities.entity_iron": "Creatures",
   "pedestals.target_entities.entity_coal": "Mobs",
+  "pedestals.target_entities.entity_hay": "Babies",
+  "pedestals.target_entities.entity_kelp": "Adults",
   "pedestals.target_entities.entity_glass_lime": "Villagers",
   "pedestals.target_entities.entity_glass_black": "Raiders",
+  "pedestals.target_entities.entity_slime": "Items",
+  "pedestals.target_entities.entity_quartz": "XP Orbs",
   "pedestals.target_entities.entity_all": "All",
 
   "item.pedestals.coin.attack": "Pedestal Upgrade",
