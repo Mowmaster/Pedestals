@@ -332,6 +332,11 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                 }
                             }
                         }
+                        else
+                        {
+                            if(craftingCurrent.size()>0)removeCraftingQueue(coin);
+                            if(stackCurrent.size()>0)removeInventoryQueue(coin);
+                        }
                     }
                 }
             }
