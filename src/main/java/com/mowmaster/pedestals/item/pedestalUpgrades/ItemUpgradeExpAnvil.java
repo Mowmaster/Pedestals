@@ -352,7 +352,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                                 }
                                                 handler.extractItem(i,itemFromInvCopy.getCount(),false);
                                                 if(!tilePedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                tilePedestal.addItem(itemFromInvCopy);
+                                                tilePedestal.addItemOverride(itemFromInvCopy);
                                                 removeStoredIntFromCoin(coinInPedestal);
                                             }
                                         }
@@ -363,7 +363,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                         if(!handler.extractItem(i,itemFromInvCopy.getCount(),true).isEmpty())
                                         {
                                             handler.extractItem(i,itemFromInvCopy.getCount(),false);
-                                            tilePedestal.addItem(itemFromInvCopy);
+                                            tilePedestal.addItemOverride(itemFromInvCopy);
                                         }
                                     }
                                 }

@@ -141,7 +141,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                     {
                                         handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
                                         if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                        pedestal.addItem(toReturn);
+                                        pedestal.addItemOverride(toReturn);
                                     }
                                 }
                             }
@@ -159,7 +159,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                             if(!handler.extractItem(slotItemToRemove,toReturn.getCount(),true).isEmpty())
                             {
                                 handler.extractItem(slotItemToRemove,toReturn.getCount(),false);
-                                pedestal.addItem(toReturn);
+                                pedestal.addItemOverride(toReturn);
                             }
                         }
                     }

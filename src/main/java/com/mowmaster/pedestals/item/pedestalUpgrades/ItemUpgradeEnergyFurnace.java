@@ -186,7 +186,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                                                 removeEnergyFuel(ped,fuelToConsume,false);
                                                 spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
                                                 if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                ped.addItem(copyIncoming);
+                                                ped.addItemOverride(copyIncoming);
                                             }
                                         }
                                         //If we done have enough fuel to smelt everything then reduce size of smelt
@@ -205,7 +205,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                                                     removeEnergyFuel(ped,fuelToConsume,false);
                                                     spawnXP(world,posOfPedestal,(int)(xp*itemInputsPerSmelt));
                                                     if(!ped.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                    ped.addItem(copyIncoming);
+                                                    ped.addItemOverride(copyIncoming);
                                                 }
                                             }
                                         }
@@ -223,7 +223,7 @@ public class ItemUpgradeEnergyFurnace extends ItemUpgradeBaseEnergyMachine
                                         if(!handler.extractItem(i,itemFromInv.getCount(),true).isEmpty())
                                         {
                                             handler.extractItem(i,itemFromInv.getCount(),false);
-                                            ped.addItem(copyItemFromInv);
+                                            ped.addItemOverride(copyItemFromInv);
                                         }
                                     }
                                 }

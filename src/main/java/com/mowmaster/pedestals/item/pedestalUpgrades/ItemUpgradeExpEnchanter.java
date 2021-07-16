@@ -152,7 +152,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                                 setXPStored(coinInPedestal,getExpLeftInPedestal);
                                                 handler.extractItem(i,stackToReturn.getCount() ,false );
                                                 if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 0.35F, 1.0F);
-                                                pedestal.addItem(stackToReturn);
+                                                pedestal.addItemOverride(stackToReturn);
                                                 }
                                             }
                                         }
@@ -162,7 +162,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                                         ItemStack toReturn = itemFromInv.copy();
                                         if(!handler.extractItem(i,toReturn.getCount() ,true ).isEmpty()){
                                             handler.extractItem(i,toReturn.getCount() ,false );
-                                            pedestal.addItem(toReturn);
+                                            pedestal.addItemOverride(toReturn);
                                         }
 
                                     }

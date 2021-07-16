@@ -168,7 +168,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                             int getExpLeftInPedestal = currentlyStoredExp - rate;
                                             setXPStored(coinInPedestal,getExpLeftInPedestal);
                                             handler.extractItem(i,modifier ,false );
-                                            pedestal.addItem(getBottle);
+                                            pedestal.addItemOverride(getBottle);
                                             if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                         }
                                         else
@@ -179,7 +179,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                             int getExpLeftInPedestal = currentlyStoredExp - rate;
                                             setXPStored(coinInPedestal,getExpLeftInPedestal);
                                             handler.extractItem(i,modifier ,false );
-                                            pedestal.addItem(getBottle);
+                                            pedestal.addItemOverride(getBottle);
                                             if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                         }
                                     }

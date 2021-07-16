@@ -256,6 +256,15 @@ public class ItemUpgradeBase extends Item {
         }
     }
 
+    public void addToPedestalOverride(World world, BlockPos posOfPedestal, ItemStack itemStackToAdd)
+    {
+        ItemStack stackInPedestal = ItemStack.EMPTY;
+        TileEntity pedestalInventory = world.getTileEntity(posOfPedestal);
+        if(pedestalInventory instanceof PedestalTileEntity) {
+            ((PedestalTileEntity) pedestalInventory).addItemOverride(itemStackToAdd);
+        }
+    }
+
     public int intSpaceLeftInStack (ItemStack stack)
     {
         int value = 0;

@@ -148,7 +148,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                                 handler.extractItem(i,itemInputsPerSmelt ,false );
                                                 removeFuel(pedestal,fuelToConsume,false);
                                                 if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                pedestal.addItem(copyIncoming);
+                                                pedestal.addItemOverride(copyIncoming);
                                             }
 
                                         }
@@ -173,7 +173,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                                         handler.extractItem(i,itemInputsPerSmelt ,false );
                                                         removeFuel(pedestal,fuelToConsume,false);
                                                         if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                        pedestal.addItem(copyIncoming);
+                                                        pedestal.addItemOverride(copyIncoming);
                                                     }
                                                 }
                                             }
@@ -189,7 +189,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                         if(!handler.extractItem(i,itemFromInv.getCount(),true).isEmpty())
                                         {
                                             handler.extractItem(i,itemFromInv.getCount(),false);
-                                            pedestal.addItem(copyItemFromInv);
+                                            pedestal.addItemOverride(copyItemFromInv);
                                         }
                                     }
 

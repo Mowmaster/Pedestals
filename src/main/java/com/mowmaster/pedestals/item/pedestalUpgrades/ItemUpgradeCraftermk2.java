@@ -258,7 +258,7 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
                                                     result.setCount(intBatchCraftedAmount);
                                                     //itemExtractionMap.forEach((integer, integer2) -> handler.extractItem(integer,integer2,false));
                                                     if (!pedestal.hasMuffler()) world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                    addToPedestal(world, pedestalPos, result);
+                                                    addToPedestalOverride(world, pedestalPos, result);
                                                     writeStoredIntToNBT(coin, intGetNextIteration + 1);
                                                     break;
                                                 }
