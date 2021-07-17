@@ -58,6 +58,8 @@
     "pedestals:coin/voidfluid",
     "pedestals:coin/sawmill",
     "pedestals:coin/attack",
+    "pedestals:coin/turret",
+    "pedestals:coin/babymaker",
     "pedestals:coin/effect",
     "pedestals:coin/fan",
     "pedestals:coin/rffuelgen",

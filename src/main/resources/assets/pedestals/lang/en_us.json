@@ -253,6 +253,21 @@
   "item.pedestals.coin.attack.chat_enchants": "Enchantments:",
   "jei.pedestals.attack.desc": "Attacks entities in the area around it, Placing a Block of Netherite/Emerald/Diamond/Gold/Iron under the pedestal will change what is attacked. Putting a sword into the pedestal will increase the damage dealt, Sharpness/Bane/Smite on the sword also increase the damage. (Magnetic) (Filterable)",
 
+  "item.pedestals.coin.turret": "Pedestal Upgrade",
+  "item.pedestals.coin.turret.tooltip_name": "Arrow Turret",
+  "item.pedestals.coin.turret.tooltip_area": "Affected Area: ",
+  "item.pedestals.coin.turret.tooltip_areax": "x",
+  "item.pedestals.coin.turret.tooltip_rate": "Base Damage Dealt Per Operation: ",
+  "item.pedestals.coin.turret.tooltip_speed": "Operational Speed: ",
+  "item.pedestals.coin.turret.chat_area": "Affected Area: ",
+  "item.pedestals.coin.turret.chat_areax": "x",
+  "item.pedestals.coin.turret.chat_rate": "Estimated Damage Dealt per Operation: ",
+  "item.pedestals.coin.turret.chat_entity": "Target Entity: ",
+  "item.pedestals.coin.turret.chat_speed": "Operational Speed: ",
+  "item.pedestals.coin.turret.chat_tool": "Tool: ",
+  "item.pedestals.coin.turret.chat_enchants": "Enchantments:",
+  "jei.pedestals.turret.desc": "Attacks entities in the area around it, Placing a Block of Netherite/Emerald/Diamond/Gold/Iron under the pedestal will change what is attacked. Putting a bow into the pedestal will increase the damage dealt, Power on the bow also increases the damage.",
+
   "death.attack.pedestal1": "%1$s was poked one too many times.",
   "death.attack.pedestal2": "%1$s got the stabby stabby.",
   "death.attack.pedestal3": "%1$s was sliced into bits.",
@@ -266,6 +281,7 @@
 
   "death.attack.pedestal11": "%1$s has kicked the bucket.",
   "death.attack.pedestal12": "%1$s, we told you not to play around with sharp things!",
+  "death.attack.pedestal13": "%1$s, became Holey, then they Ascended!",
 
   "item.pedestals.coin.recycler": "Pedestal Upgrade",
   "item.pedestals.coin.recycler.tooltip_name": "Recycler Upgrade",

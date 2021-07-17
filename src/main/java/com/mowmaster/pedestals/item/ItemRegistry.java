@@ -113,6 +113,7 @@ public class ItemRegistry
         ItemUpgradeTeleporter.onItemRegistryReady(e);
         ItemUpgradeCobbleGen.onItemRegistryReady(e);
         ItemUpgradeAttacker.onItemRegistryReady(e);
+        ItemUpgradeTurret.onItemRegistryReady(e);
         ItemUpgradeFan.onItemRegistryReady(e);
         ItemUpgradeEffect.onItemRegistryReady(e);
         ItemUpgradeShearer.onItemRegistryReady(e);

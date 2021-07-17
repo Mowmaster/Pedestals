@@ -1385,6 +1385,70 @@ public class ItemUpgradeBase extends Item {
         return block;
     }
 
+    public double[] getPedTopPos(PedestalTileEntity pedestal, double Yheight)
+    {
+        BlockPos pos = pedestal.getPos();
+        BlockState state = pedestal.getBlockState();
+        Direction enumfacing = Direction.UP;
+        //double[] doubleBlockAdd = new double[]{0D,0D,0D};
+        if(state.getBlock() instanceof PedestalBlock)
+        {
+            enumfacing = state.get(FACING);
+        }
+
+        switch (enumfacing)
+        {
+            case UP:
+                return new double[]{0.5D,Yheight,0.5D};
+            case DOWN:
+                return new double[]{0.5D,(1.0D-Yheight),0.5D};
+            case NORTH:
+                return new double[]{0.5D,0.5D,(1.0D-Yheight)};
+            case SOUTH:
+                return new double[]{0.5D,0.5D,Yheight};
+            case EAST:
+                return new double[]{Yheight,0.5D,0.5D};
+            case WEST:
+                return new double[]{(1.0D-Yheight),0.5D,0.5D};
+            default:
+                return new double[]{0.5D,Yheight,0.5D};
+        }
+    }
+
+    /*
+    Copy of master method before testing
+
+    public double[] getPedTopPos(PedestalTileEntity pedestal, double Yheight)
+    {
+        BlockPos pos = pedestal.getPos();
+        BlockState state = pedestal.getBlockState();
+        Direction enumfacing = Direction.UP;
+        //double[] doubleBlockAdd = new double[]{0D,0D,0D};
+        if(state.getBlock() instanceof PedestalBlock)
+        {
+            enumfacing = state.get(FACING);
+        }
+
+        switch (enumfacing)
+        {
+            case UP:
+                return new double[]{0.5D,Yheight,0.5D};
+            case DOWN:
+                return new double[]{0.5D,-Yheight,0.5D};
+            case NORTH:
+                return new double[]{0.5D,0.5D,-Yheight};
+            case SOUTH:
+                return new double[]{0.5D,0.5D,Yheight};
+            case EAST:
+                return new double[]{Yheight,0.5D,0.5D};
+            case WEST:
+                return new double[]{-Yheight,0.5D,0.5D};
+            default:
+                return new double[]{+0.5D,Yheight,0.5D};
+        }
+    }
+     */
+
     public BlockPos getPosOfBlockBelow(World world, BlockPos posOfPedestal, int numBelow)
     {
         BlockState state = world.getBlockState(posOfPedestal);

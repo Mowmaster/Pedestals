@@ -160,7 +160,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                 {
                                     int rate = (modifier * xpCost);
                                     ItemStack getBottle = new ItemStack(Items.EXPERIENCE_BOTTLE,modifier);
-                                    if(pedestal.canAcceptItems(world,posOfPedestal,getBottle)>=rate)
+                                    if(pedestal.canAcceptItems(world,posOfPedestal,getBottle)>=modifier)
                                     {
                                         int currentlyStoredExp = getXPStored(coinInPedestal);
                                         if(currentlyStoredExp >= rate)
