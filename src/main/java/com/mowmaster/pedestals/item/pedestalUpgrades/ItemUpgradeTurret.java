@@ -57,10 +57,6 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
 {
     public ItemUpgradeTurret(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
-    //For damage
-    @Override
-    public Boolean canAcceptCapacity() {return true;}
-
     @Override
     public Boolean canAcceptArea() {
         return true;
@@ -70,6 +66,9 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
     public Boolean canAcceptRange() {
         return true;
     }
+
+    @Override
+    public Boolean canAcceptAdvanced() { return true; }
 
     public int getAreaWidth(ItemStack stack)
     {
@@ -105,70 +104,6 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
     public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
     {
         return getAreaWidth(coin);
-    }
-
-    public float getSwordDamage(LivingEntity entityIn, ItemStack toolInPedestal)
-    {
-        float damage = 2.0f;
-
-        //By defalut accounts for any enchants that add attack damage (like sharpness)
-        Multimap<Attribute, AttributeModifier> attributes = toolInPedestal.getItem().getAttributeModifiers(EquipmentSlotType.MAINHAND,toolInPedestal);
-        if(attributes.containsKey(Attributes.ATTACK_DAMAGE))
-        {
-            if(attributes.get(Attributes.ATTACK_DAMAGE).size()>0)
-            {
-                AttributeModifier collected = attributes.get(Attributes.ATTACK_DAMAGE).iterator().next();
-                if(collected.getAmount() > damage)damage += collected.getAmount();
-            }
-
-        }
-
-        //Adds damage for enchants on the tool that effect mobs (vanilla enchants supported only)
-        if(entityIn instanceof SpiderEntity && EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.BANE_OF_ARTHROPODS))
-        {
-            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.BANE_OF_ARTHROPODS,toolInPedestal);
-            damage += 1+(lvl*0.5);
-        }
-        if(entityIn instanceof ZombieEntity || entityIn instanceof SkeletonEntity && EnchantmentHelper.getEnchantments(toolInPedestal).containsKey(Enchantments.SMITE))
-        {
-            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.SMITE,toolInPedestal);
-            damage += 1+(lvl*0.5);
-        }
-
-        return  damage;
-    }
-
-    public float getAttackDamage(LivingEntity entityIn, ItemStack toolInPedestal, ItemStack coinInPedestal)
-    {
-        float damage = getCapacityModifier(coinInPedestal)*2 + 2.0F;
-        damage += getSwordDamage(entityIn,toolInPedestal);
-        return damage;
-    }
-
-    public float getMostlyDamage(PedestalTileEntity pedestal)
-    {
-        ItemStack inPedestal = pedestal.getToolOnPedestal();
-        float damage = getCapacityModifier(pedestal.getCoinOnPedestal()) + 2.0f;
-        float damage2 = 2.0f;
-        if(inPedestal.getItem() instanceof SwordItem){
-            SwordItem sword = (SwordItem)inPedestal.getItem();
-            if(sword.getAttackDamage() > damage2){
-                damage += (sword.getAttackDamage()/2);
-            }
-        }
-        else if(inPedestal.getItem() instanceof ToolItem){
-            ToolItem tool = (ToolItem)inPedestal.getItem();
-            if(tool.getAttackDamage() > damage2){
-                damage += (tool.getAttackDamage()/2);
-            }
-        }
-        if(EnchantmentHelper.getEnchantments(inPedestal).containsKey(Enchantments.SHARPNESS))
-        {
-            int lvl = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS,inPedestal);
-            damage += Math.round((1+(lvl*0.5))/2);
-        }
-
-        return damage;
     }
 
     public void updateAction(World world, PedestalTileEntity pedestal)
@@ -220,24 +155,24 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
                 if (pedestal.hasTool() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, toolInPedestal);}
                 if (toolInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}
                 //Using the custom pedestal one this should work fine now...
-                DamageSource sourceE = new EntityDamageSource(list.get(rn.nextInt(list.size())),fakePlayer);
-                //DamageSource sourceE = (selectedEntity instanceof AbstractRaiderEntity && ((AbstractRaiderEntity) selectedEntity).isLeader())?(new EntityDamageSource(list.get(rn.nextInt(list.size())),null)):(new EntityDamageSource(list.get(rn.nextInt(list.size())),fakePlayer));
-                float damage = getAttackDamage(getEntityFromList,toolInPedestal,coinInPedestal);
-
-                if(filterBlock.equals(Blocks.NETHERITE_BLOCK)) {damage *= 2.0f;}
 
                 attackEntityWithRangedAttack(pedestal,fakePlayer,selectedEntity,10.0f);
-                //selectedEntity.attackEntityFrom(sourceE,damage);
+                //ADVANCED OPTION: BowItem --> public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft)
+                //Make it so it emulates a player shooting a bow, which means any modded bow with effects could take advantage of it >:)
             }
         }
     }
 
+
+
     public void attackEntityWithRangedAttack(PedestalTileEntity pedestal,FakePlayer fakePlayer, LivingEntity target, float distanceFactor) {
-        //LOOK INTO ADDING SUPPORT FOR BOWS TO ADD DAMAGE AND STUFF
         World world = pedestal.getWorld();
+        ItemStack tool = pedestal.getToolOnPedestal();
         BlockPos pedestalPos = pedestal.getPos();
         double[] doubleBlockAdd = getPedTopPos(pedestal, 1.0);
         ItemStack itemInPedestal = pedestal.getItemInPedestal();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        Block filterBlock = readFilterBlockFromNBT(coinInPedestal);
         ArrowEntity arrowEntity = new ArrowEntity(world,pedestalPos.getX()+doubleBlockAdd[0],pedestalPos.getY()+doubleBlockAdd[1],pedestalPos.getZ()+doubleBlockAdd[2]);
         if(itemInPedestal.getItem() instanceof TippedArrowItem)
         {
@@ -250,7 +185,22 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
         double d3 = target.getPosZ() - pedestalPos.getZ();
         float f = MathHelper.sqrt(d1 * d1 + d3 * d3) * 0.2F;
         arrowEntity.shoot(d1, d2 + (double)f, d3, 1.6F, 12.0F);
-        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.HOSTILE, 0.25F, 1.0F);
+
+        int j = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, tool);
+        if (j > 0) {
+            arrowEntity.setDamage(arrowEntity.getDamage() + (double)j * 0.5D + 0.5D);
+        }
+
+        int k = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH, tool);
+        if (k > 0) {
+            arrowEntity.setKnockbackStrength(k);
+        }
+
+        if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, tool) > 0) {
+            arrowEntity.setFire(100);
+        }
+
+        if(filterBlock.equals(Blocks.NETHERITE_BLOCK)) {arrowEntity.setDamage(arrowEntity.getDamage() * 2.0D);}
 
         if(itemInPedestal.getItem() instanceof TippedArrowItem)
         {
@@ -264,11 +214,14 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
             if(count != customPotionEffects.size()){
                 if(world.addEntity(arrowEntity))
                 {
+                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.HOSTILE, 0.25F, 1.0F);
                     pedestal.removeItem(1);
                 }
             }
         }
-        else world.addEntity(arrowEntity);
+        else {
+            if (world.addEntity(arrowEntity))if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.HOSTILE, 0.25F, 1.0F);
+        }
     }
 
     //Just update the block, whatever it is. genrally this wont be changing much anyway so we'll take the hit when it does change.
@@ -304,11 +257,6 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
         player.sendMessage(area,Util.DUMMY_UUID);
-
-        TranslationTextComponent rate = new TranslationTextComponent(getTranslationKey() + ".chat_rate");
-        rate.appendString("" + getMostlyDamage(pedestal) + "");
-        rate.mergeStyle(TextFormatting.GRAY);
-        player.sendMessage(rate,Util.DUMMY_UUID);
 
         ItemStack toolStack = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY);
         if(!toolStack.isEmpty())
