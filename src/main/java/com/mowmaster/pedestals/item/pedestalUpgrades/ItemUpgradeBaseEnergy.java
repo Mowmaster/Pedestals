@@ -334,7 +334,6 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
 
     public int availableEnergySpaceInCoin(ItemStack coin)
     {
-
         int getMaxEnergy = readMaxEnergyFromNBT(coin);
         int getCurrentEnergy = getEnergyStored(coin);
         int difference = getMaxEnergy-getCurrentEnergy;
@@ -344,9 +343,8 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
         {
             return difference;
         }
-
         //Otherwise just return the max allowed
-        return getMaxEnergy;
+        else return getMaxEnergy;
     }
 
 
@@ -364,6 +362,25 @@ public class ItemUpgradeBaseEnergy extends ItemUpgradeBase {
             return true;
         }
         return false;
+    }
+
+    //returns amount filled
+    public int fillEnergy(ItemStack coin, int energyIn, boolean simulate)
+    {
+        int returner = 0;
+        int getMaxEnergyValue = readMaxEnergyFromNBT(coin);
+        int currentEnergy = getEnergyStored(coin);
+        int getSpace = getMaxEnergyValue-currentEnergy;
+        int newEnergyValue = Math.min(getSpace,energyIn);
+        if(newEnergyValue>0)
+        {
+            if(!simulate)
+            {
+                addEnergy(coin,newEnergyValue,simulate);
+            }
+            returner = newEnergyValue;
+        }
+        return returner;
     }
 
     public boolean removeEnergy(ItemStack coin, int energyOut, boolean simulate)

@@ -90,20 +90,20 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         return new IEnergyStorage() {
             @Override
             public int receiveEnergy(int maxReceive, boolean simulate) {
-
                 if((hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeEnergyImport))
                 {
                     ItemUpgradeBaseEnergy itemE =  (ItemUpgradeBaseEnergy)getCoinOnPedestal().getItem();
-                    if(itemE.addEnergy(getCoinOnPedestal(),maxReceive,simulate))
+                    return itemE.fillEnergy(getCoinOnPedestal(),maxReceive,simulate);
+
+                    /*if(itemE.addEnergy(getCoinOnPedestal(),maxReceive,simulate))
                     {
                         //Return input power if it can be insert???
-                        return maxReceive;
+                        return Math.min(maxReceive,itemE.availableEnergySpaceInCoin(getCoinOnPedestal()));
                     }
                     //Else return availablespace???
-                    else return itemE.availableEnergySpaceInCoin(getCoinOnPedestal());
+                    else return itemE.availableEnergySpaceInCoin(getCoinOnPedestal());*/
                 }
-
-                return 0;
+                else return 0;
             }
 
             @Override
