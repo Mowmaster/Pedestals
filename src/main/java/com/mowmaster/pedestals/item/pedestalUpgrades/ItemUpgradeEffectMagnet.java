@@ -42,6 +42,11 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
     @Override
     public Boolean canAcceptRange() {return true;}
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;

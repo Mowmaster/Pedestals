@@ -50,6 +50,11 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     @Override
     public Boolean canAcceptRange() {return true;}
 
+    @Override
+    public Boolean canAcceptAdvanced() {
+        return true;
+    }
+
     public int getAreaWidth(ItemStack stack)
     {
         int areaWidth = 0;
@@ -175,7 +180,7 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
                     setXPStored(coinInPedestal, currentlyStoredExp + value);
                 }
             }
-            break;
+            if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
         }
 
         int widthP = 0;
