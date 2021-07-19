@@ -15,6 +15,7 @@
   "pedestals.fluid_to_xp": "Fluid to XP Conversions",
   "pedestals.jei.fluid_to_xp": "Exp Count Returned",
 
+  "pedestals.baseItem": "This is a Crafting Ingredient",
   "pedestals.filters.tooltip_filtertype": "Filter Type: ",
   "pedestals.filters.tooltip_filterwhite": "Whitelist",
   "pedestals.filters.tooltip_filterblack": "Blacklist",

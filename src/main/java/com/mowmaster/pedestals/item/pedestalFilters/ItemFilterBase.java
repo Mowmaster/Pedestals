@@ -393,26 +393,35 @@ public class ItemFilterBase extends Item
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack filterStack = pedestal.getFilterInPedestal();
-        TranslationTextComponent filterList = new TranslationTextComponent(filterStack.getDisplayName().getString());
-        filterList.mergeStyle(TextFormatting.GOLD);
-        player.sendMessage(filterList, Util.DUMMY_UUID);
-
-        List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack);
-        if(filterQueue.size()>0)
+        if(!filterStack.getItem().equals(BASEFILTER))
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            player.sendMessage(enchant, Util.DUMMY_UUID);
+            TranslationTextComponent filterList = new TranslationTextComponent(filterStack.getDisplayName().getString());
+            filterList.mergeStyle(TextFormatting.GOLD);
+            player.sendMessage(filterList, Util.DUMMY_UUID);
 
-            for(int i=0;i<filterQueue.size();i++) {
+            List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack);
+            if(filterQueue.size()>0)
+            {
+                TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
+                enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+                player.sendMessage(enchant, Util.DUMMY_UUID);
 
-                if(!filterQueue.get(i).isEmpty())
-                {
-                    TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
-                    enchants.mergeStyle(TextFormatting.GRAY);
-                    player.sendMessage(enchants, Util.DUMMY_UUID);
+                for(int i=0;i<filterQueue.size();i++) {
+
+                    if(!filterQueue.get(i).isEmpty())
+                    {
+                        TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
+                        enchants.mergeStyle(TextFormatting.GRAY);
+                        player.sendMessage(enchants, Util.DUMMY_UUID);
+                    }
                 }
             }
+        }
+        else
+        {
+            TranslationTextComponent base = new TranslationTextComponent(Reference.MODID + ".baseItem");
+            base.mergeStyle(TextFormatting.DARK_RED);
+            player.sendMessage(base, Util.DUMMY_UUID);
         }
     }
 
@@ -420,30 +429,39 @@ public class ItemFilterBase extends Item
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        boolean filterType = getFilterType(stack);
-        TranslationTextComponent filterList = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filtertype");
-        TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
-        TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
-        filterList.append((filterType)?(black):(white));
-        filterList.mergeStyle(TextFormatting.GOLD);
-        tooltip.add(filterList);
-
-        List<ItemStack> filterQueue = readFilterQueueFromNBT(stack);
-        if(filterQueue.size()>0)
+        if(!stack.getItem().equals(BASEFILTER))
         {
-            TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
-            enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
-            tooltip.add(enchant);
+            boolean filterType = getFilterType(stack);
+            TranslationTextComponent filterList = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filtertype");
+            TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
+            TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
+            filterList.append((filterType)?(black):(white));
+            filterList.mergeStyle(TextFormatting.GOLD);
+            tooltip.add(filterList);
 
-            for(int i=0;i<filterQueue.size();i++) {
+            List<ItemStack> filterQueue = readFilterQueueFromNBT(stack);
+            if(filterQueue.size()>0)
+            {
+                TranslationTextComponent enchant = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterlist");
+                enchant.mergeStyle(TextFormatting.LIGHT_PURPLE);
+                tooltip.add(enchant);
 
-                if(!filterQueue.get(i).isEmpty())
-                {
-                    TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
-                    enchants.mergeStyle(TextFormatting.GRAY);
-                    tooltip.add(enchants);
+                for(int i=0;i<filterQueue.size();i++) {
+
+                    if(!filterQueue.get(i).isEmpty())
+                    {
+                        TranslationTextComponent enchants = new TranslationTextComponent(filterQueue.get(i).getDisplayName().getString());
+                        enchants.mergeStyle(TextFormatting.GRAY);
+                        tooltip.add(enchants);
+                    }
                 }
             }
+        }
+        else
+        {
+            TranslationTextComponent base = new TranslationTextComponent(Reference.MODID + ".baseItem");
+            base.mergeStyle(TextFormatting.DARK_RED);
+            tooltip.add(base);
         }
     }
 

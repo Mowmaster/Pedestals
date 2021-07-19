@@ -622,7 +622,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || stack.getToolTypes().contains(ToolType.SHOVEL)
                                 || GET_TOOLS.contains(stack.getItem())
                         ) && !GET_NOTTOOLS.contains(stack.getItem()) && !hasTool()) return true;
-                if (slot == 6 && stack.getItem() instanceof ItemFilterBase && !hasFilter()) return true;
+                if (slot == 6 && stack.getItem() instanceof ItemFilterBase && !stack.getItem().equals(ItemFilterBase.BASEFILTER) && !hasFilter()) return true;
                 if (slot == 7 && stack.getItem().equals(Items.REDSTONE_TORCH) && !hasTorch()) return true;
                 if (slot == 8 && stack.getItem().equals(ItemPedestalUpgrades.ROUNDROBIN) && !hasRRobin()) return true;
                 if (slot == 9 && stack.getItem().equals(ItemPedestalUpgrades.SOUNDMUFFLER)) return true;
