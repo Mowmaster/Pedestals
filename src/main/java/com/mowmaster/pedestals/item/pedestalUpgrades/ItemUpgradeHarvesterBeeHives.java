@@ -13,6 +13,7 @@ import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tileentity.DispenserTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -54,6 +55,11 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
 
     @Override
     public Boolean canAcceptRange() {
+        return true;
+    }
+
+    @Override
+    public Boolean canAcceptMagnet() {
         return true;
     }
 
@@ -179,6 +185,20 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                 Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
                 BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
                 BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+
+                int width = getAreaWidth(coinInPedestal);
+                int height = getRangeHeight(coinInPedestal);
+                if(hasMagnetEnchant(coinInPedestal))
+                {
+                    BlockPos negBlockPos = getNegRangePosEntity(world,pedestalPos,width,height);
+                    BlockPos posBlockPos = getPosRangePosEntity(world,pedestalPos,width,height);
+                    AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+                    List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                    if(itemList.size()>0)
+                    {
+                        upgradeActionMagnet(pedestal, world, itemList, itemInPedestal, pedestalPos);
+                    }
+                }
 
                 if(world.isAreaLoaded(negNums,posNums))
                 {
@@ -331,6 +351,13 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name,Util.DUMMY_UUID);
+
+        if(hasMagnetEnchant(stack) && pedestal.getItemInPedestal().getItem().equals(Items.GLASS_BOTTLE))
+        {
+            TranslationTextComponent magnet = new TranslationTextComponent(getTranslationKey() + ".chat_magnet");
+            magnet.mergeStyle(TextFormatting.DARK_RED);
+            player.sendMessage(magnet,Util.DUMMY_UUID);
+        }
 
         int s3 = getAreaWidth(stack);
         String tr = "" + (s3+s3+1) + "";

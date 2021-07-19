@@ -472,6 +472,7 @@
   "item.pedestals.coin.harvesterhives.chat_areax": "x",
   "item.pedestals.coin.harvesterhives.chat_btm": "Hives To Harvest: ",
   "item.pedestals.coin.harvesterhives.chat_speed": "Harvesting Speed: ",
+  "item.pedestals.coin.harvesterhives.chat_magnet": "Using Bottles in the Pedestal will prevent the Magnet Enchant from being able to pickup any items.",
   "jei.pedestals.harvesterhives.desc": "Will harvest combs from hives in the work area. When bottles are in the pedestal, it will use those to bottle honey.",
 
   "item.pedestals.coin.magnet": "Pedestal Upgrade",
