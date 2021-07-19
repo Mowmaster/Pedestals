@@ -155,7 +155,8 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         ItemStack stackInPed = pedestal.getItemInPedestalOverride();
         ItemStack itemStackToExtract = new ItemStack(getItemToSpawn(pedestal));
         int cobbleToRemove = removeCobble(pedestal,amountOut,true);
-        if(getCobbleStored(pedestal)<=0)
+        int stored = getCobbleStored(pedestal);
+        if(stored<=0)
         {
             //Should default to normal pedestal pull out methods
             return new ItemStack(Items.COMMAND_BLOCK);
@@ -168,7 +169,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                 removeCobble(pedestal,amountOut,false);
             }
 
-            ItemStack toReturn = new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+            ItemStack toReturn = new ItemStack((stored>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
             return (toReturn.getCount()>0 || toReturn.isEmpty())?(toReturn):(ItemStack.EMPTY);
             //Fm in e6 discord pinged me an issue where mek was spamming the console
             //#BlameMek
@@ -267,6 +268,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 int current = getCobbleStored(pedestal);
                 writeStoredIntToNBT(coinInPedestal,(current+amountIn));
+                //System.out.println("Cobble Added");
             }
             return 0;
         }
@@ -342,15 +344,8 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
 
             if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
             {
-                //Keep Pedestal Full at all times
-                ItemStack stackInPed = pedestal.getItemInPedestalOverride();
-                if(stackInPed.getCount() < stackInPed.getMaxStackSize())
-                {
-                    fillPedestalAction(pedestal);
-                }
                 //Cobble Gen Updates once per 20 ticks (to help prevent lag)
                 if (world.getGameTime()%20 == 0) {
-                    TileEntity tileCheckForPedestal = world.getTileEntity(pedestalPos);
                     int intSpawnRate = getCobbleGenSpawnRate(coinInPedestal);
                     int speedMultiplier = (int)(20/speed);
                     int addAmount = intSpawnRate * speedMultiplier;
@@ -359,13 +354,20 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                         int cobbleToAdd = addCobble(pedestal,addAmount,true);
                         if(cobbleToAdd==0)
                         {
-                            this.addCobble(pedestal,addAmount,false);
+                            addCobble(pedestal,addAmount,false);
                         }
                         else
                         {
-                            this.addCobble(pedestal,cobbleToAdd,false);
+                            addCobble(pedestal,cobbleToAdd,false);
                         }
                     }
+                }
+
+                //Keep Pedestal Full at all times
+                ItemStack stackInPed = pedestal.getItemInPedestalOverride();
+                if(stackInPed.getCount() < stackInPed.getMaxStackSize())
+                {
+                    if(getCobbleStored(pedestal)>0)fillPedestalAction(pedestal);
                 }
             }
         }
@@ -379,7 +381,6 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         ItemStack stackSpawnedItem = new ItemStack(getItemToSpawn(pedestal),intSpace);
         if(intSpace>0 && cobbleStored>0)
         {
-
             int cobbleToRemove = removeCobbleBuffer(pedestal,intSpace,true);
             if(cobbleToRemove==0)
             {

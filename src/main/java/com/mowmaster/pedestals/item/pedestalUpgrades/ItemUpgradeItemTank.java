@@ -163,7 +163,6 @@ public class ItemUpgradeItemTank extends ItemUpgradeBase
 
             ItemStack toReturn = new ItemStack((stored.isEmpty())?(itemInPed.getItem()):(itemStackToExtract.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
             toReturn.setTag((stored.isEmpty())?(itemInPed.getTag()):(itemStackToExtract.getTag()));
-
             return toReturn;
         }
         else
