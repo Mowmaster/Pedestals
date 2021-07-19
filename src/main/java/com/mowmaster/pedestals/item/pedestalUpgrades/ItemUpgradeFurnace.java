@@ -64,6 +64,9 @@ public class ItemUpgradeFurnace extends ItemUpgradeBaseMachine
         Optional<BlastingRecipe> optional = recipeManager.getRecipe(IRecipeType.BLASTING, inv, world);
         if (optional.isPresent()) return optional.get();
 
+        Optional<SmokingRecipe> optional2 = recipeManager.getRecipe(IRecipeType.SMOKING, inv, world);
+        if (optional2.isPresent()) return optional2.get();
+
         Optional<FurnaceRecipe> optional1 = recipeManager.getRecipe(IRecipeType.SMELTING, inv, world);
         return optional1.orElse(null);
     }
