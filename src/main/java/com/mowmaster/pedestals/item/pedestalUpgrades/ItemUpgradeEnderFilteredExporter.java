@@ -65,7 +65,8 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
 
     public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack itemInPedestal, ItemStack coinInPedestal)
     {
-        PlayerEntity player = ((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
+        ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
+        PlayerEntity player = sworld.getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
         if(player != null)
         {
             if(itemInPedestal.isEmpty())

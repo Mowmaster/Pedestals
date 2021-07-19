@@ -165,6 +165,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
 
         ToolType tool = blockToBreak.getHarvestTool();
         int toolLevel = pickaxe.getHarvestLevel(tool, null, blockToBreak);
+        ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
         //if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && toolLevel >= blockToBreak.getHarvestLevel() &&blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
         if(!blockToBreak.isAir())
         {
@@ -181,7 +182,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
                         int expdrop = blockToBreak.getBlock().getExpDrop(blockToBreak,world,posOfBlock,
                                 (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
                                 (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
-                        if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
+                        if(expdrop>0)blockToBreak.getBlock().dropXpOnBlockBreak(sworld,posOfPedestal,expdrop);
                         world.removeBlock(posOfBlock, false);
                     }
                     //world.setBlockState(posOfBlock, Blocks.AIR.getDefaultState());

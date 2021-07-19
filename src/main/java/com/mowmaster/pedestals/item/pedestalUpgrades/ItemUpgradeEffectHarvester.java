@@ -299,8 +299,9 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                 //https://github.com/Lothrazar/Cyclic/blob/trunk/1.16/src/main/java/com/lothrazar/cyclic/block/harvester/TileHarvester.java
                 if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                 {
+                    ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
                     Item targetSeed = getSeed(world,target,posTarget);
-                    List<ItemStack> targetDrops = Block.getDrops(target, (ServerWorld) world, posTarget, null);
+                    List<ItemStack> targetDrops = Block.getDrops(target, sworld, posTarget, null);
                     IntegerProperty propInt = getBlockPropertyAge(target);
                     int min = Collections.min(propInt.getAllowedValues());
                     /*
@@ -328,7 +329,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                         PedestalUtils.spawnItemStackInWorld(world,posTarget,itemStack);
                     }
                     //Do additional world drops, like silverfish
-                    if (world instanceof ServerWorld)target.spawnAdditionalDrops((ServerWorld) world, posTarget, ItemStack.EMPTY);
+                    target.spawnAdditionalDrops(sworld, posTarget, ItemStack.EMPTY);
                     world.setBlockState(posTarget,target.with(propInt,min));
                     if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
                 }

@@ -1954,6 +1954,7 @@ public class ItemUpgradeBase extends Item {
 
     public void upgradeActionMagnet(PedestalTileEntity pedestal, World world, List<ItemEntity> itemList, ItemStack itemInPedestal, BlockPos posOfPedestal)
     {
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         if(itemList.size()>0)
         {
             for(ItemEntity getItemFromList : itemList)
@@ -1975,7 +1976,7 @@ public class ItemUpgradeBase extends Item {
                             pedestal.addItem(copyStack);
                             if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                         }
-                        else break;
+                        else if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                     }
                     else if(copyStack.getCount() <=maxSize)
                     {
@@ -1994,7 +1995,7 @@ public class ItemUpgradeBase extends Item {
                         pedestal.addItem(copyStack);
                         if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
                     }
-                    break;
+                    if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
                 }
             }
         }
@@ -2067,14 +2068,16 @@ public class ItemUpgradeBase extends Item {
 
     public WeakReference<FakePlayer> fakePedestalPlayer(PedestalTileEntity pedestal)
     {
-        //ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
-        return new WeakReference<FakePlayer>(new PedestalFakePlayer((ServerWorld) pedestal.getWorld(),getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),(pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY)));
+        World world = pedestal.getWorld();
+        ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
+        return new WeakReference<FakePlayer>(new PedestalFakePlayer(sworld ,getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),(pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY)));
     }
 
     public WeakReference<FakePlayer> fakePedestalPlayer(PedestalTileEntity pedestal, ItemStack itemInHand)
     {
-        //ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
-        return new WeakReference<FakePlayer>(new PedestalFakePlayer((ServerWorld) pedestal.getWorld(),getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),itemInHand));
+        World world = pedestal.getWorld();
+        ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
+        return new WeakReference<FakePlayer>(new PedestalFakePlayer(sworld,getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),itemInHand));
     }
 
     public void setPlayerOnCoin(ItemStack stack, PlayerEntity player)

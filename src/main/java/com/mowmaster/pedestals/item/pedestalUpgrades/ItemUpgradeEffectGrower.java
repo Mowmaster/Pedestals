@@ -201,7 +201,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
                     else
                     {
                         if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,255,255));
-                        target.randomTick((ServerWorld) world, posTarget, rand);
+                        target.randomTick(sworld, posTarget, rand);
                         world.notifyBlockUpdate(posTarget, target, target, 2);
                     }
                 }
@@ -209,7 +209,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
             else
             {
                 if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,255,255));
-                target.randomTick((ServerWorld) world, posTarget, rand);
+                target.randomTick(sworld, posTarget, rand);
                 world.notifyBlockUpdate(posTarget, target, target, 2);
             }
         }

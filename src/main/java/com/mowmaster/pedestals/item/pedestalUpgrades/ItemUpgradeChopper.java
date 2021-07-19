@@ -224,6 +224,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
 
             ToolType tool = blockToChop.getHarvestTool();
             int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToChop);
+            ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
             //if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true))
 
             //Leaving this out since its annoying as f to need an axe and a hoe to harvest a tree
@@ -238,7 +239,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                 int expdrop = blockToChop.getBlock().getExpDrop(blockToChop,world,blockToChopPos,
                         (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
                         (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
-                if(expdrop>0)blockToChop.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
+                if(expdrop>0)blockToChop.getBlock().dropXpOnBlockBreak(sworld,posOfPedestal,expdrop);
                 if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,blockToChopPos.getX(),blockToChopPos.getY(),blockToChopPos.getZ(),255,164,0));
                     world.removeBlock(blockToChopPos, false);
                 //}

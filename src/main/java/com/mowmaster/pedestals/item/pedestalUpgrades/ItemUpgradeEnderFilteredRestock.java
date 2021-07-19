@@ -80,8 +80,9 @@ public class ItemUpgradeEnderFilteredRestock extends ItemUpgradeBase
         {
             PedestalTileEntity ped = ((PedestalTileEntity)tile);
             ItemStack coinInPedestal = ped.getCoinOnPedestal();
+            ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
 
-            PlayerEntity player = ((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
+            PlayerEntity player = sworld.getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
             if(player != null)
             {
                 if(hasAdvancedInventoryTargeting(coinInPedestal))
@@ -134,7 +135,8 @@ public class ItemUpgradeEnderFilteredRestock extends ItemUpgradeBase
         {
             PedestalTileEntity ped = ((PedestalTileEntity)tile);
             ItemStack coinInPedestal = ped.getCoinOnPedestal();
-            PlayerEntity player = ((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
+            ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
+            PlayerEntity player = sworld.getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
             if(player != null)
             {
                 if(hasAdvancedInventoryTargeting(coinInPedestal))
@@ -241,10 +243,11 @@ public class ItemUpgradeEnderFilteredRestock extends ItemUpgradeBase
         int i = getStoredInt(coinInPedestal);
         int upgradeTransferRate = 64;
         ItemStack itemFromPedestal = getStackInPedestal(world,posOfPedestal);
+        ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
         //IF pedestal is empty and has nothing to transfer then dont do anything
         if(!itemFromPedestal.isEmpty() && !itemFromPedestal.equals(ItemStack.EMPTY))
         {
-            PlayerEntity player = ((ServerWorld) world).getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
+            PlayerEntity player = sworld.getPlayerByUuid(getPlayerFromCoin(coinInPedestal));
             PlayerMainInvWrapper inventory = new PlayerMainInvWrapper(player.inventory);
             if(player != null)
             {

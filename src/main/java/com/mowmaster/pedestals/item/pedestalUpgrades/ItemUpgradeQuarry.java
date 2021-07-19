@@ -300,7 +300,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
         if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
         ToolType tool = blockToMine.getHarvestTool();
         int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToMine);
-
+        ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
         if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
         {
             //ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToMine,toolLevel >= blockToMine.getHarvestLevel())
@@ -310,7 +310,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                 int expdrop = blockToMine.getBlock().getExpDrop(blockToMine,world,blockToMinePos,
                         (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
                         (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
-                if(expdrop>0)blockToMine.getBlock().dropXpOnBlockBreak((ServerWorld)world,posOfPedestal,expdrop);
+                if(expdrop>0)blockToMine.getBlock().dropXpOnBlockBreak(sworld,posOfPedestal,expdrop);
                 world.removeBlock(blockToMinePos, false);
                 if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR_CENTERED,blockToMinePos.getX(),blockToMinePos.getY(),blockToMinePos.getZ(),255,164,0));
             }
