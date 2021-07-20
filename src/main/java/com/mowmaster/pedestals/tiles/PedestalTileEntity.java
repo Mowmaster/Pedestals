@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.tiles;
 
+import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
@@ -622,7 +623,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || stack.getToolTypes().contains(ToolType.SHOVEL)
                                 || GET_TOOLS.contains(stack.getItem())
                         ) && !GET_NOTTOOLS.contains(stack.getItem()) && !hasTool()) return true;
-                if (slot == 6 && stack.getItem() instanceof ItemFilterBase && !stack.getItem().equals(ItemFilterBase.BASEFILTER) && !hasFilter()) return true;
+                if (slot == 6 && stack.getItem() instanceof IFilterBase && !stack.getItem().equals(ItemFilterBase.BASEFILTER) && !hasFilter()) return true;
                 if (slot == 7 && stack.getItem().equals(Items.REDSTONE_TORCH) && !hasTorch()) return true;
                 if (slot == 8 && stack.getItem().equals(ItemPedestalUpgrades.ROUNDROBIN) && !hasRRobin()) return true;
                 if (slot == 9 && stack.getItem().equals(ItemPedestalUpgrades.SOUNDMUFFLER)) return true;
@@ -1547,10 +1548,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             Direction dir = state.get(PedestalBlock.FACING);
             boolean lit = state.get(PedestalBlock.LIT);
             int filterState = state.get(PedestalBlock.FILTER_STATUS);
-            if(filter.getItem() instanceof ItemFilterBase)
+            if(filter.getItem() instanceof IFilterBase)
             {
                 //Blacklist = 2 , whitelist = 1
-                filterState = (((ItemFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
+                filterState = (((IFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
             }
             BlockState newstate = state.with(PedestalBlock.FACING,dir).with(PedestalBlock.WATERLOGGED,watered).with(PedestalBlock.LIT,lit).with(PedestalBlock.FILTER_STATUS,filterState);
 
@@ -1591,10 +1592,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             BlockState state = world.getBlockState(pos);
             int filterState = state.get(PedestalBlock.FILTER_STATUS);
             int newFilterState = filterState;
-            if(filter.getItem() instanceof ItemFilterBase)
+            if(filter.getItem() instanceof IFilterBase)
             {
                 //Blacklist = 2 , whitelist = 1
-                newFilterState = (((ItemFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
+                newFilterState = (((IFilterBase) filter.getItem()).getFilterTypeFromNBT(filter))?(2):(1);
 
                 if(filter.hasTag())
                 {
@@ -1950,9 +1951,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         if(hasFilter())
         {
             Item filterInPed = this.getFilterInPedestal().getItem();
-            if(filterInPed instanceof ItemFilterBase)
+            if(filterInPed instanceof IFilterBase)
             {
-                pedestalAccept = ((ItemFilterBase) filterInPed).canAcceptCount(getTile(), worldIn, posPedestal, getItemInPedestal(), itemsIncoming);
+                pedestalAccept = ((IFilterBase) filterInPed).canAcceptCount(getTile(), itemsIncoming);
             }
         }
 
@@ -1970,7 +1971,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         if(pedestalSendingTo.hasFilter())
         {
             Item filterInPedestal = pedestalSendingTo.getFilterInPedestal().getItem();
-            if(filterInPedestal instanceof ItemFilterBase)
+            if(filterInPedestal instanceof IFilterBase)
             {
                 returner = true;
             }
@@ -2044,9 +2045,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                     if(tilePedestalToSendTo.hasFilter())
                                     {
                                         Item filterInPedestal = tilePedestalToSendTo.getFilterInPedestal().getItem();
-                                        if(filterInPedestal instanceof ItemFilterBase)
+                                        if(filterInPedestal instanceof IFilterBase)
                                         {
-                                            filter = ((ItemFilterBase) filterInPedestal).canAcceptItem(tilePedestalToSendTo,itemStackIncoming);
+                                            filter = ((IFilterBase) filterInPedestal).canAcceptItem(tilePedestalToSendTo,itemStackIncoming);
                                         }
                                     }
 

@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalFilters;
 
+import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.AbstractRailBlock;
@@ -94,11 +95,12 @@ Energy/Fluid/Exp Relay(blocked) - A blank whitelist filter would do the same thi
 
  */
 
-public class ItemFilterBase extends Item
+public class ItemFilterBase extends Item implements IFilterBase
 {
     public boolean filterType = false;
     public ItemFilterBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
+    @Override
     public boolean getFilterType()
     {
         //state 0|
@@ -107,6 +109,7 @@ public class ItemFilterBase extends Item
         return filterType;
     }
 
+    @Override
     public boolean getFilterType(ItemStack filterItem)
     {
         //false = whitelist
@@ -115,6 +118,7 @@ public class ItemFilterBase extends Item
         return getFilterType();
     }
 
+    @Override
     public void setFilterType(ItemStack filterItem, boolean filterSet)
     {
         filterType = filterSet;
@@ -135,19 +139,27 @@ public class ItemFilterBase extends Item
         return 16777215;
     }
 
+    @Override
     public boolean canAcceptItem(PedestalTileEntity pedestal, ItemStack itemStackIn)
     {
         return true;
     }
 
+    @Override
     public boolean canSendItem(PedestalTileEntity tile)
     {
         return true;
     }
 
+    //From API
+    @Override
+    public int canAcceptCount(PedestalTileEntity pedestal, ItemStack itemStackIncoming) {
+        return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
+    }
+
     public int canAcceptCount(PedestalTileEntity pedestal, World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
-        return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
+        return canAcceptCount(pedestal,itemStackIncoming);
     }
 
     @Override
@@ -210,6 +222,7 @@ public class ItemFilterBase extends Item
         return super.onItemRightClick(p_77659_1_, p_77659_2_, p_77659_3_);
     }
 
+    @Override
     public void removeFilterQueueHandler(ItemStack stack)
     {
         CompoundNBT compound = new CompoundNBT();
@@ -224,6 +237,7 @@ public class ItemFilterBase extends Item
         }
     }
 
+    @Override
     public int filterQueueSize(ItemStack coin)
     {
         int filterQueueSize = 0;
@@ -242,6 +256,7 @@ public class ItemFilterBase extends Item
         return filterQueueSize;
     }
 
+    @Override
     public List<ItemStack> buildFilterQueue(World world, BlockPos invBlock)
     {
         List<ItemStack> filterQueue = new ArrayList<>();
@@ -264,6 +279,7 @@ public class ItemFilterBase extends Item
         return filterQueue;
     }
 
+    @Override
     public void writeFilterQueueToNBT(ItemStack stack, List<ItemStack> listIn)
     {
         CompoundNBT compound = new CompoundNBT();
@@ -280,6 +296,7 @@ public class ItemFilterBase extends Item
         stack.setTag(compound);
     }
 
+    @Override
     public List<ItemStack> readFilterQueueFromNBT(ItemStack filter)
     {
         List<ItemStack> filterQueue = new ArrayList<>();
@@ -364,6 +381,7 @@ public class ItemFilterBase extends Item
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
+    @Override
     public void writeFilterTypeToNBT(ItemStack stack)
     {
         CompoundNBT compound = new CompoundNBT();
@@ -375,6 +393,7 @@ public class ItemFilterBase extends Item
         stack.setTag(compound);
     }
 
+    @Override
     public boolean getFilterTypeFromNBT(ItemStack stack)
     {
         if(stack.hasTag())
@@ -390,6 +409,7 @@ public class ItemFilterBase extends Item
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
+    @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack filterStack = pedestal.getFilterInPedestal();
