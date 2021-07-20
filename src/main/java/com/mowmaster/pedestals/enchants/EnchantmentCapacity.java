@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.enchants;
 
-import com.mowmaster.pedestals.item.ItemEnchantableBook;
+import com.mowmaster.pedestals.api.enchanting.ICapacityBook;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
+import com.mowmaster.pedestals.item.books.ItemEnchantableBookBase;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -35,15 +37,15 @@ public class EnchantmentCapacity extends Enchantment
     public boolean canApply(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
-        if(coin instanceof ItemUpgradeBase)
+        if(coin instanceof IUpgradeBase)
         {
-            canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptCapacity();
-            return stack.getItem() instanceof ItemUpgradeBase && canApplyToUpgrade;
+            canApplyToUpgrade = ((IUpgradeBase) coin).canAcceptCapacity();
+            return stack.getItem() instanceof IUpgradeBase && canApplyToUpgrade;
         }
-        if(coin.equals(ItemEnchantableBook.CAPACITY))
+        if(coin instanceof ICapacityBook)
         {
             canApplyToUpgrade = true;
-            return stack.equals(ItemEnchantableBook.CAPACITY) && canApplyToUpgrade;
+            return (coin instanceof ICapacityBook) && canApplyToUpgrade;
         }
         return false;
     }
@@ -52,11 +54,11 @@ public class EnchantmentCapacity extends Enchantment
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
-        if(coin instanceof ItemUpgradeBase)
+        if(coin instanceof IUpgradeBase)
         {
-            canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptCapacity();
+            canApplyToUpgrade = ((IUpgradeBase) coin).canAcceptCapacity();
         }
-        if(coin.equals(ItemEnchantableBook.CAPACITY))
+        if(coin instanceof ICapacityBook)
         {
             canApplyToUpgrade = true;
         }

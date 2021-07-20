@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.enchants;
 
-import com.mowmaster.pedestals.item.ItemEnchantableBook;
+import com.mowmaster.pedestals.api.enchanting.IAdvancedBook;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
@@ -37,11 +37,11 @@ public class EnchantmentAdvanced extends Enchantment
     @Override
     public boolean canApply(ItemStack stack) {
         boolean canApplyToUpgrade = false;
-        Item coin = stack.getItem();
-        if(coin.equals(ItemEnchantableBook.ADVANCED))
+        Item book = stack.getItem();
+        if(book instanceof IAdvancedBook)
         {
             canApplyToUpgrade = true;
-            return stack.equals(ItemEnchantableBook.ADVANCED) && canApplyToUpgrade;
+            return (book instanceof IAdvancedBook) && canApplyToUpgrade;
         }
         return false;
     }
@@ -49,8 +49,8 @@ public class EnchantmentAdvanced extends Enchantment
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
         boolean canApplyToUpgrade = false;
-        Item coin = stack.getItem();
-        if(coin.equals(ItemEnchantableBook.ADVANCED))
+        Item book = stack.getItem();
+        if(book instanceof IAdvancedBook)
         {
             canApplyToUpgrade = true;
         }

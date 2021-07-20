@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.enchants;
 
-import com.mowmaster.pedestals.item.ItemEnchantableBook;
+import com.mowmaster.pedestals.api.enchanting.IRangeBook;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
+import com.mowmaster.pedestals.item.books.ItemEnchantableBookBase;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -34,15 +36,15 @@ public class EnchantmentRange extends Enchantment
     public boolean canApply(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
-        if(coin instanceof ItemUpgradeBase)
+        if(coin instanceof IUpgradeBase)
         {
-            canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptRange();
-            return stack.getItem() instanceof ItemUpgradeBase && canApplyToUpgrade;
+            canApplyToUpgrade = ((IUpgradeBase) coin).canAcceptRange();
+            return stack.getItem() instanceof IUpgradeBase && canApplyToUpgrade;
         }
-        if(coin.equals(ItemEnchantableBook.RANGE))
+        if(coin instanceof IRangeBook)
         {
             canApplyToUpgrade = true;
-            return stack.equals(ItemEnchantableBook.RANGE) && canApplyToUpgrade;
+            return (coin instanceof IRangeBook) && canApplyToUpgrade;
         }
         return false;
     }
@@ -51,11 +53,11 @@ public class EnchantmentRange extends Enchantment
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
-        if(coin instanceof ItemUpgradeBase)
+        if(coin instanceof IUpgradeBase)
         {
-            canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptRange();
+            canApplyToUpgrade = ((IUpgradeBase) coin).canAcceptRange();
         }
-        if(coin.equals(ItemEnchantableBook.RANGE))
+        if(coin instanceof IRangeBook)
         {
             canApplyToUpgrade = true;
         }

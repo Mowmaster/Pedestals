@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.util.compat.jei;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.item.*;
+import com.mowmaster.pedestals.item.books.*;
 import com.mowmaster.pedestals.item.pedestalFilters.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import com.mowmaster.pedestals.recipes.*;
@@ -180,12 +181,12 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemTagTool.TAG, "tagtool");
         addValueInfoPage(registration, ItemUpgradeTool.UPGRADE, "upgradetool");
         addValueInfoPage(registration, ItemToolSwapper.QUARRYTOOL, "toolswapper");
-        addValueInfoPage(registration, ItemEnchantableBook.SPEED, "bookspeed");
-        addValueInfoPage(registration, ItemEnchantableBook.CAPACITY, "bookcapacity");
-        addValueInfoPage(registration, ItemEnchantableBook.RANGE, "bookrange");
-        addValueInfoPage(registration, ItemEnchantableBook.AREA, "bookarea");
-        addValueInfoPage(registration, ItemEnchantableBook.ADVANCED, "bookadvanced");
-        addValueInfoPage(registration, ItemEnchantableBook.MAGNET, "bookmagnet");
+        addValueInfoPage(registration, ItemSpeedBook.SPEED, "bookspeed");
+        addValueInfoPage(registration, ItemCapacityBook.CAPACITY, "bookcapacity");
+        addValueInfoPage(registration, ItemRangeBook.RANGE, "bookrange");
+        addValueInfoPage(registration, ItemAreaBook.AREA, "bookarea");
+        addValueInfoPage(registration, ItemAdvancedBook.ADVANCED, "bookadvanced");
+        addValueInfoPage(registration, ItemMagnetBook.MAGNET, "bookmagnet");
 
         //Upgrades
         addValueInfoPage(registration, ItemUpgradeBreaker.BREAKER, "breaker");

@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.enchants;
 
-import com.mowmaster.pedestals.item.ItemEnchantableBook;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
+import com.mowmaster.pedestals.api.enchanting.IMagnetBook;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
@@ -35,15 +35,15 @@ public class EnchantmentMagnet extends Enchantment
     public boolean canApply(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
-        if(coin instanceof ItemUpgradeBase)
+        if(coin instanceof IUpgradeBase)
         {
-            canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptMagnet();
-            return stack.getItem() instanceof ItemUpgradeBase && canApplyToUpgrade;
+            canApplyToUpgrade = ((IUpgradeBase) coin).canAcceptMagnet();
+            return stack.getItem() instanceof IUpgradeBase && canApplyToUpgrade;
         }
-        if(coin.equals(ItemEnchantableBook.MAGNET))
+        if(coin instanceof IMagnetBook)
         {
             canApplyToUpgrade = true;
-            return stack.equals(ItemEnchantableBook.MAGNET) && canApplyToUpgrade;
+            return (coin instanceof IMagnetBook) && canApplyToUpgrade;
         }
         return false;
     }
@@ -52,11 +52,11 @@ public class EnchantmentMagnet extends Enchantment
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
         boolean canApplyToUpgrade = false;
         Item coin = stack.getItem();
-        if(coin instanceof ItemUpgradeBase)
+        if(coin instanceof IUpgradeBase)
         {
-            canApplyToUpgrade = ((ItemUpgradeBase) coin).canAcceptMagnet();
+            canApplyToUpgrade = ((IUpgradeBase) coin).canAcceptMagnet();
         }
-        if(coin.equals(ItemEnchantableBook.MAGNET))
+        if(coin instanceof IMagnetBook)
         {
             canApplyToUpgrade = true;
         }

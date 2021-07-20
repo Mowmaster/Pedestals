@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item;
 
 import com.mowmaster.pedestals.blocks.*;
+import com.mowmaster.pedestals.item.books.ItemEnchantableBookBase;
 import com.mowmaster.pedestals.item.pedestalFilters.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import net.minecraft.item.Item;
@@ -25,7 +26,7 @@ public class ItemRegistry
         ItemFilterSwapper.onItemRegistryReady(e);
         ItemDevTool.onItemRegistryReady(e);
         ItemColorPallet.onItemRegistryReady(e);
-        ItemEnchantableBook.onItemRegistryReady(e);
+        ItemEnchantableBookBase.onItemRegistryReady(e);
         ItemPedestalUpgrades.onItemRegistryReady(e);
 
         ItemFilterBase.onItemRegistryReady(e);

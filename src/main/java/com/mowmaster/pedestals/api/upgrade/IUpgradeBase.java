@@ -8,5 +8,19 @@ package com.mowmaster.pedestals.api.upgrade;
 //Chat with Loth about API's
 //https://discord.com/channels/749302798797242449/749302799644229715/866807219550814238
 
-public interface IUpgradeBase {
+public interface IUpgradeBase
+{
+
+    Boolean canAcceptOpSpeed();
+
+    Boolean canAcceptCapacity();
+
+    Boolean canAcceptMagnet();
+
+    Boolean canAcceptRange();
+
+    Boolean canAcceptAdvanced();
+
+    Boolean canAcceptArea();
+
 }
