@@ -121,29 +121,31 @@ public class ItemUpgradeBabyMaker extends ItemUpgradeBase
         AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
 
         FakePlayer fakePlayer =  fakePedestalPlayer(pedestal,itemInPedestal).get();
-
-        List<AnimalEntity> animalList = world.getEntitiesWithinAABB(AnimalEntity.class,getBox);
-        for(AnimalEntity getAnimalFromList : animalList)
+        if(fakePlayer !=null)
         {
-            if(getAnimalFromList != null)
+            List<AnimalEntity> animalList = world.getEntitiesWithinAABB(AnimalEntity.class,getBox);
+            for(AnimalEntity getAnimalFromList : animalList)
             {
-                if (getAnimalFromList.isBreedingItem(itemInPedestal))
+                if(getAnimalFromList != null)
                 {
-                    if (getAnimalFromList.canFallInLove() && getAnimalFromList.getGrowingAge()==0  && !getAnimalFromList.isChild())
+                    if (getAnimalFromList.isBreedingItem(itemInPedestal))
                     {
-                        pedestal.removeItem(1);
-                        getAnimalFromList.setInLove(fakePlayer);
-                    }
-
-                    if(hasAdvancedInventoryTargeting(coinInPedestal))
-                    {
-                        if (getAnimalFromList.isChild()) {
+                        if (getAnimalFromList.canFallInLove() && getAnimalFromList.getGrowingAge()==0  && !getAnimalFromList.isChild())
+                        {
                             pedestal.removeItem(1);
-                            if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,getAnimalFromList.getPosX(),getAnimalFromList.getPosY()+0.5,getAnimalFromList.getPosZ(),76,255,0));
-                            getAnimalFromList.ageUp((int)((float)(-getAnimalFromList.getGrowingAge() / 20) * 0.1F), true);
+                            getAnimalFromList.setInLove(fakePlayer);
                         }
-                    }
 
+                        if(hasAdvancedInventoryTargeting(coinInPedestal))
+                        {
+                            if (getAnimalFromList.isChild()) {
+                                pedestal.removeItem(1);
+                                if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,getAnimalFromList.getPosX(),getAnimalFromList.getPosY()+0.5,getAnimalFromList.getPosZ(),76,255,0));
+                                getAnimalFromList.ageUp((int)((float)(-getAnimalFromList.getGrowingAge() / 20) * 0.1F), true);
+                            }
+                        }
+
+                    }
                 }
             }
         }

@@ -117,14 +117,17 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
                         if (!itemInPedestal.isEmpty() && itemInPedestal.getItem() instanceof BlockItem && ((BlockItem) itemInPedestal.getItem()).getBlock() instanceof Block) {
 
                             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
-                            if(!fakePlayer.getPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPosition(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
+                            if(fakePlayer !=null)
+                            {
+                                if(!fakePlayer.getPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPosition(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
 
-                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));
+                                BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));
 
-                            ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == ActionResultType.CONSUME) {
-                                this.removeFromPedestal(world,pedPos,1);
-                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                if (result == ActionResultType.CONSUME) {
+                                    this.removeFromPedestal(world,pedPos,1);
+                                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                }
                             }
                         }
                     }

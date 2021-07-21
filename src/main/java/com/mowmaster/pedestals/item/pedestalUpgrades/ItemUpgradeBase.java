@@ -1581,26 +1581,28 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
         FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
-        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
-        if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
-        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
-        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
-        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
-        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
-
-
-        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
-                && !(blockToMine instanceof PedestalBlock)
-                && passesFilter(world, pedestalPos, blockToMine)
-                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
-                && ForgeHooks.canHarvestBlock(blockToMineState,fakePlayer,world,blockToMinePos)
-                && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !BLACKLIST.contains(blockToMine)
-                && advanced)
+        if(fakePlayer !=null)
         {
-            return true;
-        }
+            if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
+            if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+            ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
+            ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
+            //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+            boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
 
+
+            if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
+                    && !(blockToMine instanceof PedestalBlock)
+                    && passesFilter(world, pedestalPos, blockToMine)
+                    && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
+                    && ForgeHooks.canHarvestBlock(blockToMineState,fakePlayer,world,blockToMinePos)
+                    && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
+                    && !BLACKLIST.contains(blockToMine)
+                    && advanced)
+            {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -2256,23 +2258,26 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
         BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
         FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
-        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
-        if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
-
-
-        List<BlockPos> workQueue = new ArrayList<>();
-
-        for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+        if(fakePlayer !=null)
         {
-            BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
-            BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-            if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
-            {
-                workQueue.add(blockToMinePos);
-            }
-        }
+            if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
+            if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
 
-        writeWorkQueueToNBT(coin, workQueue);
+
+            List<BlockPos> workQueue = new ArrayList<>();
+
+            for(int i=0;!resetCurrentPosInt(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));i++)
+            {
+                BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
+                BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                if(canMineBlock(pedestal, blockToMinePos,fakePlayer))
+                {
+                    workQueue.add(blockToMinePos);
+                }
+            }
+
+            writeWorkQueueToNBT(coin, workQueue);
+        }
     }
 
     public void writeWorkQueueToNBT(ItemStack coin, List<BlockPos> listIn)

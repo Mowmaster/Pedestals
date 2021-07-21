@@ -264,28 +264,31 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         {
             ItemStack harvestingShears = (itemInPedestal.isEmpty())?(new ItemStack(Items.SHEARS,1)):(itemInPedestal);
             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
-            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
-            if(!fakePlayer.getHeldItemMainhand().equals(harvestingShears)) {fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);}
+            if(fakePlayer !=null)
+            {
+                if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+                if(!fakePlayer.getHeldItemMainhand().equals(harvestingShears)) {fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);}
 
-            PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
-            if (!MinecraftForge.EVENT_BUS.post(e)) {
-                ActionResultType type = ((BeehiveBlock)target.getBlock()).onBlockActivated(target,world,posTarget,fakePlayer,Hand.MAIN_HAND,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,true));
-                if(type == ActionResultType.CONSUME || type == ActionResultType.SUCCESS)
-                {
-                    if(!itemInPedestal.isEmpty())
+                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
+                if (!MinecraftForge.EVENT_BUS.post(e)) {
+                    ActionResultType type = ((BeehiveBlock)target.getBlock()).onBlockActivated(target,world,posTarget,fakePlayer,Hand.MAIN_HAND,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,true));
+                    if(type == ActionResultType.CONSUME || type == ActionResultType.SUCCESS)
                     {
-                        ItemStack itemInFakeBoy = ItemStack.EMPTY;
-                        itemInFakeBoy = IntStream.range(0,fakePlayer.inventory.getSizeInventory())//Int Range
-                                .mapToObj((fakePlayer.inventory)::getStackInSlot)//Function being applied to each interval
-                                .filter(itemStack -> !itemStack.isEmpty())
-                                .filter(itemStack -> !itemStack.getItem().equals(itemInPedestal.getItem()))
-                                .findFirst().orElse(ItemStack.EMPTY);
-                        BlockPos spawnItemHere = getPosOfBlockBelow(world,posTarget,-1);
-                        pedestal.spawnItemStack(world,spawnItemHere.getX(),spawnItemHere.getY(),spawnItemHere.getZ(),itemInFakeBoy);
-                        int getSlot = getPlayerSlotWithMatchingStackExact(fakePlayer.inventory,itemInFakeBoy);
-                        if(getSlot>=0 && !fakePlayer.inventory.getStackInSlot(0).getItem().equals(itemInPedestal.getItem()))
+                        if(!itemInPedestal.isEmpty())
                         {
-                            fakePlayer.inventory.removeStackFromSlot(getSlot);
+                            ItemStack itemInFakeBoy = ItemStack.EMPTY;
+                            itemInFakeBoy = IntStream.range(0,fakePlayer.inventory.getSizeInventory())//Int Range
+                                    .mapToObj((fakePlayer.inventory)::getStackInSlot)//Function being applied to each interval
+                                    .filter(itemStack -> !itemStack.isEmpty())
+                                    .filter(itemStack -> !itemStack.getItem().equals(itemInPedestal.getItem()))
+                                    .findFirst().orElse(ItemStack.EMPTY);
+                            BlockPos spawnItemHere = getPosOfBlockBelow(world,posTarget,-1);
+                            pedestal.spawnItemStack(world,spawnItemHere.getX(),spawnItemHere.getY(),spawnItemHere.getZ(),itemInFakeBoy);
+                            int getSlot = getPlayerSlotWithMatchingStackExact(fakePlayer.inventory,itemInFakeBoy);
+                            if(getSlot>=0 && !fakePlayer.inventory.getStackInSlot(0).getItem().equals(itemInPedestal.getItem()))
+                            {
+                                fakePlayer.inventory.removeStackFromSlot(getSlot);
+                            }
                         }
                     }
                 }

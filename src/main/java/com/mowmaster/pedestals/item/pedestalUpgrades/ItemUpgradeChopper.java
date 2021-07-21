@@ -211,38 +211,41 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         if(!blockToChop.getBlock().isAir(blockToChop,world,blockToChopPos) && blockToChop.getBlock().isIn(BlockTags.LOGS) || blockToChop.getBlock().isIn(BlockTags.LEAVES))
         {
             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
-            //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
-            ItemStack choppingAxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
-
-            if(!pedestal.hasTool())
+            if(fakePlayer !=null)
             {
-                choppingAxe = getToolDefaultEnchanted(coinInPedestal,choppingAxe);
-            }
+                //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+                ItemStack choppingAxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
 
-            if (!fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);}
+                if(!pedestal.hasTool())
+                {
+                    choppingAxe = getToolDefaultEnchanted(coinInPedestal,choppingAxe);
+                }
 
-            ToolType tool = blockToChop.getHarvestTool();
-            int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToChop);
-            ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
-            //if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true))
+                if (!fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);}
 
-            //Leaving this out since its annoying as f to need an axe and a hoe to harvest a tree
-            //toolLevel >= blockToChop.getHarvestLevel()
-            if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true))
-            {
+                ToolType tool = blockToChop.getHarvestTool();
+                int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToChop);
+                ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
+                //if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true))
 
-                //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockToChopPos, blockToChop, fakePlayer);
-                //if (!MinecraftForge.EVENT_BUS.post(e)) {
+                //Leaving this out since its annoying as f to need an axe and a hoe to harvest a tree
+                //toolLevel >= blockToChop.getHarvestLevel()
+                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,blockToChop,true))
+                {
+
+                    //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockToChopPos, blockToChop, fakePlayer);
+                    //if (!MinecraftForge.EVENT_BUS.post(e)) {
                     blockToChop.getBlock().harvestBlock(world, fakePlayer, blockToChopPos, blockToChop, null, fakePlayer.getHeldItemMainhand());
                     blockToChop.getBlock().onBlockHarvested(world, blockToChopPos, blockToChop, fakePlayer);
-                int expdrop = blockToChop.getBlock().getExpDrop(blockToChop,world,blockToChopPos,
-                        (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
-                        (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
-                if(expdrop>0)blockToChop.getBlock().dropXpOnBlockBreak(sworld,posOfPedestal,expdrop);
-                if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,blockToChopPos.getX(),blockToChopPos.getY(),blockToChopPos.getZ(),255,164,0));
+                    int expdrop = blockToChop.getBlock().getExpDrop(blockToChop,world,blockToChopPos,
+                            (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.FORTUNE))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE,fakePlayer.getHeldItemMainhand())):(0),
+                            (EnchantmentHelper.getEnchantments(fakePlayer.getHeldItemMainhand()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,fakePlayer.getHeldItemMainhand())):(0));
+                    if(expdrop>0)blockToChop.getBlock().dropXpOnBlockBreak(sworld,posOfPedestal,expdrop);
+                    if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,blockToChopPos.getX(),blockToChopPos.getY(),blockToChopPos.getZ(),255,164,0));
                     world.removeBlock(blockToChopPos, false);
-                //}
+                    //}
+                }
             }
         }
     }

@@ -143,22 +143,22 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
         List<LivingEntity> itemList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
         for(LivingEntity getEntityFromList : itemList)
         {
-            List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10", "pedestal11", "pedestal12");
-            Random rn = new Random();
-
             LivingEntity selectedEntity = getTargetEntity(filterBlock,getEntityFromList);
 
             if(selectedEntity != null)
             {
                 FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
-                if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
-                if (pedestal.hasTool() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, toolInPedestal);}
-                if (toolInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}
-                //Using the custom pedestal one this should work fine now...
+                if(fakePlayer !=null)
+                {
+                    if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+                    if (pedestal.hasTool() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, toolInPedestal);}
+                    if (toolInPedestal.isEmpty() && !fakePlayer.getHeldItemMainhand().equals(toolInPedestal)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);}
+                    //Using the custom pedestal one this should work fine now...
 
-                attackEntityWithRangedAttack(pedestal,fakePlayer,selectedEntity,10.0f);
-                //ADVANCED OPTION: BowItem --> public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft)
-                //Make it so it emulates a player shooting a bow, which means any modded bow with effects could take advantage of it >:)
+                    attackEntityWithRangedAttack(pedestal,fakePlayer,selectedEntity,10.0f);
+                    //ADVANCED OPTION: BowItem --> public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft)
+                    //Make it so it emulates a player shooting a bow, which means any modded bow with effects could take advantage of it >:)
+                }
             }
         }
     }

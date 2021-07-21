@@ -303,15 +303,18 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                 if(removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,true))
                 {
                     FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
-                    fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
-                    ItemStack getBucketOfFluid = getBucket(fluidInCoin);
-                    fakePlayer.setHeldItem(Hand.MAIN_HAND,getBucketOfFluid);
-
-                    if(world.isBlockModifiable(fakePlayer,targetPos) && placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,true))
+                    if(fakePlayer !=null)
                     {
-                        removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
-                        placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,false);
-                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                        fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+                        ItemStack getBucketOfFluid = getBucket(fluidInCoin);
+                        fakePlayer.setHeldItem(Hand.MAIN_HAND,getBucketOfFluid);
+
+                        if(world.isBlockModifiable(fakePlayer,targetPos) && placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,true))
+                        {
+                            removeFluid(pedestal, coinInPedestal,FluidAttributes.BUCKET_VOLUME,false);
+                            placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,false);
+                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                        }
                     }
                 }
             }
@@ -335,11 +338,14 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
             BlockPos targetPos = getPosOfNextBlock(i,(enumfacing == Direction.DOWN)?(negNums.add(0,1,0)):(negNums),(enumfacing != Direction.UP)?(posNums.add(0,1,0)):(posNums));
             BlockPos blockToFillPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
-            fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
-
-            if(world.isBlockModifiable(fakePlayer,blockToFillPos) && placeFluid(pedestal,fakePlayer,blockToFillPos,fluidInCoin,true))
+            if(fakePlayer !=null)
             {
-                validBlocks++;
+                fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
+
+                if(world.isBlockModifiable(fakePlayer,blockToFillPos) && placeFluid(pedestal,fakePlayer,blockToFillPos,fluidInCoin,true))
+                {
+                    validBlocks++;
+                }
             }
         }
 

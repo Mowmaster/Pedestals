@@ -196,17 +196,20 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                         if (world.getBlockState(posTarget.down()).canSustainPlant(world,posTarget.down(), Direction.UP,(IPlantable) block)) {
                             //Use item in pedestal because, we're planting it
                             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
-                            //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-                            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+                            if(fakePlayer !=null)
+                            {
+                                //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                                if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
 
-                            //This places seeds based on the pedestals rotation, unless more mods add wierd and wacky ways to plant seeds, dont use this, or make a way to switch to it.
-                            //BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget.down(), false));
-                            BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, Direction.UP, posTarget.down(), false));
+                                //This places seeds based on the pedestals rotation, unless more mods add wierd and wacky ways to plant seeds, dont use this, or make a way to switch to it.
+                                //BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,posOfPedestal), posTarget.down(), false));
+                                BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, Direction.UP, posTarget.down(), false));
 
-                            ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == ActionResultType.CONSUME) {
-                                this.removeFromPedestal(world,posOfPedestal,1);
-                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                ActionResultType result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                if (result == ActionResultType.CONSUME) {
+                                    this.removeFromPedestal(world,posOfPedestal,1);
+                                    if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posTarget.getX(), posTarget.getY(), posTarget.getZ(), SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                }
                             }
                         }
                     }

@@ -280,30 +280,32 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
             FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
-            //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
-            if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
-            //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...
-            ItemStack harvestingHoe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_HOE,1));
-            if (!fakePlayer.getHeldItemMainhand().equals(harvestingHoe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, harvestingHoe);}
-
-            if(!pedestal.hasTool())
+            if(fakePlayer !=null)
             {
-                harvestingHoe = getToolDefaultEnchanted(coinInPedestal,harvestingHoe);
-            }
+                //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
+                if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
+                //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...
+                ItemStack harvestingHoe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_HOE,1));
+                if (!fakePlayer.getHeldItemMainhand().equals(harvestingHoe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, harvestingHoe);}
 
-            ToolType tool = target.getHarvestTool();
-            int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, target);
-
-            if(hasAdvancedInventoryTargeting(coinInPedestal))
-            {
-                //https://github.com/Lothrazar/Cyclic/blob/trunk/1.16/src/main/java/com/lothrazar/cyclic/block/harvester/TileHarvester.java
-                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
+                if(!pedestal.hasTool())
                 {
-                    ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
-                    Item targetSeed = getSeed(world,target,posTarget);
-                    List<ItemStack> targetDrops = Block.getDrops(target, sworld, posTarget, null);
-                    IntegerProperty propInt = getBlockPropertyAge(target);
-                    int min = Collections.min(propInt.getAllowedValues());
+                    harvestingHoe = getToolDefaultEnchanted(coinInPedestal,harvestingHoe);
+                }
+
+                ToolType tool = target.getHarvestTool();
+                int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, target);
+
+                if(hasAdvancedInventoryTargeting(coinInPedestal))
+                {
+                    //https://github.com/Lothrazar/Cyclic/blob/trunk/1.16/src/main/java/com/lothrazar/cyclic/block/harvester/TileHarvester.java
+                    if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
+                    {
+                        ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
+                        Item targetSeed = getSeed(world,target,posTarget);
+                        List<ItemStack> targetDrops = Block.getDrops(target, sworld, posTarget, null);
+                        IntegerProperty propInt = getBlockPropertyAge(target);
+                        int min = Collections.min(propInt.getAllowedValues());
                     /*
                     world.setBlockState(posTarget,target.with(propInt,min));
                     Sets a block state into this world.
@@ -318,35 +320,36 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                      Flags can be OR-ed
                      */
 
-                    target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
-                    for(ItemStack itemStack : targetDrops)
-                    {
-                        if(targetSeed !=null && itemStack.getItem().equals(targetSeed))
+                        target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
+                        for(ItemStack itemStack : targetDrops)
                         {
-                            itemStack.shrink(1);
-                            targetSeed =null;
+                            if(targetSeed !=null && itemStack.getItem().equals(targetSeed))
+                            {
+                                itemStack.shrink(1);
+                                targetSeed =null;
+                            }
+                            PedestalUtils.spawnItemStackInWorld(world,posTarget,itemStack);
                         }
-                        PedestalUtils.spawnItemStackInWorld(world,posTarget,itemStack);
+                        //Do additional world drops, like silverfish
+                        target.spawnAdditionalDrops(sworld, posTarget, ItemStack.EMPTY);
+                        world.setBlockState(posTarget,target.with(propInt,min));
+                        if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
                     }
-                    //Do additional world drops, like silverfish
-                    target.spawnAdditionalDrops(sworld, posTarget, ItemStack.EMPTY);
-                    world.setBlockState(posTarget,target.with(propInt,min));
-                    if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
                 }
-            }
-            else
-            {
-                //toolLevel >= target.getHarvestLevel()
-                if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
+                else
                 {
-                    //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
-                    //if (!MinecraftForge.EVENT_BUS.post(e)) {
+                    //toolLevel >= target.getHarvestLevel()
+                    if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
+                    {
+                        //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
+                        //if (!MinecraftForge.EVENT_BUS.post(e)) {
                         target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());
                         target.getBlock().onBlockHarvested(world, posTarget, target, fakePlayer);
                         //PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.HARVESTED,posTarget.getX(),posTarget.getY()-0.5f,posTarget.getZ(),posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ(),5));
-                    if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
+                        if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,164,0));
                         world.removeBlock(posTarget, false);
-                    //}
+                        //}
+                    }
                 }
             }
         }
