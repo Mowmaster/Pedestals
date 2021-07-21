@@ -123,6 +123,7 @@ public class ItemUpgradeBabyMaker extends ItemUpgradeBase
         FakePlayer fakePlayer =  fakePedestalPlayer(pedestal,itemInPedestal).get();
         if(fakePlayer !=null)
         {
+            fakePlayer.setSilent(true);
             List<AnimalEntity> animalList = world.getEntitiesWithinAABB(AnimalEntity.class,getBox);
             for(AnimalEntity getAnimalFromList : animalList)
             {

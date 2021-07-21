@@ -16,6 +16,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntity;
@@ -212,6 +213,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
         FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
         if(fakePlayer !=null)
         {
+            fakePlayer.setSilent(true);
             //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
             ItemStack choppingAxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_AXE,1));
@@ -221,7 +223,7 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
                 choppingAxe = getToolDefaultEnchanted(coinInPedestal,choppingAxe);
             }
 
-            if (!fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, choppingAxe);}
+            if (!fakePlayer.getHeldItemMainhand().equals(choppingAxe)) {fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND, choppingAxe);}
 
             ToolType tool = blockToChop.getHarvestTool();
             int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToChop);

@@ -1583,8 +1583,9 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
         if(fakePlayer !=null)
         {
+            fakePlayer.setSilent(true);
             if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
-            if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+            if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,pickaxe);
             ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
             ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
             //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
@@ -1621,7 +1622,7 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
         player.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
-        if(!doItemsMatch(player.getHeldItemMainhand(),pickaxe))player.setHeldItem(Hand.MAIN_HAND,pickaxe);
+        if(!doItemsMatch(player.getHeldItemMainhand(),pickaxe))player.setItemStackToSlot(EquipmentSlotType.MAINHAND,pickaxe);
 
         ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
         ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
@@ -2260,8 +2261,9 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
         if(fakePlayer !=null)
         {
+            fakePlayer.setSilent(true);
             if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
-            if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+            if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,pickaxe);
 
 
             List<BlockPos> workQueue = new ArrayList<>();

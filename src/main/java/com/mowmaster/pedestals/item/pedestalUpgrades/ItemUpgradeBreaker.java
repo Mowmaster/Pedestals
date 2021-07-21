@@ -16,6 +16,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
@@ -152,6 +153,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
         FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
         if(fakePlayer !=null)
         {
+            fakePlayer.setSilent(true);
             if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
             ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
             BlockPos posOfBlock = getPosOfBlockBelow(world, posOfPedestal, range);
@@ -171,7 +173,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
             //if (!blockToBreak.getBlock().isAir(blockToBreak, world, posOfBlock) && !(blockToBreak.getBlock() instanceof IFluidBlock || blockToBreak.getBlock() instanceof FlowingFluidBlock) && toolLevel >= blockToBreak.getHarvestLevel() &&blockToBreak.getBlockHardness(world, posOfBlock) != -1.0F) {
             if(!blockToBreak.isAir())
             {
-                if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setHeldItem(Hand.MAIN_HAND,pickaxe);
+                if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,pickaxe);
 
                 if(canMineBlock(pedestal, posOfBlock,fakePlayer))
                 {

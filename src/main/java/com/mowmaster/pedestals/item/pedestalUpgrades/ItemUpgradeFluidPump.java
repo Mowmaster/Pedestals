@@ -88,6 +88,7 @@ public class ItemUpgradeFluidPump extends ItemUpgradeBaseFluid
                             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
                             if(fakePlayer !=null)
                             {
+                                fakePlayer.setSilent(true);
                                 if(!fakePlayer.getPosition().equals(new BlockPos(pedPos.getX(), pedPos.getY(), pedPos.getZ()))) {fakePlayer.setPosition(pedPos.getX(), pedPos.getY(), pedPos.getZ());}
 
                                 BlockItemUseContext blockContext = new BlockItemUseContext(fakePlayer, Hand.MAIN_HAND, itemInPedestal.copy(), new BlockRayTraceResult(Vector3d.ZERO, getPedestalFacing(world,pedPos), targetPos, false));

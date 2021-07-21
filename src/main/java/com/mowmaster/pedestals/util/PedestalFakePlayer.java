@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.util;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Hand;
@@ -60,6 +61,7 @@ public class PedestalFakePlayer extends FakePlayer
 
     @Override
     public void setHeldItem(Hand hand, ItemStack stack) {
-        super.setHeldItem(hand, stack);
+        super.setHeldItem(hand, heldItem);
     }
+
 }

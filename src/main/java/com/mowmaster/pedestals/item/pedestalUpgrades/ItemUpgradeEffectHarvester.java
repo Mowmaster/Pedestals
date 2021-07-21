@@ -12,6 +12,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
@@ -282,11 +283,12 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
             FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
             if(fakePlayer !=null)
             {
+                fakePlayer.setSilent(true);
                 //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
                 if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
                 //Changed to a stick by default since atm6 has a dumb mod installed that modifies default vanilla hoe behavior...
                 ItemStack harvestingHoe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_HOE,1));
-                if (!fakePlayer.getHeldItemMainhand().equals(harvestingHoe)) {fakePlayer.setHeldItem(Hand.MAIN_HAND, harvestingHoe);}
+                if (!fakePlayer.getHeldItemMainhand().equals(harvestingHoe)) {fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND, harvestingHoe);}
 
                 if(!pedestal.hasTool())
                 {

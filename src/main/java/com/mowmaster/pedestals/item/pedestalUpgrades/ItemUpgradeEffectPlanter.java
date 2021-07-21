@@ -198,6 +198,7 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
                             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
                             if(fakePlayer !=null)
                             {
+                                fakePlayer.setSilent(true);
                                 //FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
                                 if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
 

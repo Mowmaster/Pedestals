@@ -8,6 +8,7 @@ import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -148,6 +149,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
         FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
         if(fakePlayer !=null)
         {
+            fakePlayer.setSilent(true);
             fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
 
             LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
@@ -209,7 +211,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                             {
                                 if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
                                 {
-                                    fakePlayer.setHeldItem(Hand.MAIN_HAND,itemForHand);
+                                    fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,itemForHand);
                                 }
                                 ActionResultType result = moomoo.func_230254_b_(fakePlayer,Hand.MAIN_HAND);
                                 fluid = getFluidInItem(fakePlayer.getHeldItemMainhand());

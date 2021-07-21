@@ -9,6 +9,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
@@ -266,8 +267,9 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
             if(fakePlayer !=null)
             {
+                fakePlayer.setSilent(true);
                 if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
-                if(!fakePlayer.getHeldItemMainhand().equals(harvestingShears)) {fakePlayer.setHeldItem(Hand.MAIN_HAND,harvestingShears);}
+                if(!fakePlayer.getHeldItemMainhand().equals(harvestingShears)) {fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,harvestingShears);}
 
                 PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
                 if (!MinecraftForge.EVENT_BUS.post(e)) {

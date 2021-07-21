@@ -18,6 +18,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -292,6 +293,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
         FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
         if(fakePlayer !=null)
         {
+            fakePlayer.setSilent(true);
             if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
 
             if(!pedestal.hasTool())
@@ -299,7 +301,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                 pick = getToolDefaultEnchanted(coinInPedestal,pick);
             }
 
-            if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setHeldItem(Hand.MAIN_HAND,pick);
+            if(!fakePlayer.getHeldItemMainhand().equals(pick))fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,pick);
             ToolType tool = blockToMine.getHarvestTool();
             int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, blockToMine);
             ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());

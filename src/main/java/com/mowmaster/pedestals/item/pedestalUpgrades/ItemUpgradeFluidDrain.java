@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
@@ -305,9 +306,10 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
                     FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
                     if(fakePlayer !=null)
                     {
+                        fakePlayer.setSilent(true);
                         fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
                         ItemStack getBucketOfFluid = getBucket(fluidInCoin);
-                        fakePlayer.setHeldItem(Hand.MAIN_HAND,getBucketOfFluid);
+                        fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,getBucketOfFluid);
 
                         if(world.isBlockModifiable(fakePlayer,targetPos) && placeFluid(pedestal,fakePlayer,targetPos,fluidInCoin,true))
                         {
@@ -340,6 +342,7 @@ public class ItemUpgradeFluidDrain extends ItemUpgradeBaseFluid
             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
             if(fakePlayer !=null)
             {
+                fakePlayer.setSilent(true);
                 fakePlayer.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
 
                 if(world.isBlockModifiable(fakePlayer,blockToFillPos) && placeFluid(pedestal,fakePlayer,blockToFillPos,fluidInCoin,true))
