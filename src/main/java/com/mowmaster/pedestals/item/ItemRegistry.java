@@ -75,6 +75,7 @@ public class ItemRegistry
         ItemUpgradeEnergyCrusher.onItemRegistryReady(e);
         ItemUpgradeEnergyFurnace.onItemRegistryReady(e);
         ItemUpgradeEnergySawMill.onItemRegistryReady(e);
+        ItemUpgradeEnergyField.onItemRegistryReady(e);
 
         ItemUpgradeFluidImport.onItemRegistryReady(e);
         ItemUpgradeFluidFilteredImport.onItemRegistryReady(e);

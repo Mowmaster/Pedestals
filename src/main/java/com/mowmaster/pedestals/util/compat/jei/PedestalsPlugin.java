@@ -218,6 +218,8 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemUpgradeEnergyCrusher.RFCRUSHER, "rfcrusher");
         addValueInfoPage(registration, ItemUpgradeEnergyFurnace.RFSMELTER, "rfsmelter");
         addValueInfoPage(registration, ItemUpgradeEnergySawMill.RFSAWMILL, "rfsawmill");
+        addValueInfoPage(registration, ItemUpgradeEnergyField.ENERGYFIELD, "rffield");
+
         addValueInfoPage(registration, ItemUpgradeExpCollector.XPMAGNET, "xpmagnet");
         addValueInfoPage(registration, ItemUpgradeExpRelay.XPRELAY, "xprelay");
         addValueInfoPage(registration, ItemUpgradeExpTank.XPTANK, "xptank");

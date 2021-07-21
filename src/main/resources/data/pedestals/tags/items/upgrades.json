@@ -70,6 +70,7 @@
     "pedestals:coin/rftank",
     "pedestals:coin/rfcrusher",
     "pedestals:coin/rfsmelter",
-    "pedestals:coin/rfsawmill"
+    "pedestals:coin/rfsawmill",
+    "pedestals:coin/rffield"
   ]
 }
