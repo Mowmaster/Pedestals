@@ -72,22 +72,23 @@ public class ParticleDiffuserCrafting
                             if(paper > 0)
                             {
                                 worldIn.createExplosion(new ItemEntity(worldIn, posX, posY, posZ),(DamageSource)null,(ExplosionContext)null, posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Explosion.Mode.NONE);
+
+                                /*float rainValue = (worldIn.rainingStrength>1f)?(worldIn.rainingStrength):(1f);
+                                if((rainValue-(float) paper)>0)worldIn.setRainStrength(rainValue);
+                                else worldIn.getWorldInfo().setRaining(false);*/
+
+                                //WIll make number of upgrades = to amount of paper available
+                                ItemEntity itemEn = new ItemEntity(worldIn,posX,posY+1,posZ,new ItemStack(ItemPedestalUpgrades.PARTICLEDIFFUSER,paper));
+                                itemEn.setInvulnerable(true);
+                                worldIn.addEntity(itemEn);
+                                worldIn.getWorldInfo().setRaining(false);
+                                paper=0;
+
                                 if(paper>0)
                                 {
-                                    float rainValue = (worldIn.rainingStrength>1f)?(worldIn.rainingStrength):(1f);
-                                    if((rainValue-(float) paper)>0)worldIn.setRainStrength(rainValue);
-                                    else worldIn.getWorldInfo().setRaining(false);
-
-                                    ItemEntity itemEn = new ItemEntity(worldIn,posX,posY+1,posZ,new ItemStack(ItemPedestalUpgrades.PARTICLEDIFFUSER,(int)rainValue));
-                                    itemEn.setInvulnerable(true);
-                                    worldIn.addEntity(itemEn);
-
-                                    if(paper>0)
-                                    {
-                                        ItemEntity itemEn2 = new ItemEntity(worldIn,posX,posY+1,posZ,new ItemStack(Items.PAPER,paper));
-                                        itemEn2.setInvulnerable(true);
-                                        worldIn.addEntity(itemEn2);
-                                    }
+                                    ItemEntity itemEn2 = new ItemEntity(worldIn,posX,posY+1,posZ,new ItemStack(Items.PAPER,paper));
+                                    itemEn2.setInvulnerable(true);
+                                    worldIn.addEntity(itemEn2);
                                 }
                             }
                         }
