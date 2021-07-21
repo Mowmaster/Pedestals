@@ -12,6 +12,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -33,6 +36,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mowmaster.pedestals.references.Reference.MODID;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -193,6 +197,48 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
         }
     }
 
+    public int getNextSlotWithItemsCapAnvil(LazyOptional<IItemHandler> cap, ItemStack stackInPedestal)
+    {
+        ITag<Item> BLACKLIST_ALL = ItemTags.getCollection().get(new ResourceLocation("pedestals", "anvil/blacklist_all"));
+        AtomicInteger slot = new AtomicInteger(-1);
+        if(cap.isPresent()) {
+
+            cap.ifPresent(itemHandler -> {
+                int range = itemHandler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    //find a slot with items
+                    if(!stackInSlot.isEmpty())
+                    {
+                        //check if it could pull the item out or not
+                        if(!itemHandler.extractItem(i,1 ,true ).equals(ItemStack.EMPTY))
+                        {
+                            if(!BLACKLIST_ALL.contains(stackInSlot.getItem()))
+                            {
+                                //If pedestal is empty accept any items
+                                if(stackInPedestal.isEmpty())
+                                {
+                                    slot.set(i);
+                                    break;
+                                }
+                                //if stack in pedestal matches items in slot
+                                else if(doItemsMatch(stackInPedestal,stackInSlot))
+                                {
+                                    slot.set(i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }});
+
+
+        }
+
+        return slot.get();
+    }
+
     public void upgradeAction(World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal)
     {
         int getMaxXpValue = getExpCountByLevel(getExpBuffer(coinInPedestal));
@@ -225,7 +271,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                 else {
                     if(handler != null)
                     {
-                        int i = getNextSlotWithItemsCap(cap ,getStackInPedestal(world,posOfPedestal));
+                        int i = getNextSlotWithItemsCapAnvil(cap ,getStackInPedestal(world,posOfPedestal));
                         if(i>=0)
                         {
                             itemFromInv = handler.getStackInSlot(i);
@@ -236,8 +282,11 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
 
                                 if(!tilePedestal.hasItem())
                                 {
+                                    ITag<Item> BLACKLIST_COMBINE = ItemTags.getCollection().get(new ResourceLocation("pedestals", "anvil/blacklist_combine"));
+                                    ITag<Item> BLACKLIST_REPAIR = ItemTags.getCollection().get(new ResourceLocation("pedestals", "anvil/blacklist_repair"));
+
                                     //Repair first if possible
-                                    if(itemFromInv.isDamaged())
+                                    if(itemFromInv.isDamaged() && !BLACKLIST_REPAIR.contains(itemFromInv.getItem()))
                                     {
                                         if(itemFromInv.getItem().isRepairable(itemFromInv) && itemFromInv.getItem().getMaxDamage(itemFromInv) > 0)
                                         {
@@ -248,7 +297,7 @@ public class ItemUpgradeExpAnvil extends ItemUpgradeBaseExp
                                             }
                                         }
                                     }
-                                    else if(stackToCombine.size() > 0)
+                                    else if(stackToCombine.size() > 0 && !BLACKLIST_COMBINE.contains(itemFromInv.getItem()))
                                     {
                                         //First check if other enchants exist, then we Need to add the item to enchantments list for combining
                                         stackToCombine.add(itemFromInv);
