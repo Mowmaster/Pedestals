@@ -33,11 +33,11 @@ public class ItemUpgradeExport extends ItemUpgradeBase
     public ItemUpgradeExport(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 
-    public Boolean canAcceptAdvanced() {return true;}
+    public boolean canAcceptAdvanced() {return true;}
 
     private int getNextSlotEmptyOrMatching(LazyOptional<IItemHandler> cap, ItemStack stackInPedestal)
     {

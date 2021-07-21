@@ -44,7 +44,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
     public ItemUpgradeCrafter(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return true;
     }
 

@@ -41,12 +41,12 @@ public class ItemUpgradeEnderFilteredRestock extends ItemUpgradeBase
     public ItemUpgradeEnderFilteredRestock(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptOpSpeed() {
+    public boolean canAcceptOpSpeed() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptAdvanced() {return true;}
+    public boolean canAcceptAdvanced() {return true;}
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {

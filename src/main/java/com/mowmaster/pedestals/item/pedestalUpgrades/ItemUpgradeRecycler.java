@@ -48,12 +48,12 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
     public ItemUpgradeRecycler(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return false;
     }
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return true;
     }
 

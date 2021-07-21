@@ -33,7 +33,7 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
     public ItemUpgradePlacer(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptRange() {
+    public boolean canAcceptRange() {
         return true;
     }
 

@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.tiles;
 
 import com.mowmaster.pedestals.api.filter.IFilterBase;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
 import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
@@ -444,9 +445,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 }
 
                 ItemStack coinOnPedestal = getCoinOnPedestal();
-                if(coinOnPedestal.getItem() instanceof ItemUpgradeBase)
+                if(coinOnPedestal.getItem() instanceof IUpgradeBase)
                 {
-                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
                     //System.out.println(IUB.customSlotLimit(getTile(),stack));
                     return IUB.customIsValid(getTile(),slot,stack);
                 }
@@ -471,9 +472,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 }
 
                 ItemStack coinOnPedestal = getCoinOnPedestal();
-                if(coinOnPedestal.getItem() instanceof ItemUpgradeBase)
+                if(coinOnPedestal.getItem() instanceof IUpgradeBase)
                 {
-                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
                     return IUB.canAcceptCount(world,pos,getItemInPedestal(),stack);
                 }
                 else return super.getStackLimit(slot, stack);
@@ -483,9 +484,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             public int getSlotLimit(int slot) {
 
                 ItemStack coinOnPedestal = getCoinOnPedestal();
-                if(coinOnPedestal.getItem() instanceof ItemUpgradeBase)
+                if(coinOnPedestal.getItem() instanceof IUpgradeBase)
                 {
-                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
                     //System.out.println(IUB.customSlotLimit(getTile(),stack));
                     if(IUB.customSlotLimit(getTile())!=-1)
                     {
@@ -502,9 +503,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 {
                     return super.getStackInSlot(0);
                 }
-                else if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                else if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
                 {
-                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
                     if(!IUB.customStackInSlot(getTile(),super.getStackInSlot(slot)).getItem().equals(Items.COMMAND_BLOCK))
                     {
                         return IUB.customStackInSlot(getTile(),super.getStackInSlot(slot));
@@ -521,9 +522,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 {
                     return super.insertItem(0, stack, simulate);
                 }
-                else if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                else if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
                 {
-                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
                     //System.out.println("Coin: "+IUB.customInsertItem(getTile(),stack, true).getItem().getName().toString());
                     if(!IUB.customInsertItem(getTile(),stack, true).getItem().equals(Items.COMMAND_BLOCK))
                     {
@@ -549,9 +550,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                     //System.out.println("Override: "+super.extractItem(0, amount, true));
                     return super.extractItem(0, amount, simulate);
                 }
-                else if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                else if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
                 {
-                    ItemUpgradeBase IUB = (ItemUpgradeBase)getCoinOnPedestal().getItem();
+                    IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
                     if(!IUB.customExtractItem(getTile(),amount, true).getItem().equals(Items.COMMAND_BLOCK))
                     {
                         return IUB.customExtractItem(getTile(),amount, simulate);
@@ -608,7 +609,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                if (slot == 0 && stack.getItem() instanceof ItemUpgradeBase && !hasCoin()) return true;
+                if (slot == 0 && stack.getItem() instanceof IUpgradeBase && !hasCoin()) return true;
                 if (slot == 1 && stack.getItem().equals(Items.GLOWSTONE) && !hasLight()) return true;
                 if (slot == 2 && stack.getItem().equals(ItemPedestalUpgrades.SPEED) && getSpeed()<5) return true;
                 if (slot == 3 && stack.getItem().equals(ItemPedestalUpgrades.CAPACITY) && getCapacity()<5) return true;
@@ -682,7 +683,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         for(int i = 0; i < ph.getSlots(); ++i) {
             if(i==0 && hasCoin())
             {
-                ItemUpgradeBase coin = ((ItemUpgradeBase)ph.getStackInSlot(0).getItem());
+                IUpgradeBase coin = ((IUpgradeBase)ph.getStackInSlot(0).getItem());
                 ItemStack actualCoin = ph.getStackInSlot(0);
                 coin.removePlayerFromCoin(actualCoin);
                 coin.removeWorkQueueFromCoin(actualCoin);
@@ -1010,9 +1011,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if(tilePedestal.hasCoin())
                 {
                     Item coinInPed = tilePedestal.getCoinOnPedestal().getItem();
-                    if(coinInPed instanceof ItemUpgradeBase)
+                    if(coinInPed instanceof IUpgradeBase)
                     {
-                        ((ItemUpgradeBase) coinInPed).actionOnCollideWithBlock(tilePedestal, entityIn);
+                        ((IUpgradeBase) coinInPed).actionOnCollideWithBlock(tilePedestal, ((ItemEntity)entityIn));
                     }
                 }
             }
@@ -1057,8 +1058,8 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     public ItemStack removeCoin() {
         IItemHandler ph = privateHandler.orElse(null);
         ItemStack stack = ph.getStackInSlot(0);
-        if(stack.getItem() instanceof ItemUpgradeBase){
-            ItemUpgradeBase coin = (ItemUpgradeBase)stack.getItem();
+        if(stack.getItem() instanceof IUpgradeBase){
+            IUpgradeBase coin = (IUpgradeBase)stack.getItem();
             coin.removePlayerFromCoin(stack);
             coin.removeWorkQueueFromCoin(stack);
             coin.removeWorkQueueTwoFromCoin(stack);
@@ -1088,9 +1089,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 ItemStack itemFromBlock = coinFromBlock.copy();
                 itemFromBlock.setCount(1);
                 //We know this is what the item is because of the pedestal block check
-                ((ItemUpgradeBase)itemFromBlock.getItem()).setPlayerOnCoin(itemFromBlock,player);
+                ((IUpgradeBase)itemFromBlock.getItem()).setPlayerOnCoin(itemFromBlock,player);
                 if(!hasCoin())ph.insertItem(0,itemFromBlock,false);
-                //if(coinFromBlock.getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)coinFromBlock.getItem()).onPedestalNeighborChanged(this);
+                //if(coinFromBlock.getItem() instanceof IUpgradeBase)((IUpgradeBase)coinFromBlock.getItem()).onPedestalNeighborChanged(this);
                 //update();
             }
             return true;
@@ -1526,9 +1527,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
         if(hasCoin())
         {
-            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+            if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
             {
-                ItemUpgradeBase coin = ((ItemUpgradeBase)getCoinOnPedestal().getItem());
+                IUpgradeBase coin = ((IUpgradeBase)getCoinOnPedestal().getItem());
                 coin.setFilterChangeUpdate(getCoinOnPedestal());
             }
         }
@@ -1569,9 +1570,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
                     if(hasCoin())
                     {
-                        if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                        if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
                         {
-                            ItemUpgradeBase coin = ((ItemUpgradeBase)getCoinOnPedestal().getItem());
+                            IUpgradeBase coin = ((IUpgradeBase)getCoinOnPedestal().getItem());
                             coin.setFilterChangeUpdate(getCoinOnPedestal());
                         }
                     }
@@ -1603,9 +1604,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
                     if(hasCoin())
                     {
-                        if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                        if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
                         {
-                            ItemUpgradeBase coin = ((ItemUpgradeBase)getCoinOnPedestal().getItem());
+                            IUpgradeBase coin = ((IUpgradeBase)getCoinOnPedestal().getItem());
                             coin.setFilterChangeUpdate(getCoinOnPedestal());
                         }
                     }
@@ -1629,9 +1630,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
                         if(hasCoin())
                         {
-                            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)
+                            if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
                             {
-                                ItemUpgradeBase coin = ((ItemUpgradeBase)getCoinOnPedestal().getItem());
+                                IUpgradeBase coin = ((IUpgradeBase)getCoinOnPedestal().getItem());
                                 coin.setFilterChangeUpdate(getCoinOnPedestal());
                             }
                         }
@@ -1868,9 +1869,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             if(hasCoin())
             {
                 Item coin = getCoinOnPedestal().getItem();
-                if(coin instanceof ItemUpgradeBase)
+                if(coin instanceof IUpgradeBase)
                 {
-                    return ((ItemUpgradeBase)coin).canSendItem(pedestal);
+                    return ((IUpgradeBase)coin).canSendItem(pedestal);
                 }
             }
             else return true;
@@ -1914,9 +1915,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         if(hasCoin())
         {
             Item coinInPed = this.getCoinOnPedestal().getItem();
-            if(coinInPed instanceof ItemUpgradeBase)
+            if(coinInPed instanceof IUpgradeBase)
             {
-                pedestalAccept = ((ItemUpgradeBase) coinInPed).canAcceptCount(worldIn, posPedestal, getItemInPedestal(), itemsIncoming);
+                pedestalAccept = ((IUpgradeBase) coinInPed).canAcceptCount(worldIn, posPedestal, getItemInPedestal(), itemsIncoming);
             }
 
             if(coinInPed instanceof ItemUpgradeItemTank)
@@ -1988,9 +1989,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         if(hasCoin())
         {
             Item coinInPedestal = getCoinOnPedestal().getItem();
-            if(coinInPedestal instanceof ItemUpgradeBase)
+            if(coinInPedestal instanceof IUpgradeBase)
             {
-                return ((ItemUpgradeBase) coinInPedestal).canSendItem(this);
+                return ((IUpgradeBase) coinInPedestal).canSendItem(this);
             }
         }
 
@@ -2054,9 +2055,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                     if(tilePedestalToSendTo.hasCoin())
                                     {
                                         Item coinInPedestal = tilePedestalToSendTo.getCoinOnPedestal().getItem();
-                                        if(coinInPedestal instanceof ItemUpgradeBase)
+                                        if(coinInPedestal instanceof IUpgradeBase)
                                         {
-                                            coin = ((ItemUpgradeBase) coinInPedestal).canAcceptItem(getWorld(),pedestalToSendTo,itemStackIncoming);
+                                            coin = ((IUpgradeBase) coinInPedestal).canAcceptItem(getWorld(),pedestalToSendTo,itemStackIncoming);
                                         }
                                     }
 
@@ -2176,10 +2177,10 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             if(hasCoin())
             {
                 Item coinInPed = getCoinOnPedestal().getItem();
-                if(coinInPed instanceof ItemUpgradeBase)
+                if(coinInPed instanceof IUpgradeBase)
                 {
                     impTicker++;
-                    ((ItemUpgradeBase) coinInPed).updateAction(world,this);
+                    ((IUpgradeBase) coinInPed).updateAction(world,this);
                     //Has to be bigger than our biggest ticker value for an upgrade, or itll reset the upgrade instance before the upgrade action can fire
                     if(impTicker >=Integer.MAX_VALUE-100){impTicker=0;}
                 }
@@ -2191,11 +2192,11 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             if(hasCoin())
             {
                 Item coinInPed = getCoinOnPedestal().getItem();
-                if(coinInPed instanceof ItemUpgradeBase)
+                if(coinInPed instanceof IUpgradeBase)
                 {
                     partTicker++;
                     Random rand = new Random();
-                    ((ItemUpgradeBase) coinInPed).onRandomDisplayTick(this,partTicker, world.getBlockState(getPos()), world, getPos(), rand);
+                    ((IUpgradeBase) coinInPed).onRandomDisplayTick(this,partTicker, world.getBlockState(getPos()), world, getPos(), rand);
                     if(partTicker >=Integer.MAX_VALUE-100){partTicker=0;}
                 }
             }

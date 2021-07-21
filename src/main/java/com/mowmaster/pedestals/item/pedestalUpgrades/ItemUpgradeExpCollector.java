@@ -38,20 +38,20 @@ public class ItemUpgradeExpCollector extends ItemUpgradeBaseExp
     public ItemUpgradeExpCollector(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptArea() {
+    public boolean canAcceptArea() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptRange() {return true;}
+    public boolean canAcceptRange() {return true;}
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return true;
     }
 

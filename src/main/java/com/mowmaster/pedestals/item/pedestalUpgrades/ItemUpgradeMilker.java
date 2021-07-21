@@ -45,20 +45,20 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
     public ItemUpgradeMilker(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptArea() {return true;}
+    public boolean canAcceptArea() {return true;}
 
     @Override
-    public Boolean canAcceptRange() {
+    public boolean canAcceptRange() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return true;
     }
 

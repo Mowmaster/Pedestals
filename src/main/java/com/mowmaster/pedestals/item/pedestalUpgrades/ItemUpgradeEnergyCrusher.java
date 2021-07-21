@@ -33,14 +33,14 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
     public ItemUpgradeEnergyCrusher(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return true;
     }
 
     //Speed - Default
     //Capacity - Increase Items Smelted at once
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 
@@ -90,7 +90,7 @@ public class ItemUpgradeEnergyCrusher extends ItemUpgradeBaseEnergyMachine
     //Crusher Normal Action
     public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        Boolean isAdvanced = hasAdvancedInventoryTargeting(coinInPedestal);
+        boolean isAdvanced = hasAdvancedInventoryTargeting(coinInPedestal);
         //Set Default Energy Buffer
         int getMaxEnergyValue = getEnergyBuffer(coinInPedestal);
         if(!hasMaxEnergySet(coinInPedestal) || readMaxEnergyFromNBT(coinInPedestal) != getMaxEnergyValue) {setMaxEnergy(coinInPedestal, getMaxEnergyValue);}

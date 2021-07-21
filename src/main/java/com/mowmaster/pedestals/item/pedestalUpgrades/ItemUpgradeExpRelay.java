@@ -30,12 +30,12 @@ public class ItemUpgradeExpRelay extends ItemUpgradeBaseExp
     public ItemUpgradeExpRelay(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptOpSpeed() {
+    public boolean canAcceptOpSpeed() {
         return false;
     }
 

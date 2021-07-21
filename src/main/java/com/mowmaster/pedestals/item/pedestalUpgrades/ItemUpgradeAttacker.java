@@ -49,20 +49,20 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
     //For damage
     @Override
-    public Boolean canAcceptCapacity() {return true;}
+    public boolean canAcceptCapacity() {return true;}
 
     @Override
-    public Boolean canAcceptArea() {
+    public boolean canAcceptArea() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptRange() {
+    public boolean canAcceptRange() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptMagnet() {
+    public boolean canAcceptMagnet() {
         return true;
     }
 

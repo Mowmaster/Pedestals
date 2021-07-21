@@ -46,12 +46,12 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
     public ItemUpgradeFluidCrafter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 

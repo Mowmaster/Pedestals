@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
@@ -70,7 +71,9 @@ import java.util.stream.IntStream;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
-public class ItemUpgradeBase extends Item {
+public class ItemUpgradeBase extends Item implements IUpgradeBase {
+
+
 
     public int maxStored = 2000000000;
     public int maxLVLStored = 20000;
@@ -90,12 +93,14 @@ public class ItemUpgradeBase extends Item {
     //https://skmedix.github.io/ForgeJavaDocs/javadoc/forge/1.9.4-12.17.0.2051/net/minecraftforge/items/IItemHandler.html
 
 
+    @Override
     public boolean customIsValid(PedestalTileEntity pedestal, int slot, @Nonnull ItemStack stack)
     {
         return (slot==0)?(true):(false);
     }
 
     //ItemStack extracted from the slot, must be null, if nothing can be extracted
+    @Override
     public ItemStack customExtractItem(PedestalTileEntity pedestal, int amountOut, boolean simulate)
     {
         //Default return that forces pedestal to do a normal thing
@@ -104,6 +109,7 @@ public class ItemUpgradeBase extends Item {
 
     //The remaining ItemStack that was not inserted (if the entire stack is accepted, then return null).
     //May be the same as the input ItemStack if unchanged, otherwise a new ItemStack.
+    @Override
     public ItemStack customInsertItem(PedestalTileEntity pedestal, ItemStack stackIn, boolean simulate)
     {
         //Default return that forces pedestal to do a normal thing
@@ -111,12 +117,14 @@ public class ItemUpgradeBase extends Item {
     }
 
     //ItemStack in given slot. May be null.
+    @Override
     public ItemStack customStackInSlot(PedestalTileEntity pedestal,ItemStack stackFromHandler)
     {
         //Default return that forces pedestal to do a normal thing
         return new ItemStack(Items.COMMAND_BLOCK);
     }
 
+    @Override
     public int customSlotLimit(PedestalTileEntity pedestal)
     {
         return -1;
@@ -124,11 +132,13 @@ public class ItemUpgradeBase extends Item {
 
     //For Filters to return if they can or cannot allow items to pass
     //Will probably need overwritten
+    @Override
     public boolean canAcceptItem(World world, BlockPos posPedestal, ItemStack itemStackIn)
     {
         return true;
     }
 
+    @Override
     public int canAcceptCount(World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
         TileEntity tile = world.getTileEntity(posPedestal);
@@ -294,6 +304,7 @@ public class ItemUpgradeBase extends Item {
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
+    @Override
     public boolean canSendItem(PedestalTileEntity tile)
     {
         return true;
@@ -818,37 +829,43 @@ public class ItemUpgradeBase extends Item {
         return true;
     }
 
-    public Boolean canAcceptOpSpeed()
+    @Override
+    public boolean canAcceptOpSpeed()
     {
         return true;
     }
 
-    public Boolean canAcceptCapacity()
+    @Override
+    public boolean canAcceptCapacity()
     {
         return false;
     }
 
-    public Boolean canAcceptMagnet()
+    @Override
+    public boolean canAcceptMagnet()
     {
         return false;
     }
 
-    public Boolean canAcceptRange()
+    @Override
+    public boolean canAcceptRange()
     {
         return false;
     }
 
-    public Boolean canAcceptAdvanced()
+    @Override
+    public boolean canAcceptAdvanced()
     {
         return true;
     }
 
-    public Boolean canAcceptArea()
+    @Override
+    public boolean canAcceptArea()
     {
         return false;
     }
 
-    public Boolean hasMagnetEnchant(ItemStack stack)
+    public boolean hasMagnetEnchant(ItemStack stack)
     {
         return (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.MAGNET,stack)>=1)?(true):(false);
     }
@@ -2080,6 +2097,7 @@ public class ItemUpgradeBase extends Item {
         return new WeakReference<FakePlayer>(new PedestalFakePlayer(sworld,getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),itemInHand));
     }
 
+    @Override
     public void setPlayerOnCoin(ItemStack stack, PlayerEntity player)
     {
         writeUUIDToNBT(stack,player.getUniqueID());
@@ -3479,6 +3497,7 @@ public class ItemUpgradeBase extends Item {
 
     }
 
+    @Override
     public void actionOnCollideWithBlock(PedestalTileEntity tilePedestal, Entity entityIn)
     {
         World world = tilePedestal.getWorld();
@@ -3486,6 +3505,7 @@ public class ItemUpgradeBase extends Item {
         BlockState state = world.getBlockState(posPedestal);
         actionOnCollideWithBlock(world, tilePedestal, posPedestal, state, entityIn);
     }
+
 
     public void actionOnCollideWithBlock(World world, PedestalTileEntity tilePedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
     {

@@ -44,12 +44,12 @@ public class ItemUpgradeEffectPlanter extends ItemUpgradeBase
     public ItemUpgradeEffectPlanter(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptArea() {
+    public boolean canAcceptArea() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptRange() {
+    public boolean canAcceptRange() {
         return true;
     }
 

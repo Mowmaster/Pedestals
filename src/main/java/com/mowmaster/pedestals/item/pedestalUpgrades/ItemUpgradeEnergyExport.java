@@ -20,7 +20,7 @@ public class ItemUpgradeEnergyExport extends ItemUpgradeBaseEnergy
     public ItemUpgradeEnergyExport(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 

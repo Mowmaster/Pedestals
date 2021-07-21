@@ -38,7 +38,7 @@ public class ItemUpgradeFluidVoid extends ItemUpgradeBaseFluid
     public ItemUpgradeFluidVoid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 

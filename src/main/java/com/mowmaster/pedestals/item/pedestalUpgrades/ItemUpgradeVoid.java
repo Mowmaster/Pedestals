@@ -37,7 +37,7 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
     public ItemUpgradeVoid(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 

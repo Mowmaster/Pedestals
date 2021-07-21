@@ -44,7 +44,7 @@ public class ItemUpgradeEnergyGenerator extends ItemUpgradeBaseEnergy
     public ItemUpgradeEnergyGenerator(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 

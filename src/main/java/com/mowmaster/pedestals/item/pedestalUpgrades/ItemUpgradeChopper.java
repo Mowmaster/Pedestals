@@ -56,17 +56,17 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
     public ItemUpgradeChopper(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptRange() {
+    public boolean canAcceptRange() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptArea() {
+    public boolean canAcceptArea() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptMagnet() {
+    public boolean canAcceptMagnet() {
         return true;
     }
 

@@ -35,15 +35,15 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
     public ItemUpgradeEffectMagnet(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptArea() {
+    public boolean canAcceptArea() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptRange() {return true;}
+    public boolean canAcceptRange() {return true;}
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return true;
     }
 

@@ -30,7 +30,7 @@ public class ItemUpgradeExpTank extends ItemUpgradeBaseExp
     public ItemUpgradeExpTank(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 

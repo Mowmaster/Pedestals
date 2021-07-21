@@ -32,7 +32,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
     public ItemUpgradeCrusher(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return true;
     }
 
@@ -83,7 +83,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
 
     public void upgradeAction(PedestalTileEntity pedestal, World world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        Boolean isAdvanced = hasAdvancedInventoryTargeting(coinInPedestal);
+        boolean isAdvanced = hasAdvancedInventoryTargeting(coinInPedestal);
         BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
         int itemsPerSmelt = getItemTransferRate(coinInPedestal);
 

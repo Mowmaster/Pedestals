@@ -61,15 +61,15 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
     public ItemUpgradeBreaker(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptRange() {
+    public boolean canAcceptRange() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptAdvanced() {return true;}
+    public boolean canAcceptAdvanced() {return true;}
 
     @Override
-    public Boolean canAcceptMagnet() {
+    public boolean canAcceptMagnet() {
         return true;
     }
 

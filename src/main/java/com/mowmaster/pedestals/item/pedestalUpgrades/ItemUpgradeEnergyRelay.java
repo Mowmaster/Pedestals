@@ -17,13 +17,13 @@ public class ItemUpgradeEnergyRelay extends ItemUpgradeBaseEnergy
     public ItemUpgradeEnergyRelay(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptCapacity() {
+    public boolean canAcceptCapacity() {
         return true;
     }
 
     //Since Energy Transfer is as fast as possible, speed isnt needed, just capacity
     @Override
-    public Boolean canAcceptOpSpeed() {
+    public boolean canAcceptOpSpeed() {
         return false;
     }
 

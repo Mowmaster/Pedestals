@@ -58,17 +58,17 @@ public class ItemUpgradeTurret extends ItemUpgradeBase
     public ItemUpgradeTurret(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptArea() {
+    public boolean canAcceptArea() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptRange() {
+    public boolean canAcceptRange() {
         return true;
     }
 
     @Override
-    public Boolean canAcceptAdvanced() { return true; }
+    public boolean canAcceptAdvanced() { return true; }
 
     public int getAreaWidth(ItemStack stack)
     {

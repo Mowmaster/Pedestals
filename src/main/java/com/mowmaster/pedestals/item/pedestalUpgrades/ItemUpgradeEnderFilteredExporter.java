@@ -41,7 +41,7 @@ public class ItemUpgradeEnderFilteredExporter extends ItemUpgradeBase
     public ItemUpgradeEnderFilteredExporter(Properties builder) {super(builder.group(PEDESTALS_TAB));}
 
     @Override
-    public Boolean canAcceptAdvanced() {
+    public boolean canAcceptAdvanced() {
         return super.canAcceptAdvanced();
     }
 
