@@ -24,9 +24,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.items.ItemHandlerHelper;
-import top.theillusivec4.curios.api.type.capability.ICurioItem;
+
+//import net.minecraftforge.items.ItemHandlerHelper;
+//import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import javax.annotation.Nullable;
 import java.util.List;

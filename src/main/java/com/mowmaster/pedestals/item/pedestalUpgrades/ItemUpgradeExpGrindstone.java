@@ -30,6 +30,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
@@ -111,17 +112,11 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                 else {
                     if(handler != null)
                     {
-                        int range = handler.getSlots();
-                        ItemStack nextItemToGrind = ItemStack.EMPTY;
-                        nextItemToGrind = IntStream.range(0,range)//Int Range
-                                .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                                .filter(itemStack -> itemStack.isEnchanted() || itemStack.getItem() instanceof EnchantedBookItem)
-                                .findFirst().orElse(ItemStack.EMPTY);
+                        int i = getNextSlotWithEnchantedItem(pedestal,cap,getStackInPedestal(world,posOfPedestal));
 
-                        if(!nextItemToGrind.isEmpty())
+                        if(i>0)
                         {
-                            int slotItemToGrind = getSlotWithMatchingStackExact(cap,nextItemToGrind);
-                            itemFromInv = handler.getStackInSlot(slotItemToGrind);
+                            itemFromInv = handler.getStackInSlot(i);
                             int maxXp = readMaxXpFromNBT(coinInPedestal);
                             int currentlyStoredExp = getXPStored(coinInPedestal);
                             int xpDisenchant = getItemsExpDisenchantAmount(itemFromInv);
@@ -137,9 +132,9 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                     setXPStored(coinInPedestal,getExpLeftInPedestal);
 
                                     ItemStack toReturn = stackToReturn.copy();
-                                    if(!handler.extractItem(slotItemToGrind,toReturn.getCount(),true).isEmpty())
+                                    if(!handler.extractItem(i,toReturn.getCount(),true).isEmpty())
                                     {
-                                        handler.extractItem(slotItemToGrind,toReturn.getCount(),false);
+                                        handler.extractItem(i,toReturn.getCount(),false);
                                         if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                         pedestal.addItemOverride(toReturn);
                                     }
@@ -148,24 +143,57 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                         }
                         else
                         {
-                            ItemStack nextItemToRemove = ItemStack.EMPTY;
-                            nextItemToRemove = IntStream.range(0,range)//Int Range
-                                    .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                                    .filter(itemStack -> !itemStack.isEnchanted() || !(itemStack.getItem() instanceof EnchantedBookItem))
-                                    .findFirst().orElse(ItemStack.EMPTY);
-
-                            int slotItemToRemove = getSlotWithMatchingStackExact(cap,nextItemToRemove);
-                            ItemStack toReturn = nextItemToRemove.copy();
-                            if(!handler.extractItem(slotItemToRemove,toReturn.getCount(),true).isEmpty())
+                            if(i>0)
                             {
-                                handler.extractItem(slotItemToRemove,toReturn.getCount(),false);
-                                pedestal.addItemOverride(toReturn);
+                                itemFromInv = handler.getStackInSlot(i);
+                                ItemStack toReturn = itemFromInv.copy();
+                                if(!handler.extractItem(i,toReturn.getCount(),true).isEmpty())
+                                {
+                                    handler.extractItem(i,toReturn.getCount(),false);
+                                    pedestal.addItemOverride(toReturn);
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    public int getNextSlotWithEnchantedItem(PedestalTileEntity pedestal, LazyOptional<IItemHandler> cap, ItemStack stackInPedestal)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        if(cap.isPresent()) {
+
+            cap.ifPresent(itemHandler -> {
+                int range = itemHandler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    //find a slot with items
+                    if(!stackInSlot.isEmpty() && (stackInSlot.isEnchanted() || stackInSlot.getItem() instanceof EnchantedBookItem))
+                    {
+                        //check if it could pull the item out or not
+                        if(!itemHandler.extractItem(i,1 ,true ).equals(ItemStack.EMPTY))
+                        {
+                            //If pedestal is empty accept any items
+                            if(stackInPedestal.isEmpty())
+                            {
+                                slot.set(i);
+                                break;
+                            }
+                            //if stack in pedestal matches items in slot
+                            else if(doItemsMatch(stackInPedestal,stackInSlot))
+                            {
+                                slot.set(i);
+                                break;
+                            }
+                        }
+                    }
+                }});
+        }
+
+        return slot.get();
     }
 
     public int getExpBuffer(ItemStack stack)
