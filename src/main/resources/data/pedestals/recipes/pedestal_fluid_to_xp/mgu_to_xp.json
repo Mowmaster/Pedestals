@@ -1,0 +1,16 @@
+{
+  "type": "pedestals:pedestal_fluid_to_xp",
+  "ingredient": {
+    "item": "mob_grinding_utils:fluid_xp_bucket"
+  },
+  "result": {
+    "item": "minecraft:experience_bottle",
+    "count": 50
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mob_grinding_utils"
+    }
+  ]
+}
