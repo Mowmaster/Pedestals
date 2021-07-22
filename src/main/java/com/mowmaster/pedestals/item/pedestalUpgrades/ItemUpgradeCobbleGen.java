@@ -131,21 +131,29 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             getItem = new ItemStack(Items.COBBLESTONE).getItem();
         }
 
-        if(coinInPedestal.isEnchanted())
+        if(hasSilk(pedestal))
         {
-            if(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,coinInPedestal)> 0)
+            jsonResults = getProcessResultsSilk(getRecipeSilk(world,itemBlockBelow));
+            resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
+            getItem = resultSmelted.getItem();
+            if(resultSmelted.isEmpty())
             {
-                jsonResults = getProcessResultsSilk(getRecipeSilk(world,itemBlockBelow));
-                resultSmelted = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
-                getItem = resultSmelted.getItem();
-                if(resultSmelted.isEmpty())
-                {
-                    getItem = new ItemStack(Items.STONE).getItem();
-                }
+                getItem = new ItemStack(Items.STONE).getItem();
             }
         }
 
         return getItem;
+    }
+
+    private boolean hasSilk(PedestalTileEntity pedestal)
+    {
+        boolean returner = false;
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        ItemStack tool = pedestal.getToolOnPedestal();
+
+        if(EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,coin)> 0 || EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH,tool)> 0)returner = true;
+
+        return returner;
     }
 
     @Override
