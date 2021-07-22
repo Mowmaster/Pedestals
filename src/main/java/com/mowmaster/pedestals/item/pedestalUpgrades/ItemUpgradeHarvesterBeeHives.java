@@ -285,7 +285,8 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                         itemInFakeBoy = IntStream.range(0,fakePlayer.inventory.getSizeInventory())//Int Range
                                 .mapToObj((fakePlayer.inventory)::getStackInSlot)//Function being applied to each interval
                                 .filter(itemStack -> !itemStack.isEmpty())
-                                .filter(itemStack -> (!itemStack.getItem().equals((itemInPedestal.isEmpty())?(Items.GLASS_BOTTLE):(itemInPedestal.getItem()))))
+                                .filter(itemStack -> !fakePlayer.getHeldItemMainhand().getItem().equals(itemInPedestal.getItem()))
+                                .filter(itemStack -> (!itemStack.getItem().equals((toolInPed.isEmpty())?(Items.SHEARS):(toolInPed.getItem()))))
                                 .findFirst().orElse(ItemStack.EMPTY);
                         BlockPos spawnItemHere = getPosOfBlockBelow(world,posTarget,-1);
                         pedestal.spawnItemStack(world,spawnItemHere.getX(),spawnItemHere.getY(),spawnItemHere.getZ(),itemInFakeBoy);
