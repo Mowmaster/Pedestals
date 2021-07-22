@@ -95,6 +95,7 @@ Energy/Fluid/Exp Relay(blocked) - A blank whitelist filter would do the same thi
 
  */
 
+
 public class ItemFilterBase extends Item implements IFilterBase
 {
     public boolean filterType = false;
@@ -154,12 +155,12 @@ public class ItemFilterBase extends Item implements IFilterBase
     //From API
     @Override
     public int canAcceptCount(PedestalTileEntity pedestal, ItemStack itemStackIncoming) {
-        return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
+        return canAcceptCount(pedestal, pedestal.getWorld(), pedestal.getPos(), pedestal.getItemInPedestal(), itemStackIncoming);
     }
 
     public int canAcceptCount(PedestalTileEntity pedestal, World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
-        return canAcceptCount(pedestal,itemStackIncoming);
+        return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
     }
 
     @Override

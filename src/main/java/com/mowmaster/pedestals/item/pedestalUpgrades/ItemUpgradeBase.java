@@ -75,6 +75,7 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
 
 
 
+
     public int maxStored = 2000000000;
     public int maxLVLStored = 20000;
     public ItemUpgradeBase(Properties builder) {super(builder.group(PEDESTALS_TAB));}

@@ -56,10 +56,8 @@ public class ItemFilterRestricted extends ItemFilterBase
                 count +=stackCurrent.get(i).getCount();
                 if(count>=maxIncomming)break;
             }
-
             return (count>0)?((count>maxIncomming)?(maxIncomming):(count)):(1);
         }
-
         return 0;
     }
 
