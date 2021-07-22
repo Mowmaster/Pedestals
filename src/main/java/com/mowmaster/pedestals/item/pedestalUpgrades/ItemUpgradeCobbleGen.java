@@ -163,9 +163,12 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         ItemStack stackInPed = pedestal.getItemInPedestalOverride();
         ItemStack itemStackToExtract = new ItemStack(getItemToSpawn(pedestal));
         int cobbleToRemove = removeCobble(pedestal,amountOut,true);
+        //System.out.println(cobbleToRemove);
         int stored = getCobbleStored(pedestal);
+        //.out.println(stored);
         if(stored<=0)
         {
+            //System.out.println("Else 1: ");
             //Should default to normal pedestal pull out methods
             return new ItemStack(Items.COMMAND_BLOCK);
         }
@@ -178,11 +181,12 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             }
 
             ItemStack toReturn = new ItemStack((stored>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
+            //System.out.println("Else 2: "+ ((toReturn.getCount()>0 || toReturn.isEmpty())?(toReturn):(ItemStack.EMPTY)));
             return (toReturn.getCount()>0 || toReturn.isEmpty())?(toReturn):(ItemStack.EMPTY);
             //Fm in e6 discord pinged me an issue where mek was spamming the console
             //#BlameMek
             //https://github.com/mekanism/Mekanism/blob/99f3b1e517a58f825349772cfd981d15f1c40e8f/src/main/java/mekanism/common/lib/inventory/TileTransitRequest.java#L67
-            //return new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.maxStackSize())?(itemStackToExtract.maxStackSize()):(amountOut));
+            //return new ItemStack((getCobbleStored(pedestal)>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
         }
         else
         {
@@ -191,6 +195,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 removeCobble(pedestal,cobbleToRemove,false);
             }
+            //System.out.println("Else 3: "+itemStackToExtract);
             return itemStackToExtract;
         }
     }
@@ -240,14 +245,15 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             ItemStack getItemStackInPedestal = pedestal.getItemInPedestalOverride();
             Item getItemInPedestal = getItemStackInPedestal.getItem();
             int stored = getCobbleStored(pedestal);
-            if(getItemInPedestal.equals(getItem) || getItemStackInPedestal.isEmpty())
+            if(getItemInPedestal.equals(getItem) || (getItemStackInPedestal.isEmpty() && stored>0))
             {
                 if(stored>0)
                 {
-                    int amount = getCobbleStored(pedestal)+pedestal.getItemInPedestalOverride().getCount();
+                    int amount = getCobbleStored(pedestal)+getItemStackInPedestal.getCount();
                     ItemStack getStack = new ItemStack(getItem,amount);
                     return getStack;
                 }
+                else return getItemStackInPedestal;
             }
             else
             {
