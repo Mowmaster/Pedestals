@@ -248,7 +248,7 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                                     }
                                                 }
                                             }
-                                            if(getIngredientStack.isEmpty() || getIngredientStack.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER))
+                                            else if(getIngredientStack.isEmpty() || getIngredientStack.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER))
                                             {
                                                 continue;
                                             }
@@ -297,15 +297,15 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                                                 ItemStack stackInRecipe = stackCurrent.get(s);
 
                                                 if (stackInRecipe.isEmpty() || stackInRecipe.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER))
-                                                {
                                                     continue;
-                                                }
-                                                else if(stackInRecipe.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER_BUCKET))
+
+                                                if(stackInRecipe.getItem().equals(ItemCraftingPlaceholder.PLACEHOLDER_BUCKET))
                                                 {
                                                     removeFluid(pedestal,coin,(fluidBucketsNeeded*FluidAttributes.BUCKET_VOLUME*intBatchCraftingSize),false);
                                                     continue;
                                                 }
-                                                else if (stackInRecipe.getItem().hasContainerItem(stackInRecipe)) {
+
+                                                if (stackInRecipe.getItem().hasContainerItem(stackInRecipe)) {
                                                     //Will Now Hold All Container items if set with advanced enchant
                                                     ItemStack container = stackInRecipe.getItem().getContainerItem(stackInRecipe);
                                                     if (!hasAdvancedInventoryTargeting(coin)) {
