@@ -8,10 +8,12 @@ import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
@@ -24,6 +26,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
@@ -145,49 +148,41 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
         ItemStack itemForHand = new ItemStack(Items.BUCKET);
         ItemStack itemMilkBucket = new ItemStack(Items.MILK_BUCKET);
 
-
-        FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
-        if(fakePlayer !=null)
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        if(cap.isPresent())
         {
-            fakePlayer.setSilent(true);
-            fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
-
-            LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
-            if(cap.isPresent())
+            if(!isInventoryEmpty(cap))
             {
-                if(!isInventoryEmpty(cap))
-                {
-                    IItemHandler handler = cap.orElse(null);
-                    TileEntity invToPullFrom = world.getTileEntity(posInventory);
-                    if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
-                        itemFromInv = ItemStack.EMPTY;
-                    }
-                    else {
-                        if(handler != null)
+                IItemHandler handler = cap.orElse(null);
+                TileEntity invToPullFrom = world.getTileEntity(posInventory);
+                if (((hasAdvancedInventoryTargeting(coinInPedestal) && invToPullFrom instanceof PedestalTileEntity)||!(invToPullFrom instanceof PedestalTileEntity))?(false):(true)) {
+                    itemFromInv = ItemStack.EMPTY;
+                }
+                else {
+                    if(handler != null)
+                    {
+                        int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
+                        if(i>=0)
                         {
-                            int i = getNextSlotWithItemsCap(cap,getStackInPedestal(world,posOfPedestal));
-                            if(i>=0)
+                            itemFromInv = handler.getStackInSlot(i);
+                            if(itemFromInv.getItem().equals(Items.BUCKET))
                             {
-                                itemFromInv = handler.getStackInSlot(i);
-                                if(itemFromInv.getItem().equals(Items.BUCKET))
+                                //Milking Code Here
+                                ItemStack milkBucket = new ItemStack(Items.MILK_BUCKET,1);
+                                List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
+                                if(moo.size()>0)
                                 {
-                                    //Milking Code Here
-                                    ItemStack milkBucket = new ItemStack(Items.MILK_BUCKET,1);
-                                    List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
-                                    if(moo.size()>0)
+                                    for(CowEntity moomoo : moo)
                                     {
-                                        for(CowEntity moomoo : moo)
+                                        if (!moomoo.isChild() && itemInPedestal.equals(ItemStack.EMPTY))
                                         {
-                                            if (!moomoo.isChild() && itemInPedestal.equals(ItemStack.EMPTY))
-                                            {
-                                                BlockPos mooie = moomoo.getPosition();
-                                                if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
-                                                if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                                                if(!handler.extractItem(i,1 ,true ).isEmpty()){
-                                                    handler.extractItem(i,1 ,false );
-                                                    pedestal.addItem(milkBucket);
-                                                    break;
-                                                }
+                                            BlockPos mooie = moomoo.getPosition();
+                                            if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));
+                                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_COW_MILK, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                                            if(!handler.extractItem(i,1 ,true ).isEmpty()){
+                                                handler.extractItem(i,1 ,false );
+                                                pedestal.addItem(milkBucket);
+                                                break;
                                             }
                                         }
                                     }
@@ -197,25 +192,31 @@ public class ItemUpgradeMilker extends ItemUpgradeBaseFluid
                     }
                 }
             }
-            else
+        }
+        else
+        {
+            if(availableFluidSpaceInCoin(coinInPedestal)>= FluidAttributes.BUCKET_VOLUME)
             {
-                if(availableFluidSpaceInCoin(coinInPedestal)>= FluidAttributes.BUCKET_VOLUME)
+                ITag<Item> MILK = ItemTags.getCollection().get(new ResourceLocation("forge","milk"));
+                FluidStack fluid = getFluidInItem(new ItemStack(Items.MILK_BUCKET));
+
+                if((MILK !=null && MILK.contains(itemMilkBucket.getItem())) || !fluid.isEmpty())
                 {
-                    FluidStack fluid = getFluidInItem(itemMilkBucket);
-                    if(!fluid.isEmpty())
+                    List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
+                    if(moo.size()>0)
                     {
-                        List<CowEntity> moo = world.getEntitiesWithinAABB(CowEntity.class,getBox);
-                        if(moo.size()>0)
+                        for(CowEntity moomoo : moo)
                         {
-                            for(CowEntity moomoo : moo)
+                            FakePlayer fakePlayer = fakePedestalPlayer(pedestal,itemForHand).get();
+                            if(fakePlayer !=null)
                             {
-                                if(!fakePlayer.getHeldItemMainhand().equals(itemInPedestal))
-                                {
-                                    fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,itemForHand);
-                                }
+                                fakePlayer.setSilent(true);
+
+                                if(!fakePlayer.getPosition().equals(posOfPedestal))fakePlayer.setPosition(posOfPedestal.getX(),posOfPedestal.getY(),posOfPedestal.getZ());
+                                if(!fakePlayer.getHeldItemMainhand().equals(itemForHand))fakePlayer.setHeldItem(Hand.MAIN_HAND,itemForHand);
                                 ActionResultType result = moomoo.func_230254_b_(fakePlayer,Hand.MAIN_HAND);
                                 fluid = getFluidInItem(fakePlayer.getHeldItemMainhand());
-                                if (result.isSuccessOrConsume() && addFluid(pedestal,coinInPedestal,fluid,true))
+                                if (result.isSuccessOrConsume() && !fluid.isEmpty() &&addFluid(pedestal,coinInPedestal,fluid,true))
                                 {
                                     BlockPos mooie = moomoo.getPosition();
                                     if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,mooie.getX(),mooie.getY()+0.5,mooie.getZ(),255,255,255));

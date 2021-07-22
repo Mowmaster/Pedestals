@@ -2090,7 +2090,7 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
     {
         World world = pedestal.getWorld();
         ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
-        return new WeakReference<FakePlayer>(new PedestalFakePlayer(sworld ,getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal.getPos(),(pedestal.hasTool())?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY)));
+        return new WeakReference<FakePlayer>(new PedestalFakePlayer(sworld ,getPlayerFromCoin(pedestal.getCoinOnPedestal()), getPlayerNameFromCoin(pedestal.getCoinOnPedestal()),pedestal));
     }
 
     public WeakReference<FakePlayer> fakePedestalPlayer(PedestalTileEntity pedestal, ItemStack itemInHand)

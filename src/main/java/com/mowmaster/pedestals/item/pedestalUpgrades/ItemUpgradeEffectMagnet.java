@@ -4,6 +4,7 @@ import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -23,6 +24,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoader;
+import net.minecraftforge.items.ItemHandlerHelper;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -30,6 +34,7 @@ import java.util.List;
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 
+//public class ItemUpgradeEffectMagnet extends ItemUpgradeBase implements ICurioItem
 public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
 {
     public ItemUpgradeEffectMagnet(Item.Properties builder) {super(builder.group(PEDESTALS_TAB));}
@@ -130,6 +135,38 @@ public class ItemUpgradeEffectMagnet extends ItemUpgradeBase
             }
         }
     }
+
+    /*
+    Just a failed test
+    @Override
+    public void curioTick(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
+
+        if(livingEntity instanceof PlayerEntity)
+        {
+            PlayerEntity player = ((PlayerEntity)livingEntity);
+            World world = player.getEntityWorld();
+            if(world.isRemote)
+            {
+                BlockPos pos = player.getPosition();
+                int width = getAreaWidth(stack);
+                int height = getHeight(stack);
+
+                BlockPos negBlockPos = getNegRangePosEntity(world,pos,width,height);
+                BlockPos posBlockPos = getPosRangePosEntity(world,pos,width,height);
+
+                AxisAlignedBB getBox = new AxisAlignedBB(negBlockPos,posBlockPos);
+
+                List<ItemEntity> itemList = world.getEntitiesWithinAABB(ItemEntity.class,getBox);
+                if(itemList.size()>0)
+                {
+                    for(ItemEntity getItemFromList : itemList)
+                    {
+                        ItemHandlerHelper.giveItemToPlayer(player,getItemFromList.getItem());
+                    }
+                }
+            }
+        }
+    }*/
 
     @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)

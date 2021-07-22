@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.util;
 
 import com.mojang.authlib.GameProfile;
+import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
@@ -25,14 +26,20 @@ public class PedestalFakePlayer extends FakePlayer
     private BlockPos fakePos;
     private ItemStack heldItem;
 
+    public PedestalFakePlayer(ServerWorld world, @Nullable UUID getPlayerUUID, @Nullable String getPlayerName, @Nullable PedestalTileEntity pedestal) {
+        //Think might fix some issues with players showing up as "Pedestals"???
+        super(world, new GameProfile((getPlayerUUID != null)?(getPlayerUUID):(Util.DUMMY_UUID),(getPlayerName != null)?(getPlayerName):("[Pedestals]")));
+        //super(world, new GameProfile((getplayerUUID != null)?(getplayerUUID):(Util.DUMMY_UUID),"[Pedestals]"));
+        this.fakePos = (pedestal.getPos() !=null)?(pedestal.getPos()):(BlockPos.ZERO);
+        //this.heldItem = (pedestal.getToolOnPedestal() !=null )?(pedestal.getToolOnPedestal()):(ItemStack.EMPTY);
+    }
+
     public PedestalFakePlayer(ServerWorld world, @Nullable UUID getPlayerUUID, @Nullable String getPlayerName, @Nullable BlockPos setPos, @Nullable ItemStack toolHeld) {
         //Think might fix some issues with players showing up as "Pedestals"???
         super(world, new GameProfile((getPlayerUUID != null)?(getPlayerUUID):(Util.DUMMY_UUID),(getPlayerName != null)?(getPlayerName):("[Pedestals]")));
         //super(world, new GameProfile((getplayerUUID != null)?(getplayerUUID):(Util.DUMMY_UUID),"[Pedestals]"));
         this.fakePos = (setPos !=null)?(setPos):(BlockPos.ZERO);
-        this.heldItem = (toolHeld !=null )?(toolHeld):(ItemStack.EMPTY);
-
-
+        //this.heldItem = (toolHeld !=null )?(toolHeld):(ItemStack.EMPTY);
     }
 
 
@@ -60,8 +67,7 @@ public class PedestalFakePlayer extends FakePlayer
     }
 
     @Override
-    public void setHeldItem(Hand hand, ItemStack stack) {
-        super.setHeldItem(hand, heldItem);
+    protected void playEquipSound(ItemStack stack) {
+        //do nothing
     }
-
 }
