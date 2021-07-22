@@ -114,7 +114,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                     {
                         int i = getNextSlotWithEnchantedItem(pedestal,cap,getStackInPedestal(world,posOfPedestal));
 
-                        if(i>0)
+                        if(i>=0)
                         {
                             itemFromInv = handler.getStackInSlot(i);
                             int maxXp = readMaxXpFromNBT(coinInPedestal);
@@ -143,7 +143,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                         }
                         else
                         {
-                            if(i>0)
+                            if(i>=0)
                             {
                                 itemFromInv = handler.getStackInSlot(i);
                                 ItemStack toReturn = itemFromInv.copy();
