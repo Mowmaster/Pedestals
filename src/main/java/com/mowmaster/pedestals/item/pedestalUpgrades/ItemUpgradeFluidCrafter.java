@@ -7,6 +7,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -151,15 +152,15 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
 
         //Dont bother unless pedestal is empty
         //Yes i'm being lazy here...
+        LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
 
-        if(itemInPedestal.isEmpty())
+        if(cap.isPresent())
         {
-            LazyOptional<IItemHandler> cap = findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, pedestalPos),true);
+            if(itemInPedestal.isEmpty()) {
 
-            if(!isInventoryEmpty(cap))
-            {
                 //Get Inventory Below
-                if(cap.isPresent()) {
+                if(!isInventoryEmpty(cap))
+                {
                     IItemHandler handler = cap.orElse(null);
                     TileEntity invToPullFrom = world.getTileEntity(posInventory);
                     int intInventorySlotCount = handler.getSlots();//normal chests return value of 1-27
@@ -172,7 +173,7 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                         {
                             //If they Dont Match, this should force that
                             //System.out.println("CurrentStackSizeOfInv: "+stackCurrent.size());
-                            if(stackCurrent.size() != intInventorySlotCount)
+                            if((stackCurrent.size() != intInventorySlotCount) || checkFirstNine(cap,stackCurrent))
                             {
                                 List<ItemStack> stackIn = buildInventoryQueue(pedestal);
                                 writeInventoryQueueToNBT(coin,stackIn);
@@ -399,6 +400,35 @@ public class ItemUpgradeFluidCrafter extends ItemUpgradeBaseFluid
                 }
             }
         }
+        else
+        {
+            if(craftingCurrent.size()>0)removeCraftingQueue(coin);
+            if(stackCurrent.size()>0)removeInventoryQueue(coin);
+        }
+    }
+
+    private  boolean checkFirstNine(LazyOptional<IItemHandler> cap, List<ItemStack> queue)
+    {
+        boolean returner = false;
+        if (cap.isPresent())
+        {
+            IItemHandler handler = cap.orElse(null);
+            if(handler != null)
+            {
+                if(handler.getSlots() == queue.size())
+                {
+                    int checksize = (handler.getSlots()>=9)?(9):(handler.getSlots());
+                    int checker = 0;
+                    for (int i=0;i<checksize;i++)
+                    {
+                        if(handler.getStackInSlot(i).equals(queue.get(i)))checker++;
+                    }
+                    if(checker==checksize)returner = true;
+                }
+            }
+        }
+
+        return returner;
     }
 
     @Override
