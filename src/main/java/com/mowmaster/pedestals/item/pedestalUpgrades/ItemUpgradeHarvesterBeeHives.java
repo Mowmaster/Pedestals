@@ -7,7 +7,9 @@ import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
@@ -263,7 +265,9 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
     {
         if(canHarvest(world,target) && !target.getBlock().isAir(target,world,posTarget))
         {
-            ItemStack harvestingShears = (itemInPedestal.isEmpty())?(new ItemStack(Items.SHEARS,1)):(itemInPedestal);
+            ItemStack toolInPed = pedestal.getToolOnPedestal();
+            //Check for tool, if not, check for item on ped, if not then set to shears
+            ItemStack harvestingShears = (toolInPed.isEmpty())?((itemInPedestal.isEmpty())?(new ItemStack(Items.SHEARS,1)):(itemInPedestal)):(itemInPedestal);
             FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
             if(fakePlayer !=null)
             {
@@ -271,26 +275,24 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
                 if(!fakePlayer.getPosition().equals(new BlockPos(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ()))) {fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());}
                 if(!fakePlayer.getHeldItemMainhand().equals(harvestingShears)) {fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,harvestingShears);}
 
-                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,Direction.UP);
+                PlayerInteractEvent.RightClickBlock e = new PlayerInteractEvent.RightClickBlock(fakePlayer,Hand.MAIN_HAND,posTarget,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,true));
                 if (!MinecraftForge.EVENT_BUS.post(e)) {
+
                     ActionResultType type = ((BeehiveBlock)target.getBlock()).onBlockActivated(target,world,posTarget,fakePlayer,Hand.MAIN_HAND,new BlockRayTraceResult(new Vector3d(posTarget.getX(),posTarget.getY(),posTarget.getZ()),Direction.UP,posTarget,true));
                     if(type == ActionResultType.CONSUME || type == ActionResultType.SUCCESS)
                     {
-                        if(!itemInPedestal.isEmpty())
+                        ItemStack itemInFakeBoy = ItemStack.EMPTY;
+                        itemInFakeBoy = IntStream.range(0,fakePlayer.inventory.getSizeInventory())//Int Range
+                                .mapToObj((fakePlayer.inventory)::getStackInSlot)//Function being applied to each interval
+                                .filter(itemStack -> !itemStack.isEmpty())
+                                .filter(itemStack -> (!itemStack.getItem().equals((itemInPedestal.isEmpty())?(Items.GLASS_BOTTLE):(itemInPedestal.getItem()))))
+                                .findFirst().orElse(ItemStack.EMPTY);
+                        BlockPos spawnItemHere = getPosOfBlockBelow(world,posTarget,-1);
+                        pedestal.spawnItemStack(world,spawnItemHere.getX(),spawnItemHere.getY(),spawnItemHere.getZ(),itemInFakeBoy);
+                        int getSlot = getPlayerSlotWithMatchingStackExact(fakePlayer.inventory,itemInFakeBoy);
+                        if(getSlot>=0 && !fakePlayer.inventory.getStackInSlot(0).getItem().equals(itemInPedestal.getItem()))
                         {
-                            ItemStack itemInFakeBoy = ItemStack.EMPTY;
-                            itemInFakeBoy = IntStream.range(0,fakePlayer.inventory.getSizeInventory())//Int Range
-                                    .mapToObj((fakePlayer.inventory)::getStackInSlot)//Function being applied to each interval
-                                    .filter(itemStack -> !itemStack.isEmpty())
-                                    .filter(itemStack -> !itemStack.getItem().equals(itemInPedestal.getItem()))
-                                    .findFirst().orElse(ItemStack.EMPTY);
-                            BlockPos spawnItemHere = getPosOfBlockBelow(world,posTarget,-1);
-                            pedestal.spawnItemStack(world,spawnItemHere.getX(),spawnItemHere.getY(),spawnItemHere.getZ(),itemInFakeBoy);
-                            int getSlot = getPlayerSlotWithMatchingStackExact(fakePlayer.inventory,itemInFakeBoy);
-                            if(getSlot>=0 && !fakePlayer.inventory.getStackInSlot(0).getItem().equals(itemInPedestal.getItem()))
-                            {
-                                fakePlayer.inventory.removeStackFromSlot(getSlot);
-                            }
+                            fakePlayer.inventory.removeStackFromSlot(getSlot);
                         }
                     }
                 }
@@ -346,6 +348,14 @@ public class ItemUpgradeHarvesterBeeHives extends ItemUpgradeBase
         }
 
         return false;
+    }
+
+    @Override
+    public void actionOnCollideWithBlock(PedestalTileEntity tilePedestal, Entity entityIn) {
+        if(entityIn instanceof BeeEntity)
+        {
+            ((BeeEntity)entityIn).setAngerTime(0);
+        }
     }
 
     @Override
