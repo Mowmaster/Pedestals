@@ -436,6 +436,12 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
                 //System.out.println("Is Valid");
 
+                //Override
+                if(slot == -1)
+                {
+                    return true;
+                }
+
                 ItemStack filterOnPedestal = getFilterInPedestal();
                 if(filterOnPedestal.getItem() instanceof ItemFilterBase)
                 {
