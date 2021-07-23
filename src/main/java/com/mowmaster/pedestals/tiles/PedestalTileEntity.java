@@ -579,6 +579,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     ResourceLocation grabNotTools = new ResourceLocation("pedestals", "pedestal_tool_blacklist");
     ITag<Item> GET_NOTTOOLS = ItemTags.getCollection().get(grabNotTools);
 
+    //Pack Devs *Could* modify this list, but its really only intended for the mod dev as a temp solution.
     ResourceLocation filtersBreakTheseUpgrades = new ResourceLocation("pedestals", "filter_broke_these_upgrades");
     ITag<Item> FILTER_BROKE_UPGRADES = ItemTags.getCollection().get(filtersBreakTheseUpgrades);
 
