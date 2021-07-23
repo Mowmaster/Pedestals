@@ -158,6 +158,7 @@ public class ItemFilterBase extends Item implements IFilterBase
         return canAcceptCount(pedestal, pedestal.getWorld(), pedestal.getPos(), pedestal.getItemInPedestal(), itemStackIncoming);
     }
 
+    @Override
     public int canAcceptCount(PedestalTileEntity pedestal, World world, BlockPos posPedestal, ItemStack inPedestal, ItemStack itemStackIncoming)
     {
         return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
@@ -180,7 +181,7 @@ public class ItemFilterBase extends Item implements IFilterBase
                     ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
                     //Should prevent it from its nbt changing???
 
-                    if(itemInHand.getItem() instanceof ItemFilterBase)
+                    if(itemInHand.getItem() instanceof IFilterBase)
                     {
                         boolean getCurrentType = getFilterType(itemInHand);
                         setFilterType(itemInHand,!getCurrentType);
@@ -201,7 +202,7 @@ public class ItemFilterBase extends Item implements IFilterBase
                 if(p_77659_2_.isCrouching())
                 {
                     ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
-                    if(itemInHand.getItem() instanceof ItemFilterBase)
+                    if(itemInHand.getItem() instanceof IFilterBase)
                     {
                         ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
                         BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);

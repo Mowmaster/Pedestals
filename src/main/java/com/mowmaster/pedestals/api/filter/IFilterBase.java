@@ -86,6 +86,8 @@ public interface IFilterBase
      */
     int canAcceptCount(PedestalTileEntity pedestal, ItemStack itemStackIncoming);
 
+    int canAcceptCount(PedestalTileEntity tile, World world, BlockPos pos, ItemStack itemInPedestal, ItemStack stack);
+
     /**
      * @param filterStack
      * Used to remove the nbt "filterqueue"
@@ -146,4 +148,5 @@ public interface IFilterBase
      * Generally this will output filter info to the players chat in game.
      */
     void chatDetails(PlayerEntity player, PedestalTileEntity pedestal);
+
 }

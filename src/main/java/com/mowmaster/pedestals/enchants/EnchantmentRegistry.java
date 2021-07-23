@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.enchants;
 
 import com.google.common.base.Preconditions;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.util.ResourceLocation;
@@ -18,7 +18,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD)
 public final class EnchantmentRegistry
 {
-    public static final EnchantmentType COINUPGRADE = EnchantmentType.create("pedestalupgrade", ItemUpgradeBase.class::isInstance);
+    public static final EnchantmentType COINUPGRADE = EnchantmentType.create("pedestalupgrade", IUpgradeBase.class::isInstance);
 
     public static final Enchantment OPERATIONSPEED = new EnchantmentOperationSpeed();
     public static final Enchantment RANGE = new EnchantmentRange();

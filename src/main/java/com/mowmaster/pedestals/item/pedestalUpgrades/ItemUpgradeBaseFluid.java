@@ -1,8 +1,9 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
+import com.mowmaster.pedestals.api.filter.IFilterBase;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.crafting.CalculateColor;
 import com.mowmaster.pedestals.item.ItemUpgradeTool;
-import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
@@ -123,9 +124,9 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
             Item item = incomingFluidStack.getFluid().getFilledBucket();
             ItemStack incomingBucket = new ItemStack(item);
 
-            if(filter.getItem() instanceof ItemFilterBase)
+            if(filter.getItem() instanceof IFilterBase)
             {
-                return ((ItemFilterBase)filter.getItem()).canAcceptItem(pedestalReceiving,incomingBucket);
+                return ((IFilterBase)filter.getItem()).canAcceptItem(pedestalReceiving,incomingBucket);
             }
         }
         return true;
@@ -224,7 +225,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                                     mainPedestalTile.update();
                                                     addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                     storedPedestalTile.update();
-                                                    if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
+                                                    if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof IUpgradeBase)((IUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                                 }
                                                 else
                                                 {
@@ -245,7 +246,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                                         mainPedestalTile.update();
                                                         addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                         storedPedestalTile.update();
-                                                        if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
+                                                        if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof IUpgradeBase)((IUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                                     }
                                                 }
                                                 //}
@@ -277,7 +278,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                                 mainPedestalTile.update();
                                                 addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                 storedPedestalTile.update();
-                                                if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
+                                                if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof IUpgradeBase)((IUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                             }
                                             else
                                             {
@@ -298,7 +299,7 @@ public class ItemUpgradeBaseFluid extends ItemUpgradeBase {
                                                     mainPedestalTile.update();
                                                     addFluid(pedestal, storedPedestalCoin,fluidToStore,false);
                                                     storedPedestalTile.update();
-                                                    if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase)((ItemUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
+                                                    if(storedPedestalTile.getCoinOnPedestal().getItem() instanceof IUpgradeBase)((IUpgradeBase)storedPedestalTile.getCoinOnPedestal().getItem()).notifyTransferUpdate(storedPedestalTile);
                                                 }
                                             }
                                             //}

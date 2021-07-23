@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
@@ -50,7 +51,7 @@ public class ItemUpgradeEnderFilteredRestock extends ItemUpgradeBase
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        if(stack.getItem() instanceof ItemUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
+        if(stack.getItem() instanceof IUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
         {
             return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
         }

@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalFilters;
 
+import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
@@ -74,7 +75,7 @@ public class ItemFilterRestricted extends ItemFilterBase
                 if(p_77659_2_.isCrouching())
                 {
                     ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
-                    if(itemInHand.getItem() instanceof ItemFilterBase)
+                    if(itemInHand.getItem() instanceof IFilterBase)
                     {
                         ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
                         BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);

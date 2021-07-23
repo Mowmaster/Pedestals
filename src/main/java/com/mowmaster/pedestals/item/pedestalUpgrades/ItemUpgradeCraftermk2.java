@@ -2,13 +2,11 @@ package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
 import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
-import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;

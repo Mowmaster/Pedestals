@@ -1,17 +1,13 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mojang.authlib.GameProfile;
-import com.mowmaster.pedestals.blocks.PedestalBlock;
+import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.enchants.*;
-import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -37,25 +33,14 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.common.extensions.IForgeBlock;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -332,9 +317,9 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
             if(pedestal.hasFilter())
             {
                 Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
-                if(filterInPedestal instanceof ItemFilterBase)
+                if(filterInPedestal instanceof IFilterBase)
                 {
-                    returner = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,new ItemStack(blockIn));
+                    returner = ((IFilterBase) filterInPedestal).canAcceptItem(pedestal,new ItemStack(blockIn));
                 }
             }
         }

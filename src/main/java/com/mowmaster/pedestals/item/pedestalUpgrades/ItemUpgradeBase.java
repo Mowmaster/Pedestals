@@ -1,11 +1,11 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
+import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.item.ItemCraftingPlaceholder;
-import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import com.mowmaster.pedestals.util.PedestalFakePlayer;
@@ -554,9 +554,9 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         if(pedestal.hasFilter())
         {
             Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
-            if(filterInPedestal instanceof ItemFilterBase)
+            if(filterInPedestal instanceof IFilterBase)
             {
-                returner = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,stackIn);
+                returner = ((IFilterBase) filterInPedestal).canAcceptItem(pedestal,stackIn);
             }
 
         }
@@ -807,7 +807,7 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        if(stack.getItem() instanceof ItemUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
+        if(stack.getItem() instanceof IUpgradeBase && enchantment.getRegistryName().getNamespace().equals(Reference.MODID))
         {
             return !EnchantmentRegistry.COINUPGRADE.equals(enchantment.type) && super.canApplyAtEnchantingTable(stack, enchantment);
         }
@@ -1963,9 +1963,9 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
             if(pedestal.hasFilter())
             {
                 Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
-                if(filterInPedestal instanceof ItemFilterBase)
+                if(filterInPedestal instanceof IFilterBase)
                 {
-                    filter = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,itemStackIncoming);
+                    filter = ((IFilterBase) filterInPedestal).canAcceptItem(pedestal,itemStackIncoming);
                 }
             }
             //Should return true by default, or fals eif a filter or coin blocks it???
@@ -2731,9 +2731,9 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         if(pedestal.hasFilter())
         {
             ItemStack patternStack = pedestal.getFilterInPedestal();
-            if(patternStack.getItem() instanceof ItemFilterBase)
+            if(patternStack.getItem() instanceof IFilterBase)
             {
-                ItemFilterBase filterClassItem = ((ItemFilterBase)patternStack.getItem());
+                IFilterBase filterClassItem = ((IFilterBase)patternStack.getItem());
                 List<ItemStack> patternList = filterClassItem.readFilterQueueFromNBT(patternStack);
                 Map<ItemStack, List<ItemStack>> mappedOutputIngredients = buildIngredientList(pedestal, patternList);
                 writeOutputIngredientMapToNBT(pedestal.getCoinOnPedestal(),mappedOutputIngredients);
@@ -2984,6 +2984,7 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         }
     }
 
+    @Override
     public void notifyTransferUpdate(PedestalTileEntity receiverTile)
     {
 

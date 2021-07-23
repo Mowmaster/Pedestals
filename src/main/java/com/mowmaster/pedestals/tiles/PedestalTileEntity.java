@@ -437,9 +437,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 //System.out.println("Is Valid");
 
                 ItemStack filterOnPedestal = getFilterInPedestal();
-                if(filterOnPedestal.getItem() instanceof ItemFilterBase)
+                if(filterOnPedestal.getItem() instanceof IFilterBase)
                 {
-                    ItemFilterBase IFB = (ItemFilterBase)filterOnPedestal.getItem();
+                    IFilterBase IFB = (IFilterBase)filterOnPedestal.getItem();
                     //System.out.println(IUB.customSlotLimit(getTile(),stack));
                     return IFB.canAcceptItem(getTile(),stack);
                 }
@@ -464,9 +464,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
 
                 ItemStack filterOnPedestal = getFilterInPedestal();
-                if(filterOnPedestal.getItem() instanceof ItemFilterBase)
+                if(filterOnPedestal.getItem() instanceof IFilterBase)
                 {
-                    ItemFilterBase IFB = (ItemFilterBase)filterOnPedestal.getItem();
+                    IFilterBase IFB = (IFilterBase)filterOnPedestal.getItem();
                     //System.out.println(IUB.customSlotLimit(getTile(),stack));
                     return IFB.canAcceptCount(getTile(), getWorld(),getPos(),getItemInPedestal(),stack);
                 }
@@ -1085,22 +1085,28 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
     public boolean addCoin(PlayerEntity player, ItemStack coinFromBlock,boolean simulate)
     {
-        if(!hasCoin())
+        if(hasCoin())
         {
-            if(!simulate)
-            {
-                IItemHandler ph = privateHandler.orElse(null);
-                ItemStack itemFromBlock = coinFromBlock.copy();
-                itemFromBlock.setCount(1);
-                //We know this is what the item is because of the pedestal block check
-                ((IUpgradeBase)itemFromBlock.getItem()).setPlayerOnCoin(itemFromBlock,player);
-                if(!hasCoin())ph.insertItem(0,itemFromBlock,false);
-                //if(coinFromBlock.getItem() instanceof IUpgradeBase)((IUpgradeBase)coinFromBlock.getItem()).onPedestalNeighborChanged(this);
-                //update();
-            }
-            return true;
+            return false;
         }
-        return false;
+        else
+        {
+            IItemHandler ph = privateHandler.orElse(null);
+            ItemStack coinItem = coinFromBlock.copy();
+            coinItem.setCount(1);
+            if(!hasCoin() && ph.isItemValid(0,coinItem))
+            {
+                if(!simulate)
+                {
+                    ((IUpgradeBase)coinFromBlock.getItem()).setPlayerOnCoin(coinFromBlock,player);
+                    ph.insertItem(0,coinItem,false);
+
+
+                }
+                return true;
+            }
+            else return false;
+        }
     }
 
     /*============================================================================

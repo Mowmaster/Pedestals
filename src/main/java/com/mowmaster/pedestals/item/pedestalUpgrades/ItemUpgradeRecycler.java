@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Maps;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.enchants.EnchantmentArea;
 import com.mowmaster.pedestals.enchants.EnchantmentCapacity;
 import com.mowmaster.pedestals.enchants.EnchantmentOperationSpeed;
@@ -165,7 +166,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                         ItemStack resultRecycler = (jsonResults.iterator().next().isEmpty())?(ItemStack.EMPTY):(jsonResults.iterator().next());
                         Item getItemResultRecycler = resultRecycler.getItem();
                         int slotItemToGrind = getSlotWithMatchingStackExact(cap,nextItemToGrind);
-                        if(!nextItemToGrind.isEmpty() && (nextItemToGrind.getItem() instanceof ItemUpgradeBase || nextItemToGrind.getItem() instanceof TieredItem || nextItemToGrind.getItem() instanceof ArmorItem ||  !resultRecycler.isEmpty()) && !BLACKLISTED.contains(nextItemToGrind.getItem()))
+                        if(!nextItemToGrind.isEmpty() && (nextItemToGrind.getItem() instanceof IUpgradeBase || nextItemToGrind.getItem() instanceof TieredItem || nextItemToGrind.getItem() instanceof ArmorItem ||  !resultRecycler.isEmpty()) && !BLACKLISTED.contains(nextItemToGrind.getItem()))
                         {
                             Collection<ItemStack> smeltedResults = getNormalResults(getNormalRecipe(world,nextItemToGrind),nextItemToGrind);
                             //Make sure recipe output isnt empty

@@ -1,8 +1,8 @@
 package com.mowmaster.pedestals.blocks;
 
+import com.mowmaster.pedestals.api.filter.IFilterBase;
+import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.item.*;
-import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
-import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
@@ -408,14 +408,14 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                         ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeParticleDiffuser());
                     }
                 }
-                else if(getItemInOffHand.equals(ItemUpgradeTool.UPGRADE) || getItemInOffHand instanceof ItemUpgradeBase)
+                else if(getItemInOffHand.equals(ItemUpgradeTool.UPGRADE) || getItemInOffHand instanceof IUpgradeBase)
                 {
                     if(tilePedestal.hasCoin())
                     {
                         ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeCoin());
                     }
                 }
-                else if(getItemInOffHand.equals(ItemFilterSwapper.FILTERTOOL) || getItemInOffHand instanceof ItemFilterBase)
+                else if(getItemInOffHand.equals(ItemFilterSwapper.FILTERTOOL) || getItemInOffHand instanceof IFilterBase)
                 {
                     if(tilePedestal.hasFilter())
                     {
@@ -471,7 +471,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 {
                     return ActionResultType.FAIL;
                 }
-                else if(getItemInOffHand instanceof ItemUpgradeBase)
+                else if(getItemInOffHand instanceof IUpgradeBase)
                 {
                     if(!tilePedestal.hasCoin())
                     {
@@ -570,7 +570,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                         return ActionResultType.SUCCESS;
                     }
                 }
-                else if(getItemInOffHand instanceof ItemFilterBase)
+                else if(getItemInOffHand instanceof IFilterBase)
                 {
                     if(!tilePedestal.hasFilter())
                     {
@@ -777,9 +777,9 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                     {
                         PedestalTileEntity pedestal = (PedestalTileEntity)tile;
                         Item coin = pedestal.getCoinOnPedestal().getItem();
-                        if(coin instanceof ItemUpgradeBase)
+                        if(coin instanceof IUpgradeBase)
                         {
-                            ((ItemUpgradeBase)coin).onPedestalNeighborChanged(pedestal);
+                            ((IUpgradeBase)coin).onPedestalNeighborChanged(pedestal);
                         }
                     }
                 }
@@ -803,9 +803,9 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                     {
                         PedestalTileEntity pedestal = (PedestalTileEntity)tile;
                         Item coin = pedestal.getCoinOnPedestal().getItem();
-                        if(coin instanceof ItemUpgradeBase)
+                        if(coin instanceof IUpgradeBase)
                         {
-                            ((ItemUpgradeBase)coin).onPedestalBelowNeighborChanged(pedestal,p_196271_3_,p_196271_6_);
+                            ((IUpgradeBase)coin).onPedestalBelowNeighborChanged(pedestal,p_196271_3_,p_196271_6_);
                         }
                     }
                 }
@@ -848,9 +848,9 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack itemstack = pedestal.getItemInPedestalOverride();
             ItemStack coin = pedestal.getCoinOnPedestal();
-            if(coin.getItem() instanceof ItemUpgradeBase)
+            if(coin.getItem() instanceof IUpgradeBase)
             {
-                return ((ItemUpgradeBase)coin.getItem()).getComparatorRedstoneLevel(worldIn,pos);
+                return ((IUpgradeBase)coin.getItem()).getComparatorRedstoneLevel(worldIn,pos);
             }
             if(!itemstack.isEmpty())
             {

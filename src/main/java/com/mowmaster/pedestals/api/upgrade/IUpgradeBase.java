@@ -16,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -90,6 +91,14 @@ public interface IUpgradeBase
 
     //Main Method Call that allows the upgrade to do things
     void updateAction(World world, PedestalTileEntity pedestal);
+
+    int getComparatorRedstoneLevel(World worldIn, BlockPos pos);
+
+    void notifyTransferUpdate(PedestalTileEntity receiverTile);
+
+    void onPedestalNeighborChanged(PedestalTileEntity pedestal);
+
+    void onPedestalBelowNeighborChanged(PedestalTileEntity pedestal, BlockState blockChanged, BlockPos blockChangedPos);
 
     //Used to display particles on a pedestal
     void onRandomDisplayTick(PedestalTileEntity pedestal, int ticker, BlockState pedestalState, World world, BlockPos pedestalPos, Random randomNumber);

@@ -1,12 +1,10 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
-import com.mojang.authlib.GameProfile;
+import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.enchants.*;
-import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,7 +19,6 @@ import net.minecraft.item.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -34,21 +31,15 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
@@ -320,9 +311,9 @@ public class ItemUpgradeChopperShrooms extends ItemUpgradeBase
             if(pedestal.hasFilter())
             {
                 Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
-                if(filterInPedestal instanceof ItemFilterBase)
+                if(filterInPedestal instanceof IFilterBase)
                 {
-                    returner = ((ItemFilterBase) filterInPedestal).canAcceptItem(pedestal,new ItemStack(blockIn));
+                    returner = ((IFilterBase) filterInPedestal).canAcceptItem(pedestal,new ItemStack(blockIn));
                 }
             }
         }

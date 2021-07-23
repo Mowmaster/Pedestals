@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.item.pedestalFilters;
 
+import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -55,7 +56,7 @@ public class ItemFilterEnchanted extends ItemFilterBase
                 if(p_77659_2_.isCrouching())
                 {
                     ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
-                    if(itemInHand.getItem() instanceof ItemFilterBase)
+                    if(itemInHand.getItem() instanceof IFilterBase)
                     {
                         boolean getCurrentType = getFilterType(itemInHand);
                         setFilterType(itemInHand,!getCurrentType);
