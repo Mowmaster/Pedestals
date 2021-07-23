@@ -170,6 +170,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
 
                                     if(!getRecipe.isEmpty())
                                     {
+
                                         //Calc max stack size craftable
                                         ItemStack getIngredientStack = stackCurrent.get(intGetNextIteration);
                                         int stackSize = getIngredientStack.getCount();
@@ -186,6 +187,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                         }
 
                                         //Means there is something to craft, realistically since getRecipe.isEmpty is checked already, this should never be < 0
+
                                         if(intBatchCraftingSize > 0)
                                         {
                                             int intRecipeResultCount = getRecipe.getCount();
@@ -215,7 +217,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
 
                                                 getRecipe.setCount(itemsToInsertToPedestal);
                                                 if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                                addToPedestalOverride(world, pedestalPos, getRecipe);
+                                                addToPedestal(world, pedestalPos, getRecipe);
                                                 onPedestalNeighborChanged(pedestal);
                                                 writeStoredIntToNBT(coin,intGetNextIteration+1);
                                             }

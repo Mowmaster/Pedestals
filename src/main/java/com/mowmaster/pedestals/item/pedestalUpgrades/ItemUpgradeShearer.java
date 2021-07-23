@@ -130,7 +130,7 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
                                             BlockPos sheerie = baaaaaa.getPosition();
                                             if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,pedestalPos,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,sheerie.getX(),sheerie.getY()+0.5,sheerie.getZ(),145,145,145));
                                             if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), SoundEvents.ENTITY_SHEEP_SHEAR, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                            pedestal.addItemOverride(drops.get(d));
+                                            pedestal.addItem(drops.get(d));
                                         }
                                     }
                                 }

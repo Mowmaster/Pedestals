@@ -170,7 +170,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                             if (!handler.extractItem(i,adjustedModifier ,true ).isEmpty())
                                             {
                                                 handler.extractItem(i,adjustedModifier ,false );
-                                                pedestal.addItemOverride(getBottle);
+                                                pedestal.addItem(getBottle);
                                                 if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             }
                                         }
@@ -184,7 +184,7 @@ public class ItemUpgradeExpBottler extends ItemUpgradeBaseExp
                                             if (!handler.extractItem(i,adjustedModifier ,true ).isEmpty())
                                             {
                                                 handler.extractItem(i,adjustedModifier ,false);
-                                                pedestal.addItemOverride(getBottle);
+                                                pedestal.addItem(getBottle);
                                                 if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_GENERIC_DRINK, SoundCategory.BLOCKS, 0.25F, 1.0F);
                                             }
                                         }

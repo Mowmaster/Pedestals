@@ -436,12 +436,6 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
                 //System.out.println("Is Valid");
 
-                //Override
-                if(slot == -1)
-                {
-                    return true;
-                }
-
                 ItemStack filterOnPedestal = getFilterInPedestal();
                 if(filterOnPedestal.getItem() instanceof ItemFilterBase)
                 {
@@ -585,6 +579,9 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     ResourceLocation grabNotTools = new ResourceLocation("pedestals", "pedestal_tool_blacklist");
     ITag<Item> GET_NOTTOOLS = ItemTags.getCollection().get(grabNotTools);
 
+    ResourceLocation filtersBreakTheseUpgrades = new ResourceLocation("pedestals", "filter_broke_these_upgrades");
+    ITag<Item> FILTER_BROKE_UPGRADES = ItemTags.getCollection().get(filtersBreakTheseUpgrades);
+
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 10 slots to future proof things
         return new ItemStackHandler(11) {
@@ -615,7 +612,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                if (slot == 0 && stack.getItem() instanceof IUpgradeBase && !hasCoin()) return true;
+                if (slot == 0 && stack.getItem() instanceof IUpgradeBase && !hasCoin() && ((hasFilter())?(!FILTER_BROKE_UPGRADES.contains(stack.getItem())):(true))) return true;
                 if (slot == 1 && stack.getItem().equals(Items.GLOWSTONE) && !hasLight()) return true;
                 if (slot == 2 && stack.getItem().equals(ItemPedestalUpgrades.SPEED) && getSpeed()<5) return true;
                 if (slot == 3 && stack.getItem().equals(ItemPedestalUpgrades.CAPACITY) && getCapacity()<5) return true;
@@ -630,7 +627,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                                 || stack.getToolTypes().contains(ToolType.SHOVEL)
                                 || GET_TOOLS.contains(stack.getItem())
                         ) && !GET_NOTTOOLS.contains(stack.getItem()) && !hasTool()) return true;
-                if (slot == 6 && stack.getItem() instanceof IFilterBase && !stack.getItem().equals(ItemFilterBase.BASEFILTER) && !hasFilter()) return true;
+                if (slot == 6 && stack.getItem() instanceof IFilterBase && !stack.getItem().equals(ItemFilterBase.BASEFILTER) && !hasFilter() && ((hasCoin())?(!FILTER_BROKE_UPGRADES.contains(getCoinOnPedestal().getItem())):(true))) return true;
                 if (slot == 7 && stack.getItem().equals(Items.REDSTONE_TORCH) && !hasTorch()) return true;
                 if (slot == 8 && stack.getItem().equals(ItemPedestalUpgrades.ROUNDROBIN) && !hasRRobin()) return true;
                 if (slot == 9 && stack.getItem().equals(ItemPedestalUpgrades.SOUNDMUFFLER)) return true;

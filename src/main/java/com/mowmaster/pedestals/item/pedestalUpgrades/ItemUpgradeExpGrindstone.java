@@ -136,7 +136,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                                     {
                                         handler.extractItem(i,toReturn.getCount(),false);
                                         if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.BLOCK_GRINDSTONE_USE, SoundCategory.BLOCKS, 0.25F, 1.0F);
-                                        pedestal.addItemOverride(toReturn);
+                                        pedestal.addItem(toReturn);
                                     }
                                 }
                             }
@@ -171,7 +171,7 @@ public class ItemUpgradeExpGrindstone extends ItemUpgradeBaseExp
                 {
                     ItemStack stackInSlot = itemHandler.getStackInSlot(i);
                     //find a slot with items
-                    if(!stackInSlot.isEmpty() && (stackInSlot.isEnchanted() || stackInSlot.getItem() instanceof EnchantedBookItem))
+                    if(!stackInSlot.isEmpty() && (stackInSlot.isEnchanted() || stackInSlot.getItem() instanceof EnchantedBookItem)  && pedestal.canAcceptItems(pedestal.getWorld(),pedestal.getPos(),stackInSlot)>0)
                     {
                         //check if it could pull the item out or not
                         if(!itemHandler.extractItem(i,1 ,true ).equals(ItemStack.EMPTY))

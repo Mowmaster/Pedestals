@@ -206,7 +206,7 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
                                     if(intGetNextIteration==counter)
                                     {
                                         ItemStack result = entry.getKey();
-                                        if(result != null) {
+                                        if(result != null && pedestal.canAcceptItems(world,pedestalPos,result)>0) {
                                             List<ItemStack> ingredientList = entry.getValue();
                                             int hasIngredents = 0;
 
