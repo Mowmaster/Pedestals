@@ -1,5 +1,7 @@
 package com.mowmaster.pedestals;
 
+import com.mowmaster.pedestals.blocks.PedestalBlock;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -70,7 +72,14 @@ public class Pedestals
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here
-            LOGGER.info("HELLO from Register Block");
+            //LOGGER.info("HELLO from Register Block");
+            PedestalBlock.onBlockRegistryReady(blockRegistryEvent);
+        }
+
+        @SubscribeEvent
+        public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
+
+            PedestalBlock.onItemRegistryReady(itemRegistryEvent);
         }
     }
 }
