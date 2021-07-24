@@ -1,8 +1,0 @@
-{
-  "parent": "pedestals:block/pedestallit",
-  "textures": {
-    "glow":"pedestals:blocks/ancient/ancientglowstone",
-    "type": "pedestals:blocks/stone/stone/tintstone",
-    "typepart":"pedestals:blocks/stone/stone/tintstone"
-  }
-}
