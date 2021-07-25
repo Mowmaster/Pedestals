@@ -26,13 +26,13 @@ public class ClientPedestals {
     @SubscribeEvent
     public static void onBlockColorsReady(ColorHandlerEvent.Block event)
     {
-        PedestalBlock.handleBlockColors(event);
+        //PedestalBlock.handleBlockColors(event);
         //PedestalBlock.handleBlockColors(event);
     }
 
     @SubscribeEvent
     public static void onItemColorsReady(ColorHandlerEvent.Item event)
     {
-        PedestalBlock.handleItemColors(event);
+        //PedestalBlock.handleItemColors(event);
     }
 }

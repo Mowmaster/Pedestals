@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals;
 
 import com.mowmaster.pedestals.blocks.PedestalBlock;
+import com.mowmaster.pedestals.creativetab.PedestalsTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -25,6 +26,7 @@ public class Pedestals
 {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
+    public static final PedestalsTab PEDESTALS_TAB = new PedestalsTab();
 
     public Pedestals() {
         // Register the setup method for modloading
