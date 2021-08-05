@@ -1,0 +1,7 @@
+{
+  "name": "Entity Filterable",
+  "description": "Upgrades that can be configured to only effect specific entities.",
+  "icon": "pedestals:coin/attack",
+  "sortnum": 6,
+  "parent": "upgrades/upgrade_index"
+}

@@ -10,7 +10,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemAreaBook extends ItemEnchantableBookBase implements IAreaBook {
 
-    public static final Item AREA = new ItemEnchantableBookBase().setRegistryName(new ResourceLocation(MODID, "bookarea"));
+    public static final Item AREA = new ItemAreaBook().setRegistryName(new ResourceLocation(MODID, "bookarea"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

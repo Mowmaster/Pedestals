@@ -1,0 +1,7 @@
+{
+  "name": "Augments vs Upgrades",
+  "description": "",
+  "icon": "pedestals:upgradecapacity",
+  "sortnum": 3,
+  "parent": "getting_started/getting_started"
+}

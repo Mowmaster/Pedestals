@@ -1,0 +1,7 @@
+{
+  "name": "Fluid Upgrades",
+  "description": "All upgrades that can use or manipulate fluids.",
+  "icon": "pedestals:coin/fluidtank",
+  "sortnum": 2,
+  "parent": "upgrades/upgrade_index"
+}

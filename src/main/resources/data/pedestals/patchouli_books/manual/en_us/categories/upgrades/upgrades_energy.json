@@ -1,0 +1,7 @@
+{
+  "name": "Energy Upgrades",
+  "description": "All upgrades that can use energy.",
+  "icon": "pedestals:coin/rftank",
+  "sortnum": 1,
+  "parent": "upgrades/upgrade_index"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Machine Type Upgrades",
+  "description": "Upgrades that need items for input in order to make an output.",
+  "icon": "pedestals:coin/smelter",
+  "sortnum": 5,
+  "parent": "upgrades/upgrade_index"
+}

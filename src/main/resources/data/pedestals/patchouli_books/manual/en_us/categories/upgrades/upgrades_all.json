@@ -1,0 +1,7 @@
+{
+  "name": "All Upgrades",
+  "description": "List of All Upgrades regardless of type/category.",
+  "icon": "pedestals:coin/default",
+  "sortnum": 9,
+  "parent": "upgrades/upgrade_index"
+}

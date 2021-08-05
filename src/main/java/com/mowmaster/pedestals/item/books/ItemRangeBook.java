@@ -10,7 +10,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemRangeBook extends ItemEnchantableBookBase implements IRangeBook {
 
-    public static final Item RANGE = new ItemEnchantableBookBase().setRegistryName(new ResourceLocation(MODID, "bookrange"));
+    public static final Item RANGE = new ItemRangeBook().setRegistryName(new ResourceLocation(MODID, "bookrange"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

@@ -1,0 +1,7 @@
+{
+  "name": "Redstone Control",
+  "description": "",
+  "icon": "minecraft:redstone_torch",
+  "sortnum": 9,
+  "parent": "getting_started/getting_started"
+}

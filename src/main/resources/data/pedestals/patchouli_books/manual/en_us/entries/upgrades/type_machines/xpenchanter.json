@@ -1,0 +1,15 @@
+{
+  "category": "upgrades/upgrades_machines",
+  "name": "XP Enchanter",
+  "subtitle": "Imports Energy from other mods cables/blocks into the Pedestal Energy Network (PEN).",
+  "icon": "pedestals:coin/xpenchanter",
+  "sortnum": 7,
+  "priority": true,
+  "pages": [
+    {
+      "title": "XP Enchanter",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_xp/xpenchanter)XP Enchanter "
+    }
+  ]
+}

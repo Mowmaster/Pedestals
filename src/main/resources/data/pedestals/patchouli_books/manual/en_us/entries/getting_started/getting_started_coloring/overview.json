@@ -1,0 +1,14 @@
+{
+  "category": "getting_started/getting_started_coloring",
+  "name": "Color Pallet Overview",
+  "subtitle": "",
+  "icon": "pedestals:itemcolorpalletdefault",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "text": ""
+    }
+  ]
+}

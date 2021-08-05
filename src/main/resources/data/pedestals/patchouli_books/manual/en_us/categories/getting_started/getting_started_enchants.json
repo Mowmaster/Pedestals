@@ -1,0 +1,7 @@
+{
+  "name": "Pedestal Enchants",
+  "description": "",
+  "icon": "minecraft:enchanted_book",
+  "sortnum": 4,
+  "parent": "getting_started/getting_started"
+}

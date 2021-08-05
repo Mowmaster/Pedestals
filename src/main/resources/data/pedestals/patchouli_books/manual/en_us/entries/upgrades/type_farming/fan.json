@@ -1,0 +1,15 @@
+{
+  "category": "upgrades/upgrades_farming",
+  "name": "Fan",
+  "subtitle": "Imports items from inventories into the pedestal.",
+  "icon": "pedestals:coin/fan",
+  "sortnum": 11,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Fan",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_mob/fan)Fan "
+    }
+  ]
+}

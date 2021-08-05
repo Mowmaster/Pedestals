@@ -1,0 +1,15 @@
+{
+  "category": "upgrades/upgrades_farming",
+  "name": "Auto Attacker",
+  "subtitle": "Imports items from inventories into the pedestal.",
+  "icon": "pedestals:coin/attack",
+  "sortnum": 10,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Auto Attacker",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_mob/attacker)Auto Attacker "
+    }
+  ]
+}

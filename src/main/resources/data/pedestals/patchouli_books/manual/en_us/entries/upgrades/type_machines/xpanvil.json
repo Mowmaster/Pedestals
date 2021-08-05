@@ -1,0 +1,15 @@
+{
+  "category": "upgrades/upgrades_machines",
+  "name": "XP Anvil",
+  "subtitle": "Imports Energy from other mods cables/blocks into the Pedestal Energy Network (PEN).",
+  "icon": "pedestals:coin/xpanvil",
+  "sortnum": 8,
+  "priority": true,
+  "pages": [
+    {
+      "title": "XP Anvil",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_xp/xpanvil)XP Anvil "
+    }
+  ]
+}

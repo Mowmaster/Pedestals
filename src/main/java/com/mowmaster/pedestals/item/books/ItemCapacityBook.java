@@ -10,7 +10,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemCapacityBook extends ItemEnchantableBookBase implements ICapacityBook {
 
-    public static final Item CAPACITY = new ItemEnchantableBookBase().setRegistryName(new ResourceLocation(MODID, "bookcapacity"));
+    public static final Item CAPACITY = new ItemCapacityBook().setRegistryName(new ResourceLocation(MODID, "bookcapacity"));
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {

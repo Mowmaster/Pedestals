@@ -1,0 +1,15 @@
+{
+  "category": "upgrades/upgrades_farming",
+  "name": "Auto Turret",
+  "subtitle": "Imports items from inventories into the pedestal.",
+  "icon": "pedestals:coin/turret",
+  "sortnum": 11,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Auto Turret",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_mob/turret)Auto Turret "
+    }
+  ]
+}

@@ -10,7 +10,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemMagnetBook extends ItemEnchantableBookBase implements IMagnetBook {
 
-    public static final Item MAGNET = new ItemEnchantableBookBase().setRegistryName(new ResourceLocation(MODID, "bookmagnet"));
+    public static final Item MAGNET = new ItemMagnetBook().setRegistryName(new ResourceLocation(MODID, "bookmagnet"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

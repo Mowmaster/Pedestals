@@ -1,0 +1,15 @@
+{
+  "category": "upgrades/upgrades_machines",
+  "name": "XP Bottler",
+  "subtitle": "Imports Energy from other mods cables/blocks into the Pedestal Energy Network (PEN).",
+  "icon": "pedestals:coin/xpbottler",
+  "sortnum": 10,
+  "priority": true,
+  "pages": [
+    {
+      "title": "XP Bottler",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_xp/xpbottler)XP Bottler "
+    }
+  ]
+}

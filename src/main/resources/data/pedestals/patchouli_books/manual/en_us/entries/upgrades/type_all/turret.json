@@ -1,0 +1,20 @@
+{
+  "category": "upgrades/upgrades_all",
+  "name": "Auto Turret",
+  "subtitle": "Imports items from inventories into the pedestal.",
+  "icon": "pedestals:coin/turret",
+  "sortnum": 11,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "General Vague Overview"
+    },
+    {
+      "title": "Original Page",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_mob/attacker)Auto Attacker "
+    }
+  ]
+}

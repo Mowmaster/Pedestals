@@ -1,0 +1,7 @@
+{
+  "name": "Misc Upgrades",
+  "description": "Upgrades that don't fit in a specific category.",
+  "icon": "pedestals:coin/teleporter",
+  "sortnum": 8,
+  "parent": "upgrades/upgrade_index"
+}

@@ -10,7 +10,7 @@ import static com.mowmaster.pedestals.references.Reference.MODID;
 
 public class ItemAdvancedBook extends ItemEnchantableBookBase implements IAdvancedBook {
 
-    public static final Item ADVANCED = new ItemEnchantableBookBase().setRegistryName(new ResourceLocation(MODID, "bookadvanced"));
+    public static final Item ADVANCED = new ItemAdvancedBook().setRegistryName(new ResourceLocation(MODID, "bookadvanced"));
 
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)

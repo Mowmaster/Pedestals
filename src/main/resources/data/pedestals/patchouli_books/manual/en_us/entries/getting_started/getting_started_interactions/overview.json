@@ -1,0 +1,40 @@
+{
+  "category": "getting_started/getting_started_interactions",
+  "name": "Overview",
+  "subtitle": "",
+  "icon": "minecraft:map",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "text": "There is two types of interaction with a pedestal. $(li)Inserting/Extracting Items $(li)Inserting/Extracting Modifications"
+    },
+    {
+      "title": "Items (Inserting)",
+      "type": "text",
+      "text": "When inserting items as ITEMS, they will be placed on the pedestal and start rotating or if the pedestal is linked, it'll follow the path thats been setup. $(br) Inserting items can be done with items in the main hand, then Right Click the pedestal, this will remove all items from your hand, placing them in the pedestal."
+    },
+    {
+      "title": "Items (Extracting)",
+      "type": "text",
+      "text": "With an empty Main Hand, a single left click will extract 1 item from the pedestal at a time, while a crouch + left click will remove up to a stack from the pedestal putting it in your hand. $(br)If the item in you hand matches the item being extracted, you can continue to pull out single items or stacks from the pedestal, itll fill up your inventory, and then overflow will spill out onto the ground."
+    },
+    {
+      "title": "Modifications",
+      "type": "text",
+      "text": "Modifications are anything being insert into a pedestal thats not intended to be insert like an item, this might be things like... $(li)Upgrades $(li)Filters, $(li)Tools, $(li)Augments $(li)Colored Pallets $(li)Glowstone $(li)Redstone Torches"
+    },
+    {
+      "title": "Modifications (Inserting)",
+      "type": "text",
+      "text": ""
+    },
+    {
+      "title": "Modifications (Extracting)",
+      "type": "text",
+      "text": ""
+    }
+
+  ]
+}

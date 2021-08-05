@@ -1,0 +1,15 @@
+{
+  "category": "upgrades/upgrades_machines",
+  "name": "XP Grindstone",
+  "subtitle": "Imports Energy from other mods cables/blocks into the Pedestal Energy Network (PEN).",
+  "icon": "pedestals:coin/xpgrindstone",
+  "sortnum": 9,
+  "priority": true,
+  "pages": [
+    {
+      "title": "XP Grindstone",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_xp/xpgrindstone)XP Grindstone "
+    }
+  ]
+}

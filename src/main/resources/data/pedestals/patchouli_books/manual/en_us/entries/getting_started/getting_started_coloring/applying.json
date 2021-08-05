@@ -1,0 +1,14 @@
+{
+  "category": "getting_started/getting_started_coloring",
+  "name": "Applying Color Pallets",
+  "subtitle": "",
+  "icon": "pedestals:itemcolorpallet",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "text": ""
+    }
+  ]
+}

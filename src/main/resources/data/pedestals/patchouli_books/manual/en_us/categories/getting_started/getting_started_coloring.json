@@ -1,0 +1,7 @@
+{
+  "name": "Coloring",
+  "description": "",
+  "icon": "pedestals:itemcolorpalletdefault",
+  "sortnum": 1,
+  "parent": "getting_started/getting_started"
+}

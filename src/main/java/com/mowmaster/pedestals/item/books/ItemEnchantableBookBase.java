@@ -4,10 +4,16 @@ import com.mowmaster.pedestals.api.enchanting.*;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.references.Reference;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import java.util.Map;
 
 import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 
@@ -40,6 +46,26 @@ public class ItemEnchantableBookBase extends Item implements IEnchantableBook {
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return true;
+    }
+
+
+
+    @Override
+    public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
+
+        if(stack.isEnchanted())
+        {
+            entity.setInvulnerable(true);
+            if(entity.isInLava() || entity.isBurning())
+            {
+                Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
+                ItemStack newBook = new ItemStack(Items.ENCHANTED_BOOK,stack.getCount());
+                EnchantmentHelper.setEnchantments(enchants,newBook);
+                entity.setItem(newBook);
+            }
+        }
+
+        return super.onEntityItemUpdate(stack, entity);
     }
 
     @SubscribeEvent

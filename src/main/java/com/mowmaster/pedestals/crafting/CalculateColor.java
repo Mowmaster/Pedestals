@@ -41,7 +41,7 @@ public class CalculateColor
     {
         int[] intRGB = new int[]{0,0,0};
 
-        intRGB[0]= Math.floorDiv(((getINTColor/65536)%256),1);
+        intRGB[0]=Math.floorDiv(((getINTColor/65536)%256),1);
         intRGB[1]=Math.floorDiv(((getINTColor/256)%256),1);
         intRGB[2]=Math.floorDiv((getINTColor%256),1);
 

@@ -1,14 +1,20 @@
 package com.mowmaster.pedestals.item.pedestalFilters;
 
+import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -58,6 +64,41 @@ public class ItemCraftingPattern extends ItemFilterBase
     }
 
     @Override
+    public ActionResult<ItemStack> onItemRightClick(World p_77659_1_, PlayerEntity p_77659_2_, Hand p_77659_3_) {
+        //Thankyou past self: https://github.com/Mowmaster/Ensorcelled/blob/main/src/main/java/com/mowmaster/ensorcelled/enchantments/handlers/HandlerAOEMiner.java#L53
+        //RayTraceResult result = player.pick(player.getLookVec().length(),0,false); results in MISS type returns
+        RayTraceResult result = p_77659_2_.pick(5,0,false);
+        if(result != null)
+        {
+            //Assuming it it hits a block it wont work???
+            if(result.getType() == RayTraceResult.Type.BLOCK)
+            {
+                if(p_77659_2_.isCrouching())
+                {
+                    ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
+                    if(itemInHand.getItem() instanceof IFilterBase)
+                    {
+                        ItemUseContext context = new ItemUseContext(p_77659_2_,p_77659_3_,((BlockRayTraceResult) result));
+                        BlockRayTraceResult res = new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false);
+                        BlockPos posBlock = res.getPos();
+
+                        List<ItemStack> buildQueue = buildFilterQueue(p_77659_1_,posBlock);
+
+                        if(buildQueue.size() > 0)
+                        {
+                            writeFilterQueueToNBT(itemInHand,buildQueue);
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
+                        return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+                    }
+                }
+            }
+        }
+
+        return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
+    }
+
+    @Override
     public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
     {
         ItemStack filterStack = pedestal.getFilterInPedestal();
@@ -83,14 +124,6 @@ public class ItemCraftingPattern extends ItemFilterBase
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-
-        boolean filterType = getFilterType(stack);
-        TranslationTextComponent filterList = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filtertype");
-        TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
-        TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
-        filterList.append((filterType)?(black):(white));
-        filterList.mergeStyle(TextFormatting.GOLD);
-        tooltip.add(filterList);
 
         List<ItemStack> filterQueue = readFilterQueueFromNBT(stack);
         if(filterQueue.size()>0)

@@ -1,0 +1,20 @@
+{
+  "category": "upgrades/upgrades_all",
+  "name": "Crafter (Smart)",
+  "subtitle": "THIS UPGRADE IS [WIP] USE AT YOUR OWN DISCRETION",
+  "icon": "pedestals:coin/crafter3mk2",
+  "sortnum": 2,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "General Vague Overview"
+    },
+    {
+      "title": "Original Page",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_mob/attacker)Auto Attacker "
+    }
+  ]
+}

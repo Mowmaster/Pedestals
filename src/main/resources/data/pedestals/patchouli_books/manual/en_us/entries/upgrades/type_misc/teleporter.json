@@ -1,0 +1,52 @@
+{
+  "category": "upgrades/upgrades_misc",
+  "name": "Teleporter",
+  "subtitle": "Imports items from inventories into the pedestal.",
+  "icon": "pedestals:coin/teleporter",
+  "sortnum": 1,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Teleporter",
+      "recipe": "pedestals:upgrades/teleporter",
+      "text": ""
+    },
+    {
+      "type": "multiblock",
+      "name": "Planter Setup",
+      "multiblock": {
+        "pattern": [
+          [ "_P_" ],
+          [ "_0_" ],
+          [ "___" ]
+        ],
+        "mapping": {
+          "P": "pedestals:pedestal/stone333",
+          "0": "minecraft:emerald_block"
+        }
+      },
+      "text": ""
+    },
+    {
+      "title": "Enchants",
+      "type": "text",
+      "text": "$(li)$(l)Speed$(): Increases the Rate at which items are extracted. $(l)MAX Level: 5 $() $(li)$(l)Capacity$(): Increases the amount of items extracted per operation. $(l)MAX Level: 5 $() $(li)$(l)Advanced$(): (See Advanced Uses Page for More Info) $(l)MAX Level: 1$()"
+    },
+    {
+      "title": "Normal Uses",
+      "type": "text",
+      "text": "$(li)By default this upgrade will extract items from the 'below' inventory. $(br)$(li)There is a secondary use, which is if any items collide with a pedestal with this upgrade, those items will be inserted into the pedestal, this allows for easier collecting of items from water traps without the need of a magnet."
+    },
+    {
+      "title": "Normal Uses Con.",
+      "type": "text",
+      "text": "$(li)Default Inventories that this can extract from: Block Inventories and Minecrafts with Inventories."
+    },
+    {
+      "title": "Advanced Uses",
+      "type": "text",
+      "text": "Allows use of ANY entities inventory, this Entity must still be within the 1 block space below the pedestal, but any entity can be used, $(li)Lama: Auto import items to storage? $(li)Grab that enchanted bow off that annoying skelly? $(li)Troll your friends as they walk into your trapped hallway? $(br)Possibilities are endless!"
+    }
+  ]
+}

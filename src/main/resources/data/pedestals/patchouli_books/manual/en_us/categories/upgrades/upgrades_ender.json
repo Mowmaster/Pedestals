@@ -1,0 +1,7 @@
+{
+  "name": "Ender Upgrades",
+  "description": "Upgrades that can tap into a players Ender Network.",
+  "icon": "pedestals:coin/enderimport",
+  "sortnum": 4,
+  "parent": "upgrades/upgrade_index"
+}

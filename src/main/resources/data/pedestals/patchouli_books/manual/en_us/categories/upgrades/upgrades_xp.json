@@ -1,0 +1,7 @@
+{
+  "name": "XP Upgrades",
+  "description": "Upgrades that can manipulate and store xp",
+  "icon": "pedestals:coin/xptank",
+  "sortnum": 3,
+  "parent": "upgrades/upgrade_index"
+}

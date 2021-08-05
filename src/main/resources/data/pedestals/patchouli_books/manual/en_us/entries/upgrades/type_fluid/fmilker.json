@@ -1,0 +1,15 @@
+{
+  "category": "upgrades/upgrades_fluid",
+  "name": "Auto Milker",
+  "subtitle": "Imports Energy from other mods cables/blocks into the Pedestal Energy Network (PEN).",
+  "icon": "pedestals:coin/milker",
+  "sortnum": 3,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Auto Milker",
+      "type": "text",
+      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_farming/milker)Auto Milker "
+    }
+  ]
+}

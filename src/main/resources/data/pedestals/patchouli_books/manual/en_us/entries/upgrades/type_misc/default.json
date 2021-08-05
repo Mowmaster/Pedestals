@@ -1,0 +1,27 @@
+{
+  "category": "upgrades/upgrades_misc",
+  "name": "Upgrade Base",
+  "subtitle": "Imports items from inventories into the pedestal.",
+  "icon": "pedestals:coin/default",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Upgrade Base",
+      "recipe": "pedestals:upgrades/default",
+      "text": ""
+    },
+    {
+      "type": "smelting",
+      "title": "All Upgrades Recycle into Gold",
+      "recipe": "pedestals:ingot_gold_from_upgrades",
+      "text": ""
+    },
+    {
+      "title": "Normal Uses",
+      "type": "text",
+      "text": ""
+    }
+  ]
+}

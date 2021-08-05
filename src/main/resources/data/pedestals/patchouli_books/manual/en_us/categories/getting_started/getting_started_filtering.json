@@ -1,0 +1,7 @@
+{
+  "name": "Filtering",
+  "description": "",
+  "icon": "pedestals:filter/filterbase",
+  "sortnum": 6,
+  "parent": "getting_started/getting_started"
+}

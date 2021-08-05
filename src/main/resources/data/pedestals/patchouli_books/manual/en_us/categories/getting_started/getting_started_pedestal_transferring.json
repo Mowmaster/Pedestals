@@ -1,0 +1,7 @@
+{
+  "name": "Transferring With Pedestals",
+  "description": "",
+  "icon": "pedestals:pedestal/stone030",
+  "sortnum": 8,
+  "parent": "getting_started/getting_started"
+}

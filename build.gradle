@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.8s_hotfix_4'
+version = '0.8s_hotfix_5'
 group = 'com.mowmaster.pedestals' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'pedestals'
 
@@ -89,11 +89,12 @@ repositories {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
+        //https://modmaven.dev/
     }
-     //maven {
-     //     name = "Patchouli"
-     //     url 'https://maven.blamejared.com'
-     //}
+     maven {
+          name = "Patchouli"
+          url 'https://maven.blamejared.com'
+     }
     //maven { modurl "https://cursemaven.com"}
     //maven { url = "https://cdn.hrzn.studio/maven"}
     //maven {url = "https://maven.theillusivec4.top/"}
@@ -118,8 +119,8 @@ dependencies {
     //compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.2:api")
 
 
-    //compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
-    //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
