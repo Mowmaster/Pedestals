@@ -1,0 +1,26 @@
+{
+  "category": "tools",
+  "name": "Upgrade Tool",
+  "subtitle": "Gives Detailed info about an Upgrade on a pedestal. Also used to see the work area of an upgraded pedestal.",
+  "icon": "pedestals:upgradetool",
+  "sortnum": 2,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Upgrade Tool",
+      "recipe": "pedestals:upgradetool",
+      "text": "11/10 Craft this tool if you dont already have one. Arguably more useful then the Linking Tool."
+    },
+    {
+      "title": "Crafting Alt.",
+      "type": "text",
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a Tag Tool"
+    },
+    {
+      "title": "Interactions",
+      "type": "text",
+      "text": ""
+    }
+  ]
+}

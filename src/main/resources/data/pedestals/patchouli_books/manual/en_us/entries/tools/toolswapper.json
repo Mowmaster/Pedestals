@@ -1,0 +1,20 @@
+{
+  "category": "tools",
+  "name": "Tool Swapper",
+  "subtitle": "Used to show details about the tool inside a pedestal.",
+  "icon": "pedestals:toolswapper",
+  "sortnum": 3,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Crafting",
+      "type": "text",
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with an Upgrade Tool (When not selecting anything)"
+    },
+    {
+      "title": "Interactions",
+      "type": "text",
+      "text": "When in offhand, left click to remove inserted tool. Right click displays info about an inserted tool."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "category": "tools",
+  "name": "Backwards Linking Tool",
+  "subtitle": "Same as the Linking Tool, Connects things Sender To Receiver.",
+  "icon": "pedestals:linkingtoolbackwards",
+  "sortnum": 1,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Crafting",
+      "type": "text",
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a Linking Tool (When not selecting anything)"
+    }
+  ]
+}

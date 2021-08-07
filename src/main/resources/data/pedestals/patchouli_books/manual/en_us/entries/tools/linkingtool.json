@@ -1,0 +1,21 @@
+{
+  "category": "tools",
+  "name": "Linking Tool",
+  "subtitle": "Links Pedestals, and shows info about a pedestal. Used in Crafting of Pedestals",
+  "icon": "pedestals:linkingtool",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Linking Tool",
+      "recipe": "pedestals:linkingtool",
+      "text": "The Linking Tool is required to start in Pedestals, without it, you really cant do much."
+    },
+    {
+      "title": "Interactions",
+      "type": "text",
+      "text": ""
+    }
+  ]
+}

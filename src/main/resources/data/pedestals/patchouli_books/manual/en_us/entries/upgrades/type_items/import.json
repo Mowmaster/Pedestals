@@ -34,6 +34,11 @@
       "text": "$(li)$(l)Speed$(): Increases the Rate at which items are extracted. $(l)MAX Level: 5 $() $(li)$(l)Capacity$(): Increases the amount of items extracted per operation. $(l)MAX Level: 5 $() $(li)$(l)Advanced$(): (See Advanced Uses Page for More Info) $(l)MAX Level: 1$()"
     },
     {
+      "title": "Redstone Comparator Output",
+      "type": "text",
+      "text": "Outputs redstone equal to how many items are in the pedestal."
+    },
+    {
       "title": "Normal Uses",
       "type": "text",
       "text": "$(li)By default this upgrade will extract items from the 'below' inventory. $(br)$(li)There is a secondary use, which is if any items collide with a pedestal with this upgrade, those items will be inserted into the pedestal, this allows for easier collecting of items from water traps without the need of a magnet."

@@ -1,0 +1,20 @@
+{
+  "category": "tools",
+  "name": "Filter Swapper",
+  "subtitle": "Shows Info about inserted Filter",
+  "icon": "pedestals:filterswapper",
+  "sortnum": 4,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Crafting",
+      "type": "text",
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a Tool Swapper"
+    },
+    {
+      "title": "Interactions",
+      "type": "text",
+      "text": "When in offhand, left click the pedestal to remove an inserted filter"
+    }
+  ]
+}

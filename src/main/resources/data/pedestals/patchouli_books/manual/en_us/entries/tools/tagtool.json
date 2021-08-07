@@ -1,0 +1,20 @@
+{
+  "category": "tools",
+  "name": "Tag Tool",
+  "subtitle": "Used to Craft Tag Filters, and to get the Tags on items.",
+  "icon": "pedestals:tagtool",
+  "sortnum": 5,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Crafting",
+      "type": "text",
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a Filter Tool"
+    },
+    {
+      "title": "Interactions",
+      "type": "text",
+      "text": "$(li)Used in crafting of the Tag Filter. $(li)With an item in your $(l)Offhand$() Right click this tool, the chat will display all the tags on the held item."
+    }
+  ]
+}
