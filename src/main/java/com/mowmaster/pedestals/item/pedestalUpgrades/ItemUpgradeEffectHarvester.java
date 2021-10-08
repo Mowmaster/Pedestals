@@ -291,29 +291,6 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
         ItemStack toolInPedestal = pedestal.getToolOnPedestal();
         BlockPos posOfPedestal = pedestal.getPos();
 
-        IHarvesterOverride applicable = null;
-
-        for (IHarvesterOverride override : HARVEST_OVERRIDES) {
-            if (override.appliesTo(target, world, posTarget)) {
-                applicable = override;
-                break;
-            }
-        }
-
-        if (applicable != null) {
-            if (hasAdvancedInventoryTargeting(coinInPedestal)) {
-                applicable.attemptGentleHarvest(target, world, posTarget, stack -> {
-                    PedestalUtils.spawnItemStackInWorld(world, posTarget, stack);
-                });
-            } else {
-                applicable.attemptHardHarvest(target, world, posTarget, stack -> {
-                    PedestalUtils.spawnItemStackInWorld(world, posTarget, stack);
-                });
-            }
-
-            return;
-        }
-
         if (canHarvest(world, target, posTarget) && !target.getBlock().isAir(target,world,posTarget))
         {
             FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
@@ -334,11 +311,26 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                 ToolType tool = target.getHarvestTool();
                 int toolLevel = fakePlayer.getHeldItemMainhand().getHarvestLevel(tool, fakePlayer, target);
 
+                IHarvesterOverride applicable = null;
+
+                for (IHarvesterOverride override : HARVEST_OVERRIDES) {
+                    if (override.appliesTo(target, world, posTarget)) {
+                        applicable = override;
+                        break;
+                    }
+                }
+
                 if(hasAdvancedInventoryTargeting(coinInPedestal))
                 {
                     //https://github.com/Lothrazar/Cyclic/blob/trunk/1.16/src/main/java/com/lothrazar/cyclic/block/harvester/TileHarvester.java
                     if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                     {
+                        if (applicable != null) {
+                            applicable.attemptGentleHarvest(target, world, posTarget, fakePlayer);
+
+                            return;
+                        }
+
                         ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
                         Item targetSeed = getSeed(world,target,posTarget);
                         List<ItemStack> targetDrops = Block.getDrops(target, sworld, posTarget, null);
@@ -379,6 +371,12 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                     //toolLevel >= target.getHarvestLevel()
                     if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer,target,true))
                     {
+                        if (applicable != null) {
+                            applicable.attemptHardHarvest(target, world, posTarget, fakePlayer);
+
+                            return;
+                        }
+
                         //BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, posTarget, target, fakePlayer);
                         //if (!MinecraftForge.EVENT_BUS.post(e)) {
                         target.getBlock().harvestBlock(world, fakePlayer, posTarget, target, null, fakePlayer.getHeldItemMainhand());

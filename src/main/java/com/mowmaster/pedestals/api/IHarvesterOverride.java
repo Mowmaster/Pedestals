@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.api;
 import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeEffectHarvester;
 import java.util.function.Consumer;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -54,11 +55,10 @@ public interface IHarvesterOverride {
      *          the world
      * @param pos
      *          the position
-     * @param dropConsumer
-     *          pass any drops resulting from the harvest operation
-     * @return true if the harvesting operation was successfully handled
+     * @param player
+     *          the fake player used by Pedestals
      */
-    boolean attemptHardHarvest(BlockState state, World world, BlockPos pos, Consumer<ItemStack> consumer);
+    void attemptHardHarvest(BlockState state, World world, BlockPos pos, PlayerEntity player);
 
     /**
      * Attempt to harvest and run custom harvest logic for a block at the given position, as if right-clicked
@@ -73,5 +73,5 @@ public interface IHarvesterOverride {
      *          pass any drops resulting from the harvest operation
      * @return true if the harvesting operation was successfully handled
      */
-    boolean attemptGentleHarvest(BlockState state, World world, BlockPos pos, Consumer<ItemStack> consumer);
+    void attemptGentleHarvest(BlockState state, World world, BlockPos pos, PlayerEntity player);
 }
