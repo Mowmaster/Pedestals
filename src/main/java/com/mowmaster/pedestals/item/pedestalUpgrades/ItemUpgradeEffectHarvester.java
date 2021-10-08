@@ -335,7 +335,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                         Item targetSeed = getSeed(world,target,posTarget);
                         List<ItemStack> targetDrops = Block.getDrops(target, sworld, posTarget, null);
                         IntegerProperty propInt = getBlockPropertyAge(target);
-                        int min = Collections.min(propInt.getAllowedValues()); // CRASHES HERE IF I JUST OVERRIDE CANHARVEST
+                        int min = Collections.min(propInt.getAllowedValues());
                     /*
                     world.setBlockState(posTarget,target.with(propInt,min));
                     Sets a block state into this world.
