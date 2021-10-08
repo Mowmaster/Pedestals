@@ -15,8 +15,6 @@ public interface IHarvesterOverride {
      *          the override to register
      */
     public static void registerHarvestOverrider(IHarvesterOverride override) {
-        System.out.println("Registering override");
-        System.out.println(override.getClass().getSimpleName());
         ItemUpgradeEffectHarvester.HARVEST_OVERRIDES.add(override);
     }
 
