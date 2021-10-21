@@ -3,12 +3,13 @@
   "name": "Applying Color Pallets",
   "subtitle": "",
   "icon": "pedestals:itemcolorpallet",
-  "sortnum": 0,
+  "sortnum": 2,
   "priority": true,
   "pages": [
     {
       "type": "text",
-      "text": ""
+      "title": "Applying Colored Palettes",
+      "text": "Currently, to apply a color to a pedestal, you must have a newly placed pedestal. $(br)It $(l)CANNOT$() be linked, have items, augments, tools, filters, glowstone, or redstone torches, inserted. $(br)Put the Colored Palette in your $(l)OFFHAND$() and $(l)RIGHT CLICK$() with an empty $(l)MAINHAND$() $(br)This Consumes the Palette and colors the pedestal permanently."
     }
   ]
 }

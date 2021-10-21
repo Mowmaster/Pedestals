@@ -1,14 +1,46 @@
 {
   "category": "getting_started/getting_started_coloring",
-  "name": "Crafting Color Pallets",
+  "name": "Crafting Palettes",
   "subtitle": "",
   "icon": "minecraft:crafting_table",
-  "sortnum": 0,
+  "sortnum": 1,
   "priority": true,
   "pages": [
     {
       "type": "text",
-      "text": ""
+      "title": "Materials/Tools Needed",
+      "text": "$(li) Color Palettes (get a bunch).$(li) Lots of $(#f00)Red$(), $(#0f0)Green$(), and $(#00f)Blue$() dye.$(li) $(l:pedestals:tools/linkingtool)Linking Tool$()"
+    },
+    {
+      "type": "text",
+      "title": "Crafting CP's",
+      "text": "$(li)Drop any amount of Color Palettes on the ground.$(li) Drop your dye combination on the ground. (See Next page for more info on picking colors)$(li) $(l)Right Click$() on the ground with the $(l)Linking Tool$()"
+    },
+    {
+      "type": "text",
+      "title": "Picking a Color",
+      "text": "To pick a color, you throw a combination of $(#f00)Red$(), $(#0f0)Green$(), and $(#00f)Blue$() dye on the ground. $(li) You can use 0 dye of a color or up to 3 of each color."
+    },
+    {
+      "type": "text",
+      "title": "Color Combinations",
+      "text": "Color Combinations are in amount of each color $(#f00)R$()$(#0f0)G$()$(#00F)B$(). $(li) 000-$(#000000)$(l)Black$(). $(li) 001-$(#000055)Color$(). $(li) 002-$(#0000aa)Color$(). $(li) 003-$(#0000ff)Blue$(). $(li) 010-$(#005500)Color$(). $(li) 011-$(#005555)Color$(). $(li) 012-$(#0055aa)Color$(). $(li) 013-$(#0055ff)Color$(). $(li) 020-$(#00aa00)Color$(). $(li) 021-$(#00aa55)Color$(). $(li) 022-$(#00aaaa)Color$(). $(li) 023-$(#00aaff)Color$(). "
+    },
+    {
+      "type": "text",
+      "text": "$(li) 030-$(#00ff00)$(l)Green$(). $(li) 031-$(#00ff55)Color$(). $(li) 032-$(#00ffaa)Color$(). $(li) 033-$(#00ffff)Color$(). $(li) 100-$(#550000)Color$(). $(li) 101-$(#550055)Color$(). $(li) 102-$(#5500aa)Color$(). $(li) 103-$(#5500ff)Color$(). $(li) 110-$(#555500)Color$(). $(li) 111-$(#555555)Color$(). $(li) 112-$(#5555aa)Color$(). $(li) 113-$(#5555ff)Color$(). $(li) 120-$(#55aa00)Color$(). $(li) 121-$(#55aa55)Color$(). $(li) 122-$(#55aaaa)Color$(). "
+    },
+    {
+      "type": "text",
+      "text": "$(li) 123-$(#55aaff)Color$(). $(li) 130-$(#55ff00)Color$(). $(li) 131-$(#55ff55)Color$(). $(li) 132-$(#55ffaa)Color$(). $(li) 133-$(#55ffff)Color$(). $(li) 200-$(#aa0000)Color$(). $(li) 201-$(#aa0055)Color$(). $(li) 202-$(#aa00aa)Color$(). $(li) 203-$(#aa00ff)Color$(). $(li) 210-$(#aa5500)Color$(). $(li) 211-$(#aa5555)Color$(). $(li) 212-$(#aa55aa)Color$(). $(li) 213-$(#aa55ff)Color$(). $(li) 220-$(#aaaa00)Color$(). $(li) 221-$(#aaaa55)Color$(). "
+    },
+    {
+      "type": "text",
+      "text": "$(li) 222-$(#aaaaaa)Color$(). $(li) 223-$(#aaaaff)Color$(). $(li) 230-$(#aaff00)Color$(). $(li) 231-$(#aaff55)Color$(). $(li) 232-$(#aaffaa)Color$(). $(li) 233-$(#aaffff)Color$(). $(li) 300-$(#ff0000)$(l)Red$(). $(li) 301-$(#ff0055)Color$(). $(li) 302-$(#ff00aa)Color$(). $(li) 303-$(#ff00ff)Color$(). $(li) 310-$(#ff5500)Color$(). $(li) 311-$(#ff5555)Color$(). $(li) 312-$(#ff55aa)Color$(). $(li) 313-$(#ff55ff)Color$(). $(li) 320-$(#ffaa00)Color$(). "
+    },
+    {
+      "type": "text",
+      "text": "$(li) 321-$(#ffaa55)Color$(). $(li) 322-$(#ffaaaa)Color$(). $(li) 323-$(#ffaaff)Color$(). $(li) 330-$(#ffff00)Color$(). $(li) 331-$(#ffff55)Color$(). $(li) 332-$(#ffffaa)Color$(). $(li) 333-$(#ffffff)$(l)White$(). "
     }
   ]
 }
