@@ -98,16 +98,16 @@ public class ItemDevTool extends Item {
                                 p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
                                 return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                             }
-                            else
+                        }
+                        else
+                        {
+                            CompoundNBT nbt = pedestal.getUpdateTag();
+                            if(nbt.contains("inv"))
                             {
-                                CompoundNBT nbt = pedestal.getUpdateTag();
-                                if(nbt.contains("inv"))
-                                {
-                                    TranslationTextComponent name = new TranslationTextComponent(""+ nbt.toString() +"");
-                                    name.mergeStyle(TextFormatting.WHITE);
-                                    p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
-                                    return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
-                                }
+                                TranslationTextComponent name = new TranslationTextComponent(""+ nbt.toString() +"");
+                                name.mergeStyle(TextFormatting.WHITE);
+                                p_77659_2_.sendMessage(name,p_77659_2_.getUniqueID());
+                                return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                             }
                         }
 

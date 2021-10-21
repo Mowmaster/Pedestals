@@ -9,12 +9,17 @@
     {
       "title": "Crafting",
       "type": "text",
-      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a Tool Swapper"
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a $(l:pedestals:tools/toolswapper)Tool Swapper$()"
+    },
+    {
+      "title": "Uses",
+      "type": "text",
+      "text": "$(li)Used to craft the $(l:pedestals:filters/filterbase)Base Filter$() crafting component item."
     },
     {
       "title": "Interactions",
       "type": "text",
-      "text": "When in offhand, left click the pedestal to remove an inserted filter"
+      "text": "$(li)$(l)Right Click$() a pedestal with a filter in it to get details about the inserted filter. $(li)When in the $(l)OFFHAND, LEFT CLICK$() a pedestal to remove its inserted filter. $(li)$(l)Crouch Right Click$() in the air to swap this into the $(l:pedestals:tools/tagtool)Tag Tool$()"
     }
   ]
 }

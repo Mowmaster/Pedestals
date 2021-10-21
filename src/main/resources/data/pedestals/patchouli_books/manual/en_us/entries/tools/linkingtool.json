@@ -10,12 +10,37 @@
       "type": "crafting",
       "title": "Linking Tool",
       "recipe": "pedestals:linkingtool",
-      "text": "The Linking Tool is required to start in Pedestals, without it, you really cant do much."
+      "text": "The Linking Tool is required to craft pedestals and link them."
+    },
+    {
+      "title": "Uses",
+      "type": "text",
+      "text": "$(li)Used to craft $(l)Pedestals$(). $(li)Used to craft the $(l:pedestals:upgrades/type_misc/default)Base Upgrade$() crafting component item."
     },
     {
       "title": "Interactions",
       "type": "text",
-      "text": ""
+      "text": "$(li)$(l)Right Click$() Tool on pedestal to see details about it. $(li) $(l)Crouch Right Click$() a pedestal to select it. $(li) $(l)Crouch Right Click$() a non-pedestal block to clear the currently selected pedestal. $(li)$(l)Crouch Right Click$() in the air to swap to the $(l:pedestals:tools/backwardslinkingtool)Backwards Linking Tool$()."
+    },
+    {
+      "title": "Interactions Cont.",
+      "type": "text",
+      "text": "$(li)When the tool has a selection, when in the $(l)OFFHAND$() and placing pedestals, the placed pedestals will automatically be linked as $(l)SENDERS$()."
+    },
+    {
+      "title": "Linking Process",
+      "type": "text",
+      "text": "This Tool Connects Pedestals Receiver to Sender. $(li)First Select the Pedestal $(l)RECEIVING$() $(li)Second Select the Pedestal $(l)SENDING$() "
+    },
+    {
+      "title": "Notes",
+      "type": "text",
+      "text": "When a Pedestal is Selected by the tool, some in-world details will also show for that selection. $(li)A red box will appear, this is the linking range when $(l)SENDING$(). $(li)White Boxes will display on all $(l)RECEIVER$() pedestals connected to the selected one."
+    },
+    {
+      "title": "Notes Cont.",
+      "type": "text",
+      "text": "$(li)Different shades of smoke particles will show on these linked pedestals, this shows priority linked order from darkest to lightest (1st - 8th)"
     }
   ]
 }

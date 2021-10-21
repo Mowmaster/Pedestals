@@ -9,12 +9,12 @@
     {
       "title": "Crafting",
       "type": "text",
-      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with an Upgrade Tool (When not selecting anything)"
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with an $(l:pedestals:tools/upgradetool)Upgrade Tool$()"
     },
     {
       "title": "Interactions",
       "type": "text",
-      "text": "When in offhand, left click to remove inserted tool. Right click displays info about an inserted tool."
+      "text": "$(li)$(l)Right Click$() a pedestal with a tool in it to get details about the inserted tool. $(li)When in the $(l)OFFHAND, LEFT CLICK$() a pedestal to remove its inserted tool. $(li)$(l)Crouch Right Click$() in the air to swap this into the $(l:pedestals:tools/filtertool)Filter Tool$()"
     }
   ]
 }
