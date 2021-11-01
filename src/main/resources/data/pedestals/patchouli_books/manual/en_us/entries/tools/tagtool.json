@@ -9,12 +9,17 @@
     {
       "title": "Crafting",
       "type": "text",
-      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a Filter Tool"
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a $(l:pedestals:tools/filtertool)Filter Tool$()"
+    },
+    {
+      "title": "Uses",
+      "type": "text",
+      "text": "$(li)Used to craft $(l:pedestals:filters/tagfilter)Tag Filters$()"
     },
     {
       "title": "Interactions",
       "type": "text",
-      "text": "$(li)Used in crafting of the Tag Filter. $(li)With an item in your $(l)Offhand$() Right click this tool, the chat will display all the tags on the held item."
+      "text": "$(li)With this tool in your $(l)MAINHAND$() and an item in your $(l)OFFHAND, RIGHTCLICK$() it, the chat will display all the tags on the item. $(li)$(l)Crouch Right Click$() in the air to swap this into the $(l:pedestals:tools/upgradetool)Upgrade Tool$()"
     }
   ]
 }

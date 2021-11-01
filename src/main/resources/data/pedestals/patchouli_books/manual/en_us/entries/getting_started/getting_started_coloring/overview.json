@@ -1,14 +1,21 @@
 {
   "category": "getting_started/getting_started_coloring",
-  "name": "Color Pallet Overview",
+  "name": "Overview",
   "subtitle": "",
   "icon": "pedestals:itemcolorpalletdefault",
   "sortnum": 0,
   "priority": true,
   "pages": [
     {
+      "type": "crafting",
+      "title": "Color Palette",
+      "recipe": "pedestals:itemcolorpalletdefault",
+      "text": "The Color Palette is a crafting component needed to craft Colored Palettes $(br)To color a pedestal, the process is a bit unusual, but this gives us a bit more flexibility with how many options for colors we can have."
+    },
+    {
+      "title": "Coloring Explanation",
       "type": "text",
-      "text": ""
+      "text": "Since we have more then the default 16 color options, the system used to pick colors is in-world and a bit more complex.$(br)We use a combination of $(#f00)Red$(), $(#0f0)Green$(), and $(#00f)Blue$() dye to pick our colors. So go out and get a good supply of those colors!"
     }
   ]
 }

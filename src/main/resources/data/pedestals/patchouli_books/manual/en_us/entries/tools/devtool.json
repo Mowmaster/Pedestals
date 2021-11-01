@@ -1,0 +1,25 @@
+{
+  "category": "tools",
+  "name": "Dev Tool",
+  "subtitle": "Gives Detailed info about an Upgrade on a pedestal. Also used to see the work area of an upgraded pedestal.",
+  "icon": "pedestals:devtool",
+  "sortnum": 6,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "title": "Dev Tool",
+      "text": "This is a $(l)CREATIVE ONLY$() tool"
+    },
+    {
+      "title": "Interactions",
+      "type": "text",
+      "text": "$(li)Just having this in the the players inventory allows creative players to break pedestals. $(li)$(l)Right Click$() a pedestal to see its NBT data. $(li)$(l)Crouch Right Click$() a pedestal with an upgrade to see the upgrades NBT"
+    },
+    {
+      "title": "Interactions Cont.",
+      "type": "text",
+      "text": "$(li)When in the $(l)MAINHAND$() and an item with NBT is in the $(l)OFFHAND, RIGHT CLICK$() to display the items NBT. $(li)When in the $(l)MAINHAND$() and a $(l:pedestals:getting_started/getting_started_coloring/applying)Colored Pallet$() is in the $(l)OFFHAND, RIGHT CLICK$() to display the colors INT value."
+    }
+  ]
+}

@@ -10,17 +10,22 @@
       "type": "crafting",
       "title": "Upgrade Tool",
       "recipe": "pedestals:upgradetool",
-      "text": "11/10 Craft this tool if you dont already have one. Arguably more useful then the Linking Tool."
+      "text": "11/10 Craft this tool if you dont already have one. Arguably more useful then the $(l:pedestals:tools/linkingtool)Linking Tool$()."
     },
     {
       "title": "Crafting Alt.",
       "type": "text",
-      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a Tag Tool"
+      "text": "Gotten by $(l)Crouch + Right Click (In Air)$() with a $(l:pedestals:tools/tagtool)Tag Tool$()"
     },
     {
       "title": "Interactions",
       "type": "text",
-      "text": ""
+      "text": "$(li)$(l)Right Click$() a pedestal with an upgrade to see details about the upgrade. $(li)$(l)Crouch Right Click$() a pedestal with an upgrade to select it, if the upgrade interacts with blocks in-world, it will display particles in the effective work area.$(li)$(l)Crouch Right Click$() any non pedestal block to clear the selected pedestal."
+    },
+    {
+      "title": "Interactions Cont.",
+      "type": "text",
+      "text": "$(li)When in the $(l)OFFHAND, LEFT CLICK$() a pedestal to remove its upgrade. $(li)$(l)Crouch Right Click$() in the air to swap this into the $(l:pedestals:tools/toolswapper)Tool Swapper$()"
     }
   ]
 }
