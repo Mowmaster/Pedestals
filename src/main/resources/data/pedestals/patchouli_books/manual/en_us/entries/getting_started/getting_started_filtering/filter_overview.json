@@ -1,0 +1,24 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Overview",
+  "icon": "minecraft:map",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "Filtering in pedestals may seem a bit odd at first, but it can be very useful, and filters are only limited by the size of the inventory containers you have available`."
+    },
+    {
+      "title": "Interactions",
+      "type": "text",
+      "text": "$(li)$(l)CROUCH RIGHT CLICK$() an inventory to $(l)SET$() the filter. $(li)$(l)CROUCH RIGHT CLICK$() in the $(l)AIR$() to change the filter between WhiteList and Blacklist (if applicable). $(li)With a $(l:pedestals:tools/filtertool)Filter Tool$() in the $(l)OFFHAND$() and Filter in the $(l)MAINHAND, CROUCH RIGHT CLICK$() in the $(l)AIR$() to $(l)RESET$() the Filter. "
+    },
+    {
+      "title": "Interactions Cont.",
+      "type": "text",
+      "text": "$(li)With a Filter in the $(l)OFFHAND, RIGHTCLICK$() with an $(l)EMPTY MAINHAND$() to insert it into a pedestal. $(li)With a $(l:pedestals:tools/filtertool)Filter Tool$() in the $(l)OFFHAND, LEFT CLICK$() a pedestal to remove its inserted filter."
+    }
+  ]
+}

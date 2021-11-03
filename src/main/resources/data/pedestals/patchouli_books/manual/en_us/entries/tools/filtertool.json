@@ -19,7 +19,12 @@
     {
       "title": "Interactions",
       "type": "text",
-      "text": "$(li)$(l)Right Click$() a pedestal with a filter in it to get details about the inserted filter. $(li)When in the $(l)OFFHAND, LEFT CLICK$() a pedestal to remove its inserted filter. $(li)$(l)Crouch Right Click$() in the air to swap this into the $(l:pedestals:tools/tagtool)Tag Tool$()"
+      "text": "$(li)$(l)Right Click$() a pedestal with a filter in it to get details about the inserted filter. $(li)When in the $(l)OFFHAND, LEFT CLICK$() a pedestal to remove its inserted filter.$(li)When in the $(l)OFFHAND$(), and a $(l:pedestals:getting_started/getting_started_filtering/filter_overview)Filter$() is in the $(l)MAINHAND$(), $(l)CROUCH RIGHTCLICK$() to clear the filter."
+    },
+    {
+      "title": "Interactions Cont.",
+      "type": "text",
+      "text": "$(li)$(l)Crouch Right Click$() in the air to swap this into the $(l:pedestals:tools/tagtool)Tag Tool$()"
     }
   ]
 }

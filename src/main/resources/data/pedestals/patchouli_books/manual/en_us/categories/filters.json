@@ -1,0 +1,6 @@
+{
+  "name": "Filters",
+  "description": "Filters can be applied to pedestals, this effects what items the pedestal can $(l)RECEIVE$(), which can also effect the actions of upgrades as well.",
+  "icon": "pedestals:filter/filterbase",
+  "sortnum": 5
+}

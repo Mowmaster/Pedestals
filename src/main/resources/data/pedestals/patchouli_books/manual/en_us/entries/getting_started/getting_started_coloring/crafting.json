@@ -2,7 +2,7 @@
   "category": "getting_started/getting_started_coloring",
   "name": "Crafting Palettes",
   "subtitle": "",
-  "icon": "minecraft:crafting_table",
+  "icon": "pedestals:itemcolorpalletdefault",
   "sortnum": 1,
   "priority": true,
   "pages": [

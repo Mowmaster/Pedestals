@@ -2,7 +2,7 @@
   "category": "getting_started/getting_started_coloring",
   "name": "Overview",
   "subtitle": "",
-  "icon": "pedestals:itemcolorpalletdefault",
+  "icon": "minecraft:map",
   "sortnum": 0,
   "priority": true,
   "pages": [

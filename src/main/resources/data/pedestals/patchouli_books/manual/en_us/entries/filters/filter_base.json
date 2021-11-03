@@ -1,0 +1,16 @@
+{
+  "category": "filters",
+  "name": "Base Filter",
+  "subtitle": "The $(l)Base$() to all filtering things!",
+  "icon": "pedestals:filter/filterbase",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Filter Base",
+      "recipe": "pedestals:filter/filterbase",
+      "text": "Crafted using the $(l:pedestals:tools/filtertool)Filter Tool$(), this item is required to craft all other filters, and some filtering related upgrades."
+    }
+  ]
+}

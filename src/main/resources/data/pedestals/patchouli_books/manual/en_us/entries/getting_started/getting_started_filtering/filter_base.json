@@ -1,0 +1,19 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Base Filter",
+  "icon": "pedestals:filter/filterbase",
+  "sortnum": 1,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "This item is crafting component needed to craft all filters."
+    },
+    {
+      "title": "Additional Info:",
+      "type": "text",
+      "text": "You can find its crafting and more in-depth info here: $(br)$(l:pedestals:filters/filter_base)Base Filter$()"
+    }
+  ]
+}
