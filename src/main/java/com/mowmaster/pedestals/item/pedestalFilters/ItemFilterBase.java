@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.item.pedestalFilters;
 
 import com.mowmaster.pedestals.api.filter.IFilterBase;
+import com.mowmaster.pedestals.item.ItemFilterSwapper;
+import com.mowmaster.pedestals.item.ItemUpgradeTool;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.AbstractRailBlock;
@@ -30,6 +32,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -179,20 +182,37 @@ public class ItemFilterBase extends Item implements IFilterBase
                 if(p_77659_2_.isCrouching())
                 {
                     ItemStack itemInHand = p_77659_2_.getHeldItem(p_77659_3_);
+                    ItemStack itemInMainHand = p_77659_2_.getHeldItemMainhand();
+                    ItemStack itemInOffHand = p_77659_2_.getHeldItemOffhand();
                     //Should prevent it from its nbt changing???
-
-                    if(itemInHand.getItem() instanceof IFilterBase)
+                    if(itemInOffHand.getItem() instanceof ItemFilterSwapper)
                     {
-                        boolean getCurrentType = getFilterType(itemInHand);
-                        setFilterType(itemInHand,!getCurrentType);
-                        TranslationTextComponent changed = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterchange");
-                        changed.mergeStyle(TextFormatting.GREEN);
-                        TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
-                        TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
-                        changed.append((!getCurrentType)?(black):(white));
-                        p_77659_2_.sendStatusMessage(changed,true);
-                        return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        if(itemInMainHand.getItem() instanceof IFilterBase)
+                        {
+                            removeFilterQueueHandler(itemInMainHand);
+                            //TODO: localize this text
+                            TranslationTextComponent output = new TranslationTextComponent("Filter Cleared");
+                            output.mergeStyle(TextFormatting.WHITE);
+                            p_77659_2_.sendStatusMessage(output,true);
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
                     }
+                    else
+                    {
+                        if(itemInHand.getItem() instanceof IFilterBase)
+                        {
+                            boolean getCurrentType = getFilterType(itemInHand);
+                            setFilterType(itemInHand,!getCurrentType);
+                            TranslationTextComponent changed = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterchange");
+                            changed.mergeStyle(TextFormatting.GREEN);
+                            TranslationTextComponent white = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterwhite");
+                            TranslationTextComponent black = new TranslationTextComponent(Reference.MODID + ".filters.tooltip_filterblack");
+                            changed.append((!getCurrentType)?(black):(white));
+                            p_77659_2_.sendStatusMessage(changed,true);
+                            return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
+                        }
+                    }
+
                     return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));
                 }
             }
