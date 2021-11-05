@@ -1,0 +1,10 @@
+{
+  "title": {
+    "text": "Pedestals - Interactions",
+    "bold": true,
+    "color": "gold"
+  },
+  "tip": {
+    "text": "You can Insert items with right click, extract single items with left click (empty hand/matching item), and extract stacks with crouch + left click."
+  }
+}
