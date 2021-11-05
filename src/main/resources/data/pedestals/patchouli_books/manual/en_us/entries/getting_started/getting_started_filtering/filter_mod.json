@@ -1,0 +1,19 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Filter (Mod)",
+  "icon": "pedestals:filter/filtermod",
+  "sortnum": 4,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "This can filter for items from the same Mod."
+    },
+    {
+      "title": "Additional Info:",
+      "type": "text",
+      "text": "You can find its crafting and more in-depth info here: $(br)$(l:pedestals:filters/filter_mod)Filter (Mod)$()"
+    }
+  ]
+}

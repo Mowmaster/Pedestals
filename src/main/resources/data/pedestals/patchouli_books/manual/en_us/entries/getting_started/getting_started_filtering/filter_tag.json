@@ -1,0 +1,19 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Filter (Tag)",
+  "icon": "pedestals:filter/filtertag",
+  "sortnum": 5,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "This can filter for items matching a data tag, like 'forge:ores'."
+    },
+    {
+      "title": "Additional Info:",
+      "type": "text",
+      "text": "You can find its crafting and more in-depth info here: $(br)$(l:pedestals:filters/filter_tag)Filter (Tag)$()"
+    }
+  ]
+}

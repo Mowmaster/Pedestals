@@ -8,7 +8,7 @@
     {
       "title": "Overview",
       "type": "text",
-      "text": "Filtering in pedestals may seem a bit odd at first, but it can be very useful, and filters are only limited by the size of the inventory containers you have available`."
+      "text": "Filtering in pedestals may seem a bit odd at first, but it can be very useful, and filters are only limited by the size of the inventory containers you have available`. $(li)Filters can also be used in conjunction with upgrades, for a variety of effects. (Please see the specific upgrades for those effects)"
     },
     {
       "title": "Interactions",

@@ -1,0 +1,20 @@
+{
+  "category": "filters",
+  "name": "Filter (ItemStack)",
+  "icon": "pedestals:filter/filteritemstack",
+  "sortnum": 2,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Filter Base",
+      "recipe": "pedestals:filter/filteritemstack",
+      "text": "This can filter for specific items, taking into account its nbt and additional data."
+    },
+    {
+      "title": "Example(s)",
+      "type": "text",
+      "text": "$(li)Lets say we want to automate brewing. We want, say a Swiftness Potion, but do not want any of the previous steps to be extracted. You'd set the swiftness potion in your filter, insert it into the pedestal, then the pedestal would not be able to accept any previous stages of the potion, until that $(l)SPECIFIC$() potion is ready."
+    }
+  ]
+}

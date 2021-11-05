@@ -1,7 +1,6 @@
 {
   "category": "filters",
   "name": "Base Filter",
-  "subtitle": "The $(l)Base$() to all filtering things!",
   "icon": "pedestals:filter/filterbase",
   "sortnum": 0,
   "priority": true,

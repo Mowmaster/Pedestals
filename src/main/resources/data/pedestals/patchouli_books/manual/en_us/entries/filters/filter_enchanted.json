@@ -1,0 +1,20 @@
+{
+  "category": "filters",
+  "name": "Filter (isEnchanted)",
+  "icon": "pedestals:filter/filterenchanted",
+  "sortnum": 6,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Filter Base",
+      "recipe": "pedestals:filter/filteritemstack",
+      "text": "This can filter for ."
+    },
+    {
+      "title": "Example(s)",
+      "type": "text",
+      "text": "$(li)."
+    }
+  ]
+}

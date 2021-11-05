@@ -1,0 +1,20 @@
+{
+  "category": "filters",
+  "name": "Filter (Mod)",
+  "icon": "pedestals:filter/filtermod",
+  "sortnum": 3,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Filter Base",
+      "recipe": "pedestals:filter/filtermod",
+      "text": "This can filter for items in the same mod as the one set in the filter."
+    },
+    {
+      "title": "Example(s)",
+      "type": "text",
+      "text": "$(li)Say we want to setup an early game storage system, if we set 1 item from 8 different mods in our first filter, then 8 stage 2 filters each containing 1 of those different mod items, ."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Filter (Item)",
+  "icon": "pedestals:filter/filteritem",
+  "sortnum": 2,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "This filters for Items, regardless of the additional data an item can contain."
+    },
+    {
+      "title": "Additional Info:",
+      "type": "text",
+      "text": "You can find its crafting and more in-depth info here: $(br)$(l:pedestals:filters/filter_item)Filter (Item)$()"
+    }
+  ]
+}

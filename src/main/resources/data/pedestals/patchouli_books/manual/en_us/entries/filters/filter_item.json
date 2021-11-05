@@ -1,20 +1,20 @@
 {
   "category": "filters",
-  "name": "Item Filter",
-  "subtitle": "Imports items from inventories into the pedestal.",
-  "icon": "pedestals:coin/attack",
+  "name": "Filter (Item)",
+  "icon": "pedestals:filter/filteritem",
   "sortnum": 1,
   "priority": true,
   "pages": [
     {
-      "title": "Overview",
-      "type": "text",
-      "text": "General Vague Overview"
+      "type": "crafting",
+      "title": "Filter Base",
+      "recipe": "pedestals:filter/filteritem",
+      "text": "This can filter for items, regardless of nbt or additional data it contains."
     },
     {
-      "title": "Original Page",
+      "title": "Example(s)",
       "type": "text",
-      "text": "Please see the original Entry for more info: $(l:pedestals:upgrades/type_mob/attacker)Auto Attacker "
+      "text": "There isnt a whole lot to this filter, it does 1 job, very well. $(li)Lets say we have a witch farm, since we can get a variety of potions from them it would be handy to be able to filter out all potions, Using this filter you could set a water bottle in the filter, and the filter would now be able to filter for all manner of vanilla style potions."
     }
   ]
 }

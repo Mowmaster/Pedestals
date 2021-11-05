@@ -1,0 +1,19 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Filter (Durability)",
+  "icon": "pedestals:filter/filterdurability",
+  "sortnum": 11,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "This filters items that have the same percentage of durability and if its Above or Below."
+    },
+    {
+      "title": "Additional Info:",
+      "type": "text",
+      "text": "You can find its crafting and more in-depth info here: $(br)$(l:pedestals:filters/filter_durability)Filter (Durability)$()"
+    }
+  ]
+}

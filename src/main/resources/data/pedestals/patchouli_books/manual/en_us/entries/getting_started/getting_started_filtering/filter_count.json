@@ -1,0 +1,19 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Filter (Restricted)",
+  "icon": "pedestals:filter/filterrestriction",
+  "sortnum": 12,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "This restricts how many items can be received at one time."
+    },
+    {
+      "title": "Additional Info:",
+      "type": "text",
+      "text": "You can find its crafting and more in-depth info here: $(br)$(l:pedestals:filters/filter_count)Filter (Restricted)$()"
+    }
+  ]
+}

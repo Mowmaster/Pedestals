@@ -1,0 +1,20 @@
+{
+  "category": "filters",
+  "name": "Filter (Durability)",
+  "icon": "pedestals:filter/filterdurability",
+  "sortnum": 10,
+  "priority": true,
+  "pages": [
+    {
+      "type": "crafting",
+      "title": "Filter Base",
+      "recipe": "pedestals:filter/filteritemstack",
+      "text": "This can filter for ."
+    },
+    {
+      "title": "Example(s)",
+      "type": "text",
+      "text": "$(li)."
+    }
+  ]
+}

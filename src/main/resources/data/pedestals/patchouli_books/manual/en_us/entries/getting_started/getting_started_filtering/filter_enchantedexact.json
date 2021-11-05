@@ -1,0 +1,19 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Filter (Enchanted Exact)",
+  "icon": "pedestals:filter/filterenchantedexact",
+  "sortnum": 9,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "This filters for items with the same exact matching enchants."
+    },
+    {
+      "title": "Additional Info:",
+      "type": "text",
+      "text": "You can find its crafting and more in-depth info here: $(br)$(l:pedestals:filters/filter_enchantedexact)Filter (Enchanted Exact)$()"
+    }
+  ]
+}

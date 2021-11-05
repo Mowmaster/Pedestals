@@ -1,0 +1,19 @@
+{
+  "category": "getting_started/getting_started_filtering",
+  "name": "Filter (Enchanted Fuzzy)",
+  "icon": "pedestals:filter/filterenchantedfuzzy",
+  "sortnum": 8,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "This filters for any item that has the matching enchant."
+    },
+    {
+      "title": "Additional Info:",
+      "type": "text",
+      "text": "You can find its crafting and more in-depth info here: $(br)$(l:pedestals:filters/filter_enchantedfuzzy)Filter (Enchanted Fuzzy)$()"
+    }
+  ]
+}
