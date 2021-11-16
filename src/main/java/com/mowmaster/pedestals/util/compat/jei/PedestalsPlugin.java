@@ -3,6 +3,8 @@ package com.mowmaster.pedestals.util.compat.jei;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.enchants.EnchantmentRegistry;
 import com.mowmaster.pedestals.item.*;
+import com.mowmaster.pedestals.item.augments.ItemPedestalRenderAugment;
+import com.mowmaster.pedestals.item.augments.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.books.*;
 import com.mowmaster.pedestals.item.pedestalFilters.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
@@ -178,6 +180,7 @@ public class PedestalsPlugin implements IModPlugin {
         addValueInfoPage(registration, ItemPedestalUpgrades.ROUNDROBIN, "upgraderoundrobin");
         addValueInfoPage(registration, ItemPedestalUpgrades.SOUNDMUFFLER, "upgradesoundmuffler");
         addValueInfoPage(registration, ItemPedestalUpgrades.PARTICLEDIFFUSER, "upgradeparticlediffuser");
+        addValueInfoPage(registration, ItemPedestalRenderAugment.RENDERAUGMENT, "upgraderenderaugment");
         addValueInfoPage(registration, ItemTagTool.TAG, "tagtool");
         addValueInfoPage(registration, ItemUpgradeTool.UPGRADE, "upgradetool");
         addValueInfoPage(registration, ItemToolSwapper.QUARRYTOOL, "toolswapper");

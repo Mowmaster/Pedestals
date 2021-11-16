@@ -1,4 +1,4 @@
-package com.mowmaster.pedestals.item;
+package com.mowmaster.pedestals.item.augments;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -21,8 +21,6 @@ public class ItemPedestalUpgrades extends Item {
     public static final Item SOUNDMUFFLER = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradesoundmuffler"));
     public static final Item PARTICLEDIFFUSER = new ItemPedestalUpgrades().setRegistryName(new ResourceLocation(MODID, "upgradeparticlediffuser"));
 
-
-
     @SubscribeEvent
     public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
     {
@@ -32,6 +30,7 @@ public class ItemPedestalUpgrades extends Item {
         event.getRegistry().register(ROUNDROBIN);
         event.getRegistry().register(SOUNDMUFFLER);
         event.getRegistry().register(PARTICLEDIFFUSER);
+        ItemPedestalRenderAugment.onItemRegistryReady(event);
     }
 
 

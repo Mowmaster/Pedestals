@@ -1,9 +1,8 @@
 package com.mowmaster.pedestals.crafting;
 
 import com.mowmaster.pedestals.item.ItemLinkingTool;
-import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
+import com.mowmaster.pedestals.item.augments.ItemPedestalUpgrades;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.ParrotEntity;
@@ -25,7 +24,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 
 @Mod.EventBusSubscriber

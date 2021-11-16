@@ -35,49 +35,56 @@ public class RenderPedestal extends TileEntityRenderer<PedestalTileEntity> {
             ItemStack stack = tileEntityIn.getItemInPedestalOverride();
             ItemStack coin = tileEntityIn.getCoinOnPedestal();
             World world = tileEntityIn.getWorld();
+            int renderAugmentType = tileEntityIn.getRenderAugmentType();
 
-            if(facing== Direction.UP)//when placed on ground
+            if(renderAugmentType !=0)
             {
-                renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn);
+                if(facing== Direction.UP)//when placed on ground
+                {
+                    renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn,renderAugmentType);
+                }
+                if(facing== Direction.DOWN) {
+                    //matrixStackIn.rotate(new Quaternion(0, 0, 1,180));
+                    matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180));
+                    matrixStackIn.translate(0, -1, 0);
+                    matrixStackIn.translate(-1, 0, 0);
+                    renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn,renderAugmentType);            }
+                if(facing== Direction.NORTH) {
+                    //matrixStackIn.rotate(new Quaternion(1, 0, 0,270));
+                    matrixStackIn.rotate(Vector3f.XP.rotationDegrees(270));
+                    matrixStackIn.translate(0, -1, 0);
+                    renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn,renderAugmentType);            }
+                if(facing== Direction.EAST) {
+                    //matrixStackIn.rotate(270, 0, 0, 1);
+                    matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(270));
+                    matrixStackIn.translate(-1, 0, 0);
+                    renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn,renderAugmentType);            }
+                if(facing== Direction.SOUTH) {
+                    //matrixStackIn.rotate(90, 1, 0, 0);
+                    matrixStackIn.rotate(Vector3f.XP.rotationDegrees(90));
+                    matrixStackIn.translate(0, 0, -1);
+                    renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn,renderAugmentType);            }
+                if(facing== Direction.WEST) {
+                    //matrixStackIn.rotate(90, 0, 0, 1);
+                    matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(90));
+                    matrixStackIn.translate(0, -1, 0);
+                    renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn,renderAugmentType);            }
             }
-            if(facing== Direction.DOWN) {
-                //matrixStackIn.rotate(new Quaternion(0, 0, 1,180));
-                matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180));
-                matrixStackIn.translate(0, -1, 0);
-                matrixStackIn.translate(-1, 0, 0);
-                renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn);            }
-            if(facing== Direction.NORTH) {
-                //matrixStackIn.rotate(new Quaternion(1, 0, 0,270));
-                matrixStackIn.rotate(Vector3f.XP.rotationDegrees(270));
-                matrixStackIn.translate(0, -1, 0);
-                renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn);            }
-            if(facing== Direction.EAST) {
-                //matrixStackIn.rotate(270, 0, 0, 1);
-                matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(270));
-                matrixStackIn.translate(-1, 0, 0);
-                renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn);            }
-            if(facing== Direction.SOUTH) {
-                //matrixStackIn.rotate(90, 1, 0, 0);
-                matrixStackIn.rotate(Vector3f.XP.rotationDegrees(90));
-                matrixStackIn.translate(0, 0, -1);
-                renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn);            }
-            if(facing== Direction.WEST) {
-                //matrixStackIn.rotate(90, 0, 0, 1);
-                matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(90));
-                matrixStackIn.translate(0, -1, 0);
-                renderTile(world,matrixStackIn,bufferIn,coin,stack,combinedLightIn,combinedOverlayIn);            }
         }
     }
 
-    public static void  renderTile(World worldIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, ItemStack coin, ItemStack item, int combinedLightIn, int combinedOverlayIn)
+    public static void  renderTile(World worldIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, ItemStack coin, ItemStack item, int combinedLightIn, int combinedOverlayIn, int renderAugmentType)
     {
-        renderItemRotating(worldIn,matrixStackIn,bufferIn,item,combinedLightIn,combinedOverlayIn);
-        renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.5f,0.475f,0.3125f,0,0,0,0,combinedLightIn,combinedOverlayIn);
-        renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.3125f,0.475f,0.5f,90,0,1f,0,combinedLightIn,combinedOverlayIn);
-        renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.5f,0.475f,0.6875f,180,0,1f,0,combinedLightIn,combinedOverlayIn);
-        renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.6875f,0.475f,0.5f,270,0,1f,0,combinedLightIn,combinedOverlayIn);
-
+        if(renderAugmentType !=2)renderItemRotating(worldIn,matrixStackIn,bufferIn,item,combinedLightIn,combinedOverlayIn);
+        if(renderAugmentType !=1)
+        {
+            renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.5f,0.475f,0.3125f,0,0,0,0,combinedLightIn,combinedOverlayIn);
+            renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.3125f,0.475f,0.5f,90,0,1f,0,combinedLightIn,combinedOverlayIn);
+            renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.5f,0.475f,0.6875f,180,0,1f,0,combinedLightIn,combinedOverlayIn);
+            renderCoin(worldIn,coin,matrixStackIn,bufferIn,0.6875f,0.475f,0.5f,270,0,1f,0,combinedLightIn,combinedOverlayIn);
+        }
     }
+
     public static void renderItemRotating(World worldIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, ItemStack itemStack, int combinedLightIn, int combinedOverlayIn)
     {
         if (!itemStack.isEmpty()) {

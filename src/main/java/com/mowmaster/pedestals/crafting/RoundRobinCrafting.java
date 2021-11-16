@@ -1,25 +1,17 @@
 package com.mowmaster.pedestals.crafting;
 
-import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.item.ItemLinkingTool;
-import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
-import com.mowmaster.pedestals.item.ItemRegistry;
+import com.mowmaster.pedestals.item.augments.ItemPedestalUpgrades;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.ParrotEntity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;

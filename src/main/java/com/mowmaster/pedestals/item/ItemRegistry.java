@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.item;
 
 import com.mowmaster.pedestals.blocks.*;
+import com.mowmaster.pedestals.item.augments.ItemPedestalRenderAugment;
+import com.mowmaster.pedestals.item.augments.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.books.ItemEnchantableBookBase;
 import com.mowmaster.pedestals.item.pedestalFilters.*;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
@@ -141,5 +143,6 @@ public class ItemRegistry
         ItemFilterEnchantedCount.handleItemColors(event);
         ItemFilterDurability.handleItemColors(event);
         ItemFilterRestricted.handleItemColors(event);
+        ItemPedestalRenderAugment.handleItemColors(event);
     }
 }

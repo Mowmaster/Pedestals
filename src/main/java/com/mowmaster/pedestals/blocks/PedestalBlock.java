@@ -3,6 +3,8 @@ package com.mowmaster.pedestals.blocks;
 import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.item.*;
+import com.mowmaster.pedestals.item.augments.ItemPedestalRenderAugment;
+import com.mowmaster.pedestals.item.augments.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
@@ -408,6 +410,13 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                         ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeParticleDiffuser());
                     }
                 }
+                else if(getItemInOffHand.equals(ItemPedestalRenderAugment.RENDERAUGMENT))
+                {
+                    if(tilePedestal.hasRenderAugment())
+                    {
+                        ItemHandlerHelper.giveItemToPlayer(player,tilePedestal.removeRenderAugment());
+                    }
+                }
                 else if(getItemInOffHand.equals(ItemUpgradeTool.UPGRADE) || getItemInOffHand instanceof IUpgradeBase)
                 {
                     if(tilePedestal.hasCoin())
@@ -566,6 +575,15 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                     if(!tilePedestal.hasParticleDiffuser())
                     {
                         tilePedestal.addParticleDiffuser(getItemStackInOffHand);
+                        if(!isCreative)getItemStackInOffHand.shrink(1);
+                        return ActionResultType.SUCCESS;
+                    }
+                }
+                else if(getItemInOffHand.equals(ItemPedestalRenderAugment.RENDERAUGMENT))
+                {
+                    if(!tilePedestal.hasRenderAugment())
+                    {
+                        tilePedestal.addRenderAugment(getItemStackInOffHand);
                         if(!isCreative)getItemStackInOffHand.shrink(1);
                         return ActionResultType.SUCCESS;
                     }

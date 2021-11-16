@@ -4,7 +4,8 @@ import com.mowmaster.pedestals.api.filter.IFilterBase;
 import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.blocks.PedestalBlock;
 import com.mowmaster.pedestals.crafting.CraftingPedestals;
-import com.mowmaster.pedestals.item.ItemPedestalUpgrades;
+import com.mowmaster.pedestals.item.augments.ItemPedestalRenderAugment;
+import com.mowmaster.pedestals.item.augments.ItemPedestalUpgrades;
 import com.mowmaster.pedestals.item.pedestalFilters.ItemFilterBase;
 import com.mowmaster.pedestals.item.pedestalUpgrades.*;
 import com.mowmaster.pedestals.network.PacketHandler;
@@ -23,14 +24,12 @@ import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LockCode;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -584,17 +583,17 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     ITag<Item> FILTER_BROKE_UPGRADES = ItemTags.getCollection().get(filtersBreakTheseUpgrades);
 
     private IItemHandler createHandlerPedestalPrivate() {
-        //going from 5 to 10 slots to future proof things
-        return new ItemStackHandler(11) {
+        //going from 5 to 11 slots to future proof things
+        return new ItemStackHandler(12) {
 
             @Override
             protected void onLoad() {
-                if(getSlots()<11)
+                if(getSlots()<12)
                 {
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    setSize(11);
+                    setSize(12);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
                     }
@@ -633,6 +632,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if (slot == 8 && stack.getItem().equals(ItemPedestalUpgrades.ROUNDROBIN) && !hasRRobin()) return true;
                 if (slot == 9 && stack.getItem().equals(ItemPedestalUpgrades.SOUNDMUFFLER)) return true;
                 if (slot == 10 && stack.getItem().equals(ItemPedestalUpgrades.PARTICLEDIFFUSER)) return true;
+                if (slot == 11 && stack.getItem().equals(ItemPedestalRenderAugment.RENDERAUGMENT)) return true;
                 return false;
             }
         };
@@ -1856,6 +1856,73 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
     /*============================================================================
     ==============================================================================
     ===========================    PARTICLE END     ==============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ============================   RENDER START    ===============================
+    ==============================================================================
+    ============================================================================*/
+
+    public ItemStack addRenderAugment(ItemStack particle)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        ItemStack itemFromBlock = particle.copy();
+        itemFromBlock.setCount(1);
+        if(!hasRenderAugment())
+        {
+            //update();
+            return ph.insertItem(11,itemFromBlock,false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeRenderAugment()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasRenderAugment())
+        {
+            //update();
+            return ph.extractItem(11,ph.getStackInSlot(11).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public boolean hasRenderAugment()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(11).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public int getRenderAugmentType()
+    {
+        // 0 = BOTH
+        // 1 = UPGRADE
+        // 2 = ITEM
+        // 3 = NORMAL RENDER
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasRenderAugment())
+        {
+            if(ph.getStackInSlot(11).getItem() instanceof ItemPedestalRenderAugment)
+            {
+                ItemPedestalRenderAugment augment = ((ItemPedestalRenderAugment)ph.getStackInSlot(11).getItem());
+                return augment.getAugmentType(ph.getStackInSlot(11));
+            }
+            else  return 0;
+        }
+        else  return 3;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ============================    RENDER END     ===============================
     ==============================================================================
     ============================================================================*/
 
