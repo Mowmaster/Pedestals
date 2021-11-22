@@ -2,7 +2,6 @@ package com.mowmaster.pedestals.crafting;
 
 import com.mowmaster.pedestals.item.ItemColorPallet;
 import com.mowmaster.pedestals.item.ItemLinkingTool;
-import javafx.scene.layout.Priority;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
