@@ -549,7 +549,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                     //System.out.println("Override: "+super.extractItem(0, amount, true));
                     return super.extractItem(0, amount, simulate);
                 }
-                else if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
+                else if(getCoinOnPedestal().getItem() instanceof IUpgradeBase && getCoinOnPedestal().getItem().equals(super.extractItem(slot,amount,simulate)))
                 {
                     IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
                     if(!IUB.customExtractItem(getTile(),amount, true).getItem().equals(Items.COMMAND_BLOCK))
