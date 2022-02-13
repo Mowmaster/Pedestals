@@ -1,7 +1,0 @@
-{
-  "name": "Filtering",
-  "description": "Filters can be applied to pedestals, this effects what items the pedestal can $(l)RECEIVE$(), which can also effect the actions of upgrades as well. $(br2)This section will brief you on what each filter can do, seek out the Filtering category later if you need a more in depth explanation of how it works. ",
-  "icon": "pedestals:filter/filterbase",
-  "sortnum": 6,
-  "parent": "getting_started/getting_started"
-}

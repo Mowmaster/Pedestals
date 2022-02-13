@@ -1,7 +1,0 @@
-{
-  "name": "Lighting & Waterlogging",
-  "description": "",
-  "icon": "minecraft:glowstone",
-  "sortnum": 2,
-  "parent": "getting_started/getting_started"
-}
