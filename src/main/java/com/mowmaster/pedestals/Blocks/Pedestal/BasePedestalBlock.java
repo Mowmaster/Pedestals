@@ -737,14 +737,12 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
     {
         int hasItem=0;
         BlockEntity blockEntity = worldIn.getBlockEntity(pos);
-        if(blockEntity instanceof BasePedestalBlockEntity) {
-            BasePedestalBlockEntity pedestal = ((BasePedestalBlockEntity) blockEntity);
+        if(blockEntity instanceof BasePedestalBlockEntity pedestal) {
             ItemStack itemstack = pedestal.getItemInPedestal();
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            /*if(coin.getItem() instanceof IPedestalUpgrade)
+            if(pedestal.getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
             {
-                return ((IPedestalUpgrade)coin.getItem()).getComparatorRedstoneLevel(worldIn,pos);
-            }*/
+                return upgrade.getComparatorRedstoneLevel(worldIn,pos);
+            }
             if(!itemstack.isEmpty())
             {
                 float f = (float)itemstack.getCount()/(float)itemstack.getMaxStackSize();

@@ -34,9 +34,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.stream.IntStream;
 
-import static com.mowmaster.pedestals.PedestalUtils.PedestalUtilities.*;
-import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
-
 
 public class ItemUpgradeImport extends ItemUpgradeBase
 {

@@ -43,6 +43,12 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         super(new Properties().tab(PedestalsTab.TAB_ITEMS));
     }
 
+    /*
+    *
+    * Methods Runs By Pedestal
+    * START
+    *
+     */
     @Override
     public int getComparatorRedstoneLevel(Level worldIn, BlockPos pos) {
         return PedestalUtilities.getRedstoneLevelPedestal(worldIn, pos);
@@ -57,6 +63,13 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn) {
 
     }
+
+    /*
+     *
+     * Methods Runs By Pedestal
+     * END
+     *
+     */
 
 
     public static void saveModeToNBT(ItemStack augment, int mode)

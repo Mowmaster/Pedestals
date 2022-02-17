@@ -901,9 +901,9 @@ public class BasePedestalBlockEntity extends BlockEntity
             if(pedestal.hasCoin())
             {
                 Item coinInPed = pedestal.getCoinOnPedestal().getItem();
-                if(coinInPed instanceof IPedestalUpgrade)
+                if(coinInPed instanceof IPedestalUpgrade upgrade)
                 {
-                    ((IPedestalUpgrade) coinInPed).actionOnCollideWithBlock(pedestal, entityIn);
+                    upgrade.actionOnCollideWithBlock(pedestal, entityIn);
                 }
             }
         }
@@ -2389,7 +2389,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 if(hasCoin() && !isPedestalBlockPowered(getPedestal()))
                 {
                     Item coinInPed = getCoinOnPedestal().getItem();
-                    if(coinInPed instanceof IPedestalUpgrade) { ((IPedestalUpgrade) coinInPed).updateAction(level,this); }
+                    if(coinInPed instanceof IPedestalUpgrade upgrade) { upgrade.updateAction(level,this); }
                 }
 
                 List<Entity> entitiesColliding = level.getEntitiesOfClass(Entity.class,new AABB(getPos()));

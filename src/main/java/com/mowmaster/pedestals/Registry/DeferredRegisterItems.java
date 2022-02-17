@@ -8,6 +8,7 @@ import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeExport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeImport;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines.ItemUpgradeCobbleGenerator;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -74,6 +75,9 @@ public class DeferredRegisterItems
             () -> new ItemUpgradeImport(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_EXPORT = ITEMS.register("upgrade_pedestal_export",
             () -> new ItemUpgradeExport(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_COBBLEGEN = ITEMS.register("upgrade_pedestal_cobblegen",
+            () -> new ItemUpgradeCobbleGenerator(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_ROUNDROBIN = ITEMS.register("augment_pedestal_roundrobin",
             () -> new AugmentBase(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
