@@ -11,7 +11,7 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 public class OwnerUtil
 {
-    public void removePlayerFromStack(ItemStack stack)
+    public static void removePlayerFromStack(ItemStack stack)
     {
         if(hasPlayerSet(stack))
         {
@@ -38,7 +38,7 @@ public class OwnerUtil
     //UUID HANDLING
     //
 
-    public UUID getPlayerFromStack(ItemStack stack)
+    public static UUID getPlayerFromStack(ItemStack stack)
     {
         if(hasPlayerSet(stack))
         {
@@ -51,13 +51,13 @@ public class OwnerUtil
         return Util.NIL_UUID;
     }
 
-    public void setPlayerStack(ItemStack stack, Player player)
+    public static void setPlayerStack(ItemStack stack, Player player)
     {
         writeUUIDToNBT(stack,player.getUUID());
         writeNameToStackNBT(stack,player.getDisplayName().getString());
     }
 
-    public boolean hasPlayerSet(ItemStack stack)
+    public static boolean hasPlayerSet(ItemStack stack)
     {
         boolean returner = false;
         CompoundTag compound = new CompoundTag();
@@ -75,7 +75,7 @@ public class OwnerUtil
         return returner;
     }
 
-    public void writeUUIDToNBT(ItemStack stack, UUID uuidIn)
+    public static void writeUUIDToNBT(ItemStack stack, UUID uuidIn)
     {
         CompoundTag compound = new CompoundTag();
         if(stack.hasTag())
@@ -87,7 +87,7 @@ public class OwnerUtil
         stack.setTag(compound);
     }
 
-    public UUID readUUIDFromNBT(ItemStack stack)
+    public static UUID readUUIDFromNBT(ItemStack stack)
     {
         if(stack.hasTag())
         {
@@ -102,7 +102,7 @@ public class OwnerUtil
     //PLAYER NAME HANDLING
     //
 
-    public String getPlayerNameFromStack(ItemStack stack)
+    public static String getPlayerNameFromStack(ItemStack stack)
     {
         if(hasPlayerNameSet(stack))
         {
@@ -111,7 +111,7 @@ public class OwnerUtil
         return null;
     }
 
-    public boolean hasPlayerNameSet(ItemStack stack)
+    public static boolean hasPlayerNameSet(ItemStack stack)
     {
         boolean returner = false;
         CompoundTag compound = new CompoundTag();
@@ -129,7 +129,7 @@ public class OwnerUtil
         return returner;
     }
 
-    public void writeNameToStackNBT(ItemStack stack, String name)
+    public static void writeNameToStackNBT(ItemStack stack, String name)
     {
         CompoundTag compound = new CompoundTag();
         if(stack.hasTag())
@@ -141,7 +141,7 @@ public class OwnerUtil
         stack.setTag(compound);
     }
 
-    public String readNameFromStackNBT(ItemStack stack)
+    public static String readNameFromStackNBT(ItemStack stack)
     {
         if(stack.hasTag())
         {
@@ -152,7 +152,7 @@ public class OwnerUtil
         return null;
     }
 
-    public CompoundTag writeNameToNBT(CompoundTag tag, String name)
+    public static CompoundTag writeNameToNBT(CompoundTag tag, String name)
     {
         CompoundTag compound = tag;
 
@@ -160,7 +160,7 @@ public class OwnerUtil
         return compound;
     }
 
-    public String readNameFromNBT(CompoundTag tag)
+    public static String readNameFromNBT(CompoundTag tag)
     {
         if(tag.contains(MODID + "_playername"))
         {

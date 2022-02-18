@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " RG",
+    " SB",
+    "D  "
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:dyes/red"
+    },
+    "G": {
+      "tag": "forge:dyes/green"
+    },
+    "B": {
+      "tag": "forge:dyes/blue"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    },
+    "D": {
+      "tag": "forge:ingots/gold"
+    }
+  },
+  "result": {
+    "item": "pedestals:tool_upgradetool"
+  }
+}

@@ -67,12 +67,13 @@ public class pedestals
         DeferredRegisterTileBlocks.BLOCKS.register(eventBus);
         DeferredBlockEntityTypes.BLOCK_ENTITIES.register(eventBus);
 
+        addRecipes(eventBus);
     }
 
-    /*public void addRecipes(IEventBus event)
+    public void addRecipes(IEventBus event)
     {
         DeferredRecipeSerializers.RECIPES.register(event);
-    }*/
+    }
 
     private void setup(final FMLCommonSetupEvent event)
     {

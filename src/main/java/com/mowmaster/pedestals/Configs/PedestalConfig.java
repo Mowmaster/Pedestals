@@ -11,17 +11,17 @@ public class PedestalConfig
     public static class Common {
 
 
-        public final ForgeConfigSpec.IntValue effectMaxPotency;
+        public final ForgeConfigSpec.IntValue cobbleGeneratorMultiplier;
 
 
 
         Common(ForgeConfigSpec.Builder builder) {
 
-            builder.comment("Potency Setting").push("Potency");
+            builder.comment("Upgrade Machine Configs").push("Upgrade_Machines");
 
-            effectMaxPotency = builder
-                    .comment("Max Effect Potency")
-                    .defineInRange("maxPotency", 5, 0, Integer.MAX_VALUE);
+            cobbleGeneratorMultiplier = builder
+                    .comment("Cobble Gen Multiplier")
+                    .defineInRange("genMultiplier", 16, 1, Integer.MAX_VALUE);
             builder.pop();
         }
     }
@@ -37,11 +37,11 @@ public class PedestalConfig
 
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading configEvent) {
-        pedestals.LOGGER.debug("Loaded Dust's config file {}", configEvent.getConfig().getFileName());
+        pedestals.LOGGER.debug("Loaded Pedestals config file {}", configEvent.getConfig().getFileName());
     }
 
     @SubscribeEvent
     public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
-        pedestals.LOGGER.debug("Dust's config just got changed on the file system!");
+        pedestals.LOGGER.debug("Pedestals config just got changed on the file system!");
     }
 }

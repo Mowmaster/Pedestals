@@ -1,0 +1,13 @@
+{
+  "type": "pedestals:pedestals_cobblegen",
+  "input": {
+    "item": ""
+  },
+  "result": {
+    "item": "minecraft:iron_ore"
+  },
+  "energy": 0,
+  "experience": 0,
+  "fluidName": "",
+  "fluid": 0
+}

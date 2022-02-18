@@ -3,6 +3,8 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
+import com.mowmaster.pedestals.PedestalUtils.OwnerUtil;
+import com.mowmaster.pedestals.PedestalUtils.PedestalFakePlayer;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -16,6 +18,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -24,12 +27,14 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -479,6 +484,42 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             p_41423_.add(base);
         }
     }
+
+
+
+    /*============================================================================
+    ==============================================================================
+    =========================    FAKE PLAYER  START    ===========================
+    ==============================================================================
+    ============================================================================*/
+
+    public WeakReference<FakePlayer> fakePedestalPlayer(BasePedestalBlockEntity pedestal)
+    {
+        Level world = pedestal.getLevel();
+        ItemStack upgrade = pedestal.getCoinOnPedestal();
+        if(world instanceof ServerLevel slevel)
+        {
+            return new WeakReference<FakePlayer>(new PedestalFakePlayer(slevel , OwnerUtil.getPlayerFromStack(upgrade), OwnerUtil.getPlayerNameFromStack(upgrade),pedestal));
+        }
+        else return null;
+    }
+
+    public WeakReference<FakePlayer> fakePedestalPlayer(BasePedestalBlockEntity pedestal, ItemStack itemInHand)
+    {
+        Level world = pedestal.getLevel();
+        ItemStack upgrade = pedestal.getCoinOnPedestal();
+        if(world instanceof ServerLevel slevel)
+        {
+            return new WeakReference<FakePlayer>(new PedestalFakePlayer(slevel,OwnerUtil.getPlayerFromStack(upgrade), OwnerUtil.getPlayerNameFromStack(upgrade),pedestal.getPos(),itemInHand));
+        }
+        else return null;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    =========================     FAKE PLAYER  END     ===========================
+    ==============================================================================
+    ============================================================================*/
 
 
 }

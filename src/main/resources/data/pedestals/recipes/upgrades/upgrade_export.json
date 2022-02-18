@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_import"
+    }
+  ],
+  "result": {
+    "item": "pedestals:upgrade_pedestal_export"
+  }
+}

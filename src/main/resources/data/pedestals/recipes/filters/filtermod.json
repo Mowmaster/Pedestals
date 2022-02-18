@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:filter_base"
+    },
+    {
+      "tag": "forge:glass"
+    }
+  ],
+  "result": {
+    "item": "pedestals:filter_mod"
+  }
+}
