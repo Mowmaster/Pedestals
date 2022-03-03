@@ -71,7 +71,7 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
 
     public void updateAction(World world, PedestalTileEntity pedestal)
     {
-        if(!world.isRemote)
+        /*if(!world.isRemote)
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             BlockPos pedestalPos = pedestal.getPos();
@@ -84,7 +84,7 @@ public class ItemUpgradeCraftermk2 extends ItemUpgradeBaseMachine
                     upgradeAction(pedestal);
                 }
             }
-        }
+        }*/
     }
 
     public static IRecipe<CraftingInventory> findRecipe(CraftingInventory inv, World world) {
