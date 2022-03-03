@@ -127,7 +127,7 @@ public class ItemLinkingTool extends Item {
                                             if(!tilePedestal.isAlreadyLinked(getStoredPosition(player.getHeldItemMainhand())))
                                             {
                                                 //Checks if senderPedestal has locationSlots available
-                                                //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
+                                                ////System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                 if(tilePedestal.storeNewLocation(getStoredPosition(player.getHeldItemMainhand())))
                                                 {
                                                     //If slots are available then set wrench properties back to a default value
@@ -221,7 +221,7 @@ public class ItemLinkingTool extends Item {
                             player.sendMessage(capacity,Util.DUMMY_UUID);
                         }
 
-                        if(tilePedestal.getCapacity()>0)
+                        if(tilePedestal.getRange()>0)
                         {
                             TranslationTextComponent range = new TranslationTextComponent(getTranslationKey() + ".tool_range");
                             range.appendString(""+tilePedestal.getRange()+"");
@@ -347,7 +347,7 @@ public class ItemLinkingTool extends Item {
 
                                         /*if(ticker>30)
                                         {
-                                            //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
+                                            //Test to see what location is stored in the wrench //System.out.println(this.getStoredPosition(stack));
                                             for (int c = zmin; c <= zmax; c++) {
                                                 for (int a = xmin; a <= xmax; a++) {
                                                     for (int b = ymin; b <= ymax; b++) {

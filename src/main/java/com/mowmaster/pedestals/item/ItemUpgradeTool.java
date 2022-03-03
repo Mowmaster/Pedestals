@@ -90,14 +90,14 @@ public class ItemUpgradeTool extends Item {
                                 int workSingle = ((ItemUpgradeBase)coin.getItem()).getWorkAreaY(worldIn,pos,coin)[1];
                                 if(workX+workY+workZ > 0)
                                 {
-                                    //System.out.println("X: "+workX);
-                                    //System.out.println("Y: "+workY);
-                                    //System.out.println("Z: "+workZ);
+                                    ////System.out.println("X: "+workX);
+                                    ////System.out.println("Y: "+workY);
+                                    ////System.out.println("Z: "+workZ);
                                     if (player.getHeldItemMainhand().isEnchanted() == false) {
                                         //Gets Pedestal Clicked on Pos
-                                        //System.out.println(pos);
+                                        ////System.out.println(pos);
                                         this.storedPosition = pos;
-                                        //System.out.println(storedPosition);
+                                        ////System.out.println(storedPosition);
                                         //Writes to NBT
                                         writePosToNBT(player.getHeldItemMainhand());
                                         writeWorkPosToNBT(player.getHeldItemMainhand(),workX,workY,workZ,workSingle);
@@ -218,7 +218,7 @@ public class ItemUpgradeTool extends Item {
                     {
                         if(isSelected)
                         {
-                            //System.out.println("Tick: "+pos);
+                            ////System.out.println("Tick: "+pos);
                             if(worldIn.isRemote)
                             {
                                 ticker++;
@@ -227,7 +227,7 @@ public class ItemUpgradeTool extends Item {
                                 {
                                     if(ticker>30)
                                     {
-                                        //Test to see what location is stored in the wrench System.out.println(this.getStoredPosition(stack));
+                                        //Test to see what location is stored in the wrench //System.out.println(this.getStoredPosition(stack));
                                         for (int x = negNums.getX(); x <= posNums.getX(); x++) {
                                             for (int z = negNums.getZ(); z <= posNums.getZ(); z++) {
                                                 for (int y = negNums.getY(); y <= posNums.getY(); y++) {

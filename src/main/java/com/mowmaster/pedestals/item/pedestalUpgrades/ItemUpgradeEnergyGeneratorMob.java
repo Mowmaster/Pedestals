@@ -133,9 +133,9 @@ public class ItemUpgradeEnergyGeneratorMob extends ItemUpgradeBaseEnergy
         List<LivingEntity> entityList = world.getEntitiesWithinAABB(LivingEntity.class,getBox);
         for(LivingEntity getEntityFromList : entityList)
         {
-            System.out.println(getEntityFromList.getDisplayName().getString());
-            System.out.println(getEntityFromList.getLootTableResourceLocation());
-            System.out.println(getEntityFromList.getAttribute(Attributes.MAX_HEALTH).getValue());
+            //System.out.println(getEntityFromList.getDisplayName().getString());
+            //System.out.println(getEntityFromList.getLootTableResourceLocation());
+            //System.out.println(getEntityFromList.getAttribute(Attributes.MAX_HEALTH).getValue());
 
             FakePlayer fakePlayer = FakePlayerFactory.get((ServerWorld) world,new GameProfile(getPlayerFromCoin(coinInPedestal),"[Pedestals]"));
             fakePlayer.setPosition(posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ());
@@ -152,14 +152,14 @@ public class ItemUpgradeEnergyGeneratorMob extends ItemUpgradeBaseEnergy
                     .withParameter(LootParameters.KILLER_ENTITY, fakePlayer)
                     .withParameter(LootParameters.LAST_DAMAGE_PLAYER, fakePlayer)
                     .withNullableParameter(LootParameters.DIRECT_KILLER_ENTITY, fakePlayer);
-            //table.generate(context.build(LootParameterSets.ENTITY)).forEach(stack -> System.out.println(stack.getDisplayName().getString()));
+            //table.generate(context.build(LootParameterSets.ENTITY)).forEach(stack -> //System.out.println(stack.getDisplayName().getString()));
 
             ItemStack stackDrop = ItemStack.EMPTY;
             stackDrop = IntStream.range(0,table.generate(context.build(LootParameterSets.ENTITY)).size())//Int Range
                     .mapToObj(table.generate(context.build(LootParameterSets.ENTITY))::get)//Function being applied to each interval
                     .filter(itemStack -> !itemStack.isEmpty())
                     .findFirst().orElse(ItemStack.EMPTY);
-            System.out.println(stackDrop.getDisplayName().getString());
+            //System.out.println(stackDrop.getDisplayName().getString());
 
         }
         */

@@ -27,5 +27,19 @@ public class RenderPedestalType extends RenderType
                     .cull(CULL_DISABLED)
                     .lightmap(LIGHTMAP_DISABLED)
                     .writeMask(COLOR_WRITE)
-                    .build(false));
+                    .build(false)
+    );
+
+    public static final RenderType BOX_COLOR_FILL = makeType("box_color_fill",
+            DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINES, 256,
+            RenderType.State.getBuilder()
+                    .layer(field_239235_M_)
+                    .transparency(TRANSLUCENT_TRANSPARENCY)
+                    .texture(NO_TEXTURE)
+                    .depthTest(DEPTH_ALWAYS)
+                    .cull(CULL_DISABLED)
+                    .lightmap(LIGHTMAP_DISABLED)
+                    .writeMask(COLOR_WRITE)
+                    .build(false)
+    );
 }

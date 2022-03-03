@@ -105,7 +105,7 @@ public class ItemUpgradeSawMill extends ItemUpgradeBaseMachine
                             int maxInSlot = handler.getSlotLimit(i);
                             itemFromInv = handler.getStackInSlot(i);
                             //Should work without catch since we null check this in our GetNextSlotFunction\
-                            //System.out.println(SawMill.instance().getResult(itemFromInv.getItem()));
+                            ////System.out.println(SawMill.instance().getResult(itemFromInv.getItem()));
                             Collection<ItemStack> jsonResults = getProcessResults(getRecipe(world,itemFromInv));
                             Collection<ItemStack> jsonResultsAdvanced = getProcessResultsAdvanced(getRecipeAdvanced(world,itemFromInv));
 

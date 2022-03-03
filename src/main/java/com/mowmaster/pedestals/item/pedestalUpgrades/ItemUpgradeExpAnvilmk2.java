@@ -417,9 +417,9 @@ VANISHING_CURSE:
 
                                         }
 
-                                        //System.out.println("Level To Combine: "+ intLevelCostToCombine);
+                                        ////System.out.println("Level To Combine: "+ intLevelCostToCombine);
                                         int intExpCostToCombine = getExpCountByLevel(intLevelCostToCombine);
-                                        //System.out.println("XP To Combine: "+ intExpCostToCombine);
+                                        ////System.out.println("XP To Combine: "+ intExpCostToCombine);
                                         if(intExpInCoin >= intExpCostToCombine)
                                         {
                                             ItemStack itemFromInvCopy = itemFromInv.copy();

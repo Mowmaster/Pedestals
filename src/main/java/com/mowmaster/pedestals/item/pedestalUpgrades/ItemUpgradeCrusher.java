@@ -39,7 +39,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
     @Nullable
     protected CrusherRecipeAdvanced getRecipeAdvanced(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
-        //System.out.println(world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null));
+        ////System.out.println(world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null));
         return world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipeAdvanced.recipeType, inv, world).orElse(null);
     }
 
@@ -50,7 +50,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
     @Nullable
     protected CrusherRecipe getRecipe(World world, ItemStack stackIn) {
         Inventory inv = new Inventory(stackIn);
-        //System.out.println(world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null));
+        ////System.out.println(world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null));
         return world == null ? null : world.getRecipeManager().getRecipe(CrusherRecipe.recipeType, inv, world).orElse(null);
     }
 
@@ -163,7 +163,7 @@ public class ItemUpgradeCrusher extends ItemUpgradeBaseMachine
                                                 itemInputsPerSmelt = Math.floorDiv(fuelLeft,burnTimeCostPerItemSmelted );
                                                 if(itemInputsPerSmelt >=1)
                                                 {
-                                                    //System.out.println(itemInputsPerSmelt);
+                                                    ////System.out.println(itemInputsPerSmelt);
                                                     fuelToConsume = burnTimeCostPerItemSmelted * itemInputsPerSmelt;
                                                     itemsOutputWhenStackSmelted = (itemInputsPerSmelt*resultSmelted.getCount());
                                                     copyIncoming.setCount(itemsOutputWhenStackSmelted);

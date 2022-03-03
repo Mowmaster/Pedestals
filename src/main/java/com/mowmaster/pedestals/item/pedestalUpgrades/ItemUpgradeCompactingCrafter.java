@@ -141,7 +141,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                         if(handler != null)
                         {
                             //If they Dont Match, this should force that
-                            //System.out.println("CurrentStackSizeOfInv: "+stackCurrent.size());
+                            ////System.out.println("CurrentStackSizeOfInv: "+stackCurrent.size());
                             if(stackCurrent.size() != intInventorySlotCount)
                             {
                                 List<ItemStack> stackIn = buildInventoryQueue(pedestal);
@@ -154,7 +154,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                             {
                                 intGetNextIteration = 0;
                             }
-                            //System.out.println("CurrentCraftingSize: "+craftingCurrent.size());
+                            ////System.out.println("CurrentCraftingSize: "+craftingCurrent.size());
                             if(craftingCurrent.size() > 0)
                             {
                                 // Get Next iteration to craft
@@ -166,7 +166,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
                                     //copy so we dont set the stack size any higher
                                     ItemStack getRecipe = craftingCurrent.get(intGetNextIteration).copy();
 
-                                    //System.out.println("GetRecipe: "+getRecipe);
+                                    ////System.out.println("GetRecipe: "+getRecipe);
 
                                     if(!getRecipe.isEmpty())
                                     {
@@ -271,7 +271,7 @@ public class ItemUpgradeCompactingCrafter extends ItemUpgradeBaseMachine
             }
         }, gridSize, gridSize);
 
-        //System.out.println("THIS IS THE GRID COUNT FOR THE RECIPE!!!"+ intGridCount);
+        ////System.out.println("THIS IS THE GRID COUNT FOR THE RECIPE!!!"+ intGridCount);
 
         //For Each stack in the invBuffer
         for(int s=0; s<invQueue.size(); s++)

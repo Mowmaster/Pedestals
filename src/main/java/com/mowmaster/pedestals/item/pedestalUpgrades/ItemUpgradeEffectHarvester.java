@@ -1,12 +1,11 @@
 package com.mowmaster.pedestals.item.pedestalUpgrades;
 
 import com.google.common.collect.Sets;
-import com.mowmaster.pedestals.api.IHarvesterOverride;
+import com.mowmaster.pedestals.api.upgrade.IHarvesterOverride;
 import com.mowmaster.pedestals.enchants.*;
 import com.mowmaster.pedestals.network.PacketHandler;
 import com.mowmaster.pedestals.network.PacketParticles;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
-import com.mowmaster.pedestals.util.PedestalFakePlayer;
 import com.mowmaster.pedestals.util.PedestalUtils;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
@@ -20,7 +19,6 @@ import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;

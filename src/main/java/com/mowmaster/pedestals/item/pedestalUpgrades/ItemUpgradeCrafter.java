@@ -129,7 +129,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                         if(handler != null)
                         {
                             //If they Dont Match, this should force that
-                            //System.out.println("CurrentStackSizeOfInv: "+stackCurrent.size());
+                            ////System.out.println("CurrentStackSizeOfInv: "+stackCurrent.size());
                             if((stackCurrent.size() != intInventorySlotCount) || checkFirstNine(cap,stackCurrent))
                             {
                                 List<ItemStack> stackIn = buildInventoryQueue(pedestal);
@@ -137,7 +137,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                 buildAndWriteCraftingQueue(pedestal,stackIn);
                             }
 
-                            //System.out.println("CurrentCraftingSize: "+craftingCurrent.size());
+                            ////System.out.println("CurrentCraftingSize: "+craftingCurrent.size());
                             if(intInventorySlotCount >= intGridCount)
                             {
                                 int intGetNextIteration = getStoredInt(coin);//Default value is 0
@@ -161,14 +161,14 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                         intSlotToEndBefore = (intGetNextIteration * intGridCount);//use i < intSlotToEndBefore in for-loop
                                     }
 
-                                    //System.out.println("WhichRecipeIndex: "+intGetNextIteration);
-                                    //System.out.println("StartingSlot: "+intSlotToStartFrom);
-                                    //System.out.println("EndingSlot: "+intSlotToEndBefore);
+                                    ////System.out.println("WhichRecipeIndex: "+intGetNextIteration);
+                                    ////System.out.println("StartingSlot: "+intSlotToStartFrom);
+                                    ////System.out.println("EndingSlot: "+intSlotToEndBefore);
 
                                     //copy so we dont set the stack size any higher
                                     ItemStack getRecipe = craftingCurrent.get(intGetNextIteration-1).copy();
 
-                                    //System.out.println("GetRecipe: "+getRecipe);
+                                    ////System.out.println("GetRecipe: "+getRecipe);
 
                                     if(!getRecipe.isEmpty())
                                     {
@@ -219,7 +219,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBaseMachine
                                             }
                                         }
 
-                                        //System.out.println("BatchCraftingSize: "+intBatchCraftingSize);
+                                        ////System.out.println("BatchCraftingSize: "+intBatchCraftingSize);
 
                                         //Means there is something to craft, realistically since getRecipe.isEmpty is checked already, this should never be < 0
                                         if(intBatchCraftingSize > 0)

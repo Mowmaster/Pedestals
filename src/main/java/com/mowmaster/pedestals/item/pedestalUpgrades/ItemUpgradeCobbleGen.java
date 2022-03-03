@@ -163,12 +163,12 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
         ItemStack stackInPed = pedestal.getItemInPedestalOverride();
         ItemStack itemStackToExtract = new ItemStack(getItemToSpawn(pedestal));
         int cobbleToRemove = removeCobble(pedestal,amountOut,true);
-        //System.out.println(cobbleToRemove);
+        ////System.out.println(cobbleToRemove);
         int stored = getCobbleStored(pedestal);
         //.out.println(stored);
         if(stored<=0)
         {
-            //System.out.println("Else 1: ");
+            ////System.out.println("Else 1: ");
             //Should default to normal pedestal pull out methods
             return new ItemStack(Items.COMMAND_BLOCK);
         }
@@ -181,7 +181,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             }
 
             ItemStack toReturn = new ItemStack((stored>0)?(itemStackToExtract.getItem()):(stackInPed.getItem()),(amountOut>itemStackToExtract.getMaxStackSize())?(itemStackToExtract.getMaxStackSize()):(amountOut));
-            //System.out.println("Else 2: "+ ((toReturn.getCount()>0 || toReturn.isEmpty())?(toReturn):(ItemStack.EMPTY)));
+            ////System.out.println("Else 2: "+ ((toReturn.getCount()>0 || toReturn.isEmpty())?(toReturn):(ItemStack.EMPTY)));
             return (toReturn.getCount()>0 || toReturn.isEmpty())?(toReturn):(ItemStack.EMPTY);
             //Fm in e6 discord pinged me an issue where mek was spamming the console
             //#BlameMek
@@ -195,7 +195,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 removeCobble(pedestal,cobbleToRemove,false);
             }
-            //System.out.println("Else 3: "+itemStackToExtract);
+            ////System.out.println("Else 3: "+itemStackToExtract);
             return itemStackToExtract;
         }
     }
@@ -282,7 +282,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 int current = getCobbleStored(pedestal);
                 writeStoredIntToNBT(coinInPedestal,(current+amountIn));
-                //System.out.println("Cobble Added");
+                ////System.out.println("Cobble Added");
             }
             return 0;
         }

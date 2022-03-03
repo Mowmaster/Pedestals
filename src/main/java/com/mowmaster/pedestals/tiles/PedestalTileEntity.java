@@ -433,13 +433,13 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                //System.out.println("Is Valid");
+                ////System.out.println("Is Valid");
 
                 ItemStack filterOnPedestal = getFilterInPedestal();
                 if(filterOnPedestal.getItem() instanceof IFilterBase)
                 {
                     IFilterBase IFB = (IFilterBase)filterOnPedestal.getItem();
-                    //System.out.println(IUB.customSlotLimit(getTile(),stack));
+                    ////System.out.println(IUB.customSlotLimit(getTile(),stack));
                     return IFB.canAcceptItem(getTile(),stack);
                 }
 
@@ -447,7 +447,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if(coinOnPedestal.getItem() instanceof IUpgradeBase)
                 {
                     IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
-                    //System.out.println(IUB.customSlotLimit(getTile(),stack));
+                    ////System.out.println(IUB.customSlotLimit(getTile(),stack));
                     return IUB.customIsValid(getTile(),slot,stack);
                 }
 
@@ -466,7 +466,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if(filterOnPedestal.getItem() instanceof IFilterBase)
                 {
                     IFilterBase IFB = (IFilterBase)filterOnPedestal.getItem();
-                    //System.out.println(IUB.customSlotLimit(getTile(),stack));
+                    ////System.out.println(IUB.customSlotLimit(getTile(),stack));
                     return IFB.canAcceptCount(getTile(), getWorld(),getPos(),getItemInPedestal(),stack);
                 }
 
@@ -486,7 +486,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 if(coinOnPedestal.getItem() instanceof IUpgradeBase)
                 {
                     IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
-                    //System.out.println(IUB.customSlotLimit(getTile(),stack));
+                    ////System.out.println(IUB.customSlotLimit(getTile(),stack));
                     if(IUB.customSlotLimit(getTile())!=-1)
                     {
                         return IUB.customSlotLimit(getTile());
@@ -516,7 +516,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
             @Nonnull
             @Override
             public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-                //System.out.println("AttemptInsert");
+                ////System.out.println("AttemptInsert");
                 if(slot==-1)
                 {
                     return super.insertItem(0, stack, simulate);
@@ -524,19 +524,19 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
                 else if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
                 {
                     IUpgradeBase IUB = (IUpgradeBase)getCoinOnPedestal().getItem();
-                    //System.out.println("Coin: "+IUB.customInsertItem(getTile(),stack, true).getItem().getName().toString());
+                    ////System.out.println("Coin: "+IUB.customInsertItem(getTile(),stack, true).getItem().getName().toString());
                     if(!IUB.customInsertItem(getTile(),stack, true).getItem().equals(Items.COMMAND_BLOCK))
                     {
-                        //System.out.println("Ped Insert Custom Return: "+ IUB.customInsertItem(getTile(),stack, true));
+                        ////System.out.println("Ped Insert Custom Return: "+ IUB.customInsertItem(getTile(),stack, true));
                         return IUB.customInsertItem(getTile(),stack, simulate);
                     }
                     else
                     {
-                        //System.out.println("Has Coin Ped Insert: "+ super.insertItem(slot, stack, true));
+                        ////System.out.println("Has Coin Ped Insert: "+ super.insertItem(slot, stack, true));
                         return super.insertItem(slot, stack, simulate);
                     }
                 }
-                //System.out.println("Ped Insert: "+ super.insertItem(slot, stack, true));
+                ////System.out.println("Ped Insert: "+ super.insertItem(slot, stack, true));
                 return super.insertItem(slot, stack, simulate);
             }
 
@@ -546,7 +546,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
 
                 if(slot==-1)
                 {
-                    //System.out.println("Override: "+super.extractItem(0, amount, true));
+                    ////System.out.println("Override: "+super.extractItem(0, amount, true));
                     return super.extractItem(0, amount, simulate);
                 }
                 else if(getCoinOnPedestal().getItem() instanceof IUpgradeBase)
@@ -2360,6 +2360,7 @@ public class PedestalTileEntity extends TileEntity implements ITickableTileEntit
         BlockState state = this.world.getBlockState(this.pos);
         this.handleUpdateTag(state,pkt.getNbtCompound());
         this.world.notifyBlockUpdate(this.pos, state, state, 3);
+        ////System.out.println("ON Data Packet: "+ pkt.getNbtCompound().toString());
     }
 
     @Override

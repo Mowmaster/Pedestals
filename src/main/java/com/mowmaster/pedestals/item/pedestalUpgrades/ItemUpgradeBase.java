@@ -2699,12 +2699,12 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
                 //stack.getCount()>=2 ||  stack.maxStackSize()==1 ||
                 if(getStack.isEmpty() || getStack.getItem() instanceof ItemCraftingPlaceholder)
                 {
-                    //System.out.println("SetEmpty");
+                    ////System.out.println("SetEmpty");
                     craft.setInventorySlotContents(s, ItemStack.EMPTY);
                 }
                 else
                 {
-                    //System.out.println("SetNormal: " + getStack);
+                    ////System.out.println("SetNormal: " + getStack);
                     craft.setInventorySlotContents(s,getStack);
                 }
             }

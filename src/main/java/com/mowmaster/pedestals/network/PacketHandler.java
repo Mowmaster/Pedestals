@@ -19,7 +19,7 @@ public class PacketHandler {
     private static int ID = 0;
     public static int nextID(){return ID++;}
     public static void registerMessages(){
-        //System.out.println("Registering packets!!");
+        ////System.out.println("Registering packets!!");
         INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(Reference.MODID, "network"), () -> "1.0", s->true, s->true);
 
         INSTANCE.registerMessage(nextID(),

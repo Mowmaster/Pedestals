@@ -129,7 +129,7 @@ public class ItemLinkingToolBackwards extends ItemLinkingTool {
                                             if(!senderPedestal.isAlreadyLinked(pos))
                                             {
                                                 //Checks if senderPedestal has locationSlots available
-                                                //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
+                                                ////System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                 if(senderPedestal.storeNewLocation(pos))
                                                 {
                                                     //If slots are available then set wrench properties back to a default value

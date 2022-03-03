@@ -177,7 +177,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
 
     /*public static ItemStack addRandomEnchantment(Random p_77504_0_, ItemStack p_77504_1_, int p_77504_2_, boolean p_77504_3_) {
         List list = buildEnchantmentList(p_77504_0_, p_77504_1_, p_77504_2_, p_77504_3_);
-        System.out.println(list.size());
+        //System.out.println(list.size());
         boolean flag = p_77504_1_.getItem() == Items.BOOK;
         if(flag) {
             p_77504_1_ = new ItemStack(Items.ENCHANTED_BOOK);
@@ -191,7 +191,7 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                 EnchantedBookItem.addEnchantment(p_77504_1_, enchantmentdata);
             } else {
                 p_77504_1_.addEnchantment(enchantmentdata.enchantment, enchantmentdata.enchantmentLevel);
-                System.out.println(enchantmentdata.enchantment);
+                //System.out.println(enchantmentdata.enchantment);
             }
         }
 
@@ -244,37 +244,37 @@ public class ItemUpgradeExpEnchanter extends ItemUpgradeBaseExp
                             }
 
                             enchantment = (Enchantment)var6.next();
-                            //if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("");
+                            //if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("");
 
-                            if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("isTreasure: "+ enchantment.isTreasureEnchantment());
-                            if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("isTreasureAllowed: "+ !p_185291_2_);
-                            if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("isTreasureANDAllowed: "+ (enchantment.isTreasureEnchantment() && !p_185291_2_));
-                            if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("isTreasure: "+ enchantment.isTreasureEnchantment());
-                            if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("isTreasureAllowed: "+ !p_185291_2_);
-                            if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("isTreasureANDAllowed: "+ (enchantment.isTreasureEnchantment() && !p_185291_2_));
+                            if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("isTreasure: "+ enchantment.isTreasureEnchantment());
+                            if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("isTreasureAllowed: "+ !p_185291_2_);
+                            if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("isTreasureANDAllowed: "+ (enchantment.isTreasureEnchantment() && !p_185291_2_));
+                            if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("isTreasure: "+ enchantment.isTreasureEnchantment());
+                            if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("isTreasureAllowed: "+ !p_185291_2_);
+                            if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("isTreasureANDAllowed: "+ (enchantment.isTreasureEnchantment() && !p_185291_2_));
                         } while(enchantment.isTreasureEnchantment() && !p_185291_2_);
-                        if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("canGenInLoot: "+ !enchantment.canGenerateInLoot());
-                        if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("canGenInLoot: "+ !enchantment.canGenerateInLoot());
+                        if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("canGenInLoot: "+ !enchantment.canGenerateInLoot());
+                        if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("canGenInLoot: "+ !enchantment.canGenerateInLoot());
                     } while(!enchantment.canGenerateInLoot());
-                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("canApplyInTable: "+ !enchantment.canApplyAtEnchantingTable(p_185291_1_));
-                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("isAllowedOnBooks: "+ (!flag || !enchantment.isAllowedOnBooks()));
-                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("canApplyInTableANDisAllowedOnBooks: "+ (!enchantment.canApplyAtEnchantingTable(p_185291_1_) && (!flag || !enchantment.isAllowedOnBooks())));
-                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("canApplyInTable: "+ !enchantment.canApplyAtEnchantingTable(p_185291_1_));
-                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("isAllowedOnBooks: "+ (!flag || !enchantment.isAllowedOnBooks()));
-                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("canApplyInTableANDisAllowedOnBooks: "+ (!enchantment.canApplyAtEnchantingTable(p_185291_1_) && (!flag || !enchantment.isAllowedOnBooks())));
+                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("canApplyInTable: "+ !enchantment.canApplyAtEnchantingTable(p_185291_1_));
+                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("isAllowedOnBooks: "+ (!flag || !enchantment.isAllowedOnBooks()));
+                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("canApplyInTableANDisAllowedOnBooks: "+ (!enchantment.canApplyAtEnchantingTable(p_185291_1_) && (!flag || !enchantment.isAllowedOnBooks())));
+                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("canApplyInTable: "+ !enchantment.canApplyAtEnchantingTable(p_185291_1_));
+                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("isAllowedOnBooks: "+ (!flag || !enchantment.isAllowedOnBooks()));
+                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("canApplyInTableANDisAllowedOnBooks: "+ (!enchantment.canApplyAtEnchantingTable(p_185291_1_) && (!flag || !enchantment.isAllowedOnBooks())));
 
                 } while(!enchantment.canApplyAtEnchantingTable(p_185291_1_) && (!flag || !enchantment.isAllowedOnBooks()));
 
-                if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("MIN LEVEL: "+ enchantment.getMinLevel());
-                if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("MIN LEVEL: "+ enchantment.getMinLevel());
-                if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("MAX LEVEL: "+ enchantment.getMaxLevel());
-                if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("MAX LEVEL: "+ enchantment.getMaxLevel());
+                if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("MIN LEVEL: "+ enchantment.getMinLevel());
+                if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("MIN LEVEL: "+ enchantment.getMinLevel());
+                if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("MAX LEVEL: "+ enchantment.getMaxLevel());
+                if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("MAX LEVEL: "+ enchantment.getMaxLevel());
 
                 for(int i = enchantment.getMaxLevel(); i > enchantment.getMinLevel() - 1; --i) {
-                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("MIN ENCHANTABLITY: "+ enchantment.getMinEnchantability(i));
-                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("MIN ENCHANTABLITY: "+ enchantment.getMinEnchantability(i));
-                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))System.out.println("MAX ENCHANTABLITY: "+ enchantment.getMaxEnchantability(i));
-                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))System.out.println("MAX ENCHANTABLITY: "+ enchantment.getMaxEnchantability(i));
+                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("MIN ENCHANTABLITY: "+ enchantment.getMinEnchantability(i));
+                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("MIN ENCHANTABLITY: "+ enchantment.getMinEnchantability(i));
+                    if(enchantment.equals(EnchantmentRegistry.ADVANCED))//System.out.println("MAX ENCHANTABLITY: "+ enchantment.getMaxEnchantability(i));
+                    if(enchantment.equals(EnchantmentRegistry.CAPACITY))//System.out.println("MAX ENCHANTABLITY: "+ enchantment.getMaxEnchantability(i));
                     if(p_185291_0_ >= enchantment.getMinEnchantability(i) && p_185291_0_ <= enchantment.getMaxEnchantability(i)) {
                         list.add(new EnchantmentData(enchantment, i));
                         break;

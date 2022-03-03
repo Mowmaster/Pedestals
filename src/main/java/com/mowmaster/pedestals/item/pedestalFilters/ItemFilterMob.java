@@ -59,7 +59,7 @@ public class ItemFilterMob extends ItemFilterBase
 
                         if(res.hitInfo !=null)
                         {
-                            System.out.println(res.hitInfo.getClass().getTypeName());
+                            //System.out.println(res.hitInfo.getClass().getTypeName());
                             return ActionResult.resultSuccess(p_77659_2_.getHeldItem(p_77659_3_));
                         }
                         return ActionResult.resultFail(p_77659_2_.getHeldItem(p_77659_3_));

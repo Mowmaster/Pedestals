@@ -21,11 +21,11 @@ public class CalculateColor
 
     public static int rounder(double numIn)
     {
-        //System.out.println("NumIn: "+numIn);
+        ////System.out.println("NumIn: "+numIn);
         int numOut = 0;
 
         double numProc = Math.floor((numIn - Math.floor(numIn))*10);
-        //System.out.println(numProc);
+        ////System.out.println(numProc);
         if(numProc>=5)
         {
             numOut = (int)Math.floor((double)numIn) + 1;
