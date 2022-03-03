@@ -96,6 +96,8 @@
   "pedestals.pedestal_block.add_tool": "Tool Added Successfully",
   "pedestals.tool_change": "Tool Changed Successfully",
 
+  "pedestals.pedestal_block.cant_tank": "Unable to insert. Item in Pedestal Doesnt match Items in Tank, remove items in pedestal first.",
+
   "item.pedestals.linkingtool": "Linking Tool",
   "item.pedestals.linkingtool.tool_link_success": "Link Successful",
   "item.pedestals.linkingtool.tool_link_unsucess": "Link Unsuccessful - Maximum Links Reached",

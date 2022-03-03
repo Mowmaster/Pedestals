@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.api.upgrade.IUpgradeBase;
 import com.mowmaster.pedestals.item.*;
 import com.mowmaster.pedestals.item.augments.ItemPedestalRenderAugment;
 import com.mowmaster.pedestals.item.augments.ItemPedestalUpgrades;
+import com.mowmaster.pedestals.item.pedestalUpgrades.ItemUpgradeItemTank;
 import com.mowmaster.pedestals.references.Reference;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
 import net.minecraft.block.*;
@@ -273,7 +274,8 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 PedestalTileEntity tilePedestal = (PedestalTileEntity) tileEntity;
                 ItemStack getItemStackInHand = player.getHeldItemMainhand();
 
-                ItemStack inHandCopy = getItemStackInHand.copy();
+                //ItemStack inHandCopy = getItemStackInHand.copy();
+                ItemStack inHandCopy = getItemStackInHand;
                 ItemStack checkInsert = tilePedestal.addItemCustom(inHandCopy,true);
                 if (checkInsert.isEmpty())
                 {
@@ -484,11 +486,48 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                 {
                     if(!tilePedestal.hasCoin())
                     {
-                        ItemStack coinToBePlaced = getItemStackInOffHand.copy();
-                        if(tilePedestal.addCoin(player,getItemStackInOffHand,true))
+                        if(tilePedestal.hasItem() && getItemInOffHand instanceof ItemUpgradeItemTank)
                         {
-                            tilePedestal.addCoin(player,coinToBePlaced,false);
-                            if(!isCreative)getItemStackInOffHand.shrink(1);
+                            ItemUpgradeItemTank tank = (ItemUpgradeItemTank)getItemInOffHand;
+                            if(!tank.getItemStored(getItemStackInOffHand).isEmpty())
+                            {
+                                if(ItemHandlerHelper.canItemStacksStack(tilePedestal.getItemInPedestal(),tank.getItemStored(getItemStackInOffHand)))
+                                {
+                                    ItemStack coinToBePlaced = getItemStackInOffHand.copy();
+                                    if(tilePedestal.addCoin(player,getItemStackInOffHand,true))
+                                    {
+                                        tilePedestal.addCoin(player,coinToBePlaced,false);
+                                        if(!isCreative)getItemStackInOffHand.shrink(1);
+                                    }
+                                }
+                                else
+                                {
+                                    //Some error message
+                                    TranslationTextComponent cantsetupgrade = new TranslationTextComponent(Reference.MODID + ".pedestal_block" + ".cant_tank");
+                                    cantsetupgrade.mergeStyle(TextFormatting.RED);
+                                    player.sendStatusMessage(cantsetupgrade,true);
+                                }
+                            }
+                            else
+                            {
+                                ItemStack coinToBePlaced = getItemStackInOffHand.copy();
+                                if(tilePedestal.addCoin(player,getItemStackInOffHand,true))
+                                {
+                                    tilePedestal.addCoin(player,coinToBePlaced,false);
+                                    if(!isCreative)getItemStackInOffHand.shrink(1);
+                                }
+                            }
+
+
+                        }
+                        else
+                        {
+                            ItemStack coinToBePlaced = getItemStackInOffHand.copy();
+                            if(tilePedestal.addCoin(player,getItemStackInOffHand,true))
+                            {
+                                tilePedestal.addCoin(player,coinToBePlaced,false);
+                                if(!isCreative)getItemStackInOffHand.shrink(1);
+                            }
                         }
                     }
                 }
@@ -697,7 +736,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                             if(!tilePedestal.isAlreadyLinked(linkingTool.getStoredPosition(offhand)))
                                             {
                                                 //Checks if senderPedestal has locationSlots available
-                                                //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
+                                                ////System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                 if(tilePedestal.storeNewLocation(linkingTool.getStoredPosition(offhand)))
                                                 {
                                                     player.sendMessage(linksucess,Util.DUMMY_UUID);
@@ -750,7 +789,7 @@ public class PedestalBlock extends DirectionalBlock implements IWaterLoggable{
                                             if(!tilePedestalSender.isAlreadyLinked(pos))
                                             {
                                                 //Checks if senderPedestal has locationSlots available
-                                                //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
+                                                ////System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                 if(tilePedestalSender.storeNewLocation(pos))
                                                 {
                                                     player.sendMessage(linksucess,Util.DUMMY_UUID);
