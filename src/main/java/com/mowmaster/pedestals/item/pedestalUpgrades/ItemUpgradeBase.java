@@ -3156,6 +3156,52 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
     }
 
 
+    //Delay Int
+
+    public void removeDelayFromCoin(ItemStack stack)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+            if(compound.contains("storeddelay"))
+            {
+                compound.remove("storeddelay");
+                stack.setTag(compound);
+            }
+        }
+    }
+
+    //This is needed for the "slowdown" of machines
+    public void writeDelayToNBT(ItemStack stack, int value)
+    {
+        CompoundNBT compound = new CompoundNBT();
+        if(stack.hasTag())
+        {
+            compound = stack.getTag();
+        }
+
+        compound.putInt("storeddelay",value);
+        stack.setTag(compound);
+    }
+
+    public int readDelayFromNBT(ItemStack stack)
+    {
+        int maxenergy = 0;
+        if(stack.hasTag())
+        {
+            CompoundNBT getCompound = stack.getTag();
+            maxenergy = getCompound.getInt("storeddelay");
+        }
+        return maxenergy;
+    }
+
+    public int getDelay(ItemStack coin)
+    {
+        return readDelayFromNBT(coin);
+    }
+
+
     /***************************************
      ****************************************
      **      End Of StoredINT Stuff        **

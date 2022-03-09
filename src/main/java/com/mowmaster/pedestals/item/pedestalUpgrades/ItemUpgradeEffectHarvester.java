@@ -259,6 +259,7 @@ public class ItemUpgradeEffectHarvester extends ItemUpgradeBase
                             }
                         }
                         else {
+                            //if(getDelay(coinInPedestal)++)
                             int delay = rangeWidth*rangeWidth*rangeHeight;
                             writeStoredIntTwoToNBT(coinInPedestal,(delay<100)?(100):(delay));
                         }
