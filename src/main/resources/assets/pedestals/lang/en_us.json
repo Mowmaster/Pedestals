@@ -1218,7 +1218,7 @@
   "block.pedestals.pedestal332": "Colored Pedestal",
   "jei.pedestals.pedestal332.desc": "R-Clicking a pedestal with a Colored Palette will make a Colored Pedestal. (Filterable)",
   "block.pedestals.pedestal333": "Pedestal",
-  "jei.pedestals.pedestal333.desc": "Pedestals can be Ppaced on all 6 sides, colored with Colored Palettes, lit up with Glowstone blocks, and upgraded with pedestal upgrades. Upgraded pedestals can be powered off with a redstone signal.",
+  "jei.pedestals.pedestal333.desc": "Pedestals can be Placed on all 6 sides, colored with Colored Palettes, lit up with Glowstone blocks, and upgraded with pedestal upgrades. Upgraded pedestals can be powered off with a redstone signal.",
 
   "pedestals.pedestal_block.cant_color": "Colors can't be set on pedestals, if it has the same color, has items, light, upgrades, or linked pedestals",
 
