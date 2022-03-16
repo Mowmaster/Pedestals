@@ -1,5 +1,5 @@
 {
-  "category": "getting_started/getting_started_pedestal_direction",
+  "category": "getting_started/getting_started_pedestal_directional",
   "name": "Overview",
   "subtitle": "",
   "icon": "pedestals:pedestal/stone333",
@@ -11,7 +11,7 @@
       "text": "Pedestals can be placed in all 6 directions. $(li)UP (Default when placed on the ground) $(li)DOWN (When placed on a Ceiling, or when placing a pedestal on top of an UP facing one. $(li)NORTH $(li)EAST $(li)SOUTH $(li)WEST"
     },
     {
-        "title": "Why Directional Placement?",
+        "title": "Why This Placement?",
       "type": "text",
       "text": "The 'Working Area' of an upgrade is based on the pedestals placement direction, For example, an upgrade with a 3x5x3 area: $(li)UP: No Changes $(li)Down: 3x-5x3 $(li)East: -5x3x3 $(li)West: 5x3x3 $(li)North: 3x3x-5 $(li)South: 3x3x5"
     }

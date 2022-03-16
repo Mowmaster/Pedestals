@@ -29,12 +29,22 @@
     {
       "title": "Uses",
       "type": "text",
-      "text": "$(li)Over Leveled Enchants take effect, as in, pedestals enchants level 6+ are more effective overall [but hard limits still apply, like processing items at 64/t is a hard cap, or effecting blocks in world at 1 per tick is another hard cap, storage of xp/energy/fluids/items maxes out at 2147483647 too] Range and Area enchants basically have no limit outside of what you can keep chunkloaded. $(li)Upgrades that use a 'below' inventory can now tap into the inventory of entities as well as other pedestals. $(li)Unlocks an upgrades 'hidden' feature (not all upgrades have one)"
+      "text": "$(li)Over Leveled Enchants take effect, as in, pedestals enchants level 6+ are more effective overall [but hard limits still apply, like processing items at 64/t is a hard cap, or effecting blocks in world at 1 per tick is another hard cap, storage of xp/energy/fluids/items maxes out at 2147483647 too] Range and Area enchants basically have no limit outside of what you can keep chunkloaded."
+    },
+    {
+      "title": "Uses Con.",
+      "type": "text",
+      "text": "$(li)Upgrades that use a 'below' inventory can now tap into the inventory of entities as well as other pedestals. $(li)Unlocks an upgrades 'hidden' feature (not all upgrades have one)"
     },
     {
       "title": "Hidden Features",
       "type": "text",
-      "text": "$(li)Crafters: No longer ejects 'container' items. $(li)Crushers: Access to Advanced Recipes. $(li)Harvester: Gentle Harvests. $(li)Ender Upgrades: Switches to effect the players inventory of whoever placed the upgrade. $(li)Furnaces: Access to Advanced Recipes. $(li)Saw Mills: Access to Advanced Recipes. $(li)Fan: Pushes all Entities and has additional filters for Items(Quartz Block) and XP orbs(Slime Block) $(li)Quarry: If a taglist has been setup, it can mine additional blocks. $(li)Recycler: Returns an items repair material in an amount dependent on its current durability."
+      "text": "$(li)Crafters: No longer ejects 'container' items. $(li)Crushers: Access to Advanced Recipes. $(li)Harvester: Gentle Harvests. $(li)Ender Upgrades: Switches to effect the players inventory of whoever placed the upgrade. "
+    },
+    {
+      "title": "Hidden Features Con.",
+      "type": "text",
+      "text": "$(li)Furnaces: Access to Advanced Recipes. $(li)Saw Mills: Access to Advanced Recipes. $(li)Fan: Pushes all Entities and has additional filters for Items(Quartz Block) and XP orbs(Slime Block) $(li)Quarry: If a taglist has been setup, it can mine additional blocks. $(li)Recycler: Returns an items repair material in an amount dependent on its current durability."
     }
   ]
 }

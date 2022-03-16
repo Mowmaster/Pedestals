@@ -1,7 +1,7 @@
 {
   "category": "getting_started/getting_started_enchants",
   "name": "Over Enchanting",
-  "icon": "minecraft:diamonds",
+  "icon": "minecraft:diamond",
   "sortnum": 7,
   "priority": true,
   "pages": [
