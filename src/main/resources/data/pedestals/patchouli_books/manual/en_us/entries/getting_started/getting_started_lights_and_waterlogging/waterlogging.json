@@ -1,0 +1,15 @@
+{
+  "category": "getting_started/getting_started_lights_and_waterlogging",
+  "name": "Waterlogging",
+  "subtitle": "",
+  "icon": "minecraft:water_bucket",
+  "sortnum": 1,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "title": "Use a Water Bucket",
+      "text": "Like in vanilla, using a water bucket on the block a pedestal is in will waterlog it, and using an empty bucket will remove the water. $(br) This can be useful for watering farms, or making automated concrete."
+    }
+  ]
+}

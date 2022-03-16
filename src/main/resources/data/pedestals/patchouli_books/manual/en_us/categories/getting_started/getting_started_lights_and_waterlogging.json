@@ -1,6 +1,6 @@
 {
   "name": "Lighting & Waterlogging",
-  "description": "",
+  "description": "Pedestals can be water logged with a bucket of water, or made into a light source using a block of Glowstone.",
   "icon": "minecraft:glowstone",
   "sortnum": 2,
   "parent": "getting_started/getting_started"

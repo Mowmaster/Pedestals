@@ -1,0 +1,25 @@
+{
+  "category": "getting_started/getting_started_lights_and_waterlogging",
+  "name": "Lighting",
+  "subtitle": "",
+  "icon": "minecraft:glowstone",
+  "sortnum": 1,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "title": "Pedestals as Light Sources",
+      "text": "Inserting Glowstone (Block) into a pedestal will add some glowing bands to the pedestal, which emit light."
+    },
+    {
+      "title": "Glowstone (Inserting)",
+      "type": "text",
+      "text": "When inserting, it can be done with the glowstone in the Offhand, then Right Click the pedestal, this will remove one glowstone from your hand, placing it in the pedestal."
+    },
+    {
+      "title": "Glowstone (Extracting)",
+      "type": "text",
+      "text": "When extracting, put the glowstone in the Offhand, then Left Click. This will remove the currently inserted glowstone from the pedestal."
+    }
+  ]
+}
