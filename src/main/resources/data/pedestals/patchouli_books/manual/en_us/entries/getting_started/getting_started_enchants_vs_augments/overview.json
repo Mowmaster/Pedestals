@@ -1,0 +1,30 @@
+{
+  "category": "getting_started/getting_started_enchants_vs_augments",
+  "name": "Overview",
+  "subtitle": "",
+  "icon": "minecraft:map",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "text",
+      "text": "Enchants and Augments both do similar things, but they Effect different things."
+    },
+    {
+      "title": "Enchants",
+      "type": "text",
+      "text": "These ONLY effect Upgrades, while you could enchant a pedestal, it does not benefit the pedestal in any way, and you will loose the enchants on the pedestal once its placed down."
+    },
+    {
+      "title": "Augments",
+      "type": "text",
+      "text": "These ONLY effect the Pedestal, Upgrades inserted in the pedestal will NOT be any more effective if the pedestal has Augments in it."
+    },
+    {
+      "title": "Why U Do Dis?",
+      "type": "text",
+      "text": "Upgrades are very much a single setup, where pedestals tend to be augmented more and more as your progress in your playthrough. Having to break a pedestal, would be annoying everytime you wanted to make it 'better' so it uses a more dynamic 'upgrading' system."
+    }
+
+  ]
+}
