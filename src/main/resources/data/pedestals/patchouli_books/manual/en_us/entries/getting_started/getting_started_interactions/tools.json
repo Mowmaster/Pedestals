@@ -2,13 +2,28 @@
   "category": "getting_started/getting_started_interactions",
   "name": "Tools",
   "subtitle": "",
-  "icon": "pedestals:upgradetool",
+  "icon": "minecraft:diamond_pickaxe",
   "sortnum": 3,
   "priority": true,
   "pages": [
     {
       "type": "text",
-      "text": "There are many ways to Interact with a pedestal. $(br)$(li)Placing or grabbing items. $(br)$(li)Inserting upgrades, filters, augments, color pallets, glowstone, or redstone torches. $(br)$(li)Tools have their own interactions too."
+      "text": "Unlike other modifications that have tools, you HAVE to use the $(l:pedestals:tools/toolswapper)Tool Swapper$() in the offhand to extract Tools from the pedestal."
+    },
+    {
+      "title": "Tools (Inserting)",
+      "type": "text",
+      "text": "When inserting tools, they will be placed in an invisibe slot, and do not display anything on the pedestal. $(br) Inserting Tools can be done with the tool in the Offhand, then Right Click the pedestal, this will remove one tool from your Offhand, placing it in the pedestal."
+    },
+    {
+      "title": "Tools (Extracting)",
+      "type": "text",
+      "text": "When extracting tools, use the $(l:pedestals:tools/toolswapper)Tool Swapper$() in the Offhand, then Left Click. This will remove the currently inserted Tool from the pedestal."
+    },
+    {
+      "title": "Tool (Pedestal Info)",
+      "type": "text",
+      "text": "When right clicking the $(l:pedestals:tools/toolswapper)Tool Swapper$() on the pedestal, your chat will display some info about the currently insert tool."
     }
   ]
 }

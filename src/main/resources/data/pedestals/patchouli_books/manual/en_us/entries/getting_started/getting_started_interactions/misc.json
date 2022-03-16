@@ -8,7 +8,17 @@
   "pages": [
     {
       "type": "text",
-      "text": "There are many ways to Interact with a pedestal. $(br)$(li)Placing or grabbing items. $(br)$(li)Inserting upgrades, filters, augments, color pallets, glowstone, or redstone torches. $(br)$(li)Tools have their own interactions too."
+      "text": "Glowstone (Block) and Redstone Torches can also be inserted into the pedestal. $(br)$(li)Glowstone will add some glowing bands to the pedestal that emit light. $(br)$(li)Inserting redstone torches toggles its redstone control, but doesnt display on the pedestal in any way."
+    },
+    {
+      "title": "Misc (Inserting)",
+      "type": "text",
+      "text": "When inserting, it can be done with the item in the Offhand, then Right Click the pedestal, this will remove one item from your hand, placing it in the pedestal."
+    },
+    {
+      "title": "Misc (Extracting)",
+      "type": "text",
+      "text": "When extracting, put the item corresponding to the one your removing in the Offhand, then Left Click. This will remove the currently inserted item from the pedestal."
     }
   ]
 }

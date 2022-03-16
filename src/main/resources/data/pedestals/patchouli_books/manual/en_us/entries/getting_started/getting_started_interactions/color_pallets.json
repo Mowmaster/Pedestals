@@ -1,6 +1,6 @@
 {
   "category": "getting_started/getting_started_interactions",
-  "name": "Color Pallets",
+  "name": "Color Palettes",
   "subtitle": "",
   "icon": "pedestals:itemcolorpalletdefault",
   "sortnum": 6,
@@ -8,7 +8,12 @@
   "pages": [
     {
       "type": "text",
-      "text": "There are many ways to Interact with a pedestal. $(br)$(li)Placing or grabbing items. $(br)$(li)Inserting upgrades, filters, augments, color pallets, glowstone, or redstone torches. $(br)$(li)Tools have their own interactions too."
+      "text": "Color Palettes can ONLY be insert into a newly placed pedestal, Inserting it will permanently change the color of the pedestal, consuming the Palette in the process."
+    },
+    {
+      "title": "Palettes (Inserting)",
+      "type": "text",
+      "text": "When inserting palettes, they change the color of the pedestal. $(br) Inserting palettes can be done with palette in the Offhand, then Right Click the pedestal, this will remove one palette from your Offhand."
     }
   ]
 }

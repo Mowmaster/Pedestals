@@ -8,7 +8,22 @@
   "pages": [
     {
       "type": "text",
-      "text": "There are many ways to Interact with a pedestal. $(br)$(li)Placing or grabbing items. $(br)$(li)Inserting upgrades, filters, augments, color pallets, glowstone, or redstone torches. $(br)$(li)Tools have their own interactions too."
+      "text": "Like other modifications that have tools, you can use the $(l:pedestals:tools/upgradetool)Upgrade Tool$() in the offhand when extracting Upgrades from the pedestal."
+    },
+    {
+      "title": "Upgrades (Inserting)",
+      "type": "text",
+      "text": "When inserting upgrades, they will be placed on the four sides of the pedestal. $(br) Inserting Upgrades can be done with items in the Offhand, then Right Click the pedestal, this will remove one Upgrade from your Offhand, placing it in the pedestal."
+    },
+    {
+      "title": "Upgrades (Extracting)",
+      "type": "text",
+      "text": "When extracting upgrades, put any Upgrade or the $(l:pedestals:tools/upgradetool)Upgrade Tool$() in the Offhand, then Left Click. This will remove the currently inserted Upgrade from the pedestal."
+    },
+    {
+      "title": "Upgrade (Pedestal Info)",
+      "type": "text",
+      "text": "When right clicking the $(l:pedestals:tools/upgradetool)Upgrade Tool$() on the pedestal, your chat will display some info about the currently insert upgrade."
     }
   ]
 }

@@ -28,12 +28,12 @@
     {
       "title": "Modifications (Inserting)",
       "type": "text",
-      "text": ""
+      "text": "Most modifications are insert using the Offhand with a right click. Some may require specific conditions for insertion, so make sure to pay attention to the on screen messages when inserting modifications."
     },
     {
       "title": "Modifications (Extracting)",
       "type": "text",
-      "text": ""
+      "text": "Most modifications can use the same item in the left hand with a left click to remove them. Any modification with a similarly named tool can also use that tool in the offhand + left click for extraction."
     }
 
   ]

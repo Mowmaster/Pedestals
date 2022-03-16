@@ -8,7 +8,22 @@
   "pages": [
     {
       "type": "text",
-      "text": "There are many ways to Interact with a pedestal. $(br)$(li)Placing or grabbing items. $(br)$(li)Inserting upgrades, filters, augments, color pallets, glowstone, or redstone torches. $(br)$(li)Tools have their own interactions too."
+      "text": "There are many kinds of Augments. They are all inserted and extracted the same way."
+    },
+    {
+      "title": "Augments (Inserting)",
+      "type": "text",
+      "text": "When inserting augments, they do not display on the pedestal, but some may effect the appearance of the pedestal. $(br) Inserting augments can be done with augment in the main hand, then Right Click the pedestal, this will remove one augment from your hand, placing it in the pedestal."
+    },
+    {
+      "title": "Augments (Extracting)",
+      "type": "text",
+      "text": "When extracting augments, put the Augment corresponding to the one your removing in the Offhand, then Left Click. This will remove the currently inserted Augment from the pedestal."
+    },
+    {
+      "title": "Augment (Pedestal Info)",
+      "type": "text",
+      "text": "When right clicking the $(l:pedestals:tools/linkingtool)Linking Tool$() or $(l:pedestals:tools/backwardslinkingtool)Backwards Linking Tool$() on the pedestal, your chat will display some info about the currently inserted augments."
     }
   ]
 }
