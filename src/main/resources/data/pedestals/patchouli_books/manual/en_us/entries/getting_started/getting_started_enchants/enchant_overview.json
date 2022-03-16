@@ -1,0 +1,14 @@
+{
+  "category": "getting_started/getting_started_enchants",
+  "name": "Overview",
+  "icon": "minecraft:enchanted_book",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "Enchanting benefits Upgrades ONLY, All enchants have a Focused Book which makes obtaining them easier. $(br)Here are some of the possible enchants: $(li)$(l:pedestals:getting_started_enchants/enchant_advanced)Advanced $()$(li)$(l:pedestals:getting_started_enchants/enchant_area)Area $()$(li)$(l:pedestals:getting_started_enchants/enchant_capacity)Capacity $()$(li)$(l:pedestals:getting_started_enchants/enchant_magnet)Magnet $()$(li)$(l:pedestals:getting_started_enchants/enchant_range)Range $()$(li)$(l:pedestals:getting_started_enchants/enchant_speed)Speed $()"
+    }
+  ]
+}

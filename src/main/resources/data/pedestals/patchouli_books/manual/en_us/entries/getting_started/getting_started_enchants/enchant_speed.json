@@ -1,0 +1,30 @@
+{
+  "category": "getting_started/getting_started_enchants",
+  "name": "Speed Enchant",
+  "icon": "pedestals:bookspeed",
+  "sortnum": 1,
+  "priority": true,
+  "pages": [
+    {
+      "title": "Overview",
+      "type": "text",
+      "text": "Speed increases the frequency that an upgrade does its work action."
+    },
+    {
+      "title": "Obtaining",
+      "type": "text",
+      "text": "This can be Obtained from Villagers. Normal Enchanting, and Enchanting Focused Book (Speed)."
+    },
+    {
+      "type": "crafting",
+      "title": "Focus Book (Speed)",
+      "recipe": "pedestals:bookspeed",
+      "text": "Effective Enchanting levels are 0-50 by Default, Some mods may modify this enchant level ceiling."
+    },
+    {
+      "title": "Levels",
+      "type": "text",
+      "text": "Speed Effects Different Upgrades Differently, but for most, Level 5 (V) is the max level that is effective. See individual Upgrades Pages to see what levels of Speed an upgrade can use. $(li)Min Level 1. $(li)Max Level 5."
+    }
+  ]
+}

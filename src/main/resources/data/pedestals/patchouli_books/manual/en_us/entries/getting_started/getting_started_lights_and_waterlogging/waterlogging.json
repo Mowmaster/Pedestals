@@ -3,7 +3,7 @@
   "name": "Waterlogging",
   "subtitle": "",
   "icon": "minecraft:water_bucket",
-  "sortnum": 1,
+  "sortnum": 0,
   "priority": true,
   "pages": [
     {
