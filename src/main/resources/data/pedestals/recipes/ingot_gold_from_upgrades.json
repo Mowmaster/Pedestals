@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:smelting",
-  "ingredient": {
-    "tag": "pedestals:upgrades"
-  },
-  "result": "minecraft:gold_ingot",
-  "experience": 0.15,
-  "cookingtime": 200
-}

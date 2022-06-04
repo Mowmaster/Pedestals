@@ -1,8 +1,0 @@
-{
-  "name": "pedestals.patch_book",
-  "landing_text": "pedestals.patch_book_landing",
-  "subtitle": "",
-  "model": "pedestals:bookguide",
-  "show_progress": false,
-  "creative_tab": "pedestals_blocks"
-}
