@@ -1,0 +1,8 @@
+{
+"parent": "pedestals:item/filter_item",
+  "textures": {
+    "0": "pedestals:items/models/filters/filteritemdefault_xp",
+    "1": "pedestals:items/models/filters/filterbase",
+    "particle": "pedestals:items/models/filters/filteritemdefault_xp"
+  }
+}

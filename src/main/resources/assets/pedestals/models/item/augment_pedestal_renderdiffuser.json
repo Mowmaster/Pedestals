@@ -1,0 +1,15 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "pedestals:items/augments/renderaugment"
+  },
+  "overrides": [
+    { "predicate": { "pedestals:augment_mode": 0}, "model": "pedestals:item/augments/augment_p"},
+    { "predicate": { "pedestals:augment_mode": 1}, "model": "pedestals:item/augments/augment_i"},
+    { "predicate": { "pedestals:augment_mode": 2}, "model": "pedestals:item/augments/augment_u"},
+    { "predicate": { "pedestals:augment_mode": 3}, "model": "pedestals:item/augments/augment_pi"},
+    { "predicate": { "pedestals:augment_mode": 4}, "model": "pedestals:item/augments/augment_pu"},
+    { "predicate": { "pedestals:augment_mode": 5}, "model": "pedestals:item/augments/augment_iu"},
+    { "predicate": { "pedestals:augment_mode": 6}, "model": "pedestals:item/augments/augment_piu"}
+  ]
+}

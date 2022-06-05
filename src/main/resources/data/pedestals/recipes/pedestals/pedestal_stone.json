@@ -1,0 +1,27 @@
+{
+
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SLS",
+    " B ",
+    "BBB"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stone_slab"
+    },
+    "B": {
+    "item": "minecraft:stone"
+    },
+    "L": {
+    "tag": "pedestals:linkingtools"
+    }
+  },
+  "result": {
+    "item": "pedestals:block_pedestal",
+    "nbt": {
+      "dust_color": 11184810
+    }
+  }
+
+}

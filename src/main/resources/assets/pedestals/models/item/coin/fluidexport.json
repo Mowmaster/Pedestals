@@ -1,8 +1,0 @@
-{
-"parent": "pedestals:item/coin",
-"textures": {
-"coin": "pedestals:items/models/coins/fluidcoin",
-"letter": "pedestals:items/models/coins/coinfluidexport",
-"part": "pedestals:items/models/coins/fluidcoin"
-}
-}

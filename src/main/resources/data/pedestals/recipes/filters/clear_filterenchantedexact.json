@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:filter_enchantedexact"
+    }
+  ],
+  "result": {
+    "item": "pedestals:filter_enchantedexact"
+  }
+}

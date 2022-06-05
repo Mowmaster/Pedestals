@@ -1,7 +1,0 @@
-{
-  "name": "Farming Upgrades",
-  "description": "Upgrades that can be used to help with farming tasks.",
-  "icon": "pedestals:coin/planter",
-  "sortnum": 7,
-  "parent": "upgrades/upgrade_index"
-}

@@ -1,7 +1,0 @@
-{
-  "name": "Coloring",
-  "description": "Pedestals can be colored in 64 different colors, the system is a bit unique, but it allows for more color options then the normal boring 16 minecraft ones.",
-  "icon": "pedestals:itemcolorpalletdefault",
-  "sortnum": 1,
-  "parent": "getting_started/getting_started"
-}

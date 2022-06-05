@@ -1,7 +1,0 @@
-{
-  "name": "Item Transport",
-  "description": "Upgrades that can assist in transporting/storing items.",
-  "icon": "pedestals:coin/itemtank",
-  "sortnum": 0,
-  "parent": "upgrades/upgrade_index"
-}

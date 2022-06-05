@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SPS",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "pedestals:block_crystal_stone"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    }
+  },
+  "result": {
+    "item": "pedestals:applicator",
+    "count": 1
+  }
+}
