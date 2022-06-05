@@ -45,16 +45,16 @@ public class ChangeApplicatorColor {
             ResourceLocation grabGreen = new ResourceLocation("forge", "dyes/green");
             ResourceLocation grabBlue = new ResourceLocation("forge", "dyes/blue");
             ResourceLocation grabBlack = new ResourceLocation("forge", "dyes/black");
-            Tag<Item> RED_DYE = ItemTags.getAllTags().getTag(grabRed);
+            /*Tag<Item> RED_DYE = ItemTags.getAllTags().getTag(grabRed);
             Tag<Item> GREEN_DYE = ItemTags.getAllTags().getTag(grabGreen);
             Tag<Item> BLUE_DYE = ItemTags.getAllTags().getTag(grabBlue);
-            Tag<Item> BLACK_DYE = ItemTags.getAllTags().getTag(grabBlack);
+            Tag<Item> BLACK_DYE = ItemTags.getAllTags().getTag(grabBlack);*/
 
             if(!world.isClientSide())
             {
                 if(player.getItemInHand(hand).getItem() instanceof ColorApplicator)
                 {
-                    AABB aabb = (new AABB(pos)).inflate(3.0).expandTowards(0.0D, (double)world.getHeight(), 0.0D);
+                    /*AABB aabb = (new AABB(pos)).inflate(3.0).expandTowards(0.0D, (double)world.getHeight(), 0.0D);
                     List<ItemEntity> list = world.getEntitiesOfClass(ItemEntity.class, aabb);
 
                     for (ItemEntity item : list) {
@@ -80,7 +80,7 @@ public class ChangeApplicatorColor {
                             black+=stack.getCount();
                             item.remove(Entity.RemovalReason.DISCARDED);
                         }
-                    }
+                    }*/
                 }
                 if(red>3)red/=3;
                 if(green>3)red/=3;

@@ -48,10 +48,10 @@ public class TagTool extends BaseTool implements IPedestalTool
                 {
                     if(mainhand.getItem().equals(DeferredRegisterItems.TOOL_TAGTOOL.get()))
                     {
-                        if(!offhand.isEmpty() && offhand.getItem().getTags().toString().length()>0)
+                        /*if(!offhand.isEmpty() && offhand.getItem().getTags().toString().length()>0)
                         {
                             MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,offhand.getItem().getTags().toString());
-                        }
+                        }*/
                     }
                 }
             }

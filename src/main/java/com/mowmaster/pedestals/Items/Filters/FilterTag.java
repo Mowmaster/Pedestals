@@ -75,10 +75,10 @@ public class FilterTag extends BaseFilter{
             int range = stackCurrent.size();
 
             ItemStack itemFromInv = ItemStack.EMPTY;
-            itemFromInv = IntStream.range(0,range)//Int Range
+            /*itemFromInv = IntStream.range(0,range)//Int Range
                     .mapToObj((stackCurrent)::get)//Function being applied to each interval
                     .filter(itemStack -> itemStackIn.getItem().getTags().toString().contains(itemStack.getDisplayName().getString()))
-                    .findFirst().orElse(ItemStack.EMPTY);
+                    .findFirst().orElse(ItemStack.EMPTY);*/
 
             if(!itemFromInv.isEmpty())
             {
