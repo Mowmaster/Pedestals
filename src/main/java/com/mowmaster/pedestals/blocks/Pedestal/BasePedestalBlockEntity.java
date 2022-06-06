@@ -2436,9 +2436,9 @@ public class BasePedestalBlockEntity extends BlockEntity
 
             if(canSpawnParticles())
             {
-                if(getLevel().getGameTime()%20 == 0){if(this.hasEnergy()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()+0.25,getPos().getY()-0.90,getPos().getZ()+0.25,255,0,0));}}
-                if(getLevel().getGameTime()%20 == 0){if(this.hasExperience()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()-0.25,getPos().getY()-0.90,getPos().getZ()-0.25,0,255,0));}}
-                if(getLevel().getGameTime()%20 == 0){if(this.hasFluid()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()+0.25,getPos().getY()-0.90,getPos().getZ()-0.25,0,0,255));}}
+                if(getLevel().getGameTime()%20 == 0){if(this.hasEnergy()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()+0.25,getPos().getY(),getPos().getZ()+0.25,255,0,0));}}
+                if(getLevel().getGameTime()%20 == 0){if(this.hasExperience()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()-0.25,getPos().getY(),getPos().getZ()-0.25,0,255,0));}}
+                if(getLevel().getGameTime()%20 == 0){if(this.hasFluid()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()+0.25,getPos().getY(),getPos().getZ()-0.25,0,0,255));}}
             }
         }
     }
