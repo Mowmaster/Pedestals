@@ -10,10 +10,13 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -75,10 +78,10 @@ public class FilterTag extends BaseFilter{
             int range = stackCurrent.size();
 
             ItemStack itemFromInv = ItemStack.EMPTY;
-            /*itemFromInv = IntStream.range(0,range)//Int Range
+            itemFromInv = IntStream.range(0,range)//Int Range
                     .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                    .filter(itemStack -> itemStackIn.getItem().getTags().toString().contains(itemStack.getDisplayName().getString()))
-                    .findFirst().orElse(ItemStack.EMPTY);*/
+                    .filter(itemStack -> ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation(itemStack.getDisplayName().getString()))).stream().toList().contains(itemStackIn.getItem()))
+                    .findFirst().orElse(ItemStack.EMPTY);
 
             if(!itemFromInv.isEmpty())
             {

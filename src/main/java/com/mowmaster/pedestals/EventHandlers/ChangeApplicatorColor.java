@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -19,6 +20,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,20 +43,42 @@ public class ChangeApplicatorColor {
             int blue = 0;
             int black = 0;
 
+
+            List<Item> RED_DYE = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes/red"))).stream().toList();
+            List<Item> GREEN_DYE = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes/green"))).stream().toList();
+            List<Item> BLUE_DYE = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes/blue"))).stream().toList();
+            List<Item> BLACK_DYE = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes/black"))).stream().toList();
+
+
+            /*
             ResourceLocation grabRed = new ResourceLocation("forge", "dyes/red");
             ResourceLocation grabGreen = new ResourceLocation("forge", "dyes/green");
             ResourceLocation grabBlue = new ResourceLocation("forge", "dyes/blue");
             ResourceLocation grabBlack = new ResourceLocation("forge", "dyes/black");
-            /*Tag<Item> RED_DYE = ItemTags.getAllTags().getTag(grabRed);
+
+            Tag<Item> RED_DYE = ItemTags.getAllTags().getTag(grabRed);
             Tag<Item> GREEN_DYE = ItemTags.getAllTags().getTag(grabGreen);
             Tag<Item> BLUE_DYE = ItemTags.getAllTags().getTag(grabBlue);
-            Tag<Item> BLACK_DYE = ItemTags.getAllTags().getTag(grabBlack);*/
+            Tag<Item> BLACK_DYE = ItemTags.getAllTags().getTag(grabBlack);
+
+// This is to get the values of a tag that is bound to items :
+ForgeRegistries.ITEMS.tags().getTag([THE TAG YOU WANT]).stream().toList(); // Returns a List<Item>
+//                                           ^
+//                                Should be a TagKey<Item>
+
+
+// To get a tag that is bound to blocks :
+ForgeRegistries.BLOCKS.tags().getTag([THE TAG YOU WANT]).stream().toList(); // Returns a List<Block>
+//                                            ^
+//                                Should be a TagKey<Block>
+
+            */
 
             if(!world.isClientSide())
             {
                 if(player.getItemInHand(hand).getItem() instanceof ColorApplicator)
                 {
-                    /*AABB aabb = (new AABB(pos)).inflate(3.0).expandTowards(0.0D, (double)world.getHeight(), 0.0D);
+                    AABB aabb = (new AABB(pos)).inflate(3.0).expandTowards(0.0D, (double)world.getHeight(), 0.0D);
                     List<ItemEntity> list = world.getEntitiesOfClass(ItemEntity.class, aabb);
 
                     for (ItemEntity item : list) {
@@ -80,7 +104,7 @@ public class ChangeApplicatorColor {
                             black+=stack.getCount();
                             item.remove(Entity.RemovalReason.DISCARDED);
                         }
-                    }*/
+                    }
                 }
                 if(red>3)red/=3;
                 if(green>3)red/=3;

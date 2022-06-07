@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 
+import java.util.List;
+
 public class TagTool extends BaseTool implements IPedestalTool
 {
     public TagTool(Properties p_41383_) {
@@ -48,10 +50,12 @@ public class TagTool extends BaseTool implements IPedestalTool
                 {
                     if(mainhand.getItem().equals(DeferredRegisterItems.TOOL_TAGTOOL.get()))
                     {
-                        /*if(!offhand.isEmpty() && offhand.getItem().getTags().toString().length()>0)
+                        if(!offhand.isEmpty() && offhand.getTags().count()>0)
                         {
-                            MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,offhand.getItem().getTags().toString());
-                        }*/
+                            MessageUtils.messagePlayerChat(player,ChatFormatting.GRAY,"-----> " + offhand.getItem().getRegistryName().toString() + " <-----");
+                            offhand.getTags().forEach(tagKey -> MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,tagKey.location().toString()));
+                            MessageUtils.messagePlayerChat(player,ChatFormatting.GRAY,"--------------------");
+                        }
                     }
                 }
             }
