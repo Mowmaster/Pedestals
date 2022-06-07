@@ -1,12 +1,10 @@
 package com.mowmaster.pedestals.EventHandlers;
 
-import com.mowmaster.pedestals.Items.ColorApplicator;
-import com.mowmaster.pedestals.PedestalUtils.ColorReference;
+import com.mowmaster.mowlib.Items.ColorApplicator;
+import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;

@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.PedestalUtils.ColorReference;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;

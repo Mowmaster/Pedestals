@@ -1,19 +1,18 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
+
+import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
 import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
 import com.mowmaster.pedestals.Items.Augments.AugmentRenderDiffuser;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
-import com.mowmaster.pedestals.PedestalUtils.ColorReference;
 import com.mowmaster.pedestals.Networking.DustPacketHandler;
 import com.mowmaster.pedestals.Networking.DustPacketParticles;
-import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.*;
-import static com.mowmaster.pedestals.PedestalUtils.ColorReference.getTrueColorFromInt;
 
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import net.minecraft.core.BlockPos;
@@ -2415,7 +2414,7 @@ public class BasePedestalBlockEntity extends BlockEntity
 
                 if(hasEffect() && !isPedestalBlockPowered(getPedestal()))
                 {
-                    List<Integer> colorList = getTrueColorFromInt(storedPotionEffect.getEffect().getColor());
+                    List<Integer> colorList = ColorReference.getTrueColorFromInt(storedPotionEffect.getEffect().getColor());
                     decreaseEffect(speed);
                     if(canSpawnParticles())DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX(),getPos().getY(),getPos().getZ(),colorList.get(0),colorList.get(1),colorList.get(2)));
                 }
@@ -2475,10 +2474,10 @@ public class BasePedestalBlockEntity extends BlockEntity
                 if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasEnergy()){DustPacketHandler.sendToNearby(level,posDirectionalEnergy,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalEnergy.getX(),posDirectionalEnergy.getY(),posDirectionalEnergy.getZ(),255,0,0));}}
                 BlockPos posDirectionalXP = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0D,0D,0D);
                 if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasExperience()){DustPacketHandler.sendToNearby(level,posDirectionalXP,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalXP.getX(),posDirectionalXP.getY(),posDirectionalXP.getZ(),0,255,0));}}
-                System.out.println(getPos());
+                //System.out.println(getPos());
 
                 BlockPos posDirectionalFluid = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0.5D,0D,0D);
-                System.out.println(getPos().offset(0.5D,0D,0D));
+                //System.out.println(getPos().offset(0.5D,0D,0D));
                 if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasFluid()){DustPacketHandler.sendToNearby(level,posDirectionalFluid,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalFluid.getX(),posDirectionalFluid.getY(),posDirectionalFluid.getZ(),0,0,255));}}
             }
         }

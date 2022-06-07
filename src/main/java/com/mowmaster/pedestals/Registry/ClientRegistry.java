@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Registry;
 
 
+import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntityRenderer;
 import com.mowmaster.pedestals.Items.Filters.FilterEnchantCount;
 import com.mowmaster.pedestals.Items.Filters.FilterRestricted;
@@ -13,7 +14,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import com.mowmaster.pedestals.PedestalUtils.ColorReference;
+
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "pedestals", bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -22,10 +23,6 @@ public class ClientRegistry
 
     @SubscribeEvent
     public static void registerItemColor(ColorHandlerEvent.Item event) {
-
-        event.getItemColors().register((stack, color) ->
-         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.COLOR_APPLICATOR.get());
-
 
         event.getItemColors().register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ITEM.get());

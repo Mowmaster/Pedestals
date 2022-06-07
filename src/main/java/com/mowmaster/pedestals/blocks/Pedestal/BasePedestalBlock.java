@@ -1,13 +1,13 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
-import com.mowmaster.pedestals.Blocks.BaseColoredBlock;
-import com.mowmaster.pedestals.Items.ColorApplicator;
+import com.mowmaster.mowlib.Blocks.BaseColoredBlock;
+import com.mowmaster.mowlib.Items.ColorApplicator;
+import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
-import com.mowmaster.pedestals.PedestalUtils.ColorReference;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
@@ -15,9 +15,11 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -58,9 +60,13 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
+import java.util.List;
+
+import static com.mowmaster.mowlib.MowLibUtils.ColorReference.getIntColor;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
@@ -445,6 +451,13 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
             {
                 ItemStack itemInHand = p_60506_.getMainHandItem();
                 ItemStack itemInOffHand = p_60506_.getOffhandItem();
+
+                int getColor;
+                int currentColor;
+                TranslatableComponent sameColor;
+                BlockState newState;
+                List<Item> DYES = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes"))).stream().toList();
+
                 if(itemInHand.getItem() instanceof IPedestalTool)
                 {
 
@@ -454,19 +467,22 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     }
                     return InteractionResult.FAIL;
                 }
-                else if(itemInHand.getItem() instanceof ColorApplicator)
-                {
-                    int getColor = ColorReference.getColorFromItemStackInt(itemInHand);
-                    BlockState newState = ColorReference.addColorToBlockState(p_60503_,getColor);
-                    p_60504_.setBlock(p_60505_,newState,3);
-                    return InteractionResult.SUCCESS;
-                }
-                else if(itemInOffHand.getItem() instanceof ColorApplicator)
-                {
-                    int getColor = ColorReference.getColorFromItemStackInt(itemInOffHand);
-                    BlockState newState = ColorReference.addColorToBlockState(p_60503_,getColor);
-                    p_60504_.setBlock(p_60505_,newState,3);
-                    return InteractionResult.SUCCESS;
+                else if (p_60506_.getItemInHand(p_60507_).getItem() instanceof ColorApplicator) {
+
+
+                    getColor = ColorReference.getColorFromItemStackInt(p_60506_.getItemInHand(p_60507_));
+                    currentColor = ColorReference.getColorFromStateInt(p_60503_);
+                    if (currentColor != getColor) {
+                        newState = ColorReference.addColorToBlockState(p_60503_, getColor);
+                        p_60504_.setBlock(p_60505_, newState, 3);
+                        return InteractionResult.SUCCESS;
+                    }
+                    else {
+                        sameColor = new TranslatableComponent("mowlib.recolor.message_sameColor");
+                        sameColor.withStyle(ChatFormatting.RED);
+                        p_60506_.sendMessage(sameColor, Util.NIL_UUID);
+                        return InteractionResult.FAIL;
+                    }
                 }
                 else if(itemInOffHand.getItem() instanceof IPedestalUpgrade)
                 {
@@ -540,6 +556,22 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                             return InteractionResult.SUCCESS;
                         }
                     }
+                }
+                else if(DYES.contains(itemInOffHand.getItem()))
+                {
+                    getColor = ColorReference.getColorFromDyeInt(itemInOffHand);
+                    currentColor = ColorReference.getColorFromStateInt(p_60503_);
+                    if (currentColor != getColor) {
+                        newState = ColorReference.addColorToBlockState(p_60503_, getColor);
+                        p_60504_.setBlock(p_60505_, newState, 3);
+                        return InteractionResult.SUCCESS;
+                    } else {
+                        sameColor = new TranslatableComponent("mowlib.recolor.message_sameColor");
+                        sameColor.withStyle(ChatFormatting.RED);
+                        p_60506_.sendMessage(sameColor, Util.NIL_UUID);
+                        return InteractionResult.FAIL;
+                    }
+
                 }
                 else if(itemInHand.isEmpty())
                 {

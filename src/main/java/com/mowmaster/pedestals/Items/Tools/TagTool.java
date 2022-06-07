@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.Items.Tools;
 
 
-import com.mowmaster.pedestals.PedestalUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -11,8 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
-
-import java.util.List;
 
 public class TagTool extends BaseTool implements IPedestalTool
 {

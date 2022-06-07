@@ -145,6 +145,11 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+
+    maven {
+        // for any curseforge mod
+        url "https://cursemaven.com"
+    }
 }
 
 dependencies {
@@ -157,6 +162,9 @@ dependencies {
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
     // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
     // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
+
+    compileOnly fg.deobf("curse.maven:mowlib-631455:3821202")
+    runtimeOnly fg.deobf("curse.maven:mowlib-631455:3821202")
 
     // Examples using mod jars from ./libs
     // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")

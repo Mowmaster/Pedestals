@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.PedestalTab;
 
+import com.mowmaster.pedestals.Registry.DeferredRegisterBlocks;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
+import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -14,6 +16,6 @@ public class PedestalsTab extends CreativeModeTab
 
     @Override
     public ItemStack makeIcon() {
-        return new ItemStack(DeferredRegisterItems.COLOR_APPLICATOR.get());
+        return new ItemStack(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get());
     }
 }

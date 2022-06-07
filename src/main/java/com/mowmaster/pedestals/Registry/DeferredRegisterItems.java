@@ -2,7 +2,6 @@ package com.mowmaster.pedestals.Registry;
 
 import com.mowmaster.pedestals.Items.Augments.AugmentBase;
 import com.mowmaster.pedestals.Items.Augments.AugmentRenderDiffuser;
-import com.mowmaster.pedestals.Items.ColorApplicator;
 import com.mowmaster.pedestals.Items.Filters.*;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
@@ -23,12 +22,6 @@ public class DeferredRegisterItems
 {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-
-
-
-    public static final RegistryObject<Item> COLOR_APPLICATOR = ITEMS.register("applicator",
-            () -> new ColorApplicator(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
-
 
 
     public static final RegistryObject<Item> TOOL_LINKINGTOOL = ITEMS.register("tool_linkingtool",

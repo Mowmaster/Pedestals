@@ -1,10 +1,10 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.MowLibUtils.MowLibFakePlayer;
+import com.mowmaster.mowlib.MowLibUtils.OwnerUtil;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
-import com.mowmaster.pedestals.PedestalUtils.OwnerUtil;
-import com.mowmaster.pedestals.PedestalUtils.PedestalFakePlayer;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -493,13 +493,13 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     ==============================================================================
     ============================================================================*/
 
-    public WeakReference<FakePlayer> fakePedestalPlayer(BasePedestalBlockEntity pedestal)
+    /*public WeakReference<FakePlayer> fakePedestalPlayer(BasePedestalBlockEntity pedestal)
     {
         Level world = pedestal.getLevel();
         ItemStack upgrade = pedestal.getCoinOnPedestal();
         if(world instanceof ServerLevel slevel)
         {
-            return new WeakReference<FakePlayer>(new PedestalFakePlayer(slevel , OwnerUtil.getPlayerFromStack(upgrade), OwnerUtil.getPlayerNameFromStack(upgrade),pedestal));
+            return new WeakReference<FakePlayer>(new MowLibFakePlayer(slevel , OwnerUtil.getPlayerFromStack(upgrade), OwnerUtil.getPlayerNameFromStack(upgrade)));
         }
         else return null;
     }
@@ -513,7 +513,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             return new WeakReference<FakePlayer>(new PedestalFakePlayer(slevel,OwnerUtil.getPlayerFromStack(upgrade), OwnerUtil.getPlayerNameFromStack(upgrade),pedestal.getPos(),itemInHand));
         }
         else return null;
-    }
+    }*/
 
     /*============================================================================
     ==============================================================================
