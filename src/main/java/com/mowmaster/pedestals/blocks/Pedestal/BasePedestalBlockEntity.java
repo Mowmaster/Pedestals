@@ -8,6 +8,7 @@ import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.PedestalUtils.ColorReference;
 import com.mowmaster.pedestals.Networking.DustPacketHandler;
 import com.mowmaster.pedestals.Networking.DustPacketParticles;
+import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -2352,7 +2353,41 @@ public class BasePedestalBlockEntity extends BlockEntity
     }
 
 
-
+    public BlockPos offsetBasedOnDirection(Direction enumfacing, BlockPos posOfPedestal, double x, double y, double z)
+    {
+        BlockPos blockBelow = posOfPedestal;
+        switch (enumfacing)
+        {
+            case UP:
+                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + y, blockBelow.getZ() + z);
+            case DOWN:
+                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + y + 1D, blockBelow.getZ() + z);
+            case NORTH:
+                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + z, blockBelow.getZ() + y);
+            case SOUTH:
+                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + z, blockBelow.getZ() + y);
+            case EAST:
+                return new BlockPos(blockBelow.getX() + y, blockBelow.getY() + x, blockBelow.getZ() + z);
+            case WEST:
+                return new BlockPos(blockBelow.getX() + y, blockBelow.getY() + x, blockBelow.getZ() + z);
+            default:
+                return blockBelow;
+            /*case UP:
+                return blockBelow.offset(x,-y,z);
+            case DOWN:
+                return blockBelow.offset(x,y,z);
+            case NORTH:
+                return blockBelow.offset(x,z,y);
+            case SOUTH:
+                return blockBelow.offset(x,z,-y);
+            case EAST:
+                return blockBelow.offset(-y,x,z);
+            case WEST:
+                return blockBelow.offset(y,x,z);
+            default:
+                return blockBelow;*/
+        }
+    }
 
 
 
@@ -2436,9 +2471,15 @@ public class BasePedestalBlockEntity extends BlockEntity
 
             if(canSpawnParticles())
             {
-                if(getLevel().getGameTime()%20 == 0){if(this.hasEnergy()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()+0.25,getPos().getY(),getPos().getZ()+0.25,255,0,0));}}
-                if(getLevel().getGameTime()%20 == 0){if(this.hasExperience()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()-0.25,getPos().getY(),getPos().getZ()-0.25,0,255,0));}}
-                if(getLevel().getGameTime()%20 == 0){if(this.hasFluid()){DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX()+0.25,getPos().getY(),getPos().getZ()-0.25,0,0,255));}}
+                BlockPos posDirectionalEnergy = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0D,0D,0D);
+                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasEnergy()){DustPacketHandler.sendToNearby(level,posDirectionalEnergy,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalEnergy.getX(),posDirectionalEnergy.getY(),posDirectionalEnergy.getZ(),255,0,0));}}
+                BlockPos posDirectionalXP = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0D,0D,0D);
+                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasExperience()){DustPacketHandler.sendToNearby(level,posDirectionalXP,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalXP.getX(),posDirectionalXP.getY(),posDirectionalXP.getZ(),0,255,0));}}
+                System.out.println(getPos());
+
+                BlockPos posDirectionalFluid = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0.5D,0D,0D);
+                System.out.println(getPos().offset(0.5D,0D,0D));
+                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasFluid()){DustPacketHandler.sendToNearby(level,posDirectionalFluid,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalFluid.getX(),posDirectionalFluid.getY(),posDirectionalFluid.getZ(),0,0,255));}}
             }
         }
     }

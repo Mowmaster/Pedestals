@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RailBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.extensions.IForgeAbstractMinecart;
 import net.minecraftforge.common.util.LazyOptional;
@@ -23,6 +24,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.List;
+
+import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
 
 public class PedestalUtilities
 {
@@ -257,5 +260,30 @@ public class PedestalUtilities
             }
         }
         return startAmount - amount;
+    }
+
+    public BlockPos getPosOfBlockBelow(Level level, BlockPos posOfPedestal, int numBelow)
+    {
+        BlockState state = level.getBlockState(posOfPedestal);
+
+        Direction enumfacing = (state.hasProperty(FACING))?(state.getValue(FACING)):(Direction.UP);
+        BlockPos blockBelow = posOfPedestal;
+        switch (enumfacing)
+        {
+            case UP:
+                return blockBelow.offset(0,-numBelow,0);
+            case DOWN:
+                return blockBelow.offset(0,numBelow,0);
+            case NORTH:
+                return blockBelow.offset(0,0,numBelow);
+            case SOUTH:
+                return blockBelow.offset(0,0,-numBelow);
+            case EAST:
+                return blockBelow.offset(-numBelow,0,0);
+            case WEST:
+                return blockBelow.offset(numBelow,0,0);
+            default:
+                return blockBelow;
+        }
     }
 }
