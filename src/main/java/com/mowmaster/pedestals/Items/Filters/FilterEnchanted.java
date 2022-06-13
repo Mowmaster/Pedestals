@@ -1,12 +1,13 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -84,29 +85,17 @@ public class FilterEnchanted extends BaseFilter{
 
                             List<ItemStack> buildQueue = this.buildFilterQueue(world,posBlock);
 
-                            if(buildQueue.size() > 0 && this.getFilterMode(itemInOffhand)<=0)
+                            if(buildQueue.size() > 0 && PedestalModesAndTypes.getModeFromStack(itemInOffhand)<=0)
                             {
-                                this.writeFilterQueueToNBT(itemInOffhand,buildQueue, this.getFilterMode(itemInOffhand));
-                                ChatFormatting color;
-                                switch (getFilterMode(itemInOffhand))
-                                {
-                                    case 0: color = ChatFormatting.GOLD; break;
-                                    case 1: color = ChatFormatting.BLUE; break;
-                                    case 2: color = ChatFormatting.RED; break;
-                                    case 3: color = ChatFormatting.GREEN; break;
-                                    default: color = ChatFormatting.WHITE; break;
-                                }
-                                TranslatableComponent filterChanged = new TranslatableComponent(MODID + ".filter_changed");
-                                filterChanged.withStyle(color);
-                                player.displayClientMessage(filterChanged,true);
+                                this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
+                                ChatFormatting color = PedestalModesAndTypes.getModeColorFormat(itemInOffhand);
+                                MessageUtils.messagePopup(player,color,MODID + ".filter_changed");
                             }
                         }
                     }
                 }
                 else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter){
-                    TranslatableComponent pedestalFluid = new TranslatableComponent(MODID + ".filter.message_twohanded");
-                    pedestalFluid.withStyle(ChatFormatting.RED);
-                    player.displayClientMessage(pedestalFluid,true);
+                    MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
                 }
             }
         }

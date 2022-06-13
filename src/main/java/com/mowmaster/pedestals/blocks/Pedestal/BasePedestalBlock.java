@@ -1,8 +1,9 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
-import com.mowmaster.mowlib.Blocks.BaseColoredBlock;
+import com.mowmaster.mowlib.Blocks.BaseBlocks.BaseColoredBlock;
 import com.mowmaster.mowlib.Items.ColorApplicator;
 import com.mowmaster.mowlib.MowLibUtils.ColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
@@ -14,7 +15,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -242,18 +244,12 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
             if(p_49850_ instanceof Player)
             {
                 Player player = ((Player)p_49850_);
-                TranslatableComponent linksucess = new TranslatableComponent(MODID + ".tool_link_success");
-                linksucess.withStyle(ChatFormatting.WHITE);
-                TranslatableComponent linkunsuccess = new TranslatableComponent(MODID + ".tool_link_unsucess");
-                linkunsuccess.withStyle(ChatFormatting.WHITE);
-                TranslatableComponent linkremoved = new TranslatableComponent(MODID + ".tool_link_removed");
-                linkremoved.withStyle(ChatFormatting.WHITE);
-                TranslatableComponent linkitsself = new TranslatableComponent(MODID + ".tool_link_itsself");
-                linkitsself.withStyle(ChatFormatting.WHITE);
-                TranslatableComponent linknetwork = new TranslatableComponent(MODID + ".tool_link_network");
-                linknetwork.withStyle(ChatFormatting.WHITE);
-                TranslatableComponent linkdistance = new TranslatableComponent(MODID + ".tool_link_distance");
-                linkdistance.withStyle(ChatFormatting.WHITE);
+                String linksucess = MODID + ".tool_link_success";
+                String linkunsuccess = MODID + ".tool_link_unsucess";
+                String linkremoved = MODID + ".tool_link_removed";
+                String linkitsself = MODID + ".tool_link_itsself";
+                String linknetwork = MODID + ".tool_link_network";
+                String linkdistance = MODID + ".tool_link_distance";
                 if(player.getOffhandItem().getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOL.get()))
                 {
                     LinkingTool tool = ((LinkingTool)player.getOffhandItem().getItem());
@@ -287,16 +283,16 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                                                     //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                     if(tilePedestal.storeNewLocation(tool.getStoredPosition(player.getOffhandItem())))
                                                     {
-                                                        player.sendMessage(linksucess, Util.NIL_UUID);
+                                                        MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linksucess);
                                                     }
-                                                    else player.sendMessage(linkunsuccess,Util.NIL_UUID);
+                                                    else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkunsuccess);
                                                 }
                                             }
-                                            else player.sendMessage(linkitsself,Util.NIL_UUID);
+                                            else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkitsself);
                                         }
-                                        else player.sendMessage(linknetwork,Util.NIL_UUID);
+                                        else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linknetwork);
                                     }
-                                    else player.sendMessage(linkdistance, Util.NIL_UUID);
+                                    else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkdistance);
                                 }
                             }
                         }
@@ -335,16 +331,16 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                                                     //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                     if(tileSender.storeNewLocation(p_49848_))
                                                     {
-                                                        player.sendMessage(linksucess, Util.NIL_UUID);
+                                                        MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linksucess);
                                                     }
-                                                    else player.sendMessage(linkunsuccess,Util.NIL_UUID);
+                                                    else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkunsuccess);
                                                 }
                                             }
-                                            else player.sendMessage(linkitsself,Util.NIL_UUID);
+                                            else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkitsself);
                                         }
-                                        else player.sendMessage(linknetwork,Util.NIL_UUID);
+                                        else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linknetwork);
                                     }
-                                    else player.sendMessage(linkdistance, Util.NIL_UUID);
+                                    else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkdistance);
                                 }
                             }
                         }
@@ -454,7 +450,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
 
                 int getColor;
                 int currentColor;
-                TranslatableComponent sameColor;
+                Component sameColor;
                 BlockState newState;
                 List<Item> DYES = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes"))).stream().toList();
 
@@ -478,9 +474,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                         return InteractionResult.SUCCESS;
                     }
                     else {
-                        sameColor = new TranslatableComponent("mowlib.recolor.message_sameColor");
-                        sameColor.withStyle(ChatFormatting.RED);
-                        p_60506_.sendMessage(sameColor, Util.NIL_UUID);
+                        MessageUtils.messagePlayerChat(p_60506_, ChatFormatting.RED,"mowlib.recolor.message_sameColor");
                         return InteractionResult.FAIL;
                     }
                 }
@@ -566,9 +560,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                         p_60504_.setBlock(p_60505_, newState, 3);
                         return InteractionResult.SUCCESS;
                     } else {
-                        sameColor = new TranslatableComponent("mowlib.recolor.message_sameColor");
-                        sameColor.withStyle(ChatFormatting.RED);
-                        p_60506_.sendMessage(sameColor, Util.NIL_UUID);
+                        MessageUtils.messagePlayerChat(p_60506_, ChatFormatting.RED,"mowlib.recolor.message_sameColor");
                         return InteractionResult.FAIL;
                     }
 
@@ -579,7 +571,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     {
                         if(pedestal.hasRedstone())
                         {
-                            TranslatableComponent itemCountInPedestal = new TranslatableComponent(MODID + ".pedestal.message_redstone_disable");
+                            MutableComponent itemCountInPedestal = Component.translatable(MODID + ".pedestal.message_redstone_disable");
                             itemCountInPedestal.append(""+pedestal.getRedstonePowerNeeded()+"");
                             itemCountInPedestal.withStyle(ChatFormatting.LIGHT_PURPLE);
                             p_60506_.displayClientMessage(itemCountInPedestal,true);
@@ -588,25 +580,25 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                         if(pedestal.hasFluid())
                         {
                             String fluid = pedestal.getStoredFluid().getDisplayName().getString() +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
-                            TranslatableComponent pedestalFluid = new TranslatableComponent(fluid);
+                            MutableComponent pedestalFluid = Component.translatable(fluid);
                             pedestalFluid.withStyle(ChatFormatting.BLUE);
-                            p_60506_.sendMessage(pedestalFluid,Util.NIL_UUID);
+                            p_60506_.displayClientMessage(pedestalFluid, true);
                         }
 
                         if(pedestal.hasEnergy())
                         {
                             String energy = "Energy: "+ pedestal.getStoredEnergy() +"/"+pedestal.getEnergyCapacity();
-                            TranslatableComponent pedestalEnergy = new TranslatableComponent(energy);
+                            MutableComponent pedestalEnergy = Component.translatable(energy);
                             pedestalEnergy.withStyle(ChatFormatting.RED);
-                            p_60506_.sendMessage(pedestalEnergy,Util.NIL_UUID);
+                            p_60506_.displayClientMessage(pedestalEnergy, true);
                         }
 
                         if(pedestal.hasExperience())
                         {
                             String experience = "Experience: "+ pedestal.getStoredExperience() +"/"+pedestal.getExperienceCapacity();
-                            TranslatableComponent pedestalExperience = new TranslatableComponent(experience);
+                            MutableComponent pedestalExperience = Component.translatable(experience);
                             pedestalExperience.withStyle(ChatFormatting.GREEN);
-                            p_60506_.sendMessage(pedestalExperience,Util.NIL_UUID);
+                            p_60506_.displayClientMessage(pedestalExperience,true);
                         }
 
                     }
@@ -614,7 +606,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     {
                         if(pedestal.hasItem())
                         {
-                            TranslatableComponent itemCountInPedestal = new TranslatableComponent(pedestal.getItemInPedestal().getDisplayName().getString() + " " + pedestal.getItemInPedestal().getCount());
+                            MutableComponent itemCountInPedestal = Component.translatable(pedestal.getItemInPedestal().getDisplayName().getString() + " " + pedestal.getItemInPedestal().getCount());
                             itemCountInPedestal.withStyle(ChatFormatting.GOLD);
                             p_60506_.displayClientMessage(itemCountInPedestal,true);
                         }
@@ -635,7 +627,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                                 if(!p_60506_.isCreative())ItemHandlerHelper.giveItemToPlayer(p_60506_,new ItemStack(bucketItem));
 
                                 String fluidRemoved = fluid +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
-                                TranslatableComponent pedestalFluid = new TranslatableComponent(fluidRemoved);
+                                MutableComponent pedestalFluid = Component.translatable(fluidRemoved);
                                 pedestalFluid.withStyle(ChatFormatting.WHITE);
                                 p_60506_.displayClientMessage(pedestalFluid,true);
 

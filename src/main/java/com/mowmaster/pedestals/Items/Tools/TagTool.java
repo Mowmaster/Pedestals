@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class TagTool extends BaseTool implements IPedestalTool
 {
@@ -50,7 +51,7 @@ public class TagTool extends BaseTool implements IPedestalTool
                     {
                         if(!offhand.isEmpty() && offhand.getTags().count()>0)
                         {
-                            MessageUtils.messagePlayerChat(player,ChatFormatting.GRAY,"-----> " + offhand.getItem().getRegistryName().toString() + " <-----");
+                            MessageUtils.messagePlayerChat(player,ChatFormatting.GRAY,"-----> " + ForgeRegistries.ITEMS.getKey(offhand.getItem()).toString() + " <-----");
                             offhand.getTags().forEach(tagKey -> MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,tagKey.location().toString()));
                             MessageUtils.messagePlayerChat(player,ChatFormatting.GRAY,"--------------------");
                         }

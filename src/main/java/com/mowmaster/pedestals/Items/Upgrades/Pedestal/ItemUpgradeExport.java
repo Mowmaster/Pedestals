@@ -10,7 +10,9 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -64,7 +66,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase
                             saveModeToNBT(itemInOffhand,setNewMode);
                             player.setItemInHand(InteractionHand.OFF_HAND,itemInOffhand);
 
-                            TranslatableComponent changed = new TranslatableComponent(MODID + ".mode_changed");
+                            MutableComponent changed = Component.translatable(MODID + ".mode_changed");
                             ChatFormatting colorChange = ChatFormatting.BLACK;
                             String typeString = "";
                             switch(setNewMode)
@@ -87,7 +89,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase
                                 default: typeString = ".error"; colorChange = ChatFormatting.DARK_RED; break;
                             }
                             changed.withStyle(colorChange);
-                            TranslatableComponent type = new TranslatableComponent(MODID + typeString);
+                            MutableComponent type = Component.translatable(MODID + typeString);
                             changed.append(type);
                             player.displayClientMessage(changed,true);
                         }

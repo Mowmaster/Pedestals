@@ -4,7 +4,8 @@ package com.mowmaster.pedestals.Blocks.Pedestal;
 import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
 import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
-import com.mowmaster.pedestals.Items.Augments.AugmentRenderDiffuser;
+import com.mowmaster.pedestals.Configs.PedestalConfig;
+import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Networking.DustPacketHandler;
@@ -31,10 +32,7 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -80,6 +78,7 @@ public class BasePedestalBlockEntity extends BlockEntity
     private boolean showRenderRange = false;
     public BlockPos getPos() { return this.worldPosition; }
     private BasePedestalBlockEntity getPedestal() { return this; }
+    private int maxRate = Integer.MAX_VALUE;
 
     public boolean getRenderRange(){return this.showRenderRange;}
     public void setRenderRange(boolean setRender){ this.showRenderRange = setRender; update();}
@@ -165,16 +164,16 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 11 slots to future proof things
-        return new ItemStackHandler(10) {
+        return new ItemStackHandler(11) {
 
             @Override
             protected void onLoad() {
-                if(getSlots()<10)
+                if(getSlots()<11)
                 {
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    setSize(10);
+                    setSize(11);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
                     }
@@ -201,7 +200,10 @@ public class BasePedestalBlockEntity extends BlockEntity
                 if (slot == 4 && stack.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()) && !hasRRobin()) return true;
                 if (slot == 5 && stack.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()) && !hasRenderAugment()) return true;
                 if (slot == 6 && stack.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()) && !hasNoCollide()) return true;
-                //if (slot == 6 && stack.
+                if (slot == 7 && stack.getItem() instanceof AugmentTieredSpeed && canInsertAugmentSpeed(stack)) return true;
+                if (slot == 8 && stack.getItem() instanceof AugmentTieredCapacity && canInsertAugmentCapacity(stack)) return true;
+                if (slot == 9 && stack.getItem() instanceof AugmentTieredStorage && canInsertAugmentStorage(stack)) return true;
+                if (slot == 10 && stack.getItem() instanceof AugmentTieredRange && canInsertAugmentRange(stack)) return true;
                 return false;
             }
         };
@@ -663,16 +665,6 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     public int getNumberOfStoredLocations() {return storedLocations.size();}
 
-
-
-
-    public int getRange()
-    {
-        //Update if i ever do add back in range augments, or some sort of range increasing potion?
-        // 0 = Default, scales to 5 which is 64 blocks currently
-        return 0;
-    }
-
     public boolean storeNewLocation(BlockPos pos)
     {
         boolean returner = false;
@@ -721,29 +713,7 @@ public class BasePedestalBlockEntity extends BlockEntity
     public int getLinkingRange()
     {
         int range = 8;
-        switch (getRange())
-        {
-            case 0:
-                range = (getRange()>0)?(8):(8);//normal speed
-                break;
-            case 1:
-                range=(getRange()>0)?(12):(8);//2x faster
-                break;
-            case 2:
-                range = (getRange()>0)?(16):(8);;//4x faster
-                break;
-            case 3:
-                range = (getRange()>0)?(32):(8);;//6x faster
-                break;
-            case 4:
-                range = (getRange()>0)?(48):(8);;//10x faster
-                break;
-            case 5:
-                range=(getRange()>0)?(64):(8);;//20x faster
-                break;
-            default: range=8;
-        }
-        return  range;
+        return  range + getRangeIncrease();
     }
 
     public boolean isPedestalInRange(BasePedestalBlockEntity pedestalCurrent, BlockPos pedestalToBeLinked)
@@ -1282,72 +1252,98 @@ public class BasePedestalBlockEntity extends BlockEntity
     ==============================================================================
     ============================================================================*/
 
-    public boolean hasEffect()
+    public boolean addSpeed(ItemStack speedAugment)
     {
-        return this.storedPotionEffect!=null;
+        if(speedAugment.getItem() instanceof AugmentTieredSpeed speedStack)
+        {
+            IItemHandler ph = privateHandler.orElse(null);
+            ItemStack itemFromBlock = speedAugment.copy();
+            itemFromBlock.setCount(1);
+            if(getSpeed() < speedStack.getAllowedInsertAmount())
+            {
+                ph.insertItem(7,itemFromBlock,false);
+                //update();
+                return true;
+            }
+            else return false;
+        }
+        else return false;
     }
 
-    public boolean decreaseEffect(int decrease)
+    public ItemStack removeSpeed(int count)
     {
-        if(hasEffect())
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasSpeed())
         {
-            if(this.storedPotionEffectDuration-decrease>0)
+            return ph.extractItem(7,count,false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeAllSpeed()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasSpeed())
+        {
+            //update();
+            return ph.extractItem(7,ph.getStackInSlot(7).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public boolean hasSpeed()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(7).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public int getSpeed()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(7).getCount();
+    }
+
+    public ItemStack getSpeedStack()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(7);
+    }
+
+    public boolean canInsertAugmentSpeed(ItemStack speedAugment)
+    {
+        if(speedAugment.getItem() instanceof AugmentTieredSpeed speedStack)
+        {
+            //Check to see if any can be insert
+            if(speedStack.getAllowedInsertAmount()>0) return false;
+
+            if(hasSpeed())
             {
-                this.storedPotionEffectDuration-=decrease;
-                update();
+                //Check to see if stacks to be insert match
+                if(!speedAugment.getItem().equals(getSpeedStack().getItem()))return false;
+                //Check to see if more can be insert
+                if(getSpeed() >= speedStack.getAllowedInsertAmount()) return false;
+
                 return true;
             }
-            else
-            {
-                this.storedPotionEffectDuration=0;
-                this.storedPotionEffect = null;
-                update();
-                return true;
-            }
+            else return true;
         }
 
         return false;
     }
 
-    public boolean addEffect(MobEffectInstance incomingInstance)
+    public int getTicksReduced()
     {
-        if(hasEffect()){return false;}
-        else
+        ItemStack augmentSpeed = getSpeedStack();
+        if(augmentSpeed.getItem() instanceof AugmentTieredSpeed speedStack)
         {
-            this.storedPotionEffect = incomingInstance;
-            this.storedPotionEffectDuration = incomingInstance.getDuration();
-            update();
-            return true;
-        }
-    }
-
-    public MobEffect getCurrentEffect()
-    {
-        if(hasEffect())
-        {
-            return this.storedPotionEffect.getEffect();
+            return speedStack.getTicksReducedPerItem() * augmentSpeed.getCount();
         }
 
-        return null;
-    }
-
-    public int getSpeed(MobEffectInstance effectInstance)
-    {
-        MobEffect effect = effectInstance.getEffect();
-        int strength = effectInstance.getAmplifier();
-
-        if(effect.equals(MobEffects.MOVEMENT_SPEED))
-        {
-            int speed = (int)Math.round(20.0D - (20.0D*(0.2D * (strength+1))));
-            return (speed<0)?(0):(speed);
-        }
-        else if(effect.equals(MobEffects.MOVEMENT_SLOWDOWN))
-        {
-            int speed = (int)Math.round(20.0D + (20.0D*(0.2D * (strength+1))));
-            return (speed>100)?(100):(speed);
-        }
-
-        return 20;
+        return 0;
     }
 
     /*============================================================================
@@ -1364,16 +1360,20 @@ public class BasePedestalBlockEntity extends BlockEntity
     ==============================================================================
     ============================================================================*/
 
-    /*public boolean addCapacity(ItemStack capacityUpgrade)
+    public boolean addCapacity(ItemStack capacityAugment)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack itemFromBlock = capacityUpgrade.copy();
-        itemFromBlock.setCount(1);
-        if(getCapacity() < 5)
+        if(capacityAugment.getItem() instanceof AugmentTieredCapacity capacityStack)
         {
-            ph.insertItem(3,itemFromBlock,false);
-            //update();
-            return true;
+            IItemHandler ph = privateHandler.orElse(null);
+            ItemStack itemFromBlock = capacityAugment.copy();
+            itemFromBlock.setCount(1);
+            if(getCapacity() < capacityStack.getAllowedInsertAmount())
+            {
+                ph.insertItem(8,itemFromBlock,false);
+                //update();
+                return true;
+            }
+            else return false;
         }
         else return false;
     }
@@ -1383,19 +1383,18 @@ public class BasePedestalBlockEntity extends BlockEntity
         IItemHandler ph = privateHandler.orElse(null);
         if(hasCapacity())
         {
-            //update();
-            return ph.extractItem(3,count,false);
+            return ph.extractItem(8,count,false);
         }
         else return ItemStack.EMPTY;
     }
 
-    public ItemStack removeCapacity()
+    public ItemStack removeAllCapacity()
     {
         IItemHandler ph = privateHandler.orElse(null);
         if(hasCapacity())
         {
             //update();
-            return ph.extractItem(3,ph.getStackInSlot(3).getCount(),false);
+            return ph.extractItem(8,ph.getStackInSlot(8).getCount(),false);
         }
         else return ItemStack.EMPTY;
     }
@@ -1403,17 +1402,90 @@ public class BasePedestalBlockEntity extends BlockEntity
     public boolean hasCapacity()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(3).isEmpty())
+        if(ph.getStackInSlot(8).isEmpty())
         {
             return false;
         }
         else  return true;
     }
+
     public int getCapacity()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(3).getCount();
-    }*/
+        return ph.getStackInSlot(8).getCount();
+    }
+
+    public ItemStack getCapacityStack()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(8);
+    }
+
+    public boolean canInsertAugmentCapacity(ItemStack capacityAugment)
+    {
+        if(capacityAugment.getItem() instanceof AugmentTieredCapacity capacityStack)
+        {
+            //Check to see if any can be insert
+            if(capacityStack.getAllowedInsertAmount()>0) return false;
+
+            if(hasCapacity())
+            {
+                //Check to see if stacks to be insert match
+                if(!capacityAugment.getItem().equals(getCapacityStack().getItem()))return false;
+                //Check to see if more can be insert
+                if(getCapacity() >= capacityStack.getAllowedInsertAmount()) return false;
+
+                return true;
+            }
+            else return true;
+        }
+
+        return false;
+    }
+
+    public int getItemTransferRateIncreaseFromCapacity()
+    {
+        ItemStack augmentCapacity = getCapacityStack();
+        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
+        {
+            return capacityStack.getAdditionalItemTransferRatePerItem() * augmentCapacity.getCount();
+        }
+
+        return 0;
+    }
+
+    public int getFluidTransferRateIncreaseFromCapacity()
+    {
+        ItemStack augmentCapacity = getCapacityStack();
+        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
+        {
+            return capacityStack.getAdditionalFluidTransferRatePerItem() * augmentCapacity.getCount();
+        }
+
+        return 0;
+    }
+
+    public int getEnergyTransferRateIncreaseFromCapacity()
+    {
+        ItemStack augmentCapacity = getCapacityStack();
+        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
+        {
+            return capacityStack.getAdditionalEnergyTransferRatePerItem() * augmentCapacity.getCount();
+        }
+
+        return 0;
+    }
+
+    public int getXpTransferRateIncreaseFromCapacity()
+    {
+        ItemStack augmentCapacity = getCapacityStack();
+        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
+        {
+            return capacityStack.getAdditionalItemTransferRatePerItem() * augmentCapacity.getCount();
+        }
+
+        return 0;
+    }
 
     /*============================================================================
     ==============================================================================
@@ -1421,6 +1493,253 @@ public class BasePedestalBlockEntity extends BlockEntity
     ==============================================================================
     ============================================================================*/
 
+
+    /*============================================================================
+    ==============================================================================
+    ===========================    STORAGE  START    =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean addStorage(ItemStack storageAugment)
+    {
+        if(storageAugment.getItem() instanceof AugmentTieredStorage storageStack)
+        {
+            IItemHandler ph = privateHandler.orElse(null);
+            ItemStack itemFromBlock = storageAugment.copy();
+            itemFromBlock.setCount(1);
+            if(getStorage() < storageStack.getAllowedInsertAmount())
+            {
+                ph.insertItem(9,itemFromBlock,false);
+                //update();
+                return true;
+            }
+            else return false;
+        }
+        else return false;
+    }
+
+    public ItemStack removeStorage(int count)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasStorage())
+        {
+            return ph.extractItem(9,count,false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeAllStorage()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasStorage())
+        {
+            //update();
+            return ph.extractItem(9,ph.getStackInSlot(9).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public boolean hasStorage()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(9).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public int getStorage()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(9).getCount();
+    }
+
+    public ItemStack getStorageStack()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(9);
+    }
+
+    public boolean canInsertAugmentStorage(ItemStack storageAugment)
+    {
+        if(storageAugment.getItem() instanceof AugmentTieredStorage storageStack)
+        {
+            //Check to see if any can be insert
+            if(storageStack.getAllowedInsertAmount()>0) return false;
+
+            if(hasStorage())
+            {
+                //Check to see if stacks to be insert match
+                if(!storageAugment.getItem().equals(getStorageStack().getItem()))return false;
+                //Check to see if more can be insert
+                if(getStorage() >= storageStack.getAllowedInsertAmount()) return false;
+
+                return true;
+            }
+            else return true;
+        }
+
+        return false;
+    }
+
+    public int getItemTransferRateIncreaseFromStorage()
+    {
+        ItemStack augmentStorage = getStorageStack();
+        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
+        {
+            return storageStack.getAdditionalItemStoragePerItem() * augmentStorage.getCount();
+        }
+
+        return 0;
+    }
+
+    public int getFluidTransferRateIncreaseFromStorage()
+    {
+        ItemStack augmentStorage = getStorageStack();
+        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
+        {
+            return storageStack.getAdditionalFluidStoragePerItem() * augmentStorage.getCount();
+        }
+
+        return 0;
+    }
+
+    public int getEnergyTransferRateIncreaseFromStorage()
+    {
+        ItemStack augmentStorage = getStorageStack();
+        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
+        {
+            return storageStack.getAdditionalEnergyStoragePerItem() * augmentStorage.getCount();
+        }
+
+        return 0;
+    }
+
+    public int getXpTransferRateIncreaseFromStorage()
+    {
+        ItemStack augmentStorage = getStorageStack();
+        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
+        {
+            return storageStack.getAdditionalXpStoragePerItem() * augmentStorage.getCount();
+        }
+
+        return 0;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     STORAGE  END     =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     RANGE  START     =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean addRange(ItemStack rangeAugment)
+    {
+        if(rangeAugment.getItem() instanceof AugmentTieredRange rangeStack)
+        {
+            IItemHandler ph = privateHandler.orElse(null);
+            ItemStack itemFromBlock = rangeAugment.copy();
+            itemFromBlock.setCount(1);
+            if(getRange() < rangeStack.getAllowedInsertAmount())
+            {
+                ph.insertItem(10,itemFromBlock,false);
+                //update();
+                return true;
+            }
+            else return false;
+        }
+        else return false;
+    }
+
+    public ItemStack removeRange(int count)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasRange())
+        {
+            return ph.extractItem(10,count,false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeAllRange()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasRange())
+        {
+            //update();
+            return ph.extractItem(10,ph.getStackInSlot(10).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public boolean hasRange()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(10).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public int getRange()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(10).getCount();
+    }
+
+    public ItemStack getRangeStack()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(10);
+    }
+
+    public boolean canInsertAugmentRange(ItemStack rangeAugment)
+    {
+        if(rangeAugment.getItem() instanceof AugmentTieredRange rangeStack)
+        {
+            //Check to see if any can be insert
+            if(rangeStack.getAllowedInsertAmount()>0) return false;
+
+            if(hasRange())
+            {
+                //Check to see if stacks to be insert match
+                if(!rangeAugment.getItem().equals(getRangeStack().getItem()))return false;
+                //Check to see if more can be insert
+                if(getRange() >= rangeStack.getAllowedInsertAmount()) return false;
+
+                return true;
+            }
+            else return true;
+        }
+
+        return false;
+    }
+
+    public int getRangeIncrease()
+    {
+        ItemStack augmentRange = getRangeStack();
+        if(augmentRange.getItem() instanceof AugmentTieredRange rangeStack)
+        {
+            return rangeStack.getRangeIncreasePerItem() * augmentRange.getCount();
+        }
+
+        return 0;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      RANGE  END      =============================
+    ==============================================================================
+    ============================================================================*/
 
 
     /*============================================================================
@@ -2408,16 +2727,12 @@ public class BasePedestalBlockEntity extends BlockEntity
         {
             pedTicker++;
             //if (pedTicker%getOperationSpeed() == 0) {
-            int speed = 20;
-            if(hasEffect())speed = getSpeed(storedPotionEffect);
+            int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
+            int speed = configSpeed;
+            if(hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getTicksReduced();
+            //Make sure speed has at least a value of 1
+            if(speed<=0)speed = 1;
             if (pedTicker%speed == 0) {
-
-                if(hasEffect() && !isPedestalBlockPowered(getPedestal()))
-                {
-                    List<Integer> colorList = ColorReference.getTrueColorFromInt(storedPotionEffect.getEffect().getColor());
-                    decreaseEffect(speed);
-                    if(canSpawnParticles())DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX(),getPos().getY(),getPos().getZ(),colorList.get(0),colorList.get(1),colorList.get(2)));
-                }
 
                 if(getNumberOfStoredLocations() > 0 && !isPedestalBlockPowered(getPedestal())) { transferAction(); }
 
@@ -2430,40 +2745,13 @@ public class BasePedestalBlockEntity extends BlockEntity
                 List<Entity> entitiesColliding = level.getEntitiesOfClass(Entity.class,new AABB(getPos()));
                 for(Entity getEntity : entitiesColliding)
                 {
-                    if(!hasEffect())
-                    {
-                        if(getEntity instanceof ItemEntity)
-                        {
-                            ItemEntity item = ((ItemEntity)getEntity);
-                            List<MobEffectInstance> effects = PotionUtils.getMobEffects(item.getItem());
-                            if(effects!=null)
-                            {
-                                MobEffectInstance instance = IntStream.range(0,effects.size())//Int Range
-                                        .mapToObj((effects)::get)//Function being applied to each interval
-                                        .filter(MobEffectInstance -> (MobEffectInstance.getEffect().equals(MobEffects.MOVEMENT_SPEED) || MobEffectInstance.getEffect().equals(MobEffects.MOVEMENT_SLOWDOWN)))
-                                        .findFirst().orElse(null);
-                                if(instance !=null)
-                                {
-                                    addEffect(instance);
-                                    if(item.getItem().getCount()>1){ item.getItem().shrink(1); }
-                                    else { item.remove(Entity.RemovalReason.DISCARDED); }
-                                }
-                            }
-                        }
-                    }
-
                     if(!hasNoCollide() && !isPedestalBlockPowered(getPedestal()))
                     {
                         collideWithPedestal(level, getPedestal(), getPos(), getBlockState(), getEntity);
                     }
-
-
                 }
-
-
-
-
-                if(pedTicker >=100){pedTicker=0;}
+                //make sure we dont go over max int limit, regardless of config
+                if(pedTicker >= maxRate-1){pedTicker=0;}
             }
 
             if(getRenderRange()){ if(getLevel().getGameTime()%20 == 0)DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX(),getPos().getY(),getPos().getZ(),0,0,0)); }

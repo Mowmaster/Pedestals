@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Items.Filters;
 
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 
+import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -31,7 +32,7 @@ public class FilterItemStack extends BaseFilter{
         {
             if(itemInPedestal.isEmpty())
             {
-                List<ItemStack> stackCurrentRestricted = readFilterQueueFromNBT(itemFromInv,getFilterMode(itemFromInv));
+                List<ItemStack> stackCurrentRestricted = readFilterQueueFromNBT(itemFromInv, PedestalModesAndTypes.getModeFromStack(itemFromInv));
                 int rangeRestricted = stackCurrentRestricted.size();
                 int count = 0;
                 int maxIncomming = itemStackIncoming.getMaxStackSize();

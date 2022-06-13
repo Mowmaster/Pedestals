@@ -6,6 +6,7 @@ import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.Filters.FilterItem;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeExport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeImport;
+import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -22,9 +23,9 @@ public class ItemModelPropertiesDust
             return ItemUpgradeExport.getUpgradeMode(p_174625_);});
 
         ItemProperties.register(item, new ResourceLocation(MODID + ":filter_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
-            return BaseFilter.getFilterMode(p_174625_);});
+            return PedestalModesAndTypes.getModeFromStack(p_174625_);});
         ItemProperties.register(item, new ResourceLocation(MODID + ":filter_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
-            return FilterItem.getFilterMode(p_174625_);});
+            return PedestalModesAndTypes.getModeFromStack(p_174625_);});
 
         ItemProperties.register(item, new ResourceLocation(MODID + ":augment_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
             return AugmentRenderDiffuser.getAugmentMode(p_174625_);});

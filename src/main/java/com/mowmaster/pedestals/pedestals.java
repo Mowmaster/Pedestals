@@ -12,7 +12,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -38,7 +37,7 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODNAME;
 public class pedestals
 {
     // Directly reference a log4j logger.
-    public static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger PLOGGER = LogManager.getLogger();
 
     public pedestals() {
         // Register the setup method for modloading
@@ -77,16 +76,16 @@ public class pedestals
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        LOGGER.info("Initialize "+MODNAME+" WorldGen");
+        PLOGGER.info("Initialize "+MODNAME+" WorldGen");
         DustPacketHandler.registerMessages();
     }
 
     private void setupClient(final FMLClientSetupEvent event)
     {
-        LOGGER.info("Initialize "+MODNAME+" Block Entity Renders");
+        PLOGGER.info("Initialize "+MODNAME+" Block Entity Renders");
         ClientRegistry.registerBlockEntityRenderers();
 
-        LOGGER.info("Initialize "+MODNAME+" Tooltip Renders");
+        PLOGGER.info("Initialize "+MODNAME+" Tooltip Renders");
         MinecraftForgeClient.registerTooltipComponentFactory(ItemTooltipComponent.class, ClientItemTooltipComponent::new);
     }
 

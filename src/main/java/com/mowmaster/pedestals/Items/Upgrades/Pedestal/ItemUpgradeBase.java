@@ -17,7 +17,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.BucketItem;
@@ -450,7 +452,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         {
             //Display Current Mode
             int mode = getUpgradeMode(p_41421_);
-            TranslatableComponent changed = new TranslatableComponent(MODID + ".tooltip_mode");
+            MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
             ChatFormatting colorChange = ChatFormatting.GOLD;
             String typeString = "";
             switch(mode)
@@ -473,13 +475,13 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 default: typeString = ".error"; break;
             }
             changed.withStyle(colorChange);
-            TranslatableComponent type = new TranslatableComponent(MODID + typeString);
+            MutableComponent type = Component.translatable(MODID + typeString);
             changed.append(type);
             p_41423_.add(changed);
         }
         else
         {
-            TranslatableComponent base = new TranslatableComponent(getDescriptionId() + ".base_description");
+            MutableComponent base = Component.literal(getDescriptionId() + ".base_description");
             base.withStyle(ChatFormatting.DARK_RED);
             p_41423_.add(base);
         }

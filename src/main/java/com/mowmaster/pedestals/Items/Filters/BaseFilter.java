@@ -1,8 +1,10 @@
 package com.mowmaster.pedestals.Items.Filters;
 
 import com.mowmaster.mowlib.MowLibUtils.ColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Client.ItemTooltipComponent;
+import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
@@ -11,7 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes.getModeLocalizedString;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
@@ -44,54 +47,6 @@ public class BaseFilter extends Item implements IPedestalFilter
 
     public BaseFilter(Properties p_41383_) {
         super(p_41383_);
-    }
-
-    public static int getFilterMode(ItemStack stack) {
-        return readModeFromNBT(stack);
-    }
-
-    public String getFilterModeString(int mode) {
-
-        switch(mode)
-        {
-            case 0: return "item";
-            case 1: return "fluid";
-            case 2: return "energy";
-            case 3: return "xp";
-            default: return "item";
-        }
-    }
-
-    public String getFilterModeString(ItemStack stack) {
-
-        switch(getFilterMode(stack))
-        {
-            case 0: return "item";
-            case 1: return "fluid";
-            case 2: return "energy";
-            case 3: return "xp";
-            default: return "item";
-        }
-    }
-
-    public static void saveModeToNBT(ItemStack filter, int mode)
-    {
-        CompoundTag compound = new CompoundTag();
-        if(filter.hasTag())
-        {
-            compound = filter.getTag();
-        }
-        compound.putInt(MODID+"_filter_mode",mode);
-        filter.setTag(compound);
-    }
-
-    public static int readModeFromNBT(ItemStack filter) {
-        if(filter.hasTag())
-        {
-            CompoundTag getCompound = filter.getTag();
-            return getCompound.getInt(MODID+"_filter_mode");
-        }
-        return 0;
     }
 
     public boolean doItemsMatch(ItemStack stackPedestal, ItemStack itemStackIn)
@@ -143,29 +98,16 @@ public class BaseFilter extends Item implements IPedestalFilter
 
                             List<ItemStack> buildQueue = this.buildFilterQueue(world,posBlock);
 
-                            if(buildQueue.size() > 0 && this.getFilterMode(itemInOffhand)<=1)
+                            if(buildQueue.size() > 0 && PedestalModesAndTypes.getModeFromStack(itemInOffhand)<=1)
                             {
-                                this.writeFilterQueueToNBT(itemInOffhand,buildQueue, this.getFilterMode(itemInOffhand));
-                                ChatFormatting color;
-                                switch (getFilterMode(itemInOffhand))
-                                {
-                                    case 0: color = ChatFormatting.GOLD; break;
-                                    case 1: color = ChatFormatting.BLUE; break;
-                                    case 2: color = ChatFormatting.RED; break;
-                                    case 3: color = ChatFormatting.GREEN; break;
-                                    default: color = ChatFormatting.WHITE; break;
-                                }
-                                TranslatableComponent filterChanged = new TranslatableComponent(MODID + ".filter_changed");
-                                filterChanged.withStyle(color);
-                                player.displayClientMessage(filterChanged,true);
+                                this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
+                                MessageUtils.messagePopup(player,PedestalModesAndTypes.getModeColorFormat(itemInOffhand),MODID + ".filter_changed");
                             }
                         }
                     }
                 }
                 else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter){
-                    TranslatableComponent pedestalFluid = new TranslatableComponent(MODID + ".filter.message_twohanded");
-                    pedestalFluid.withStyle(ChatFormatting.RED);
-                    player.displayClientMessage(pedestalFluid,true);
+                    MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
                 }
             }
         }
@@ -175,14 +117,14 @@ public class BaseFilter extends Item implements IPedestalFilter
 
     public void setFilterTypeWhiteBlacklist(Player player, ItemStack heldItem)
     {
-        boolean getCurrentType = getFilterType(heldItem,getFilterMode(heldItem));
+
+        boolean getCurrentType = getFilterType(heldItem,PedestalModesAndTypes.getModeFromStack(heldItem));
         this.setFilterType(heldItem,!getCurrentType);
-        TranslatableComponent changed = new TranslatableComponent(MODID + ".filter_type_changed");
-        changed.withStyle((!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE));
-        TranslatableComponent white = new TranslatableComponent(MODID + ".filter_type_whitelist");
-        TranslatableComponent black = new TranslatableComponent(MODID + ".filter_type_blacklist");
-        changed.append((!getCurrentType)?(black):(white));
-        player.displayClientMessage(changed,true);
+        String white = MODID + ".filter_type_whitelist";
+        String black = MODID + ".filter_type_blacklist";
+        List<String> listed = new ArrayList<>();
+        listed.add((!getCurrentType)?(black):(white));
+        MessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
     }
 
     public void setFilterTypeAboveBelow(Player player, ItemStack heldItem)
@@ -190,14 +132,13 @@ public class BaseFilter extends Item implements IPedestalFilter
         if(heldItem.getItem() instanceof BaseFilter) {
             BaseFilter filterItem = ((BaseFilter) heldItem.getItem());
 
-            boolean getCurrentType = filterItem.getFilterType(heldItem,getFilterMode(heldItem));
+            boolean getCurrentType = filterItem.getFilterType(heldItem,PedestalModesAndTypes.getModeFromStack(heldItem));
             filterItem.setFilterType(heldItem,!getCurrentType);
-            TranslatableComponent changed = new TranslatableComponent(MODID + ".filter_type_changed");
-            changed.withStyle((!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE));
-            TranslatableComponent above = new TranslatableComponent(MODID + ".filter_type_above");
-            TranslatableComponent below = new TranslatableComponent(MODID + ".filter_type_below");
-            changed.append((!getCurrentType)?(below):(above));
-            player.displayClientMessage(changed,true);
+            String above = MODID + ".filter_type_above";
+            String below = MODID + ".filter_type_below";
+            List<String> listed = new ArrayList<>();
+            listed.add((!getCurrentType)?(below):(above));
+            MessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
         }
     }
 
@@ -207,27 +148,18 @@ public class BaseFilter extends Item implements IPedestalFilter
         {
             BaseFilter filterItem = ((BaseFilter)heldItem.getItem());
 
-            int mode = filterItem.getFilterMode(heldItem)+1;
+            int mode = PedestalModesAndTypes.getModeFromStack(heldItem)+1;
             int setNewMode = (mode<=3)?(mode):(0);
-            filterItem.saveModeToNBT(heldItem,setNewMode);
+            PedestalModesAndTypes.saveModeToNBT(heldItem,setNewMode);
             ColorReference.addColorToItemStack(heldItem,filterItem.getFilterTypeColor(heldItem));
             player.setItemInHand(hand,heldItem);
 
-            TranslatableComponent changed = new TranslatableComponent(MODID + ".mode_changed");
-            ChatFormatting colorChange = ChatFormatting.BLACK;
-            String typeString = "";
-            switch(setNewMode)
-            {
-                case 0: typeString = ".mode_items"; colorChange = ChatFormatting.GOLD; break;
-                case 1: typeString = ".mode_fluids"; colorChange = ChatFormatting.DARK_BLUE; break;
-                case 2: typeString = ".mode_energy"; colorChange = ChatFormatting.RED; break;
-                case 3: typeString = ".mode_experience"; colorChange = ChatFormatting.DARK_GREEN; break;
-                default: typeString = ".error"; colorChange = ChatFormatting.DARK_RED; break;
-            }
-            changed.withStyle(colorChange);
-            TranslatableComponent type = new TranslatableComponent(MODID + typeString);
-            changed.append(type);
-            player.displayClientMessage(changed,true);
+            ChatFormatting colorChange = PedestalModesAndTypes.getModeDarkColorFormat(setNewMode);
+            String typeString = getModeLocalizedString(setNewMode);
+
+            List<String> listed = new ArrayList<>();
+            listed.add(MODID + typeString);
+            MessageUtils.messagePopupWithAppend(MODID, player,colorChange,MODID + ".mode_changed",listed);
         }
     }
 
@@ -243,7 +175,7 @@ public class BaseFilter extends Item implements IPedestalFilter
     public boolean getFilterType(ItemStack filterItem) {
         //false = whitelist
         //true = blacklist
-        getFilterTypeFromNBT(filterItem,getFilterMode(filterItem));
+        getFilterTypeFromNBT(filterItem,PedestalModesAndTypes.getModeFromStack(filterItem));
         return getFilterType();
     }
 
@@ -259,7 +191,7 @@ public class BaseFilter extends Item implements IPedestalFilter
         filterType = filterSet;
         if(filterSet) { ColorReference.addColorToItemStack(filterItem,2763306); }
         else ColorReference.addColorToItemStack(filterItem,16777215);
-        writeFilterTypeToNBT(filterItem,getFilterMode(filterItem));
+        writeFilterTypeToNBT(filterItem,PedestalModesAndTypes.getModeFromStack(filterItem));
     }
 
     public int getFilterTypeColor(ItemStack filterItem)
@@ -323,9 +255,10 @@ public class BaseFilter extends Item implements IPedestalFilter
             compound = filterStack.getTag();
             for(int i=0; i<4;i++)
             {
-                if(compound.contains(getFilterModeString(i)+"filterqueue"))
+
+                if(compound.contains(PedestalModesAndTypes.getModeStringFromInt(i)+"filterqueue"))
                 {
-                    compound.remove(getFilterModeString(i)+"filterqueue");
+                    compound.remove(PedestalModesAndTypes.getModeStringFromInt(i)+"filterqueue");
                     filterStack.setTag(compound);
                 }
             }
@@ -338,9 +271,9 @@ public class BaseFilter extends Item implements IPedestalFilter
         if(filterStack.hasTag())
         {
             CompoundTag getCompound = filterStack.getTag();
-            if(getCompound.contains(getFilterModeString(mode)+"filterqueue"))
+            if(getCompound.contains(PedestalModesAndTypes.getModeStringFromInt(mode)+"filterqueue"))
             {
-                getCompound.get(getFilterModeString(mode)+"filterqueue");
+                getCompound.get(PedestalModesAndTypes.getModeStringFromInt(mode)+"filterqueue");
                 ItemStackHandler handler = new ItemStackHandler();
                 handler.deserializeNBT(getCompound);
                 return handler.getSlots();
@@ -384,7 +317,7 @@ public class BaseFilter extends Item implements IPedestalFilter
         for(int i=0;i<handler.getSlots();i++) {handler.setStackInSlot(i,builtFilterQueueList.get(i));}
 
         compoundStorage = handler.serializeNBT();
-        compound.put(getFilterModeString(mode)+"filterqueue",compoundStorage);
+        compound.put(PedestalModesAndTypes.getModeStringFromInt(mode)+"filterqueue",compoundStorage);
         filterStack.setTag(compound);
     }
 
@@ -394,9 +327,9 @@ public class BaseFilter extends Item implements IPedestalFilter
         if(filterStack.hasTag())
         {
             CompoundTag getCompound = filterStack.getTag();
-            if(getCompound.contains(getFilterModeString(mode)+"filterqueue"))
+            if(getCompound.contains(PedestalModesAndTypes.getModeStringFromInt(mode)+"filterqueue"))
             {
-                CompoundTag invTag = getCompound.getCompound(getFilterModeString(mode)+"filterqueue");
+                CompoundTag invTag = getCompound.getCompound(PedestalModesAndTypes.getModeStringFromInt(mode)+"filterqueue");
                 ItemStackHandler handler = new ItemStackHandler();
                 ((INBTSerializable<CompoundTag>) handler).deserializeNBT(invTag);
 
@@ -414,7 +347,7 @@ public class BaseFilter extends Item implements IPedestalFilter
         {
             compound = filterStack.getTag();
         }
-        compound.putBoolean(getFilterModeString(mode)+"filter_type",this.filterType);
+        compound.putBoolean(PedestalModesAndTypes.getModeStringFromInt(mode)+"filter_type",this.filterType);
         filterStack.setTag(compound);
     }
 
@@ -423,7 +356,7 @@ public class BaseFilter extends Item implements IPedestalFilter
         if(filterStack.hasTag())
         {
             CompoundTag getCompound = filterStack.getTag();
-            this.filterType = getCompound.getBoolean(getFilterModeString(mode)+"filter_type");
+            this.filterType = getCompound.getBoolean(PedestalModesAndTypes.getModeStringFromInt(mode)+"filter_type");
         }
         return filterType;
     }
@@ -435,9 +368,8 @@ public class BaseFilter extends Item implements IPedestalFilter
         ItemStack filterStack = pedestal.getFilterInPedestal();
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
-            TranslatableComponent filterList = new TranslatableComponent(filterStack.getDisplayName().getString());
-            filterList.withStyle(ChatFormatting.GOLD);
-            player.sendMessage(filterList, Util.NIL_UUID);
+            List<String> listed = new ArrayList<>();
+            MessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GOLD,filterStack.getDisplayName().getString(), listed);
 
             //For each Mode
             for(int i=0;i<4;i++)
@@ -445,33 +377,29 @@ public class BaseFilter extends Item implements IPedestalFilter
                 List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,i);
                 if(filterQueue.size()>0)
                 {
-                    TranslatableComponent enchant = new TranslatableComponent(MODID + ".filters.tooltip_filterlist");
-                    enchant.withStyle(ChatFormatting.LIGHT_PURPLE);
-                    player.sendMessage(enchant, Util.NIL_UUID);
+                    MessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
+                    List<String> enchantList = new ArrayList<>();
                     for(int j=0;j<filterQueue.size();j++) {
 
                         if(!filterQueue.get(j).isEmpty())
                         {
-                            TranslatableComponent enchants = new TranslatableComponent(filterQueue.get(j).getDisplayName().getString());
-                            enchants.withStyle(ChatFormatting.GRAY);
-                            player.sendMessage(enchants, Util.NIL_UUID);
+                            enchantList.add(filterQueue.get(j).getDisplayName().getString() + ", ");
                         }
                     }
+                    MessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GRAY,filterStack.getDisplayName().getString(), enchantList);
                 }
             }
         }
         else
         {
-            TranslatableComponent base = new TranslatableComponent(MODID + ".baseItem");
-            base.withStyle(ChatFormatting.DARK_RED);
-            player.sendMessage(base, Util.NIL_UUID);
+            MessageUtils.messagePlayerChat(player,ChatFormatting.DARK_RED,MODID + ".baseItem");
         }
     }
 
     @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(stack,getFilterMode(stack));
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(stack,PedestalModesAndTypes.getModeFromStack(stack));
         NonNullList<ItemStack> nonnulllist = NonNullList.create();
         stackCurrent.forEach(nonnulllist::add);
 
@@ -485,34 +413,26 @@ public class BaseFilter extends Item implements IPedestalFilter
 
         if(!p_41421_.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
-            boolean filterType = getFilterType(p_41421_,getFilterMode(p_41421_));
-            int filterMode = getFilterMode(p_41421_);
+            boolean filterType = getFilterType(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
+            int filterMode = PedestalModesAndTypes.getModeFromStack(p_41421_);
 
-            TranslatableComponent filterList = new TranslatableComponent(MODID + ".filter_type");
-            TranslatableComponent white = new TranslatableComponent(MODID + ".filter_type_whitelist");
-            TranslatableComponent black = new TranslatableComponent(MODID + ".filter_type_blacklist");
+            MutableComponent filterList = Component.translatable(MODID + ".filter_type");
+            MutableComponent white = Component.translatable(MODID + ".filter_type_whitelist");
+            MutableComponent black = Component.translatable(MODID + ".filter_type_blacklist");
             filterList.append((filterType)?(black):(white));
             filterList.withStyle(ChatFormatting.WHITE);
             p_41423_.add(filterList);
 
-            TranslatableComponent changed = new TranslatableComponent(MODID + ".tooltip_mode");
-            String typeString = "";
-            switch(filterMode)
-            {
-                case 0: typeString = ".mode_items"; break;
-                case 1: typeString = ".mode_fluids"; break;
-                case 2: typeString = ".mode_energy"; break;
-                case 3: typeString = ".mode_experience"; break;
-                default: typeString = ".error"; break;
-            }
+            MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
+            String typeString = PedestalModesAndTypes.getModeLocalizedString(filterMode);
             changed.withStyle(ChatFormatting.GOLD);
-            TranslatableComponent type = new TranslatableComponent(MODID + typeString);
+            MutableComponent type = Component.translatable(MODID + typeString);
             changed.append(type);
             p_41423_.add(changed);
         }
         else
         {
-            TranslatableComponent base = new TranslatableComponent(getDescriptionId() + ".base_description");
+            MutableComponent base = Component.translatable(getDescriptionId() + ".base_description");
             base.withStyle(ChatFormatting.DARK_RED);
             p_41423_.add(base);
         }

@@ -6,8 +6,12 @@ import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.horse.Donkey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.ChestBoat;
+import net.minecraft.world.entity.vehicle.ContainerEntity;
+import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RailBlock;
@@ -74,6 +78,7 @@ public class PedestalUtilities
             }
             else
             {
+
                 //Added for quark boats with inventories (i hope)
                 List<Entity> list = world.getEntitiesOfClass(null, new AABB(pos), entity -> entity instanceof Boat);
                 if(!list.isEmpty())
@@ -98,7 +103,14 @@ public class PedestalUtilities
         }
         if(allowCart)
         {
-            if(RailBlock.isRail(world, pos))
+            List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof ContainerEntity);
+            if(!list.isEmpty())
+            {
+                LazyOptional<IItemHandler> cap = list.get(world.random.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                if(cap.isPresent())
+                    return cap;
+            }
+            /*if(RailBlock.isRail(world, pos))
             {
                 List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof IForgeAbstractMinecart);
                 if(!list.isEmpty())
@@ -111,14 +123,15 @@ public class PedestalUtilities
             else
             {
                 //Added for quark boats with inventories (i hope)
-                List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof Boat);
+                List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof ContainerEntity);
+                System.out.println(list);
                 if(!list.isEmpty())
                 {
                     LazyOptional<IItemHandler> cap = list.get(world.random.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
                     if(cap.isPresent())
                         return cap;
                 }
-            }
+            }*/
         }
         return LazyOptional.empty();
     }
@@ -134,7 +147,14 @@ public class PedestalUtilities
         }
         if(allowCart)
         {
-            if(RailBlock.isRail(world, pos))
+            List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof ContainerEntity);
+            if(!list.isEmpty())
+            {
+                LazyOptional<IFluidHandler> cap = list.get(world.random.nextInt(list.size())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+                if(cap.isPresent())
+                    return cap;
+            }
+            /*if(RailBlock.isRail(world, pos))
             {
                 List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof IForgeAbstractMinecart);
                 if(!list.isEmpty())
@@ -154,7 +174,7 @@ public class PedestalUtilities
                     if(cap.isPresent())
                         return cap;
                 }
-            }
+            }*/
         }
         return LazyOptional.empty();
     }
@@ -170,7 +190,14 @@ public class PedestalUtilities
         }
         if(allowCart)
         {
-            if(RailBlock.isRail(world, pos))
+            List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof ContainerEntity);
+            if(!list.isEmpty())
+            {
+                LazyOptional<IEnergyStorage> cap = list.get(world.random.nextInt(list.size())).getCapability(CapabilityEnergy.ENERGY);
+                if(cap.isPresent())
+                    return cap;
+            }
+            /*if(RailBlock.isRail(world, pos))
             {
                 List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof IForgeAbstractMinecart);
                 if(!list.isEmpty())
@@ -190,7 +217,7 @@ public class PedestalUtilities
                     if(cap.isPresent())
                         return cap;
                 }
-            }
+            }*/
         }
         return LazyOptional.empty();
     }
@@ -206,7 +233,14 @@ public class PedestalUtilities
         }
         if(allowCart)
         {
-            if(RailBlock.isRail(world, pos))
+            List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof ContainerEntity);
+            if(!list.isEmpty())
+            {
+                LazyOptional<IExperienceStorage> cap = list.get(world.random.nextInt(list.size())).getCapability(CapabilityExperience.EXPERIENCE);
+                if(cap.isPresent())
+                    return cap;
+            }
+            /*if(RailBlock.isRail(world, pos))
             {
                 List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof IForgeAbstractMinecart);
                 if(!list.isEmpty())
@@ -226,7 +260,7 @@ public class PedestalUtilities
                     if(cap.isPresent())
                         return cap;
                 }
-            }
+            }*/
         }
         return LazyOptional.empty();
     }

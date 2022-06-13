@@ -1,15 +1,15 @@
 package com.mowmaster.pedestals.Items.Tools;
 
 import com.google.common.collect.Maps;
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -49,18 +49,12 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
         InteractionHand hand = p_41434_;
         ItemStack stackInHand = player.getItemInHand(hand);
 
-        TranslatableComponent linksucess = new TranslatableComponent(MODID + ".tool_link_success");
-        linksucess.withStyle(ChatFormatting.WHITE);
-        TranslatableComponent linkunsuccess = new TranslatableComponent(MODID + ".tool_link_unsucess");
-        linkunsuccess.withStyle(ChatFormatting.WHITE);
-        TranslatableComponent linkremoved = new TranslatableComponent(MODID + ".tool_link_removed");
-        linkremoved.withStyle(ChatFormatting.WHITE);
-        TranslatableComponent linkitsself = new TranslatableComponent(MODID + ".tool_link_itsself");
-        linkitsself.withStyle(ChatFormatting.WHITE);
-        TranslatableComponent linknetwork = new TranslatableComponent(MODID + ".tool_link_network");
-        linknetwork.withStyle(ChatFormatting.WHITE);
-        TranslatableComponent linkdistance = new TranslatableComponent(MODID + ".tool_link_distance");
-        linkdistance.withStyle(ChatFormatting.WHITE);
+        String linksucess = MODID + ".tool_link_success";
+        String linkunsuccess = MODID + ".tool_link_unsucess";
+        String linkremoved = MODID + ".tool_link_removed";
+        String linkitsself = MODID + ".tool_link_itsself";
+        String linknetwork = MODID + ".tool_link_network";
+        String linkdistance = MODID + ".tool_link_distance";
 
 
         if(!world.isClientSide())
@@ -82,9 +76,7 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                         }
                         player.setItemInHand(hand, newTool);
 
-                        TranslatableComponent changed = new TranslatableComponent(MODID + ".tool_change");
-                        changed.withStyle(ChatFormatting.GREEN);
-                        player.displayClientMessage(changed,true);
+                        MessageUtils.messagePopupText(player,ChatFormatting.GREEN,getDescriptionId() + ".tool_change");
                         return InteractionResultHolder.success(stackInHand);
                     }
                 }
@@ -161,10 +153,10 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                                                                 EnchantmentHelper.setEnchantments(enchantsNone,stackInHand);
                                                             }
                                                         }
-                                                        player.sendMessage(linksucess, Util.NIL_UUID);
+                                                        MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linksucess);
                                                         return InteractionResultHolder.success(stackInHand);
                                                     }
-                                                    else player.sendMessage(linkunsuccess,Util.NIL_UUID);
+                                                    else MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linkunsuccess);
                                                 }
                                                 else
                                                 {
@@ -178,15 +170,15 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                                                             EnchantmentHelper.setEnchantments(enchantsNone,stackInHand);
                                                         }
                                                     }
-                                                    player.sendMessage(linkremoved,Util.NIL_UUID);
+                                                    MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linkremoved);
                                                     return InteractionResultHolder.success(stackInHand);
                                                 }
                                             }
-                                            else player.sendMessage(linkitsself,Util.NIL_UUID);
+                                            else MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linkitsself);
                                         }
-                                        else player.sendMessage(linknetwork,Util.NIL_UUID);
+                                        else MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linknetwork);
                                     }
-                                    else player.sendMessage(linkdistance, Util.NIL_UUID);
+                                    else MessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linkdistance);
                                 }
                             }
                             return InteractionResultHolder.fail(stackInHand);
@@ -222,13 +214,11 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                         if (tileEntity instanceof BasePedestalBlockEntity) {
                             BasePedestalBlockEntity tilePedestal = (BasePedestalBlockEntity) tileEntity;
 
-                            TranslatableComponent rrobin = new TranslatableComponent(MODID + ".tool_chat_rrobin");
-                            TranslatableComponent rrobint = new TranslatableComponent(MODID + ".tool_chat_rrobin_true");
-                            TranslatableComponent rrobinf = new TranslatableComponent(MODID + ".tool_chat_rrobin_false");
-                            TranslatableComponent TransferTypeText = (tilePedestal.hasRRobin())?(rrobint):(rrobinf);
-                            rrobin.append(TransferTypeText);
-                            rrobin.withStyle(ChatFormatting.LIGHT_PURPLE);
-                            player.sendMessage(rrobin,Util.NIL_UUID);
+                            String rrobint = MODID + ".tool_chat_rrobin_true";
+                            String rrobinf = MODID + ".tool_chat_rrobin_false";
+                            List<String> listed = new ArrayList<>();
+                            listed.add(tilePedestal.hasRRobin()?(rrobint):(rrobinf));
+                            MessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.LIGHT_PURPLE,MODID + ".tool_chat_rrobin",listed);
 
                             /*if(tilePedestal.getSpeed()>0)
                             {
@@ -253,20 +243,17 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                             List<BlockPos> getLocations = tilePedestal.getLocationList();
                             if(getLocations.size()>0)
                             {
-                                TranslatableComponent links = new TranslatableComponent(MODID + ".tool_chat_linked");
-                                links.withStyle(ChatFormatting.GOLD);
-                                player.sendMessage(links,Util.NIL_UUID);
+                                MessageUtils.messagePlayerChat(player,ChatFormatting.GOLD,MODID + ".tool_chat_linked");
 
+                                List<String> appends = new ArrayList<>();
                                 for(int i = 0; i < getLocations.size();i++)
                                 {
-                                    TranslatableComponent linked = new TranslatableComponent("   " + getLocations.get(i).getX() + "");
-                                    TranslatableComponent seperator = new TranslatableComponent(MODID + ".tool_chat_seperator");
-                                    linked.append(seperator.getString());
-                                    linked.append("" + getLocations.get(i).getY() + "");
-                                    linked.append(seperator.getString());
-                                    linked.append("" + getLocations.get(i).getZ() + "");
-                                    linked.withStyle(ChatFormatting.GRAY);
-                                    player.sendMessage(linked,Util.NIL_UUID);
+                                    String seperator = MODID + ".tool_chat_seperator";
+                                    appends.add(seperator);
+                                    appends.add("" + getLocations.get(i).getY() + "");
+                                    appends.add(seperator);
+                                    appends.add("" + getLocations.get(i).getZ() + "");
+                                    MessageUtils.messagePlayerChatWithAppend(MODID,player, ChatFormatting.GRAY, "   " + getLocations.get(i).getX() + "", appends);
                                 }
                             }
                         }
@@ -466,11 +453,11 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
     @Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
 
-        TranslatableComponent selected = new TranslatableComponent(MODID + ".tool_tip_block_selected");
-        TranslatableComponent unselected = new TranslatableComponent(MODID + ".tool_tip_block_unselected");
-        TranslatableComponent cordX = new TranslatableComponent(MODID + ".tool_tip_X");
-        TranslatableComponent cordY = new TranslatableComponent(MODID + ".tool_tip_Y");
-        TranslatableComponent cordZ = new TranslatableComponent(MODID + ".tool_tip_Z");
+        MutableComponent selected = Component.translatable(MODID + ".tool_tip_block_selected");
+        MutableComponent unselected = Component.translatable(MODID + ".tool_tip_block_unselected");
+        MutableComponent cordX = Component.translatable(MODID + ".tool_tip_X");
+        MutableComponent cordY = Component.translatable(MODID + ".tool_tip_Y");
+        MutableComponent cordZ = Component.translatable(MODID + ".tool_tip_Z");
         if(p_41421_.getItem() instanceof LinkingTool || p_41421_.getItem() instanceof LinkingToolBackwards) {
             if (p_41421_.hasTag()) {
                 if (p_41421_.isEnchanted()) {

@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
@@ -8,7 +10,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Player;
@@ -43,7 +45,7 @@ public class FilterTag extends BaseFilter{
         {
             if(itemInPedestal.isEmpty())
             {
-                List<ItemStack> stackCurrentRestricted = readFilterQueueFromNBT(itemFromInv,getFilterMode(itemFromInv));
+                List<ItemStack> stackCurrentRestricted = readFilterQueueFromNBT(itemFromInv, PedestalModesAndTypes.getModeFromStack(itemFromInv));
                 int rangeRestricted = stackCurrentRestricted.size();
                 int count = 0;
                 int maxIncomming = itemStackIncoming.getMaxStackSize();
@@ -98,9 +100,7 @@ public class FilterTag extends BaseFilter{
         ItemStack filterStack = pedestal.getFilterInPedestal();
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
-            TranslatableComponent filterList = new TranslatableComponent(filterStack.getDisplayName().getString());
-            filterList.withStyle(ChatFormatting.GOLD);
-            player.sendMessage(filterList, Util.NIL_UUID);
+            MessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
             //For each Mode
             for(int i=0;i<4;i++)
@@ -108,17 +108,13 @@ public class FilterTag extends BaseFilter{
                 List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,i);
                 if(filterQueue.size()>0)
                 {
-                    TranslatableComponent enchant = new TranslatableComponent(MODID + ".filters.tooltip_filterlist");
-                    enchant.withStyle(ChatFormatting.LIGHT_PURPLE);
-                    player.sendMessage(enchant, Util.NIL_UUID);
+                    MessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
                     for(int j=0;j<filterQueue.size();j++) {
 
                         if(!filterQueue.get(j).isEmpty())
                         {
-                            TranslatableComponent enchants = new TranslatableComponent(filterQueue.get(j).getDisplayName().getString());
-                            enchants.withStyle(ChatFormatting.GRAY);
-                            player.sendMessage(enchants, Util.NIL_UUID);
+                            MessageUtils.messagePlayerChatText(player,ChatFormatting.GRAY,filterQueue.get(j).getDisplayName().getString());
                         }
                     }
                 }
@@ -131,17 +127,17 @@ public class FilterTag extends BaseFilter{
 
         if(!p_41421_.getItem().equals(DeferredRegisterItems.FILTER_BASE))
         {
-            boolean filterType = getFilterType(p_41421_,getFilterMode(p_41421_));
-            int filterMode = getFilterMode(p_41421_);
+            boolean filterType = getFilterType(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
+            int filterMode = PedestalModesAndTypes.getModeFromStack(p_41421_);
 
-            TranslatableComponent filterList = new TranslatableComponent(MODID + ".filter_type");
-            TranslatableComponent white = new TranslatableComponent(MODID + ".filter_type_whitelist");
-            TranslatableComponent black = new TranslatableComponent(MODID + ".filter_type_blacklist");
-            filterList.append((filterType)?(black):(white));
-            filterList.withStyle(ChatFormatting.WHITE);
-            p_41423_.add(filterList);
+            MutableComponent filterList = Component.translatable(MODID + ".filter_type");
+MutableComponent white = Component.translatable(MODID + ".filter_type_whitelist");
+MutableComponent black = Component.translatable(MODID + ".filter_type_blacklist");
+filterList.append((filterType)?(black):(white));
+filterList.withStyle(ChatFormatting.WHITE);
+p_41423_.add(filterList);
 
-            TranslatableComponent changed = new TranslatableComponent(MODID + ".tooltip_mode");
+            MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
             String typeString = "";
             switch(filterMode)
             {
@@ -152,7 +148,7 @@ public class FilterTag extends BaseFilter{
                 default: typeString = ".error"; break;
             }
             changed.withStyle(ChatFormatting.GOLD);
-            TranslatableComponent type = new TranslatableComponent(MODID + typeString);
+            MutableComponent type = Component.translatable(MODID + typeString);
             changed.append(type);
             p_41423_.add(changed);
         }
@@ -161,7 +157,7 @@ public class FilterTag extends BaseFilter{
     /*@Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
 
-        boolean filterType = getFilterType(p_41421_,getFilterMode(p_41421_));
+        boolean filterType = getFilterType(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
         TranslatableComponent filterList = new TranslatableComponent(MODID + ".filters.tooltip_filtertype");
         TranslatableComponent white = new TranslatableComponent(MODID + ".filters.tooltip_filterwhite");
         TranslatableComponent black = new TranslatableComponent(MODID + ".filters.tooltip_filterblack");
@@ -169,7 +165,7 @@ public class FilterTag extends BaseFilter{
         filterList.withStyle(ChatFormatting.GOLD);
         p_41423_.add(filterList);
 
-        List<ItemStack> filterQueue = readFilterQueueFromNBT(p_41421_,getFilterMode(p_41421_));
+        List<ItemStack> filterQueue = readFilterQueueFromNBT(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
         if(filterQueue.size()>0)
         {
             TranslatableComponent enchant = new TranslatableComponent(MODID + ".filters.tooltip_filterlist");

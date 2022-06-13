@@ -1,9 +1,10 @@
 package com.mowmaster.pedestals.Items.Augments;
 
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -100,9 +101,7 @@ public class AugmentRenderDiffuser extends AugmentBase
                             default: typeString = ".error"; colorChange = ChatFormatting.DARK_RED; break;
                         }
 
-                        TranslatableComponent type = new TranslatableComponent(MODID + typeString);
-                        type.withStyle(colorChange);
-                        player.displayClientMessage(type,true);
+                        MessageUtils.messagePopup(player,colorChange,MODID + typeString);
                     }
                 }
             }
@@ -129,7 +128,7 @@ public class AugmentRenderDiffuser extends AugmentBase
             default: typeString = ".error"; break;
         }
 
-        TranslatableComponent type = new TranslatableComponent(MODID + typeString);
+        MutableComponent type = Component.translatable(MODID + typeString);
         type.withStyle(ChatFormatting.GOLD);
         p_41423_.add(type);
 

@@ -3,7 +3,9 @@ package com.mowmaster.pedestals.Items.Tools;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -36,9 +38,7 @@ public class UpgradeTool extends BaseTool implements IPedestalTool
                     ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_FILTERTOOL.get());
                     player.setItemInHand(hand, newTool);
 
-                    TranslatableComponent changed = new TranslatableComponent(getDescriptionId() + ".tool_change");
-                    changed.withStyle(ChatFormatting.GREEN);
-                    player.displayClientMessage(changed,true);
+                    MessageUtils.messagePopupText(player,ChatFormatting.GREEN,getDescriptionId() + ".tool_change");
                     return InteractionResultHolder.success(stackInHand);
                 }
             }

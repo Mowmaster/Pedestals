@@ -1,9 +1,9 @@
 package com.mowmaster.pedestals.Items.Tools;
 
+import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -35,10 +35,7 @@ public class FilterTool extends BaseTool implements IPedestalTool
                 {
                     ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_TAGTOOL.get());
                     player.setItemInHand(hand, newTool);
-
-                    TranslatableComponent changed = new TranslatableComponent(getDescriptionId() + ".tool_change");
-                    changed.withStyle(ChatFormatting.GREEN);
-                    player.displayClientMessage(changed,true);
+                    MessageUtils.messagePopupText(player,ChatFormatting.GREEN,getDescriptionId() + ".tool_change");
                     return InteractionResultHolder.success(stackInHand);
                 }
             }
