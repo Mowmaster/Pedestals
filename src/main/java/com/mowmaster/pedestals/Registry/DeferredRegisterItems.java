@@ -25,17 +25,19 @@ public class DeferredRegisterItems
 
 
     public static final RegistryObject<Item> TOOL_LINKINGTOOL = ITEMS.register("tool_linkingtool",
-            () -> new LinkingTool(new Item.Properties().stacksTo(64).tab(PedestalsTab.TAB_ITEMS)));
+            () -> new LinkingTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_LINKINGTOOLBACKWARDS = ITEMS.register("tool_linkingtoolbackwards",
-            () -> new LinkingToolBackwards(new Item.Properties().stacksTo(64).tab(PedestalsTab.TAB_ITEMS)));
+            () -> new LinkingToolBackwards(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_UPGRADETOOL = ITEMS.register("tool_upgradetool",
-            () -> new UpgradeTool(new Item.Properties().stacksTo(64).tab(PedestalsTab.TAB_ITEMS)));
+            () -> new UpgradeTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_FILTERTOOL = ITEMS.register("tool_filtertool",
-            () -> new FilterTool(new Item.Properties().stacksTo(64).tab(PedestalsTab.TAB_ITEMS)));
+            () -> new FilterTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_TAGTOOL = ITEMS.register("tool_tagtool",
-            () -> new TagTool(new Item.Properties().stacksTo(64).tab(PedestalsTab.TAB_ITEMS)));
+            () -> new TagTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_TOOLSWAPPER = ITEMS.register("tool_toolswapper",
+            () -> new ToolSwapper(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_DEVTOOL = ITEMS.register("tool_devtool",
-            () -> new DevTool(new Item.Properties().stacksTo(64).tab(PedestalsTab.TAB_ITEMS)));
+            () -> new DevTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> FILTER_BASE = ITEMS.register("filter_base",
             () -> new BaseFilter(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
@@ -92,13 +94,13 @@ public class DeferredRegisterItems
 
     //Increases storage, stacks, and max amount for fluids, energy, and xp
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T1_STORAGE = ITEMS.register("augment_pedestal_t1_storage",
-            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t1StorageItem.get(),PedestalConfig.COMMON.augment_t1StorageFluid.get(),PedestalConfig.COMMON.augment_t1StorageEnergy.get(),PedestalConfig.COMMON.augment_t1StorageXp.get(),PedestalConfig.COMMON.augment_t1StorageInsertSize.get()));
+            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t1StorageItem.get(),PedestalConfig.COMMON.augment_t1StorageFluid.get(),PedestalConfig.COMMON.augment_t1StorageEnergy.get(),PedestalConfig.COMMON.augment_t1StorageXp.get(),PedestalConfig.COMMON.augment_t1StorageInsertSize.get()));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T2_STORAGE = ITEMS.register("augment_pedestal_t2_storage",
-            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t2StorageItem.get(),PedestalConfig.COMMON.augment_t2StorageFluid.get(),PedestalConfig.COMMON.augment_t2StorageEnergy.get(),PedestalConfig.COMMON.augment_t2StorageXp.get(),PedestalConfig.COMMON.augment_t2StorageInsertSize.get()));
+            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t2StorageItem.get(),PedestalConfig.COMMON.augment_t2StorageFluid.get(),PedestalConfig.COMMON.augment_t2StorageEnergy.get(),PedestalConfig.COMMON.augment_t2StorageXp.get(),PedestalConfig.COMMON.augment_t2StorageInsertSize.get()));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T3_STORAGE = ITEMS.register("augment_pedestal_t3_storage",
-            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t3StorageItem.get(),PedestalConfig.COMMON.augment_t3StorageFluid.get(),PedestalConfig.COMMON.augment_t3StorageEnergy.get(),PedestalConfig.COMMON.augment_t3StorageXp.get(),PedestalConfig.COMMON.augment_t3StorageInsertSize.get()));
+            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t3StorageItem.get(),PedestalConfig.COMMON.augment_t3StorageFluid.get(),PedestalConfig.COMMON.augment_t3StorageEnergy.get(),PedestalConfig.COMMON.augment_t3StorageXp.get(),PedestalConfig.COMMON.augment_t3StorageInsertSize.get()));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_STORAGE = ITEMS.register("augment_pedestal_t4_storage",
-            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4StorageItem.get(),PedestalConfig.COMMON.augment_t4StorageFluid.get(),PedestalConfig.COMMON.augment_t4StorageEnergy.get(),PedestalConfig.COMMON.augment_t4StorageXp.get(),PedestalConfig.COMMON.augment_t4StorageInsertSize.get()));
+            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4StorageItem.get(),PedestalConfig.COMMON.augment_t4StorageFluid.get(),PedestalConfig.COMMON.augment_t4StorageEnergy.get(),PedestalConfig.COMMON.augment_t4StorageXp.get(),PedestalConfig.COMMON.augment_t4StorageInsertSize.get()));
 
 
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T1_SPEED = ITEMS.register("augment_pedestal_t1_speed",
@@ -111,13 +113,13 @@ public class DeferredRegisterItems
             () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4SpeedReduction.get(),PedestalConfig.COMMON.augment_t4SpeedInsertable.get()));
 
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T1_RANGE = ITEMS.register("augment_pedestal_t1_range",
-            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t1RangeIncrease.get(),PedestalConfig.COMMON.augment_t1RangeInsertable.get()));
+            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t1RangeIncrease.get(),PedestalConfig.COMMON.augment_t1RangeInsertable.get()));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T2_RANGE = ITEMS.register("augment_pedestal_t2_range",
-            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t2RangeIncrease.get(),PedestalConfig.COMMON.augment_t2RangeInsertable.get()));
+            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t2RangeIncrease.get(),PedestalConfig.COMMON.augment_t2RangeInsertable.get()));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T3_RANGE = ITEMS.register("augment_pedestal_t3_range",
-            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t3RangeIncrease.get(),PedestalConfig.COMMON.augment_t3RangeInsertable.get()));
+            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t3RangeIncrease.get(),PedestalConfig.COMMON.augment_t3RangeInsertable.get()));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_RANGE = ITEMS.register("augment_pedestal_t4_range",
-            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4RangeIncrease.get(),PedestalConfig.COMMON.augment_t4RangeInsertable.get()));
+            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4RangeIncrease.get(),PedestalConfig.COMMON.augment_t4RangeInsertable.get()));
 
 
     public static void register(IEventBus eventBus) {

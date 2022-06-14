@@ -38,7 +38,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
     public void render(BasePedestalBlockEntity p_112307_, float p_112308_, PoseStack p_112309_, MultiBufferSource p_112310_, int p_112311_, int p_112312_) {
         if (!p_112307_.isRemoved()) {
             Direction facing = p_112307_.getBlockState().getValue(FACING);
-            ItemStack stack = p_112307_.getItemInPedestal();
+            ItemStack stack = p_112307_.getItemInPedestalFirst();
             ItemStack coin = p_112307_.getCoinOnPedestal();
             Level world = p_112307_.getLevel();
             // 0 - No Particles

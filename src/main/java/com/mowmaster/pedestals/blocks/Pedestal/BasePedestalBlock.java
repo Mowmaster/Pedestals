@@ -4,6 +4,10 @@ import com.mowmaster.mowlib.Blocks.BaseBlocks.BaseColoredBlock;
 import com.mowmaster.mowlib.Items.ColorApplicator;
 import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.pedestals.Items.Augments.AugmentTieredCapacity;
+import com.mowmaster.pedestals.Items.Augments.AugmentTieredRange;
+import com.mowmaster.pedestals.Items.Augments.AugmentTieredSpeed;
+import com.mowmaster.pedestals.Items.Augments.AugmentTieredStorage;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
@@ -388,6 +392,10 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCoin());
                 }
+                else if(pedestal.hasTool() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
+                {
+                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
+                }
                 else if(pedestal.hasFilter() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_FILTERTOOL.get()))
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeFilter(true));
@@ -419,7 +427,27 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeNoCollide());
                 }
-                else if(pedestal.hasItem())
+                else if(pedestal.hasSpeed() && itemInOffHand.getItem() instanceof AugmentTieredSpeed)
+                {
+                    if(p_60502_.isCrouching()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllSpeed());}
+                    else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeSpeed(1));
+                }
+                else if(pedestal.hasCapacity() && itemInOffHand.getItem() instanceof AugmentTieredCapacity)
+                {
+                    if(p_60502_.isCrouching()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllCapacity());}
+                    else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCapacity(1));
+                }
+                else if(pedestal.hasStorage() && itemInOffHand.getItem() instanceof AugmentTieredStorage)
+                {
+                    if(p_60502_.isCrouching()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllStorage());}
+                    else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeStorage(1));
+                }
+                else if(pedestal.hasRange() && itemInOffHand.getItem() instanceof AugmentTieredRange)
+                {
+                    if(p_60502_.isCrouching()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRange());}
+                    else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRange(1));
+                }
+                else if(pedestal.hasItemFirst())
                 {
                     if(p_60502_.isCrouching())
                     {
@@ -545,6 +573,61 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     if(!pedestal.hasNoCollide())
                     {
                         if(pedestal.addNoCollide(p_60506_.getOffhandItem()))
+                        {
+                            p_60506_.getOffhandItem().shrink(1);
+                            return InteractionResult.SUCCESS;
+                        }
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof AugmentTieredSpeed)
+                {
+                    if(pedestal.canInsertAugmentSpeed(itemInOffHand))
+                    {
+                        if(pedestal.addSpeed(p_60506_.getOffhandItem()))
+                        {
+                            p_60506_.getOffhandItem().shrink(1);
+                            return InteractionResult.SUCCESS;
+                        }
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof AugmentTieredCapacity)
+                {
+                    if(pedestal.canInsertAugmentCapacity(itemInOffHand))
+                    {
+                        if(pedestal.addCapacity(p_60506_.getOffhandItem()))
+                        {
+                            p_60506_.getOffhandItem().shrink(1);
+                            return InteractionResult.SUCCESS;
+                        }
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof AugmentTieredStorage)
+                {
+                    if(pedestal.canInsertAugmentStorage(itemInOffHand))
+                    {
+                        if(pedestal.addStorage(p_60506_.getOffhandItem()))
+                        {
+                            p_60506_.getOffhandItem().shrink(1);
+                            return InteractionResult.SUCCESS;
+                        }
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof AugmentTieredRange)
+                {
+                    if(pedestal.canInsertAugmentRange(itemInOffHand))
+                    {
+                        if(pedestal.addRange(p_60506_.getOffhandItem()))
+                        {
+                            p_60506_.getOffhandItem().shrink(1);
+                            return InteractionResult.SUCCESS;
+                        }
+                    }
+                }
+                else if(pedestal.isAllowedTool(itemInOffHand))
+                {
+                    if(pedestal.canInsertTool(itemInOffHand))
+                    {
+                        if(pedestal.addTool(p_60506_.getOffhandItem()))
                         {
                             p_60506_.getOffhandItem().shrink(1);
                             return InteractionResult.SUCCESS;

@@ -61,7 +61,17 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue augment_t4StorageInsertSize;
 
 
+
         public final ForgeConfigSpec.IntValue pedestal_maxTicksToTransfer;
+        public final ForgeConfigSpec.IntValue pedestal_baseItemStacks;
+        public final ForgeConfigSpec.IntValue pedestal_baseFluidStorage;
+        public final ForgeConfigSpec.IntValue pedestal_baseEnergyStorage;
+        public final ForgeConfigSpec.IntValue pedestal_baseXpStorage;
+        public final ForgeConfigSpec.IntValue pedestal_baseItemTransferRate;
+        public final ForgeConfigSpec.IntValue pedestal_baseFluidTransferRate;
+        public final ForgeConfigSpec.IntValue pedestal_baseEnergyTransferRate;
+        public final ForgeConfigSpec.IntValue pedestal_baseXpTransferRate;
+
 
 
         public final ForgeConfigSpec.IntValue augment_t1SpeedReduction;
@@ -145,6 +155,16 @@ public class PedestalConfig
 
             //default speed is 4:40 ticks per send or 1:10 ticks(same as hopper rate)
             pedestal_maxTicksToTransfer = builder.comment("The max number of ticks needed to send items (before augments)").defineInRange("pedestal_ticksToTransfer", 40, 1, Integer.MAX_VALUE);
+            pedestal_baseItemStacks = builder.comment("The initial number of stacks a pedestal holds (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseItemStacks", 1, 1, 27);
+            pedestal_baseFluidStorage = builder.comment("The initial fluid storage for pedestals (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseFluidStorage", 16000, 1, Integer.MAX_VALUE);
+            pedestal_baseEnergyStorage = builder.comment("The initial energy storage for pedestals (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseEnergyStorage", 20000, 1, Integer.MAX_VALUE);
+            pedestal_baseXpStorage = builder.comment("The initial xp storage for pedestals [In levels] (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseXpStorage", 30, 1, 21000);
+
+            pedestal_baseItemTransferRate = builder.comment("Base Item Transfer Rate").defineInRange("pedestal_baseItemTransferRate", 4, 1, Integer.MAX_VALUE);
+            pedestal_baseFluidTransferRate = builder.comment("Base Fluid Transfer Rate").defineInRange("pedestal_baseFluidTransferRate", 1000, 1, Integer.MAX_VALUE);
+            pedestal_baseEnergyTransferRate = builder.comment("Base Energy Transfer Rate").defineInRange("pedestal_baseEnergyTransferRate", 5000, 1, Integer.MAX_VALUE);
+            pedestal_baseXpTransferRate = builder.comment("Base Xp Transfer Rate [In Levels]").defineInRange("pedestal_baseXpTransferRate", 1, 1, Integer.MAX_VALUE);
+
 
             //4:30 so 2 ticks reduced for 5 upgrades?
             augment_t1SpeedReduction = builder.comment("Tier 1, Number of Ticks Reduced").defineInRange("t1_ticksReduced", 2, 0, Integer.MAX_VALUE);

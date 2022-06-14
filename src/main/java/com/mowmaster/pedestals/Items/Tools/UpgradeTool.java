@@ -35,7 +35,7 @@ public class UpgradeTool extends BaseTool implements IPedestalTool
             {
                 if(stackInHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
                 {
-                    ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_FILTERTOOL.get());
+                    ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_TOOLSWAPPER.get());
                     player.setItemInHand(hand, newTool);
 
                     MessageUtils.messagePopupText(player,ChatFormatting.GREEN,getDescriptionId() + ".tool_change");

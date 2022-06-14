@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Blocks.Pedestal;
 
 
 import com.mowmaster.mowlib.MowLibUtils.ColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
 import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
@@ -10,6 +11,7 @@ import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Networking.DustPacketHandler;
 import com.mowmaster.pedestals.Networking.DustPacketParticles;
+import com.mowmaster.pedestals.PedestalUtils.PedestalsXpUtil;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -40,6 +42,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -97,7 +101,7 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     //9 slots, but only when it has the tank upgrade will we allow more then the first to be used.
     public IItemHandler createHandlerPedestal() {
-        return new ItemStackHandler(1) {
+        return new ItemStackHandler(27) {
             @Override
             protected void onLoad() {
                 super.onLoad();
@@ -119,7 +123,9 @@ public class BasePedestalBlockEntity extends BlockEntity
             @Override
             public int getSlots() {
                 //maybe return less if there is no tank upgrade???
-                return 1;
+                int baseSlots = PedestalConfig.COMMON.pedestal_baseItemStacks.get();
+                int additionalSlots = getItemSlotIncreaseFromStorage();
+                return baseSlots + additionalSlots;
             }
 
             @Override
@@ -135,45 +141,45 @@ public class BasePedestalBlockEntity extends BlockEntity
             public int getSlotLimit(int slot) {
 
                 //Hopefully never mess with this again
+                //Amount of items allowed in the slot --- may use for bibliomania???
                 return super.getSlotLimit(slot);
             }
 
             @Nonnull
             @Override
             public ItemStack getStackInSlot(int slot) {
-                //only allow slot 1 unless tank upgrade exists
-                return super.getStackInSlot(slot);
+
+                return super.getStackInSlot((slot>getSlots())?(0):(slot));
             }
 
             @Nonnull
             @Override
             public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-                //restrict to slot 1 unless it has the tank
-                return super.insertItem(slot, stack, simulate);
+
+                return super.insertItem((slot>getSlots())?(0):(slot), stack, simulate);
             }
 
             @Nonnull
             @Override
             public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                //restrict to slot 1 unless it has the tank
 
-                return super.extractItem(slot, amount, simulate);
+                return super.extractItem((slot>getSlots())?(0):(slot), amount, simulate);
             }
         };
     }
 
     private IItemHandler createHandlerPedestalPrivate() {
         //going from 5 to 11 slots to future proof things
-        return new ItemStackHandler(11) {
+        return new ItemStackHandler(12) {
 
             @Override
             protected void onLoad() {
-                if(getSlots()<11)
+                if(getSlots()<12)
                 {
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    setSize(11);
+                    setSize(12);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
                     }
@@ -204,6 +210,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 if (slot == 8 && stack.getItem() instanceof AugmentTieredCapacity && canInsertAugmentCapacity(stack)) return true;
                 if (slot == 9 && stack.getItem() instanceof AugmentTieredStorage && canInsertAugmentStorage(stack)) return true;
                 if (slot == 10 && stack.getItem() instanceof AugmentTieredRange && canInsertAugmentRange(stack)) return true;
+                if (slot == 11 && canInsertTool(stack)) return true;
                 return false;
             }
         };
@@ -259,7 +266,9 @@ public class BasePedestalBlockEntity extends BlockEntity
             @Override
             public int getMaxEnergyStored() {
 
-                return 20000;
+                int baseStorage = PedestalConfig.COMMON.pedestal_baseEnergyStorage.get();
+                int additionalStorage = getEnergyAmountIncreaseFromStorage();
+                return baseStorage + additionalStorage;
             }
 
             @Override
@@ -370,8 +379,11 @@ public class BasePedestalBlockEntity extends BlockEntity
             }
 
             @Override
-            public int getTankCapacity(int i) {
-                return 16000;
+            public int getTankCapacity(int i)
+            {
+                int baseFluidStorage = PedestalConfig.COMMON.pedestal_baseFluidStorage.get();
+                int additionalFluidStorage = getFluidAmountIncreaseFromStorage();
+                return baseFluidStorage + additionalFluidStorage;
             }
 
             @Override
@@ -492,7 +504,10 @@ public class BasePedestalBlockEntity extends BlockEntity
 
             @Override
             public int getMaxExperienceStored() {
-                return 1395;//30 levels
+                int convertLevelsToXp = PedestalsXpUtil.getExpCountByLevel(PedestalConfig.COMMON.pedestal_baseXpStorage.get());
+                //Conditioning out running the xp converter when theres not need to.
+                int convertLevelsToXpAdditional = (getXpLevelAmountIncreaseFromStorage()>0)?(PedestalsXpUtil.getExpCountByLevel(getXpLevelAmountIncreaseFromStorage())):(0);
+                return convertLevelsToXp + convertLevelsToXpAdditional;//30 levels is default
             }
 
             @Override
@@ -533,34 +548,19 @@ public class BasePedestalBlockEntity extends BlockEntity
         return super.getCapability(cap, side);
     }
 
-    public void spawnItemStack(Level worldIn, double x, double y, double z, ItemStack stack) {
-        Random RANDOM = new Random();
-        double d0 = (double) EntityType.ITEM.getWidth();
-        double d1 = 1.0D - d0;
-        double d2 = d0 / 2.0D;
-        double d3 = Math.floor(x) + RANDOM.nextDouble() * d1 + d2;
-        double d4 = Math.floor(y) + RANDOM.nextDouble() * d1;
-        double d5 = Math.floor(z) + RANDOM.nextDouble() * d1 + d2;
 
-        while(!stack.isEmpty()) {
-            ItemEntity itementity = new ItemEntity(worldIn, d3, d4, d5, stack.split(RANDOM.nextInt(21) + 10));
-            float f = 0.05F;
-            itementity.lerpMotion(RANDOM.nextGaussian() * 0.05000000074505806D, RANDOM.nextGaussian() * 0.05000000074505806D + 0.20000000298023224D, RANDOM.nextGaussian() * 0.05000000074505806D);
-            worldIn.addFreshEntity(itementity);
-        }
-    }
 
     public void dropInventoryItems(Level worldIn, BlockPos pos) {
         IItemHandler h = handler.orElse(null);
         for(int i = 0; i < h.getSlots(); ++i) {
-            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
+            MowLibItemUtils.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
         }
     }
 
     public void dropInventoryItemsPrivate(Level worldIn, BlockPos pos) {
         IItemHandler ph = privateHandler.orElse(null);
         for(int i = 0; i < ph.getSlots(); ++i) {
-            spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
+            MowLibItemUtils.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
         }
     }
 
@@ -753,7 +753,44 @@ public class BasePedestalBlockEntity extends BlockEntity
     public boolean hasItem()
     {
         IItemHandler h = handler.orElse(null);
-        if(h.getStackInSlot(0).isEmpty())
+        int firstPartialOrNonEmptySlot = 0;
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                ItemStack stackInSlot = h.getStackInSlot(i);
+                if(stackInSlot.getCount() < stackInSlot.getMaxStackSize() || stackInSlot.isEmpty())
+                {
+                    firstPartialOrNonEmptySlot = i;
+                    break;
+                }
+            }
+        }
+
+        if(h.getStackInSlot(firstPartialOrNonEmptySlot).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public boolean hasItemFirst()
+    {
+        IItemHandler h = handler.orElse(null);
+        int firstNonEmptySlot = 0;
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                if(!h.getStackInSlot(i).isEmpty())
+                {
+                    firstNonEmptySlot = i;
+                    break;
+                }
+            }
+        }
+
+        if(h.getStackInSlot(firstNonEmptySlot).isEmpty())
         {
             return false;
         }
@@ -763,9 +800,59 @@ public class BasePedestalBlockEntity extends BlockEntity
     public ItemStack getItemInPedestal()
     {
         IItemHandler h = handler.orElse(null);
+        if(hasItemFirst())
+        {
+            int firstNonEmptySlot = 0;
+            if(h.getSlots()>1)
+            {
+                for(int i=0;i<h.getSlots();i++)
+                {
+                    ItemStack stackInSlot = h.getStackInSlot(i);
+                    if(!stackInSlot.isEmpty())
+                    {
+                        firstNonEmptySlot = i;
+                        break;
+                    }
+                }
+            }
+            return h.getStackInSlot(firstNonEmptySlot);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack getItemInPedestalFirst()
+    {
+        IItemHandler h = handler.orElse(null);
+        if(hasItemFirst())
+        {
+            int firstNonEmptySlot = 0;
+            if(h.getSlots()>1)
+            {
+                for(int i=0;i<h.getSlots();i++)
+                {
+                    if(!h.getStackInSlot(i).isEmpty())
+                    {
+                        firstNonEmptySlot = i;
+                        break;
+                    }
+                }
+            }
+            return h.getStackInSlot(firstNonEmptySlot);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack getItemInPedestal(int slot)
+    {
+        IItemHandler h = handler.orElse(null);
         if(hasItem())
         {
-            return h.getStackInSlot(0);
+            int firstNonEmptySlot = 0;
+            if(h.getSlots()>1)
+            {
+                firstNonEmptySlot = slot;
+            }
+            return h.getStackInSlot(firstNonEmptySlot);
         }
         else return ItemStack.EMPTY;
     }
@@ -786,7 +873,19 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     public ItemStack removeItem(int numToRemove) {
         IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.extractItem(0,numToRemove,false);
+        int firstNonEmptySlot = 0;
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                if(!h.getStackInSlot(i).isEmpty())
+                {
+                    firstNonEmptySlot = i;
+                    break;
+                }
+            }
+        }
+        ItemStack stack = h.extractItem(firstNonEmptySlot,numToRemove,false);
         //update();
 
         return stack;
@@ -794,7 +893,19 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     public ItemStack removeItem() {
         IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.extractItem(0,getItemInPedestal().getMaxStackSize(),false);
+        int firstNonEmptySlot = 0;
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                if(!h.getStackInSlot(i).isEmpty())
+                {
+                    firstNonEmptySlot = i;
+                    break;
+                }
+            }
+        }
+        ItemStack stack = h.extractItem(firstNonEmptySlot,getItemInPedestal().getMaxStackSize(),false);
         //update();
 
         return stack;
@@ -803,7 +914,26 @@ public class BasePedestalBlockEntity extends BlockEntity
     public boolean addItem(ItemStack itemFromBlock,boolean simulate)
     {
         IItemHandler h = handler.orElse(null);
-        if(h.isItemValid(0,itemFromBlock))
+        int firstEmptyorMatchingSlot = 0;
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                ItemStack stackInSlot = h.getStackInSlot(i);
+                if(stackInSlot.getCount() < stackInSlot.getMaxStackSize() && ItemHandlerHelper.canItemStacksStack(stackInSlot,itemFromBlock))
+                {
+                    firstEmptyorMatchingSlot = i;
+                    break;
+                }
+                else if(h.getStackInSlot(i).isEmpty())
+                {
+                    firstEmptyorMatchingSlot = i;
+                    break;
+                }
+            }
+        }
+
+        if(h.isItemValid(firstEmptyorMatchingSlot,itemFromBlock))
         {
             if(hasItem())
             {
@@ -811,7 +941,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     if(!simulate)
                     {
-                        h.insertItem(0, itemFromBlock.copy(), false);
+                        h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), false);
                         update();
                     }
                     return true;
@@ -821,7 +951,7 @@ public class BasePedestalBlockEntity extends BlockEntity
             {
                 if(!simulate)
                 {
-                    h.insertItem(0, itemFromBlock.copy(), false);
+                    h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), false);
                     update();
                 }
                 return true;
@@ -833,37 +963,39 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     public int getItemTransferRate()
     {
-        int itemRate = 4;
-        /*switch (getCapacity())
-        {
-            case 0:
-                itemRate = (getCapacity()>0)?(4):(4);
-                break;
-            case 1:
-                itemRate= (getCapacity()>0)?(8):(4);
-                break;
-            case 2:
-                itemRate = (getCapacity()>0)?(16):(4);
-                break;
-            case 3:
-                itemRate = (getCapacity()>0)?(32):(4);
-                break;
-            case 4:
-                itemRate = (getCapacity()>0)?(48):(4);
-                break;
-            case 5:
-                itemRate=(getCapacity()>0)?(64):(4);
-                break;
-            default: itemRate=4;
-        }*/
+        int itemRate = PedestalConfig.COMMON.pedestal_baseItemTransferRate.get();
+        int getRateIncrease = getItemTransferRateIncreaseFromCapacity();
 
-        return  itemRate;
+        return  itemRate + getRateIncrease;
     }
 
     public int getSlotSizeLimit()
     {
         IItemHandler h = handler.orElse(null);
-        return (h != null)?(h.getSlotLimit(0)):(0);
+        int firstNonEmptySlot = 0;
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                if(!h.getStackInSlot(i).isEmpty())
+                {
+                    firstNonEmptySlot = i;
+                    break;
+                }
+            }
+        }
+        return (h != null)?(h.getSlotLimit(firstNonEmptySlot)):(0);
+    }
+
+    public int getSlotSizeLimit(int slot)
+    {
+        IItemHandler h = handler.orElse(null);
+        int firstNonEmptySlot = 0;
+        if(h.getSlots()>1)
+        {
+            firstNonEmptySlot = slot;
+        }
+        return (h != null)?(h.getSlotLimit(firstNonEmptySlot)):(0);
     }
 
     public void collideWithPedestal(Level world, BasePedestalBlockEntity pedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
@@ -946,33 +1078,10 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     public int getFluidTransferRate()
     {
-        //im assuming # = rf value???
-        int fluidTransferRate = 0;
-        int modifier = 1;
-        switch (modifier)
-        {
-            case 0:
-                fluidTransferRate = 1000;//1x
-                break;
-            case 1:
-                fluidTransferRate=2000;//2x
-                break;
-            case 2:
-                fluidTransferRate = 4000;//4x
-                break;
-            case 3:
-                fluidTransferRate = 6000;//6x
-                break;
-            case 4:
-                fluidTransferRate = 10000;//10x
-                break;
-            case 5:
-                fluidTransferRate=20000;//20x
-                break;
-            default: fluidTransferRate=2000;
-        }
+        int fluidTransferRate = PedestalConfig.COMMON.pedestal_baseFluidTransferRate.get();
+        int getFluidRateIncrease = getFluidTransferRateIncreaseFromCapacity();
 
-        return  fluidTransferRate;
+        return  fluidTransferRate + getFluidRateIncrease;
     }
 
 
@@ -1042,41 +1151,10 @@ public class BasePedestalBlockEntity extends BlockEntity
     public int getEnergyTransferRate()
     {
         //im assuming # = rf value???
-        int fluidTransferRate = 0;
-        int modifier = 1;
-        switch (modifier)
-        {
-            case -3:
-                fluidTransferRate = 125;//1x
-                break;
-            case -2:
-                fluidTransferRate = 250;//1x
-                break;
-            case -1:
-                fluidTransferRate = 500;//1x
-                break;
-            case 0:
-                fluidTransferRate = 750;//1x
-                break;
-            case 1:
-                fluidTransferRate=1000;//2x
-                break;
-            case 2:
-                fluidTransferRate = 750;//4x
-                break;
-            case 3:
-                fluidTransferRate = 1000;//6x
-                break;
-            case 4:
-                fluidTransferRate = 10000;//10x
-                break;
-            case 5:
-                fluidTransferRate=20000;//20x
-                break;
-            default: fluidTransferRate=250;
-        }
+        int energyTransferRate = PedestalConfig.COMMON.pedestal_baseEnergyTransferRate.get();
+        int energyTransferRateIncrease = getEnergyTransferRateIncreaseFromCapacity();
 
-        return  fluidTransferRate;
+        return  energyTransferRate + energyTransferRateIncrease;
     }
 
     /*============================================================================
@@ -1145,32 +1223,10 @@ public class BasePedestalBlockEntity extends BlockEntity
     public int getExperienceTransferRate()
     {
         //im assuming # = rf value???
-        int experienceTransferRate = 0;
-        int modifier = 1;
-        switch (modifier)
-        {
-            case 0:
-                experienceTransferRate = 55;//5l
-                break;
-            case 1:
-                experienceTransferRate=160;//10l
-                break;
-            case 2:
-                experienceTransferRate = 315;//15l
-                break;
-            case 3:
-                experienceTransferRate = 550;//20l
-                break;
-            case 4:
-                experienceTransferRate = 910;//25l
-                break;
-            case 5:
-                experienceTransferRate=1395;//30l
-                break;
-            default: experienceTransferRate=160;
-        }
+        int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
+        int experienceTransferRateConverted = PedestalsXpUtil.getExpCountByLevel(baseValue);
 
-        return  experienceTransferRate;
+        return  (getXpTransferRateIncreaseFromCapacity()>0)?(PedestalsXpUtil.getExpCountByLevel(getXpTransferRateIncreaseFromCapacity()+baseValue)):(experienceTransferRateConverted);
     }
 
     /*============================================================================
@@ -1318,7 +1374,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(speedAugment.getItem() instanceof AugmentTieredSpeed speedStack)
         {
             //Check to see if any can be insert
-            if(speedStack.getAllowedInsertAmount()>0) return false;
+            if(speedStack.getAllowedInsertAmount()<=0) return false;
 
             if(hasSpeed())
             {
@@ -1426,7 +1482,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(capacityAugment.getItem() instanceof AugmentTieredCapacity capacityStack)
         {
             //Check to see if any can be insert
-            if(capacityStack.getAllowedInsertAmount()>0) return false;
+            if(capacityStack.getAllowedInsertAmount()<=0) return false;
 
             if(hasCapacity())
             {
@@ -1566,7 +1622,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(storageAugment.getItem() instanceof AugmentTieredStorage storageStack)
         {
             //Check to see if any can be insert
-            if(storageStack.getAllowedInsertAmount()>0) return false;
+            if(storageStack.getAllowedInsertAmount()<=0) return false;
 
             if(hasStorage())
             {
@@ -1583,7 +1639,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         return false;
     }
 
-    public int getItemTransferRateIncreaseFromStorage()
+    public int getItemSlotIncreaseFromStorage()
     {
         ItemStack augmentStorage = getStorageStack();
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
@@ -1594,7 +1650,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         return 0;
     }
 
-    public int getFluidTransferRateIncreaseFromStorage()
+    public int getFluidAmountIncreaseFromStorage()
     {
         ItemStack augmentStorage = getStorageStack();
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
@@ -1605,7 +1661,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         return 0;
     }
 
-    public int getEnergyTransferRateIncreaseFromStorage()
+    public int getEnergyAmountIncreaseFromStorage()
     {
         ItemStack augmentStorage = getStorageStack();
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
@@ -1616,7 +1672,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         return 0;
     }
 
-    public int getXpTransferRateIncreaseFromStorage()
+    public int getXpLevelAmountIncreaseFromStorage()
     {
         ItemStack augmentStorage = getStorageStack();
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
@@ -1707,7 +1763,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(rangeAugment.getItem() instanceof AugmentTieredRange rangeStack)
         {
             //Check to see if any can be insert
-            if(rangeStack.getAllowedInsertAmount()>0) return false;
+            if(rangeStack.getAllowedInsertAmount()<=0) return false;
 
             if(hasRange())
             {
@@ -1740,6 +1796,153 @@ public class BasePedestalBlockEntity extends BlockEntity
     ===========================      RANGE  END      =============================
     ==============================================================================
     ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     TOOL   START     =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean isAllowedTool(ItemStack toolIn)
+    {
+        if(toolIn.getItem() instanceof DiggerItem)return true;
+        if(toolIn.getItem() instanceof SwordItem)return true;
+        if(toolIn.getItem() instanceof ProjectileWeaponItem)return true;
+        if(toolIn.getItem() instanceof TridentItem)return true;
+        if(toolIn.canPerformAction(ToolActions.PICKAXE_DIG))return true;
+        if(toolIn.canPerformAction(ToolActions.AXE_DIG))return true;
+        if(toolIn.canPerformAction(ToolActions.SHOVEL_DIG))return true;
+        if(toolIn.canPerformAction(ToolActions.HOE_DIG))return true;
+        if(toolIn.canPerformAction(ToolActions.SWORD_SWEEP))return true;
+        if(toolIn.canPerformAction(ToolActions.SWORD_DIG))return true;
+        if(toolIn.canPerformAction(ToolActions.SHEARS_HARVEST))return true;
+        if(toolIn.canPerformAction(ToolActions.SHEARS_DIG))return true;
+
+        return false;
+    }
+
+
+    public boolean addTool(ItemStack toolItem)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        ItemStack itemFromBlock = toolItem.copy();
+        itemFromBlock.setCount(1);
+
+        if(canInsertTool(itemFromBlock))
+        {
+            System.out.println(ph.insertItem(11,itemFromBlock,true));
+            ph.insertItem(11,itemFromBlock,false);
+            return true;
+        }
+        else return false;
+    }
+
+    public ItemStack removeTool(int count)
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasTool())
+        {
+            return ph.extractItem(11,count,false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack removeAllTool()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(hasTool())
+        {
+            //update();
+            return ph.extractItem(11,ph.getStackInSlot(11).getCount(),false);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public boolean hasTool()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(11).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public int getToolDurability()
+    {
+        if(hasTool())
+        {
+            ItemStack toolInPed = getToolStack();
+            if(toolInPed.isDamageableItem())
+            {
+                return toolInPed.getDamageValue();
+            }
+            return -1;
+        }
+        return 0;
+    }
+
+    public int getToolMaxDurability()
+    {
+        if(hasTool())
+        {
+            ItemStack toolInPed = getToolStack();
+            if(toolInPed.isDamageableItem())
+            {
+                return toolInPed.getMaxDamage();
+            }
+            return -1;
+        }
+        return 0;
+    }
+
+    public int getDurabilityRemainingOnInsertedTool()
+    {
+        return getToolMaxDurability() - getToolDurability();
+    }
+
+    public boolean damageInsertedTool(int damageAmount, boolean simulate)
+    {
+        if(getDurabilityRemainingOnInsertedTool()>damageAmount)
+        {
+            if(!simulate)
+            {
+                int newDamageAmount = getToolDurability() - damageAmount;
+                getToolStack().setDamageValue(newDamageAmount);
+                return true;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    public ItemStack getToolStack()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(11);
+    }
+
+    public boolean canInsertTool(ItemStack tool)
+    {
+        if(isAllowedTool(tool))
+        {
+            //Check to see if any can be insert
+            if(hasTool())return false;
+            else return true;
+        }
+
+        return false;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================      TOOL   END      =============================
+    ==============================================================================
+    ============================================================================*/
+
 
 
     /*============================================================================
