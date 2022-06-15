@@ -1,17 +1,16 @@
 package com.mowmaster.pedestals.EventHandlers;
 
 
+import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
+import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
-import com.mowmaster.pedestals.Networking.DustPacketHandler;
-import com.mowmaster.pedestals.Networking.DustPacketParticles;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -61,8 +60,8 @@ public class NoCollideAugmentCrafting
                             if(stack.getItem().equals(Items.PAPER))
                             {
                                 getPos = item.getOnPos().above();
-                                DustPacketHandler.sendToNearby(worldIn,getPos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos.getX(),getPos.getY(),getPos.getZ(),200,0,0));
-                                DustPacketHandler.sendToNearby(worldIn,getPos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos.getX(),getPos.getY(),getPos.getZ(),100,100,100));
+                                MowLibPacketHandler.sendToNearby(worldIn,getPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,getPos.getX(),getPos.getY(),getPos.getZ(),200,0,0));
+                                MowLibPacketHandler.sendToNearby(worldIn,getPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,getPos.getX(),getPos.getY(),getPos.getZ(),100,100,100));
                                 List<Animal> animals = worldIn.getEntitiesOfClass(Animal.class,new AABB(getPos));
 
                                 if(animals.size()>0)

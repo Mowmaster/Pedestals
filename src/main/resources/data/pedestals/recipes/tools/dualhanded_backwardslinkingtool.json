@@ -1,0 +1,15 @@
+{
+  "type": "mowlib:dualhandedcrafting",
+  "blockTarget": {
+    "item": "minecraft:bookshelf"
+  },
+  "mainhandTool": {
+    "tag": "forge:gems"
+  },
+  "offhandTool": {
+    "tag": "forge:rods"
+  },
+  "result": {
+    "item": "pedestals:tool_linkingtoolbackwards"
+  }
+}

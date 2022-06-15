@@ -1,8 +1,8 @@
 package com.mowmaster.pedestals.Items.Tools;
 
+import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
+import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
-import com.mowmaster.pedestals.Networking.DustPacketHandler;
-import com.mowmaster.pedestals.Networking.DustPacketParticles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -40,46 +40,46 @@ public class BaseTool extends Item
         switch (enumfacing)
         {
             case UP:
-                if (world.getGameTime()%20 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%25 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.75D,r,g,b));
-                if (world.getGameTime()%15 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%30 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%20 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%25 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%15 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%30 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.75D,r,g,b));
                 return;
             case DOWN:
-                if (world.getGameTime()%20 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%25 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.75D,r,g,b));
-                if (world.getGameTime()%15 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%30 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%20 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%25 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%15 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%30 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.75D,r,g,b));
                 return;
             case NORTH:
-                if (world.getGameTime()%20 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.25D,dz+ 0.5D,r,g,b));
-                if (world.getGameTime()%25 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.75D,dz+ 0.5D,r,g,b));
-                if (world.getGameTime()%15 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.25D,dz+ 0.5D,r,g,b));
-                if (world.getGameTime()%30 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.75D,dz+ 0.5D,r,g,b));
+                if (world.getGameTime()%20 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.25D,dz+ 0.5D,r,g,b));
+                if (world.getGameTime()%25 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.75D,dz+ 0.5D,r,g,b));
+                if (world.getGameTime()%15 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.25D,dz+ 0.5D,r,g,b));
+                if (world.getGameTime()%30 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.75D,dz+ 0.5D,r,g,b));
                 return;
             case SOUTH:
-                if (world.getGameTime()%20 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.25D,dz+ 0.5D,r,g,b));
-                if (world.getGameTime()%25 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.75D,dz+ 0.5D,r,g,b));
-                if (world.getGameTime()%15 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.25D,dz+ 0.5D,r,g,b));
-                if (world.getGameTime()%30 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.75D,dz+ 0.5D,r,g,b));
+                if (world.getGameTime()%20 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.25D,dz+ 0.5D,r,g,b));
+                if (world.getGameTime()%25 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.75D,dz+ 0.5D,r,g,b));
+                if (world.getGameTime()%15 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.25D,dz+ 0.5D,r,g,b));
+                if (world.getGameTime()%30 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.75D,dz+ 0.5D,r,g,b));
                 return;
             case EAST:
-                if (world.getGameTime()%20 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.25D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%25 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.25D,dz+ 0.75D,r,g,b));
-                if (world.getGameTime()%15 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.75D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%30 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.75D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%20 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.25D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%25 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.25D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%15 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.75D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%30 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.75D,dz+ 0.75D,r,g,b));
                 return;
             case WEST:
-                if (world.getGameTime()%20 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.25D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%25 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.25D,dz+ 0.75D,r,g,b));
-                if (world.getGameTime()%15 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.75D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%30 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.75D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%20 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.25D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%25 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.25D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%15 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.75D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%30 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.5D,dy+0.75D,dz+ 0.75D,r,g,b));
                 return;
             default:
-                if (world.getGameTime()%30 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%35 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.75D,r,g,b));
-                if (world.getGameTime()%25 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.25D,r,g,b));
-                if (world.getGameTime()%30 == 0) DustPacketHandler.sendToNearby(world,pos,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%30 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%35 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.25D,dy+0.5D,dz+ 0.75D,r,g,b));
+                if (world.getGameTime()%25 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.25D,r,g,b));
+                if (world.getGameTime()%30 == 0) MowLibPacketHandler.sendToNearby(world,pos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,dx+ 0.75D,dy+0.5D,dz+ 0.75D,r,g,b));
                 return;
         }
     }

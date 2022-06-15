@@ -19,8 +19,9 @@
   },
   "result": {
     "item": "pedestals:block_pedestal",
+    "type": "forge:nbt",
     "nbt": {
-      "dust_color": 11184810
+      "mowlib_color": 11184810
     }
   }
 

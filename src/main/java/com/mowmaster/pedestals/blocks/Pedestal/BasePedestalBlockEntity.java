@@ -3,15 +3,15 @@ package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtil;
+import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
+import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
 import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
-import com.mowmaster.pedestals.Networking.DustPacketHandler;
-import com.mowmaster.pedestals.Networking.DustPacketParticles;
-import com.mowmaster.pedestals.PedestalUtils.PedestalsXpUtil;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -25,24 +25,19 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -62,7 +57,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 public class BasePedestalBlockEntity extends BlockEntity
 {
@@ -504,9 +498,9 @@ public class BasePedestalBlockEntity extends BlockEntity
 
             @Override
             public int getMaxExperienceStored() {
-                int convertLevelsToXp = PedestalsXpUtil.getExpCountByLevel(PedestalConfig.COMMON.pedestal_baseXpStorage.get());
+                int convertLevelsToXp = MowLibXpUtil.getExpCountByLevel(PedestalConfig.COMMON.pedestal_baseXpStorage.get());
                 //Conditioning out running the xp converter when theres not need to.
-                int convertLevelsToXpAdditional = (getXpLevelAmountIncreaseFromStorage()>0)?(PedestalsXpUtil.getExpCountByLevel(getXpLevelAmountIncreaseFromStorage())):(0);
+                int convertLevelsToXpAdditional = (getXpLevelAmountIncreaseFromStorage()>0)?(MowLibXpUtil.getExpCountByLevel(getXpLevelAmountIncreaseFromStorage())):(0);
                 return convertLevelsToXp + convertLevelsToXpAdditional;//30 levels is default
             }
 
@@ -797,6 +791,24 @@ public class BasePedestalBlockEntity extends BlockEntity
         else  return true;
     }
 
+    public boolean hasSpaceForItem(ItemStack stackToMatch)
+    {
+        IItemHandler h = handler.orElse(null);
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                ItemStack stackInSlot = h.getStackInSlot(i);
+                if(((stackInSlot.getCount() < stackInSlot.getMaxStackSize()) && ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToMatch)) || stackInSlot.isEmpty())
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public ItemStack getItemInPedestal()
     {
         IItemHandler h = handler.orElse(null);
@@ -809,6 +821,52 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     ItemStack stackInSlot = h.getStackInSlot(i);
                     if(!stackInSlot.isEmpty())
+                    {
+                        firstNonEmptySlot = i;
+                        break;
+                    }
+                }
+            }
+            return h.getStackInSlot(firstNonEmptySlot);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack getItemInPedestalOrEmptySlot()
+    {
+        IItemHandler h = handler.orElse(null);
+        if(hasItemFirst())
+        {
+            int firstNonEmptySlot = 0;
+            if(h.getSlots()>1)
+            {
+                for(int i=0;i<h.getSlots();i++)
+                {
+                    ItemStack stackInSlot = h.getStackInSlot(i);
+                    if((stackInSlot.getMaxStackSize() > stackInSlot.getCount()) || stackInSlot.isEmpty())
+                    {
+                        firstNonEmptySlot = i;
+                        break;
+                    }
+                }
+            }
+            return h.getStackInSlot(firstNonEmptySlot);
+        }
+        else return ItemStack.EMPTY;
+    }
+
+    public ItemStack getMatchingItemInPedestalOrEmptySlot(ItemStack stackToMatch)
+    {
+        IItemHandler h = handler.orElse(null);
+        if(hasItemFirst())
+        {
+            int firstNonEmptySlot = 0;
+            if(h.getSlots()>1)
+            {
+                for(int i=0;i<h.getSlots();i++)
+                {
+                    ItemStack stackInSlot = h.getStackInSlot(i);
+                    if(((stackInSlot.getMaxStackSize() > stackInSlot.getCount())  && ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToMatch))  || stackInSlot.isEmpty())
                     {
                         firstNonEmptySlot = i;
                         break;
@@ -840,6 +898,28 @@ public class BasePedestalBlockEntity extends BlockEntity
             return h.getStackInSlot(firstNonEmptySlot);
         }
         else return ItemStack.EMPTY;
+    }
+
+    public List<ItemStack> getItemStacks()
+    {
+        IItemHandler h = handler.orElse(null);
+        List<ItemStack> listed = new ArrayList<>();
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                if(!h.getStackInSlot(i).isEmpty())
+                {
+                    listed.add(h.getStackInSlot(i));
+                }
+            }
+        }
+        else
+        {
+            listed.add(h.getStackInSlot(0));
+        }
+
+        return listed;
     }
 
     public ItemStack getItemInPedestal(int slot)
@@ -933,19 +1013,17 @@ public class BasePedestalBlockEntity extends BlockEntity
             }
         }
 
+
         if(h.isItemValid(firstEmptyorMatchingSlot,itemFromBlock))
         {
-            if(hasItem())
+            if(hasSpaceForItem(itemFromBlock) && ItemHandlerHelper.canItemStacksStack(h.getStackInSlot(firstEmptyorMatchingSlot),itemFromBlock))
             {
-                if(ItemHandlerHelper.canItemStacksStack(getItemInPedestal(),itemFromBlock))
+                if(!simulate)
                 {
-                    if(!simulate)
-                    {
-                        h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), false);
-                        update();
-                    }
-                    return true;
+                    h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), false);
+                    update();
                 }
+                return true;
             }
             else
             {
@@ -1224,9 +1302,9 @@ public class BasePedestalBlockEntity extends BlockEntity
     {
         //im assuming # = rf value???
         int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
-        int experienceTransferRateConverted = PedestalsXpUtil.getExpCountByLevel(baseValue);
+        int experienceTransferRateConverted = MowLibXpUtil.getExpCountByLevel(baseValue);
 
-        return  (getXpTransferRateIncreaseFromCapacity()>0)?(PedestalsXpUtil.getExpCountByLevel(getXpTransferRateIncreaseFromCapacity()+baseValue)):(experienceTransferRateConverted);
+        return  (getXpTransferRateIncreaseFromCapacity()>0)?(MowLibXpUtil.getExpCountByLevel(getXpTransferRateIncreaseFromCapacity()+baseValue)):(experienceTransferRateConverted);
     }
 
     /*============================================================================
@@ -1537,7 +1615,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentCapacity = getCapacityStack();
         if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
         {
-            return capacityStack.getAdditionalItemTransferRatePerItem() * augmentCapacity.getCount();
+            return capacityStack.getAdditionalXpTransferRatePerItem() * augmentCapacity.getCount();
         }
 
         return 0;
@@ -2452,13 +2530,13 @@ public class BasePedestalBlockEntity extends BlockEntity
         int canAccept = 0;
         int pedestalAccept = 0;
 
-        if(getItemInPedestal().isEmpty() || getItemInPedestal().equals(ItemStack.EMPTY))
+        if(getMatchingItemInPedestalOrEmptySlot(itemsIncoming).isEmpty() || getMatchingItemInPedestalOrEmptySlot(itemsIncoming).equals(ItemStack.EMPTY))
         {
             canAccept = itemsIncoming.getMaxStackSize();
         }
         else
         {
-            if(ItemHandlerHelper.canItemStacksStack(getItemInPedestal(),itemsIncoming))
+            if(ItemHandlerHelper.canItemStacksStack(getMatchingItemInPedestalOrEmptySlot(itemsIncoming),itemsIncoming))
             {
                 //Two buckets match but cant be stacked since max stack size is 1
                 //BUT if its a tank, its cooler then this
@@ -2466,9 +2544,9 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     //If i did this right, slot limit should default to stack max size, or custom allowed
                     int allowed = getSlotSizeLimit();
-                    if(getItemInPedestal().getCount() < allowed)
+                    if(getItemInPedestalOrEmptySlot().getCount() < allowed)
                     {
-                        canAccept = (allowed - getItemInPedestal().getCount());
+                        canAccept = (allowed - getItemInPedestalOrEmptySlot().getCount());
                     }
                 }
             }
@@ -2604,15 +2682,98 @@ public class BasePedestalBlockEntity extends BlockEntity
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //The actual transfer methods for items
     public boolean sendItemsToPedestal(BlockPos pedestalToSendTo, ItemStack itemStackIncoming)
     {
-        if(hasItem())
+        if(hasItemFirst())
         {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity)
+            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
-                BasePedestalBlockEntity tilePedestalToSendTo = (BasePedestalBlockEntity)level.getBlockEntity(pedestalToSendTo);
-
                 //Checks if pedestal is empty or if not then checks if items match and how many can be insert
                 if(tilePedestalToSendTo.canAcceptItems(level,pedestalToSendTo,itemStackIncoming) > 0)
                 {
@@ -2652,7 +2813,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                                 copyStackToSend.setCount(countToSend);
                                 removeItem(copyStackToSend.getCount());
                                 tilePedestalToSendTo.addItem(copyStackToSend,false);
-                                if(canSpawnParticles()) DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
+                                if(canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
                                 return true;
                             }
                         }
@@ -2706,7 +2867,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                                 {
                                     tilePedestalToSendTo.addFluid(new FluidStack(fluidStackIncoming.getFluid(),finalFluidCountToSend,fluidStackIncoming.getTag()), IFluidHandler.FluidAction.EXECUTE);
                                     removeFluid(countFluidToSend, IFluidHandler.FluidAction.EXECUTE);
-                                    if(canSpawnParticles()) DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
+                                    if(canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
                                     return true;
                                 }
                             }
@@ -2758,7 +2919,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                                 {
                                     removeEnergy(finalEnergyCountToSend,false);
                                     tilePedestalToSendTo.addEnergy(finalEnergyCountToSend,false);
-                                    if(canSpawnParticles()) DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
+                                    if(canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
                                     return true;
                                 }
                             }
@@ -2810,7 +2971,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                                 {
                                     removeExperience(finalExperienceCountToSend,false);
                                     tilePedestalToSendTo.addExperience(finalExperienceCountToSend,false);
-                                    if(canSpawnParticles()) DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
+                                    if(canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
                                     return true;
                                 }
                             }
@@ -2957,19 +3118,19 @@ public class BasePedestalBlockEntity extends BlockEntity
                 if(pedTicker >= maxRate-1){pedTicker=0;}
             }
 
-            if(getRenderRange()){ if(getLevel().getGameTime()%20 == 0)DustPacketHandler.sendToNearby(level,getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,getPos().getX(),getPos().getY(),getPos().getZ(),0,0,0)); }
+            if(getRenderRange()){ if(getLevel().getGameTime()%20 == 0)MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,getPos().getX(),getPos().getY(),getPos().getZ(),0,0,0)); }
 
             if(canSpawnParticles())
             {
                 BlockPos posDirectionalEnergy = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0D,0D,0D);
-                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasEnergy()){DustPacketHandler.sendToNearby(level,posDirectionalEnergy,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalEnergy.getX(),posDirectionalEnergy.getY(),posDirectionalEnergy.getZ(),255,0,0));}}
+                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasEnergy()){MowLibPacketHandler.sendToNearby(level,posDirectionalEnergy,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalEnergy.getX(),posDirectionalEnergy.getY(),posDirectionalEnergy.getZ(),255,0,0));}}
                 BlockPos posDirectionalXP = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0D,0D,0D);
-                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasExperience()){DustPacketHandler.sendToNearby(level,posDirectionalXP,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalXP.getX(),posDirectionalXP.getY(),posDirectionalXP.getZ(),0,255,0));}}
+                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasExperience()){MowLibPacketHandler.sendToNearby(level,posDirectionalXP,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalXP.getX(),posDirectionalXP.getY(),posDirectionalXP.getZ(),0,255,0));}}
                 //System.out.println(getPos());
 
                 BlockPos posDirectionalFluid = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0.5D,0D,0D);
                 //System.out.println(getPos().offset(0.5D,0D,0D));
-                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasFluid()){DustPacketHandler.sendToNearby(level,posDirectionalFluid,new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,posDirectionalFluid.getX(),posDirectionalFluid.getY(),posDirectionalFluid.getZ(),0,0,255));}}
+                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasFluid()){MowLibPacketHandler.sendToNearby(level,posDirectionalFluid,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalFluid.getX(),posDirectionalFluid.getY(),posDirectionalFluid.getZ(),0,0,255));}}
             }
         }
     }

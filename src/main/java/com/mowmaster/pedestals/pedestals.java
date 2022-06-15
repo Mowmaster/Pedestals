@@ -4,10 +4,7 @@ import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
 import com.mowmaster.pedestals.Client.ClientItemTooltipComponent;
 import com.mowmaster.pedestals.Client.ItemTooltipComponent;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Networking.DustPacketHandler;
 import com.mowmaster.pedestals.Registry.*;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
@@ -15,7 +12,6 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -27,8 +23,6 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.stream.Collectors;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODNAME;
 
@@ -77,7 +71,6 @@ public class pedestals
     private void setup(final FMLCommonSetupEvent event)
     {
         PLOGGER.info("Initialize "+MODNAME+" WorldGen");
-        DustPacketHandler.registerMessages();
     }
 
     private void setupClient(final FMLClientSetupEvent event)

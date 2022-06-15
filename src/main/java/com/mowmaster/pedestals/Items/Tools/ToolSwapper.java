@@ -41,7 +41,7 @@ public class ToolSwapper extends BaseTool implements IPedestalTool
                     {
                         ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_FILTERTOOL.get());
                         player.setItemInHand(hand, newTool);
-                        MessageUtils.messagePopup(player,ChatFormatting.GREEN,getDescriptionId() + ".tool_change");
+                        MessageUtils.messagePopup(player,ChatFormatting.GREEN,"pedestals.tool_change");
                         return InteractionResultHolder.success(stackInHand);
                     }
                 }

@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "pedestals:linkingtool",
-    "pedestals:linkingtoolbackwards"
+    "pedestals:tool_linkingtool",
+    "pedestals:tool_linkingtoolbackwards"
   ]
 }

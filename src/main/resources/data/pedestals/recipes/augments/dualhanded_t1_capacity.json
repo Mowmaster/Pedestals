@@ -1,0 +1,17 @@
+{
+  "type": "mowlib:dualhandedcrafting",
+  "blockTarget": {
+    "item": "minecraft:obsidian"
+  },
+  "mainhandTool": {
+    "tag": "pedestals:linkingtools"
+  },
+  "consumeMainhandItem": false,
+  "offhandTool": {
+    "tag": "forge:gems/emerald"
+  },
+  "consumeOffhandItem": true,
+  "result": {
+    "item": "pedestals:augment_pedestal_t1_capacity"
+  }
+}

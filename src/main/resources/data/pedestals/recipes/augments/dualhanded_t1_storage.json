@@ -1,0 +1,17 @@
+{
+  "type": "mowlib:dualhandedcrafting",
+  "blockTarget": {
+    "item": "minecraft:obsidian"
+  },
+  "mainhandTool": {
+    "tag": "pedestals:linkingtools"
+  },
+  "consumeMainhandItem": false,
+  "offhandTool": {
+    "tag": "forge:ingots/netherite"
+  },
+  "consumeOffhandItem": true,
+  "result": {
+    "item": "pedestals:augment_pedestal_t1_storage"
+  }
+}

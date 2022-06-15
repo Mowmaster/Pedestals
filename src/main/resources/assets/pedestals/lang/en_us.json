@@ -79,6 +79,8 @@
   "item.pedestals.tool_filtertool.interaction": "§3 Offhand Left Tool and Left Click to Remove Upgrades, Crouch Right Click in Air to Switch Tool.",
   "item.pedestals.tool_tagtool": "Tag Tool",
   "item.pedestals.tool_tagtool.interaction": "§3 Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_toolswapper": "Tool Swapper",
+  "item.pedestals.tool_toolswapper.interaction": "§3 Crouch Right Click in Air to Switch Tool.",
   "item.pedestals.tool_devtool": "Dev Tool (Creative Only)",
   "item.pedestals.tool_devtool.interaction": "§3 Offhand Left Tool and Left Click to Break Pedestals if in Creative Mode",
 
@@ -131,8 +133,64 @@
   "item.pedestals.augment_pedestal_renderdiffuser.interaction": "§3 Offhand Item, Crouch Right Click in Air to Toggle",
   "item.pedestals.augment_pedestal_renderdiffuser.crafting": "Crafted when a Linking Tool is Right Clicked on the ground near paper when its raining.",
 
+  "item.pedestals.augment_pedestal_t1_capacity": "Capacity Augment (Tier 1)",
+  "item.pedestals.augment_pedestal_t1_capacity.description": "§5 Increases the transfer rate slightly for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t2_capacity": "§bCapacity Augment (Tier 2)",
+  "item.pedestals.augment_pedestal_t2_capacity.description": "§5 Increases the transfer rate moderately for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t3_capacity": "§dCapacity Augment (Tier 3)",
+  "item.pedestals.augment_pedestal_t3_capacity.description": "§5 Increases the transfer rate considerably for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t4_capacity": "§6Capacity Augment (Tier 4)",
+  "item.pedestals.augment_pedestal_t4_capacity.description": "§5 Increases the transfer rate tremendously for each upgrade inserted.",
+
+  "item.pedestals.augment_pedestal_t1_storage": "Storage Augment (Tier 1)",
+  "item.pedestals.augment_pedestal_t1_storage.description": "§5 Increases the storage buffer slightly for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t2_storage": "§bStorage Augment (Tier 2)",
+  "item.pedestals.augment_pedestal_t2_storage.description": "§5 Increases the storage buffer moderately for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t3_storage": "§dStorage Augment (Tier 3)",
+  "item.pedestals.augment_pedestal_t3_storage.description": "§5 Increases the storage buffer considerably for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t4_storage": "§6Storage Augment (Tier 4)",
+  "item.pedestals.augment_pedestal_t4_storage.description": "§5 Increases the storage buffer tremendously for each upgrade inserted.",
+
+  "item.pedestals.augment_pedestal_t1_speed": "Speed Augment (Tier 1)",
+  "item.pedestals.augment_pedestal_t1_speed.description": "§5 Increases the transfer speed slightly for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t2_speed": "§bSpeed Augment (Tier 2)",
+  "item.pedestals.augment_pedestal_t2_speed.description": "§5 Increases the transfer speed moderately for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t3_speed": "§dSpeed Augment (Tier 3)",
+  "item.pedestals.augment_pedestal_t3_speed.description": "§5 Increases the transfer speed considerably for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t4_speed": "§6Speed Augment (Tier 4)",
+  "item.pedestals.augment_pedestal_t4_speed.description": "§5 Increases the transfer speed tremendously for each upgrade inserted.",
+
+  "item.pedestals.augment_pedestal_t1_range": "Range Augment (Tier 1)",
+  "item.pedestals.augment_pedestal_t1_range.description": "§5 Increases the transfer range slightly for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t2_range": "§bRange Augment (Tier 2)",
+  "item.pedestals.augment_pedestal_t2_range.description": "§5 Increases the transfer range moderately for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t3_range": "§dRange Augment (Tier 3)",
+  "item.pedestals.augment_pedestal_t3_range.description": "§5 Increases the transfer range considerably for each upgrade inserted.",
+  "item.pedestals.augment_pedestal_t4_range": "§6Range Augment (Tier 4)",
+  "item.pedestals.augment_pedestal_t4_range.description": "§5 Increases the transfer range tremendously for each upgrade inserted.",
+
+
+  "pedestals.augments.description_shift": "Press Shift to See Modifications of this Augment",
+
+  "pedestals.augments_insertable": "Maximum Allowed to Insert: ",
+
+  "pedestals.augments_capacity_itemrate": "Increases Item Transfer Rate by: ",
+  "pedestals.augments_capacity_fluidrate": "Increases Fluid Transfer Rate by: ",
+  "pedestals.augments_capacity_energyrate": "Increases Energy Transfer Rate by: ",
+  "pedestals.augments_capacity_xprate": "Increases XP Level Transfer Rate by: ",
+
+  "pedestals.augments_range_increase": "Increases Linking Range by: ",
+
+  "pedestals.augments_speed_ticksreduced": "Decrease Number of Ticks Between Transfers: ",
+
+  "pedestals.augments_storage_itemrate": "Increases Number of Stacks Allowed In Pedestal: ",
+  "pedestals.augments_storage_fluidrate": "Increases Fluid Buffer In Pedestal: ",
+  "pedestals.augments_storage_energyrate": "Increases Energy Buffer In Pedestal: ",
+  "pedestals.augments_storage_xprate": "Increases Xp Level Buffer In Pedestal: ",
+
+
   "item.pedestals.upgrade_pedestal_base": "Upgrade Base",
-  "item.pedestals.upgrade_pedestal_base.base_description": "§5 THIS UPGRADE BASE IS JUST A CRAFTING COMPONENT!!!",
+  "item.pedestals.upgrade_pedestal_base.base_description": "§5THIS UPGRADE BASE IS JUST A CRAFTING COMPONENT!!!",
   "item.pedestals.upgrade_pedestal_base.description": "§5 All Other Upgrades: Offhand Upgrade and Crouch Right Click to switch MODES, Offhand Upgrade and Right Click to Insert Into Pedestal",
   "item.pedestals.upgrade_pedestal_import": "Import Upgrade",
   "item.pedestals.upgrade_pedestal_import.description": "§5 Imports from 'Below' Inventory into the Pedestal at a rate of 4 items/ 2 Buckets/ 1000rf/ 10 Levels a second.",

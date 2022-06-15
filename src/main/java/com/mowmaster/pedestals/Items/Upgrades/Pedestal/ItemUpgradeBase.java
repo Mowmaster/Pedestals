@@ -481,7 +481,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
         else
         {
-            MutableComponent base = Component.literal(getDescriptionId() + ".base_description");
+            MutableComponent base = Component.translatable(getDescriptionId() + ".base_description");
             base.withStyle(ChatFormatting.DARK_RED);
             p_41423_.add(base);
         }

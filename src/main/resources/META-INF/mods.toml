@@ -62,6 +62,6 @@ side="BOTH"
 modId="mowlib"
 mandatory=true
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
-versionRange="[0.0.15,1.0.0)"
+versionRange="[0.1.17,2.0.0)"
 ordering="NONE"
 side="BOTH"

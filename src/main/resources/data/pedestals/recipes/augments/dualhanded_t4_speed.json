@@ -1,0 +1,15 @@
+{
+  "type": "mowlib:dualhandedcrafting",
+  "blockTarget": {
+    "item": "minecraft:obsidian"
+  },
+  "mainhandTool": {
+    "item": "pedestals:augment_pedestal_t3_speed"
+  },
+  "offhandTool": {
+    "tag": "forge:gems/diamond"
+  },
+  "result": {
+    "item": "pedestals:augment_pedestal_t4_speed"
+  }
+}

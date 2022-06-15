@@ -719,7 +719,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                         }
                     }
 
-                    int allowedInsert = pedestal.countAllowedForInsert(itemInHand);
+                    int allowedInsert = pedestal.canAcceptItems(p_60504_, p_60505_, itemInHand);
                     ItemStack stackToInsert = itemInHand.copy();
                     int countToSet = (allowedInsert>itemInHand.getCount())?(itemInHand.getCount()):(allowedInsert);
                     stackToInsert.setCount(countToSet);

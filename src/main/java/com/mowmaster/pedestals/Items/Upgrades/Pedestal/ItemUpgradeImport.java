@@ -1,10 +1,11 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
+import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Networking.DustPacketHandler;
-import com.mowmaster.pedestals.Networking.DustPacketParticles;
+
 import static com.mowmaster.pedestals.PedestalUtils.PedestalUtilities.*;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -383,7 +384,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                             itemEntity.getItem().setCount(itemInCount-countToAdd);
                             if(itemInCount<=countToAdd)itemEntity.remove(Entity.RemovalReason.DISCARDED);
                             pedestal.addItem(stackToAdd,false);
-                            if(pedestal.canSpawnParticles()) DustPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,180));
+                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,180));
                         }
                     }
                 }
@@ -424,7 +425,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                                     int slot = player.getInventory().findSlotMatchingItem(itemStack);
                                     player.getInventory().setItem(slot,newStackInPlayer);
                                     pedestal.addItem(stackToAdd,false);
-                                    if(pedestal.canSpawnParticles()) DustPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,0));
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,0));
                                 }
                             }
                         }
@@ -447,7 +448,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                         if(value > 0)
                         {
                             pedestal.addExperience( currentlyStoredExp + value,false);
-                            if(pedestal.canSpawnParticles()) DustPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new DustPacketParticles(DustPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
+                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
                         }
                     }
                 }

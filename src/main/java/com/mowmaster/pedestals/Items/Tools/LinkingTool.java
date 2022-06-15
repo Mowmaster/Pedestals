@@ -77,7 +77,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
                         }
                         player.setItemInHand(hand, newTool);
 
-                        MessageUtils.messagePopupText(player,ChatFormatting.GREEN,getDescriptionId() + ".tool_change");
+                        MessageUtils.messagePopup(player,ChatFormatting.GREEN,"pedestals.tool_change");
                         return InteractionResultHolder.success(stackInHand);
                     }
                 }
