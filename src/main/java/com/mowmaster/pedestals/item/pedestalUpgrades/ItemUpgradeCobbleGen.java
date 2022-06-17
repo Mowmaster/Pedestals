@@ -91,7 +91,7 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
                 return 32;
             case 5:
                 return 64;
-            default: return (intCobbleSpawned >= maxStored)?(maxStored):(intCobbleSpawned);
+            default: return Math.min(intCobbleSpawned, maxStored);
         }
     }
 
@@ -360,11 +360,11 @@ public class ItemUpgradeCobbleGen extends ItemUpgradeBase
             {
                 //Cobble Gen Updates once per 20 ticks (to help prevent lag)
                 if (world.getGameTime()%20 == 0) {
-                    int intSpawnRate = getCobbleGenSpawnRate(coinInPedestal);
-                    int speedMultiplier = (int)(20/speed);
-                    int addAmount = intSpawnRate * speedMultiplier;
                     if(availableCobbleStorageSpace(pedestal)>0)
                     {
+                        int intSpawnRate = getCobbleGenSpawnRate(coinInPedestal);
+                        int speedMultiplier = (int)(20/speed);
+                        int addAmount = intSpawnRate * speedMultiplier;
                         int cobbleToAdd = addCobble(pedestal,addAmount,true);
                         if(cobbleToAdd==0)
                         {

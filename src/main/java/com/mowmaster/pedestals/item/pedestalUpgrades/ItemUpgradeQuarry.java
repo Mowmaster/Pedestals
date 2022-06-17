@@ -146,7 +146,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
     @Override
     public int getOperationSpeed(ItemStack stack)
     {
-        int intOperationalSpeed = 128;
+        int intOperationalSpeed;
         switch (intOperationalSpeedModifier(stack))
         {
             case 0:
@@ -202,8 +202,9 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
 
             BlockState pedestalState = world.getBlockState(pedestalPos);
             Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
+            int height = (enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST) ? (rangeHeight - 1) : (rangeHeight);
+            BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth, height);
+            BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth, height);
 
             if(world.isAreaLoaded(negNums,posNums))
             {

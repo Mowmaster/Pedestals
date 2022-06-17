@@ -1,15 +1,21 @@
 package com.mowmaster.pedestals.util;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.Dynamic;
 import com.mowmaster.pedestals.tiles.PedestalTileEntity;
+import net.minecraft.block.PortalInfo;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.ServerRecipeBook;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.GameType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
 
@@ -70,4 +76,20 @@ public class PedestalFakePlayer extends FakePlayer
     protected void playEquipSound(ItemStack stack) {
         //do nothing
     }
+
+    @Override
+    protected void func_205734_a(ServerWorld worldIn) {
+        this.moveToBlockPosAndAngles(worldIn.getSpawnPoint(), 0.0F, 0.0F);
+//
+//        while(!worldIn.hasNoCollisions(this) && this.getPosY() < 255.0D) {
+//            this.setPosition(this.getPosX(), this.getPosY() + 1.0D, this.getPosZ());
+//        }
+    }
+
+    @Override
+    protected Brain<?> createBrain(Dynamic<?> p_213364_1_) {
+        return null;
+    }
+
+
 }
