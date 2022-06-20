@@ -192,21 +192,11 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         if(cap.isPresent())
         {
             IItemHandler handler = cap.orElse(null);
-            if(handler != null)
-            {
-                int range = handler.getSlots();
+            int range = handler.getSlots();
 
-                ItemStack itemFromInv = ItemStack.EMPTY;
-                itemFromInv = IntStream.range(0,range)//Int Range
-                        .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
-                        .filter(itemStack -> !itemStack.isEmpty())
-                        .findFirst().orElse(ItemStack.EMPTY);
-
-                if(!itemFromInv.isEmpty())
-                {
-                    return false;
-                }
-            }
+            return !IntStream.range(0,range)//Int Range
+                    .mapToObj((handler)::getStackInSlot)//Function being applied to each interval
+                    .anyMatch(itemStack -> !itemStack.isEmpty());
         }
         return true;
     }
@@ -1113,7 +1103,8 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         int range = 0;
         if(hasEnchant(stack))
         {
-            range = (EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack) > 5)?(5):(EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack));
+            int lvl = EnchantmentHelper.getEnchantmentLevel(EnchantmentRegistry.RANGE,stack);
+            range = Math.min(lvl, 5);
         }
         return range;
     }
@@ -1124,12 +1115,14 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         return  ((getRangeModifier(stack)*2)+3);
     }
     //Based on old 16 block max
+//    private Integer lastRange = null;
+//    private ItemStack lastCoin = ItemStack.EMPTY;
     public int getRangeSmall(ItemStack stack)
     {
         int rangeOver = getRangeModifier(stack);
-        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):((rangeOver>5)?(5):(rangeOver));
+        int advancedAllowed = (hasAdvancedInventoryTargeting(stack))?(rangeOver):(Math.min(rangeOver, 5));
 
-        int height = 1;
+        int height;
         switch (advancedAllowed)
         {
             case 0:
@@ -1153,7 +1146,7 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
             default: height=((advancedAllowed*4)-4);
         }
 
-        return  height;
+        return height;
     }
     //Based on old 32 block max
     public int getRangeMedium(ItemStack stack)
@@ -1472,24 +1465,7 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         BlockState state = world.getBlockState(posOfPedestal);
 
         Direction enumfacing = (state.hasProperty(FACING))?(state.get(FACING)):(Direction.UP);
-        BlockPos blockBelow = posOfPedestal;
-        switch (enumfacing)
-        {
-            case UP:
-                return blockBelow.add(0,-numBelow,0);
-            case DOWN:
-                return blockBelow.add(0,numBelow,0);
-            case NORTH:
-                return blockBelow.add(0,0,numBelow);
-            case SOUTH:
-                return blockBelow.add(0,0,-numBelow);
-            case EAST:
-                return blockBelow.add(-numBelow,0,0);
-            case WEST:
-                return blockBelow.add(numBelow,0,0);
-            default:
-                return blockBelow;
-        }
+        return posOfPedestal.offset(enumfacing.getOpposite(), numBelow);
     }
 
     public BlockPos getNegRangePos(World world, BlockPos posOfPedestal, int intWidth, int intHeight)
@@ -1579,33 +1555,32 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
+        if (
+                blockToMine.isAir(blockToMineState, world, blockToMinePos)
+                        || blockToMine instanceof PedestalBlock
+                        || blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock
+                        || blockToMineState.getBlockHardness(world, blockToMinePos) == -1.0F
+                        || BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist")).contains(blockToMine)
+                        || (BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced")).contains(blockToMine)
+                                && !hasAdvancedInventoryTargeting(coinInPedestal)
+                )
+        ) {
+            return false;
+        }
+
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
         FakePlayer fakePlayer = fakePedestalPlayer(pedestal).get();
-        if(fakePlayer !=null)
-        {
-            fakePlayer.setSilent(true);
-            if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
-            if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,pickaxe);
-            ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
-            ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
-            //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
-            boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
-
-
-            if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
-                    && !(blockToMine instanceof PedestalBlock)
-                    && passesFilter(world, pedestalPos, blockToMine)
-                    && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
-                    && ForgeHooks.canHarvestBlock(blockToMineState,fakePlayer,world,blockToMinePos)
-                    && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                    && !BLACKLIST.contains(blockToMine)
-                    && advanced)
-            {
-                return true;
-            }
+        if (fakePlayer == null) {
+            return false;
         }
-        return false;
+        fakePlayer.setSilent(true);
+        if(!fakePlayer.getPosition().equals(new BlockPos(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))) {fakePlayer.setPosition(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());}
+        if(!doItemsMatch(fakePlayer.getHeldItemMainhand(),pickaxe))fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND,pickaxe);
+        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
+
+        return passesFilter(world, pedestalPos, blockToMine)
+                && ForgeHooks.canHarvestBlock(blockToMineState, fakePlayer, world, blockToMinePos);
     }
 
     public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
@@ -1617,33 +1592,29 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
     {
         World world = pedestal.getWorld();
         BlockPos pedestalPos = pedestal.getPos();
-        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         BlockState blockToMineState = world.getBlockState(blockToMinePos);
         Block blockToMine = blockToMineState.getBlock();
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        if (
+                blockToMine.isAir(blockToMineState, world, blockToMinePos)
+                        || blockToMine instanceof PedestalBlock
+                        || blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock
+                        || blockToMineState.getBlockHardness(world, blockToMinePos) == -1.0F
+                        || BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist")).contains(blockToMine)
+                        || (BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced")).contains(blockToMine)
+                        && !hasAdvancedInventoryTargeting(coinInPedestal)
+                )
+        ) {
+            return false;
+        }
+
         ItemStack pickaxe = (pedestal.hasTool())?(pedestal.getToolOnPedestal()):(new ItemStack(Items.DIAMOND_PICKAXE,1));
         ToolType tool = blockToMineState.getHarvestTool();
         player.setPosition(pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ());
         if(!doItemsMatch(player.getHeldItemMainhand(),pickaxe))player.setItemStackToSlot(EquipmentSlotType.MAINHAND,pickaxe);
 
-        ITag<Block> ADVANCED = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/advanced"));
-        ITag<Block> BLACKLIST = BlockTags.getCollection().get(new ResourceLocation("pedestals", "quarry/blacklist"));
-        //IF block is in advanced, check to make sure the coin has advanced (Y=true N=false), otherwise its fine;
-        boolean advanced = (ADVANCED.contains(blockToMine))?((hasAdvancedInventoryTargeting(coinInPedestal))?(true):(false)):(true);
-
-
-        if(!blockToMine.isAir(blockToMineState,world,blockToMinePos)
-                && !(blockToMine instanceof PedestalBlock)
-                && passesFilter(world, pedestalPos, blockToMine)
-                && !(blockToMine instanceof IFluidBlock || blockToMine instanceof FlowingFluidBlock)
-                && ForgeHooks.canHarvestBlock(blockToMineState,player,world,blockToMinePos)
-                && blockToMineState.getBlockHardness(world, blockToMinePos) != -1.0F
-                && !BLACKLIST.contains(blockToMine)
-                && advanced)
-        {
-            return true;
-        }
-
-        return false;
+        return passesFilter(world, pedestalPos, blockToMine)
+                && ForgeHooks.canHarvestBlock(blockToMineState, player, world, blockToMinePos);
     }
 
     public ItemStack getToolDefaultEnchanted(ItemStack coinInPedestal, ItemStack tool)
@@ -2243,7 +2214,6 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
                 int[] xval = getCompound.getIntArray("workqueueposx");
                 return xval.length;
             }
-
         }
 
         return workQueueSize;
@@ -2257,8 +2227,9 @@ public class ItemUpgradeBase extends Item implements IUpgradeBase {
         ItemStack pickaxe = pedestal.getToolOnPedestal();
         BlockState pedestalState = world.getBlockState(pedestalPos);
         Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
-        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(height-1):(height));
+        int rangeHeight = (enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST) ? (height - 1) : (height);
+        BlockPos negNums = getNegRangePosEntity(world,pedestalPos,width, rangeHeight);
+        BlockPos posNums = getPosRangePosEntity(world,pedestalPos,width, rangeHeight);
         FakePlayer fakePlayer =  fakePedestalPlayer(pedestal).get();
         if(fakePlayer !=null)
         {

@@ -36,9 +36,10 @@ import static com.mowmaster.pedestals.pedestals.PEDESTALS_TAB;
 import static com.mowmaster.pedestals.references.Reference.MODID;
 import static net.minecraft.state.properties.BlockStateProperties.FACING;
 
-public class ItemUpgradeEffectGrower extends ItemUpgradeBase
-{
-    public ItemUpgradeEffectGrower(Properties builder) {super(builder.group(PEDESTALS_TAB));}
+public class ItemUpgradeEffectGrower extends ItemUpgradeBase {
+    public ItemUpgradeEffectGrower(Properties builder) {
+        super(builder.group(PEDESTALS_TAB));
+    }
 
     @Override
     public boolean canAcceptArea() {
@@ -55,160 +56,138 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         return true;
     }
 
-    public int getAreaWidth(ItemStack stack)
-    {
+    public int getAreaWidth(ItemStack stack) {
         int areaWidth = 0;
         int aW = getAreaModifier(stack);
-        areaWidth = ((aW)+1);
-        return  areaWidth;
+        areaWidth = ((aW) + 1);
+        return areaWidth;
     }
 
-    public int getHeight(ItemStack stack)
-    {
-        return  getRangeTiny(stack);
+    public int getHeight(ItemStack stack) {
+        return getRangeTiny(stack);
     }
 
     @Override
-    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin)
-    {
+    public int getWorkAreaX(World world, BlockPos pos, ItemStack coin) {
         return getAreaWidth(coin);
     }
 
     @Override
-    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin)
-    {
-        return new int[]{getHeight(coin),0};
+    public int[] getWorkAreaY(World world, BlockPos pos, ItemStack coin) {
+        return new int[]{getHeight(coin), 0};
     }
 
     @Override
-    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin)
-    {
+    public int getWorkAreaZ(World world, BlockPos pos, ItemStack coin) {
         return getAreaWidth(coin);
     }
 
     @Override
-    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos)
-    {
-        int intItem=0;
+    public int getComparatorRedstoneLevel(World worldIn, BlockPos pos) {
+        int intItem = 0;
         TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if(tileEntity instanceof PedestalTileEntity) {
+        if (tileEntity instanceof PedestalTileEntity) {
             PedestalTileEntity pedestal = (PedestalTileEntity) tileEntity;
             ItemStack coin = pedestal.getCoinOnPedestal();
             int amount = workQueueSize(coin);
             int area = workQueueTwoSize(coin);
-            if(amount>0)
-            {
-                float f = (float)amount/(float)area;
-                intItem = MathHelper.floor(f*14.0F)+1;
+            if (amount > 0) {
+                float f = (float) amount / (float) area;
+                intItem = MathHelper.floor(f * 14.0F) + 1;
             }
         }
 
         return intItem;
     }
 
-    public void updateAction(World world, PedestalTileEntity pedestal)
-    {
-        if(!world.isRemote)
-        {
-            ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+    public void updateAction(World world, PedestalTileEntity pedestal) {
+        if (world.isRemote) {
+            return;
+        }
+
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
+
+        int rangeWidth = getAreaWidth(coinInPedestal);
+        int rangeHeight = getHeight(coinInPedestal);
+        BlockState pedestalState = world.getBlockState(pedestalPos);
+        Direction enumfacing = (pedestalState.hasProperty(FACING)) ? (pedestalState.get(FACING)) : (Direction.UP);
+        BlockPos negNums = getNegRangePosEntity(world, pedestalPos, rangeWidth, (enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST) ? (rangeHeight - 1) : (rangeHeight));
+        BlockPos posNums = getPosRangePosEntity(world, pedestalPos, rangeWidth, (enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST) ? (rangeHeight - 1) : (rangeHeight));
+
+        if (!world.isAreaLoaded(negNums, posNums)) {
+            return;
+        }
+
+        int val = readStoredIntTwoFromNBT(coinInPedestal);
+        if (val > 0) {
+            writeStoredIntTwoToNBT(coinInPedestal, val - 1);
+        } else {
+            if (pedestal.isPedestalBlockPowered(world, pedestalPos)) {
+                return;
+            }
+
             ItemStack itemInPedestal = pedestal.getItemInPedestal();
-            BlockPos pedestalPos = pedestal.getPos();
-
-            if(!pedestal.isPedestalBlockPowered(world,pedestalPos))
-            {
-                int rangeWidth = getAreaWidth(coinInPedestal);
-                int rangeHeight = getHeight(coinInPedestal);
-                BlockState pedestalState = world.getBlockState(pedestalPos);
-                Direction enumfacing = (pedestalState.hasProperty(FACING))?(pedestalState.get(FACING)):(Direction.UP);
-                BlockPos negNums = getNegRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-                BlockPos posNums = getPosRangePosEntity(world,pedestalPos,rangeWidth,(enumfacing == Direction.NORTH || enumfacing == Direction.EAST || enumfacing == Direction.SOUTH || enumfacing == Direction.WEST)?(rangeHeight-1):(rangeHeight));
-
-                if(world.isAreaLoaded(negNums,posNums))
-                {
-                    int speed = getOperationSpeed(coinInPedestal);
-
-                    //Wont Magnet anything
-
-                    int val = readStoredIntTwoFromNBT(coinInPedestal);
-                    if(val>0)
-                    {
-                        writeStoredIntTwoToNBT(coinInPedestal,val-1);
-                    }
-                    else {
-                        //If work queue doesnt exist, try to make one
-                        if(workQueueSize(coinInPedestal)<=0)
-                        {
-                            buildWorkQueue(pedestal,rangeWidth,rangeHeight);
-                            buildWorkQueueTwo(pedestal,rangeWidth,rangeHeight);
-                            //Update pedestal if no items are present so that the comparator will update for the passive mode
-                            if(itemInPedestal.isEmpty()) {pedestal.update();}
-                        }
-
-                        if(workQueueSize(coinInPedestal) > 0)
-                        {
-                            List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
-                            if (world.getGameTime() % speed == 0) {
-                                for(int i = 0;i< workQueue.size(); i++)
-                                {
-                                    BlockPos targetPos = workQueue.get(i);
-                                    BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-                                    BlockState targetBlock = world.getBlockState(blockToMinePos);
-                                    if(canMineBlock(pedestal,blockToMinePos))
-                                    {
-                                        workQueue.remove(i);
-                                        writeWorkQueueToNBT(coinInPedestal,workQueue);
-                                        upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, pedestalPos, targetPos, targetBlock);
-                                        if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
-                                    }
-                                    else
-                                    {
-                                        workQueue.remove(i);
-                                    }
-                                }
-                                writeWorkQueueToNBT(coinInPedestal,workQueue);
-                            }
-                        }
-                        else {
-                            //5 second cooldown
-                            writeStoredIntTwoToNBT(coinInPedestal,100);
-                        }
-                    }
+            //If work queue doesnt exist, try to make one
+            if (workQueueSize(coinInPedestal) <= 0) {
+                buildWorkQueue(pedestal, rangeWidth, rangeHeight);
+                buildWorkQueueTwo(pedestal, rangeWidth, rangeHeight);
+                //Update pedestal if no items are present so that the comparator will update for the passive mode
+                if (itemInPedestal.isEmpty()) {
+                    pedestal.update();
                 }
+            }
+
+            List<BlockPos> workQueue = readWorkQueueFromNBT(coinInPedestal);
+            if (!workQueue.isEmpty()) {
+                int speed = getOperationSpeed(coinInPedestal);
+                if (world.getGameTime() % speed == 0) {
+                    for (int i = 0; i < workQueue.size(); i++) {
+                        BlockPos targetPos = workQueue.get(i);
+                        BlockPos blockToMinePos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+                        BlockState targetBlock = world.getBlockState(blockToMinePos);
+                        workQueue.remove(0);
+                        if (canMineBlock(pedestal, blockToMinePos)) {
+                            writeWorkQueueToNBT(coinInPedestal, workQueue);
+                            upgradeAction(pedestal, world, itemInPedestal, coinInPedestal, pedestalPos, targetPos, targetBlock);
+                            if (!hasAdvancedInventoryTargetingTwo(coinInPedestal)) break;
+                        }
+                    }
+                    writeWorkQueueToNBT(coinInPedestal, workQueue);
+                }
+            } else {
+                //5 second cooldown
+                writeStoredIntTwoToNBT(coinInPedestal, 100);
             }
         }
     }
 
-    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target)
-    {
+    public void upgradeAction(PedestalTileEntity pedestal, World world, ItemStack itemInPedestal, ItemStack coinInPedestal, BlockPos posOfPedestal, BlockPos posTarget, BlockState target) {
         ServerWorld sworld = world.getServer().getWorld(world.getDimensionKey());
         ItemStack bonemeal = new ItemStack(Items.BONE_MEAL);
         Random rand = new Random();
 
-        if(target.getBlock() instanceof IGrowable || target.getBlock() instanceof IPlantable)
-        {
+        if (target.getBlock() instanceof IGrowable || target.getBlock() instanceof IPlantable) {
             if (target.getBlock() instanceof IGrowable) {
-                if(((IGrowable) target.getBlock()).canGrow(world,posTarget,target,false))
-                {
-                    if(doItemsMatch(itemInPedestal,bonemeal))
-                    {
-                        ((IGrowable) target.getBlock()).grow(sworld,rand,posTarget,target);
+                if (((IGrowable) target.getBlock()).canGrow(world, posTarget, target, false)) {
+                    if (doItemsMatch(itemInPedestal, bonemeal)) {
+                        ((IGrowable) target.getBlock()).grow(sworld, rand, posTarget, target);
                         TileEntity pedestalInv = world.getTileEntity(posOfPedestal);
-                        if(pedestalInv instanceof PedestalTileEntity) {
+                        if (pedestalInv instanceof PedestalTileEntity) {
                             ((PedestalTileEntity) pedestalInv).removeItem(1);
-                            if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),0,255,0));
+                            if (!pedestal.hasParticleDiffuser())
+                                PacketHandler.sendToNearby(world, posOfPedestal, new PacketParticles(PacketParticles.EffectType.ANY_COLOR, posTarget.getX(), posTarget.getY(), posTarget.getZ(), 0, 255, 0));
                         }
-                    }
-                    else
-                    {
-                        if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,255,255));
+                    } else {
+                        if (!pedestal.hasParticleDiffuser())
+                            PacketHandler.sendToNearby(world, posOfPedestal, new PacketParticles(PacketParticles.EffectType.ANY_COLOR, posTarget.getX(), posTarget.getY(), posTarget.getZ(), 255, 255, 255));
                         target.randomTick(sworld, posTarget, rand);
                         world.notifyBlockUpdate(posTarget, target, target, 2);
                     }
                 }
-            }
-            else
-            {
-                if(!pedestal.hasParticleDiffuser())PacketHandler.sendToNearby(world,posOfPedestal,new PacketParticles(PacketParticles.EffectType.ANY_COLOR,posTarget.getX(),posTarget.getY(),posTarget.getZ(),255,255,255));
+            } else {
+                if (!pedestal.hasParticleDiffuser())
+                    PacketHandler.sendToNearby(world, posOfPedestal, new PacketParticles(PacketParticles.EffectType.ANY_COLOR, posTarget.getX(), posTarget.getY(), posTarget.getZ(), 255, 255, 255));
                 target.randomTick(sworld, posTarget, rand);
                 world.notifyBlockUpdate(posTarget, target, target, 2);
             }
@@ -217,15 +196,13 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
     //Blocks That Can Be Bonemealed
     @Override
-    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player)
-    {
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos, PlayerEntity player) {
         World world = pedestal.getWorld();
         BlockPos targetPos = blockToMinePos;
         BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
         Block blockToGrow = blockToGrowState.getBlock();
-        if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
-        {
+        if (blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable) {
             if (blockToGrow instanceof IGrowable) {
                 if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
                     return true;
@@ -235,16 +212,15 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
         return false;
     }
+
     @Override
-    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos)
-    {
+    public boolean canMineBlock(PedestalTileEntity pedestal, BlockPos blockToMinePos) {
         World world = pedestal.getWorld();
         BlockPos targetPos = blockToMinePos;
         BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
         Block blockToGrow = blockToGrowState.getBlock();
-        if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
-        {
+        if (blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable) {
             if (blockToGrow instanceof IGrowable) {
                 if (((IGrowable) blockToGrow).canGrow(world, targetPos, blockToGrowState, false)) {
                     return true;
@@ -257,15 +233,13 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
 
     //All Possible Crops In Area
     @Override
-    public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos)
-    {
+    public boolean canMineBlockTwo(PedestalTileEntity pedestal, BlockPos blockToMinePos) {
         World world = pedestal.getWorld();
         BlockPos targetPos = blockToMinePos;
         BlockPos blockToGrowPos = new BlockPos(targetPos.getX(), targetPos.getY(), targetPos.getZ());
         BlockState blockToGrowState = world.getBlockState(blockToGrowPos);
         Block blockToGrow = blockToGrowState.getBlock();
-        if(blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable)
-        {
+        if (blockToGrow instanceof IGrowable || blockToGrow instanceof IPlantable) {
             return true;
         }
 
@@ -273,15 +247,14 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     }
 
     @Override
-    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal)
-    {
+    public void chatDetails(PlayerEntity player, PedestalTileEntity pedestal) {
         ItemStack stack = pedestal.getCoinOnPedestal();
 
         TranslationTextComponent name = new TranslationTextComponent(getTranslationKey() + ".tooltip_name");
         name.mergeStyle(TextFormatting.GOLD);
         player.sendMessage(name, Util.DUMMY_UUID);
         int s3 = getAreaWidth(stack);
-        String tr = "" + (s3+s3+1) + "";
+        String tr = "" + (s3 + s3 + 1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".chat_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".chat_areax");
         area.appendString(tr);
@@ -290,18 +263,18 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
         area.appendString(areax.getString());
         area.appendString(tr);
         area.mergeStyle(TextFormatting.WHITE);
-        player.sendMessage(area,Util.DUMMY_UUID);
+        player.sendMessage(area, Util.DUMMY_UUID);
 
         TranslationTextComponent btm = new TranslationTextComponent(getTranslationKey() + ".chat_btm");
         btm.appendString("" + workQueueSize(stack) + "");
         btm.mergeStyle(TextFormatting.YELLOW);
-        player.sendMessage(btm,Util.DUMMY_UUID);
+        player.sendMessage(btm, Util.DUMMY_UUID);
 
         //Display Speed Last Like on Tooltips
         TranslationTextComponent speed = new TranslationTextComponent(getTranslationKey() + ".chat_speed");
         speed.appendString(getOperationSpeedString(stack));
         speed.mergeStyle(TextFormatting.RED);
-        player.sendMessage(speed,Util.DUMMY_UUID);
+        player.sendMessage(speed, Util.DUMMY_UUID);
     }
 
     @Override
@@ -309,7 +282,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         int s3 = getAreaWidth(stack);
-        String tr = "" + (s3+s3+1) + "";
+        String tr = "" + (s3 + s3 + 1) + "";
         TranslationTextComponent area = new TranslationTextComponent(getTranslationKey() + ".tooltip_area");
         TranslationTextComponent areax = new TranslationTextComponent(getTranslationKey() + ".tooltip_areax");
         area.appendString(tr);
@@ -330,8 +303,7 @@ public class ItemUpgradeEffectGrower extends ItemUpgradeBase
     public static final Item GROWER = new ItemUpgradeEffectGrower(new Properties().maxStackSize(64).group(PEDESTALS_TAB)).setRegistryName(new ResourceLocation(MODID, "coin/grower"));
 
     @SubscribeEvent
-    public static void onItemRegistryReady(RegistryEvent.Register<Item> event)
-    {
+    public static void onItemRegistryReady(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(GROWER);
     }
 
