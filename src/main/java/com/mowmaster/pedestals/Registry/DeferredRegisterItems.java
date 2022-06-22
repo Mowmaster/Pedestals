@@ -84,42 +84,42 @@ public class DeferredRegisterItems
 
 
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T1_CAPACITY = ITEMS.register("augment_pedestal_t1_capacity",
-            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t1CapacityItem.get(),PedestalConfig.COMMON.augment_t1CapacityFluid.get(),PedestalConfig.COMMON.augment_t1CapacityEnergy.get(),PedestalConfig.COMMON.augment_t1CapacityXp.get(),PedestalConfig.COMMON.augment_t1CapacityInsertSize.get()));
+            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T2_CAPACITY = ITEMS.register("augment_pedestal_t2_capacity",
-            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t2CapacityItem.get(),PedestalConfig.COMMON.augment_t2CapacityFluid.get(),PedestalConfig.COMMON.augment_t2CapacityEnergy.get(),PedestalConfig.COMMON.augment_t2CapacityXp.get(),PedestalConfig.COMMON.augment_t2CapacityInsertSize.get()));
+            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T3_CAPACITY = ITEMS.register("augment_pedestal_t3_capacity",
-            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t3CapacityItem.get(),PedestalConfig.COMMON.augment_t3CapacityFluid.get(),PedestalConfig.COMMON.augment_t3CapacityEnergy.get(),PedestalConfig.COMMON.augment_t3CapacityXp.get(),PedestalConfig.COMMON.augment_t3CapacityInsertSize.get()));
+            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_CAPACITY = ITEMS.register("augment_pedestal_t4_capacity",
-            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4CapacityItem.get(),PedestalConfig.COMMON.augment_t4CapacityFluid.get(),PedestalConfig.COMMON.augment_t4CapacityEnergy.get(),PedestalConfig.COMMON.augment_t4CapacityXp.get(),PedestalConfig.COMMON.augment_t4CapacityInsertSize.get()));
+            () -> new AugmentTieredCapacity(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
     //Increases storage, stacks, and max amount for fluids, energy, and xp
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T1_STORAGE = ITEMS.register("augment_pedestal_t1_storage",
-            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t1StorageItem.get(),PedestalConfig.COMMON.augment_t1StorageFluid.get(),PedestalConfig.COMMON.augment_t1StorageEnergy.get(),PedestalConfig.COMMON.augment_t1StorageXp.get(),PedestalConfig.COMMON.augment_t1StorageInsertSize.get()));
+            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T2_STORAGE = ITEMS.register("augment_pedestal_t2_storage",
-            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t2StorageItem.get(),PedestalConfig.COMMON.augment_t2StorageFluid.get(),PedestalConfig.COMMON.augment_t2StorageEnergy.get(),PedestalConfig.COMMON.augment_t2StorageXp.get(),PedestalConfig.COMMON.augment_t2StorageInsertSize.get()));
+            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T3_STORAGE = ITEMS.register("augment_pedestal_t3_storage",
-            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t3StorageItem.get(),PedestalConfig.COMMON.augment_t3StorageFluid.get(),PedestalConfig.COMMON.augment_t3StorageEnergy.get(),PedestalConfig.COMMON.augment_t3StorageXp.get(),PedestalConfig.COMMON.augment_t3StorageInsertSize.get()));
+            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_STORAGE = ITEMS.register("augment_pedestal_t4_storage",
-            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4StorageItem.get(),PedestalConfig.COMMON.augment_t4StorageFluid.get(),PedestalConfig.COMMON.augment_t4StorageEnergy.get(),PedestalConfig.COMMON.augment_t4StorageXp.get(),PedestalConfig.COMMON.augment_t4StorageInsertSize.get()));
+            () -> new AugmentTieredStorage(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T1_SPEED = ITEMS.register("augment_pedestal_t1_speed",
-            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t1SpeedReduction.get(),PedestalConfig.COMMON.augment_t1SpeedInsertable.get()));
+            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T2_SPEED = ITEMS.register("augment_pedestal_t2_speed",
-            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t2SpeedReduction.get(),PedestalConfig.COMMON.augment_t2SpeedInsertable.get()));
+            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T3_SPEED = ITEMS.register("augment_pedestal_t3_speed",
-            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t3SpeedReduction.get(),PedestalConfig.COMMON.augment_t3SpeedInsertable.get()));
+            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_SPEED = ITEMS.register("augment_pedestal_t4_speed",
-            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4SpeedReduction.get(),PedestalConfig.COMMON.augment_t4SpeedInsertable.get()));
+            () -> new AugmentTieredSpeed(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T1_RANGE = ITEMS.register("augment_pedestal_t1_range",
-            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t1RangeIncrease.get(),PedestalConfig.COMMON.augment_t1RangeInsertable.get()));
+            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T2_RANGE = ITEMS.register("augment_pedestal_t2_range",
-            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t2RangeIncrease.get(),PedestalConfig.COMMON.augment_t2RangeInsertable.get()));
+            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T3_RANGE = ITEMS.register("augment_pedestal_t3_range",
-            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t3RangeIncrease.get(),PedestalConfig.COMMON.augment_t3RangeInsertable.get()));
+            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_RANGE = ITEMS.register("augment_pedestal_t4_range",
-            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), PedestalConfig.COMMON.augment_t4RangeIncrease.get(),PedestalConfig.COMMON.augment_t4RangeInsertable.get()));
+            () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
     public static void register(IEventBus eventBus) {

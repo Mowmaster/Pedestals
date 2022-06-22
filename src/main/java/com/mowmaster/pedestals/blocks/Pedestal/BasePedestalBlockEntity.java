@@ -1393,7 +1393,7 @@ public class BasePedestalBlockEntity extends BlockEntity
             IItemHandler ph = privateHandler.orElse(null);
             ItemStack itemFromBlock = speedAugment.copy();
             itemFromBlock.setCount(1);
-            if(getSpeed() < speedStack.getAllowedInsertAmount())
+            if(getSpeed() < speedStack.getAllowedInsertAmount(speedAugment.getItem()))
             {
                 ph.insertItem(7,itemFromBlock,false);
                 //update();
@@ -1452,14 +1452,14 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(speedAugment.getItem() instanceof AugmentTieredSpeed speedStack)
         {
             //Check to see if any can be insert
-            if(speedStack.getAllowedInsertAmount()<=0) return false;
+            if(speedStack.getAllowedInsertAmount(speedAugment.getItem())<=0) return false;
 
             if(hasSpeed())
             {
                 //Check to see if stacks to be insert match
                 if(!speedAugment.getItem().equals(getSpeedStack().getItem()))return false;
                 //Check to see if more can be insert
-                if(getSpeed() >= speedStack.getAllowedInsertAmount()) return false;
+                if(getSpeed() >= speedStack.getAllowedInsertAmount(speedAugment.getItem())) return false;
 
                 return true;
             }
@@ -1474,7 +1474,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentSpeed = getSpeedStack();
         if(augmentSpeed.getItem() instanceof AugmentTieredSpeed speedStack)
         {
-            return speedStack.getTicksReducedPerItem() * augmentSpeed.getCount();
+            return speedStack.getTicksReducedPerItem(augmentSpeed.getItem()) * augmentSpeed.getCount();
         }
 
         return 0;
@@ -1501,7 +1501,7 @@ public class BasePedestalBlockEntity extends BlockEntity
             IItemHandler ph = privateHandler.orElse(null);
             ItemStack itemFromBlock = capacityAugment.copy();
             itemFromBlock.setCount(1);
-            if(getCapacity() < capacityStack.getAllowedInsertAmount())
+            if(getCapacity() < capacityStack.getAllowedInsertAmount(capacityAugment.getItem()))
             {
                 ph.insertItem(8,itemFromBlock,false);
                 //update();
@@ -1560,14 +1560,14 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(capacityAugment.getItem() instanceof AugmentTieredCapacity capacityStack)
         {
             //Check to see if any can be insert
-            if(capacityStack.getAllowedInsertAmount()<=0) return false;
+            if(capacityStack.getAllowedInsertAmount(capacityAugment.getItem())<=0) return false;
 
             if(hasCapacity())
             {
                 //Check to see if stacks to be insert match
                 if(!capacityAugment.getItem().equals(getCapacityStack().getItem()))return false;
                 //Check to see if more can be insert
-                if(getCapacity() >= capacityStack.getAllowedInsertAmount()) return false;
+                if(getCapacity() >= capacityStack.getAllowedInsertAmount(capacityAugment.getItem())) return false;
 
                 return true;
             }
@@ -1582,7 +1582,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentCapacity = getCapacityStack();
         if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
         {
-            return capacityStack.getAdditionalItemTransferRatePerItem() * augmentCapacity.getCount();
+            return capacityStack.getAdditionalItemTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
         }
 
         return 0;
@@ -1593,7 +1593,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentCapacity = getCapacityStack();
         if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
         {
-            return capacityStack.getAdditionalFluidTransferRatePerItem() * augmentCapacity.getCount();
+            return capacityStack.getAdditionalFluidTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
         }
 
         return 0;
@@ -1604,7 +1604,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentCapacity = getCapacityStack();
         if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
         {
-            return capacityStack.getAdditionalEnergyTransferRatePerItem() * augmentCapacity.getCount();
+            return capacityStack.getAdditionalEnergyTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
         }
 
         return 0;
@@ -1615,7 +1615,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentCapacity = getCapacityStack();
         if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
         {
-            return capacityStack.getAdditionalXpTransferRatePerItem() * augmentCapacity.getCount();
+            return capacityStack.getAdditionalXpTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
         }
 
         return 0;
@@ -1641,7 +1641,7 @@ public class BasePedestalBlockEntity extends BlockEntity
             IItemHandler ph = privateHandler.orElse(null);
             ItemStack itemFromBlock = storageAugment.copy();
             itemFromBlock.setCount(1);
-            if(getStorage() < storageStack.getAllowedInsertAmount())
+            if(getStorage() < storageStack.getAllowedInsertAmount(storageAugment.getItem()))
             {
                 ph.insertItem(9,itemFromBlock,false);
                 //update();
@@ -1700,14 +1700,14 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(storageAugment.getItem() instanceof AugmentTieredStorage storageStack)
         {
             //Check to see if any can be insert
-            if(storageStack.getAllowedInsertAmount()<=0) return false;
+            if(storageStack.getAllowedInsertAmount(storageAugment.getItem())<=0) return false;
 
             if(hasStorage())
             {
                 //Check to see if stacks to be insert match
                 if(!storageAugment.getItem().equals(getStorageStack().getItem()))return false;
                 //Check to see if more can be insert
-                if(getStorage() >= storageStack.getAllowedInsertAmount()) return false;
+                if(getStorage() >= storageStack.getAllowedInsertAmount(storageAugment.getItem())) return false;
 
                 return true;
             }
@@ -1722,7 +1722,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentStorage = getStorageStack();
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
         {
-            return storageStack.getAdditionalItemStoragePerItem() * augmentStorage.getCount();
+            return storageStack.getAdditionalItemStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
         }
 
         return 0;
@@ -1733,7 +1733,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentStorage = getStorageStack();
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
         {
-            return storageStack.getAdditionalFluidStoragePerItem() * augmentStorage.getCount();
+            return storageStack.getAdditionalFluidStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
         }
 
         return 0;
@@ -1744,7 +1744,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentStorage = getStorageStack();
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
         {
-            return storageStack.getAdditionalEnergyStoragePerItem() * augmentStorage.getCount();
+            return storageStack.getAdditionalEnergyStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
         }
 
         return 0;
@@ -1755,7 +1755,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentStorage = getStorageStack();
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
         {
-            return storageStack.getAdditionalXpStoragePerItem() * augmentStorage.getCount();
+            return storageStack.getAdditionalXpStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
         }
 
         return 0;
@@ -1782,7 +1782,7 @@ public class BasePedestalBlockEntity extends BlockEntity
             IItemHandler ph = privateHandler.orElse(null);
             ItemStack itemFromBlock = rangeAugment.copy();
             itemFromBlock.setCount(1);
-            if(getRange() < rangeStack.getAllowedInsertAmount())
+            if(getRange() < rangeStack.getAllowedInsertAmount(rangeAugment.getItem()))
             {
                 ph.insertItem(10,itemFromBlock,false);
                 //update();
@@ -1841,14 +1841,14 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(rangeAugment.getItem() instanceof AugmentTieredRange rangeStack)
         {
             //Check to see if any can be insert
-            if(rangeStack.getAllowedInsertAmount()<=0) return false;
+            if(rangeStack.getAllowedInsertAmount(rangeAugment.getItem())<=0) return false;
 
             if(hasRange())
             {
                 //Check to see if stacks to be insert match
                 if(!rangeAugment.getItem().equals(getRangeStack().getItem()))return false;
                 //Check to see if more can be insert
-                if(getRange() >= rangeStack.getAllowedInsertAmount()) return false;
+                if(getRange() >= rangeStack.getAllowedInsertAmount(rangeAugment.getItem())) return false;
 
                 return true;
             }
@@ -1863,7 +1863,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         ItemStack augmentRange = getRangeStack();
         if(augmentRange.getItem() instanceof AugmentTieredRange rangeStack)
         {
-            return rangeStack.getRangeIncreasePerItem() * augmentRange.getCount();
+            return rangeStack.getRangeIncreasePerItem(augmentRange.getItem()) * augmentRange.getCount();
         }
 
         return 0;

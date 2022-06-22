@@ -1,8 +1,11 @@
 package com.mowmaster.pedestals.Items.Augments;
 
 import com.mowmaster.mowlib.MowLibUtils.TooltipUtils;
+import com.mowmaster.pedestals.Configs.PedestalConfig;
+import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -15,22 +18,26 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 public class AugmentTieredSpeed extends AugmentBase{
 
-    private int ticksReduced;
-    private int allowedToInsert;
-    public AugmentTieredSpeed(Properties p_41383_, int amount, int allowedInsert) {
+    public AugmentTieredSpeed(Properties p_41383_) {
         super(p_41383_);
-        this.ticksReduced = amount;
-        this.allowedToInsert = allowedInsert;
     }
 
-    public int getTicksReducedPerItem()
+    public int getTicksReducedPerItem(Item augment)
     {
-        return ticksReduced;
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T1_SPEED.get()))return PedestalConfig.COMMON.augment_t1SpeedReduction.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T2_SPEED.get()))return PedestalConfig.COMMON.augment_t2SpeedReduction.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T3_SPEED.get()))return PedestalConfig.COMMON.augment_t3SpeedReduction.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T4_SPEED.get()))return PedestalConfig.COMMON.augment_t4SpeedReduction.get();
+        return 0;
     }
 
-    public int getAllowedInsertAmount()
+    public int getAllowedInsertAmount(Item augment)
     {
-        return allowedToInsert;
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T1_SPEED.get()))return PedestalConfig.COMMON.augment_t1SpeedInsertable.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T2_SPEED.get()))return PedestalConfig.COMMON.augment_t2SpeedInsertable.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T3_SPEED.get()))return PedestalConfig.COMMON.augment_t3SpeedInsertable.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T4_SPEED.get()))return PedestalConfig.COMMON.augment_t4SpeedInsertable.get();
+        return 0;
     }
 
     @Override
@@ -45,12 +52,12 @@ public class AugmentTieredSpeed extends AugmentBase{
             colors.add(ChatFormatting.YELLOW);
             listed.add(MODID + ".augments_speed_ticksreduced");
             colors.add(ChatFormatting.WHITE);
-            listed.add(""+speedAugment.getTicksReducedPerItem()+"");
+            listed.add(""+speedAugment.getTicksReducedPerItem(p_41421_.getItem())+"");
 
             colors.add(ChatFormatting.LIGHT_PURPLE);
             listed.add(MODID + ".augments_insertable");
             colors.add(ChatFormatting.GOLD);
-            listed.add(""+speedAugment.getAllowedInsertAmount()+"");
+            listed.add(""+speedAugment.getAllowedInsertAmount(p_41421_.getItem())+"");
 
 
             TooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID+".augments",p_41423_,listed,colors);
