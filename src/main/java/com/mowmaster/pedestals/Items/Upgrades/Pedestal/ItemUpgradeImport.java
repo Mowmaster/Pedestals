@@ -434,7 +434,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
             }
         }
 
-        if(canTransferXP(pedestal.getCoinOnPedestal()))
+        if(canTransferXP(pedestal.getCoinOnPedestal()) && pedestal.canAcceptExperience())
         {
             if (entityIn instanceof Player) {
                 Player player = ((Player) entityIn);
@@ -447,7 +447,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                         int value = removeXp(player, transferRate);
                         if(value > 0)
                         {
-                            pedestal.addExperience( currentlyStoredExp + value,false);
+                            pedestal.addExperience(value,false);
                             if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
                         }
                     }
