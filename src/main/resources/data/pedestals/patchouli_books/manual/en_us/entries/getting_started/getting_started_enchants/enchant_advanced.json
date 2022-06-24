@@ -29,7 +29,7 @@
     {
       "title": "Uses",
       "type": "text",
-      "text": "$(li)Over Leveled Enchants take effect, as in, pedestals enchants level 6+ are more effective overall [but hard limits still apply, like processing items at 64/t is a hard cap, or effecting blocks in world at 1 per tick is another hard cap, storage of xp/energy/fluids/items maxes out at 2147483647 too] Range and Area enchants basically have no limit outside of what you can keep chunkloaded."
+      "text": "$(li)Over Leveled Enchants take effect, as in, pedestals enchants level 6+ are more effective overall [but hard limits still apply, like processing items at 64/t is a hard cap, or effecting blocks in world at 1 per tick is another hard cap, storage of xp/energy/fluids/items maxes out at 2147483647. Range and Area enchants basically have no limit outside of what you can keep chunkloaded."
     },
     {
       "title": "Uses Con.",

@@ -13,7 +13,7 @@
     {
       "title": "Filters (Setup)",
       "type": "text",
-      "text": "Filters can be setup by Crouch + Right Clicking an inventory of items, and Right Clicking in the air to swap Whitelist / Blacklist. See $(l:pedestals:getting_started_filtering/filter_overview)Filter Overview() for more detailed info regarding setup."
+      "text": "Filters can be setup by Crouch + Right Clicking an inventory of items, and Right Clicking in the air to swap Whitelist / Blacklist. See $(l:pedestals:getting_started/getting_started_filtering/filter_overview)Filter Overview$() for more detailed info regarding setup."
     },
     {
       "title": "Filters (Inserting)",
