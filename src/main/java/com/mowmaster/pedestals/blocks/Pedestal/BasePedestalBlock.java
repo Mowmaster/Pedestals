@@ -762,7 +762,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
 
     @Override
     public void playerDestroy(Level p_49827_, Player p_49828_, BlockPos p_49829_, BlockState p_49830_, @Nullable BlockEntity p_49831_, ItemStack p_49832_) {
-        if(!p_49827_.isClientSide())
+        /*if(!p_49827_.isClientSide())
         {
             if (p_49830_.getBlock() instanceof BasePedestalBlock) {
                 if (!p_49827_.isClientSide && !p_49828_.isCreative()) {
@@ -775,7 +775,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     p_49827_.addFreshEntity(itementity);
                 }
             }
-        }
+        }*/
         super.playerDestroy(p_49827_, p_49828_, p_49829_, p_49830_, p_49831_, p_49832_);
         p_49827_.removeBlock(p_49829_,false);
     }
@@ -799,8 +799,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
         if(p_60515_.getBlock() != p_60518_.getBlock())
         {
             BlockEntity blockEntity = p_60516_.getBlockEntity(p_60517_);
-            if(blockEntity instanceof BasePedestalBlockEntity) {
-                BasePedestalBlockEntity pedestal = ((BasePedestalBlockEntity) blockEntity);
+            if(blockEntity instanceof BasePedestalBlockEntity pedestal) {
                 pedestal.dropInventoryItems(p_60516_,p_60517_);
                 pedestal.dropInventoryItemsPrivate(p_60516_,p_60517_);
                 pedestal.dropLiquidsInWorld(p_60516_,p_60517_);
@@ -809,11 +808,12 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
 
                 p_60516_.updateNeighbourForOutputSignal(p_60517_,p_60518_.getBlock());
             }
+            p_60516_.removeBlock(p_60517_,false);
             super.onRemove(p_60515_, p_60516_, p_60517_, p_60518_, p_60519_);
         }
     }
 
-    @Override
+    /*@Override
     public void playerWillDestroy(Level p_56212_, BlockPos p_56213_, BlockState p_56214_, Player p_56215_) {
 
         if(!p_56212_.isClientSide())
@@ -831,7 +831,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
             }
         }
         super.playerWillDestroy(p_56212_, p_56213_, p_56214_, p_56215_);
-    }
+    }*/
 
     @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction direction) {
