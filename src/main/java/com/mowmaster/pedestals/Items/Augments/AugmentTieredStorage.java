@@ -100,7 +100,7 @@ public class AugmentTieredStorage extends AugmentBase{
             listed.add(""+storageAugment.getAllowedInsertAmount(p_41421_.getItem())+"");
 
 
-            TooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID+".augments",p_41423_,listed,colors);
+            TooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID,p_41423_,listed,colors);
         }
     }
 

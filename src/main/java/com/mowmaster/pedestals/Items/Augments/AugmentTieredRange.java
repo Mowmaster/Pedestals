@@ -60,7 +60,7 @@ public class AugmentTieredRange extends AugmentBase{
             listed.add(""+rangeAugment.getAllowedInsertAmount(p_41421_.getItem())+"");
 
 
-            TooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID+".augments",p_41423_,listed,colors);
+            TooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID,p_41423_,listed,colors);
         }
     }
 
