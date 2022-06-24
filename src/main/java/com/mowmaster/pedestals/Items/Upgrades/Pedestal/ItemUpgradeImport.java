@@ -140,13 +140,14 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                     else {
                         if(handler != null)
                         {
-                            int i = getNextSlotWithItemsCapFiltered(pedestal,cap,pedestal.getItemInPedestal());
+                            int i = getNextSlotWithItemsCapFiltered(pedestal,cap);
                             if(i>=0)
                             {
                                 int maxStackSizeAllowedInPedestal = 0;
                                 int roomLeftInPedestal = 0;
                                 itemFromInv = handler.getStackInSlot(i);
-                                ItemStack itemFromPedestal = pedestal.getItemInPedestal();
+                                ItemStack copyIncoming = itemFromInv.copy();
+                                ItemStack itemFromPedestal = pedestal.getMatchingItemInPedestalOrEmptySlot(copyIncoming);
                                 //if there IS a valid item in the inventory to pull out
                                 if(itemFromInv != null && !itemFromInv.isEmpty() && itemFromInv.getItem() != Items.AIR)
                                 {
@@ -155,6 +156,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                                     {maxStackSizeAllowedInPedestal = 64;}
                                     else
                                     {maxStackSizeAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
+
                                     //Get Room left in pedestal
                                     roomLeftInPedestal = maxStackSizeAllowedInPedestal-itemFromPedestal.getCount();
                                     //Get items stack count(from inventory)
@@ -168,16 +170,12 @@ public class ItemUpgradeImport extends ItemUpgradeBase
 
                                     //if(itemFromInv.maxStackSize() < allowedTransferRate) allowedTransferRate = itemFromInv.maxStackSize();
 
-                                    ItemStack copyIncoming = itemFromInv.copy();
-                                    copyIncoming.setCount(allowedTransferRate);
-                                    BlockEntity pedestalInv = world.getBlockEntity(posOfPedestal);
-                                    if(pedestalInv instanceof BasePedestalBlockEntity) {
-                                        if(!handler.extractItem(i,allowedTransferRate ,true ).isEmpty() && ((BasePedestalBlockEntity) pedestalInv).addItem(copyIncoming, true))
-                                        {
-                                            handler.extractItem(i,allowedTransferRate ,false );
-                                            ((BasePedestalBlockEntity) pedestalInv).addItem(copyIncoming, false);
-                                        }
 
+                                    copyIncoming.setCount(allowedTransferRate);
+                                    if(!handler.extractItem(i,allowedTransferRate ,true ).isEmpty() && pedestal.addItem(copyIncoming, true))
+                                    {
+                                        handler.extractItem(i,allowedTransferRate ,false );
+                                        pedestal.addItem(copyIncoming, false);
                                     }
                                 }
                             }

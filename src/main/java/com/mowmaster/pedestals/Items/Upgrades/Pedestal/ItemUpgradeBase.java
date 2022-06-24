@@ -308,7 +308,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
-    public int getNextSlotWithItemsCapFiltered(BasePedestalBlockEntity pedestal, LazyOptional<IItemHandler> cap, ItemStack stackInPedestal)
+    public int getNextSlotWithItemsCapFiltered(BasePedestalBlockEntity pedestal, LazyOptional<IItemHandler> cap)
     {
         AtomicInteger slot = new AtomicInteger(-1);
         if(cap.isPresent()) {
@@ -327,13 +327,14 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                             //If pedestal is empty accept any items
                             if(passesItemFilter(pedestal,stackInSlot))
                             {
-                                if(stackInPedestal.isEmpty())
+                                ItemStack itemFromPedestal = pedestal.getMatchingItemInPedestalOrEmptySlot(stackInSlot);
+                                if(itemFromPedestal.isEmpty())
                                 {
                                     slot.set(i);
                                     break;
                                 }
                                 //if stack in pedestal matches items in slot
-                                else if(doItemsMatch(stackInPedestal,stackInSlot))
+                                else if(doItemsMatch(itemFromPedestal,stackInSlot))
                                 {
                                     slot.set(i);
                                     break;
