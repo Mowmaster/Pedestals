@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:big_dripleaf"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:dripstone_block"
   },
   "energy": 0,
   "experience": 0,

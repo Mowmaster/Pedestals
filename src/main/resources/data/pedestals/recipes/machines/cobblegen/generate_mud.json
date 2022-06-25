@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:muddy_mangrove_roots"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:mud"
   },
   "energy": 0,
   "experience": 0,

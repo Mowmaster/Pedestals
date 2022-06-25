@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:amethyst_block"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:calcite"
   },
   "energy": 0,
   "experience": 0,

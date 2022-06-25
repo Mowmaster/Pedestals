@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:polished_basalt"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:basalt"
   },
   "energy": 0,
   "experience": 0,

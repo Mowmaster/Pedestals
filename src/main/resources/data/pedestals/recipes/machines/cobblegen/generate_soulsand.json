@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:soul_soil"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:soul_sand"
   },
   "energy": 0,
   "experience": 0,

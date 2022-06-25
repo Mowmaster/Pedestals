@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:purpur_block"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:end_stone"
   },
   "energy": 0,
   "experience": 0,

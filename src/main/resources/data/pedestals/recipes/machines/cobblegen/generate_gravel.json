@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:gravel"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:gravel"
   },
   "energy": 0,
   "experience": 0,

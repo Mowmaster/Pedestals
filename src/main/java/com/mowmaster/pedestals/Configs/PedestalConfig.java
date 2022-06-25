@@ -93,9 +93,7 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue augment_t4RangeInsertable;
 
 
-
-
-        public final ForgeConfigSpec.IntValue cobbleGeneratorMultiplier;
+        public final ForgeConfigSpec.BooleanValue cobbleGeneratorDamageTools;
 
 
 
@@ -195,9 +193,9 @@ public class PedestalConfig
 
             builder.comment("Upgrade Machine Configs").push("Upgrade_Machines");
 
-            cobbleGeneratorMultiplier = builder
-                    .comment("Cobble Gen Multiplier")
-                    .defineInRange("genMultiplier", 16, 1, Integer.MAX_VALUE);
+            cobbleGeneratorDamageTools = builder
+                    .comment("Cobble Gen Damages Inserted Tools")
+                    .define("cobbleGenToolDamage",false);
             builder.pop();
         }
     }

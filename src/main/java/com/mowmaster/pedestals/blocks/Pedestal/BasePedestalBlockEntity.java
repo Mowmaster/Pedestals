@@ -11,6 +11,7 @@ import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
+import com.mowmaster.pedestals.Items.Upgrades.IUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -1374,6 +1375,14 @@ public class BasePedestalBlockEntity extends BlockEntity
         }
     }
 
+    public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
+
+        if(pedestal.getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
+        {
+            upgrade.actionOnNeighborBelowChange(pedestal,belowBlock);
+        }
+    }
+
     /*============================================================================
     ==============================================================================
     ===========================       COIN END       =============================
@@ -1910,7 +1919,6 @@ public class BasePedestalBlockEntity extends BlockEntity
 
         if(canInsertTool(itemFromBlock))
         {
-            System.out.println(ph.insertItem(11,itemFromBlock,true));
             ph.insertItem(11,itemFromBlock,false);
             return true;
         }
@@ -1981,13 +1989,29 @@ public class BasePedestalBlockEntity extends BlockEntity
         return getToolMaxDurability() - getToolDurability();
     }
 
+    public boolean repairInsertedTool(int repairAmount, boolean simulate)
+    {
+        if(getDurabilityRemainingOnInsertedTool()<getToolMaxDurability())
+        {
+            if(!simulate)
+            {
+                int newDamageAmount = getToolDurability() - repairAmount;
+                getToolStack().setDamageValue(newDamageAmount);
+                return true;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean damageInsertedTool(int damageAmount, boolean simulate)
     {
         if(getDurabilityRemainingOnInsertedTool()>damageAmount)
         {
             if(!simulate)
             {
-                int newDamageAmount = getToolDurability() - damageAmount;
+                int newDamageAmount = getToolDurability() + damageAmount;
                 getToolStack().setDamageValue(newDamageAmount);
                 return true;
             }

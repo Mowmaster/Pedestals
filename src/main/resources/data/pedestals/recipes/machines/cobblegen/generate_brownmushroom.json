@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:mycelium"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:brown_mushroom_block"
   },
   "energy": 0,
   "experience": 0,

@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:polished_andesite"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:andesite"
   },
   "energy": 0,
   "experience": 0,

@@ -71,6 +71,11 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     }
 
+    @Override
+    public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
+
+    }
+
     /*
      *
      * Methods Runs By Pedestal

@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:spore_blossom"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:moss_block"
   },
   "energy": 0,
   "experience": 0,

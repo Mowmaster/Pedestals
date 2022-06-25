@@ -13,6 +13,7 @@ import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
+import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
@@ -394,6 +395,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 }
                 else if(pedestal.hasTool() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
                 {
+                    pedestal.actionOnNeighborBelowChange(pedestal,getPosOfBlockBelow(p_60499_, p_60501_, 1));
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
                 }
                 else if(pedestal.hasFilter() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_FILTERTOOL.get()))
@@ -629,6 +631,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     {
                         if(pedestal.addTool(p_60506_.getOffhandItem()))
                         {
+                            pedestal.actionOnNeighborBelowChange(pedestal,getPosOfBlockBelow(p_60503_, p_60505_, 1));
                             p_60506_.getOffhandItem().shrink(1);
                             return InteractionResult.SUCCESS;
                         }
@@ -903,6 +906,46 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
             }
         }
 
+    }
+
+    public BlockPos getPosOfBlockBelow(BlockState state, BlockPos posOfPedestal, int numBelow)
+    {
+        Direction enumfacing = (state.hasProperty(FACING))?(state.getValue(FACING)):(Direction.UP);
+        BlockPos blockBelow = posOfPedestal;
+        switch (enumfacing)
+        {
+            case UP:
+                return blockBelow.offset(0,-numBelow,0);
+            case DOWN:
+                return blockBelow.offset(0,numBelow,0);
+            case NORTH:
+                return blockBelow.offset(0,0,numBelow);
+            case SOUTH:
+                return blockBelow.offset(0,0,-numBelow);
+            case EAST:
+                return blockBelow.offset(-numBelow,0,0);
+            case WEST:
+                return blockBelow.offset(numBelow,0,0);
+            default:
+                return blockBelow;
+        }
+    }
+
+    @Override
+    public void neighborChanged(BlockState p_60509_, Level p_60510_, BlockPos p_60511_, Block p_60512_, BlockPos p_60513_, boolean p_60514_) {
+
+        if(!p_60510_.isClientSide())
+        {
+//System.out.println("NEIGHBOR CHECK: "+ p_60513_.equals(getPosOfBlockBelow(p_60509_, p_60511_, 1)));
+            if(p_60513_.equals(getPosOfBlockBelow(p_60509_, p_60511_, 1)))
+            {
+                if(p_60510_.getBlockEntity(p_60511_) instanceof BasePedestalBlockEntity pedestal)
+                {
+                    pedestal.actionOnNeighborBelowChange(pedestal,getPosOfBlockBelow(p_60509_, p_60511_, 1));
+                }
+            }
+        }
+        super.neighborChanged(p_60509_, p_60510_, p_60511_, p_60512_, p_60513_, p_60514_);
     }
 
 

@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:rooted_dirt"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:podzol"
   },
   "energy": 0,
   "experience": 0,

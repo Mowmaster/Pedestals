@@ -1,7 +1,8 @@
-/*
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines;
 
 import com.mowmaster.mowlib.MowLibUtils.ContainerUtils;
+import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
+import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
@@ -21,12 +22,10 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
 
@@ -34,20 +33,18 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
         super(p_41383_);
     }
 
-
-
     public int getCobbleGenSpawnRate(ItemStack stack)
     {
         int capacity = UpgradeUtils.getCapacityOnItem(stack);
-        return (capacity==0)?(1):(capacity*PedestalConfig.COMMON.cobbleGeneratorMultiplier.get());
+        return 1;
     }
 
     @Nullable
     public CobbleGenRecipe getRecipe(Level level, ItemStack stackIn) {
         Container cont = ContainerUtils.getContainer(1);
         cont.setItem(-1,stackIn);
-        List<CobbleGenRecipe> recipes = level.getRecipeManager().getRecipesFor(CobbleGenRecipe.COBBLE_GENERATOR,cont,level);
-        return recipes.size() > 0 ? level.getRecipeManager().getRecipesFor(CobbleGenRecipe.COBBLE_GENERATOR,cont,level).get(0) : null;
+        List<CobbleGenRecipe> recipes = level.getRecipeManager().getRecipesFor(CobbleGenRecipe.Type.INSTANCE,cont,level);
+        return recipes.size() > 0 ? level.getRecipeManager().getRecipesFor(CobbleGenRecipe.Type.INSTANCE,cont,level).get(0) : null;
     }
 
     protected Collection<ItemStack> getGeneratedItem(CobbleGenRecipe recipe) {
@@ -66,29 +63,29 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
         return (recipe == null)?(FluidStack.EMPTY):(recipe.getResultFluidNeeded());
     }
 
-    public ItemStack getItemToGenerate(BasePedestalBlockEntity pedestal, ItemStack blockBelow)
+    public List<ItemStack> getItemToGenerate(BasePedestalBlockEntity pedestal, ItemStack blockBelow)
     {
+        ItemStack getInitialGeneratedItem = ItemStack.EMPTY;
         Level level = pedestal.getLevel();
-        CobbleGenRecipe getRecipeForGeneration = getRecipe(level,blockBelow);
-        ItemStack getInitialGeneratedItem = getGeneratedItem(getRecipeForGeneration).stream().findFirst().get();
+        //ItemStack itemBlockBelow = new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem());
+        if(getRecipe(pedestal.getLevel(),blockBelow) == null)return new ArrayList<>();
+        getInitialGeneratedItem = getGeneratedItem(getRecipe(pedestal.getLevel(),blockBelow)).stream().findFirst().get();
 
         Block generatedBlock = Block.byItem(getInitialGeneratedItem.getItem());
         if(generatedBlock != Blocks.AIR)
         {
-            //TODO: Get tool from pedestal
-            ItemStack getToolFromPedestal = (pedestal.getItemInPedestal().isEmpty())?(new ItemStack(Items.STONE_PICKAXE)):(pedestal.getItemInPedestal());
-            //ItemStack getToolFromPedestal = new ItemStack(Items.STONE_PICKAXE);
+            ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(new ItemStack(Items.STONE_PICKAXE)):(pedestal.getToolStack());
+//System.out.println(getToolFromPedestal);
 
             LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
                     .withRandom(level.random)
                     .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
                     .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
-            List<ItemStack> getPossibleDrops = generatedBlock.defaultBlockState().getDrops(builder);
-            if(getPossibleDrops.size()>0)return getPossibleDrops.get(0);
+            return generatedBlock.defaultBlockState().getDrops(builder);
         }
 
-        return getInitialGeneratedItem;
+        return new ArrayList<>();
     }
 
     @Override
@@ -97,22 +94,103 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
     }
 
     @Override
+    public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
+        //Update Block Below data
+/*System.out.println("UPDATE");
+        ItemStack itemBlockBelow = new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem());
+        getCobbleRecipe = getRecipe(pedestal.getLevel(),itemBlockBelow);
+        getCobbleGenOutput = getItemToGenerate(pedestal, itemBlockBelow);*/
+    }
+
+    @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-        //TODO: get this from the pedestal somehow
-        ItemStack blockBelow = ItemStack.EMPTY;
+        BlockPos pedestalPos = pedestal.getPos();
+        BlockPos posBelow = getPosOfBlockBelow(world,pedestalPos,1);
+        ItemStack itemBlockBelow = new ItemStack(world.getBlockState(posBelow).getBlock().asItem());
+
+        //TODO: Add in Capacity modifier for generation.
+        //int modifier = getCobbleGenSpawnRate(pedestal.getCoinOnPedestal());
 
         Level level = pedestal.getLevel();
-        CobbleGenRecipe getRecipeForGeneration = getRecipe(level,blockBelow);
-        int getEnergyNeeded = getEnergyRequiredForGeneration(getRecipeForGeneration);
-        int getExperienceNeeded = getExperienceRequiredForGeneration(getRecipeForGeneration);
-        FluidStack getFluidStackNeeded = getFluidRequiredForGeneration(getRecipeForGeneration);
+        CobbleGenRecipe getCobbleRecipe = getRecipe(pedestal.getLevel(),itemBlockBelow);;
+        if(getCobbleRecipe == null) getCobbleRecipe = getRecipe(level,itemBlockBelow);
+        if(getCobbleRecipe == null)return;
 
-        System.out.println(getItemToGenerate(pedestal, ItemStack.EMPTY));
+        int getEnergyNeeded = getEnergyRequiredForGeneration(getCobbleRecipe);
+        int getExperienceNeeded = getExperienceRequiredForGeneration(getCobbleRecipe);
+        FluidStack getFluidStackNeeded = getFluidRequiredForGeneration(getCobbleRecipe);
+        boolean fluid = false;
+        boolean energy = false;
+        boolean xp = false;
+
+        if(!getFluidStackNeeded.isEmpty())
+        {
+            if(!pedestal.removeFluid(getFluidStackNeeded, IFluidHandler.FluidAction.SIMULATE).isEmpty())
+            {
+                fluid = true;
+            }
+            else return;
+        }
+
+        if(getEnergyNeeded>0)
+        {
+            if(pedestal.removeEnergy(getEnergyNeeded, true)>0)
+            {
+                energy = true;
+            }
+            else return;
+        }
+
+
+        if(getExperienceNeeded>0)
+        {
+            if(pedestal.removeExperience(getExperienceNeeded, true)>0)
+            {
+                xp = true;
+            }
+            else return;
+        }
+
+        if(PedestalConfig.COMMON.cobbleGeneratorDamageTools.get())
+        {
+            if(pedestal.hasTool())
+            {
+                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                {
+                    if(pedestal.damageInsertedTool(1,true))
+                    {
+                        pedestal.damageInsertedTool(1,false);
+                    }
+                    else
+                    {
+                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ(),255,255,255));
+                        return;
+                    }
+                }
+                else
+                {
+                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ(),255,255,255));
+
+                    return;
+                }
+            }
+        }
+
+        List<ItemStack>getCobbleGenOutput = getItemToGenerate(pedestal,itemBlockBelow);
+        if(getCobbleGenOutput == null)getCobbleGenOutput = getItemToGenerate(pedestal, itemBlockBelow);
+        if(getCobbleGenOutput.size()<=0)return;
+//System.out.println(getCobbleGenOutput);
+        if(fluid)pedestal.removeFluid(getFluidStackNeeded, IFluidHandler.FluidAction.EXECUTE);
+        if(energy)pedestal.removeEnergy(getEnergyNeeded, false);
+        if(xp)pedestal.removeExperience(getExperienceNeeded, false);
+        for (int i=0; i < getCobbleGenOutput.size(); i++)
+        {
+            if(pedestal.addItem(getCobbleGenOutput.get(i), true))pedestal.addItem(getCobbleGenOutput.get(i), false);
+        }
     }
 
     @Override
     public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn) {
-
+        return;
     }
 }
-*/

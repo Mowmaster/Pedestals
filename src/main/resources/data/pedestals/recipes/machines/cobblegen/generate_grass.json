@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:moss"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:grass_block"
   },
   "energy": 0,
   "experience": 0,

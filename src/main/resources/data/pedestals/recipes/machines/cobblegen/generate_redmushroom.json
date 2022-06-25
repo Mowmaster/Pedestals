@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:sculk_catalyst"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:red_mushroom_block"
   },
   "energy": 0,
   "experience": 0,

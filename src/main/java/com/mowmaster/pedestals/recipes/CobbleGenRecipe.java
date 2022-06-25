@@ -1,4 +1,3 @@
-/*
 package com.mowmaster.pedestals.Recipes;
 
 import com.google.gson.JsonObject;
@@ -17,7 +16,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.ObjectHolder;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,10 +25,7 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 public class CobbleGenRecipe implements Recipe<Container>
 {
-    @ObjectHolder(MODID + ":cobblegen")
-    public static RecipeSerializer<?> SERIALIZER = new Serializer();
-
-    public static RecipeType<CobbleGenRecipe> COBBLE_GENERATOR = RecipeType.register(MODID + ":cobblegen");
+    @ObjectHolder(registryName = "forge:recipe_serializer", value = MODID + ":cobblegen")
 
     private final String group;
     private final ResourceLocation id;
@@ -61,7 +56,7 @@ public class CobbleGenRecipe implements Recipe<Container>
 
     public static Collection<CobbleGenRecipe> getAllRecipes(Level world)
     {
-        return world.getRecipeManager().getAllRecipesFor(COBBLE_GENERATOR);
+        return world.getRecipeManager().getAllRecipesFor(CobbleGenRecipe.Type.INSTANCE);
     }
 
     @Override
@@ -125,15 +120,19 @@ public class CobbleGenRecipe implements Recipe<Container>
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer()
-    {
-        return SERIALIZER;
+    public RecipeSerializer<?> getSerializer() {
+        return CobbleGenRecipe.Serializer.INSTANCE;
     }
 
     @Override
-    public RecipeType<?> getType()
-    {
-        return COBBLE_GENERATOR;
+    public RecipeType<?> getType() {
+        return CobbleGenRecipe.Type.INSTANCE;
+    }
+
+    public static class Type implements RecipeType<CobbleGenRecipe> {
+        private Type() { }
+        public static final CobbleGenRecipe.Type INSTANCE = new CobbleGenRecipe.Type();
+        public static final String ID = "cobblegen";
     }
 
     @Override
@@ -159,9 +158,11 @@ public class CobbleGenRecipe implements Recipe<Container>
         return blockBelow != null ? blockBelow : Ingredient.EMPTY;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>
-            implements RecipeSerializer<CobbleGenRecipe>
-    {
+    public static class Serializer implements RecipeSerializer<CobbleGenRecipe> {
+        public static final CobbleGenRecipe.Serializer INSTANCE = new CobbleGenRecipe.Serializer();
+        public static final ResourceLocation ID =
+                new ResourceLocation(MODID,"cobblegen");
+
         protected CobbleGenRecipe createRecipe(ResourceLocation recipeId, String group, Ingredient blockBelow, ItemStack result, @Nullable int energy, @Nullable int experience, @Nullable String fluidName, @Nullable int fluid)
         {
             return new CobbleGenRecipe(recipeId, group, blockBelow, result, energy, experience, fluidName, fluid);
@@ -207,6 +208,23 @@ public class CobbleGenRecipe implements Recipe<Container>
             buffer.writeUtf(recipe.fluidName);
             buffer.writeInt(recipe.fluid);
         }
+
+        public RecipeSerializer<?> setRegistryName(ResourceLocation name) {
+            return INSTANCE;
+        }
+
+        @Nullable
+        public ResourceLocation getRegistryName() {
+            return ID;
+        }
+
+        public Class<RecipeSerializer<?>> getRegistryType() {
+            return CobbleGenRecipe.Serializer.castClass(RecipeSerializer.class);
+        }
+
+        @SuppressWarnings("unchecked") // Need this wrapper, because generics
+        private static <G> Class<G> castClass(Class<?> cls) {
+            return (Class<G>)cls;
+        }
     }
 }
-*/

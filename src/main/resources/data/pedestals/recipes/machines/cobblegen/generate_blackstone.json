@@ -1,10 +1,10 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:stone"
+    "item": "minecraft:gilded_blackstone"
   },
   "result": {
-    "item": "minecraft:stone"
+    "item": "minecraft:blackstone"
   },
   "energy": 0,
   "experience": 0,

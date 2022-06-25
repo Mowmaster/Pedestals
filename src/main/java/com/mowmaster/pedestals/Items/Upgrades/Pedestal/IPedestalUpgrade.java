@@ -15,6 +15,9 @@ public interface IPedestalUpgrade
     void updateAction(Level world, BasePedestalBlockEntity pedestal);
     //Used when Entities Collide with Pedestal
     void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn);
+    //Used When a block below has changed and the upgrade needs to update its behavior
+    void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock);
+
 
     // Check if these can be transferred
     boolean canTransferItems(ItemStack upgrade);
