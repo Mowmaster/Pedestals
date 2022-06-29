@@ -17,6 +17,8 @@ public interface IPedestalUpgrade
     void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn);
     //Used When a block below has changed and the upgrade needs to update its behavior
     void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock);
+    //Used when removed from pedestal, or when pedestal breaks and its dropped.
+    void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal);
 
 
     // Check if these can be transferred

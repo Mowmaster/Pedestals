@@ -391,11 +391,13 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
 
                 if(pedestal.hasCoin() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
                 {
+                    //Method for upgrades to do things before removal
+                    pedestal.actionOnRemovedFromPedestal(1);
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCoin());
                 }
                 else if(pedestal.hasTool() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
                 {
-                    pedestal.actionOnNeighborBelowChange(pedestal,getPosOfBlockBelow(p_60499_, p_60501_, 1));
+                    pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60499_, p_60501_, 1));
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
                 }
                 else if(pedestal.hasFilter() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_FILTERTOOL.get()))
@@ -631,7 +633,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     {
                         if(pedestal.addTool(p_60506_.getOffhandItem()))
                         {
-                            pedestal.actionOnNeighborBelowChange(pedestal,getPosOfBlockBelow(p_60503_, p_60505_, 1));
+                            pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60503_, p_60505_, 1));
                             p_60506_.getOffhandItem().shrink(1);
                             return InteractionResult.SUCCESS;
                         }
@@ -804,6 +806,8 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
             BlockEntity blockEntity = p_60516_.getBlockEntity(p_60517_);
             if(blockEntity instanceof BasePedestalBlockEntity pedestal) {
                 pedestal.dropInventoryItems(p_60516_,p_60517_);
+                //Method for upgrades to do things before removal
+                pedestal.actionOnRemovedFromPedestal(0);
                 pedestal.dropInventoryItemsPrivate(p_60516_,p_60517_);
                 pedestal.dropLiquidsInWorld(p_60516_,p_60517_);
                 pedestal.removeEnergyFromBrokenPedestal(p_60516_,p_60517_);
@@ -941,7 +945,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
             {
                 if(p_60510_.getBlockEntity(p_60511_) instanceof BasePedestalBlockEntity pedestal)
                 {
-                    pedestal.actionOnNeighborBelowChange(pedestal,getPosOfBlockBelow(p_60509_, p_60511_, 1));
+                    pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60509_, p_60511_, 1));
                 }
             }
         }

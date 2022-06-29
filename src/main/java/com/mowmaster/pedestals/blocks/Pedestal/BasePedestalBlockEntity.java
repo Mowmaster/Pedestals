@@ -1375,11 +1375,21 @@ public class BasePedestalBlockEntity extends BlockEntity
         }
     }
 
-    public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
+    public void actionOnNeighborBelowChange(BlockPos belowBlock) {
 
-        if(pedestal.getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
+        if(getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
         {
-            upgrade.actionOnNeighborBelowChange(pedestal,belowBlock);
+            upgrade.actionOnNeighborBelowChange(getPedestal(),belowBlock);
+        }
+    }
+
+    public void actionOnRemovedFromPedestal(int type) {
+        // 0 = Dropped
+        // 1 = Removed
+
+        if(getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
+        {
+            upgrade.actionOnRemovedFromPedestal(getPedestal(), getCoinOnPedestal());
         }
     }
 

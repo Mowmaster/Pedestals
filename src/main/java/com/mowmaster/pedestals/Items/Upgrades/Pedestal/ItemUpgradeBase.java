@@ -76,6 +76,11 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     }
 
+    @Override
+    public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
+
+    }
+
     /*
      *
      * Methods Runs By Pedestal

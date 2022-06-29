@@ -6,10 +6,13 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.PedestalUtils.MowLibCompoundTagUtils;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
+import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.PedestalUtils.UpgradeUtils;
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
@@ -63,13 +66,13 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
         return (recipe == null)?(FluidStack.EMPTY):(recipe.getResultFluidNeeded());
     }
 
-    public List<ItemStack> getItemToGenerate(BasePedestalBlockEntity pedestal, ItemStack blockBelow)
+    public List<ItemStack> getItemToGenerate(BasePedestalBlockEntity pedestal, CobbleGenRecipe recipe)
     {
         ItemStack getInitialGeneratedItem = ItemStack.EMPTY;
         Level level = pedestal.getLevel();
         //ItemStack itemBlockBelow = new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem());
-        if(getRecipe(pedestal.getLevel(),blockBelow) == null)return new ArrayList<>();
-        getInitialGeneratedItem = getGeneratedItem(getRecipe(pedestal.getLevel(),blockBelow)).stream().findFirst().get();
+        if(recipe == null)return new ArrayList<>();
+        getInitialGeneratedItem = getGeneratedItem(recipe).stream().findFirst().get();
 
         Block generatedBlock = Block.byItem(getInitialGeneratedItem.getItem());
         if(generatedBlock != Blocks.AIR)
@@ -95,12 +98,26 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
 
     @Override
     public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
-        //Update Block Below data
-/*System.out.println("UPDATE");
-        ItemStack itemBlockBelow = new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem());
-        getCobbleRecipe = getRecipe(pedestal.getLevel(),itemBlockBelow);
-        getCobbleGenOutput = getItemToGenerate(pedestal, itemBlockBelow);*/
+        CobbleGenRecipe recipe = getRecipe(pedestal.getLevel(),new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem()));
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        List<ItemStack> getOutputs = getItemToGenerate(pedestal,recipe);
+        int getEnergyNeeded = getEnergyRequiredForGeneration(recipe);
+        int getExperienceNeeded = getExperienceRequiredForGeneration(recipe);
+        FluidStack getFluidStackNeeded = getFluidRequiredForGeneration(recipe);
+
+        CompoundTag tagCoin = new CompoundTag();
+        if(coinInPedestal.hasTag()) { tagCoin = coinInPedestal.getTag(); }
+        tagCoin = MowLibCompoundTagUtils.writeItemStackListToNBT(References.MODID, tagCoin, getOutputs);
+        tagCoin = MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tagCoin,getEnergyNeeded, "_energyNeeded");
+        tagCoin = MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tagCoin,getExperienceNeeded, "_xpNeeded");
     }
+
+    @Override
+    public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
+        //remove NBT saved on upgrade here
+    }
+
+
 
     @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
@@ -176,8 +193,8 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
             }
         }
 
-        List<ItemStack>getCobbleGenOutput = getItemToGenerate(pedestal,itemBlockBelow);
-        if(getCobbleGenOutput == null)getCobbleGenOutput = getItemToGenerate(pedestal, itemBlockBelow);
+        List<ItemStack>getCobbleGenOutput = getItemToGenerate(pedestal,getCobbleRecipe);
+        if(getCobbleGenOutput == null)getCobbleGenOutput = getItemToGenerate(pedestal, getCobbleRecipe);
         if(getCobbleGenOutput.size()<=0)return;
 //System.out.println(getCobbleGenOutput);
         if(fluid)pedestal.removeFluid(getFluidStackNeeded, IFluidHandler.FluidAction.EXECUTE);
