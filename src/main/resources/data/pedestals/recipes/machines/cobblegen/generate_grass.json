@@ -1,7 +1,7 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:moss"
+    "item": "minecraft:moss_block"
   },
   "result": {
     "item": "minecraft:grass_block"

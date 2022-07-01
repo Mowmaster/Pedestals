@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
@@ -35,6 +36,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.stream.IntStream;
 
 
@@ -495,6 +498,52 @@ public class ItemUpgradeImport extends ItemUpgradeBase
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
+        super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
+
+        if(!p_41421_.getItem().equals(DeferredRegisterItems.PEDESTAL_UPGRADE_COBBLEGEN.get()))
+        {
+            if(!p_41421_.getItem().equals(DeferredRegisterItems.PEDESTAL_UPGRADE_BASE.get()))
+            {
+                //Display Current Mode
+                int mode = getUpgradeMode(p_41421_);
+                MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
+                ChatFormatting colorChange = ChatFormatting.GOLD;
+                String typeString = "";
+                switch(mode)
+                {
+                    case 0: typeString = ".mode_items"; break;
+                    case 1: typeString = ".mode_fluids"; break;
+                    case 2: typeString = ".mode_energy"; break;
+                    case 3: typeString = ".mode_experience"; break;
+                    case 4: typeString = ".mode_if"; break;
+                    case 5: typeString = ".mode_ie"; break;
+                    case 6: typeString = ".mode_ix"; break;
+                    case 7: typeString = ".mode_ife"; break;
+                    case 8: typeString = ".mode_ifx"; break;
+                    case 9: typeString = ".mode_iex"; break;
+                    case 10: typeString = ".mode_ifex"; break;
+                    case 11: typeString = ".mode_fe"; break;
+                    case 12: typeString = ".mode_fx"; break;
+                    case 13: typeString = ".mode_ex"; break;
+                    case 14: typeString = ".mode_fex"; break;
+                    default: typeString = ".error"; break;
+                }
+                changed.withStyle(colorChange);
+                MutableComponent type = Component.translatable(MODID + typeString);
+                changed.append(type);
+                p_41423_.add(changed);
+            }
+            else
+            {
+                MutableComponent base = Component.translatable(getDescriptionId() + ".base_description");
+                base.withStyle(ChatFormatting.DARK_RED);
+                p_41423_.add(base);
             }
         }
     }

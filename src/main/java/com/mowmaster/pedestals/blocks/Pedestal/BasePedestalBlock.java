@@ -940,7 +940,6 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
 
         if(!p_60510_.isClientSide())
         {
-//System.out.println("NEIGHBOR CHECK: "+ p_60513_.equals(getPosOfBlockBelow(p_60509_, p_60511_, 1)));
             if(p_60513_.equals(getPosOfBlockBelow(p_60509_, p_60511_, 1)))
             {
                 if(p_60510_.getBlockEntity(p_60511_) instanceof BasePedestalBlockEntity pedestal)
