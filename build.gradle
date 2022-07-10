@@ -4,7 +4,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '5.+'
 }
 
-version = '0.1.3'
+version = '0.1.4'
 group = 'com.mowmaster.pedestals' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'pedestals'
 
@@ -149,15 +149,15 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19-41.0.62'
+    minecraft 'net.minecraftforge:forge:1.19-41.0.85'
 
     compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
     compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
     // at runtime, use the full JEI jar for Forge
-    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+    //runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
 
-    compileOnly fg.deobf("curse.maven:mowlib-631455:3853931")
-    runtimeOnly fg.deobf("curse.maven:mowlib-631455:3853931")
+    compileOnly fg.deobf("curse.maven:mowlib-631455:3866132")
+    runtimeOnly fg.deobf("curse.maven:mowlib-631455:3866132")
 
     // Examples using mod jars from ./libs
     // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")

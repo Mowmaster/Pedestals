@@ -6,7 +6,7 @@ import com.mowmaster.pedestals.Client.ItemTooltipComponent;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Registry.*;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -37,6 +37,7 @@ public class pedestals
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClientTooltips);
         // Register the enqueueIMC method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
         // Register the processIMC method for modloading
@@ -74,7 +75,13 @@ public class pedestals
         ClientRegistry.registerBlockEntityRenderers();
 
         PLOGGER.info("Initialize "+MODNAME+" Tooltip Renders");
-        MinecraftForgeClient.registerTooltipComponentFactory(ItemTooltipComponent.class, ClientItemTooltipComponent::new);
+        //MinecraftForgeClient.registerTooltipComponentFactory(ItemTooltipComponent.class, ClientItemTooltipComponent::new);
+    }
+
+    private void setupClientTooltips(final RegisterClientTooltipComponentFactoriesEvent event)
+    {
+        PLOGGER.info("Initialize "+MODNAME+" Tooltip Renders");
+        event.register(ItemTooltipComponent.class, ClientItemTooltipComponent::new);
     }
 
     /*private void setupPreClient(final TextureStitchEvent.Pre event)

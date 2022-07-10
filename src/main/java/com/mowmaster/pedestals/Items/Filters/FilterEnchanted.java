@@ -23,6 +23,8 @@ import java.util.List;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
+import net.minecraft.world.item.Item.Properties;
+
 public class FilterEnchanted extends BaseFilter{
     public FilterEnchanted(Properties p_41383_) {
         super(p_41383_);

@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 
+import net.minecraft.world.item.Item.Properties;
+
 public class FilterMod extends BaseFilter{
     public FilterMod(Properties p_41383_) {
         super(p_41383_);

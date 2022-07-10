@@ -23,6 +23,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class FilterTag extends BaseFilter{
     public FilterTag(Properties p_41383_) {
         super(p_41383_);

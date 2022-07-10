@@ -26,6 +26,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 
+import net.minecraft.world.item.Item.Properties;
+
 public class FilterRestricted extends BaseFilter{
     public FilterRestricted(Properties p_41383_) {
         super(p_41383_);

@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 
+import net.minecraft.world.item.Item.Properties;
+
 public class ItemUpgradeImport extends ItemUpgradeBase
 {
     public ItemUpgradeImport(Properties p_41383_) {

@@ -17,6 +17,8 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class BaseTool extends Item
 {
 

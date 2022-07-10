@@ -44,6 +44,8 @@ import java.util.stream.IntStream;
 
 
 
+import net.minecraft.world.item.Item.Properties;
+
 public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 {
     public ItemUpgradeBase(Properties p_41383_) {

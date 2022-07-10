@@ -13,6 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class UpgradeTool extends BaseTool implements IPedestalTool
 {
     public UpgradeTool(Properties p_41383_) {

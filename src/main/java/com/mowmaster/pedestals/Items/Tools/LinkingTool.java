@@ -33,6 +33,8 @@ import java.util.Map;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
+import net.minecraft.world.item.Item.Properties;
+
 public class LinkingTool extends BaseTool implements IPedestalTool
 {
     public static final BlockPos defaultPos = new BlockPos(0,-2000,0);

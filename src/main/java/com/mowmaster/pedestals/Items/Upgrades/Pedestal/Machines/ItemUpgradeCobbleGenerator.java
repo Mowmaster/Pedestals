@@ -37,6 +37,8 @@ import java.util.*;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
 
     public ItemUpgradeCobbleGenerator(Properties p_41383_) {

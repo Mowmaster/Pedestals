@@ -30,6 +30,8 @@ import java.util.Map;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class FilterEnchantCount extends BaseFilter{
     public FilterEnchantCount(Properties p_41383_) {
         super(p_41383_);

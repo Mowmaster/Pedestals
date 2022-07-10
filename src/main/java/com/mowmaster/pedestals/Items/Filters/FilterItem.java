@@ -10,6 +10,8 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class FilterItem extends BaseFilter{
     public FilterItem(Properties p_41383_) {
         super(p_41383_);

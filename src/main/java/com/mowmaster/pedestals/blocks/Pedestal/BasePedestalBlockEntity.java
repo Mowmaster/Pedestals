@@ -59,6 +59,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+
 public class BasePedestalBlockEntity extends BlockEntity
 {
     private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandlerPedestal);

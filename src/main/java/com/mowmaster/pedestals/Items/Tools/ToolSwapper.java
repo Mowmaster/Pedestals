@@ -13,6 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class ToolSwapper extends BaseTool implements IPedestalTool
 {
     public ToolSwapper(Properties p_41383_) {

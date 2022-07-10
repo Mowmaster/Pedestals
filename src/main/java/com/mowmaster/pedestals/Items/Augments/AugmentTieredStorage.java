@@ -16,6 +16,8 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class AugmentTieredStorage extends AugmentBase{
 
 

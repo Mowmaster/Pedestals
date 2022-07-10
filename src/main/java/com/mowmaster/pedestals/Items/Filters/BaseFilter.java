@@ -41,6 +41,8 @@ import static com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes.getMod
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
+import net.minecraft.world.item.Item.Properties;
+
 public class BaseFilter extends Item implements IPedestalFilter
 {
     public boolean filterType = false;

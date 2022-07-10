@@ -17,6 +17,8 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class AugmentTieredCapacity extends AugmentBase{
 
     public AugmentTieredCapacity(Properties p_41383_) {

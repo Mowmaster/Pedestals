@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 
+import net.minecraft.world.item.Item.Properties;
+
 public class FilterFood extends BaseFilter{
     public FilterFood(Properties p_41383_) {
         super(p_41383_);
