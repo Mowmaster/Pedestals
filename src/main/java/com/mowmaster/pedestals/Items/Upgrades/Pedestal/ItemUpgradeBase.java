@@ -1,14 +1,18 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibFakePlayer;
 import com.mowmaster.mowlib.MowLibUtils.OwnerUtil;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
+import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
+import static com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes.getModeLocalizedString;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
@@ -21,7 +25,10 @@ import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,6 +36,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -37,6 +45,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -91,7 +100,72 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
      */
 
 
-    public static void saveModeToNBT(ItemStack augment, int mode)
+    /*
+    MODES
+
+    0 - Items
+    1 - Fluids
+    2 - Energy
+    3 - XP
+    4 - Dust
+     */
+
+    public static void writeTransportModeToNBT(ItemStack filterStack, int mode, boolean allowed) {
+        CompoundTag compound = new CompoundTag();
+        if(filterStack.hasTag())
+        {
+            compound = filterStack.getTag();
+        }
+        compound.putBoolean(MODID + "_" + PedestalModesAndTypes.getModeStringFromInt(mode)+"_transport_mode",allowed);
+        filterStack.setTag(compound);
+    }
+
+    public static boolean getTransportModeFromNBT(ItemStack filterStack, int mode) {
+        boolean allowed = true;
+        if(filterStack.hasTag())
+        {
+            CompoundTag getCompound = filterStack.getTag();
+            String tag = MODID + "_" + PedestalModesAndTypes.getModeStringFromInt(mode)+"_transport_mode";
+            if(filterStack.getTag().contains(tag))
+            {
+                allowed = getCompound.getBoolean(tag);
+            }
+        }
+        return allowed;
+    }
+
+    public void toggleTransportMode(Player player, ItemStack heldItem, InteractionHand hand) {
+        if(heldItem.getItem() instanceof ItemUpgradeBase baseUpgrade)
+        {
+            int mode = getUpgradeMode(heldItem);
+            boolean getTransportMode = getTransportModeFromNBT(heldItem,mode);
+            writeTransportModeToNBT(heldItem, mode, !getTransportMode);
+            player.setItemInHand(hand,heldItem);
+
+            ChatFormatting colorChange = (!getTransportMode)?(ChatFormatting.WHITE):(ChatFormatting.BLACK);
+            MessageUtils.messagePopup(player,colorChange,MODID + ((!getTransportMode)?(".transport_mode_changed_true"):(".transport_mode_changed_false")));
+        }
+    }
+
+    public void incrementUpgradeMode(Player player, ItemStack heldItem, InteractionHand hand)
+    {
+        if(heldItem.getItem() instanceof ItemUpgradeBase baseUpgrade)
+        {
+            int mode = getUpgradeMode(heldItem)+1;
+            int setNewMode = (mode<=4)?(mode):(0);
+            saveUpgradeModeToNBT(heldItem,setNewMode);
+            player.setItemInHand(hand,heldItem);
+
+            ChatFormatting colorChange = PedestalModesAndTypes.getModeDarkColorFormat(setNewMode);
+            String typeString = getModeLocalizedString(setNewMode);
+
+            List<String> listed = new ArrayList<>();
+            listed.add(MODID + typeString);
+            MessageUtils.messagePopupWithAppend(MODID, player,colorChange,MODID + ".mode_changed",listed);
+        }
+    }
+
+    public static void saveUpgradeModeToNBT(ItemStack augment, int mode)
     {
         CompoundTag compound = new CompoundTag();
         if(augment.hasTag())
@@ -102,7 +176,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         augment.setTag(compound);
     }
 
-    public static int readModeFromNBT(ItemStack augment) {
+    public static int readUpgradeModeFromNBT(ItemStack augment) {
         if(augment.hasTag())
         {
             CompoundTag getCompound = augment.getTag();
@@ -113,121 +187,120 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     public static int getUpgradeMode(ItemStack stack) {
 
-        return readModeFromNBT(stack);
+        return readUpgradeModeFromNBT(stack);
+    }
+
+    public static int getUpgradeModeForRender(ItemStack stack) {
+
+        int mode = readUpgradeModeFromNBT(stack);
+        boolean type = getTransportModeFromNBT(stack,mode);
+        return (type)?(mode):(mode+5);
+    }
+
+    public static MutableComponent getUpgradeModeComponentFromInt(int mode) {
+
+        switch(mode)
+        {
+            case 0: return Component.translatable(MODID + ".item_mode_component");
+            case 1: return Component.translatable(MODID + ".fluid_mode_component");
+            case 2: return Component.translatable(MODID + ".energy_mode_component");
+            case 3: return Component.translatable(MODID + ".xp_mode_component");
+            case 4: return Component.translatable(MODID + ".dust_mode_component");
+            default: return Component.translatable(MODID + ".item_mode_component");
+        }
     }
 
     /*
-     * 0 - Items
-     * 1 - Fluids
-     * 2 - Energy
-     * 3 - XP
-     * 4 - Items Fluids
-     * 5 - Items Energy
-     * 6 - Items XP
-     * 7 - Items Fluids Energy
-     * 8 - Items Fluids XP
-     * 9 - Items Energy XP
-     * 10 - Items Fluids Energy XP
-     * 11 - Fluids Energy
-     * 12 - Fluids XP
-     * 13 - Energy XP
-     * 14 - Fluids Energy XP
+    INTERACTIONS
+
+    MODE CHANGE:
+    - (Offhand)Crouch Right Click = Mode change
+    TYPE CHANGE:
+    - (Offhand)Right Click = Type Change
+
+
+
+    GET BLOCK POS FOR AREA:
+    main hand crouch right click to start it and right click to end it???
      */
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level p_41432_, Player p_41433_, InteractionHand p_41434_) {
+        Level level = p_41432_;
+        Player player = p_41433_;
+        InteractionHand hand = p_41434_;
+        ItemStack itemInHand = player.getItemInHand(hand);
+        ItemStack itemInOffhand = player.getOffhandItem();
+        HitResult result = player.pick(5,0,false);
+
+        //result.getType().equals(HitResult.Type.MISS)
+
+        if(itemInHand.getItem() instanceof ItemUpgradeBase)
+        {
+            if(hand.equals(InteractionHand.MAIN_HAND) && itemInHand.getItem() instanceof ISelectableArea)
+            {
+                if(result.getType().equals(HitResult.Type.MISS))
+                {
+                    if(player.isCrouching())
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+            else if(hand.equals(InteractionHand.OFF_HAND) && itemInHand.getItem() instanceof IHasModeTypes)
+            {
+                if(result.getType().equals(HitResult.Type.MISS))
+                {
+                    if(player.isCrouching())
+                    {
+                        incrementUpgradeMode(player,itemInOffhand,hand);
+                    }
+                    else
+                    {
+                        toggleTransportMode(player,itemInOffhand,hand);
+                    }
+                }
+            }
+
+        }
+
+
+
+        return InteractionResultHolder.fail(p_41433_.getItemInHand(p_41434_));
+    }
 
     @Override
     public boolean canTransferItems(ItemStack upgrade)
     {
-        switch(getUpgradeMode(upgrade))
-        {
-            case 0: return true;
-            case 1: return false;
-            case 2: return false;
-            case 3: return false;
-            case 4: return true;
-            case 5: return true;
-            case 6: return true;
-            case 7: return true;
-            case 8: return true;
-            case 9: return true;
-            case 10: return true;
-            case 11: return false;
-            case 12: return false;
-            case 13: return false;
-            case 14: return false;
-            default: return true;
-        }
+        return getTransportModeFromNBT(upgrade, 0);
     }
 
     @Override
     public boolean canTransferFluids(ItemStack upgrade)
     {
-        switch(getUpgradeMode(upgrade))
-        {
-            case 0: return false;
-            case 1: return true;
-            case 2: return false;
-            case 3: return false;
-            case 4: return true;
-            case 5: return false;
-            case 6: return false;
-            case 7: return true;
-            case 8: return true;
-            case 9: return false;
-            case 10: return true;
-            case 11: return true;
-            case 12: return true;
-            case 13: return false;
-            case 14: return true;
-            default: return true;
-        }
+        return getTransportModeFromNBT(upgrade, 1);
     }
 
     @Override
     public boolean canTransferEnergy(ItemStack upgrade)
     {
-        switch(getUpgradeMode(upgrade))
-        {
-            case 0: return false;
-            case 1: return false;
-            case 2: return true;
-            case 3: return false;
-            case 4: return false;
-            case 5: return true;
-            case 6: return false;
-            case 7: return true;
-            case 8: return false;
-            case 9: return true;
-            case 10: return true;
-            case 11: return true;
-            case 12: return false;
-            case 13: return true;
-            case 14: return true;
-            default: return true;
-        }
+        return getTransportModeFromNBT(upgrade, 2);
     }
 
     @Override
     public boolean canTransferXP(ItemStack upgrade)
     {
-        switch(getUpgradeMode(upgrade))
-        {
-            case 0: return false;
-            case 1: return false;
-            case 2: return false;
-            case 3: return true;
-            case 4: return false;
-            case 5: return false;
-            case 6: return true;
-            case 7: return false;
-            case 8: return true;
-            case 9: return true;
-            case 10: return true;
-            case 11: return false;
-            case 12: return true;
-            case 13: return true;
-            case 14: return true;
-            default: return true;
-        }
+        return getTransportModeFromNBT(upgrade, 3);
+    }
+
+    @Override
+    public boolean canTransferDust(ItemStack upgrade)
+    {
+        return getTransportModeFromNBT(upgrade, 4);
     }
 
     public BlockPos getPosOfBlockBelow(Level world, BlockPos posOfPedestal, int numBelow)
@@ -467,6 +540,48 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             base.withStyle(ChatFormatting.DARK_RED);
             p_41423_.add(base);
         }
+
+        if(p_41421_.getItem() instanceof IHasModeTypes)
+        {
+            //Display Current Mode
+            int mode = getUpgradeMode(p_41421_);
+            MutableComponent changed = Component.translatable(MODID + ".upgrade_tooltip_mode");
+            ChatFormatting colorChange = ChatFormatting.GOLD;
+            String typeString = "";
+            switch(mode)
+            {
+                case 0: typeString = ".mode_tooltip_items"; break;
+                case 1: typeString = ".mode_tooltip_fluids"; break;
+                case 2: typeString = ".mode_tooltip_energy"; break;
+                case 3: typeString = ".mode_tooltip_experience"; break;
+                case 4: typeString = ".mode_tooltip_dust"; break;
+                default: typeString = ".tooltip_error"; break;
+            }
+            changed.withStyle(colorChange);
+            MutableComponent type = Component.translatable(MODID + typeString);
+            changed.append(type);
+            p_41423_.add(changed);
+
+            //Separator
+            MutableComponent separator = Component.translatable(MODID + ".tooltip_separator");
+            p_41423_.add(separator);
+
+            // List all the current modes and their status
+            for(int i=0;i<5;i++)
+            {
+                MutableComponent modeIterator = getUpgradeModeComponentFromInt(i);
+                MutableComponent typeIterator = (getTransportModeFromNBT(p_41421_,i))?(Component.translatable(MODID + ".upgrade_tooltip_type_enabled")):(Component.translatable(MODID + ".upgrade_tooltip_type_disabled"));
+                modeIterator.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
+                modeIterator.append(typeIterator);
+                p_41423_.add(modeIterator);
+            }
+        }
+
+        if(p_41421_.getItem() instanceof ISelectableArea)
+        {
+
+        }
+
     }
 
 

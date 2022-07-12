@@ -8,6 +8,33 @@
   "pedestals.cobble_gen.energy": "Energy Needed: ",
   "pedestals.cobble_gen.xp": "Exp Needed: ",
 
+
+  "pedestals.transport_mode_changed_true": "Mode Enabled",
+  "pedestals.transport_mode_changed_false": "Mode Disabled",
+
+  "pedestals.upgrade_tooltip_mode": "Current Mode: ",
+  "pedestals.mode_tooltip_items": "Item",
+  "pedestals.mode_tooltip_fluids": "Fluid",
+  "pedestals.mode_tooltip_energy": "Energy",
+  "pedestals.mode_tooltip_experience": "XP",
+  "pedestals.mode_tooltip_dust": "Dust",
+  "pedestals.tooltip_error": "Error",
+
+  "pedestals.item_mode_component": "§6Items",
+  "pedestals.fluid_mode_component": "§9Fluids",
+  "pedestals.energy_mode_component": "§4Energy",
+  "pedestals.xp_mode_component": "§aXP",
+  "pedestals.dust_mode_component": "§dDust",
+
+  "pedestals.tooltip_separator": "====================",
+  "pedestals.upgrade_tooltip_type_enabled": "Enabled",
+  "pedestals.upgrade_tooltip_type_disabled": "Disabled",
+  "pedestals.upgrade_tooltip_separator": ": ",
+
+
+
+
+
   "pedestals.error": "ERROR",
   "pedestals.description_shift": "Press Shift for More Info",
   "pedestals.description_alt": "Press Alt for More Info",
@@ -17,18 +44,7 @@
   "pedestals.mode_fluids": "Fluid",
   "pedestals.mode_energy": "Energy",
   "pedestals.mode_experience": "XP",
-
-  "pedestals.mode_if": "Item / Fluid",
-  "pedestals.mode_ife": "Item / Fluid / XP",
-  "pedestals.mode_ifex": "All",
-  "pedestals.mode_ie": "Item / Energy",
-  "pedestals.mode_iex": "Item / Energy / XP",
-  "pedestals.mode_ix": "Item / XP",
-  "pedestals.mode_ifx": "Item / Fluid / XP",
-  "pedestals.mode_fe": "Fluid / Energy",
-  "pedestals.mode_fx": "Fluid / XP",
-  "pedestals.mode_fex": "Fluid / Energy / XP",
-  "pedestals.mode_ex": "Energy / XP",
+  "pedestals.mode_dust": "Dust",
 
   "pedestals.mode_augment_particle": "Disable: Particles",
   "pedestals.mode_augment_item": "Disable: Item Render",

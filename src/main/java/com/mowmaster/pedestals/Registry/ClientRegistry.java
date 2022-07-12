@@ -24,27 +24,27 @@ public class ClientRegistry
     @SubscribeEvent
     public static void registerItemColor(RegisterColorHandlersEvent.Item event) {
 
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ITEM.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ITEMSTACK.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_DURABILITY.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ENCHANTED.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return FilterEnchantCount.getColor(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ENCHANTED_COUNT.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ENCHANTED_EXACT.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ENCHANTED_FUZZY.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_FOOD.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_MOD.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return FilterRestricted.getColor(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_RESTRICTED.get());
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_TAG.get());
 
 
@@ -77,7 +77,7 @@ public class ClientRegistry
         * TILE ENTITY BLOCKS HERE
         *
          */
-        event.getItemColors().register((stack, color) ->
+        event.register((stack, color) ->
         {if (color == 1) {return ColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get());
 
     }
@@ -85,7 +85,7 @@ public class ClientRegistry
     @SubscribeEvent
     public static void registerBlockColor(RegisterColorHandlersEvent.Block event) {
 
-        event.getBlockColors().register((blockstate, blockReader, blockPos, color) ->
+        event.register((blockstate, blockReader, blockPos, color) ->
         {if (color == 1) {return ColorReference.getColorFromStateInt(blockstate);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get());
     }
 

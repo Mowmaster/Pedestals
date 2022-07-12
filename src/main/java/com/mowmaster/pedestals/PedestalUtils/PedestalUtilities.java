@@ -1,5 +1,7 @@
 package com.mowmaster.pedestals.PedestalUtils;
 
+import com.mowmaster.mowlib.Capabilities.Dust.CapabilityDust;
+import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
 import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
@@ -68,7 +70,7 @@ public class PedestalUtilities
         {
             if(RailBlock.isRail(world, pos))
             {
-                List<Entity> list = world.getEntitiesOfClass(null, new AABB(pos), entity -> entity instanceof IForgeAbstractMinecart);
+                List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), entity -> entity instanceof IForgeAbstractMinecart);
                 if(!list.isEmpty())
                 {
                     LazyOptional<IItemHandler> cap = list.get(world.random.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
@@ -80,7 +82,7 @@ public class PedestalUtilities
             {
 
                 //Added for quark boats with inventories (i hope)
-                List<Entity> list = world.getEntitiesOfClass(null, new AABB(pos), entity -> entity instanceof Boat);
+                List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos.above()), entity -> entity instanceof Boat);
                 if(!list.isEmpty())
                 {
                     LazyOptional<IItemHandler> cap = list.get(world.random.nextInt(list.size())).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
@@ -262,6 +264,19 @@ public class PedestalUtilities
                 }
             }*/
         }
+        return LazyOptional.empty();
+    }
+
+    public static LazyOptional<IDustHandler> findDustHandlerAtPos(Level world, BlockPos pos, Direction side)
+    {
+        BlockEntity neighbourTile = world.getBlockEntity(pos);
+        if(neighbourTile!=null)
+        {
+            LazyOptional<IDustHandler> cap = neighbourTile.getCapability(CapabilityDust.DUST_HANDLER, side);
+            if(cap.isPresent())
+                return cap;
+        }
+
         return LazyOptional.empty();
     }
 

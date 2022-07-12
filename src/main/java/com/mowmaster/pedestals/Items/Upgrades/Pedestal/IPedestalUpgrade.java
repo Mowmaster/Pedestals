@@ -26,4 +26,5 @@ public interface IPedestalUpgrade
     boolean canTransferFluids(ItemStack upgrade);
     boolean canTransferEnergy(ItemStack upgrade);
     boolean canTransferXP(ItemStack upgrade);
+    boolean canTransferDust(ItemStack upgrade);
 }
