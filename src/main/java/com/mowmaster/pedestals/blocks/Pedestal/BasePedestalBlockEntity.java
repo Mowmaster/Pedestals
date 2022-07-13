@@ -1,13 +1,13 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
 
+import com.mowmaster.mowlib.Capabilities.Experience.CapabilityExperience;
+import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
 import com.mowmaster.mowlib.MowLibUtils.ColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtil;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
-import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
-import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
@@ -1801,60 +1801,79 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(rangeAugment.getItem() instanceof AugmentTieredRange rangeStack)
         {
             IItemHandler ph = privateHandler.orElse(null);
-            ItemStack itemFromBlock = rangeAugment.copy();
-            itemFromBlock.setCount(1);
-            if(getRange() < rangeStack.getAllowedInsertAmount(rangeAugment.getItem()))
+            if(ph != null)
             {
-                ph.insertItem(10,itemFromBlock,false);
-                //update();
-                return true;
+                ItemStack itemFromBlock = rangeAugment.copy();
+                itemFromBlock.setCount(1);
+                if(getRange() < rangeStack.getAllowedInsertAmount(rangeAugment.getItem()))
+                {
+                    ph.insertItem(10,itemFromBlock,false);
+                    //update();
+                    return true;
+                }
             }
-            else return false;
         }
-        else return false;
+
+        return false;
     }
 
     public ItemStack removeRange(int count)
     {
         IItemHandler ph = privateHandler.orElse(null);
-        if(hasRange())
+        if(ph != null)
         {
-            return ph.extractItem(10,count,false);
+            if(hasRange())
+            {
+                return ph.extractItem(10,count,false);
+            }
         }
-        else return ItemStack.EMPTY;
+
+        return ItemStack.EMPTY;
     }
 
     public ItemStack removeAllRange()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        if(hasRange())
+        if(ph != null)
         {
-            //update();
-            return ph.extractItem(10,ph.getStackInSlot(10).getCount(),false);
+            if(hasRange())
+            {
+                //update();
+                return ph.extractItem(10,ph.getStackInSlot(10).getCount(),false);
+            }
         }
-        else return ItemStack.EMPTY;
+
+        return ItemStack.EMPTY;
     }
 
     public boolean hasRange()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(10).isEmpty())
+        if(ph != null)
         {
-            return false;
+            if(ph.getStackInSlot(10).isEmpty())
+            {
+                return false;
+            }
         }
-        else  return true;
+
+        return true;
     }
 
     public int getRange()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(10).getCount();
+        if(ph != null)return ph.getStackInSlot(10).getCount();
+
+        return 0;
     }
 
     public ItemStack getRangeStack()
     {
         IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(10);
+        if(ph != null)return ph.getStackInSlot(10);
+
+        return ItemStack.EMPTY;
     }
 
     public boolean canInsertAugmentRange(ItemStack rangeAugment)
@@ -3255,6 +3274,12 @@ public class BasePedestalBlockEntity extends BlockEntity
         p_58888_.putIntArray("intArrayZSPos",storedZS);
 
         return p_58888_;
+    }
+
+    @Override
+    public AABB getRenderBoundingBox() {
+        AABB aabb = new AABB(getPos().getX() - getLinkingRange(), getPos().getY() - getLinkingRange(), getPos().getZ() - getLinkingRange(),getPos().getX() + getLinkingRange(), getPos().getY() + getLinkingRange(), getPos().getZ() + getLinkingRange());
+        return aabb;
     }
 
     @Nullable

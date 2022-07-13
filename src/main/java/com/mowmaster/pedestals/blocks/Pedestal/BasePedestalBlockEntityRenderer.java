@@ -5,6 +5,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import com.mowmaster.pedestals.Items.Upgrades.IUpgrade;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ISelectableArea;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -110,24 +113,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 BlockPos pos = p_112307_.getPos();
                 //You have to client register this too!!!
                 @SuppressWarnings("deprecation")
-                TextureAtlasSprite whiteTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage"));
-                @SuppressWarnings("deprecation")
-                TextureAtlasSprite TextureSprite1 = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage1"));
-                @SuppressWarnings("deprecation")
-                TextureAtlasSprite TextureSprite2 = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage2"));
-                @SuppressWarnings("deprecation")
-                TextureAtlasSprite TextureSprite3 = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage3"));
-                @SuppressWarnings("deprecation")
-                TextureAtlasSprite TextureSprite4 = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage4"));
-                @SuppressWarnings("deprecation")
-                TextureAtlasSprite TextureSprite5 = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage5"));
-                @SuppressWarnings("deprecation")
-                TextureAtlasSprite TextureSprite6 = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage6"));
-                @SuppressWarnings("deprecation")
-                TextureAtlasSprite TextureSprite7 = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage7"));
-                @SuppressWarnings("deprecation")
-                TextureAtlasSprite TextureSprite8 = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/whiteimage8"));
-
+                TextureAtlasSprite whiteTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/pedestal_render"));
 
                 AABB aabb = new AABB(pos.getX() - range, pos.getY() - range, pos.getZ() - range,pos.getX() + range, pos.getY() + range, pos.getZ() + range);
                 renderBoundingBox(pos, aabb, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.2f, 0.2f, 1f);
@@ -150,72 +136,24 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     }
                 }
 
-                /*if(1<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(0));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite1, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }
-                if(2<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(1));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite2, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }
-                if(3<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(2));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite3, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }
-                if(4<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(3));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite4, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }
-                if(5<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(4));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite5, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }
-                if(6<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(5));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite6, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }
-                if(7<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(6));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite7, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }
-                if(8<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(7));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite8, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }
-                if(9<=locSize)
-                {
-                    AABB aabbl = new AABB(locations.get(8));
-                    renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                    renderFaces(TextureSprite8, pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                }*/
 
-                /*if(p_112307_.getNumberOfStoredSenderLocations()>0)
+                if(coin.getItem() instanceof ISelectableArea)
                 {
-                    List<BlockPos> locations = p_112307_.getLocationSenderList();
-                    for(int i=0;i<locations.size();i++)
+                    if(coin.getItem() instanceof ItemUpgradeBase upgradeCoin)
                     {
-                        AABB aabbl = new AABB(locations.get(i));
-                        renderBoundingBox(pos, aabbl, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.42f, 0f, 1f);
-                        renderFaces(pos,aabbl,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.42f, 0f, 0.5f);
-                    }
-                }*/
+                        AABB aabbCoin = upgradeCoin.getAABBonUpgrade(coin);
+                        if(aabbCoin != new AABB(BlockPos.ZERO))
+                        {
+                            Boolean inSelectedInRange = upgradeCoin.selectedAreaWithinRange(p_112307_);
+                            //You have to client register this too!!!
+                            @SuppressWarnings("deprecation")
+                            TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
+                            renderBoundingBox(pos, aabbCoin, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 1f);
+                            renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
 
+                        }
+                    }
+                }
             }
         }
     }
@@ -569,10 +507,10 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         buffer.vertex(matrix4f, minX, maxY - 0.01f, minZ).color(red, green, blue, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(uvBrightness).normal(0, -1, 0).endVertex();
     }
 
+
     @Override
     public boolean shouldRenderOffScreen(BasePedestalBlockEntity p_112306_) {
+        //BlockEntityRenderer.super.shouldRenderOffScreen(p_112306_)
         return true;
     }
-
-
 }

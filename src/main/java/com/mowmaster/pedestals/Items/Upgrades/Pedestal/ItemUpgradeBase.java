@@ -36,6 +36,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
@@ -210,6 +211,73 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
     }
 
+
+
+
+
+
+    public static void saveBlockPosToNBT(ItemStack upgrade, int num, BlockPos posToSave)
+    {
+        CompoundTag compound = new CompoundTag();
+        if(upgrade.hasTag())
+        {
+            compound = upgrade.getTag();
+        }
+        List<Integer> listed = new ArrayList<>();
+        listed.add(posToSave.getX());
+        listed.add(posToSave.getY());
+        listed.add(posToSave.getZ());
+        compound.putIntArray(MODID+"_upgrade_blockpos_"+num, listed);
+        upgrade.setTag(compound);
+    }
+
+    public static BlockPos readBlockPosFromNBT(ItemStack upgrade, int num) {
+        if(upgrade.hasTag())
+        {
+            String tag = MODID+"_upgrade_blockpos_"+num;
+            CompoundTag getCompound = upgrade.getTag();
+            if(upgrade.getTag().contains(tag))
+            {
+                int[] listed = getCompound.getIntArray(tag);
+                if(listed.length>=3)return new BlockPos(listed[0],listed[1],listed[2]);
+            }
+        }
+        return BlockPos.ZERO;
+    }
+
+    public static BlockPos getBlockPosOnUpgrade(ItemStack stack, int num) {
+
+        return readBlockPosFromNBT(stack,num);
+    }
+
+    public boolean hasTwoPointsSelected(ItemStack stack)
+    {
+        return !readBlockPosFromNBT(stack,1).equals(BlockPos.ZERO) && !readBlockPosFromNBT(stack,2).equals(BlockPos.ZERO);
+    }
+
+    public AABB getAABBonUpgrade(ItemStack stack)
+    {
+        if(stack.getItem() instanceof ISelectableArea && hasTwoPointsSelected(stack))
+        {
+            BlockPos posOne = readBlockPosFromNBT(stack,1);
+            BlockPos posTwo = readBlockPosFromNBT(stack,2);
+
+            return new AABB(Math.min(posOne.getX(), posTwo.getX()),Math.min(posOne.getY(), posTwo.getY()),Math.min(posOne.getZ(), posTwo.getZ()),
+                    Math.max(posOne.getX(), posTwo.getX()),Math.max(posOne.getY(), posTwo.getY()),Math.max(posOne.getZ(), posTwo.getZ()));
+        }
+        return new AABB(BlockPos.ZERO);
+    }
+
+    public boolean selectedAreaWithinRange(BasePedestalBlockEntity pedestal)
+    {
+        if(pedestal.isPedestalInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1)) && pedestal.isPedestalInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2)))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     /*
     INTERACTIONS
 
@@ -239,16 +307,27 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         {
             if(hand.equals(InteractionHand.MAIN_HAND) && itemInHand.getItem() instanceof ISelectableArea)
             {
-                if(result.getType().equals(HitResult.Type.MISS))
+                if(result.getType().equals(HitResult.Type.BLOCK))
                 {
+                    BlockPos atLocation = new BlockPos(result.getLocation().x, result.getLocation().y, result.getLocation().z);
                     if(player.isCrouching())
                     {
-
+                        saveBlockPosToNBT(itemInHand,1,atLocation);
+                        player.setItemInHand(hand,itemInHand);
+                        MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_first");
                     }
                     else
                     {
-
+                        saveBlockPosToNBT(itemInHand,2,atLocation);
+                        player.setItemInHand(hand,itemInHand);
+                        MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_second");
                     }
+                }
+                else if(result.getType().equals(HitResult.Type.MISS))
+                {
+                    saveBlockPosToNBT(itemInHand,1,BlockPos.ZERO);
+                    saveBlockPosToNBT(itemInHand,2,BlockPos.ZERO);
+                    MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
                 }
             }
             else if(hand.equals(InteractionHand.OFF_HAND) && itemInHand.getItem() instanceof IHasModeTypes)
@@ -267,8 +346,6 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
 
         }
-
-
 
         return InteractionResultHolder.fail(p_41433_.getItemInHand(p_41434_));
     }
@@ -530,6 +607,80 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return stackIn.getCount();
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*public void upgradeActionMagnet(PedestalTileEntity pedestal, World world, List<ItemEntity> itemList, ItemStack itemInPedestal, BlockPos posOfPedestal)
+    {
+        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
+        if(itemList.size()>0)
+        {
+            for(ItemEntity getItemFromList : itemList)
+            {
+                ItemStack copyStack = getItemFromList.getItem().copy();
+                int maxSize = copyStack.getMaxStackSize();
+                boolean stacksMatch = doItemsMatch(itemInPedestal,copyStack);
+                if ((itemInPedestal.isEmpty() || stacksMatch ) && canThisPedestalReceiveItemStack(pedestal,world,posOfPedestal,copyStack))
+                {
+                    int spaceInPed = itemInPedestal.getMaxStackSize()-itemInPedestal.getCount();
+                    if(stacksMatch)
+                    {
+                        if(spaceInPed > 0)
+                        {
+                            int itemInCount = getItemFromList.getItem().getCount();
+                            int countToAdd = ( itemInCount<= spaceInPed)?(itemInCount):(spaceInPed);
+                            getItemFromList.getItem().setCount(itemInCount-countToAdd);
+                            copyStack.setCount(countToAdd);
+                            pedestal.addItem(copyStack);
+                            if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                        }
+                        else if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
+                    }
+                    else if(copyStack.getCount() <=maxSize)
+                    {
+                        getItemFromList.setItem(ItemStack.EMPTY);
+                        getItemFromList.remove();
+                        pedestal.addItem(copyStack);
+                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+
+                    }
+                    else
+                    {
+                        //If an ItemStackEntity has more than 64, we subtract 64 and inset 64 into the pedestal
+                        int count = getItemFromList.getItem().getCount();
+                        getItemFromList.getItem().setCount(count-maxSize);
+                        copyStack.setCount(maxSize);
+                        pedestal.addItem(copyStack);
+                        if(!pedestal.hasMuffler())world.playSound((PlayerEntity) null, posOfPedestal.getX(), posOfPedestal.getY(), posOfPedestal.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                    }
+                    if(!hasAdvancedInventoryTargetingTwo(coinInPedestal))break;
+                }
+            }
+        }
+    }*/
+
+
+
+
+
+
+
+
+
+
+
+
+
     @Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
@@ -575,11 +726,41 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 modeIterator.append(typeIterator);
                 p_41423_.add(modeIterator);
             }
+
         }
+
+        //Add a new Line if both are present
+        if(p_41421_.getItem() instanceof ISelectableArea && p_41421_.getItem() instanceof IHasModeTypes)p_41423_.add(Component.literal(""));
 
         if(p_41421_.getItem() instanceof ISelectableArea)
         {
+            if(hasTwoPointsSelected(p_41421_))
+            {
+                MutableComponent posTitle = Component.translatable(MODID + ".upgrade_tooltip_blockpos_title");
+                posTitle.withStyle(ChatFormatting.GOLD);
+                p_41423_.add(posTitle);
 
+                //Separator
+                MutableComponent separator = Component.translatable(MODID + ".tooltip_separator");
+                p_41423_.add(separator);
+
+                MutableComponent posOne = Component.translatable(MODID + ".upgrade_tooltip_blockpos_one");
+                BlockPos blockPosOne = readBlockPosFromNBT(p_41421_,1);
+                MutableComponent posOnePos = Component.literal(blockPosOne.getX() + "x " + blockPosOne.getY() + "y " + blockPosOne.getZ()+ "z");
+                posOnePos.withStyle(ChatFormatting.GRAY);
+                posOne.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
+                posOne.append(posOnePos);
+
+                p_41423_.add(posOne);
+
+                MutableComponent posTwo = Component.translatable(MODID + ".upgrade_tooltip_blockpos_two");
+                BlockPos blockPosTwo = readBlockPosFromNBT(p_41421_,2);
+                MutableComponent posTwoPos = Component.literal(blockPosTwo.getX() + "x " + blockPosTwo.getY() + "y " + blockPosTwo.getZ()+ "z");
+                posTwoPos.withStyle(ChatFormatting.GRAY);
+                posTwo.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
+                posTwo.append(posTwoPos);
+                p_41423_.add(posTwo);
+            }
         }
 
     }

@@ -1,0 +1,20 @@
+{
+"parent": "pedestals:item/upgrades/pedestal_upgrade",
+"textures": {
+"coin": "pedestals:items/models/upgrades/pedestal_upgrade",
+"letter": "pedestals:items/models/upgrades/pedestal_upgrade_magnet",
+"part": "pedestals:items/models/upgrades/pedestal_upgrade"
+},
+  "overrides": [
+    { "predicate": { "pedestals:upgrade_mode": 0}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_it"},
+    { "predicate": { "pedestals:upgrade_mode": 1}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_ft"},
+    { "predicate": { "pedestals:upgrade_mode": 2}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_et"},
+    { "predicate": { "pedestals:upgrade_mode": 3}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_xt"},
+    { "predicate": { "pedestals:upgrade_mode": 4}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_dt"},
+    { "predicate": { "pedestals:upgrade_mode": 5}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_if"},
+    { "predicate": { "pedestals:upgrade_mode": 6}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_ff"},
+    { "predicate": { "pedestals:upgrade_mode": 7}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_ef"},
+    { "predicate": { "pedestals:upgrade_mode": 8}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_xf"},
+    { "predicate": { "pedestals:upgrade_mode": 9}, "model": "pedestals:item/upgrades/magnet/pedestal_upgrade_df"}
+  ]
+}

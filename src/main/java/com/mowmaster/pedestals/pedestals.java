@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals;
 
-import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
+//import com.mowmaster.pedestals.Capability.Experience.CapabilityExperience;
 import com.mowmaster.pedestals.Client.ClientItemTooltipComponent;
 import com.mowmaster.pedestals.Client.ItemTooltipComponent;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
@@ -110,12 +110,13 @@ public class pedestals
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
     // Event bus for receiving Registry Events)
+    /*
     @SuppressWarnings("unused")
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
         @SubscribeEvent
         public static void attachCapabilities(final RegisterCapabilitiesEvent event) {
-            CapabilityExperience.register(event);
+            //CapabilityExperience.register(event);
         }
-    }
+    }*/
 }

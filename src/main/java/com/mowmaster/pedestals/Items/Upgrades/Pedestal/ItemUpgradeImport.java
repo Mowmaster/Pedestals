@@ -2,7 +2,8 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
-import com.mowmaster.pedestals.Capability.Experience.IExperienceStorage;
+import com.mowmaster.mowlib.Capabilities.Experience.CapabilityExperience;
+import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 

@@ -52,6 +52,7 @@ public class ClientRegistry
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_IMPORT.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_EXPORT.get());
+        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_MAGNET.get());
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ITEM.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ITEMSTACK.get());
@@ -99,19 +100,10 @@ public class ClientRegistry
         if(location.equals(TextureAtlas.LOCATION_BLOCKS))
         {
 
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage"));
-
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage1"));
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage2"));
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage3"));
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage4"));
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage5"));
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage6"));
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage7"));
-            event.addSprite(new ResourceLocation(MODID, "util/whiteimage8"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render"));
+            event.addSprite(new ResourceLocation(MODID, "util/upgrade_render"));
 
             event.addSprite(new ResourceLocation(MODID, "util/crystal_dust"));
-
         }
 
     }
