@@ -1,9 +1,9 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
-import com.mowmaster.mowlib.MowLibUtils.ColorReference;
-import com.mowmaster.mowlib.MowLibUtils.MowLibFakePlayer;
-import com.mowmaster.mowlib.MowLibUtils.OwnerUtil;
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
@@ -17,15 +17,16 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -33,8 +34,10 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -99,6 +102,96 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
      * END
      *
      */
+
+
+
+
+
+    //If toggled in config, this is the max allowed size of selectable area
+    public int getUpgradeSelectableAreaSize()
+    {
+        //For a default 3x3x3 area the value is 2
+        return 2;
+    }
+
+
+
+    //Requires energy
+    public boolean requiresEnergy() { return baseEnergyCostPerDistance()>0; }
+    public int baseEnergyCostPerDistance(){ return 0; }
+    public double energyCostMultiplier(){ return 1.0D; }
+
+    public boolean requiresXp() { return baseXpCostPerDistance()>0; }
+    public int baseXpCostPerDistance(){ return 0; }
+    public double xpCostMultiplier(){ return 1.0D; }
+
+    public boolean requiresDust() { return !baseDustCostPerDistance().isEmpty(); }
+    public DustMagic baseDustCostPerDistance(){ return new DustMagic(-1,0); }
+    public double dustCostMultiplier(){ return 1.0D; }
+
+    //A modifier that takes the distance the selected area covers and multiplies it by the multiplier before multiplying it by the cost.
+    public boolean hasSelectedAreaModifier() { return false; }
+    public double selectedAreaCostMultiplier(){ return 1.0D; }
+
+    public boolean requiresFuelForUpgradeAction()
+    {
+        return (requiresEnergy() || requiresXp() || requiresDust());
+    }
+
+    public boolean removeFuelForAction(BasePedestalBlockEntity pedestal, int distance, boolean simulate)
+    {
+        boolean energy = true;
+        boolean xp = true;
+        boolean dust = true;
+
+        if(requiresEnergy())
+        {
+            int energyCost = (int)Math.round(((double)baseEnergyCostPerDistance() + ((hasSelectedAreaModifier())?((double)(distance * selectedAreaCostMultiplier())):(0.0D))) * energyCostMultiplier());
+            energy = pedestal.removeEnergy(energyCost,simulate)>=energyCost;
+        }
+
+        if(requiresXp())
+        {
+            int xpCost = (int)Math.round(((double)baseXpCostPerDistance() + ((hasSelectedAreaModifier())?((double)(distance * selectedAreaCostMultiplier())):(0.0D))) * xpCostMultiplier());
+            xp = pedestal.removeExperience(xpCost,simulate)>=xpCost;
+        }
+
+        //Need to add dust stuff to pedestal yet...
+        if(requiresDust())
+        {
+            int dustAmountNeeded = (int)Math.round(((double)baseDustCostPerDistance().getDustAmount() + ((hasSelectedAreaModifier())?((double)(distance * selectedAreaCostMultiplier())):(0.0D))) * dustCostMultiplier());
+
+            //dust = pedestal.removeDust(dustAmountNeeded,simulate)>=dustAmountNeeded;
+        }
+
+        return (energy && xp && dust);
+    }
+
+    public int getDistanceBetweenPoints(BlockPos pointOne, BlockPos posToCompare)
+    {
+        int x = pointOne.getX();
+        int y = pointOne.getY();
+        int z = pointOne.getZ();
+        int x1 = posToCompare.getX();
+        int y1 = posToCompare.getY();
+        int z1 = posToCompare.getZ();
+        int xF = Math.abs(Math.subtractExact(x,x1));
+        int yF = Math.abs(Math.subtractExact(y,y1));
+        int zF = Math.abs(Math.subtractExact(z,z1));
+
+        return Math.max(Math.max(xF,yF),zF);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
     /*
@@ -213,8 +306,16 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
 
 
-
-
+    public static void saveStringToNBT(ItemStack upgrade, String nbtTag, String string)
+    {
+        CompoundTag compound = new CompoundTag();
+        if(upgrade.hasTag())
+        {
+            compound = upgrade.getTag();
+        }
+        compound.putString(MODID+nbtTag, string);
+        upgrade.setTag(compound);
+    }
 
     public static void saveBlockPosToNBT(ItemStack upgrade, int num, BlockPos posToSave)
     {
@@ -250,6 +351,24 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return readBlockPosFromNBT(stack,num);
     }
 
+    public boolean hasOneBlockPos(ItemStack stack) {
+        return !readBlockPosFromNBT(stack,1).equals(BlockPos.ZERO) || !readBlockPosFromNBT(stack,2).equals(BlockPos.ZERO);
+    }
+
+
+    public static BlockPos getExistingSingleBlockPos(ItemStack stack) {
+        return (!readBlockPosFromNBT(stack,1).equals(BlockPos.ZERO))?(readBlockPosFromNBT(stack,1)):(readBlockPosFromNBT(stack,2));
+    }
+
+
+    public boolean isNewBlockPosSmallerThanExisting(ItemStack stack, BlockPos posTwo) {
+        BlockPos posOne = getExistingSingleBlockPos(stack);
+        BlockPos toCompare = new BlockPos(Math.min(posOne.getX(), posTwo.getX()),Math.min(posOne.getY(), posTwo.getY()),Math.min(posOne.getZ(), posTwo.getZ()));
+
+        return (posTwo.equals(toCompare))?(true):(false);
+    }
+
+
     public boolean hasTwoPointsSelected(ItemStack stack)
     {
         return !readBlockPosFromNBT(stack,1).equals(BlockPos.ZERO) && !readBlockPosFromNBT(stack,2).equals(BlockPos.ZERO);
@@ -263,7 +382,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             BlockPos posTwo = readBlockPosFromNBT(stack,2);
 
             return new AABB(Math.min(posOne.getX(), posTwo.getX()),Math.min(posOne.getY(), posTwo.getY()),Math.min(posOne.getZ(), posTwo.getZ()),
-                    Math.max(posOne.getX(), posTwo.getX()),Math.max(posOne.getY(), posTwo.getY()),Math.max(posOne.getZ(), posTwo.getZ()));
+                    Math.max(posOne.getX(), posTwo.getX()),Math.max(posOne.getY(), posTwo.getY()),Math.max(posOne.getZ(), posTwo.getZ())).expandTowards(1D,1D,1D);
         }
         return new AABB(BlockPos.ZERO);
     }
@@ -276,6 +395,59 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
 
         return false;
+    }
+
+    public BlockPos getHigherByFacing(BlockPos atLocation, Direction facing)
+    {
+        //west north down +XYZ
+        //east +YZ
+        //south +XY
+        //up +XZ
+        BlockPos higherPos = atLocation;
+        switch(facing)
+        {
+            case NORTH:
+            default:
+                higherPos = atLocation.offset(1,1,1);
+                break;
+            case EAST:
+                higherPos = atLocation.offset(0,1,1);
+                break;
+            case SOUTH:
+                higherPos = atLocation.offset(1,1,0);
+                break;
+            case UP:
+                higherPos = atLocation.offset(1,0,1);
+                break;
+        }
+
+        return higherPos;
+    }
+
+    public BlockPos getLowerByFacing(BlockPos atLocation, Direction facing)
+    {
+        //west north down +-0
+        //east -x
+        //south -z
+        //up -y
+        BlockPos lowerPos = atLocation;
+        switch(facing)
+        {
+            case NORTH:
+            default:
+                break;
+            case EAST:
+                lowerPos = atLocation.offset(-1,0,0);
+                break;
+            case SOUTH:
+                lowerPos = atLocation.offset(0,0,-1);
+                break;
+            case UP:
+                lowerPos = atLocation.offset(0,-1,0);
+                break;
+        }
+
+        return lowerPos;
     }
 
     /*
@@ -291,6 +463,33 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     GET BLOCK POS FOR AREA:
     main hand crouch right click to start it and right click to end it???
      */
+    public Direction getLastClickedDirectionFromUpgrade(ItemStack stack)
+    {
+        Direction dir = Direction.UP;
+        if(stack.hasTag())
+        {
+            if(stack.getTag().contains(MODID + "_string_last_clicked_direction"))
+            {
+                String direction = stack.getTag().getString(MODID + "_string_last_clicked_direction");
+                if(direction == "down")return Direction.DOWN;
+                else if(direction == "up")return Direction.UP;
+                else if(direction == "north")return Direction.NORTH;
+                else if(direction == "south")return Direction.SOUTH;
+                else if(direction == "west")return Direction.WEST;
+                else if(direction == "east")return Direction.EAST;
+            }
+        }
+
+        return dir;
+    }
+
+    @Override
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+
+        saveBlockPosToNBT(stack,10,context.getClickedPos());
+        saveStringToNBT(stack,"_string_last_clicked_direction",context.getClickedFace().toString());
+        return super.onItemUseFirst(stack, context);
+    }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level p_41432_, Player p_41433_, InteractionHand p_41434_) {
@@ -299,7 +498,10 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         InteractionHand hand = p_41434_;
         ItemStack itemInHand = player.getItemInHand(hand);
         ItemStack itemInOffhand = player.getOffhandItem();
-        HitResult result = player.pick(5,0,false);
+        HitResult result = player.pick(5,player.getEyeHeight(),false);
+        BlockPos atLocation = readBlockPosFromNBT(itemInHand,10);
+        Direction facing = getLastClickedDirectionFromUpgrade(itemInHand);
+
 
         //result.getType().equals(HitResult.Type.MISS)
 
@@ -309,21 +511,40 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             {
                 if(result.getType().equals(HitResult.Type.BLOCK))
                 {
-                    BlockPos atLocation = new BlockPos(result.getLocation().x, result.getLocation().y, result.getLocation().z);
-                    if(player.isCrouching())
+
+                    Boolean hasOnePointAlready = hasOneBlockPos(itemInHand);
+                    Boolean hasTwoPointsAlready = hasTwoPointsSelected(itemInHand);
+
+                    if(hasOnePointAlready && !hasTwoPointsAlready)
+                    {
+                        if(PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get())
+                        {
+                            if(getDistanceBetweenPoints(readBlockPosFromNBT(itemInHand,1),atLocation) <= getUpgradeSelectableAreaSize())
+                            {
+                                saveBlockPosToNBT(itemInHand,2,atLocation);
+                                player.setItemInHand(hand,itemInHand);
+                                MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_second");
+                            }
+                            else
+                            {
+                                MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".upgrade_blockpos_point_out_of_range");
+                            }
+                        }
+                        else
+                        {
+                            saveBlockPosToNBT(itemInHand,2,atLocation);
+                            player.setItemInHand(hand,itemInHand);
+                            MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_second");
+                        }
+                    }
+                    else if(!hasTwoPointsAlready)
                     {
                         saveBlockPosToNBT(itemInHand,1,atLocation);
                         player.setItemInHand(hand,itemInHand);
                         MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_first");
                     }
-                    else
-                    {
-                        saveBlockPosToNBT(itemInHand,2,atLocation);
-                        player.setItemInHand(hand,itemInHand);
-                        MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_second");
-                    }
                 }
-                else if(result.getType().equals(HitResult.Type.MISS))
+                else if(result.getType().equals(HitResult.Type.MISS) && hasOneBlockPos(itemInHand))
                 {
                     saveBlockPosToNBT(itemInHand,1,BlockPos.ZERO);
                     saveBlockPosToNBT(itemInHand,2,BlockPos.ZERO);
@@ -713,53 +934,69 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             changed.append(type);
             p_41423_.add(changed);
 
-            //Separator
-            MutableComponent separator = Component.translatable(MODID + ".tooltip_separator");
-            p_41423_.add(separator);
-
-            // List all the current modes and their status
-            for(int i=0;i<5;i++)
-            {
-                MutableComponent modeIterator = getUpgradeModeComponentFromInt(i);
-                MutableComponent typeIterator = (getTransportModeFromNBT(p_41421_,i))?(Component.translatable(MODID + ".upgrade_tooltip_type_enabled")):(Component.translatable(MODID + ".upgrade_tooltip_type_disabled"));
-                modeIterator.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
-                modeIterator.append(typeIterator);
-                p_41423_.add(modeIterator);
+            if (!Screen.hasShiftDown()) {
+                MutableComponent base = Component.translatable(MODID + ".upgrade_description_shift");
+                base.withStyle(ChatFormatting.WHITE);
+                p_41423_.add(base);
             }
-
-        }
-
-        //Add a new Line if both are present
-        if(p_41421_.getItem() instanceof ISelectableArea && p_41421_.getItem() instanceof IHasModeTypes)p_41423_.add(Component.literal(""));
-
-        if(p_41421_.getItem() instanceof ISelectableArea)
-        {
-            if(hasTwoPointsSelected(p_41421_))
+            else
             {
-                MutableComponent posTitle = Component.translatable(MODID + ".upgrade_tooltip_blockpos_title");
-                posTitle.withStyle(ChatFormatting.GOLD);
-                p_41423_.add(posTitle);
-
                 //Separator
                 MutableComponent separator = Component.translatable(MODID + ".tooltip_separator");
                 p_41423_.add(separator);
 
-                MutableComponent posOne = Component.translatable(MODID + ".upgrade_tooltip_blockpos_one");
-                BlockPos blockPosOne = readBlockPosFromNBT(p_41421_,1);
-                MutableComponent posOnePos = Component.literal(blockPosOne.getX() + "x " + blockPosOne.getY() + "y " + blockPosOne.getZ()+ "z");
-                posOnePos.withStyle(ChatFormatting.GRAY);
-                posOne.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
-                posOne.append(posOnePos);
+                // List all the current modes and their status
+                for(int i=0;i<5;i++)
+                {
+                    MutableComponent modeIterator = getUpgradeModeComponentFromInt(i);
+                    MutableComponent typeIterator = (getTransportModeFromNBT(p_41421_,i))?(Component.translatable(MODID + ".upgrade_tooltip_type_enabled")):(Component.translatable(MODID + ".upgrade_tooltip_type_disabled"));
+                    modeIterator.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
+                    modeIterator.append(typeIterator);
+                    p_41423_.add(modeIterator);
+                }
+            }
+        }
 
-                p_41423_.add(posOne);
+        if(Screen.hasShiftDown() && Screen.hasAltDown())
+        {
+            //Add a new Line if both are present
+            p_41423_.add(Component.literal(""));
+        }
 
-                MutableComponent posTwo = Component.translatable(MODID + ".upgrade_tooltip_blockpos_two");
-                BlockPos blockPosTwo = readBlockPosFromNBT(p_41421_,2);
-                MutableComponent posTwoPos = Component.literal(blockPosTwo.getX() + "x " + blockPosTwo.getY() + "y " + blockPosTwo.getZ()+ "z");
-                posTwoPos.withStyle(ChatFormatting.GRAY);
-                posTwo.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
-                posTwo.append(posTwoPos);
-                p_41423_.add(posTwo);
+        if(p_41421_.getItem() instanceof ISelectableArea)
+        {
+            if(hasOneBlockPos(p_41421_))
+            {
+                if (!Screen.hasAltDown()) {
+                    MutableComponent base = Component.translatable(MODID + ".upgrade_description_alt");
+                    base.withStyle(ChatFormatting.WHITE);
+                    p_41423_.add(base);
+                } else {
+                    MutableComponent posTitle = Component.translatable(MODID + ".upgrade_tooltip_blockpos_title");
+                    posTitle.withStyle(ChatFormatting.GOLD);
+                    p_41423_.add(posTitle);
+
+                    //Separator
+                    MutableComponent separator = Component.translatable(MODID + ".tooltip_separator");
+                    p_41423_.add(separator);
+
+                    MutableComponent posOne = Component.translatable(MODID + ".upgrade_tooltip_blockpos_one");
+                    BlockPos blockPosOne = readBlockPosFromNBT(p_41421_,1);
+                    MutableComponent posOnePos = Component.literal(blockPosOne.getX() + "x " + blockPosOne.getY() + "y " + blockPosOne.getZ()+ "z");
+                    posOnePos.withStyle(ChatFormatting.GRAY);
+                    posOne.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
+                    posOne.append(posOnePos);
+
+                    p_41423_.add(posOne);
+
+                    MutableComponent posTwo = Component.translatable(MODID + ".upgrade_tooltip_blockpos_two");
+                    BlockPos blockPosTwo = readBlockPosFromNBT(p_41421_,2);
+                    MutableComponent posTwoPos = Component.literal(blockPosTwo.getX() + "x " + blockPosTwo.getY() + "y " + blockPosTwo.getZ()+ "z");
+                    posTwoPos.withStyle(ChatFormatting.GRAY);
+                    posTwo.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
+                    posTwo.append(posTwoPos);
+                    p_41423_.add(posTwo);
+                }
             }
         }
 

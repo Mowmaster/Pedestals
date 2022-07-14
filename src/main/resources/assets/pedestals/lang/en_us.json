@@ -35,11 +35,18 @@
   "pedestals.upgrade_tooltip_blockpos_one": "Selection 1",
   "pedestals.upgrade_tooltip_blockpos_two": "Selection 2",
 
+  "pedestals.upgrade_blockpos_clear": "Selected Area has Been Cleared",
+  "pedestals.upgrade_blockpos_first": "Point 1 Selected",
+  "pedestals.upgrade_blockpos_second": "Point 2 Selected",
+  "pedestals.upgrade_blockpos_point_out_of_range": "Invalid Selection Size",
 
+
+  "pedestals.upgrade_description_shift": "§7Press 'Shift' to Show Enabled Transfer Types",
+  "pedestals.upgrade_description_alt": "§8Press 'Alt' to Show Selected Block Points",
 
   "pedestals.error": "ERROR",
-  "pedestals.description_shift": "Press Shift for More Info",
-  "pedestals.description_alt": "Press Alt for More Info",
+  "pedestals.description_shift": "Press 'Shift' for More Info",
+  "pedestals.description_alt": "Press 'Alt' for More Info",
 
   "pedestals.mode_changed": "Mode Changed: ",
   "pedestals.mode_items": "Item",

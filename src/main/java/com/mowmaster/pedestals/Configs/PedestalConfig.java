@@ -95,7 +95,17 @@ public class PedestalConfig
 
         public final ForgeConfigSpec.BooleanValue cobbleGeneratorDamageTools;
 
+        public final ForgeConfigSpec.IntValue upgrade_magnet_baseEnergyCost;
+        public final ForgeConfigSpec.DoubleValue upgrade_magnet_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_magnet_baseXpCost;
+        public final ForgeConfigSpec.DoubleValue upgrade_magnet_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_magnet_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_magnet_baseDustAmount;
+        public final ForgeConfigSpec.DoubleValue upgrade_magnet_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_magnet_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_magnet_selectedMultiplier;
 
+        public final ForgeConfigSpec.BooleanValue upgrade_require_sized_selectable_area;
 
         Common(ForgeConfigSpec.Builder builder) {
 
@@ -186,16 +196,60 @@ public class PedestalConfig
             augment_t3RangeInsertable = builder.comment("Tier 3, Max Allowed To Insert of this Tier").defineInRange("t3_rangeInsertable", 5, 1, 64);
             augment_t4RangeIncrease = builder.comment("Tier 4, Block Range Increase").defineInRange("t4_rangeIncrease", 8, 0, Integer.MAX_VALUE);
             augment_t4RangeInsertable = builder.comment("Tier 4, Max Allowed To Insert of this Tier").defineInRange("t4_rangeInsertable", 7, 1, 64);
-
-
-
             builder.pop();
+
+
 
             builder.comment("Upgrade Machine Configs").push("Upgrade_Machines");
 
             cobbleGeneratorDamageTools = builder
                     .comment("Cobble Gen Damages Inserted Tools")
                     .define("cobbleGenToolDamage",false);
+            builder.pop();
+
+
+            builder.comment("Upgrade Toggle-ables").push("Upgrade_Toggles");
+
+            upgrade_require_sized_selectable_area = builder
+                    .comment("Restrict the Selectable Area Size based on the Upgrades AOE modifier")
+                    .define("upgrade_toggleable_require_selectable_size",  false);
+            builder.pop();
+
+
+
+
+            builder.comment("Upgrade 'Energy' Costs").push("Upgrade_Costs");
+
+            upgrade_magnet_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation")
+                    .defineInRange("upgrade_magnet_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_magnet_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier")
+                    .defineInRange("upgrade_magnet_base_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_magnet_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation")
+                    .defineInRange("upgrade_magnet_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_magnet_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier")
+                    .defineInRange("upgrade_magnet_base_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_magnet_dustColor = builder
+                    .comment("Dust Color Required to do action")
+                    .defineInRange("upgrade_magnet_base_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_magnet_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation")
+                    .defineInRange("upgrade_magnet_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_magnet_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier")
+                    .defineInRange("upgrade_magnet_base_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+
+            upgrade_magnet_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal")
+                    .define("upgrade_magnet_selected_allowed",  false);
+
+            upgrade_magnet_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula)")
+                    .defineInRange("upgrade_magnet_selected_modifier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+
             builder.pop();
         }
     }
