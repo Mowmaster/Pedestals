@@ -103,6 +103,13 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
      *
      */
 
+    //This is for things that have for loops, normally they break after each working loop,
+    // but this would remove that break and allow it to process all in the for loop
+    public boolean hasAdvancedOne()
+    {
+        return false;
+    }
+
 
 
 
