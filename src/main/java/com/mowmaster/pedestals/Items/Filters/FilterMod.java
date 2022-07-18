@@ -5,7 +5,7 @@ import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -103,7 +103,7 @@ public class FilterMod extends BaseFilter{
         ItemStack filterStack = pedestal.getFilterInPedestal();
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
-            MessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
+            MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
             //For each Mode
             for(int i=0;i<4;i++)
@@ -111,7 +111,7 @@ public class FilterMod extends BaseFilter{
                 List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,i);
                 if(filterQueue.size()>0)
                 {
-                    MessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
+                    MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
                     for(int j=0;j<filterQueue.size();j++) {
 

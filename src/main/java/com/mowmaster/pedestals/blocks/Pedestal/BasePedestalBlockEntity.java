@@ -3,15 +3,14 @@ package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Experience.CapabilityExperience;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
-import com.mowmaster.mowlib.MowLibUtils.ColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtil;
+import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
-import com.mowmaster.pedestals.Items.Upgrades.IUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -58,8 +57,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 public class BasePedestalBlockEntity extends BlockEntity
 {
@@ -501,9 +498,9 @@ public class BasePedestalBlockEntity extends BlockEntity
 
             @Override
             public int getMaxExperienceStored() {
-                int convertLevelsToXp = MowLibXpUtil.getExpCountByLevel(PedestalConfig.COMMON.pedestal_baseXpStorage.get());
+                int convertLevelsToXp = MowLibXpUtils.getExpCountByLevel(PedestalConfig.COMMON.pedestal_baseXpStorage.get());
                 //Conditioning out running the xp converter when theres not need to.
-                int convertLevelsToXpAdditional = (getXpLevelAmountIncreaseFromStorage()>0)?(MowLibXpUtil.getExpCountByLevel(getXpLevelAmountIncreaseFromStorage())):(0);
+                int convertLevelsToXpAdditional = (getXpLevelAmountIncreaseFromStorage()>0)?(MowLibXpUtils.getExpCountByLevel(getXpLevelAmountIncreaseFromStorage())):(0);
                 return convertLevelsToXp + convertLevelsToXpAdditional;//30 levels is default
             }
 
@@ -1305,9 +1302,9 @@ public class BasePedestalBlockEntity extends BlockEntity
     {
         //im assuming # = rf value???
         int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
-        int experienceTransferRateConverted = MowLibXpUtil.getExpCountByLevel(baseValue);
+        int experienceTransferRateConverted = MowLibXpUtils.getExpCountByLevel(baseValue);
 
-        return  (getXpTransferRateIncreaseFromCapacity()>0)?(MowLibXpUtil.getExpCountByLevel(getXpTransferRateIncreaseFromCapacity()+baseValue)):(experienceTransferRateConverted);
+        return  (getXpTransferRateIncreaseFromCapacity()>0)?(MowLibXpUtils.getExpCountByLevel(getXpTransferRateIncreaseFromCapacity()+baseValue)):(experienceTransferRateConverted);
     }
 
     /*============================================================================
@@ -2096,7 +2093,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         {
             IItemHandler ph = privateHandler.orElse(null);
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = ColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),ColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(true)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(true)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
             ph.insertItem(slotLight,new ItemStack(Items.GLOWSTONE,1),false);
             update();
             level.setBlock(getPos(),newstate,3);
@@ -2110,7 +2107,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(hasLight())
         {
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = ColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),ColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
             ph.extractItem(slotLight,1,false);
             level.setBlock(getPos(),newstate,3);
             update();
@@ -2126,7 +2123,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(hasLight())
         {
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = ColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),ColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
             if(getLightBrightness()<=1)
             {
                 boolLight = true;
@@ -2151,7 +2148,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(hasLight())
         {
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = ColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),ColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
             int slotCount = ph.getStackInSlot(slotLight).getCount();
             ph.extractItem(slotLight,slotCount,false);
             level.setBlock(getPos(),newstate,3);
@@ -2226,7 +2223,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(updateBlock)
         {
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = ColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),ColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, 0);
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, 0);
             level.setBlock(getPos(),newstate,3);
             update();
         }
@@ -2251,7 +2248,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     ph.insertItem(slotFilter,itemFromBlock,false);
                     BlockState state = level.getBlockState(getPos());
-                    BlockState newstate = ColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),ColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) itemFromBlock.getItem()).getFilterType(itemFromBlock))?(2):(1));
+                    BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) itemFromBlock.getItem()).getFilterType(itemFromBlock))?(2):(1));
                     level.setBlock(getPos(),newstate,3);
                     update();
                 }

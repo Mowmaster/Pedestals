@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.Items.Augments;
 
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -103,7 +103,7 @@ public class AugmentRenderDiffuser extends AugmentBase
                             default: typeString = ".error"; colorChange = ChatFormatting.DARK_RED; break;
                         }
 
-                        MessageUtils.messagePopup(player,colorChange,MODID + typeString);
+                        MowLibMessageUtils.messagePopup(player,colorChange,MODID + typeString);
                     }
                 }
             }

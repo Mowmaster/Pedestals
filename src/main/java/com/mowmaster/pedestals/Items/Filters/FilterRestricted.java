@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.Items.Filters;
 
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -100,13 +100,13 @@ public class FilterRestricted extends BaseFilter{
                             {
                                 this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
                                 ChatFormatting color = PedestalModesAndTypes.getModeColorFormat(itemInOffhand);
-                                MessageUtils.messagePopup(player,color,MODID + ".filter_changed");
+                                MowLibMessageUtils.messagePopup(player,color,MODID + ".filter_changed");
                             }
                         }
                     }
                 }
                 else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter){
-                    MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
+                    MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
                 }
             }
         }
@@ -117,9 +117,9 @@ public class FilterRestricted extends BaseFilter{
     @Override
     public void chatDetails(Player player, BasePedestalBlockEntity pedestal) {
         ItemStack filterStack = pedestal.getFilterInPedestal();
-        MessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
+        MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
-        MessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
+        MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
         MutableComponent enchants = Component.literal("1");
         List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,PedestalModesAndTypes.getModeFromStack(filterStack));

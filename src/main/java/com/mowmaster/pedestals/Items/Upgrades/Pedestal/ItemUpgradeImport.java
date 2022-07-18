@@ -14,7 +14,7 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
@@ -431,7 +431,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                                     if(!player.isCreative())ItemHandlerHelper.giveItemToPlayer(player,new ItemStack(Items.BUCKET,1));
 
                                     String fluid = pedestal.getStoredFluid().getDisplayName().getString() +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
-                                    MessageUtils.messagePopupText(player,ChatFormatting.WHITE,fluid);
+                                    MowLibMessageUtils.messagePopupText(player,ChatFormatting.WHITE,fluid);
                                 }
                             }
                         }

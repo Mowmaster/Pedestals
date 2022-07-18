@@ -35,12 +35,12 @@ public class NoCollideAugmentCrafting
     public static void NoCollideAugment(PlayerInteractEvent.RightClickBlock event)
     {
         //Added to keep fake players from canning this every time?
-        if(!(event.getPlayer() instanceof FakePlayer))
+        if(!(event.getEntity() instanceof FakePlayer))
         {
-            Level worldIn = event.getWorld();
+            Level worldIn = event.getLevel();
             InteractionHand hand = event.getHand();
             BlockState state = worldIn.getBlockState(event.getPos());
-            Player player = event.getPlayer();
+            Player player = event.getEntity();
             BlockPos pos = event.getPos();
 
             int posX = event.getPos().getX();

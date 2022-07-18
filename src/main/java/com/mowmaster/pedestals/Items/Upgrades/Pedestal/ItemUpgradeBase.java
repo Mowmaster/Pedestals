@@ -244,7 +244,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             player.setItemInHand(hand,heldItem);
 
             ChatFormatting colorChange = (!getTransportMode)?(ChatFormatting.WHITE):(ChatFormatting.BLACK);
-            MessageUtils.messagePopup(player,colorChange,MODID + ((!getTransportMode)?(".transport_mode_changed_true"):(".transport_mode_changed_false")));
+            MowLibMessageUtils.messagePopup(player,colorChange,MODID + ((!getTransportMode)?(".transport_mode_changed_true"):(".transport_mode_changed_false")));
         }
     }
 
@@ -262,7 +262,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
             List<String> listed = new ArrayList<>();
             listed.add(MODID + typeString);
-            MessageUtils.messagePopupWithAppend(MODID, player,colorChange,MODID + ".mode_changed",listed);
+            MowLibMessageUtils.messagePopupWithAppend(MODID, player,colorChange,MODID + ".mode_changed",listed);
         }
     }
 
@@ -530,32 +530,32 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                             {
                                 saveBlockPosToNBT(itemInHand,2,atLocation);
                                 player.setItemInHand(hand,itemInHand);
-                                MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_second");
+                                MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_second");
                             }
                             else
                             {
-                                MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".upgrade_blockpos_point_out_of_range");
+                                MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".upgrade_blockpos_point_out_of_range");
                             }
                         }
                         else
                         {
                             saveBlockPosToNBT(itemInHand,2,atLocation);
                             player.setItemInHand(hand,itemInHand);
-                            MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_second");
+                            MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_second");
                         }
                     }
                     else if(!hasTwoPointsAlready)
                     {
                         saveBlockPosToNBT(itemInHand,1,atLocation);
                         player.setItemInHand(hand,itemInHand);
-                        MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_first");
+                        MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_first");
                     }
                 }
                 else if(result.getType().equals(HitResult.Type.MISS) && hasOneBlockPos(itemInHand))
                 {
                     saveBlockPosToNBT(itemInHand,1,BlockPos.ZERO);
                     saveBlockPosToNBT(itemInHand,2,BlockPos.ZERO);
-                    MessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
+                    MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
                 }
             }
             else if(hand.equals(InteractionHand.OFF_HAND) && itemInHand.getItem() instanceof IHasModeTypes)

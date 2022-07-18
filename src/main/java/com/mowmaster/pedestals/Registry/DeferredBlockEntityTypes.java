@@ -12,7 +12,7 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 public class DeferredBlockEntityTypes
 {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister
-            .create(ForgeRegistries.BLOCK_ENTITIES, MODID);
+            .create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
 
     public static final RegistryObject<BlockEntityType<BasePedestalBlockEntity>> PEDESTAL = BLOCK_ENTITIES.register(
             "block_entity_pedestal",

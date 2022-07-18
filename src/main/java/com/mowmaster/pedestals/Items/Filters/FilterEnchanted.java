@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.Items.Filters;
 
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -91,13 +91,13 @@ public class FilterEnchanted extends BaseFilter{
                             {
                                 this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
                                 ChatFormatting color = PedestalModesAndTypes.getModeColorFormat(itemInOffhand);
-                                MessageUtils.messagePopup(player,color,MODID + ".filter_changed");
+                                MowLibMessageUtils.messagePopup(player,color,MODID + ".filter_changed");
                             }
                         }
                     }
                 }
                 else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter){
-                    MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
+                    MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
                 }
             }
         }

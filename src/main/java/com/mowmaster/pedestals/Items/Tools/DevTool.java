@@ -39,12 +39,12 @@ public class DevTool extends BaseTool implements IPedestalTool
     }
 
     @Override
-    public ItemStack getContainerItem(ItemStack itemStack) {
+    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
         return DeferredRegisterItems.TOOL_DEVTOOL.get().getDefaultInstance();
     }
 
     @Override
-    public boolean hasContainerItem(ItemStack stack) {
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
         return true;
     }
 }

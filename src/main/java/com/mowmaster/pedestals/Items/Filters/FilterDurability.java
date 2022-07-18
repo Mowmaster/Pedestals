@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.Items.Filters;
 
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -131,13 +131,13 @@ public class FilterDurability extends BaseFilter
                             {
                                 this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
                                 ChatFormatting color = PedestalModesAndTypes.getModeColorFormat(itemInOffhand);
-                                MessageUtils.messagePopup(player,color,MODID + ".filter_changed");
+                                MowLibMessageUtils.messagePopup(player,color,MODID + ".filter_changed");
                             }
                         }
                     }
                 }
                 else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter){
-                    MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
+                    MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
                 }
             }
         }
@@ -151,26 +151,26 @@ public class FilterDurability extends BaseFilter
         ItemStack filterStack = pedestal.getFilterInPedestal();
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
-            MessageUtils.messagePlayerChatText(player,ChatFormatting.WHITE,filterStack.getDisplayName().getString());
+            MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.WHITE,filterStack.getDisplayName().getString());
 
             boolean filterType = getFilterType(filterStack,PedestalModesAndTypes.getModeFromStack(filterStack));
             String above = MODID + ".filters.tooltip_filterabove";
             String below = MODID + ".filters.tooltip_filterbelow";
             List<String> listed = new ArrayList<>();
             listed.add((filterType)?(below):(above));
-            MessageUtils.messagePlayerChatWithAppend(MODID,player,ChatFormatting.GOLD,MODID + ".filters.tooltip_filtertype",listed);
+            MowLibMessageUtils.messagePlayerChatWithAppend(MODID,player,ChatFormatting.GOLD,MODID + ".filters.tooltip_filtertype",listed);
 
             List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,PedestalModesAndTypes.getModeFromStack(filterStack));
             if(filterQueue.size()>0)
             {
-                MessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
+                MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
-                MessageUtils.messagePlayerChatText(player,ChatFormatting.GRAY,""+getDurabilityTarget(pedestal.getFilterInPedestal())+"");
+                MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GRAY,""+getDurabilityTarget(pedestal.getFilterInPedestal())+"");
             }
         }
         else
         {
-            MessageUtils.messagePlayerChat(player,ChatFormatting.DARK_RED,MODID + ".baseItem");
+            MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.DARK_RED,MODID + ".baseItem");
         }
     }
 

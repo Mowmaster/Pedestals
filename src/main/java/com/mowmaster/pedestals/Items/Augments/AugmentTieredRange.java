@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.Items.Augments;
 
-import com.mowmaster.mowlib.MowLibUtils.TooltipUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibTooltipUtils;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
@@ -62,7 +62,7 @@ public class AugmentTieredRange extends AugmentBase{
             listed.add(""+rangeAugment.getAllowedInsertAmount(p_41421_.getItem())+"");
 
 
-            TooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID,p_41423_,listed,colors);
+            MowLibTooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID,p_41423_,listed,colors);
         }
     }
 

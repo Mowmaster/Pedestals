@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.EventHandlers;
 
 import com.mowmaster.mowlib.Items.ColorApplicator;
-import com.mowmaster.mowlib.MowLibUtils.ColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -29,10 +29,10 @@ public class ChangeApplicatorColor {
     @SubscribeEvent()
     public static void ColorApply(PlayerInteractEvent.RightClickBlock event)
     {
-        if(!(event.getPlayer() instanceof FakePlayer) && event.getPlayer().isCreative())
+        if(!(event.getEntity() instanceof FakePlayer) && event.getEntity().isCreative())
         {
-            Level world = event.getWorld();
-            Player player = event.getPlayer();
+            Level world = event.getLevel();
+            Player player = event.getEntity();
             InteractionHand hand = event.getHand();
             BlockPos pos = event.getPos();
 
@@ -112,15 +112,15 @@ ForgeRegistries.BLOCKS.tags().getTag([THE TAG YOU WANT]).stream().toList(); // R
                 if(black>0)
                 {
                     world.explode(player,null,null,pos.getX()+0.5,pos.getY()+2.0,pos.getZ()+0.5,0.0f,false, Explosion.BlockInteraction.NONE);
-                    ItemStack newStack = ColorReference.addColorToItemStack(player.getItemInHand(hand).copy(),0,0,0);
-                    ColorApplicator.saveColorList(newStack,ColorApplicator.addSavedColor(player.getItemInHand(hand),ColorReference.getColor(Arrays.asList(0,0,0))));
+                    ItemStack newStack = MowLibColorReference.addColorToItemStack(player.getItemInHand(hand).copy(),0,0,0);
+                    ColorApplicator.saveColorList(newStack,ColorApplicator.addSavedColor(player.getItemInHand(hand),MowLibColorReference.getColor(Arrays.asList(0,0,0))));
                     player.setItemInHand(hand,newStack);
                 }
                 else if(red>0 || green>0 || blue>0)
                 {
                     world.explode(player,null,null,pos.getX()+0.5,pos.getY()+2.0,pos.getZ()+0.5,0.0f,false, Explosion.BlockInteraction.NONE);
-                    ItemStack newStack = ColorReference.addColorToItemStack(player.getItemInHand(hand).copy(),red,green,blue);
-                    ColorApplicator.saveColorList(newStack,ColorApplicator.addSavedColor(player.getItemInHand(hand),ColorReference.getColor(Arrays.asList(red,green,blue))));
+                    ItemStack newStack = MowLibColorReference.addColorToItemStack(player.getItemInHand(hand).copy(),red,green,blue);
+                    ColorApplicator.saveColorList(newStack,ColorApplicator.addSavedColor(player.getItemInHand(hand),MowLibColorReference.getColor(Arrays.asList(red,green,blue))));
                     player.setItemInHand(hand,newStack);
                 }
             }

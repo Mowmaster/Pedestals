@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines;
 
-import com.mowmaster.mowlib.MowLibUtils.ContainerUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
@@ -53,7 +53,7 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
 
     @Nullable
     public CobbleGenRecipe getRecipe(Level level, ItemStack stackIn) {
-        Container cont = ContainerUtils.getContainer(1);
+        Container cont = MowLibContainerUtils.getContainer(1);
         cont.setItem(-1,stackIn);
         List<CobbleGenRecipe> recipes = level.getRecipeManager().getRecipesFor(CobbleGenRecipe.Type.INSTANCE,cont,level);
         return recipes.size() > 0 ? level.getRecipeManager().getRecipesFor(CobbleGenRecipe.Type.INSTANCE,cont,level).get(0) : null;

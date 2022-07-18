@@ -18,6 +18,8 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.stream.IntStream;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
 {
     public ItemUpgradeExport(Properties p_41383_) {

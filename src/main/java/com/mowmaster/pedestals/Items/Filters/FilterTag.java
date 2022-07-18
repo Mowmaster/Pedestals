@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.Items.Filters;
 
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -102,7 +102,7 @@ public class FilterTag extends BaseFilter{
         ItemStack filterStack = pedestal.getFilterInPedestal();
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
-            MessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
+            MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
             //For each Mode
             for(int i=0;i<4;i++)
@@ -110,13 +110,13 @@ public class FilterTag extends BaseFilter{
                 List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,i);
                 if(filterQueue.size()>0)
                 {
-                    MessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
+                    MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
                     for(int j=0;j<filterQueue.size();j++) {
 
                         if(!filterQueue.get(j).isEmpty())
                         {
-                            MessageUtils.messagePlayerChatText(player,ChatFormatting.GRAY,filterQueue.get(j).getDisplayName().getString());
+                            MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GRAY,filterQueue.get(j).getDisplayName().getString());
                         }
                     }
                 }

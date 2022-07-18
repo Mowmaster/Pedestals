@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.Items.Tools;
 
 
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -43,7 +43,7 @@ public class ToolSwapper extends BaseTool implements IPedestalTool
                     {
                         ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_FILTERTOOL.get());
                         player.setItemInHand(hand, newTool);
-                        MessageUtils.messagePopup(player,ChatFormatting.GREEN,"pedestals.tool_change");
+                        MowLibMessageUtils.messagePopup(player,ChatFormatting.GREEN,"pedestals.tool_change");
                         return InteractionResultHolder.success(stackInHand);
                     }
                 }
@@ -59,12 +59,12 @@ public class ToolSwapper extends BaseTool implements IPedestalTool
     }
 
     @Override
-    public ItemStack getContainerItem(ItemStack itemStack) {
+    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
         return DeferredRegisterItems.TOOL_TOOLSWAPPER.get().getDefaultInstance();
     }
 
     @Override
-    public boolean hasContainerItem(ItemStack stack) {
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
         return true;
     }
 }

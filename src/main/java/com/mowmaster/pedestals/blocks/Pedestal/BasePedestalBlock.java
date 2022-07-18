@@ -2,8 +2,8 @@ package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.mowmaster.mowlib.Blocks.BaseBlocks.BaseColoredBlock;
 import com.mowmaster.mowlib.Items.ColorApplicator;
-import com.mowmaster.mowlib.MowLibUtils.ColorReference;
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredCapacity;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredRange;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredSpeed;
@@ -73,7 +73,7 @@ import javax.annotation.Nullable;
 
 import java.util.List;
 
-import static com.mowmaster.mowlib.MowLibUtils.ColorReference.getIntColor;
+import static com.mowmaster.mowlib.MowLibUtils.MowLibColorReference.getIntColor;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
@@ -102,7 +102,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
     public BasePedestalBlock(BlockBehaviour.Properties p_152915_)
     {
         super(p_152915_);
-        this.registerDefaultState(ColorReference.addColorToBlockState(this.defaultBlockState(),ColorReference.DEFAULTCOLOR).setValue(WATERLOGGED, Boolean.valueOf(false)).setValue(FACING, Direction.UP).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, 0));
+        this.registerDefaultState(MowLibColorReference.addColorToBlockState(this.defaultBlockState(),MowLibColorReference.DEFAULTCOLOR).setValue(WATERLOGGED, Boolean.valueOf(false)).setValue(FACING, Direction.UP).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, 0));
         this.CUP = Shapes.or(Block.box(3.0D, 0.0D, 3.0D, 13.0D, 2.0D, 13.0D),
                 Block.box(5.0D, 2.0D, 5.0D, 11.0D, 10.0D, 11.0D),
                 Block.box(4.0D, 10.0D, 4.0D, 12.0D, 12.0D, 12.0D));
@@ -230,15 +230,15 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
         BlockPos blockpos = p_152019_.getClickedPos();
         Direction direction = p_152019_.getClickedFace();
         BlockState blockstate = p_152019_.getLevel().getBlockState(p_152019_.getClickedPos().relative(direction.getOpposite()));
-        int getColor = ColorReference.getColorFromStateInt(blockstate);
+        int getColor = MowLibColorReference.getColorFromStateInt(blockstate);
         //Lit and Filter can never be anything other then default when placing the block
         //Also copied the facing direction stuff from EndRodBlock
         return blockstate.is(this) &&
                 blockstate.getValue(FACING) == direction
                 ?
-                ColorReference.addColorToBlockState(this.defaultBlockState(),getColor).setValue(FACING, direction.getOpposite()).setValue(WATERLOGGED, Boolean.valueOf(levelaccessor.getFluidState(blockpos).getType() == Fluids.WATER)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, 0)
+                MowLibColorReference.addColorToBlockState(this.defaultBlockState(),getColor).setValue(FACING, direction.getOpposite()).setValue(WATERLOGGED, Boolean.valueOf(levelaccessor.getFluidState(blockpos).getType() == Fluids.WATER)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, 0)
                 :
-                ColorReference.addColorToBlockState(this.defaultBlockState(),getColor).setValue(FACING, direction).setValue(WATERLOGGED, Boolean.valueOf(levelaccessor.getFluidState(blockpos).getType() == Fluids.WATER)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, 0);
+                MowLibColorReference.addColorToBlockState(this.defaultBlockState(),getColor).setValue(FACING, direction).setValue(WATERLOGGED, Boolean.valueOf(levelaccessor.getFluidState(blockpos).getType() == Fluids.WATER)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, 0);
 
     }
 
@@ -288,16 +288,16 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                                                     //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                     if(tilePedestal.storeNewLocation(tool.getStoredPosition(player.getOffhandItem())))
                                                     {
-                                                        MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linksucess);
+                                                        MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linksucess);
                                                     }
-                                                    else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkunsuccess);
+                                                    else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkunsuccess);
                                                 }
                                             }
-                                            else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkitsself);
+                                            else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkitsself);
                                         }
-                                        else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linknetwork);
+                                        else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linknetwork);
                                     }
-                                    else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkdistance);
+                                    else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkdistance);
                                 }
                             }
                         }
@@ -336,16 +336,16 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                                                     //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
                                                     if(tileSender.storeNewLocation(p_49848_))
                                                     {
-                                                        MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linksucess);
+                                                        MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linksucess);
                                                     }
-                                                    else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkunsuccess);
+                                                    else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkunsuccess);
                                                 }
                                             }
-                                            else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkitsself);
+                                            else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkitsself);
                                         }
-                                        else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linknetwork);
+                                        else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linknetwork);
                                     }
-                                    else MessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkdistance);
+                                    else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkdistance);
                                 }
                             }
                         }
@@ -498,15 +498,15 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 else if (p_60506_.getItemInHand(p_60507_).getItem() instanceof ColorApplicator) {
 
 
-                    getColor = ColorReference.getColorFromItemStackInt(p_60506_.getItemInHand(p_60507_));
-                    currentColor = ColorReference.getColorFromStateInt(p_60503_);
+                    getColor = MowLibColorReference.getColorFromItemStackInt(p_60506_.getItemInHand(p_60507_));
+                    currentColor = MowLibColorReference.getColorFromStateInt(p_60503_);
                     if (currentColor != getColor) {
-                        newState = ColorReference.addColorToBlockState(p_60503_, getColor);
+                        newState = MowLibColorReference.addColorToBlockState(p_60503_, getColor);
                         p_60504_.setBlock(p_60505_, newState, 3);
                         return InteractionResult.SUCCESS;
                     }
                     else {
-                        MessageUtils.messagePlayerChat(p_60506_, ChatFormatting.RED,"mowlib.recolor.message_sameColor");
+                        MowLibMessageUtils.messagePlayerChat(p_60506_, ChatFormatting.RED,"mowlib.recolor.message_sameColor");
                         return InteractionResult.FAIL;
                     }
                 }
@@ -641,14 +641,14 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 }
                 else if(DYES.contains(itemInOffHand.getItem()))
                 {
-                    getColor = ColorReference.getColorFromDyeInt(itemInOffHand);
-                    currentColor = ColorReference.getColorFromStateInt(p_60503_);
+                    getColor = MowLibColorReference.getColorFromDyeInt(itemInOffHand);
+                    currentColor = MowLibColorReference.getColorFromStateInt(p_60503_);
                     if (currentColor != getColor) {
-                        newState = ColorReference.addColorToBlockState(p_60503_, getColor);
+                        newState = MowLibColorReference.addColorToBlockState(p_60503_, getColor);
                         p_60504_.setBlock(p_60505_, newState, 3);
                         return InteractionResult.SUCCESS;
                     } else {
-                        MessageUtils.messagePlayerChat(p_60506_, ChatFormatting.RED,"mowlib.recolor.message_sameColor");
+                        MowLibMessageUtils.messagePlayerChat(p_60506_, ChatFormatting.RED,"mowlib.recolor.message_sameColor");
                         return InteractionResult.FAIL;
                     }
 
@@ -772,8 +772,8 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
             if (p_49830_.getBlock() instanceof BasePedestalBlock) {
                 if (!p_49827_.isClientSide && !p_49828_.isCreative()) {
                     ItemStack itemstack = new ItemStack(this);
-                    int getColor = ColorReference.getColorFromStateInt(p_49830_);
-                    ItemStack newStack = ColorReference.addColorToItemStack(itemstack,getColor);
+                    int getColor = MowLibColorReference.getColorFromStateInt(p_49830_);
+                    ItemStack newStack = MowLibColorReference.addColorToItemStack(itemstack,getColor);
                     newStack.setCount(1);
                     ItemEntity itementity = new ItemEntity(p_49827_, (double)p_49829_.getX() + 0.5D, (double)p_49829_.getY() + 0.5D, (double)p_49829_.getZ() + 0.5D, newStack);
                     itementity.setDefaultPickUpDelay();
@@ -828,8 +828,8 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
             if (p_56214_.getBlock() instanceof BasePedestalBlock) {
                 if (!p_56212_.isClientSide && !p_56215_.isCreative()) {
                     ItemStack itemstack = new ItemStack(this);
-                    int getColor = ColorReference.getColorFromStateInt(p_56214_);
-                    ItemStack newStack = ColorReference.addColorToItemStack(itemstack,getColor);
+                    int getColor = MowLibColorReference.getColorFromStateInt(p_56214_);
+                    ItemStack newStack = MowLibColorReference.addColorToItemStack(itemstack,getColor);
                     newStack.setCount(1);
                     ItemEntity itementity = new ItemEntity(p_56212_, (double)p_56213_.getX() + 0.5D, (double)p_56213_.getY() + 0.5D, (double)p_56213_.getZ() + 0.5D, newStack);
                     itementity.setDefaultPickUpDelay();

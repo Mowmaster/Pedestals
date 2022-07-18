@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.Items.Filters;
 
-import com.mowmaster.mowlib.MowLibUtils.ColorReference;
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Client.ItemTooltipComponent;
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
@@ -103,13 +103,13 @@ public class BaseFilter extends Item implements IPedestalFilter
                             if(buildQueue.size() > 0 && PedestalModesAndTypes.getModeFromStack(itemInOffhand)<=1)
                             {
                                 this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
-                                MessageUtils.messagePopup(player,PedestalModesAndTypes.getModeColorFormat(itemInOffhand),MODID + ".filter_changed");
+                                MowLibMessageUtils.messagePopup(player,PedestalModesAndTypes.getModeColorFormat(itemInOffhand),MODID + ".filter_changed");
                             }
                         }
                     }
                 }
                 else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter){
-                    MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
+                    MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
                 }
             }
         }
@@ -126,7 +126,7 @@ public class BaseFilter extends Item implements IPedestalFilter
         String black = MODID + ".filter_type_blacklist";
         List<String> listed = new ArrayList<>();
         listed.add((!getCurrentType)?(black):(white));
-        MessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
+        MowLibMessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
     }
 
     public void setFilterTypeAboveBelow(Player player, ItemStack heldItem)
@@ -140,7 +140,7 @@ public class BaseFilter extends Item implements IPedestalFilter
             String below = MODID + ".filter_type_below";
             List<String> listed = new ArrayList<>();
             listed.add((!getCurrentType)?(below):(above));
-            MessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
+            MowLibMessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
         }
     }
 
@@ -153,7 +153,7 @@ public class BaseFilter extends Item implements IPedestalFilter
             int mode = PedestalModesAndTypes.getModeFromStack(heldItem)+1;
             int setNewMode = (mode<=3)?(mode):(0);
             PedestalModesAndTypes.saveModeToNBT(heldItem,setNewMode);
-            ColorReference.addColorToItemStack(heldItem,filterItem.getFilterTypeColor(heldItem));
+            MowLibColorReference.addColorToItemStack(heldItem,filterItem.getFilterTypeColor(heldItem));
             player.setItemInHand(hand,heldItem);
 
             ChatFormatting colorChange = PedestalModesAndTypes.getModeDarkColorFormat(setNewMode);
@@ -161,7 +161,7 @@ public class BaseFilter extends Item implements IPedestalFilter
 
             List<String> listed = new ArrayList<>();
             listed.add(MODID + typeString);
-            MessageUtils.messagePopupWithAppend(MODID, player,colorChange,MODID + ".mode_changed",listed);
+            MowLibMessageUtils.messagePopupWithAppend(MODID, player,colorChange,MODID + ".mode_changed",listed);
         }
     }
 
@@ -191,8 +191,8 @@ public class BaseFilter extends Item implements IPedestalFilter
     @Override
     public void setFilterType(ItemStack filterItem, boolean filterSet) {
         filterType = filterSet;
-        if(filterSet) { ColorReference.addColorToItemStack(filterItem,2763306); }
-        else ColorReference.addColorToItemStack(filterItem,16777215);
+        if(filterSet) { MowLibColorReference.addColorToItemStack(filterItem,2763306); }
+        else MowLibColorReference.addColorToItemStack(filterItem,16777215);
         writeFilterTypeToNBT(filterItem,PedestalModesAndTypes.getModeFromStack(filterItem));
     }
 
@@ -371,7 +371,7 @@ public class BaseFilter extends Item implements IPedestalFilter
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
             List<String> listed = new ArrayList<>();
-            MessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GOLD,filterStack.getDisplayName().getString(), listed);
+            MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GOLD,filterStack.getDisplayName().getString(), listed);
 
             //For each Mode
             for(int i=0;i<4;i++)
@@ -379,7 +379,7 @@ public class BaseFilter extends Item implements IPedestalFilter
                 List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,i);
                 if(filterQueue.size()>0)
                 {
-                    MessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
+                    MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
                     List<String> enchantList = new ArrayList<>();
                     for(int j=0;j<filterQueue.size();j++) {
@@ -389,13 +389,13 @@ public class BaseFilter extends Item implements IPedestalFilter
                             enchantList.add(filterQueue.get(j).getDisplayName().getString() + ", ");
                         }
                     }
-                    MessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GRAY,filterStack.getDisplayName().getString(), enchantList);
+                    MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GRAY,filterStack.getDisplayName().getString(), enchantList);
                 }
             }
         }
         else
         {
-            MessageUtils.messagePlayerChat(player,ChatFormatting.DARK_RED,MODID + ".baseItem");
+            MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.DARK_RED,MODID + ".baseItem");
         }
     }
 

@@ -1,7 +1,7 @@
 package com.mowmaster.pedestals.Items.Filters;
 
-import com.mowmaster.mowlib.MowLibUtils.ColorReference;
-import com.mowmaster.mowlib.MowLibUtils.MessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -39,7 +39,7 @@ public class FilterEnchantCount extends BaseFilter{
 
     public static int getColor(ItemStack filterIn)
     {
-        return (PedestalModesAndTypes.getModeFromStack(filterIn)==0)?(8388736):(ColorReference.getColorFromItemStackInt(filterIn));
+        return (PedestalModesAndTypes.getModeFromStack(filterIn)==0)?(8388736):(MowLibColorReference.getColorFromItemStackInt(filterIn));
     }
 
     @Override
@@ -114,7 +114,7 @@ public class FilterEnchantCount extends BaseFilter{
                                 String black = MODID + ".filter_type_blacklist";
                                 List<String> listed = new ArrayList<>();
                                 listed.add((!getCurrentType)?(black):(white));
-                                MessageUtils.messagePlayerChatWithAppend(MODID, player, (!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
+                                MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player, (!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
                             }
                         }
                     }
@@ -132,14 +132,14 @@ public class FilterEnchantCount extends BaseFilter{
                             {
                                 this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
                                 ChatFormatting color = PedestalModesAndTypes.getModeColorFormat(itemInOffhand);
-                                MessageUtils.messagePopup(player,color,MODID + ".filter_changed");
+                                MowLibMessageUtils.messagePopup(player,color,MODID + ".filter_changed");
                             }
                         }
                     }
                 }
                 else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter)
                 {
-                    MessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
+                    MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
                 }
             }
         }
@@ -151,9 +151,9 @@ public class FilterEnchantCount extends BaseFilter{
     public void chatDetails(Player player, BasePedestalBlockEntity pedestal) {
         ItemStack filterStack = pedestal.getFilterInPedestal();
 
-        MessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
+        MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
-        MessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist_count");
+        MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist_count");
 
         MutableComponent enchants = Component.literal("1");
         List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,0);
