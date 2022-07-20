@@ -1,13 +1,15 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
 
+import com.mowmaster.mowlib.Capabilities.Dust.CapabilityDust;
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.mowlib.Capabilities.Experience.CapabilityExperience;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
-import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
-import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtils;
+import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import com.mowmaster.mowlib.api.IDustStorage;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
@@ -23,21 +25,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ExperienceOrb;
-import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -51,12 +46,12 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class BasePedestalBlockEntity extends BlockEntity
 {
@@ -65,18 +60,21 @@ public class BasePedestalBlockEntity extends BlockEntity
     private LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(this::createHandlerPedestalEnergy);
     private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(this::createHandlerPedestalFluid);
     private LazyOptional<IExperienceStorage> experienceHandler = LazyOptional.of(this::createHandlerPedestalExperience);
+    private LazyOptional<IDustHandler> dustHandler = LazyOptional.of(this::createDustHandler);
     private List<ItemStack> stacksList = new ArrayList<>();
     private MobEffectInstance storedPotionEffect = null;
     private int storedPotionEffectDuration = 0;
     private int storedEnergy = 0;
     private FluidStack storedFluid = FluidStack.EMPTY;
     private int storedExperience = 0;
+    private DustMagic storedDust = DustMagic.EMPTY;
     private final List<BlockPos> storedLocations = new ArrayList<BlockPos>();
     private int storedValueForUpgrades = 0;
     private boolean showRenderRange = false;
     public BlockPos getPos() { return this.worldPosition; }
     private BasePedestalBlockEntity getPedestal() { return this; }
     private int maxRate = Integer.MAX_VALUE;
+
 
     public boolean getRenderRange(){return this.showRenderRange;}
     public void setRenderRange(boolean setRender){ this.showRenderRange = setRender; update();}
@@ -87,7 +85,6 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     public void update()
     {
-
         BlockState state = level.getBlockState(getPos());
         this.level.sendBlockUpdated(getPos(), state, state, 3);
         this.setChanged();
@@ -285,6 +282,8 @@ public class BasePedestalBlockEntity extends BlockEntity
             }
         };
     }
+
+
 
     public IFluidHandler createHandlerPedestalFluid() {
         return new IFluidHandler() {
@@ -524,6 +523,118 @@ public class BasePedestalBlockEntity extends BlockEntity
         };
     }
 
+    public IDustHandler createDustHandler() {
+        return new IDustHandler() {
+            protected void onContentsChanged()
+            {
+                update();
+            }
+
+            @Override
+            public int getTanks() {
+                return 1;
+            }
+
+            @NotNull
+            @Override
+            public DustMagic getDustMagicInTank(int tank) {
+                return storedDust;
+            }
+
+            @Override
+            public int getTankCapacity(int tank)
+            {
+                int baseStorage = PedestalConfig.COMMON.pedestal_baseDustStorage.get();
+                int additionalStorage = getDustAmountIncreaseFromStorage();
+                return baseStorage + additionalStorage;
+            }
+
+            @Override
+            public boolean isDustValid(int tank, @NotNull DustMagic dustIn) {
+                return storedDust.isDustEqualOrEmpty(dustIn);
+            }
+
+            @Override
+            public int fill(DustMagic dust, DustAction action) {
+                if (dust.isEmpty() || !isDustValid(0,dust))
+                {
+                    return 0;
+                }
+                if (action.simulate())
+                {
+                    if (storedDust.isEmpty())
+                    {
+                        return Math.min(getTankCapacity(0), dust.getDustAmount());
+                    }
+                    if (!storedDust.isDustEqual(dust))
+                    {
+                        return 0;
+                    }
+                    return Math.min(getTankCapacity(0) - storedDust.getDustAmount(), dust.getDustAmount());
+                }
+                if (storedDust.isEmpty())
+                {
+                    storedDust = new DustMagic(dust.getDustColor(), Math.min(getTankCapacity(0), dust.getDustAmount()));
+                    onContentsChanged();
+                    return storedDust.getDustAmount();
+                }
+                if (!storedDust.isDustEqual(dust))
+                {
+                    return 0;
+                }
+                int filled = getTankCapacity(0) - storedDust.getDustAmount();
+
+                if (dust.getDustAmount() < filled)
+                {
+                    storedDust.grow(dust.getDustAmount());
+                    filled = dust.getDustAmount();
+                }
+                else
+                {
+                    storedDust.setDustAmount(getTankCapacity(0));
+                }
+                if (filled > 0)
+                    onContentsChanged();
+                return filled;
+            }
+
+            @NotNull
+            @Override
+            public DustMagic drain(DustMagic dust, DustAction action) {
+                if (dust.isEmpty() || !dust.isDustEqual(storedDust))
+                {
+                    return new DustMagic(-1, 0);
+                }
+                return drain(dust.getDustAmount(), action);
+            }
+
+            @NotNull
+            @Override
+            public DustMagic drain(int maxDrain, DustAction action) {
+                int drained = maxDrain;
+                if (storedDust.getDustAmount() < drained)
+                {
+                    drained = storedDust.getDustAmount();
+                }
+                DustMagic magic = new DustMagic(storedDust.getDustColor(), drained);
+                if (action.execute() && drained > 0)
+                {
+                    if(drained>=storedDust.getDustAmount())
+                    {
+                        storedDust.setDustAmount(0);
+                        storedDust.setDustColor(-1);
+                    }
+                    else
+                    {
+                        storedDust.shrink(drained);
+                    }
+                    onContentsChanged();
+                }
+                return magic;
+            }
+        };
+    }
+
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
@@ -539,92 +650,49 @@ public class BasePedestalBlockEntity extends BlockEntity
         if ((cap == CapabilityExperience.EXPERIENCE)) {
             return experienceHandler.cast();
         }
+        if ((cap == CapabilityDust.DUST_HANDLER)) {
+            return dustHandler.cast();
+        }
         return super.getCapability(cap, side);
     }
 
 
 
+
     public void dropInventoryItems(Level worldIn, BlockPos pos) {
         IItemHandler h = handler.orElse(null);
-        for(int i = 0; i < h.getSlots(); ++i) {
-            MowLibItemUtils.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i));
-        }
+        MowLibItemUtils.dropInventoryItems(worldIn,pos,h);
     }
 
     public void dropInventoryItemsPrivate(Level worldIn, BlockPos pos) {
         IItemHandler ph = privateHandler.orElse(null);
-        for(int i = 0; i < ph.getSlots(); ++i) {
-            MowLibItemUtils.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), ph.getStackInSlot(i));
-        }
+        MowLibItemUtils.dropInventoryItems(worldIn,pos,ph);
     }
 
     public void dropLiquidsInWorld(Level worldIn, BlockPos pos) {
         IFluidHandler fluids = fluidHandler.orElse(null);
-        FluidStack fluidStack = fluids.getFluidInTank(0).copy();
-        Item item = fluidStack.getFluid().getBucket();
-
-        int x = -1;
-        int z = -1;
-        int y = 0;
-        while (fluidStack.getAmount()>=1000)
-        {
-            if(item instanceof BucketItem)
-            {
-                BucketItem bucketItem = (BucketItem) item;
-                BlockState state = worldIn.getBlockState(pos.offset(x,y,z));
-                if(state.getBlock().equals(Blocks.AIR))
-                {
-                    if(bucketItem.emptyContents(null,level,pos.offset(x,y,z),null))fluidStack.grow(-1000);
-                }
-
-                if(x>=1 && z>=1)
-                {
-                    y+=1;
-                    x=-1;
-                    z=-1;
-                }
-
-                if(x>=1)
-                {
-                    x=-1;
-                    z+=1;
-                }
-
-                x+=1;
-            }
-
-        }
+        MowLibFluidUtils.dropLiquidsInWorld(worldIn,pos,fluids);
     }
 
     public void removeEnergyFromBrokenPedestal(Level worldIn, BlockPos pos) {
         IEnergyStorage energy = energyHandler.orElse(null);
-        Random rand = new Random();
-        //MUAHAHAHAHAHAHAHAH
-        if(energy.getEnergyStored()>=5000)
-        {
-            while(energy.getEnergyStored()>=5000)
-            {
-                LightningBolt lightningbolt = EntityType.LIGHTNING_BOLT.create(worldIn);
-                lightningbolt.moveTo(Vec3.atBottomCenterOf(pos.offset(rand.nextInt(10),-1,rand.nextInt(10))));
-                lightningbolt.setCause(null);
-                worldIn.addFreshEntity(lightningbolt);
-                worldIn.playSound(null, pos, SoundEvents.TRIDENT_THUNDER, SoundSource.WEATHER, 5.0F, 1.0F);
-                energy.extractEnergy(5000,false);
-            }
-        }
+        MowLibEnergyUtils.removeEnergy(worldIn,pos,energy);
     }
 
     public void dropXPInWorld(Level worldIn, BlockPos pos) {
         IExperienceStorage experience = experienceHandler.orElse(null);
-        if(experience.getExperienceStored()>0)
-        {
-            ExperienceOrb xpEntity = new ExperienceOrb(level,getPos().getX(), getPos().getY(), getPos().getZ(),experience.getExperienceStored());
-            xpEntity.lerpMotion(0D,0D,0D);
-            level.addFreshEntity(xpEntity);
-        }
+        MowLibXpUtils.dropXPInWorld(worldIn,pos,experience);
     }
 
-
+    public void dropDustInWorld(Level worldIn, BlockPos pos) {
+        IDustHandler dust = dustHandler.orElse(null);
+        if(!dust.getDustMagicInTank(0).isEmpty())
+        {
+            ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_DUST.get());
+            DustMagic.setDustMagicInStack(toDrop,storedDust);
+            MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
+        }
+    }
 
     /*============================================================================
     ==============================================================================
@@ -1317,6 +1385,79 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     /*============================================================================
     ==============================================================================
+    ===========================    DUST   START      =============================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean hasDust()
+    {
+        IDustHandler h = dustHandler.orElse(null);
+        if(!h.getDustMagicInTank(0).isEmpty())return true;
+        return false;
+    }
+
+    public DustMagic getStoredDust()
+    {
+        IDustHandler h = dustHandler.orElse(null);
+        if(!h.getDustMagicInTank(0).isEmpty())return h.getDustMagicInTank(0);
+        return DustMagic.EMPTY;
+    }
+
+    public int getDustCapacity()
+    {
+        IDustHandler h = dustHandler.orElse(null);
+        return h.getTankCapacity(0);
+    }
+
+    public int spaceForDust()
+    {
+        return getDustCapacity()-getStoredDust().getDustAmount();
+    }
+
+    public boolean canAcceptDust(DustMagic dustMagicIn)
+    {
+        IDustHandler h = dustHandler.orElse(null);
+        return h.isDustValid(0,dustMagicIn);
+    }
+
+    public DustMagic removeDust(DustMagic dustMagicToRemove, IDustHandler.DustAction action)
+    {
+        IDustHandler h = dustHandler.orElse(null);
+        update();
+        return h.drain(dustMagicToRemove,action);
+    }
+
+    public DustMagic removeDust(int dustAmountToRemove, IDustHandler.DustAction action)
+    {
+        IDustHandler h = dustHandler.orElse(null);
+        update();
+        return h.drain(new DustMagic(getStoredDust().getDustColor(),dustAmountToRemove),action);
+    }
+
+    public int addDust(DustMagic dustMagicIn, IDustHandler.DustAction action)
+    {
+        IDustHandler h = dustHandler.orElse(null);
+        update();
+        return h.fill(dustMagicIn,action);
+    }
+
+    public int getDustTransferRate()
+    {
+        //im assuming # = rf value???
+        int baseValue = PedestalConfig.COMMON.pedestal_baseDustTransferRate.get();
+        return  (getDustTransferRateIncreaseFromCapacity()>0)?(MowLibXpUtils.getExpCountByLevel(getDustTransferRateIncreaseFromCapacity()+baseValue)):(baseValue);
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================     DUST   END       =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
     ===========================      COIN START      =============================
     ==============================================================================
     ============================================================================*/
@@ -1639,6 +1780,17 @@ public class BasePedestalBlockEntity extends BlockEntity
         return 0;
     }
 
+    public int getDustTransferRateIncreaseFromCapacity()
+    {
+        ItemStack augmentCapacity = getCapacityStack();
+        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
+        {
+            return capacityStack.getAdditionalDustTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
+        }
+
+        return 0;
+    }
+
     /*============================================================================
     ==============================================================================
     ===========================     CAPACITY END     =============================
@@ -1774,6 +1926,17 @@ public class BasePedestalBlockEntity extends BlockEntity
         if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
         {
             return storageStack.getAdditionalXpStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
+        }
+
+        return 0;
+    }
+
+    public int getDustAmountIncreaseFromStorage()
+    {
+        ItemStack augmentStorage = getStorageStack();
+        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
+        {
+            return storageStack.getAdditionalDustStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
         }
 
         return 0;
@@ -3199,6 +3362,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         this.storedEnergy = p_155245_.getInt("storedEnergy");
         this.storedFluid = FluidStack.loadFluidStackFromNBT(p_155245_.getCompound("storedFluid"));
         this.storedExperience = p_155245_.getInt("storedExperience");
+        this.storedDust = DustMagic.getDustMagicInTag(p_155245_);
         //this.setFluid(FluidStack.loadFluidStackFromNBT(p_155245_.getCompound("storedFluid")),0);
         this.storedPotionEffect = (MobEffectInstance.load(p_155245_)!=null)?(MobEffectInstance.load(p_155245_)):(null);
         this.storedPotionEffectDuration = p_155245_.getInt("storedEffectDuration");
@@ -3241,6 +3405,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         p_58888_.putInt("storedEnergy",storedEnergy);
         p_58888_.put("storedFluid",storedFluid.writeToNBT(new CompoundTag()));
         p_58888_.putInt("storedExperience",storedExperience);
+
         if(storedPotionEffect!=null)storedPotionEffect.save(p_58888_);
         p_58888_.putInt("storedEffectDuration",storedPotionEffectDuration);
         p_58888_.putBoolean("showRenderRange",showRenderRange);
@@ -3270,7 +3435,7 @@ public class BasePedestalBlockEntity extends BlockEntity
         p_58888_.putIntArray("intArrayYSPos",storedYS);
         p_58888_.putIntArray("intArrayZSPos",storedZS);
 
-        return p_58888_;
+        return DustMagic.setDustMagicInTag(p_58888_,this.storedDust);
     }
 
     @Override
@@ -3329,6 +3494,9 @@ public class BasePedestalBlockEntity extends BlockEntity
         }
         if(this.experienceHandler != null) {
             this.experienceHandler.invalidate();
+        }
+        if(this.dustHandler != null) {
+            this.dustHandler.invalidate();
         }
     }
 }

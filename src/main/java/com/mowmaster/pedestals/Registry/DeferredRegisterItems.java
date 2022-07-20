@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.*;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseDustBulkStorageItem;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeExport;
@@ -125,6 +126,12 @@ public class DeferredRegisterItems
             () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_RANGE = ITEMS.register("augment_pedestal_t4_range",
             () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
+
+
+    public static final RegistryObject<Item> MECHANICAL_STORAGE_DUST = ITEMS.register("mechanical_storage_dust",
+            () -> new BaseDustBulkStorageItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
 
 
     public static void register(IEventBus eventBus) {

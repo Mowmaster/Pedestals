@@ -1,35 +1,29 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
+import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
-import com.mowmaster.mowlib.Capabilities.Experience.CapabilityExperience;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
+import com.mowmaster.mowlib.api.IDustStorage;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 
 import static com.mowmaster.pedestals.PedestalUtils.PedestalUtilities.*;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
-
-import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
@@ -37,12 +31,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-import javax.annotation.Nullable;
-import java.util.List;
 import java.util.stream.IntStream;
-
-
-import net.minecraft.world.item.Item.Properties;
 
 public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
 {
@@ -295,11 +284,221 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                 }
             }
         }
+        if(canTransferDust(coinInPedestal))
+        {
+            LazyOptional<IDustHandler> cap = PedestalUtilities.findDustHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal));
+
+            if(cap.isPresent())
+            {
+                IDustHandler handler = cap.orElse(null);
+
+                if(handler != null)
+                {
+                    if(handler.drain(1, IDustHandler.DustAction.SIMULATE).getDustAmount()>=1)
+                    {
+                        DustMagic getCurrentlyStored = handler.getDustMagicInTank(0);
+                        int containerCurrentDust = getCurrentlyStored.getDustAmount();
+                        int getSpaceForDust = pedestal.spaceForDust();
+                        int transferRate = (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust);
+                        if (containerCurrentDust < transferRate) {transferRate = containerCurrentDust;}
+
+                        //transferRate at this point is equal to what we can send.
+                        if(handler.drain(transferRate,IDustHandler.DustAction.SIMULATE).getDustAmount() > 0)
+                        {
+                            pedestal.addExperience(transferRate,false);
+                            handler.drain(transferRate,IDustHandler.DustAction.EXECUTE);
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
     @Override
     public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn) {
+
+
+        if(canTransferXP(pedestal.getCoinOnPedestal()) && pedestal.canAcceptExperience())
+        {
+            if (entityIn instanceof Player) {
+                Player player = ((Player) entityIn);
+                if(!player.isCrouching())
+                {
+                    int currentlyStoredExp = pedestal.getStoredExperience();
+                    if(currentlyStoredExp < pedestal.getExperienceCapacity())
+                    {
+                        int transferRate = pedestal.getExperienceTransferRate();
+                        int value = removeXp(player, transferRate);
+                        if(value > 0)
+                        {
+                            pedestal.addExperience(value,false);
+                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
+                        }
+                    }
+                }
+            }
+        }
+
+        if(canTransferDust(pedestal.getCoinOnPedestal()))
+        {
+            if(entityIn instanceof ItemEntity)
+            {
+                ItemEntity itemEntity = ((ItemEntity) entityIn);
+                ItemStack itemStack = itemEntity.getItem();
+                if(itemStack.getItem() instanceof IDustStorage dustStorageItem)
+                {
+                    DustMagic getDustMagicInItemStack = DustMagic.getDustMagicInItemStack(itemStack);
+                    if(pedestal.canAcceptDust(getDustMagicInItemStack))
+                    {
+                        int containerCurrentDust = getDustMagicInItemStack.getDustAmount();
+                        //System.out.println("importDustAmount: " + containerCurrentDust);
+                        int getSpaceForDust = pedestal.spaceForDust();
+                        //System.out.println("space: " + getSpaceForDust);
+                        //System.out.println("defaultRate: " + pedestal.getDustTransferRate());
+
+                        int transferRate = Math.min(containerCurrentDust, (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust));
+                        //if (containerCurrentDust < transferRate) {transferRate = containerCurrentDust;}
+
+                        DustMagic dustToTransfer = new DustMagic(getDustMagicInItemStack.getDustColor(),transferRate);
+                        //transferRate at this point is equal to what we can send.
+
+                        //System.out.println("ADD DUST: "+ pedestal.addDust(dustToTransfer, IDustHandler.DustAction.SIMULATE));
+                        if(pedestal.addDust(dustToTransfer, IDustHandler.DustAction.SIMULATE) > 0)
+                        {
+                            pedestal.addDust(dustToTransfer, IDustHandler.DustAction.EXECUTE);
+                            //remove dust from item and maybe remove it from world
+                            if(dustToTransfer.getDustAmount() >= getDustMagicInItemStack.getDustAmount() && dustStorageItem.consumedOnEmpty(itemStack))
+                            {
+                                itemEntity.remove(Entity.RemovalReason.DISCARDED);
+                            }
+                            else
+                            {
+                                DustMagic.setDustMagicInStack(itemStack,new DustMagic(dustToTransfer.getDustColor(), getDustMagicInItemStack.getDustAmount() - dustToTransfer.getDustAmount()));
+                                itemEntity.setItem(itemStack);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (entityIn instanceof Player) {
+                Player player = ((Player) entityIn);
+                if(!player.isCrouching())
+                {
+                    //.filter(itemStack -> passesDustFilter(pedestal,itemStack))
+                    ItemStack dustItemStack = IntStream.range(0,(player.getInventory().items.size()))//Int Range
+                            .mapToObj((player.getInventory().items)::get)//Function being applied to each interval
+                            .filter(itemStack -> !itemStack.isEmpty())
+                            .filter(itemStack -> itemStack.getItem() instanceof IDustStorage)
+                            .findFirst().orElse(ItemStack.EMPTY);
+
+                    if(!dustItemStack.isEmpty())
+                    {
+                        IDustStorage dustItem = ((IDustStorage)dustItemStack.getItem());
+                        DustMagic getDustMagicInItemStack = DustMagic.getDustMagicInItemStack(dustItemStack);
+                        if(pedestal.canAcceptDust(getDustMagicInItemStack))
+                        {
+                            int containerCurrentDust = getDustMagicInItemStack.getDustAmount();
+                            int getSpaceForDust = pedestal.spaceForDust();
+                            int transferRate = (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust);
+                            if (containerCurrentDust < transferRate) {transferRate = containerCurrentDust;}
+
+                            DustMagic dustToTransfer = new DustMagic(getDustMagicInItemStack.getDustColor(),transferRate);
+                            //transferRate at this point is equal to what we can send.
+                            if(pedestal.addDust(dustToTransfer, IDustHandler.DustAction.SIMULATE) > 0)
+                            {
+                                int slot = player.getInventory().findSlotMatchingItem(dustItemStack);
+                                pedestal.addDust(dustToTransfer, IDustHandler.DustAction.EXECUTE);
+                                //remove dust from item and maybe remove it from inventory
+                                if(dustToTransfer.getDustAmount() >= getDustMagicInItemStack.getDustAmount() && dustItem.consumedOnEmpty(dustItemStack))
+                                {
+                                    if(!player.isCreative())player.getInventory().getItem(slot).shrink(dustItemStack.getCount());
+                                }
+                                else
+                                {
+                                    DustMagic.setDustMagicInStack(dustItemStack,new DustMagic(dustToTransfer.getDustColor(), getDustMagicInItemStack.getDustAmount() - dustToTransfer.getDustAmount()));
+                                    if(!player.isCreative())ItemHandlerHelper.giveItemToPlayer(player,dustItemStack);
+                                }
+
+                                String dustString = MowLibColorReference.getColorName(dustToTransfer.getDustColor()) +": " +pedestal.getStoredDust().getDustAmount() +"/"+pedestal.getDustCapacity();
+                                MowLibMessageUtils.messagePopupText(player,ChatFormatting.LIGHT_PURPLE,dustString);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(canTransferFluids(pedestal.getCoinOnPedestal()))
+        {
+            if(entityIn instanceof ItemEntity)
+            {
+                ItemEntity itemEntity = ((ItemEntity) entityIn);
+                ItemStack itemStack = itemEntity.getItem();
+                if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket && passesFluidFilter(pedestal,itemStack))
+                {
+                    Fluid bucketFluid = bucket.getFluid();
+                    FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
+                    int fluidSpaceInPedestal = pedestal.spaceForFluid();
+
+                    FluidStack fluidInPedestal = pedestal.getStoredFluid();
+                    if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
+                    {
+                        int transferRate = 1000;
+                        if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
+                        {
+                            FluidStack fluidDrained = fluidInTank.copy();
+                            if(!fluidInTank.isEmpty())
+                            {
+                                pedestal.addFluid(fluidDrained,IFluidHandler.FluidAction.EXECUTE);
+                                itemEntity.setItem(new ItemStack(Items.BUCKET,1));
+                            }
+                        }
+                    }
+                }
+            }
+            else if (entityIn instanceof Player) {
+                Player player = ((Player) entityIn);
+                if(!player.isCrouching())
+                {
+                    ItemStack bucketItemStack = IntStream.range(0,(player.getInventory().items.size()))//Int Range
+                            .mapToObj((player.getInventory().items)::get)//Function being applied to each interval
+                            .filter(itemStack -> !itemStack.isEmpty())
+                            .filter(itemStack -> !itemStack.getItem().equals(Items.BUCKET))
+                            .filter(itemStack -> itemStack.getItem() instanceof BucketItem)
+                            .filter(itemStack -> passesFluidFilter(pedestal,itemStack))
+                            .findFirst().orElse(ItemStack.EMPTY);
+
+                    if(!bucketItemStack.isEmpty())
+                    {
+                        BucketItem bucket = ((BucketItem)bucketItemStack.getItem());
+                        Fluid bucketFluid = bucket.getFluid();
+                        FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
+                        int fluidSpaceInPedestal = pedestal.spaceForFluid();
+
+                        FluidStack fluidInPedestal = pedestal.getStoredFluid();
+                        if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
+                        {
+                            int transferRate = 1000;
+                            if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
+                            {
+                                FluidStack fluidDrained = fluidInTank.copy();
+                                if(!fluidInTank.isEmpty())
+                                {
+                                    pedestal.addFluid(fluidDrained,IFluidHandler.FluidAction.EXECUTE);
+                                    int slot = player.getInventory().findSlotMatchingItem(bucketItemStack);
+                                    if(!player.isCreative())player.getInventory().getItem(slot).shrink(1);
+                                    if(!player.isCreative())ItemHandlerHelper.giveItemToPlayer(player,new ItemStack(Items.BUCKET,1));
+
+                                    String fluid = pedestal.getStoredFluid().getDisplayName().getString() +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
+                                    MowLibMessageUtils.messagePopupText(player,ChatFormatting.WHITE,fluid);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if(canTransferItems(pedestal.getCoinOnPedestal()))
         {
             if(entityIn instanceof ItemEntity)
@@ -366,72 +565,6 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                                     player.getInventory().setItem(slot,newStackInPlayer);
                                     pedestal.addItem(stackToAdd,false);
                                     if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,0));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if(canTransferXP(pedestal.getCoinOnPedestal()) && pedestal.canAcceptExperience())
-        {
-            if (entityIn instanceof Player) {
-                Player player = ((Player) entityIn);
-                if(!player.isCrouching())
-                {
-                    int currentlyStoredExp = pedestal.getStoredExperience();
-                    if(currentlyStoredExp < pedestal.getExperienceCapacity())
-                    {
-                        int transferRate = pedestal.getExperienceTransferRate();
-                        int value = removeXp(player, transferRate);
-                        if(value > 0)
-                        {
-                            pedestal.addExperience(value,false);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
-                        }
-                    }
-                }
-            }
-        }
-
-        if(canTransferFluids(pedestal.getCoinOnPedestal()))
-        {
-            if (entityIn instanceof Player) {
-                Player player = ((Player) entityIn);
-                if(!player.isCrouching())
-                {
-                    ItemStack bucketItemStack = IntStream.range(0,(player.getInventory().items.size()))//Int Range
-                            .mapToObj((player.getInventory().items)::get)//Function being applied to each interval
-                            .filter(itemStack -> !itemStack.isEmpty())
-                            .filter(itemStack -> !itemStack.getItem().equals(Items.BUCKET))
-                            .filter(itemStack -> itemStack.getItem() instanceof BucketItem)
-                            .filter(itemStack -> passesFluidFilter(pedestal,itemStack))
-                            .findFirst().orElse(ItemStack.EMPTY);
-
-                    if(!bucketItemStack.isEmpty())
-                    {
-                        BucketItem bucket = ((BucketItem)bucketItemStack.getItem());
-                        Fluid bucketFluid = bucket.getFluid();
-                        FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
-                        int fluidSpaceInPedestal = pedestal.spaceForFluid();
-
-                        FluidStack fluidInPedestal = pedestal.getStoredFluid();
-                        if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
-                        {
-                            int transferRate = 1000;
-                            if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
-                            {
-                                FluidStack fluidDrained = fluidInTank.copy();
-                                if(!fluidInTank.isEmpty())
-                                {
-                                    pedestal.addFluid(fluidDrained,IFluidHandler.FluidAction.EXECUTE);
-                                    int slot = player.getInventory().findSlotMatchingItem(bucketItemStack);
-                                    if(!player.isCreative())player.getInventory().getItem(slot).shrink(1);
-                                    if(!player.isCreative())ItemHandlerHelper.giveItemToPlayer(player,new ItemStack(Items.BUCKET,1));
-
-                                    String fluid = pedestal.getStoredFluid().getDisplayName().getString() +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
-                                    MowLibMessageUtils.messagePopupText(player,ChatFormatting.WHITE,fluid);
                                 }
                             }
                         }

@@ -14,24 +14,28 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue augment_t1CapacityFluid;
         public final ForgeConfigSpec.IntValue augment_t1CapacityEnergy;
         public final ForgeConfigSpec.IntValue augment_t1CapacityXp;
+        public final ForgeConfigSpec.IntValue augment_t1CapacityDust;
         public final ForgeConfigSpec.IntValue augment_t1CapacityInsertSize;
 
         public final ForgeConfigSpec.IntValue augment_t2CapacityItem;
         public final ForgeConfigSpec.IntValue augment_t2CapacityFluid;
         public final ForgeConfigSpec.IntValue augment_t2CapacityEnergy;
         public final ForgeConfigSpec.IntValue augment_t2CapacityXp;
+        public final ForgeConfigSpec.IntValue augment_t2CapacityDust;
         public final ForgeConfigSpec.IntValue augment_t2CapacityInsertSize;
 
         public final ForgeConfigSpec.IntValue augment_t3CapacityItem;
         public final ForgeConfigSpec.IntValue augment_t3CapacityFluid;
         public final ForgeConfigSpec.IntValue augment_t3CapacityEnergy;
         public final ForgeConfigSpec.IntValue augment_t3CapacityXp;
+        public final ForgeConfigSpec.IntValue augment_t3CapacityDust;
         public final ForgeConfigSpec.IntValue augment_t3CapacityInsertSize;
 
         public final ForgeConfigSpec.IntValue augment_t4CapacityItem;
         public final ForgeConfigSpec.IntValue augment_t4CapacityFluid;
         public final ForgeConfigSpec.IntValue augment_t4CapacityEnergy;
         public final ForgeConfigSpec.IntValue augment_t4CapacityXp;
+        public final ForgeConfigSpec.IntValue augment_t4CapacityDust;
         public final ForgeConfigSpec.IntValue augment_t4CapacityInsertSize;
 
 
@@ -40,24 +44,28 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue augment_t1StorageFluid;
         public final ForgeConfigSpec.IntValue augment_t1StorageEnergy;
         public final ForgeConfigSpec.IntValue augment_t1StorageXp;
+        public final ForgeConfigSpec.IntValue augment_t1StorageDust;
         public final ForgeConfigSpec.IntValue augment_t1StorageInsertSize;
 
         public final ForgeConfigSpec.IntValue augment_t2StorageItem;
         public final ForgeConfigSpec.IntValue augment_t2StorageFluid;
         public final ForgeConfigSpec.IntValue augment_t2StorageEnergy;
         public final ForgeConfigSpec.IntValue augment_t2StorageXp;
+        public final ForgeConfigSpec.IntValue augment_t2StorageDust;
         public final ForgeConfigSpec.IntValue augment_t2StorageInsertSize;
 
         public final ForgeConfigSpec.IntValue augment_t3StorageItem;
         public final ForgeConfigSpec.IntValue augment_t3StorageFluid;
         public final ForgeConfigSpec.IntValue augment_t3StorageEnergy;
         public final ForgeConfigSpec.IntValue augment_t3StorageXp;
+        public final ForgeConfigSpec.IntValue augment_t3StorageDust;
         public final ForgeConfigSpec.IntValue augment_t3StorageInsertSize;
 
         public final ForgeConfigSpec.IntValue augment_t4StorageItem;
         public final ForgeConfigSpec.IntValue augment_t4StorageFluid;
         public final ForgeConfigSpec.IntValue augment_t4StorageEnergy;
         public final ForgeConfigSpec.IntValue augment_t4StorageXp;
+        public final ForgeConfigSpec.IntValue augment_t4StorageDust;
         public final ForgeConfigSpec.IntValue augment_t4StorageInsertSize;
 
 
@@ -67,10 +75,15 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue pedestal_baseFluidStorage;
         public final ForgeConfigSpec.IntValue pedestal_baseEnergyStorage;
         public final ForgeConfigSpec.IntValue pedestal_baseXpStorage;
+        public final ForgeConfigSpec.IntValue pedestal_baseDustStorage;
         public final ForgeConfigSpec.IntValue pedestal_baseItemTransferRate;
         public final ForgeConfigSpec.IntValue pedestal_baseFluidTransferRate;
         public final ForgeConfigSpec.IntValue pedestal_baseEnergyTransferRate;
         public final ForgeConfigSpec.IntValue pedestal_baseXpTransferRate;
+        public final ForgeConfigSpec.IntValue pedestal_baseDustTransferRate;
+
+
+
 
 
 
@@ -115,24 +128,28 @@ public class PedestalConfig
             augment_t1CapacityFluid = builder.comment("Tier 1, Capacity Fluid Transfer Increase").defineInRange("t1_increaseFluidTransfer", 2000, 0, Integer.MAX_VALUE);
             augment_t1CapacityEnergy = builder.comment("Tier 1, Capacity Energy Transfer Increase").defineInRange("t1_increaseEnergyTransfer", 5000, 0, Integer.MAX_VALUE);
             augment_t1CapacityXp = builder.comment("Tier 1, Capacity Xp Transfer Increase (Levels)").defineInRange("t1_increaseXpTransfer", 1, 0, Integer.MAX_VALUE);
+            augment_t1CapacityDust = builder.comment("Tier 1, Capacity Dust Transfer Increase").defineInRange("t1_increaseDustTransfer", 10, 0, Integer.MAX_VALUE);
             augment_t1CapacityInsertSize = builder.comment("Tier 1, Max Allowed To Insert of this Tier").defineInRange("t1_increaseInsertableAmount", 4, 1, 64);
 
             augment_t2CapacityItem = builder.comment("Tier 2, Capacity Item Transfer Increase").defineInRange("t2_increaseItemTransfer", 4, 0, Integer.MAX_VALUE);
             augment_t2CapacityFluid = builder.comment("Tier 2, Capacity Fluid Transfer Increase").defineInRange("t2_increaseFluidTransfer", 4000, 0, Integer.MAX_VALUE);
             augment_t2CapacityEnergy = builder.comment("Tier 2, Capacity Energy Transfer Increase").defineInRange("t2_increaseEnergyTransfer", 10000, 0, Integer.MAX_VALUE);
             augment_t2CapacityXp = builder.comment("Tier 2, Capacity Xp Transfer Increase (Levels)").defineInRange("t2_increaseXpTransfer", 5, 0, Integer.MAX_VALUE);
+            augment_t2CapacityDust = builder.comment("Tier 2, Capacity Dust Transfer Increase (Levels)").defineInRange("t2_increaseDustTransfer", 10, 0, Integer.MAX_VALUE);
             augment_t2CapacityInsertSize = builder.comment("Tier 2, Max Allowed To Insert of this Tier").defineInRange("t2_increaseInsertableAmount", 8, 1, 64);
 
             augment_t3CapacityItem = builder.comment("Tier 3, Capacity Item Transfer Increase").defineInRange("t3_increaseItemTransfer", 8, 0, Integer.MAX_VALUE);
             augment_t3CapacityFluid = builder.comment("Tier 3, Capacity Fluid Transfer Increase").defineInRange("t3_increaseFluidTransfer", 8000, 0, Integer.MAX_VALUE);
             augment_t3CapacityEnergy = builder.comment("Tier 3, Capacity Energy Transfer Increase").defineInRange("t3_increaseEnergyTransfer", 100000, 0, Integer.MAX_VALUE);
             augment_t3CapacityXp = builder.comment("Tier 3, Capacity Xp Transfer Increase (Levels)").defineInRange("t3_increaseXpTransfer", 10, 0, Integer.MAX_VALUE);
+            augment_t3CapacityDust = builder.comment("Tier 3, Capacity Dust Transfer Increase").defineInRange("t3_increaseDustTransfer", 10, 0, Integer.MAX_VALUE);
             augment_t3CapacityInsertSize = builder.comment("Tier 3, Max Allowed To Insert of this Tier").defineInRange("t3_increaseInsertableAmount", 12, 1, 64);
 
             augment_t4CapacityItem = builder.comment("Tier 4, Capacity Item Transfer Increase").defineInRange("t4_increaseItemTransfer", 16, 0, Integer.MAX_VALUE);
             augment_t4CapacityFluid = builder.comment("Tier 4, Capacity Fluid Transfer Increase").defineInRange("t4_increaseFluidTransfer", 16000, 0, Integer.MAX_VALUE);
             augment_t4CapacityEnergy = builder.comment("Tier 4, Capacity Energy Transfer Increase").defineInRange("t4_increaseEnergyTransfer", 1000000, 0, Integer.MAX_VALUE);
             augment_t4CapacityXp = builder.comment("Tier 4, Capacity Xp Transfer Increase (Levels)").defineInRange("t4_increaseXpTransfer", 15, 0, Integer.MAX_VALUE);
+            augment_t4CapacityDust = builder.comment("Tier 4, Capacity Dust Transfer Increase").defineInRange("t4_increaseDustTransfer", 10, 0, Integer.MAX_VALUE);
             augment_t4CapacityInsertSize = builder.comment("Tier 4, Max Allowed To Insert of this Tier").defineInRange("t4_increaseInsertableAmount", 16, 1, 64);
 
 
@@ -141,24 +158,28 @@ public class PedestalConfig
             augment_t1StorageFluid = builder.comment("Tier 1, Storage Fluid Increase").defineInRange("t1_increaseFluidStorage", 4000, 0, Integer.MAX_VALUE);
             augment_t1StorageEnergy = builder.comment("Tier 1, Storage Energy Increase").defineInRange("t1_increaseEnergyStorage", 20000, 0, Integer.MAX_VALUE);
             augment_t1StorageXp = builder.comment("Tier 1, Storage Xp Increase (Levels)").defineInRange("t1_increaseXpStorage", 10, 0, Integer.MAX_VALUE);
+            augment_t1StorageDust = builder.comment("Tier 1, Storage Dust Increase").defineInRange("t1_increaseDustStorage", 50, 0, Integer.MAX_VALUE);
             augment_t1StorageInsertSize = builder.comment("Tier 1, Max Allowed To Insert of this Tier").defineInRange("t1_increaseInsertableStorageAmount", 3, 1, 64);
 
             augment_t2StorageItem = builder.comment("Tier 2, Storage Item Increase").defineInRange("t2_increaseItemStorage", 1, 0, Integer.MAX_VALUE);
             augment_t2StorageFluid = builder.comment("Tier 2, Storage Fluid Increase").defineInRange("t2_increaseFluidStorage", 16000, 0, Integer.MAX_VALUE);
             augment_t2StorageEnergy = builder.comment("Tier 2, Storage Energy Increase").defineInRange("t2_increaseEnergyStorage", 100000, 0, Integer.MAX_VALUE);
             augment_t2StorageXp = builder.comment("Tier 2, Storage Xp Increase (Levels)").defineInRange("t2_increaseXpStorage", 15, 0, Integer.MAX_VALUE);
+            augment_t2StorageDust = builder.comment("Tier 2, Storage Dust Increase").defineInRange("t2_increaseDustStorage", 100, 0, Integer.MAX_VALUE);
             augment_t2StorageInsertSize = builder.comment("Tier 2, Max Allowed To Insert of this Tier").defineInRange("t2_increaseInsertableStorageAmount", 7, 1, 64);
 
             augment_t3StorageItem = builder.comment("Tier 3, Storage Item Increase").defineInRange("t3_increaseItemStorage", 1, 0, Integer.MAX_VALUE);
             augment_t3StorageFluid = builder.comment("Tier 3, Storage Fluid Increase").defineInRange("t3_increaseFluidStorage", 64000, 0, Integer.MAX_VALUE);
             augment_t3StorageEnergy = builder.comment("Tier 3, Storage Energy Increase").defineInRange("t3_increaseEnergyStorage", 1000000, 0, Integer.MAX_VALUE);
             augment_t3StorageXp = builder.comment("Tier 3, Storage Xp Increase (Levels)").defineInRange("t3_increaseXpStorage", 20, 0, Integer.MAX_VALUE);
+            augment_t3StorageDust = builder.comment("Tier 3, Storage Dust Increase").defineInRange("t3_increaseDustStorage", 200, 0, Integer.MAX_VALUE);
             augment_t3StorageInsertSize = builder.comment("Tier 3, Max Allowed To Insert of this Tier").defineInRange("t3_increaseInsertableStorageAmount", 11, 1, 64);
 
             augment_t4StorageItem = builder.comment("Tier 4, Storage Item Increase").defineInRange("t4_increaseItemStorage", 1, 0, Integer.MAX_VALUE);
             augment_t4StorageFluid = builder.comment("Tier 4, Storage Fluid Increase").defineInRange("t4_increaseFluidStorage", 265000, 0, Integer.MAX_VALUE);
             augment_t4StorageEnergy = builder.comment("Tier 4, Storage Energy Increase").defineInRange("t4_increaseEnergyStorage", 10000000, 0, Integer.MAX_VALUE);
             augment_t4StorageXp = builder.comment("Tier 4, Storage Xp Increase (Levels)").defineInRange("t4_increaseXpStorage", 25, 0, Integer.MAX_VALUE);
+            augment_t4StorageDust = builder.comment("Tier 4, Storage Dust Increase").defineInRange("t4_increaseDustStorage", 500, 0, Integer.MAX_VALUE);
             augment_t4StorageInsertSize = builder.comment("Tier 4, Max Allowed To Insert of this Tier").defineInRange("t4_increaseInsertableStorageAmount", 15, 1, 64);
 
             //default speed is 4:40 ticks per send or 1:10 ticks(same as hopper rate)
@@ -167,11 +188,14 @@ public class PedestalConfig
             pedestal_baseFluidStorage = builder.comment("The initial fluid storage for pedestals (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseFluidStorage", 16000, 1, Integer.MAX_VALUE);
             pedestal_baseEnergyStorage = builder.comment("The initial energy storage for pedestals (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseEnergyStorage", 20000, 1, Integer.MAX_VALUE);
             pedestal_baseXpStorage = builder.comment("The initial xp storage for pedestals [In levels] (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseXpStorage", 30, 1, 21000);
+            pedestal_baseDustStorage = builder.comment("The initial dust storage for pedestals (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseDustStorage", 200, 1,  Integer.MAX_VALUE);
 
             pedestal_baseItemTransferRate = builder.comment("Base Item Transfer Rate").defineInRange("pedestal_baseItemTransferRate", 4, 1, Integer.MAX_VALUE);
             pedestal_baseFluidTransferRate = builder.comment("Base Fluid Transfer Rate").defineInRange("pedestal_baseFluidTransferRate", 1000, 1, Integer.MAX_VALUE);
             pedestal_baseEnergyTransferRate = builder.comment("Base Energy Transfer Rate").defineInRange("pedestal_baseEnergyTransferRate", 5000, 1, Integer.MAX_VALUE);
             pedestal_baseXpTransferRate = builder.comment("Base Xp Transfer Rate [In Levels]").defineInRange("pedestal_baseXpTransferRate", 1, 1, Integer.MAX_VALUE);
+            pedestal_baseDustTransferRate = builder.comment("Base Dust Transfer Rate").defineInRange("pedestal_baseDustTransferRate", 10, 1, Integer.MAX_VALUE);
+
 
 
             //4:30 so 2 ticks reduced for 5 upgrades?

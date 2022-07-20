@@ -812,6 +812,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 pedestal.dropLiquidsInWorld(p_60516_,p_60517_);
                 pedestal.removeEnergyFromBrokenPedestal(p_60516_,p_60517_);
                 pedestal.dropXPInWorld(p_60516_,p_60517_);
+                pedestal.dropDustInWorld(p_60516_,p_60517_);
 
                 p_60516_.updateNeighbourForOutputSignal(p_60517_,p_60518_.getBlock());
             }

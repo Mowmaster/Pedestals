@@ -57,6 +57,14 @@ public class AugmentTieredCapacity extends AugmentBase{
         if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T4_CAPACITY.get()))return PedestalConfig.COMMON.augment_t4CapacityXp.get();
         return 0;
     }
+    public int getAdditionalDustTransferRatePerItem(Item augment)
+    {
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T1_CAPACITY.get()))return PedestalConfig.COMMON.augment_t1CapacityDust.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T2_CAPACITY.get()))return PedestalConfig.COMMON.augment_t2CapacityDust.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T3_CAPACITY.get()))return PedestalConfig.COMMON.augment_t3CapacityDust.get();
+        if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T4_CAPACITY.get()))return PedestalConfig.COMMON.augment_t4CapacityDust.get();
+        return 0;
+    }
     public int getAllowedInsertAmount(Item augment)
     {
         if(augment.equals(DeferredRegisterItems.AUGMENT_PEDESTAL_T1_CAPACITY.get()))return PedestalConfig.COMMON.augment_t1CapacityInsertSize.get();
@@ -96,6 +104,11 @@ public class AugmentTieredCapacity extends AugmentBase{
             listed.add(""+capacityAugment.getAdditionalXpTransferRatePerItem(p_41421_.getItem())+"");
 
             colors.add(ChatFormatting.LIGHT_PURPLE);
+            listed.add(MODID + ".augments_capacity_dustrate");
+            colors.add(ChatFormatting.WHITE);
+            listed.add(""+capacityAugment.getAdditionalDustTransferRatePerItem(p_41421_.getItem())+"");
+
+            colors.add(ChatFormatting.GOLD);
             listed.add(MODID + ".augments_insertable");
             colors.add(ChatFormatting.GOLD);
             listed.add(""+capacityAugment.getAllowedInsertAmount(p_41421_.getItem())+"");
