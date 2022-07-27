@@ -2838,6 +2838,24 @@ public class BasePedestalBlockEntity extends BlockEntity
         return canAccept;
     }
 
+    public int dustAmountToAccept(Level worldIn, BlockPos posPedestal, int dustIncoming)
+    {
+        int spaceForDust = getDustCapacity()-getStoredDust().getDustAmount();
+        int canAccept = (dustIncoming>spaceForDust)?(spaceForDust):(dustIncoming);
+
+        if(hasFilter())
+        {
+            Item filterInPed = this.getFilterInPedestal().getItem();
+            if(filterInPed instanceof IPedestalFilter)
+            {
+                int filterCount = ((IPedestalFilter) filterInPed).canAcceptCount(getPedestal(), ItemStack.EMPTY,4);
+                if(filterCount>0)canAccept = filterCount;
+            }
+        }
+
+        return canAccept;
+    }
+
     public boolean hasFilter(BasePedestalBlockEntity pedestalSendingTo)
     {
         boolean returner = false;
@@ -3008,16 +3026,18 @@ public class BasePedestalBlockEntity extends BlockEntity
                         //Max that can be recieved
                         int countToSend = tilePedestalToSendTo.canAcceptItems(level,pedestalToSendTo,getItemInPedestal());
                         ItemStack copyStackToSend = getItemInPedestal().copy();
+                        countToSend = Math.min(getItemTransferRate(),(copyStackToSend.getCount()<countToSend)?(copyStackToSend.getCount()):(countToSend));
+
                         //Max that is available to send
-                        if(copyStackToSend.getCount()<countToSend)
+                        /*if(copyStackToSend.getCount()<countToSend)
                         {
                             countToSend = copyStackToSend.getCount();
-                        }
+                        }*/
                         //Get max that can be sent
-                        if(countToSend > getItemTransferRate())
+                        /*if(countToSend > getItemTransferRate())
                         {
                             countToSend = getItemTransferRate();
-                        }
+                        }*/
 
 
                         if(countToSend >=1)
@@ -3044,10 +3064,8 @@ public class BasePedestalBlockEntity extends BlockEntity
     {
         if(hasFluid())
         {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity)
+            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
-                BasePedestalBlockEntity tilePedestalToSendTo = (BasePedestalBlockEntity)level.getBlockEntity(pedestalToSendTo);
-
                 if(tilePedestalToSendTo.canAcceptFluid(fluidStackIncoming))
                 {
                     if(tilePedestalToSendTo.fluidAmountToAccept(level,pedestalToSendTo,fluidStackIncoming) > 0)
@@ -3056,16 +3074,17 @@ public class BasePedestalBlockEntity extends BlockEntity
                         //Max that can be recieved
                         int countToSend = tilePedestalToSendTo.spaceForFluid();
                         FluidStack currentFluid = getStoredFluid().copy();
+                        countToSend = Math.min(getFluidTransferRate(),(currentFluid.getAmount()<countToSend)?(currentFluid.getAmount()):(countToSend));
                         //Max that is available to send
-                        if(currentFluid.getAmount()<countToSend)
+                        /*if(currentFluid.getAmount()<countToSend)
                         {
                             countToSend = currentFluid.getAmount();
-                        }
+                        }*/
                         //Get max that can be sent
-                        if(countToSend > getFluidTransferRate())
+                        /*if(countToSend > getFluidTransferRate())
                         {
                             countToSend = getFluidTransferRate();
-                        }
+                        }*/
 
 
                         if(countToSend > 0)
@@ -3099,10 +3118,8 @@ public class BasePedestalBlockEntity extends BlockEntity
     {
         if(hasEnergy())
         {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity)
+            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
-                BasePedestalBlockEntity tilePedestalToSendTo = (BasePedestalBlockEntity)level.getBlockEntity(pedestalToSendTo);
-
                 //Checks if pedestal is empty or if not then checks if items match and how many can be insert
                 if(tilePedestalToSendTo.energyAmountToAccept(level,pedestalToSendTo,energyIncoming) > 0)
                 {
@@ -3110,17 +3127,18 @@ public class BasePedestalBlockEntity extends BlockEntity
                     {
                         //Max that can be recieved
                         int countToSend = tilePedestalToSendTo.getEnergyCapacity()-tilePedestalToSendTo.getStoredEnergy();
+                        countToSend = Math.min(getEnergyTransferRate(),(energyIncoming<countToSend)?(energyIncoming):(countToSend));
 
                         //Max that is available to send
-                        if(energyIncoming<countToSend)
+                        /*if(energyIncoming<countToSend)
                         {
                             countToSend = energyIncoming;
-                        }
+                        }*/
                         //Get max that can be sent
-                        if(countToSend > getEnergyTransferRate())
+                        /*if(countToSend > getEnergyTransferRate())
                         {
                             countToSend = getEnergyTransferRate();
-                        }
+                        }*/
 
 
                         if(countToSend > 0)
@@ -3151,9 +3169,8 @@ public class BasePedestalBlockEntity extends BlockEntity
     {
         if(hasExperience())
         {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity)
+            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
-                BasePedestalBlockEntity tilePedestalToSendTo = (BasePedestalBlockEntity)level.getBlockEntity(pedestalToSendTo);
 
                 if(tilePedestalToSendTo.canAcceptExperience())
                 {
@@ -3162,17 +3179,18 @@ public class BasePedestalBlockEntity extends BlockEntity
 
                         //Max that can be recieved
                         int countToSend = tilePedestalToSendTo.getExperienceCapacity()-tilePedestalToSendTo.getStoredExperience();
+                        countToSend = Math.min(getExperienceTransferRate(),(experienceIncoming<countToSend)?(experienceIncoming):(countToSend));
 
                         //Max that is available to send
-                        if(experienceIncoming<countToSend)
+                        /*if(experienceIncoming<countToSend)
                         {
                             countToSend = experienceIncoming;
-                        }
+                        }*/
                         //Get max that can be sent
-                        if(countToSend > getExperienceTransferRate())
+                        /*if(countToSend > getExperienceTransferRate())
                         {
                             countToSend = getExperienceTransferRate();
-                        }
+                        }*/
 
 
                         if(countToSend > 0)
@@ -3188,6 +3206,59 @@ public class BasePedestalBlockEntity extends BlockEntity
                                     tilePedestalToSendTo.addExperience(finalExperienceCountToSend,false);
                                     if(canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
                                     return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean sendDustToPedestal(BlockPos pedestalToSendTo, int dustIncoming)
+    {
+        if(hasDust())
+        {
+            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
+            {
+                if(tilePedestalToSendTo.canAcceptDust(getStoredDust()))
+                {
+                    if(tilePedestalToSendTo.dustAmountToAccept(level,pedestalToSendTo,dustIncoming) > 0)
+                    {
+
+                        //Max that can be recieved
+                        int countToSend = tilePedestalToSendTo.getDustCapacity()-tilePedestalToSendTo.getStoredDust().getDustAmount();
+                        countToSend = Math.min(getExperienceTransferRate(),(dustIncoming<countToSend)?(dustIncoming):(countToSend));
+
+                        //Max that is available to send
+                        /*if(dustIncoming<countToSend)
+                        {
+                            countToSend = dustIncoming;
+                        }*/
+                        //Get max that can be sent
+                        /*if(countToSend > getExperienceTransferRate())
+                        {
+                            countToSend = getExperienceTransferRate();
+                        }*/
+
+
+                        if(countToSend > 0)
+                        {
+                            //Send items
+                            int countDustToSend = tilePedestalToSendTo.addDust(new DustMagic(getStoredDust().getDustColor(),countToSend), IDustHandler.DustAction.SIMULATE);
+                            if(countDustToSend>0)
+                            {
+                                int finalExperienceCountToSend = removeDust(countDustToSend, IDustHandler.DustAction.SIMULATE).getDustAmount();
+                                if(finalExperienceCountToSend>0)
+                                {
+                                    if(tilePedestalToSendTo.addDust(new DustMagic(getStoredDust().getDustColor(),finalExperienceCountToSend), IDustHandler.DustAction.EXECUTE) > 0)
+                                    {
+                                        removeDust(countDustToSend, IDustHandler.DustAction.EXECUTE);
+                                        if(canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
+                                        return true;
+                                    }
                                 }
                             }
                         }
@@ -3221,6 +3292,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                         sendFluidsToPedestal(posReceiver,getStoredFluid());
                         sendEnergyToPedestal(posReceiver,getStoredEnergy());
                         sendExperienceToPedestal(posReceiver,getStoredExperience());
+                        sendDustToPedestal(posReceiver,getStoredDust().getDustAmount());
                     }
                 }
 
@@ -3240,6 +3312,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                             if(sendFluidsToPedestal(posReceiver,getStoredFluid()))b++;
                             if(sendEnergyToPedestal(posReceiver,getStoredEnergy()))b++;
                             if(sendExperienceToPedestal(posReceiver,getStoredExperience()))b++;
+                            if(sendDustToPedestal(posReceiver,getStoredDust().getDustAmount()))b++;
 
                             if(b>0)break;
                         }
@@ -3248,7 +3321,6 @@ public class BasePedestalBlockEntity extends BlockEntity
             }
         }
     }
-
 
     public BlockPos offsetBasedOnDirection(Direction enumfacing, BlockPos posOfPedestal, double x, double y, double z)
     {
@@ -3269,22 +3341,11 @@ public class BasePedestalBlockEntity extends BlockEntity
                 return new BlockPos(blockBelow.getX() + y, blockBelow.getY() + x, blockBelow.getZ() + z);
             default:
                 return blockBelow;
-            /*case UP:
-                return blockBelow.offset(x,-y,z);
-            case DOWN:
-                return blockBelow.offset(x,y,z);
-            case NORTH:
-                return blockBelow.offset(x,z,y);
-            case SOUTH:
-                return blockBelow.offset(x,z,-y);
-            case EAST:
-                return blockBelow.offset(-y,x,z);
-            case WEST:
-                return blockBelow.offset(y,x,z);
-            default:
-                return blockBelow;*/
         }
     }
+
+
+
 
 
 
@@ -3339,13 +3400,17 @@ public class BasePedestalBlockEntity extends BlockEntity
             {
                 BlockPos posDirectionalEnergy = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0D,0D,0D);
                 if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasEnergy()){MowLibPacketHandler.sendToNearby(level,posDirectionalEnergy,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalEnergy.getX(),posDirectionalEnergy.getY(),posDirectionalEnergy.getZ(),255,0,0));}}
-                BlockPos posDirectionalXP = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0D,0D,0D);
+                BlockPos posDirectionalXP = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0.5D,0D,0.5D);
                 if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasExperience()){MowLibPacketHandler.sendToNearby(level,posDirectionalXP,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalXP.getX(),posDirectionalXP.getY(),posDirectionalXP.getZ(),0,255,0));}}
                 //System.out.println(getPos());
 
                 BlockPos posDirectionalFluid = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0.5D,0D,0D);
                 //System.out.println(getPos().offset(0.5D,0D,0D));
                 if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasFluid()){MowLibPacketHandler.sendToNearby(level,posDirectionalFluid,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalFluid.getX(),posDirectionalFluid.getY(),posDirectionalFluid.getZ(),0,0,255));}}
+
+                BlockPos posDirectionalDust = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),-0.5D,0D,-0.5D);
+                //System.out.println(getPos().offset(0.5D,0D,0D));
+                if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasDust()){MowLibPacketHandler.sendToNearby(level,posDirectionalDust,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalDust.getX(),posDirectionalDust.getY(),posDirectionalDust.getZ(),178,0,255));}}
             }
         }
     }

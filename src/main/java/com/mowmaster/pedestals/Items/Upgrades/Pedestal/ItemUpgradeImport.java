@@ -2,7 +2,9 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
+import com.mowmaster.mowlib.Capabilities.Dust.IDustTank;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
@@ -10,11 +12,13 @@ import com.mowmaster.mowlib.api.IDustStorage;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 
+import static com.mowmaster.mowlib.MowLibUtils.MowLibReferences.MODID;
 import static com.mowmaster.pedestals.PedestalUtils.PedestalUtilities.*;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -294,24 +298,57 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
 
                 if(handler != null)
                 {
-                    if(handler.drain(1, IDustHandler.DustAction.SIMULATE).getDustAmount()>=1)
+                    if(pedestal.canAcceptDust(handler.getDustMagicInTank(0)))
                     {
                         DustMagic getCurrentlyStored = handler.getDustMagicInTank(0);
+                        int colorCurrentlyStored = getCurrentlyStored.getDustColor();
                         int containerCurrentDust = getCurrentlyStored.getDustAmount();
                         int getSpaceForDust = pedestal.spaceForDust();
-                        int transferRate = (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust);
-                        if (containerCurrentDust < transferRate) {transferRate = containerCurrentDust;}
+                        int transferRate = Math.min(containerCurrentDust, (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust));
+                        /*int transferRate = (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust);
+                        if (containerCurrentDust < transferRate) {transferRate = containerCurrentDust;}*/
 
                         //transferRate at this point is equal to what we can send.
+
                         if(handler.drain(transferRate,IDustHandler.DustAction.SIMULATE).getDustAmount() > 0)
                         {
-                            pedestal.addExperience(transferRate,false);
-                            handler.drain(transferRate,IDustHandler.DustAction.EXECUTE);
+                            if( handler.drain(transferRate,IDustHandler.DustAction.EXECUTE).getDustAmount() > 0)
+                            {
+                                pedestal.addDust(new DustMagic(colorCurrentlyStored,transferRate),IDustHandler.DustAction.EXECUTE);
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    public static ItemStack setDustMagicInItem(ItemStack stackToSet, DustMagic magicIn)
+    {
+        ItemStack copyStack = stackToSet.copy();
+        CompoundTag copyStackTag = stackToSet.getOrCreateTag();
+        copyStackTag.putInt(MODID + "_dustMagicColor",magicIn.getDustColor());
+        copyStackTag.putInt(MODID + "_dustMagicAmount",magicIn.getDustAmount());
+        copyStack.setTag(copyStackTag);
+        return copyStack;
+    }
+
+    public static DustMagic getDustMagicInItem(ItemStack stack) {
+        DustMagic magic = new DustMagic(-1, 0);
+        if (stack.hasTag()) {
+            CompoundTag tag = stack.getTag();
+            if (tag.contains("mowlib_dustMagicColor")) {
+                magic.setDustColor(tag.getInt("mowlib_dustMagicColor"));
+                if (tag.contains("mowlib_dustMagicAmount")) {
+                    magic.setDustAmount(tag.getInt("mowlib_dustMagicAmount"));
+                }
+            } else if (tag.contains("mowlib_color")) {
+                magic.setDustColor(MowLibColorReference.getColorFromItemStackInt(stack));
+                magic.setDustAmount(stack.getCount());
+            }
+        }
+
+        return magic;
     }
 
 
@@ -321,8 +358,8 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
 
         if(canTransferXP(pedestal.getCoinOnPedestal()) && pedestal.canAcceptExperience())
         {
-            if (entityIn instanceof Player) {
-                Player player = ((Player) entityIn);
+            if (entityIn instanceof Player player) {
+
                 if(!player.isCrouching())
                 {
                     int currentlyStoredExp = pedestal.getStoredExperience();
@@ -340,48 +377,99 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             }
         }
 
+
         if(canTransferDust(pedestal.getCoinOnPedestal()))
         {
-            if(entityIn instanceof ItemEntity)
+            /*if(entityIn instanceof ItemEntity)
             {
                 ItemEntity itemEntity = ((ItemEntity) entityIn);
                 ItemStack itemStack = itemEntity.getItem();
                 if(itemStack.getItem() instanceof IDustStorage dustStorageItem)
                 {
-                    DustMagic getDustMagicInItemStack = DustMagic.getDustMagicInItemStack(itemStack);
-                    if(pedestal.canAcceptDust(getDustMagicInItemStack))
+                    DustMagic dustInItem = getDustMagicInItem(itemStack);
+                    //Can Accept Color of this Dust
+                    if(pedestal.canAcceptDust(dustInItem))
                     {
-                        int containerCurrentDust = getDustMagicInItemStack.getDustAmount();
-                        //System.out.println("importDustAmount: " + containerCurrentDust);
+                        int currentDust = dustInItem.getDustAmount();
+                        int currentStackCount = itemStack.getCount();
+                        int totalDustInStack = Math.multiplyExact(currentDust,currentStackCount);
+
                         int getSpaceForDust = pedestal.spaceForDust();
-                        //System.out.println("space: " + getSpaceForDust);
-                        //System.out.println("defaultRate: " + pedestal.getDustTransferRate());
+                        int transferRate = Math.min(totalDustInStack, (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust));
+                        DustMagic dustToTransfer = new DustMagic(dustInItem.getDustColor(),transferRate);
 
-                        int transferRate = Math.min(containerCurrentDust, (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust));
-                        //if (containerCurrentDust < transferRate) {transferRate = containerCurrentDust;}
-
-                        DustMagic dustToTransfer = new DustMagic(getDustMagicInItemStack.getDustColor(),transferRate);
-                        //transferRate at this point is equal to what we can send.
-
-                        //System.out.println("ADD DUST: "+ pedestal.addDust(dustToTransfer, IDustHandler.DustAction.SIMULATE));
+                        //Can Accept Amount (and Color)
                         if(pedestal.addDust(dustToTransfer, IDustHandler.DustAction.SIMULATE) > 0)
                         {
+                            //Actual Insert
                             pedestal.addDust(dustToTransfer, IDustHandler.DustAction.EXECUTE);
-                            //remove dust from item and maybe remove it from world
-                            if(dustToTransfer.getDustAmount() >= getDustMagicInItemStack.getDustAmount() && dustStorageItem.consumedOnEmpty(itemStack))
+
+                            //Now do dust removal stuff
+
+                            //Requires at least 1 item consumed and maybe part of another
+                            if(transferRate >= currentDust)
+                            {
+                                int remainder = transferRate%currentDust;
+                                int quotient = Math.floorDiv(transferRate, currentDust);
+                                if(remainder == 0)
+                                {
+                                    //Removed quotient value of items
+                                    if(quotient > 1)
+                                    {
+                                        itemStack.shrink(quotient);
+                                    }
+                                }
+                                else
+                                {
+                                    //Removed quotient+1 value of items and return 1 modified item
+                                    if(quotient > 1)
+                                    {
+                                        itemStack.shrink(quotient+1);
+                                        //Need to then return 1 item to the player with the difference in amount.
+                                        ItemStack remainderItem = new ItemStack(itemStack.getItem(),1,itemStack.getTag());
+                                        int modifiedDustAmount = transferRate - Math.multiplyExact(quotient, currentDust);
+                                        setDustMagicInItem(remainderItem,new DustMagic(dustToTransfer.getDustColor(), modifiedDustAmount));
+                                        MowLibItemUtils.spawnItemStack(pedestal.getLevel(),itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(),remainderItem);
+                                    }
+                                    //For itemstacks == 1
+                                    else if(quotient == 1)
+                                    {
+
+                                    }
+                                }
+                            }
+
+
+                            *//*if(dustToTransfer.getDustAmount() >= getDustMagicInItemStack.getDustAmount() && dustStorageItem.consumedOnEmpty(itemStack))
                             {
                                 itemEntity.remove(Entity.RemovalReason.DISCARDED);
                             }
                             else
                             {
-                                DustMagic.setDustMagicInStack(itemStack,new DustMagic(dustToTransfer.getDustColor(), getDustMagicInItemStack.getDustAmount() - dustToTransfer.getDustAmount()));
+                                if((getDustMagicInItemStack.getDustAmount() - dustToTransfer.getDustAmount())>0)
+                                {
+                                    if(itemStack.getCount() > 1)
+                                    {
+                                        itemStack.shrink(dustToTransfer.getDustAmount());
+                                    }
+                                    setDustMagicInStack(itemStack,new DustMagic(dustToTransfer.getDustColor(), getDustMagicInItemStack.getDustAmount() - dustToTransfer.getDustAmount()));
+                                }
+                                else
+                                {
+                                    if(itemStack.getCount() > 1)
+                                    {
+                                        itemStack.shrink(dustToTransfer.getDustAmount());
+                                    }
+                                    setDustMagicInStack(itemStack,DustMagic.EMPTY);
+                                }
+
                                 itemEntity.setItem(itemStack);
-                            }
+                            }*//*
                         }
                     }
                 }
-            }
-            else if (entityIn instanceof Player) {
+            }*/
+            /*else if (entityIn instanceof Player) {
                 Player player = ((Player) entityIn);
                 if(!player.isCrouching())
                 {
@@ -390,18 +478,18 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                             .mapToObj((player.getInventory().items)::get)//Function being applied to each interval
                             .filter(itemStack -> !itemStack.isEmpty())
                             .filter(itemStack -> itemStack.getItem() instanceof IDustStorage)
+                            .filter(itemStack -> !getDustMagicInItemStack(itemStack).isEmpty())
                             .findFirst().orElse(ItemStack.EMPTY);
 
                     if(!dustItemStack.isEmpty())
                     {
                         IDustStorage dustItem = ((IDustStorage)dustItemStack.getItem());
-                        DustMagic getDustMagicInItemStack = DustMagic.getDustMagicInItemStack(dustItemStack);
+                        DustMagic getDustMagicInItemStack = getDustMagicInItemStack(dustItemStack);
                         if(pedestal.canAcceptDust(getDustMagicInItemStack))
                         {
                             int containerCurrentDust = getDustMagicInItemStack.getDustAmount();
                             int getSpaceForDust = pedestal.spaceForDust();
-                            int transferRate = (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust);
-                            if (containerCurrentDust < transferRate) {transferRate = containerCurrentDust;}
+                            int transferRate = Math.min(totalDustInStack, (getSpaceForDust >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(getSpaceForDust));
 
                             DustMagic dustToTransfer = new DustMagic(getDustMagicInItemStack.getDustColor(),transferRate);
                             //transferRate at this point is equal to what we can send.
@@ -410,14 +498,27 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                                 int slot = player.getInventory().findSlotMatchingItem(dustItemStack);
                                 pedestal.addDust(dustToTransfer, IDustHandler.DustAction.EXECUTE);
                                 //remove dust from item and maybe remove it from inventory
-                                if(dustToTransfer.getDustAmount() >= getDustMagicInItemStack.getDustAmount() && dustItem.consumedOnEmpty(dustItemStack))
+                                boolean remover = dustItem.consumedOnEmpty(dustItemStack);
+                                if((transferRate >= containerCurrentDust) && remover)
                                 {
                                     if(!player.isCreative())player.getInventory().getItem(slot).shrink(dustItemStack.getCount());
                                 }
                                 else
                                 {
-                                    DustMagic.setDustMagicInStack(dustItemStack,new DustMagic(dustToTransfer.getDustColor(), getDustMagicInItemStack.getDustAmount() - dustToTransfer.getDustAmount()));
-                                    if(!player.isCreative())ItemHandlerHelper.giveItemToPlayer(player,dustItemStack);
+                                    if(!player.isCreative())
+                                    {
+                                        int difference = getDustMagicInItemStack.getDustAmount() - dustToTransfer.getDustAmount();
+                                        if(difference>0)
+                                        {
+                                            if(remover && dustItemStack.getCount()>1)player.getInventory().getItem(slot).shrink(dustToTransfer.getDustAmount());
+                                            setDustMagicInStack(dustItemStack,new DustMagic(dustToTransfer.getDustColor(), difference));
+                                        }
+                                        else
+                                        {
+                                            if(remover)player.getInventory().getItem(slot).shrink(dustItemStack.getCount());
+                                            else setDustMagicInStack(dustItemStack,DustMagic.EMPTY);
+                                        }
+                                    }
                                 }
 
                                 String dustString = MowLibColorReference.getColorName(dustToTransfer.getDustColor()) +": " +pedestal.getStoredDust().getDustAmount() +"/"+pedestal.getDustCapacity();
@@ -426,7 +527,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                         }
                     }
                 }
-            }
+            }*/
         }
 
         if(canTransferFluids(pedestal.getCoinOnPedestal()))

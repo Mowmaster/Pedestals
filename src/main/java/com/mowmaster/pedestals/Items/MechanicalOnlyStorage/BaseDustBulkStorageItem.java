@@ -4,7 +4,6 @@ import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Items.BaseDustDropItem;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibTooltipUtils;
-import com.mowmaster.mowlib.api.IDustStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +18,11 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 public class BaseDustBulkStorageItem extends BaseDustDropItem {
     public BaseDustBulkStorageItem(Properties p_41383_) {
         super(p_41383_);
+    }
+
+    public static int getItemColor()
+    {
+        return 13659647;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
@@ -290,22 +291,26 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
 
                 if(handler != null)
                 {
-                    if(handler.drain(1, IDustHandler.DustAction.SIMULATE).getDustAmount()>0)
+                    DustMagic dustInPedestal = pedestal.getStoredDust();
+                    if(handler.isDustValid(0,dustInPedestal))
                     {
-                        System.out.println("Could maybe extract dust!!!");
-                        /*int containerMaxExperience = handler.getMaxExperienceStored();
-                        int containerCurrentExperience = handler.getExperienceStored();
-                        int containerExperienceSpace = containerMaxExperience - containerCurrentExperience;
-                        int getCurrentExperience = pedestal.getStoredExperience();
-                        int transferRate = (containerExperienceSpace >= pedestal.getExperienceTransferRate())?(pedestal.getExperienceTransferRate()):(containerExperienceSpace);
-                        if (getCurrentExperience < transferRate) {transferRate = getCurrentExperience;}
+                        int containerMaxDust = handler.getTankCapacity(0);
+                        int containerCurrentDustAmount = handler.getDustMagicInTank(0).getDustAmount();
+                        int containerDustSpace = containerMaxDust - containerCurrentDustAmount;
+                        int getCurrentDustInPedestal = dustInPedestal.getDustAmount();
+                        int transferRate = Math.min(getCurrentDustInPedestal, (containerDustSpace >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(containerDustSpace));
 
-                        //transferRate at this point is equal to what we can send.
-                        if(handler.receiveExperience(transferRate,true) > 0)
+                        /*int transferRate = (containerDustSpace >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(containerDustSpace);
+                        if (getCurrentDustInPedestal < transferRate) {transferRate = getCurrentDustInPedestal;}
+                        */
+
+                        if(handler.fill(new DustMagic(dustInPedestal.getDustColor(),transferRate), IDustHandler.DustAction.SIMULATE) > 0)
                         {
-                            pedestal.removeExperience(transferRate,false);
-                            handler.receiveExperience(transferRate,false);
-                        }*/
+                            if(handler.fill(new DustMagic(dustInPedestal.getDustColor(),transferRate), IDustHandler.DustAction.EXECUTE)>0)
+                            {
+                                pedestal.removeDust(transferRate,IDustHandler.DustAction.EXECUTE);
+                            }
+                        }
                     }
                 }
             }

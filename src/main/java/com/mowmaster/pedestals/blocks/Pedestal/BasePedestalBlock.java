@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
+import com.google.common.collect.Maps;
 import com.mowmaster.mowlib.Blocks.BaseBlocks.BaseColoredBlock;
 import com.mowmaster.mowlib.Items.ColorApplicator;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
@@ -71,7 +72,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.mowmaster.mowlib.MowLibUtils.MowLibColorReference.getIntColor;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
@@ -694,9 +698,45 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     {
                         if(pedestal.hasItem())
                         {
-                            MutableComponent itemCountInPedestal = Component.translatable(pedestal.getItemInPedestal().getDisplayName().getString() + " " + pedestal.getItemInPedestal().getCount());
-                            itemCountInPedestal.withStyle(ChatFormatting.GOLD);
-                            p_60506_.displayClientMessage(itemCountInPedestal,true);
+                            if(pedestal.getItemStacks().size()>1)
+                            {
+                                List<ItemStack> stacks = pedestal.getItemStacks();
+                                Map<Item,Integer> getMapped =  Maps.<Item,Integer>newLinkedHashMap();
+                                for(int i=0;i<stacks.size();i++)
+                                {
+                                    if(!stacks.get(i).isEmpty())continue;
+
+                                    if(getMapped.containsKey(stacks.get(i).getItem()))
+                                    {
+                                        int currentValue = getMapped.getOrDefault(stacks.get(i).getItem(),0);
+                                        getMapped.replace(stacks.get(i).getItem(),currentValue, currentValue + stacks.get(i).getCount());
+                                    }
+                                    else
+                                    {
+                                        getMapped.put(stacks.get(i).getItem(),stacks.get(i).getCount());
+                                    }
+                                }
+
+                                if(getMapped.size()>0)
+                                {
+                                    MutableComponent itemCountInPedestal = Component.literal("TESTING");
+                                    for (Item item : getMapped.keySet())
+                                    {
+                                        itemCountInPedestal.append(Component.literal("   "));
+                                        itemCountInPedestal.append(Component.translatable(item.getDefaultInstance().getDisplayName().getString() + " " + getMapped.get(item)));
+
+                                    }
+
+                                    itemCountInPedestal.withStyle(ChatFormatting.GOLD);
+                                    p_60506_.displayClientMessage(itemCountInPedestal,true);
+                                }
+                            }
+                            else
+                            {
+                                MutableComponent itemCountInPedestal = Component.translatable(pedestal.getItemInPedestal().getDisplayName().getString() + " " + pedestal.getItemInPedestal().getCount());
+                                itemCountInPedestal.withStyle(ChatFormatting.GOLD);
+                                p_60506_.displayClientMessage(itemCountInPedestal,true);
+                            }
                         }
                     }
                 }

@@ -222,6 +222,9 @@
   "pedestals.augments_storage_xprate": "Increases Xp Level Buffer In Pedestal: ",
 
 
+  "item.pedestals.mechanical_storage_dust": "Packaged Dust",
+
+
   "item.pedestals.upgrade_pedestal_base": "Upgrade Base",
   "item.pedestals.upgrade_pedestal_base.base_description": "THIS UPGRADE BASE IS JUST A CRAFTING COMPONENT!!!",
   "jei.pedestals.upgrade_pedestal_base.base_description": "§5THIS UPGRADE BASE IS JUST A CRAFTING COMPONENT!!!",
@@ -239,4 +242,5 @@
 
   "block.pedestals.block_pedestal": "Pedestal",
   "jei.pedestals.block_pedestal.description": "§5Can Transport Items, Fluids, Energy, and XP - Can be Recolored with Applicator"
+
 }
