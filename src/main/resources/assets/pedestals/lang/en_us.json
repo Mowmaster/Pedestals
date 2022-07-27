@@ -97,6 +97,14 @@
 
   "pedestals.tooltip_mode": "Mode: ",
   "pedestals.pedestal.message_redstone_disable": "Redstone Signal Strength Needed to Activate Pedestal: ",
+  "pedestals.pedestal.message_separator1": ": ",
+  "pedestals.pedestal.message_separator2": "/",
+  "pedestals.pedestal.message_separator3": " , ",
+  "pedestals.pedestal.message_separator4": " ",
+  "pedestals.pedestal.message_energy": "Energy",
+  "pedestals.pedestal.message_fluid": "Fluid",
+  "pedestals.pedestal.message_experience": "Experience",
+  "pedestals.pedestal.message_dust": "Dust",
 
 
   "item.pedestals.tool_linkingtool": "Linking Tool",

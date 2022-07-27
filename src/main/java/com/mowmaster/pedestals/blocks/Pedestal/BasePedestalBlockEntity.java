@@ -9,7 +9,6 @@ import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
 import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
-import com.mowmaster.mowlib.api.IDustStorage;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
@@ -1019,12 +1018,13 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     }
 
-    public ItemStack removeItem(int numToRemove) {
+    public ItemStack removeItem(int numToRemove, boolean simulate) {
         IItemHandler h = handler.orElse(null);
         int firstNonEmptySlot = 0;
         if(h.getSlots()>1)
         {
-            for(int i=0;i<h.getSlots();i++)
+            int endFirst = h.getSlots()-1;
+            for(int i=endFirst;i>=0;i--)
             {
                 if(!h.getStackInSlot(i).isEmpty())
                 {
@@ -1033,18 +1033,19 @@ public class BasePedestalBlockEntity extends BlockEntity
                 }
             }
         }
-        ItemStack stack = h.extractItem(firstNonEmptySlot,numToRemove,false);
+        ItemStack stack = h.extractItem(firstNonEmptySlot,numToRemove,simulate);
         //update();
 
         return stack;
     }
 
-    public ItemStack removeItem() {
+    public ItemStack removeItem(boolean simulate) {
         IItemHandler h = handler.orElse(null);
         int firstNonEmptySlot = 0;
         if(h.getSlots()>1)
         {
-            for(int i=0;i<h.getSlots();i++)
+            int endFirst = h.getSlots()-1;
+            for(int i=endFirst;i>=0;i--)
             {
                 if(!h.getStackInSlot(i).isEmpty())
                 {
@@ -1053,7 +1054,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 }
             }
         }
-        ItemStack stack = h.extractItem(firstNonEmptySlot,getItemInPedestal().getMaxStackSize(),false);
+        ItemStack stack = h.extractItem(firstNonEmptySlot,h.getStackInSlot(firstNonEmptySlot).getCount(),simulate);
         //update();
 
         return stack;
@@ -3003,7 +3004,7 @@ public class BasePedestalBlockEntity extends BlockEntity
     //The actual transfer methods for items
     public boolean sendItemsToPedestal(BlockPos pedestalToSendTo, ItemStack itemStackIncoming)
     {
-        if(hasItemFirst())
+        if(!removeItem(true).isEmpty())
         {
             if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
@@ -3015,17 +3016,17 @@ public class BasePedestalBlockEntity extends BlockEntity
                     if(tilePedestalToSendTo.hasFilter())
                     {
                         Item filterInPedestal = tilePedestalToSendTo.getFilterInPedestal().getItem();
-                        if(filterInPedestal instanceof IPedestalFilter)
+                        if(filterInPedestal instanceof IPedestalFilter filterable)
                         {
-                            filter = ((IPedestalFilter) filterInPedestal).canAcceptItem(tilePedestalToSendTo,itemStackIncoming,0);
+                            filter = filterable.canAcceptItem(tilePedestalToSendTo,itemStackIncoming,0);
                         }
                     }
 
                     if(filter)
                     {
                         //Max that can be recieved
-                        int countToSend = tilePedestalToSendTo.canAcceptItems(level,pedestalToSendTo,getItemInPedestal());
-                        ItemStack copyStackToSend = getItemInPedestal().copy();
+                        int countToSend = tilePedestalToSendTo.canAcceptItems(level,pedestalToSendTo,removeItem(true));
+                        ItemStack copyStackToSend = removeItem(true).copy();
                         countToSend = Math.min(getItemTransferRate(),(copyStackToSend.getCount()<countToSend)?(copyStackToSend.getCount()):(countToSend));
 
                         //Max that is available to send
@@ -3046,7 +3047,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                             if(tilePedestalToSendTo.addItem(copyStackToSend,true))
                             {
                                 copyStackToSend.setCount(countToSend);
-                                removeItem(copyStackToSend.getCount());
+                                removeItem(copyStackToSend.getCount(),false);
                                 tilePedestalToSendTo.addItem(copyStackToSend,false);
                                 if(canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
                                 return true;
@@ -3288,7 +3289,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     if(canSendToPedestal(pedestal))
                     {
-                        sendItemsToPedestal(posReceiver,getItemInPedestal());
+                        sendItemsToPedestal(posReceiver,removeItem(true));
                         sendFluidsToPedestal(posReceiver,getStoredFluid());
                         sendEnergyToPedestal(posReceiver,getStoredEnergy());
                         sendExperienceToPedestal(posReceiver,getStoredExperience());
@@ -3308,7 +3309,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                         if(canSendToPedestal(pedestal))
                         {
                             int b = 0;
-                            if(sendItemsToPedestal(posReceiver,getItemInPedestal()))b++;
+                            if(sendItemsToPedestal(posReceiver,removeItem(true)))b++;
                             if(sendFluidsToPedestal(posReceiver,getStoredFluid()))b++;
                             if(sendEnergyToPedestal(posReceiver,getStoredEnergy()))b++;
                             if(sendExperienceToPedestal(posReceiver,getStoredExperience()))b++;

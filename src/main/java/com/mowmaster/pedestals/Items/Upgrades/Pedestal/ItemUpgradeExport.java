@@ -44,7 +44,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
         {
             int transferRate = getItemTransferRate(coinInPedestal);
 
-            ItemStack stackInPedestal = pedestal.getItemInPedestal();
+            ItemStack stackInPedestal = pedestal.removeItem(true);
             ItemStack itemFromInv = ItemStack.EMPTY;
             LazyOptional<IItemHandler> cap = PedestalUtilities.findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
@@ -70,7 +70,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                                 {
                                     if(handler.isItemValid(i, stackInPedestal))
                                     {
-                                        stackInPedestal = pedestal.getItemInPedestal().copy();
+                                        stackInPedestal = pedestal.removeItem(true).copy();
                                         ItemStack itemFromInventory = handler.getStackInSlot(i);
                                         int spaceInInventoryStack = handler.getSlotLimit(i) - itemFromInventory.getCount();
 
@@ -89,7 +89,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                                         stackInPedestal.setCount(allowedTransferRate);
 
                                         if(ItemHandlerHelper.insertItem(handler,stackInPedestal,true).equals(ItemStack.EMPTY)){
-                                            pedestal.removeItem(allowedTransferRate);
+                                            pedestal.removeItem(allowedTransferRate,false);
                                             ItemHandlerHelper.insertItem(handler,stackInPedestal,false);
                                         }
                                     }

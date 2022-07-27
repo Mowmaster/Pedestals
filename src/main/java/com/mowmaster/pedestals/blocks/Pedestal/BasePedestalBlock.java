@@ -5,6 +5,7 @@ import com.mowmaster.mowlib.Blocks.BaseBlocks.BaseColoredBlock;
 import com.mowmaster.mowlib.Items.ColorApplicator;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibReferences;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredCapacity;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredRange;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredSpeed;
@@ -459,11 +460,11 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 {
                     if(p_60502_.isCrouching())
                     {
-                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem());
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(false));
                     }
                     else
                     {
-                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(1));
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(1,false));
                     }
                 }
             }
@@ -661,37 +662,86 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 {
                     if(p_60506_.isCrouching())
                     {
+                        boolean displayOther = false;
+                        MutableComponent displayOtherComponent = Component.literal("");
                         if(pedestal.hasRedstone())
                         {
-                            MutableComponent itemCountInPedestal = Component.translatable(MODID + ".pedestal.message_redstone_disable");
-                            itemCountInPedestal.append(""+pedestal.getRedstonePowerNeeded()+"");
-                            itemCountInPedestal.withStyle(ChatFormatting.LIGHT_PURPLE);
-                            p_60506_.displayClientMessage(itemCountInPedestal,true);
+                            MutableComponent redstoneCountInPedestal = Component.translatable(MODID + ".pedestal.message_redstone_disable");
+                            redstoneCountInPedestal.append(""+pedestal.getRedstonePowerNeeded()+"");
+                            redstoneCountInPedestal.withStyle(ChatFormatting.BLACK);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(redstoneCountInPedestal);
+                            displayOther = true;
                         }
 
                         if(pedestal.hasFluid())
                         {
-                            String fluid = pedestal.getStoredFluid().getDisplayName().getString() +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
-                            MutableComponent pedestalFluid = Component.translatable(fluid);
+                            MutableComponent pedestalFluid = pedestal.getStoredFluid().getDisplayName().copy();
+                            pedestalFluid.append(Component.translatable(MODID + ".pedestal.message_separator1"));
+                            pedestalFluid.append(""+ pedestal.getStoredFluid().getAmount() + "");
+                            pedestalFluid.append(Component.translatable(MODID + ".pedestal.message_separator2"));
+                            pedestalFluid.append(""+ pedestal.getFluidCapacity() + "");
                             pedestalFluid.withStyle(ChatFormatting.BLUE);
-                            p_60506_.displayClientMessage(pedestalFluid, true);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(pedestalFluid);
+                            displayOther = true;
                         }
 
                         if(pedestal.hasEnergy())
                         {
-                            String energy = "Energy: "+ pedestal.getStoredEnergy() +"/"+pedestal.getEnergyCapacity();
-                            MutableComponent pedestalEnergy = Component.translatable(energy);
+                            MutableComponent pedestalEnergy = Component.translatable(MODID + ".pedestal.message_energy");
+                            pedestalEnergy.append(Component.translatable(MODID + ".pedestal.message_separator1"));
+                            pedestalEnergy.append(""+ pedestal.getStoredEnergy() + "");
+                            pedestalEnergy.append(Component.translatable(MODID + ".pedestal.message_separator2"));
+                            pedestalEnergy.append(""+ pedestal.getEnergyCapacity() + "");
                             pedestalEnergy.withStyle(ChatFormatting.RED);
-                            p_60506_.displayClientMessage(pedestalEnergy, true);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(pedestalEnergy);
+                            displayOther = true;
                         }
 
                         if(pedestal.hasExperience())
                         {
-                            String experience = "Experience: "+ pedestal.getStoredExperience() +"/"+pedestal.getExperienceCapacity();
-                            MutableComponent pedestalExperience = Component.translatable(experience);
+                            MutableComponent pedestalExperience = Component.translatable(MODID + ".pedestal.message_experience");
+                            pedestalExperience.append(Component.translatable(MODID + ".pedestal.message_separator1"));
+                            pedestalExperience.append(""+ pedestal.getStoredExperience() + "");
+                            pedestalExperience.append(Component.translatable(MODID + ".pedestal.message_separator2"));
+                            pedestalExperience.append(""+ pedestal.getExperienceCapacity() + "");
                             pedestalExperience.withStyle(ChatFormatting.GREEN);
-                            p_60506_.displayClientMessage(pedestalExperience,true);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(pedestalExperience);
+                            displayOther = true;
                         }
+
+                        if(pedestal.hasDust())
+                        {
+                            MutableComponent dustInPedestal = Component.translatable(MODID + ".pedestal.message_dust");
+                            dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator1"));
+                            dustInPedestal.append(Component.translatable(MowLibReferences.MODID + "." + MowLibColorReference.getColorName(pedestal.getStoredDust().getDustColor())));
+                            dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator4"));
+                            dustInPedestal.append(""+ pedestal.getStoredDust().getDustAmount() + "");
+                            dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator2"));
+                            dustInPedestal.append(""+ pedestal.getDustCapacity() + "");
+                            dustInPedestal.withStyle(ChatFormatting.LIGHT_PURPLE);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(dustInPedestal);
+                            displayOther = true;
+                        }
+
+                        if((displayOtherComponent.getSiblings().size() > 3))
+                        {
+                            for(int i=0;i<displayOtherComponent.getSiblings().size();i++)
+                            {
+                                if(displayOtherComponent.getSiblings().get(i).getString().contains(Component.translatable(MODID + ".pedestal.message_separator3").getString()))continue;
+
+                                p_60506_.displayClientMessage(displayOtherComponent.getSiblings().get(i),false);
+                            }
+                        }
+                        else
+                        {
+                            p_60506_.displayClientMessage(displayOtherComponent,true);
+                        }
+
 
                     }
                     else
@@ -704,7 +754,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                                 Map<Item,Integer> getMapped =  Maps.<Item,Integer>newLinkedHashMap();
                                 for(int i=0;i<stacks.size();i++)
                                 {
-                                    if(!stacks.get(i).isEmpty())continue;
+                                    if(stacks.get(i).isEmpty())continue;
 
                                     if(getMapped.containsKey(stacks.get(i).getItem()))
                                     {
@@ -719,16 +769,28 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
 
                                 if(getMapped.size()>0)
                                 {
-                                    MutableComponent itemCountInPedestal = Component.literal("TESTING");
+                                    MutableComponent itemCountInPedestal = Component.literal("");
                                     for (Item item : getMapped.keySet())
                                     {
-                                        itemCountInPedestal.append(Component.literal("   "));
                                         itemCountInPedestal.append(Component.translatable(item.getDefaultInstance().getDisplayName().getString() + " " + getMapped.get(item)));
-
+                                        if(getMapped.size()>1)itemCountInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator3"));
                                     }
 
                                     itemCountInPedestal.withStyle(ChatFormatting.GOLD);
-                                    p_60506_.displayClientMessage(itemCountInPedestal,true);
+
+                                    if((itemCountInPedestal.getSiblings().size() > 5))
+                                    {
+                                        for(int i=0;i<itemCountInPedestal.getSiblings().size();i++)
+                                        {
+                                            if(itemCountInPedestal.getSiblings().get(i).getString().contains(Component.translatable(MODID + ".pedestal.message_separator3").getString()))continue;
+
+                                            p_60506_.displayClientMessage(itemCountInPedestal.getSiblings().get(i),false);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        p_60506_.displayClientMessage(itemCountInPedestal,true);
+                                    }
                                 }
                             }
                             else
