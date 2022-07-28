@@ -50,7 +50,7 @@ public class FilterRestricted extends BaseFilter{
             for(int i=0;i<range;i++)
             {
                 count +=stackCurrent.get(i).getCount();
-                if(count>=maxIncomming)break;
+                //if(count>=maxIncomming)break;
             }
             if(mode==0)
             {
@@ -61,57 +61,16 @@ public class FilterRestricted extends BaseFilter{
         return 0;
     }
 
-    //Right Click
     @Override
-    public InteractionResultHolder<ItemStack> use(Level p_41432_, Player p_41433_, InteractionHand p_41434_) {
-        Level world = p_41432_;
-        Player player = p_41433_;
-        InteractionHand hand = p_41434_;
-        ItemStack itemInMainhand = player.getMainHandItem();
-        ItemStack itemInOffhand = player.getOffhandItem();
-        HitResult result = player.pick(5,0,false);
+    public boolean canModeUseInventoryAsFilter(int mode)
+    {
+        return mode<=4;
+    }
 
-        if(!world.isClientSide())
-        {
-            //Disable Filter Base
-            if(!(itemInOffhand.getItem().equals(DeferredRegisterItems.FILTER_BASE.get())) || !(itemInMainhand.getItem().equals(DeferredRegisterItems.FILTER_BASE.get())))
-            {
-                //Check for Offhand Only Filter
-                if(itemInOffhand.getItem() instanceof IPedestalFilter && !(itemInMainhand.getItem() instanceof IPedestalFilter))
-                {
-                    if(result.getType().equals(HitResult.Type.MISS))
-                    {
-                        if(player.isCrouching())
-                        {
-                            setFilterMode(player,itemInOffhand,InteractionHand.OFF_HAND);
-                        }
-                    }
-                    else if(result.getType().equals(HitResult.Type.BLOCK))
-                    {
-                        if(player.isCrouching())
-                        {
-                            UseOnContext context = new UseOnContext(player,hand,((BlockHitResult) result));
-                            BlockHitResult res = new BlockHitResult(context.getClickLocation(), context.getHorizontalDirection(), context.getClickedPos(), false);
-                            BlockPos posBlock = res.getBlockPos();
-
-                            List<ItemStack> buildQueue = this.buildFilterQueue(world,posBlock);
-
-                            if(buildQueue.size() > 0 && PedestalModesAndTypes.getModeFromStack(itemInOffhand)<=3)
-                            {
-                                this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
-                                ChatFormatting color = PedestalModesAndTypes.getModeColorFormat(itemInOffhand);
-                                MowLibMessageUtils.messagePopup(player,color,MODID + ".filter_changed");
-                            }
-                        }
-                    }
-                }
-                else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter){
-                    MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
-                }
-            }
-        }
-
-        return InteractionResultHolder.fail(p_41433_.getItemInHand(p_41434_));
+    @Override
+    public boolean canSetFilterType(int mode)
+    {
+        return false;
     }
 
     @Override
@@ -139,7 +98,7 @@ public class FilterRestricted extends BaseFilter{
         player.displayClientMessage(enchants, false);
     }
 
-    @Override
+    /*@Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
 
         if(!p_41421_.getItem().equals(DeferredRegisterItems.FILTER_BASE))
@@ -155,45 +114,10 @@ filterList.withStyle(ChatFormatting.WHITE);
 p_41423_.add(filterList);
 
             MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
-            String typeString = "";
-            switch(filterMode)
-            {
-                case 0: typeString = ".mode_items"; break;
-                case 1: typeString = ".mode_fluids"; break;
-                case 2: typeString = ".mode_energy"; break;
-                case 3: typeString = ".mode_experience"; break;
-                default: typeString = ".error"; break;
-            }
             changed.withStyle(ChatFormatting.GOLD);
-            MutableComponent type = Component.translatable(MODID + typeString);
+            MutableComponent type = Component.translatable(MODID + PedestalModesAndTypes.getModeLocalizedString(filterMode));
             changed.append(type);
             p_41423_.add(changed);
         }
-    }
-
-    /*@Override
-    public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
-
-        TranslatableComponent enchant = new TranslatableComponent(MODID + ".filters.tooltip_filterlist_count");
-        enchant.withStyle(ChatFormatting.LIGHT_PURPLE);
-        p_41423_.add(enchant);
-
-        TranslatableComponent enchants = new TranslatableComponent("1");
-        List<ItemStack> filterQueue = readFilterQueueFromNBT(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
-        int range = filterQueue.size();
-        if(range>0)
-        {
-            int count = 0;
-            for(int i=0;i<range;i++)
-            {
-                count +=filterQueue.get(i).getCount();
-                if(count>=64)break;
-            }
-
-            enchants = new TranslatableComponent(""+((count>0)?((count>64)?(64):(count)):(1))+"");
-
-        }
-        enchants.withStyle(ChatFormatting.GRAY);
-        p_41423_.add(enchants);
     }*/
 }

@@ -14,6 +14,7 @@ public class PedestalModesAndTypes
         return readModeFromNBT(stack);
     }
 
+    //Change for new Modes
     public static String getModeStringFromInt(int mode) {
 
         switch(mode)
@@ -27,6 +28,7 @@ public class PedestalModesAndTypes
         }
     }
 
+    //Change for new Modes
     public static String getModeStringFromStack(ItemStack stack) {
 
         switch(getModeFromStack(stack))
@@ -40,6 +42,7 @@ public class PedestalModesAndTypes
         }
     }
 
+    //Change for new Modes
     public static MutableComponent getModeComponentFromStack(ItemStack stack) {
 
         switch(getModeFromStack(stack))
@@ -73,6 +76,7 @@ public class PedestalModesAndTypes
         return 0;
     }
 
+    //Change for new Modes
     public static ChatFormatting getModeColorFormat(ItemStack stack)
     {
         ChatFormatting color;
@@ -89,6 +93,7 @@ public class PedestalModesAndTypes
         return color;
     }
 
+    //Change for new Modes
     public static ChatFormatting getModeDarkColorFormat(int mode)
     {
         ChatFormatting colorChange;
@@ -105,6 +110,7 @@ public class PedestalModesAndTypes
         return colorChange;
     }
 
+    //Change for new Modes
     public static String getModeLocalizedString(int mode)
     {
         String typeString = "";

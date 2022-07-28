@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
@@ -27,6 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
@@ -56,6 +58,26 @@ public class BaseFilter extends Item implements IPedestalFilter
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
+    public boolean canModeUseInventoryAsFilter(int mode)
+    {
+        return mode<=1;
+    }
+
+    public boolean canSetFilterMode(int mode)
+    {
+        return true;
+    }
+
+    public boolean canSetFilterType(int mode)
+    {
+        return true;
+    }
+
+    public void setFilterType(Player player, ItemStack heldItem)
+    {
+        setFilterTypeCustom(player, heldItem, ".filter_type_blacklist", ".filter_type_whitelist", ChatFormatting.BLACK, ChatFormatting.WHITE, ".filter_type_changed");
+    }
+
     //Left Click
     //No methods exist without using a client one and needing to send packets back and forth, BLEH
 
@@ -81,12 +103,12 @@ public class BaseFilter extends Item implements IPedestalFilter
                     {
                         if(player.isCrouching())
                         {
-                            setFilterMode(player,itemInOffhand,InteractionHand.OFF_HAND);
+                            if(canSetFilterMode(-1))setFilterMode(player,itemInOffhand,InteractionHand.OFF_HAND);
                             //return InteractionResultHolder.success(itemInOffhand);
                         }
                         else
                         {
-                            setFilterTypeWhiteBlacklist(player,itemInOffhand);
+                            if(canSetFilterType(-1))setFilterType(player,itemInOffhand);
                             //return InteractionResultHolder.success(itemInOffhand);
                         }
                     }
@@ -100,7 +122,7 @@ public class BaseFilter extends Item implements IPedestalFilter
 
                             List<ItemStack> buildQueue = this.buildFilterQueue(world,posBlock);
 
-                            if(buildQueue.size() > 0 && PedestalModesAndTypes.getModeFromStack(itemInOffhand)<=1)
+                            if(buildQueue.size() > 0 && canModeUseInventoryAsFilter(PedestalModesAndTypes.getModeFromStack(itemInOffhand)))
                             {
                                 this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
                                 MowLibMessageUtils.messagePopup(player,PedestalModesAndTypes.getModeColorFormat(itemInOffhand),MODID + ".filter_changed");
@@ -117,33 +139,22 @@ public class BaseFilter extends Item implements IPedestalFilter
         return super.use(p_41432_, p_41433_, p_41434_);
     }
 
-    public void setFilterTypeWhiteBlacklist(Player player, ItemStack heldItem)
-    {
-
-        boolean getCurrentType = getFilterType(heldItem,PedestalModesAndTypes.getModeFromStack(heldItem));
-        this.setFilterType(heldItem,!getCurrentType);
-        String white = MODID + ".filter_type_whitelist";
-        String black = MODID + ".filter_type_blacklist";
-        List<String> listed = new ArrayList<>();
-        listed.add((!getCurrentType)?(black):(white));
-        MowLibMessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
-    }
-
-    public void setFilterTypeAboveBelow(Player player, ItemStack heldItem)
+    public void setFilterTypeCustom(Player player, ItemStack heldItem, String firstLocalization, String secondLocalization, ChatFormatting firstColor, ChatFormatting secondColor, String chatLocalization)
     {
         if(heldItem.getItem() instanceof BaseFilter) {
             BaseFilter filterItem = ((BaseFilter) heldItem.getItem());
 
             boolean getCurrentType = filterItem.getFilterType(heldItem,PedestalModesAndTypes.getModeFromStack(heldItem));
             filterItem.setFilterType(heldItem,!getCurrentType);
-            String above = MODID + ".filter_type_above";
-            String below = MODID + ".filter_type_below";
+            String second = MODID + secondLocalization;
+            String first = MODID + firstLocalization;
             List<String> listed = new ArrayList<>();
-            listed.add((!getCurrentType)?(below):(above));
-            MowLibMessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(ChatFormatting.BLACK):(ChatFormatting.WHITE),MODID + ".filter_type_changed",listed);
+            listed.add((!getCurrentType)?(first):(second));
+            MowLibMessageUtils.messagePopupWithAppend(MODID, player,(!getCurrentType)?(firstColor):(secondColor),MODID + chatLocalization,listed);
         }
     }
 
+    //Change for new Modes
     public void setFilterMode(Player player, ItemStack heldItem, InteractionHand hand)
     {
         if(heldItem.getItem() instanceof BaseFilter)
@@ -151,7 +162,7 @@ public class BaseFilter extends Item implements IPedestalFilter
             BaseFilter filterItem = ((BaseFilter)heldItem.getItem());
 
             int mode = PedestalModesAndTypes.getModeFromStack(heldItem)+1;
-            int setNewMode = (mode<=3)?(mode):(0);
+            int setNewMode = (mode<=4)?(mode):(0);
             PedestalModesAndTypes.saveModeToNBT(heldItem,setNewMode);
             MowLibColorReference.addColorToItemStack(heldItem,filterItem.getFilterTypeColor(heldItem));
             player.setItemInHand(hand,heldItem);
@@ -201,30 +212,43 @@ public class BaseFilter extends Item implements IPedestalFilter
         return (getFilterType(filterItem))?(2763306):(16777215);
     }
 
+    //Change for new Modes
     @Override
     public boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode) {
         return true;
     }
 
-    public boolean canTransferItems(ItemStack filter) { return !getFilterType(filter,0); }
+    @Override
+    public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) { return !getFilterType(filter,0); }
 
-    public boolean canTransferFluids(ItemStack filter) { return !getFilterType(filter,1); }
+    @Override
+    public boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack) { return !getFilterType(filter,1); }
 
-    public boolean canTransferEnergy(ItemStack filter)
+    @Override
+    public boolean canAcceptEnergy(ItemStack filter, int incomingAmount)
     {
         return !getFilterType(filter,2);
     }
 
-    public boolean canTransferXP(ItemStack filter)
+    @Override
+    public boolean canAcceptXP(ItemStack filter, int incomingAmount)
     {
         return !getFilterType(filter,3);
     }
+
+    @Override
+    public boolean canAcceptDust(ItemStack filter, DustMagic incomingDust)
+    {
+        return !getFilterType(filter,4);
+    }
+
 
     @Override
     public boolean canSendItem(BasePedestalBlockEntity pedestal) {
         return true;
     }
 
+    //Change for new Modes
     @Override
     public int canAcceptCount(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming, int mode) {
         switch (mode)
@@ -233,10 +257,12 @@ public class BaseFilter extends Item implements IPedestalFilter
             case 1: return pedestal.getFluidTransferRate();
             case 2: return pedestal.getEnergyTransferRate();
             case 3: return pedestal.getExperienceTransferRate();
+            case 4: return pedestal.getDustTransferRate();
             default: return -1;
         }
     }
 
+    //Change for new Modes
     @Override
     public int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode) {
         switch (mode)
@@ -245,6 +271,7 @@ public class BaseFilter extends Item implements IPedestalFilter
             case 1: return pedestal.getFluidTransferRate();
             case 2: return pedestal.getEnergyTransferRate();
             case 3: return pedestal.getExperienceTransferRate();
+            case 4: return pedestal.getDustTransferRate();
             default: return -1;
         }
     }
@@ -408,6 +435,28 @@ public class BaseFilter extends Item implements IPedestalFilter
         return Optional.of(new ItemTooltipComponent(nonnulllist));
     }
 
+    public Component filterTypeTooltip(int filterMode, boolean filterType)
+    {
+        MutableComponent filterList = Component.translatable(MODID + ".filter_type");
+        MutableComponent white = Component.translatable(MODID + ".filter_type_whitelist");
+        MutableComponent black = Component.translatable(MODID + ".filter_type_blacklist");
+        filterList.append((filterType)?(black):(white));
+        filterList.withStyle(ChatFormatting.WHITE);
+
+        return filterList;
+    }
+
+    public Component filterModeTooltip(int filterMode, boolean filterType)
+    {
+        MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
+        String typeString = PedestalModesAndTypes.getModeLocalizedString(filterMode);
+        changed.withStyle(ChatFormatting.GOLD);
+        MutableComponent type = Component.translatable(MODID + typeString);
+        changed.append(type);
+
+        return changed;
+    }
+
     @Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
 
@@ -415,22 +464,12 @@ public class BaseFilter extends Item implements IPedestalFilter
 
         if(!p_41421_.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
-            boolean filterType = getFilterType(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
             int filterMode = PedestalModesAndTypes.getModeFromStack(p_41421_);
+            boolean filterType = getFilterType(p_41421_,filterMode);
 
-            MutableComponent filterList = Component.translatable(MODID + ".filter_type");
-            MutableComponent white = Component.translatable(MODID + ".filter_type_whitelist");
-            MutableComponent black = Component.translatable(MODID + ".filter_type_blacklist");
-            filterList.append((filterType)?(black):(white));
-            filterList.withStyle(ChatFormatting.WHITE);
-            p_41423_.add(filterList);
+            if(canSetFilterType(filterMode))p_41423_.add(filterTypeTooltip(filterMode, filterType));
 
-            MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
-            String typeString = PedestalModesAndTypes.getModeLocalizedString(filterMode);
-            changed.withStyle(ChatFormatting.GOLD);
-            MutableComponent type = Component.translatable(MODID + typeString);
-            changed.append(type);
-            p_41423_.add(changed);
+            if(canSetFilterMode(filterMode))p_41423_.add(filterModeTooltip(filterMode, filterType));
         }
         else
         {

@@ -1,10 +1,12 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.FluidStack;
 
 import java.util.List;
 
@@ -42,13 +44,15 @@ public interface IPedestalFilter
      */
     boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode);
 
-    boolean canTransferItems(ItemStack filter);
+    boolean canAcceptItems(ItemStack filter, ItemStack incomingStack);
 
-    boolean canTransferFluids(ItemStack filter);
+    boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack);
 
-    boolean canTransferEnergy(ItemStack filter);
+    boolean canAcceptEnergy(ItemStack filter, int incomingAmount);
 
-    boolean canTransferXP(ItemStack filter);
+    boolean canAcceptXP(ItemStack filter, int incomingAmount);
+
+    boolean canAcceptDust(ItemStack filter, DustMagic incomingDust);
 
     /**
      * @param pedestal pedestal tile filter is in

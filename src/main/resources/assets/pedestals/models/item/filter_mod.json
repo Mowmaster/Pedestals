@@ -9,6 +9,7 @@
     { "predicate": { "pedestals:filter_mode": 0}, "model": "pedestals:item/filters/mod/filter_item"},
     { "predicate": { "pedestals:filter_mode": 1}, "model": "pedestals:item/filters/mod/filter_fluid"},
     { "predicate": { "pedestals:filter_mode": 2}, "model": "pedestals:item/filters/mod/filter_energy"},
-    { "predicate": { "pedestals:filter_mode": 3}, "model": "pedestals:item/filters/mod/filter_xp"}
+    { "predicate": { "pedestals:filter_mode": 3}, "model": "pedestals:item/filters/mod/filter_xp"},
+    { "predicate": { "pedestals:filter_mode": 4}, "model": "pedestals:item/filters/mod/filter_dust"}
   ]
 }

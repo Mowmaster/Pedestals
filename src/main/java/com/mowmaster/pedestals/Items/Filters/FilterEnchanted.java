@@ -46,63 +46,11 @@ public class FilterEnchanted extends BaseFilter{
         return filterBool;
     }
 
-    //Right Click
+    //Overrides needed for the InteractionResultHolder<ItemStack> use() method in the base class.
     @Override
-    public InteractionResultHolder<ItemStack> use(Level p_41432_, Player p_41433_, InteractionHand p_41434_) {
-        Level world = p_41432_;
-        Player player = p_41433_;
-        InteractionHand hand = p_41434_;
-        ItemStack itemInMainhand = player.getMainHandItem();
-        ItemStack itemInOffhand = player.getOffhandItem();
-        HitResult result = player.pick(5,0,false);
-
-        if(!world.isClientSide())
-        {
-            //Disable Filter Base
-            if(!(itemInOffhand.getItem().equals(DeferredRegisterItems.FILTER_BASE.get())) || !(itemInMainhand.getItem().equals(DeferredRegisterItems.FILTER_BASE.get())))
-            {
-                //Check for Offhand Only Filter
-                if(itemInOffhand.getItem() instanceof IPedestalFilter && !(itemInMainhand.getItem() instanceof IPedestalFilter))
-                {
-                    if(result.getType().equals(HitResult.Type.MISS))
-                    {
-                        if(player.isCrouching())
-                        {
-                            setFilterMode(player,itemInOffhand,InteractionHand.OFF_HAND);
-                            //return InteractionResultHolder.success(itemInOffhand);
-                        }
-                        else
-                        {
-                            setFilterTypeWhiteBlacklist(player,itemInOffhand);
-                            //return InteractionResultHolder.success(itemInOffhand);
-                        }
-                    }
-                    else if(result.getType().equals(HitResult.Type.BLOCK))
-                    {
-                        if(player.isCrouching())
-                        {
-                            UseOnContext context = new UseOnContext(player,hand,((BlockHitResult) result));
-                            BlockHitResult res = new BlockHitResult(context.getClickLocation(), context.getHorizontalDirection(), context.getClickedPos(), false);
-                            BlockPos posBlock = res.getBlockPos();
-
-                            List<ItemStack> buildQueue = this.buildFilterQueue(world,posBlock);
-
-                            if(buildQueue.size() > 0 && PedestalModesAndTypes.getModeFromStack(itemInOffhand)<=0)
-                            {
-                                this.writeFilterQueueToNBT(itemInOffhand,buildQueue, PedestalModesAndTypes.getModeFromStack(itemInOffhand));
-                                ChatFormatting color = PedestalModesAndTypes.getModeColorFormat(itemInOffhand);
-                                MowLibMessageUtils.messagePopup(player,color,MODID + ".filter_changed");
-                            }
-                        }
-                    }
-                }
-                else if(itemInOffhand.getItem() instanceof IPedestalFilter && itemInMainhand.getItem() instanceof IPedestalFilter){
-                    MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,MODID + ".filter.message_twohanded");
-                }
-            }
-        }
-
-        return InteractionResultHolder.fail(p_41433_.getItemInHand(p_41434_));
+    public boolean canModeUseInventoryAsFilter(int mode)
+    {
+        return mode<=0;
     }
 
 }
