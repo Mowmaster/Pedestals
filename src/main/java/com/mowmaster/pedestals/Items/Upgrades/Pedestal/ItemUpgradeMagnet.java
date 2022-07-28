@@ -92,27 +92,30 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
             //Fluid
             if(canTransferFluids(coinInPedestal))
             {
-                if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket && passesFluidFilter(pedestal,itemStack))
+                if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket)
                 {
                     Fluid bucketFluid = bucket.getFluid();
                     FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
-                    int fluidSpaceInPedestal = pedestal.spaceForFluid();
-
-                    FluidStack fluidInPedestal = pedestal.getStoredFluid();
-                    if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
+                    if(passesFluidFilter(pedestal,fluidInTank))
                     {
-                        int transferRate = 1000;
-                        if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
+                        int fluidSpaceInPedestal = pedestal.spaceForFluid();
+
+                        FluidStack fluidInPedestal = pedestal.getStoredFluid();
+                        if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
                         {
-                            FluidStack fluidDrained = fluidInTank.copy();
-                            if(!fluidInTank.isEmpty())
+                            int transferRate = 1000;
+                            if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
                             {
-                                pedestal.addFluid(fluidDrained, IFluidHandler.FluidAction.EXECUTE);
-                                //Turn bucket back into an empty one
-                                itemStack = new ItemStack(Items.BUCKET,1);
-                                item.setItem(itemStack);
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,0,255));
-                                actionDone = true;
+                                FluidStack fluidDrained = fluidInTank.copy();
+                                if(!fluidInTank.isEmpty())
+                                {
+                                    pedestal.addFluid(fluidDrained, IFluidHandler.FluidAction.EXECUTE);
+                                    //Turn bucket back into an empty one
+                                    itemStack = new ItemStack(Items.BUCKET,1);
+                                    item.setItem(itemStack);
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,0,255));
+                                    actionDone = true;
+                                }
                             }
                         }
                     }
@@ -330,14 +333,12 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
                             .filter(itemStack -> !itemStack.isEmpty())
                             .filter(itemStack -> !itemStack.getItem().equals(Items.BUCKET))
                             .filter(itemStack -> itemStack.getItem() instanceof BucketItem)
-                            .filter(itemStack -> passesFluidFilter(pedestal,itemStack))
+                            .filter(itemStack -> passesFluidFilter(pedestal,getFluidStackFromItemStack(itemStack)))
                             .findFirst().orElse(ItemStack.EMPTY);
 
                     if(!bucketItemStack.isEmpty())
                     {
-                        BucketItem bucket = ((BucketItem)bucketItemStack.getItem());
-                        Fluid bucketFluid = bucket.getFluid();
-                        FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
+                        FluidStack fluidInTank = getFluidStackFromItemStack(bucketItemStack);
                         int fluidSpaceInPedestal = pedestal.spaceForFluid();
 
                         FluidStack fluidInPedestal = pedestal.getStoredFluid();

@@ -536,7 +536,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             {
                 ItemEntity itemEntity = ((ItemEntity) entityIn);
                 ItemStack itemStack = itemEntity.getItem();
-                if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket && passesFluidFilter(pedestal,itemStack))
+                if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket && passesFluidFilter(pedestal,getFluidStackFromItemStack(itemStack)))
                 {
                     Fluid bucketFluid = bucket.getFluid();
                     FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
@@ -567,7 +567,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                             .filter(itemStack -> !itemStack.isEmpty())
                             .filter(itemStack -> !itemStack.getItem().equals(Items.BUCKET))
                             .filter(itemStack -> itemStack.getItem() instanceof BucketItem)
-                            .filter(itemStack -> passesFluidFilter(pedestal,itemStack))
+                            .filter(itemStack -> passesFluidFilter(pedestal,getFluidStackFromItemStack(itemStack)))
                             .findFirst().orElse(ItemStack.EMPTY);
 
                     if(!bucketItemStack.isEmpty())

@@ -13,6 +13,7 @@ import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
+import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -107,7 +108,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 //Run filter checks here(slot==0)?(true):(false)
                 IPedestalFilter filter = getIPedestalFilter();
                 if(filter == null)return true;
-                return filter.canAcceptItem(getPedestal(),stack,0);
+                return filter.canAcceptItems(getFilterInPedestal(),stack);
             }
 
             @Override
@@ -142,13 +143,36 @@ public class BasePedestalBlockEntity extends BlockEntity
                 return super.getStackInSlot((slot>getSlots())?(0):(slot));
             }
 
+            /*
+                Inserts an ItemStack into the given slot and return the remainder. The ItemStack should not be modified in this function!
+                Note: This behaviour is subtly different from IFluidHandler.fill(FluidStack, IFluidHandler.FluidAction)
+                Params:
+                    slot – Slot to insert into.
+                    stack – ItemStack to insert. This must not be modified by the item handler.
+                    simulate – If true, the insertion is only simulated
+                Returns:
+                    The remaining ItemStack that was not inserted (if the entire stack is accepted, then return an empty ItemStack).
+                    May be the same as the input ItemStack if unchanged, otherwise a new ItemStack.
+                    The returned ItemStack can be safely modified after.
+            */
             @Nonnull
             @Override
             public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-
                 return super.insertItem((slot>getSlots())?(0):(slot), stack, simulate);
             }
 
+            /*
+                Extracts an ItemStack from the given slot.
+                The returned value must be empty if nothing is extracted,
+                otherwise its stack size must be less than or equal to amount and ItemStack.getMaxStackSize().
+                Params:
+                    slot – Slot to extract from.
+                    amount – Amount to extract (may be greater than the current stack's max limit)
+                    simulate – If true, the extraction is only simulated
+                Returns:
+                    ItemStack extracted from the slot, must be empty if nothing can be extracted.
+                    The returned ItemStack can be safely modified after, so item handlers should return a new or copied stack.
+             */
             @Nonnull
             @Override
             public ItemStack extractItem(int slot, int amount, boolean simulate) {
@@ -208,6 +232,15 @@ public class BasePedestalBlockEntity extends BlockEntity
 
     public IEnergyStorage createHandlerPedestalEnergy() {
         return new IEnergyStorage() {
+
+            /*
+            Adds energy to the storage. Returns quantity of energy that was accepted.
+            Params:
+                maxReceive – Maximum amount of energy to be inserted.
+                simulate – If TRUE, the insertion will only be simulated.
+            Returns:
+                Amount of energy that was (or would have been, if simulated) accepted by the storage.
+             */
             @Override
             public int receiveEnergy(int maxReceive, boolean simulate) {
 
@@ -230,6 +263,14 @@ public class BasePedestalBlockEntity extends BlockEntity
                 }
             }
 
+            /*
+            Removes energy from the storage. Returns quantity of energy that was removed.
+            Params:
+                maxExtract – Maximum amount of energy to be extracted.
+                simulate – If TRUE, the extraction will only be simulated.
+            Returns:
+                Amount of energy that was (or would have been, if simulated) extracted from the storage.
+             */
             @Override
             public int extractEnergy(int maxExtract, boolean simulate) {
 
@@ -550,7 +591,9 @@ public class BasePedestalBlockEntity extends BlockEntity
 
             @Override
             public boolean isDustValid(int tank, @NotNull DustMagic dustIn) {
-                return storedDust.isDustEqualOrEmpty(dustIn);
+                IPedestalFilter filter = getIPedestalFilter();
+                if(filter == null)return storedDust.isDustEqualOrEmpty(dustIn);
+                return filter.canAcceptItem(getPedestal(),ItemStack.EMPTY,4);
             }
 
             @Override
@@ -1060,7 +1103,14 @@ public class BasePedestalBlockEntity extends BlockEntity
         return stack;
     }
 
-    public boolean addItem(ItemStack itemFromBlock,boolean simulate)
+    //If resulting insert stack is empty it means the full stack was inserted
+    public boolean addItem(ItemStack itemFromBlock, boolean simulate)
+    {
+        return addItemStack(itemFromBlock, simulate).isEmpty();
+    }
+
+    //Return result not inserted, if all inserted return empty stack
+    public ItemStack addItemStack(ItemStack itemFromBlock, boolean simulate)
     {
         IItemHandler h = handler.orElse(null);
         int firstEmptyorMatchingSlot = 0;
@@ -1087,25 +1137,19 @@ public class BasePedestalBlockEntity extends BlockEntity
         {
             if(hasSpaceForItem(itemFromBlock) && ItemHandlerHelper.canItemStacksStack(h.getStackInSlot(firstEmptyorMatchingSlot),itemFromBlock))
             {
-                if(!simulate)
-                {
-                    h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), false);
-                    update();
-                }
-                return true;
+                ItemStack returner = h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), simulate);
+                if(!simulate)update();
+                return returner;
             }
             else
             {
-                if(!simulate)
-                {
-                    h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), false);
-                    update();
-                }
-                return true;
+                ItemStack returner = h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), simulate);
+                if(!simulate)update();
+                return returner;
             }
         }
 
-        return false;
+        return itemFromBlock;
     }
 
     public int getItemTransferRate()
@@ -2741,7 +2785,7 @@ public class BasePedestalBlockEntity extends BlockEntity
     }
 
     //Returns items available to be insert, 0 if false
-    public int canAcceptItems(Level worldIn, BlockPos posPedestal, ItemStack itemsIncoming)
+    public int itemCountToAccept(Level worldIn, BlockPos posPedestal, ItemStack itemsIncoming)
     {
         int canAccept = 0;
         int pedestalAccept = 0;
@@ -3008,8 +3052,38 @@ public class BasePedestalBlockEntity extends BlockEntity
         {
             if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
-                //Checks if pedestal is empty or if not then checks if items match and how many can be insert
-                if(tilePedestalToSendTo.canAcceptItems(level,pedestalToSendTo,itemStackIncoming) > 0)
+                LazyOptional<IItemHandler> cap = tilePedestalToSendTo.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP);
+                if(cap.isPresent())
+                {
+                    IItemHandler handler = cap.orElse(null);
+                    //Our Item Handler doesnt require a slot value so default == 0
+                    if(handler.isItemValid(0,itemStackIncoming))
+                    {
+                        ItemStack notInsertedStackSimulation = tilePedestalToSendTo.addItemStack(itemStackIncoming,true);
+                        //this means some items were inserted OR the full stack was inserted
+                        int difference = (notInsertedStackSimulation.isEmpty())?(itemStackIncoming.getCount()):(itemStackIncoming.getCount() - notInsertedStackSimulation.getCount());
+                        if(difference > 0)
+                        {
+                            int countToSend = Math.min(getItemTransferRate(),difference);
+                            if(countToSend >=1)
+                            {
+                                ItemStack copyIncomingStack = itemStackIncoming.copy();
+                                copyIncomingStack.setCount(countToSend);
+                                //Send items
+                                if(tilePedestalToSendTo.addItem(copyIncomingStack,true))
+                                {
+                                    removeItem(copyIncomingStack.getCount(),false);
+                                    tilePedestalToSendTo.addItem(copyIncomingStack,false);
+                                    if(canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,pedestalToSendTo.getX(),pedestalToSendTo.getY(),pedestalToSendTo.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                /*//Checks if pedestal is empty or if not then checks if items match and how many can be insert
+                if(tilePedestalToSendTo.itemCountToAccept(level,pedestalToSendTo,itemStackIncoming) > 0)
                 {
                     boolean filter = true;
                     //Check if it has filter, if not return true
@@ -3025,20 +3099,20 @@ public class BasePedestalBlockEntity extends BlockEntity
                     if(filter)
                     {
                         //Max that can be recieved
-                        int countToSend = tilePedestalToSendTo.canAcceptItems(level,pedestalToSendTo,removeItem(true));
+                        int countToSend = tilePedestalToSendTo.itemCountToAccept(level,pedestalToSendTo,removeItem(true));
                         ItemStack copyStackToSend = removeItem(true).copy();
                         countToSend = Math.min(getItemTransferRate(),(copyStackToSend.getCount()<countToSend)?(copyStackToSend.getCount()):(countToSend));
 
                         //Max that is available to send
-                        /*if(copyStackToSend.getCount()<countToSend)
+                        *//*if(copyStackToSend.getCount()<countToSend)
                         {
                             countToSend = copyStackToSend.getCount();
-                        }*/
+                        }*//*
                         //Get max that can be sent
-                        /*if(countToSend > getItemTransferRate())
+                        *//*if(countToSend > getItemTransferRate())
                         {
                             countToSend = getItemTransferRate();
-                        }*/
+                        }*//*
 
 
                         if(countToSend >=1)
@@ -3054,7 +3128,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                             }
                         }
                     }
-                }
+                }*/
             }
         }
 

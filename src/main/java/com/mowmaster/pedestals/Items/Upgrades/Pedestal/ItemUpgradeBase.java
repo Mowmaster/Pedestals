@@ -785,10 +785,10 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         boolean returner = true;
         if(pedestal.hasFilter())
         {
-            Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
-            if(filterInPedestal instanceof IPedestalFilter)
+            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
             {
-                returner = ((IPedestalFilter) filterInPedestal).canAcceptItem(pedestal,stackIn,0);
+                returner = filter.canAcceptItems(filterInPedestal,stackIn);
             }
 
         }
@@ -796,25 +796,50 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return returner;
     }
 
-    public boolean passesFluidFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn)
+    public FluidStack getFluidStackFromItemStack(ItemStack stackIn)
+    {
+            BucketItem bucket = ((BucketItem)stackIn.getItem());
+            Fluid bucketFluid = bucket.getFluid();
+            return new FluidStack(bucketFluid,1000);
+    }
+
+    public boolean passesFluidFilter(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack)
     {
         boolean returner = true;
 
         if(pedestal.hasFilter())
         {
-            Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
-            if(filterInPedestal instanceof IPedestalFilter)
+            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
             {
-                returner = ((IPedestalFilter) filterInPedestal).canAcceptItem(pedestal,stackIn,1);
+                returner = filter.canAcceptFluids(filterInPedestal, incomingFluidStack);
             }
 
         }
         else
         {
-            BucketItem bucket = ((BucketItem)stackIn.getItem());
-            Fluid bucketFluid = bucket.getFluid();
-            FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
-            return pedestal.canAcceptFluid(fluidInTank);
+            return pedestal.canAcceptFluid(incomingFluidStack);
+        }
+
+        return returner;
+    }
+
+    public boolean passesDustFilter(BasePedestalBlockEntity pedestal, DustMagic incomingDust)
+    {
+        boolean returner = true;
+
+        if(pedestal.hasFilter())
+        {
+            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
+            {
+                returner = filter.canAcceptDust(filterInPedestal, incomingDust);
+            }
+
+        }
+        else
+        {
+            return pedestal.canAcceptDust(incomingDust);
         }
 
         return returner;
@@ -825,11 +850,10 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         if(pedestal.hasFilter())
         {
             Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
-            if(filterInPedestal instanceof IPedestalFilter)
+            if(filterInPedestal instanceof IPedestalFilter filter)
             {
-                return ((IPedestalFilter) filterInPedestal).canAcceptCount(pedestal,stackIn,0);
+                return filter.canAcceptCount(pedestal,stackIn,0);
             }
-
         }
 
         return stackIn.getCount();
