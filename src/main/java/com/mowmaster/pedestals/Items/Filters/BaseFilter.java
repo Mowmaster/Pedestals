@@ -231,7 +231,7 @@ public class BaseFilter extends Item implements IPedestalFilter
     }
 
     @Override
-    public boolean canAcceptXP(ItemStack filter, int incomingAmount)
+    public boolean canAcceptExperience(ItemStack filter, int incomingAmount)
     {
         return !getFilterType(filter,3);
     }
@@ -250,30 +250,33 @@ public class BaseFilter extends Item implements IPedestalFilter
 
     //Change for new Modes
     @Override
-    public int canAcceptCount(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming, int mode) {
-        switch (mode)
-        {
-            case 0: return canAcceptCount(pedestal, pedestal.getLevel(), pedestal.getPos(), pedestal.getItemInPedestal(), itemStackIncoming, mode);
-            case 1: return pedestal.getFluidTransferRate();
-            case 2: return pedestal.getEnergyTransferRate();
-            case 3: return pedestal.getExperienceTransferRate();
-            case 4: return pedestal.getDustTransferRate();
-            default: return -1;
-        }
+    public int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming)
+    {
+        return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
     }
 
-    //Change for new Modes
     @Override
-    public int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode) {
-        switch (mode)
-        {
-            case 0: return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
-            case 1: return pedestal.getFluidTransferRate();
-            case 2: return pedestal.getEnergyTransferRate();
-            case 3: return pedestal.getExperienceTransferRate();
-            case 4: return pedestal.getDustTransferRate();
-            default: return -1;
-        }
+    public int canAcceptCountFluids(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack)
+    {
+        return Math.min(pedestal.getFluidTransferRate(), incomingFluidStack.getAmount());
+    }
+
+    @Override
+    public int canAcceptCountEnergy(BasePedestalBlockEntity pedestal, int incomingEnergyAmount)
+    {
+        return Math.min(pedestal.getEnergyTransferRate(), incomingEnergyAmount);
+    }
+
+    @Override
+    public int canAcceptCountExperience(BasePedestalBlockEntity pedestal, int incomingExperienceAmount)
+    {
+        return Math.min(pedestal.getExperienceTransferRate(), incomingExperienceAmount);
+    }
+
+    @Override
+    public int canAcceptCountDust(BasePedestalBlockEntity pedestal, DustMagic incomingDust)
+    {
+        return Math.min(pedestal.getDustTransferRate(), incomingDust.getDustAmount());
     }
 
     @Override

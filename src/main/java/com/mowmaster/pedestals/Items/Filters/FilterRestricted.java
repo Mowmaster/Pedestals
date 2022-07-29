@@ -37,7 +37,7 @@ public class FilterRestricted extends BaseFilter{
     {
         return 65280;
     }
-
+/*
     @Override
     public int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode) {
         if(itemInPedestal.isEmpty())
@@ -59,7 +59,7 @@ public class FilterRestricted extends BaseFilter{
             else return count;
         }
         return 0;
-    }
+    }*/
 
     @Override
     public boolean canModeUseInventoryAsFilter(int mode)

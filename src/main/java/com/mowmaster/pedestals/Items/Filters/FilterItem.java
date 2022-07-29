@@ -17,7 +17,49 @@ public class FilterItem extends BaseFilter{
         super(p_41383_);
     }
 
+    /*
+        So the filter for count takes into account the item stack (first) and based the count on that and not the
+        actualy count in the restricted filter.
+     */
+
     @Override
+    public int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming) {
+
+        ItemStack filter = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            if(pedestal.getItemInPedestalOrEmptySlot().isEmpty())
+            {
+                List<ItemStack> stackCurrentRestricted = readFilterQueueFromNBT(itemFromInv, PedestalModesAndTypes.getModeFromStack(itemFromInv));
+                int rangeRestricted = stackCurrentRestricted.size();
+                int count = 0;
+                int maxIncomming = itemStackIncoming.getMaxStackSize();
+                for(int i=0;i<rangeRestricted;i++)
+                {
+                    count +=stackCurrent.get(i).getCount();
+                    if(count>=maxIncomming)break;
+                }
+
+                return (count>0)?((count>maxIncomming)?(maxIncomming):(count)):(1);
+            }
+
+            return 0;
+        }
+
+        return super.canAcceptCountItems(pedestal, itemStackIncoming);
+    }
+
+
+    /*@Override
     public int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode) {
 
         ItemStack filter = pedestal.getFilterInPedestal();
@@ -55,9 +97,9 @@ public class FilterItem extends BaseFilter{
         }
 
         return super.canAcceptCount(pedestal, world, pos, itemInPedestal, itemStackIncoming, mode);
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode) {
         boolean filterBool=getFilterType(pedestal.getFilterInPedestal(),mode);
 
@@ -80,6 +122,27 @@ public class FilterItem extends BaseFilter{
             else return filterBool;
         }
         else return !filterBool;
+
+    }*/
+
+    @Override
+    public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
+        boolean filterBool=getFilterType(filter,0);
+
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem().equals(incomingStack.getItem()))
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            return !filterBool;
+        }
+        else return filterBool;
 
     }
 }

@@ -28,7 +28,7 @@ public class FilterMod extends BaseFilter{
     public FilterMod(Properties p_41383_) {
         super(p_41383_);
     }
-
+/*
     @Override
     public int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode) {
 
@@ -68,7 +68,7 @@ public class FilterMod extends BaseFilter{
         }
 
         return super.canAcceptCount(pedestal, world, pos, itemInPedestal, itemStackIncoming,mode);
-    }
+    }*/
 
     @Override
     public boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode) {

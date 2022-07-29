@@ -53,6 +53,11 @@ public class FilterFood extends BaseFilter{
                             .filter(itemStack -> EnchantmentHelper.getEnchantments(itemStack).containsKey(enchantment))
                             .findFirst().orElse(ItemStack.EMPTY);
 
+                    /*
+                     EnumAction useAction = food.getItem().getItemUseAction(food);
+                     if (useAction == EnumAction.EAT || useAction == EnumAction.DRINK) return true;
+                     */
+
                     if(!itemFromInv.isEmpty())
                     {
                         return !filterBool;

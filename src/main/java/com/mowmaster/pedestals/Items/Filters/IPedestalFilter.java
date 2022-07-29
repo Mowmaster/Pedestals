@@ -50,7 +50,7 @@ public interface IPedestalFilter
 
     boolean canAcceptEnergy(ItemStack filter, int incomingAmount);
 
-    boolean canAcceptXP(ItemStack filter, int incomingAmount);
+    boolean canAcceptExperience(ItemStack filter, int incomingAmount);
 
     boolean canAcceptDust(ItemStack filter, DustMagic incomingDust);
 
@@ -67,9 +67,11 @@ public interface IPedestalFilter
      * @return itemstack count allowed to be insert
      * When this pedestal is going to receive an itemstack this is called.
      */
-    int canAcceptCount(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming, int mode);
-
-    int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode);
+    int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming);
+    int canAcceptCountFluids(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack);
+    int canAcceptCountEnergy(BasePedestalBlockEntity pedestal, int incomingEnergyAmount);
+    int canAcceptCountExperience(BasePedestalBlockEntity pedestal, int incomingExperienceAmount);
+    int canAcceptCountDust(BasePedestalBlockEntity pedestal, DustMagic incomingDust);
 
     /**
      * @param filterStack
