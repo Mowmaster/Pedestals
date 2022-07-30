@@ -23,6 +23,8 @@ public interface IPedestalFilter
 
     boolean getFilterType();
 
+    FilterDirection getFilterDirection();
+
     /**
      * @param filterItem
      * @return the value from the NBT stored on the Item
@@ -133,4 +135,25 @@ public interface IPedestalFilter
      * Generally this will output filter info to the players chat in game.
      */
     void chatDetails(Player player, BasePedestalBlockEntity pedestal);
+
+    static enum FilterDirection {
+        INSERT,
+        EXTRACT,
+        NEUTRAL;
+
+        private FilterDirection() {
+        }
+
+        public boolean insert() {
+            return this == INSERT;
+        }
+
+        public boolean extract() {
+            return this == EXTRACT;
+        }
+
+        public boolean neutral() {
+            return this == NEUTRAL;
+        }
+    }
 }

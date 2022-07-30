@@ -43,7 +43,7 @@ public class DeferredRegisterItems
             () -> new DevTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> FILTER_BASE = ITEMS.register("filter_base",
-            () -> new BaseFilter(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+            () -> new BaseFilter(new Item.Properties().tab(PedestalsTab.TAB_ITEMS), IPedestalFilter.FilterDirection.INSERT));
     public static final RegistryObject<Item> FILTER_ITEM = ITEMS.register("filter_item",
             () -> new FilterItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> FILTER_ITEMSTACK = ITEMS.register("filter_itemstack",

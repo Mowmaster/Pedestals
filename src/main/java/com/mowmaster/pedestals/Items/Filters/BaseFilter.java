@@ -9,7 +9,6 @@ import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -42,15 +41,20 @@ import java.util.Optional;
 import static com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes.getModeLocalizedString;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-
-import net.minecraft.world.item.Item.Properties;
-
 public class BaseFilter extends Item implements IPedestalFilter
 {
     public boolean filterType = false;
+    public FilterDirection filterableDirection = FilterDirection.INSERT;
 
-    public BaseFilter(Properties p_41383_) {
+    public BaseFilter(Properties p_41383_, FilterDirection direction) {
         super(p_41383_);
+        this.filterableDirection = direction;
+    }
+
+    @Override
+    public FilterDirection getFilterDirection()
+    {
+        return filterableDirection;
     }
 
     public boolean doItemsMatch(ItemStack stackPedestal, ItemStack itemStackIn)

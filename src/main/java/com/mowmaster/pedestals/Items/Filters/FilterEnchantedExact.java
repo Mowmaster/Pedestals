@@ -34,7 +34,7 @@ import net.minecraft.world.item.Item.Properties;
 
 public class FilterEnchantedExact extends BaseFilter{
     public FilterEnchantedExact(Properties p_41383_) {
-        super(p_41383_);
+        super(p_41383_, IPedestalFilter.FilterDirection.INSERT);
     }
 
     @Override

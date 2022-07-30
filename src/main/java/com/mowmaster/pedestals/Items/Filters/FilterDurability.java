@@ -31,7 +31,7 @@ import net.minecraft.world.item.Item.Properties;
 public class FilterDurability extends BaseFilter
 {
     public FilterDurability(Properties p_41383_) {
-        super(p_41383_);
+        super(p_41383_, IPedestalFilter.FilterDirection.INSERT);
     }
 
     public int getPercentDamaged(ItemStack itemIn)

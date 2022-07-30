@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item.Properties;
 
 public class FilterItemStack extends BaseFilter{
     public FilterItemStack(Properties p_41383_) {
-        super(p_41383_);
+        super(p_41383_, IPedestalFilter.FilterDirection.INSERT);
     }
 /*
     @Override
