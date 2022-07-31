@@ -18,11 +18,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -37,6 +39,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes.getModeLocalizedString;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
@@ -60,6 +63,17 @@ public class BaseFilter extends Item implements IPedestalFilter
     public boolean doItemsMatch(ItemStack stackPedestal, ItemStack itemStackIn)
     {
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
+    }
+
+    public FluidStack getFluidStackFromItemStack(ItemStack stackIn)
+    {
+        if(stackIn.getItem() instanceof BucketItem bucket)
+        {
+            Fluid bucketFluid = bucket.getFluid();
+            return new FluidStack(bucketFluid,1000);
+        }
+
+        return FluidStack.EMPTY;
     }
 
     public boolean canModeUseInventoryAsFilter(int mode)
@@ -229,10 +243,7 @@ public class BaseFilter extends Item implements IPedestalFilter
     public boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack) { return !getFilterType(filter,1); }
 
     @Override
-    public boolean canAcceptEnergy(ItemStack filter, int incomingAmount)
-    {
-        return !getFilterType(filter,2);
-    }
+    public boolean canAcceptEnergy(ItemStack filter, int incomingAmount) { return !getFilterType(filter,2); }
 
     @Override
     public boolean canAcceptExperience(ItemStack filter, int incomingAmount)
@@ -241,10 +252,7 @@ public class BaseFilter extends Item implements IPedestalFilter
     }
 
     @Override
-    public boolean canAcceptDust(ItemStack filter, DustMagic incomingDust)
-    {
-        return !getFilterType(filter,4);
-    }
+    public boolean canAcceptDust(ItemStack filter, DustMagic incomingDust) { return !getFilterType(filter,4); }
 
 
     @Override
@@ -256,31 +264,111 @@ public class BaseFilter extends Item implements IPedestalFilter
     @Override
     public int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming)
     {
+        ItemStack filter = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
+            return filterRestricted.canAcceptCountItems(pedestal,itemStackIncoming);
+        }
+
         return Math.min(pedestal.getSlotSizeLimit(), itemStackIncoming.getMaxStackSize());
     }
 
     @Override
     public int canAcceptCountFluids(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack)
     {
-        return Math.min(pedestal.getFluidTransferRate(), incomingFluidStack.getAmount());
+        ItemStack filter = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,1);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
+            return filterRestricted.canAcceptCountFluids(pedestal,incomingFluidStack);
+        }
+
+        return Math.min(pedestal.spaceForFluid(), incomingFluidStack.getAmount());
     }
 
     @Override
     public int canAcceptCountEnergy(BasePedestalBlockEntity pedestal, int incomingEnergyAmount)
     {
-        return Math.min(pedestal.getEnergyTransferRate(), incomingEnergyAmount);
+        ItemStack filter = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,2);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
+            return filterRestricted.canAcceptCountEnergy(pedestal,incomingEnergyAmount);
+        }
+
+        return Math.min(pedestal.spaceForEnergy(), incomingEnergyAmount);
     }
 
     @Override
     public int canAcceptCountExperience(BasePedestalBlockEntity pedestal, int incomingExperienceAmount)
     {
-        return Math.min(pedestal.getExperienceTransferRate(), incomingExperienceAmount);
+        ItemStack filter = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,3);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
+            return filterRestricted.canAcceptCountExperience(pedestal,incomingExperienceAmount);
+        }
+
+        return Math.min(pedestal.spaceForExperience(), incomingExperienceAmount);
     }
 
     @Override
     public int canAcceptCountDust(BasePedestalBlockEntity pedestal, DustMagic incomingDust)
     {
-        return Math.min(pedestal.getDustTransferRate(), incomingDust.getDustAmount());
+        ItemStack filter = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,4);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
+            return filterRestricted.canAcceptCountDust(pedestal,incomingDust);
+        }
+
+        return Math.min(pedestal.spaceForDust(), incomingDust.getDustAmount());
     }
 
     @Override
@@ -468,6 +556,10 @@ public class BaseFilter extends Item implements IPedestalFilter
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
 
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
+
+        MutableComponent filterDirection = Component.translatable(MODID + ".filter.tooltip_filterdirection");
+        filterDirection.append(getFilterDirection().componentDirection());
+        p_41423_.add(filterDirection);
 
         if(!p_41421_.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {

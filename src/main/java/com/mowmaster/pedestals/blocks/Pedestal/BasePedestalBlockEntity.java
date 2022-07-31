@@ -37,12 +37,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -179,7 +177,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 
                 IPedestalFilter filter = getIPedestalFilter();
                 if(filter == null || !filter.getFilterDirection().extract())return super.extractItem((slot>getSlots())?(0):(slot), amount, simulate);
-                return super.extractItem((slot>getSlots())?(0):(slot), Math.min(amount, (filter == null || !filter.getFilterDirection().extract())?(amount):(filter.canAcceptCountItems(getPedestal(),getStackInSlot((slot>getSlots())?(0):(slot))))), simulate);
+                return super.extractItem((slot>getSlots())?(0):(slot), Math.min(amount, (filter == null)?(amount):((!filter.getFilterDirection().extract())?(amount):(filter.canAcceptCountItems(getPedestal(),getStackInSlot((slot>getSlots())?(0):(slot)))))), simulate);
             }
         };
     }
@@ -296,7 +294,7 @@ public class BasePedestalBlockEntity extends BlockEntity
             public FluidStack drain(int i, FluidAction fluidAction) {
 
                 IPedestalFilter filter = getIPedestalFilter();
-                int drained = Math.min((filter == null || !filter.getFilterDirection().extract())?(i):(filter.canAcceptCountFluids(getPedestal(),storedFluid)), i);
+                int drained = Math.min((filter == null)?(i):((!filter.getFilterDirection().extract())?(i):(filter.canAcceptCountFluids(getPedestal(),storedFluid))), i);
                 if (storedFluid.getAmount() < drained)
                 {
                     drained = storedFluid.getAmount();
@@ -350,7 +348,7 @@ public class BasePedestalBlockEntity extends BlockEntity
             @Override
             public boolean isFluidValid(int i, @Nonnull FluidStack fluidStack) {
                 IPedestalFilter filter = getIPedestalFilter();
-                if(filter==null || !filter.getFilterDirection().insert())
+                if(filter == null || !filter.getFilterDirection().insert())
                 {
                     if(storedFluid.isEmpty())return true;
                     else return storedFluid.isFluidEqual(fluidStack);
@@ -371,19 +369,18 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     if (storedFluid.isEmpty())
                     {
-                        return Math.min(getTankCapacity(0),(filter!=null || !filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount()));
+                        return Math.min(getTankCapacity(0), (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount()));
                     }
                     if (!storedFluid.isFluidEqual(fluidStack))
                     {
                         return 0;
                     }
-                    return Math.min(getTankCapacity(0) - storedFluid.getAmount(), (filter!=null || !filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount()));
+                    return Math.min(getTankCapacity(0) - storedFluid.getAmount(), (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount()));
                 }
 
                 if (storedFluid.isEmpty())
                 {
-
-                    storedFluid = new FluidStack(fluidStack, Math.min(getTankCapacity(0), (filter!=null || !filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())));
+                    storedFluid = new FluidStack(fluidStack, Math.min(getTankCapacity(0), (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount())));
                     update();
                     return storedFluid.getAmount();
                 }
@@ -391,7 +388,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     return 0;
                 }
-                int filled = (filter!=null || !filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),getTankCapacity(0) - storedFluid.getAmount())):(getTankCapacity(0) - storedFluid.getAmount());
+                int filled = (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),getTankCapacity(0) - storedFluid.getAmount())):(getTankCapacity(0) - storedFluid.getAmount())):(getTankCapacity(0) - storedFluid.getAmount());
 
                 if (fluidStack.getAmount() < filled)
                 {
@@ -428,7 +425,7 @@ public class BasePedestalBlockEntity extends BlockEntity
 
                 int canReceive = maxReceive;
                 IPedestalFilter filter = getIPedestalFilter();
-                int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), (filter==null || !filter.getFilterDirection().insert())?(maxReceive):(filter.canAcceptCountEnergy(getPedestal(),maxReceive)));
+                int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), (filter == null)?(maxReceive):((!filter.getFilterDirection().insert())?(maxReceive):(filter.canAcceptCountEnergy(getPedestal(),maxReceive))));
                 if (!simulate)
                     storedEnergy += energyReceived;
                 update();
@@ -450,7 +447,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                     return 0;
 
                 IPedestalFilter filter = getIPedestalFilter();
-                int energyExtracted = Math.min(storedEnergy, (filter==null || !filter.getFilterDirection().extract())?(maxExtract):(filter.canAcceptCountEnergy(getPedestal(),maxExtract)));
+                int energyExtracted = Math.min(storedEnergy, (filter == null)?(maxExtract):((!filter.getFilterDirection().extract())?(maxExtract):(filter.canAcceptCountEnergy(getPedestal(),maxExtract))));
                 if (!simulate)
                     storedEnergy -= energyExtracted;
                 return energyExtracted;
@@ -523,7 +520,7 @@ public class BasePedestalBlockEntity extends BlockEntity
 
                 int canReceive = maxReceive;
                 IPedestalFilter filter = getIPedestalFilter();
-                int experienceReceived = Math.min(getMaxExperienceStored() - getExperienceStored(), (filter==null || !filter.getFilterDirection().insert())?(maxReceive):(filter.canAcceptCountExperience(getPedestal(),maxReceive)));
+                int experienceReceived = Math.min(getMaxExperienceStored() - getExperienceStored(), (filter == null)?(maxReceive):((!filter.getFilterDirection().insert())?(maxReceive):(filter.canAcceptCountExperience(getPedestal(),maxReceive))));
                 if (!simulate)
                     storedExperience += experienceReceived;
                 update();
@@ -558,7 +555,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                     return 0;
 
                 IPedestalFilter filter = getIPedestalFilter();
-                int experienceExtracted = Math.min(storedExperience, (filter==null || !filter.getFilterDirection().extract())?(maxExtract):(filter.canAcceptCountExperience(getPedestal(),maxExtract)));
+                int experienceExtracted = Math.min(storedExperience, (filter == null)?(maxExtract):((!filter.getFilterDirection().extract())?(maxExtract):(filter.canAcceptCountExperience(getPedestal(),maxExtract))));
                 if (!simulate)
                     storedExperience -= experienceExtracted;
                 return experienceExtracted;
@@ -660,19 +657,19 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     if (storedDust.isEmpty())
                     {
-                        return Math.min(getTankCapacity(0), (filter!=null || !filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),dust.getDustAmount())):(dust.getDustAmount()));
+                        return Math.min(getTankCapacity(0), (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),dust.getDustAmount())):(dust.getDustAmount())):(dust.getDustAmount()));
                     }
 
                     if (!storedDust.isDustEqual(dust))
                     {
                         return 0;
                     }
-
-                    return Math.min(getTankCapacity(0) - storedDust.getDustAmount(), (filter!=null || !filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),dust.getDustAmount())):(dust.getDustAmount()));
+                    
+                    return Math.min(getTankCapacity(0) - storedDust.getDustAmount(), (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),dust.getDustAmount())):(dust.getDustAmount())):(dust.getDustAmount()));
                 }
                 if (storedDust.isEmpty())
                 {
-                    storedDust = new DustMagic(dust.getDustColor(), Math.min(getTankCapacity(0), (filter!=null || !filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),dust.getDustAmount())):(dust.getDustAmount())));
+                    storedDust = new DustMagic(dust.getDustColor(), Math.min(getTankCapacity(0), (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),dust.getDustAmount())):(dust.getDustAmount())):(dust.getDustAmount())));
                     onContentsChanged();
                     return storedDust.getDustAmount();
                 }
@@ -680,8 +677,8 @@ public class BasePedestalBlockEntity extends BlockEntity
                 {
                     return 0;
                 }
-
-                int filled = (filter!=null || !filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),getTankCapacity(0) - storedDust.getDustAmount())):(getTankCapacity(0) - storedDust.getDustAmount());
+                
+                int filled = (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),getTankCapacity(0) - storedDust.getDustAmount())):(getTankCapacity(0) - storedDust.getDustAmount())):(getTankCapacity(0) - storedDust.getDustAmount());
 
                 if (dust.getDustAmount() < filled)
                 {
@@ -712,7 +709,7 @@ public class BasePedestalBlockEntity extends BlockEntity
             public DustMagic drain(int maxDrain, DustAction action) {
 
                 IPedestalFilter filter = getIPedestalFilter();
-                int drained = Math.min((filter == null || !filter.getFilterDirection().extract())?(maxDrain):(filter.canAcceptCountDust(getPedestal(),storedDust)), maxDrain);
+                int drained = Math.min((filter == null)?(maxDrain):((!filter.getFilterDirection().extract())?(maxDrain):(filter.canAcceptCountDust(getPedestal(),storedDust))), maxDrain);
                 if (storedDust.getDustAmount() < drained)
                 {
                     drained = storedDust.getDustAmount();
@@ -1362,6 +1359,11 @@ public class BasePedestalBlockEntity extends BlockEntity
         return getEnergyCapacity() - getStoredEnergy() > 0;
     }
 
+    public int spaceForEnergy()
+    {
+        return getEnergyCapacity() - getStoredEnergy();
+    }
+
     public int getEnergyCapacity()
     {
         IEnergyStorage h = energyHandler.orElse(null);
@@ -1433,6 +1435,11 @@ public class BasePedestalBlockEntity extends BlockEntity
     public boolean hasSpaceForExperience()
     {
         return getExperienceCapacity() - getStoredExperience() > 0;
+    }
+
+    public int spaceForExperience()
+    {
+        return getExperienceCapacity() - getStoredExperience();
     }
 
     public int getExperienceCapacity()

@@ -798,9 +798,13 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     public FluidStack getFluidStackFromItemStack(ItemStack stackIn)
     {
-            BucketItem bucket = ((BucketItem)stackIn.getItem());
+        if(stackIn.getItem() instanceof BucketItem bucket)
+        {
             Fluid bucketFluid = bucket.getFluid();
             return new FluidStack(bucketFluid,1000);
+        }
+
+        return FluidStack.EMPTY;
     }
 
     public boolean passesFluidFilter(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack)

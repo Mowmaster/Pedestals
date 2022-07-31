@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
@@ -11,123 +12,35 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import net.minecraft.world.item.Item.Properties;
+import net.minecraftforge.fluids.FluidStack;
 
-public class FilterItem extends BaseFilter{
+public class FilterItem extends BaseFilter
+{
     public FilterItem(Properties p_41383_) {
         super(p_41383_, IPedestalFilter.FilterDirection.INSERT);
     }
 
     /*
         So the filter for count takes into account the item stack (first) and based the count on that and not the
-        actualy count in the restricted filter.
+        actually count in the restricted filter.
      */
 
     @Override
-    public int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming) {
-
-        ItemStack filter = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
-        int range = stackCurrent.size();
-
-        ItemStack itemFromInv = ItemStack.EMPTY;
-        itemFromInv = IntStream.range(0,range)//Int Range
-                .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
-                .findFirst().orElse(ItemStack.EMPTY);
-
-        if(!itemFromInv.isEmpty())
+    public boolean canModeUseInventoryAsFilter(int mode) {
+        switch (mode)
         {
-            if(pedestal.getItemInPedestalOrEmptySlot().isEmpty())
-            {
-                List<ItemStack> stackCurrentRestricted = readFilterQueueFromNBT(itemFromInv, PedestalModesAndTypes.getModeFromStack(itemFromInv));
-                int rangeRestricted = stackCurrentRestricted.size();
-                int count = 0;
-                int maxIncomming = itemStackIncoming.getMaxStackSize();
-                for(int i=0;i<rangeRestricted;i++)
-                {
-                    count +=stackCurrent.get(i).getCount();
-                    if(count>=maxIncomming)break;
-                }
-
-                return (count>0)?((count>maxIncomming)?(maxIncomming):(count)):(1);
-            }
-
-            return 0;
+            case 0: return true;
+            case 1: return true;
+            case 2: return false;
+            case 3: return false;
+            case 4: return true;
+            default: return false;
         }
-
-        return super.canAcceptCountItems(pedestal, itemStackIncoming);
     }
-
-
-    /*@Override
-    public int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode) {
-
-        ItemStack filter = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,mode);
-        int range = stackCurrent.size();
-
-        ItemStack itemFromInv = ItemStack.EMPTY;
-        itemFromInv = IntStream.range(0,range)//Int Range
-                .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
-                .findFirst().orElse(ItemStack.EMPTY);
-
-        if(!itemFromInv.isEmpty())
-        {
-            if(itemInPedestal.isEmpty())
-            {
-                List<ItemStack> stackCurrentRestricted = readFilterQueueFromNBT(itemFromInv, PedestalModesAndTypes.getModeFromStack(itemFromInv));
-                int rangeRestricted = stackCurrentRestricted.size();
-                int count = 0;
-                int maxIncomming = itemStackIncoming.getMaxStackSize();
-                for(int i=0;i<rangeRestricted;i++)
-                {
-                    count +=stackCurrent.get(i).getCount();
-                    if(count>=maxIncomming)break;
-                }
-
-                if(mode==0)
-                {
-                    return (count>0)?((count>maxIncomming)?(maxIncomming):(count)):(1);
-                }
-                else return count;
-            }
-
-            return 0;
-        }
-
-        return super.canAcceptCount(pedestal, world, pos, itemInPedestal, itemStackIncoming, mode);
-    }*/
-
-    /*@Override
-    public boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode) {
-        boolean filterBool=getFilterType(pedestal.getFilterInPedestal(),mode);
-
-        if(mode<=1)
-        {
-            ItemStack filter = pedestal.getFilterInPedestal();
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,mode);
-            int range = stackCurrent.size();
-
-            ItemStack itemFromInv = ItemStack.EMPTY;
-            itemFromInv = IntStream.range(0,range)//Int Range
-                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                    .filter(itemStack -> itemStack.getItem().equals(itemStackIn.getItem()))
-                    .findFirst().orElse(ItemStack.EMPTY);
-
-            if(!itemFromInv.isEmpty())
-            {
-                return !filterBool;
-            }
-            else return filterBool;
-        }
-        else return !filterBool;
-
-    }*/
 
     @Override
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
-        boolean filterBool=getFilterType(filter,0);
+        boolean filterBool = super.canAcceptItems(filter, incomingStack);
 
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
         int range = stackCurrent.size();
@@ -144,5 +57,47 @@ public class FilterItem extends BaseFilter{
         }
         else return filterBool;
 
+    }
+
+    @Override
+    public boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack) {
+        boolean filterBool = super.canAcceptFluids(filter, incomingFluidStack);
+
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,1);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> !getFluidStackFromItemStack(itemStack).isEmpty())
+                .filter(itemStack -> getFluidStackFromItemStack(itemStack).equals(incomingFluidStack))
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            return !filterBool;
+        }
+        else return filterBool;
+    }
+
+    @Override
+    public boolean canAcceptDust(ItemStack filter, DustMagic incomingDust) {
+        boolean filterBool = super.canAcceptDust(filter, incomingDust);
+
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,1);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> !DustMagic.getDustMagicInItemStack(itemStack).isEmpty())
+                .filter(itemStack -> DustMagic.getDustMagicInItemStack(itemStack).isDustEqual(incomingDust))
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            return !filterBool;
+        }
+        else return filterBool;
     }
 }

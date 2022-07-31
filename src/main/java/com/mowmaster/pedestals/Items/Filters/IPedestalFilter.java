@@ -3,12 +3,15 @@ package com.mowmaster.pedestals.Items.Filters;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.List;
+
+import static com.mowmaster.mowlib.MowLibUtils.MowLibReferences.MODID;
 
 public interface IPedestalFilter
 {
@@ -45,23 +48,11 @@ public interface IPedestalFilter
      * if it returns false the itemstack will not be accepted.
      */
     boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode);
-
     boolean canAcceptItems(ItemStack filter, ItemStack incomingStack);
-
     boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack);
-
     boolean canAcceptEnergy(ItemStack filter, int incomingAmount);
-
     boolean canAcceptExperience(ItemStack filter, int incomingAmount);
-
     boolean canAcceptDust(ItemStack filter, DustMagic incomingDust);
-
-    /**
-     * @param pedestal pedestal tile filter is in
-     * ---   Currently Not in Use   ---
-     * When this pedestal is about to send an item it can prevent the item from being sent
-     */
-    boolean canSendItem(BasePedestalBlockEntity pedestal);
 
     /**
      * @param pedestal pedestal tile filter is in
@@ -74,6 +65,13 @@ public interface IPedestalFilter
     int canAcceptCountEnergy(BasePedestalBlockEntity pedestal, int incomingEnergyAmount);
     int canAcceptCountExperience(BasePedestalBlockEntity pedestal, int incomingExperienceAmount);
     int canAcceptCountDust(BasePedestalBlockEntity pedestal, DustMagic incomingDust);
+
+    /**
+     * @param pedestal pedestal tile filter is in
+     * ---   Currently Not in Use   ---
+     * When this pedestal is about to send an item it can prevent the item from being sent
+     */
+    boolean canSendItem(BasePedestalBlockEntity pedestal);
 
     /**
      * @param filterStack
@@ -154,6 +152,14 @@ public interface IPedestalFilter
 
         public boolean neutral() {
             return this == NEUTRAL;
+        }
+
+        public Component componentDirection()
+        {
+            if(this.insert())return Component.translatable(MODID + ".filterdirection_insert");
+            if(this.extract())return Component.translatable(MODID + ".filterdirection_extract");
+            if(this.neutral())return Component.translatable(MODID + ".filterdirection_neutral");
+            return Component.translatable(MODID + ".filterdirection_none");
         }
     }
 }
