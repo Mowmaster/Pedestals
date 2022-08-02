@@ -53,9 +53,9 @@ public class FilterItem extends BaseFilter
 
         if(!itemFromInv.isEmpty())
         {
-            return !filterBool;
+            return filterBool;
         }
-        else return filterBool;
+        else return !filterBool;
 
     }
 
@@ -70,21 +70,21 @@ public class FilterItem extends BaseFilter
         itemFromInv = IntStream.range(0,range)//Int Range
                 .mapToObj((stackCurrent)::get)//Function being applied to each interval
                 .filter(itemStack -> !getFluidStackFromItemStack(itemStack).isEmpty())
-                .filter(itemStack -> getFluidStackFromItemStack(itemStack).equals(incomingFluidStack))
+                .filter(itemStack -> getFluidStackFromItemStack(itemStack).getFluid().equals(incomingFluidStack.getFluid()))
                 .findFirst().orElse(ItemStack.EMPTY);
 
         if(!itemFromInv.isEmpty())
         {
-            return !filterBool;
+            return filterBool;
         }
-        else return filterBool;
+        else return !filterBool;
     }
 
     @Override
     public boolean canAcceptDust(ItemStack filter, DustMagic incomingDust) {
         boolean filterBool = super.canAcceptDust(filter, incomingDust);
 
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,1);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,4);
         int range = stackCurrent.size();
 
         ItemStack itemFromInv = ItemStack.EMPTY;
@@ -96,8 +96,8 @@ public class FilterItem extends BaseFilter
 
         if(!itemFromInv.isEmpty())
         {
-            return !filterBool;
+            return filterBool;
         }
-        else return filterBool;
+        else return !filterBool;
     }
 }

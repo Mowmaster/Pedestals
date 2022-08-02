@@ -9,6 +9,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.Foods;
+import net.minecraft.world.item.FoodOnAStickItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -22,6 +24,7 @@ import java.util.stream.IntStream;
 
 
 import net.minecraft.world.item.Item.Properties;
+import net.minecraftforge.fluids.FluidStack;
 
 public class FilterFood extends BaseFilter{
     public FilterFood(Properties p_41383_) {
@@ -29,51 +32,36 @@ public class FilterFood extends BaseFilter{
     }
 
     @Override
-    public boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode) {
-        boolean filterBool=getFilterType(pedestal.getFilterInPedestal(),mode);
-
-        if(mode==0)
+    public boolean canModeUseInventoryAsFilter(int mode) {
+        switch (mode)
         {
-            if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
-            {
-                ItemStack filter = pedestal.getFilterInPedestal();
-                List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,mode);
-                int range = stackCurrent.size();
+            case 0: return true;
+            case 1: return false;
+            case 2: return false;
+            case 3: return false;
+            case 4: return false;
+            default: return false;
+        }
+    }
 
-                Map<Enchantment, Integer> mapIncomming = EnchantmentHelper.getEnchantments(itemStackIn);
+    @Override
+    public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
+        boolean filterBool = super.canAcceptItems(filter, incomingStack);
 
-                for(Map.Entry<Enchantment, Integer> entry : mapIncomming.entrySet()) {
-                    Enchantment enchantment = entry.getKey();
-                    ItemStack itemFromInv = ItemStack.EMPTY;
-                    itemFromInv = IntStream.range(0,range)//Int Range
-                            .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                            //Check to make sure filter item is enchanted
-                            .filter(itemStack -> itemStack.isEnchanted() || itemStack.getItem().equals(Items.ENCHANTED_BOOK))
-                            //Check if filter item has any enchant that the item in the pedestal has
-                            .filter(itemStack -> EnchantmentHelper.getEnchantments(itemStack).containsKey(enchantment))
-                            .findFirst().orElse(ItemStack.EMPTY);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+        int range = stackCurrent.size();
 
-                    /*
-                     EnumAction useAction = food.getItem().getItemUseAction(food);
-                     if (useAction == EnumAction.EAT || useAction == EnumAction.DRINK) return true;
-                     */
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> itemStack.getItem().getFoodProperties().getNutrition()>0)
+                .findFirst().orElse(ItemStack.EMPTY);
 
-                    if(!itemFromInv.isEmpty())
-                    {
-                        return !filterBool;
-                    }
-                }
-            }
+        if(!itemFromInv.isEmpty())
+        {
+            return filterBool;
         }
         else return !filterBool;
 
-        return filterBool;
-    }
-
-    //Overrides needed for the InteractionResultHolder<ItemStack> use() method in the base class.
-    @Override
-    public boolean canModeUseInventoryAsFilter(int mode)
-    {
-        return false;
     }
 }

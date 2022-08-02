@@ -12,11 +12,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -29,73 +31,60 @@ public class FilterTag extends BaseFilter{
     public FilterTag(Properties p_41383_) {
         super(p_41383_, IPedestalFilter.FilterDirection.INSERT);
     }
-/*
-    @Override
-    public int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode) {
 
-        ItemStack filter = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,mode);
+    @Override
+    public boolean canModeUseInventoryAsFilter(int mode) {
+        switch (mode)
+        {
+            case 0: return true;
+            case 1: return true;
+            case 2: return false;
+            case 3: return false;
+            case 4: return false;
+            default: return false;
+        }
+    }
+
+    @Override
+    public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
+        boolean filterBool = super.canAcceptItems(filter, incomingStack);
+
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
         int range = stackCurrent.size();
 
         ItemStack itemFromInv = ItemStack.EMPTY;
         itemFromInv = IntStream.range(0,range)//Int Range
                 .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                .filter(itemStack -> itemStack.getItem() instanceof FilterRestricted)
+                .filter(itemStack -> ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation(itemStack.getDisplayName().getString()))).stream().toList().contains(incomingStack.getItem()))
                 .findFirst().orElse(ItemStack.EMPTY);
 
         if(!itemFromInv.isEmpty())
         {
-            if(itemInPedestal.isEmpty())
-            {
-                List<ItemStack> stackCurrentRestricted = readFilterQueueFromNBT(itemFromInv, PedestalModesAndTypes.getModeFromStack(itemFromInv));
-                int rangeRestricted = stackCurrentRestricted.size();
-                int count = 0;
-                int maxIncomming = itemStackIncoming.getMaxStackSize();
-                for(int i=0;i<rangeRestricted;i++)
-                {
-                    count +=stackCurrent.get(i).getCount();
-                    if(count>=maxIncomming)break;
-                }
-
-                if(mode==0)
-                {
-                    return (count>0)?((count>maxIncomming)?(maxIncomming):(count)):(1);
-                }
-                else return count;
-            }
-
-            return 0;
-        }
-
-        return super.canAcceptCount(pedestal, world, pos, itemInPedestal, itemStackIncoming, mode);
-    }*/
-
-    @Override
-    public boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode) {
-        boolean filterBool=getFilterType(pedestal.getFilterInPedestal(),mode);
-
-        if(mode<=1)
-        {
-            ItemStack filter = pedestal.getFilterInPedestal();
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,mode);
-            int range = stackCurrent.size();
-
-            ItemStack itemFromInv = ItemStack.EMPTY;
-            itemFromInv = IntStream.range(0,range)//Int Range
-                    .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                    .filter(itemStack -> ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation(itemStack.getDisplayName().getString()))).stream().toList().contains(itemStackIn.getItem()))
-                    .findFirst().orElse(ItemStack.EMPTY);
-
-            if(!itemFromInv.isEmpty())
-            {
-                return !filterBool;
-            }
+            return filterBool;
         }
         else return !filterBool;
 
-        return filterBool;
     }
 
+    @Override
+    public boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack) {
+        boolean filterBool = super.canAcceptFluids(filter, incomingFluidStack);
+
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,1);
+        int range = stackCurrent.size();
+
+        ItemStack itemFromInv = ItemStack.EMPTY;
+        itemFromInv = IntStream.range(0,range)//Int Range
+                .mapToObj((stackCurrent)::get)//Function being applied to each interval
+                .filter(itemStack -> ForgeRegistries.FLUIDS.tags().getTag(FluidTags.create(new ResourceLocation(itemStack.getDisplayName().getString()))).stream().toList().contains(incomingFluidStack.getFluid()))
+                .findFirst().orElse(ItemStack.EMPTY);
+
+        if(!itemFromInv.isEmpty())
+        {
+            return filterBool;
+        }
+        else return !filterBool;
+    }
 
     @Override
     public void chatDetails(Player player, BasePedestalBlockEntity pedestal) {
@@ -123,36 +112,4 @@ public class FilterTag extends BaseFilter{
             }
         }
     }
-
-    /*@Override
-    public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
-
-        if(!p_41421_.getItem().equals(DeferredRegisterItems.FILTER_BASE))
-        {
-            boolean filterType = getFilterType(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
-            int filterMode = PedestalModesAndTypes.getModeFromStack(p_41421_);
-
-            MutableComponent filterList = Component.translatable(MODID + ".filter_type");
-MutableComponent white = Component.translatable(MODID + ".filter_type_whitelist");
-MutableComponent black = Component.translatable(MODID + ".filter_type_blacklist");
-filterList.append((filterType)?(black):(white));
-filterList.withStyle(ChatFormatting.WHITE);
-p_41423_.add(filterList);
-
-            MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
-            String typeString = "";
-            switch(filterMode)
-            {
-                case 0: typeString = ".mode_items"; break;
-                case 1: typeString = ".mode_fluids"; break;
-                case 2: typeString = ".mode_energy"; break;
-                case 3: typeString = ".mode_experience"; break;
-                default: typeString = ".error"; break;
-            }
-            changed.withStyle(ChatFormatting.GOLD);
-            MutableComponent type = Component.translatable(MODID + typeString);
-            changed.append(type);
-            p_41423_.add(changed);
-        }
-    }*/
 }

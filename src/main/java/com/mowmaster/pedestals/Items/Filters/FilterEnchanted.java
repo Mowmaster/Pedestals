@@ -19,11 +19,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
 import net.minecraft.world.item.Item.Properties;
+import net.minecraftforge.fluids.FluidStack;
 
 public class FilterEnchanted extends BaseFilter{
     public FilterEnchanted(Properties p_41383_) {
@@ -31,26 +33,19 @@ public class FilterEnchanted extends BaseFilter{
     }
 
     @Override
-    public boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode) {
-        boolean filterBool=getFilterType(pedestal.getFilterInPedestal(),mode);
-
-        if(mode==0)
-        {
-            if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
-            {
-                return !filterBool;
-            }
-        }
-        else return !filterBool;
-
-        return filterBool;
+    public boolean canModeUseInventoryAsFilter(int mode) {
+        return false;
     }
 
-    //Overrides needed for the InteractionResultHolder<ItemStack> use() method in the base class.
     @Override
-    public boolean canModeUseInventoryAsFilter(int mode)
-    {
-        return mode<=0;
+    public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
+        boolean filterBool = super.canAcceptItems(filter, incomingStack);
+
+        if(incomingStack.isEnchanted() || incomingStack.getItem().equals(Items.ENCHANTED_BOOK))
+        {
+            return filterBool;
+        }
+        else return !filterBool;
     }
 
 }
