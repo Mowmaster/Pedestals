@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
@@ -16,17 +17,21 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 import net.minecraft.world.item.Item.Properties;
+import net.minecraftforge.fluids.FluidStack;
 
 public class FilterRestricted extends BaseFilter{
     public FilterRestricted(Properties p_41383_) {
@@ -37,7 +42,103 @@ public class FilterRestricted extends BaseFilter{
     {
         return 65280;
     }
-/*
+
+    @Override
+    public int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming) {
+        ItemStack filterStack = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,0);
+
+        int count = stackCurrent.stream()
+                .map(itemStack -> itemStack.getCount())
+                .collect(Collectors.toList())
+                .stream()
+                .reduce(0, (a,b) -> a + b);
+
+        if(count > 0)
+        {
+            return (count > itemStackIncoming.getMaxStackSize())?(itemStackIncoming.getMaxStackSize()):(count);
+        }
+
+        return (stackCurrent.size()<=0)?(super.canAcceptCountItems(pedestal, itemStackIncoming)):(0);
+    }
+
+    @Override
+    public int canAcceptCountFluids(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack) {
+        ItemStack filterStack = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,1);
+
+        int count = stackCurrent.stream()
+                .map(itemStack -> itemStack.getCount())
+                .collect(Collectors.toList())
+                .stream()
+                .reduce(0, (a,b) -> a + b);
+
+        if(count > 0)
+        {
+            return (count > pedestal.getFluidCapacity())?(pedestal.getFluidCapacity()):(count);
+        }
+
+        return (stackCurrent.size()<=0)?(super.canAcceptCountFluids(pedestal, incomingFluidStack)):(0);
+    }
+
+    @Override
+    public int canAcceptCountEnergy(BasePedestalBlockEntity pedestal, int incomingEnergyAmount) {
+        ItemStack filterStack = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,2);
+
+        int count = stackCurrent.stream()
+                .map(itemStack -> itemStack.getCount())
+                .collect(Collectors.toList())
+                .stream()
+                .reduce(0, (a,b) -> a + b);
+
+        if(count > 0)
+        {
+            return (count > pedestal.getEnergyCapacity())?(pedestal.getEnergyCapacity()):(count);
+        }
+
+        return (stackCurrent.size()<=0)?(super.canAcceptCountEnergy(pedestal, incomingEnergyAmount)):(0);
+    }
+
+    @Override
+    public int canAcceptCountExperience(BasePedestalBlockEntity pedestal, int incomingExperienceAmount) {
+        ItemStack filterStack = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,3);
+
+        int count = stackCurrent.stream()
+                .map(itemStack -> itemStack.getCount())
+                .collect(Collectors.toList())
+                .stream()
+                .reduce(0, (a,b) -> a + b);
+
+        if(count > 0)
+        {
+            return (count > pedestal.getExperienceCapacity())?(pedestal.getExperienceCapacity()):(count);
+        }
+
+        return (stackCurrent.size()<=0)?(super.canAcceptCountExperience(pedestal, incomingExperienceAmount)):(0);
+    }
+
+    @Override
+    public int canAcceptCountDust(BasePedestalBlockEntity pedestal, DustMagic incomingDust) {
+        ItemStack filterStack = pedestal.getFilterInPedestal();
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,4);
+
+        int count = stackCurrent.stream()
+                .map(itemStack -> itemStack.getCount())
+                .collect(Collectors.toList())
+                .stream()
+                .reduce(0, (a,b) -> a + b);
+
+        if(count > 0)
+        {
+            return (count > pedestal.getDustCapacity())?(pedestal.getDustCapacity()):(count);
+        }
+
+        return (stackCurrent.size()<=0)?(super.canAcceptCountDust(pedestal, incomingDust)):(0);
+    }
+
+    /*
     @Override
     public int canAcceptCount(BasePedestalBlockEntity pedestal, Level world, BlockPos pos, ItemStack itemInPedestal, ItemStack itemStackIncoming, int mode) {
         if(itemInPedestal.isEmpty())
@@ -61,12 +162,15 @@ public class FilterRestricted extends BaseFilter{
         return 0;
     }*/
 
+    //Allows all mode to use inventory as a filter for the counter to check
     @Override
     public boolean canModeUseInventoryAsFilter(int mode)
     {
-        return mode<=4;
+        return true;
     }
 
+
+    //Cant set white or blacklist for any mode if false
     @Override
     public boolean canSetFilterType(int mode)
     {
@@ -97,27 +201,4 @@ public class FilterRestricted extends BaseFilter{
         enchants.withStyle(ChatFormatting.GRAY);
         player.displayClientMessage(enchants, false);
     }
-
-    /*@Override
-    public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
-
-        if(!p_41421_.getItem().equals(DeferredRegisterItems.FILTER_BASE))
-        {
-            boolean filterType = getFilterType(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
-            int filterMode = PedestalModesAndTypes.getModeFromStack(p_41421_);
-
-            MutableComponent filterList = Component.translatable(MODID + ".filter_type");
-MutableComponent white = Component.translatable(MODID + ".filter_type_whitelist");
-MutableComponent black = Component.translatable(MODID + ".filter_type_blacklist");
-filterList.append((filterType)?(black):(white));
-filterList.withStyle(ChatFormatting.WHITE);
-p_41423_.add(filterList);
-
-            MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
-            changed.withStyle(ChatFormatting.GOLD);
-            MutableComponent type = Component.translatable(MODID + PedestalModesAndTypes.getModeLocalizedString(filterMode));
-            changed.append(type);
-            p_41423_.add(changed);
-        }
-    }*/
 }

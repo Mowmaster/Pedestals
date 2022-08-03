@@ -119,14 +119,15 @@ public class BaseFilter extends Item implements IPedestalFilter
                 {
                     if(result.getType().equals(HitResult.Type.MISS))
                     {
+                        int mode = PedestalModesAndTypes.getModeFromStack(itemInOffhand);
                         if(player.isCrouching())
                         {
-                            if(canSetFilterMode(-1))setFilterMode(player,itemInOffhand,InteractionHand.OFF_HAND);
+                            if(canSetFilterMode(mode))setFilterMode(player,itemInOffhand,InteractionHand.OFF_HAND);
                             //return InteractionResultHolder.success(itemInOffhand);
                         }
                         else
                         {
-                            if(canSetFilterType(-1))setFilterType(player,itemInOffhand);
+                            if(canSetFilterType(mode))setFilterType(player,itemInOffhand);
                             //return InteractionResultHolder.success(itemInOffhand);
                         }
                     }

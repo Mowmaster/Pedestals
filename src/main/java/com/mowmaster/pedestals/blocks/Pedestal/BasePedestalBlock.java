@@ -826,6 +826,20 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                         }
                     }
 
+                    if(!itemInHand.isEmpty())
+                    {
+                        ItemStack stackNotInsert = pedestal.addItemStack(itemInHand,true);
+                        if(itemInHand.getCount() > stackNotInsert.getCount())
+                        {
+                            int shrinkAmount = itemInHand.getCount() - pedestal.addItemStack(itemInHand,false).getCount();
+                            itemInHand.shrink(shrinkAmount);
+                            return InteractionResult.SUCCESS;
+                        }
+                        else return InteractionResult.FAIL;
+                    }
+                    else return InteractionResult.FAIL;
+
+                    /*
                     int allowedInsert = pedestal.countAllowedForInsert(itemInHand);
                     ItemStack stackToInsert = itemInHand.copy();
                     int countToSet = (allowedInsert>itemInHand.getCount())?(itemInHand.getCount()):(allowedInsert);
@@ -834,7 +848,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
 
                     if(!itemInHand.isEmpty() && allowedInsert>0)
                     {
-                        if(pedestal.addItem(stackToInsert,true))
+                        if(pedestal.addItemStack(stackToInsert,true))
                         {
                             pedestal.addItem(stackToInsert,false);
                             p_60506_.setItemInHand(InteractionHand.MAIN_HAND,returnStack);
@@ -843,6 +857,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                         return InteractionResult.SUCCESS;
                     }
                     return InteractionResult.SUCCESS;
+                    */
                 }
 
             }

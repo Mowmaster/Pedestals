@@ -124,6 +124,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                 IPedestalFilter filter = getIPedestalFilter();
                 if(filter == null || !filter.getFilterDirection().insert())return super.getStackLimit(slot, stack);
                 return filter.canAcceptCountItems(getPedestal(),stack);
+                //return super.getStackLimit(slot, stack);
             }
 
             @Override
@@ -156,6 +157,20 @@ public class BasePedestalBlockEntity extends BlockEntity
             @Nonnull
             @Override
             public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+                /*IPedestalFilter filter = getIPedestalFilter();
+                if(filter != null)
+                {
+                    if(filter.getFilterDirection().insert())
+                    {
+                        int countAllowed = filter.canAcceptCountItems(getPedestal(),stack);
+                        ItemStack modifiedStack = stack.copy();
+                        super.insertItem((slot>getSlots())?(0):(slot), modifiedStack, simulate);
+                        ItemStack returnedStack = modifiedStack.copy();
+                        returnedStack.setCount(stack.getCount() - countAllowed);
+                        return returnedStack;
+                    }
+                }*/
+
                 return super.insertItem((slot>getSlots())?(0):(slot), stack, simulate);
             }
 

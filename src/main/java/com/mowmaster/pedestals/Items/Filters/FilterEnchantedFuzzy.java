@@ -26,6 +26,7 @@ import net.minecraft.world.phys.HitResult;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
@@ -38,47 +39,46 @@ public class FilterEnchantedFuzzy extends BaseFilter{
     }
 
     @Override
-    public boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode) {
-        boolean filterBool=getFilterType(pedestal.getFilterInPedestal(),mode);
-
-        if(mode==0)
+    public boolean canModeUseInventoryAsFilter(int mode) {
+        switch (mode)
         {
-            if(itemStackIn.isEnchanted() || itemStackIn.getItem().equals(Items.ENCHANTED_BOOK))
-            {
-                ItemStack filter = pedestal.getFilterInPedestal();
-                List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,mode);
-                int range = stackCurrent.size();
+            case 0: return true;
+            case 1: return false;
+            case 2: return false;
+            case 3: return false;
+            case 4: return false;
+            default: return false;
+        }
+    }
 
-                Map<Enchantment, Integer> mapIncomming = EnchantmentHelper.getEnchantments(itemStackIn);
+    @Override
+    public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
+        boolean filterBool = super.canAcceptItems(filter, incomingStack);
 
-                for(Map.Entry<Enchantment, Integer> entry : mapIncomming.entrySet()) {
-                    Enchantment enchantment = entry.getKey();
-                    ItemStack itemFromInv = ItemStack.EMPTY;
-                    itemFromInv = IntStream.range(0,range)//Int Range
-                            .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                            //Check to make sure filter item is enchanted
-                            .filter(itemStack -> itemStack.isEnchanted() || itemStack.getItem().equals(Items.ENCHANTED_BOOK))
-                            //Check if filter item has any enchant that the item in the pedestal has
-                            .filter(itemStack -> EnchantmentHelper.getEnchantments(itemStack).containsKey(enchantment))
-                            .findFirst().orElse(ItemStack.EMPTY);
+        if(incomingStack.isEnchanted() || incomingStack.getItem().equals(Items.ENCHANTED_BOOK))
+        {
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+            int range = stackCurrent.size();
 
-                    if(!itemFromInv.isEmpty())
-                    {
-                        return !filterBool;
-                    }
+            Map<Enchantment, Integer> mapIncomming = EnchantmentHelper.getEnchantments(incomingStack);
+
+            for(Map.Entry<Enchantment, Integer> entry : mapIncomming.entrySet()) {
+                Enchantment enchantment = entry.getKey();
+                ItemStack itemFromInv = ItemStack.EMPTY;
+                itemFromInv = IntStream.range(0,range)
+                        .mapToObj((stackCurrent)::get)
+                        .filter(itemStack -> itemStack.isEnchanted() || itemStack.getItem().equals(Items.ENCHANTED_BOOK))
+                        .filter(itemStack -> EnchantmentHelper.getEnchantments(itemStack).containsKey(enchantment))
+                        .findFirst().orElse(ItemStack.EMPTY);
+
+                if(!itemFromInv.isEmpty())
+                {
+                    return filterBool;
                 }
             }
         }
-        else return !filterBool;
 
-        return filterBool;
-    }
-
-    //Overrides needed for the InteractionResultHolder<ItemStack> use() method in the base class.
-    @Override
-    public boolean canModeUseInventoryAsFilter(int mode)
-    {
-        return mode<=0;
+        return !filterBool;
     }
 
     @Override
@@ -108,38 +108,4 @@ public class FilterEnchantedFuzzy extends BaseFilter{
             }
         }
     }
-
-    /*@Override
-    public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
-
-        if(!p_41421_.getItem().equals(DeferredRegisterItems.FILTER_BASE))
-        {
-            boolean filterType = getFilterType(p_41421_,PedestalModesAndTypes.getModeFromStack(p_41421_));
-            int filterMode = PedestalModesAndTypes.getModeFromStack(p_41421_);
-
-            MutableComponent filterList = Component.translatable(MODID + ".filter_type");
-MutableComponent white = Component.translatable(MODID + ".filter_type_whitelist");
-MutableComponent black = Component.translatable(MODID + ".filter_type_blacklist");
-filterList.append((filterType)?(black):(white));
-filterList.withStyle(ChatFormatting.WHITE);
-p_41423_.add(filterList);
-
-            MutableComponent changed = Component.translatable(MODID + ".tooltip_mode");
-            String typeString = "";
-            switch(filterMode)
-            {
-                case 0: typeString = ".mode_items"; break;
-                case 1: typeString = ".mode_fluids"; break;
-                case 2: typeString = ".mode_energy"; break;
-                case 3: typeString = ".mode_experience"; break;
-                default: typeString = ".error"; break;
-            }
-            changed.withStyle(ChatFormatting.GOLD);
-            MutableComponent type = Component.translatable(MODID + typeString);
-            changed.append(type);
-            p_41423_.add(changed);
-        }
-    }*/
-
-
 }

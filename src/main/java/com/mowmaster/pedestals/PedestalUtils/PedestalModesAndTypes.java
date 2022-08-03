@@ -63,7 +63,7 @@ public class PedestalModesAndTypes
         {
             compound = stack.getTag();
         }
-        compound.putInt(MODID+"_transfer_mode",mode);
+        compound.putByte(MODID+"_transfer_mode",(byte)mode);
         stack.setTag(compound);
     }
 
@@ -71,7 +71,7 @@ public class PedestalModesAndTypes
         if(stack.hasTag())
         {
             CompoundTag getCompound = stack.getTag();
-            return getCompound.getInt(MODID+"_transfer_mode");
+            return getCompound.getByte(MODID+"_transfer_mode");
         }
         return 0;
     }
