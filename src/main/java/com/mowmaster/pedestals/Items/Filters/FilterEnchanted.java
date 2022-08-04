@@ -33,7 +33,7 @@ public class FilterEnchanted extends BaseFilter{
     }
 
     @Override
-    public boolean canModeUseInventoryAsFilter(int mode) {
+    public boolean canModeUseInventoryAsFilter(ItemTransferMode mode) {
         return false;
     }
 

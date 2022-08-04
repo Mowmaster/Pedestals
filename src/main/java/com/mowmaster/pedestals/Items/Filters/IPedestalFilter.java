@@ -2,18 +2,24 @@ package com.mowmaster.pedestals.Items.Filters;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.PedestalUtils.IItemMode;
+import com.mowmaster.pedestals.PedestalUtils.References;
+import cpw.mods.modlauncher.EnumerationHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
+import org.apache.commons.lang3.EnumUtils;
 
 import java.util.List;
 
 import static com.mowmaster.mowlib.MowLibUtils.MowLibReferences.MODID;
 
-public interface IPedestalFilter
+public interface IPedestalFilter extends IItemMode
 {
     public boolean filterType = false;
 
@@ -27,7 +33,7 @@ public interface IPedestalFilter
     boolean getFilterType();
 
     FilterDirection getFilterDirection();
-
+    
     /**
      * @param filterItem
      * @return the value from the NBT stored on the Item
@@ -42,12 +48,11 @@ public interface IPedestalFilter
     void setFilterType(ItemStack filterItem, boolean filterSet);
 
     /**
-     * @param pedestal pedestal tile filter is in
-     * @param itemStackIn incoming itemstack
+     * @param filter pedestals filter
+     * @param incomingStack incoming ItemStack
      * When this pedestal is about to receive an item, this method is called,
-     * if it returns false the itemstack will not be accepted.
+     * if it returns false the ItemStack will not be accepted.
      */
-    boolean canAcceptItem(BasePedestalBlockEntity pedestal, ItemStack itemStackIn, int mode);
     boolean canAcceptItems(ItemStack filter, ItemStack incomingStack);
     boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack);
     boolean canAcceptEnergy(ItemStack filter, int incomingAmount);
@@ -56,9 +61,9 @@ public interface IPedestalFilter
 
     /**
      * @param pedestal pedestal tile filter is in
-     * @param itemStackIncoming incoming itemstack
-     * @return itemstack count allowed to be insert
-     * When this pedestal is going to receive an itemstack this is called.
+     * @param itemStackIncoming incoming ItemStack
+     * @return ItemStack count allowed to be insert
+     * When this pedestal is going to receive an ItemStack this is called.
      */
     int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming);
     int canAcceptCountFluids(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack);
@@ -83,7 +88,7 @@ public interface IPedestalFilter
      * @param filterStack
      * Used to check the size of "filterqueue"
      */
-    int filterQueueSize(ItemStack filterStack, int mode);
+    int filterQueueSize(ItemStack filterStack, ItemTransferMode mode);
 
     /**
      * @param world
@@ -99,14 +104,14 @@ public interface IPedestalFilter
      * @param builtFilterQueueList
      * writes the list to the filters NBT "filterqueue"
      */
-    void writeFilterQueueToNBT(ItemStack filterStack, List<ItemStack> builtFilterQueueList, int mode);
+    void writeFilterQueueToNBT(ItemStack filterStack, List<ItemStack> builtFilterQueueList, ItemTransferMode mode);
 
     /**
      * @param filterStack
      * @return a list of itemstacks in the filters queue
      * reads the list of itemstacks from the filters NBT "filterqueue"
      */
-    List<ItemStack> readFilterQueueFromNBT(ItemStack filterStack, int mode);
+    List<ItemStack> readFilterQueueFromNBT(ItemStack filterStack, ItemTransferMode mode);
 
 
 
@@ -115,14 +120,14 @@ public interface IPedestalFilter
      * @param filterStack
      * writes the bool filtertype to the NBT "filter_type"
      */
-    void writeFilterTypeToNBT(ItemStack filterStack, int mode);
+    void writeFilterTypeToNBT(ItemStack filterStack, ItemTransferMode mode);
 
     /**
      * @param filterStack
      * @return filtertype
      * writes the bool filtertype from the NBT "filter_type"
      */
-    boolean getFilterTypeFromNBT(ItemStack filterStack, int mode);
+    boolean getFilterTypeFromNBT(ItemStack filterStack, ItemTransferMode mode);
 
 
 
@@ -134,7 +139,7 @@ public interface IPedestalFilter
      */
     void chatDetails(Player player, BasePedestalBlockEntity pedestal);
 
-    static enum FilterDirection {
+    public static enum FilterDirection {
         INSERT,
         EXTRACT,
         NEUTRAL;
@@ -156,10 +161,10 @@ public interface IPedestalFilter
 
         public Component componentDirection()
         {
-            if(this.insert())return Component.translatable(MODID + ".filterdirection_insert");
-            if(this.extract())return Component.translatable(MODID + ".filterdirection_extract");
-            if(this.neutral())return Component.translatable(MODID + ".filterdirection_neutral");
-            return Component.translatable(MODID + ".filterdirection_none");
+            if(this.insert())return Component.translatable(MODID + ".enum.filterdirection_insert");
+            if(this.extract())return Component.translatable(MODID + ".enum.filterdirection_extract");
+            if(this.neutral())return Component.translatable(MODID + ".enum.filterdirection_neutral");
+            return Component.translatable(MODID + ".enum.filterdirection_none");
         }
     }
 }

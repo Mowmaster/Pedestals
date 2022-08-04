@@ -74,11 +74,17 @@
   "pedestals.filter.message_twohanded": "Cannot Be Holding Filters in Both Hands for this Action",
 
   "pedestals.filter.tooltip_filterdirection": "Filter applies on ",
-  "pedestals.filterdirection_insert": "Inserting",
-  "pedestals.filterdirection_extract": "Extracting",
-  "pedestals.filterdirection_neutral": "Machines",
-  "pedestals.filterdirection_none": "§cFilter Error",
+  "mowlib.enum.filterdirection_insert": "Inserting",
+  "mowlib.enum.filterdirection_extract": "Extracting",
+  "mowlib.enum.filterdirection_neutral": "Machines",
+  "mowlib.enum.filterdirection_none": "§cFilter Error",
 
+  "pedestals.enum.filtertransfermode_item": "Item",
+  "pedestals.enum.filtertransfermode_fluid": "Fluid",
+  "pedestals.enum.filtertransfermode_energy": "Energy",
+  "pedestals.enum.filtertransfermode_experience": "Experience",
+  "pedestals.enum.filtertransfermode_dust": "Dust",
+  "pedestals.enum.filtertransfermode_default": "§cFilter Transfer Mode Error",
 
   "pedestals.tool_link_success": "Linked Successfully",
   "pedestals.tool_link_unsucess": "Linking Failed, Max Connections Reached",

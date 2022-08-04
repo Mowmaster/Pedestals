@@ -55,7 +55,7 @@ public class FilterDurability extends BaseFilter
     public int getDurabilityTarget(ItemStack filter)
     {
         int returner = 0;
-        List<ItemStack> filterQueue = readFilterQueueFromNBT(filter, PedestalModesAndTypes.getModeFromStack(filter));
+        List<ItemStack> filterQueue = readFilterQueueFromNBT(filter, getItemTransportMode(filter));
         if(filterQueue.size()>0)
         {
             for(int i=0;i<filterQueue.size();i++)
@@ -70,17 +70,19 @@ public class FilterDurability extends BaseFilter
     }
 
     @Override
-    public boolean canModeUseInventoryAsFilter(int mode) {
+    public boolean canModeUseInventoryAsFilter(ItemTransferMode mode) {
         switch (mode)
         {
-            case 0: return true;
-            case 1: return false;
-            case 2: return false;
-            case 3: return false;
-            case 4: return false;
+            case ITEMS: return true;
+            case FLUIDS: return false;
+            case ENERGY: return false;
+            case EXPERIENCE: return false;
+            case DUST: return false;
             default: return false;
         }
     }
+
+
 
     @Override
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
@@ -110,14 +112,14 @@ public class FilterDurability extends BaseFilter
         {
             MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.WHITE,filterStack.getDisplayName().getString());
 
-            boolean filterType = getFilterType(filterStack,PedestalModesAndTypes.getModeFromStack(filterStack));
+            boolean filterType = getFilterType(filterStack,getItemTransportMode(filterStack));
             String above = MODID + ".filters.tooltip_filterabove";
             String below = MODID + ".filters.tooltip_filterbelow";
             List<String> listed = new ArrayList<>();
             listed.add((filterType)?(below):(above));
             MowLibMessageUtils.messagePlayerChatWithAppend(MODID,player,ChatFormatting.GOLD,MODID + ".filters.tooltip_filtertype",listed);
 
-            List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,PedestalModesAndTypes.getModeFromStack(filterStack));
+            List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,getItemTransportMode(filterStack));
             if(filterQueue.size()>0)
             {
                 MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
@@ -138,7 +140,7 @@ public class FilterDurability extends BaseFilter
     }
 
     @Override
-    public Component filterTypeTooltip(int filterMode, boolean filterType)
+    public Component filterTypeTooltip(ItemTransferMode mode, boolean filterType)
     {
         MutableComponent filterList = Component.translatable(MODID + ".filter_type");
         MutableComponent white = Component.translatable(MODID + ".filter_type_above");

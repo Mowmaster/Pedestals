@@ -10,23 +10,12 @@ import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 public class PedestalModesAndTypes
 {
-    public static int getModeFromStack(ItemStack stack) {
+    /*public static int getModeFromStack(ItemStack stack) {
         return readModeFromNBT(stack);
     }
 
     //Change for new Modes
-    public static String getModeStringFromInt(int mode) {
 
-        switch(mode)
-        {
-            case 0: return "item";
-            case 1: return "fluid";
-            case 2: return "energy";
-            case 3: return "xp";
-            case 4: return "dust";
-            default: return "item";
-        }
-    }
 
     //Change for new Modes
     public static String getModeStringFromStack(ItemStack stack) {
@@ -111,6 +100,36 @@ public class PedestalModesAndTypes
     }
 
     //Change for new Modes
+    */
+    public static ChatFormatting getModeColorFormat(int mode)
+    {
+        ChatFormatting color;
+        switch (mode)
+        {
+            case 0: color = ChatFormatting.GOLD; break;
+            case 1: color = ChatFormatting.BLUE; break;
+            case 2: color = ChatFormatting.RED; break;
+            case 3: color = ChatFormatting.GREEN; break;
+            case 4: color = ChatFormatting.LIGHT_PURPLE; break;
+            default: color = ChatFormatting.WHITE; break;
+        }
+
+        return color;
+    }
+
+    public static String getModeStringFromInt(int mode) {
+
+        switch(mode)
+        {
+            case 0: return "item";
+            case 1: return "fluid";
+            case 2: return "energy";
+            case 3: return "xp";
+            case 4: return "dust";
+            default: return "item";
+        }
+    }
+
     public static String getModeLocalizedString(int mode)
     {
         String typeString = "";

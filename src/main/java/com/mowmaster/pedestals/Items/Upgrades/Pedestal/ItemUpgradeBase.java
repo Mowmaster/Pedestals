@@ -4,7 +4,6 @@ import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
@@ -22,9 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -37,27 +34,19 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
-
-
-
-
-import net.minecraft.world.item.Item.Properties;
 
 public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 {
@@ -257,7 +246,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             saveUpgradeModeToNBT(heldItem,setNewMode);
             player.setItemInHand(hand,heldItem);
 
-            ChatFormatting colorChange = PedestalModesAndTypes.getModeDarkColorFormat(setNewMode);
+            ChatFormatting colorChange = PedestalModesAndTypes.getModeColorFormat(setNewMode);
             String typeString = getModeLocalizedString(setNewMode);
 
             List<String> listed = new ArrayList<>();

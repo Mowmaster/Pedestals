@@ -20,15 +20,15 @@ public class FilterItemStack extends BaseFilter{
     }
 
     @Override
-    public boolean canModeUseInventoryAsFilter(int mode) {
+    public boolean canModeUseInventoryAsFilter(ItemTransferMode mode) {
         switch (mode)
         {
-            case 0: return true;
-            case 1: return true;
-            case 2: return false;
-            case 3: return false;
-            case 4: return true;
-            default: return false;
+            case ITEMS:         return true;
+            case FLUIDS:        return true;
+            case ENERGY:        return false;
+            case EXPERIENCE:    return false;
+            case DUST:          return true;
+            default:            return false;
         }
     }
 
@@ -36,7 +36,7 @@ public class FilterItemStack extends BaseFilter{
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
         boolean filterBool = super.canAcceptItems(filter, incomingStack);
 
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.ITEMS);
         int range = stackCurrent.size();
 
         ItemStack itemFromInv = ItemStack.EMPTY;
@@ -58,7 +58,7 @@ public class FilterItemStack extends BaseFilter{
     public boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack) {
         boolean filterBool = super.canAcceptFluids(filter, incomingFluidStack);
 
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,1);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.FLUIDS);
         int range = stackCurrent.size();
 
         ItemStack itemFromInv = ItemStack.EMPTY;
@@ -79,7 +79,7 @@ public class FilterItemStack extends BaseFilter{
     public boolean canAcceptDust(ItemStack filter, DustMagic incomingDust) {
         boolean filterBool = super.canAcceptDust(filter, incomingDust);
 
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,4);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.DUST);
         int range = stackCurrent.size();
 
         ItemStack itemFromInv = ItemStack.EMPTY;

@@ -1,4 +1,8 @@
 package com.mowmaster.pedestals.Items.Upgrades;
 
-public interface IUpgrade {
+import com.mowmaster.pedestals.PedestalUtils.IItemMode;
+
+public interface IUpgrade extends IItemMode
+{
+
 }

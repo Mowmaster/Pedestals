@@ -23,15 +23,15 @@ public class FilterEnchantCount extends BaseFilter{
     }
 
     @Override
-    public boolean canModeUseInventoryAsFilter(int mode) {
+    public boolean canModeUseInventoryAsFilter(ItemTransferMode mode) {
         switch (mode)
         {
-            case 0: return true;
-            case 1: return false;
-            case 2: return false;
-            case 3: return false;
-            case 4: return false;
-            default: return false;
+            case ITEMS:         return true;
+            case FLUIDS:        return false;
+            case ENERGY:        return false;
+            case EXPERIENCE:    return false;
+            case DUST:          return false;
+            default:            return false;
         }
     }
 
@@ -39,7 +39,7 @@ public class FilterEnchantCount extends BaseFilter{
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
         boolean filterBool = super.canAcceptItems(filter, incomingStack);
 
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.ITEMS);
 
         int count = stackCurrent.stream()
                 .filter(itemStack -> itemStack.isEnchanted() || itemStack.getItem().equals(Items.ENCHANTED_BOOK))
@@ -72,7 +72,7 @@ public class FilterEnchantCount extends BaseFilter{
         MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist_count");
 
         MutableComponent enchants = Component.literal("1");
-        List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,0);
+        List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,ItemTransferMode.ITEMS);
         if(filterQueue.size()>0)
         {
             int count = filterQueue.stream()

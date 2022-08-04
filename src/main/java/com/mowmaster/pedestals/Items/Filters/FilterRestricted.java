@@ -46,7 +46,7 @@ public class FilterRestricted extends BaseFilter{
     @Override
     public int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming) {
         ItemStack filterStack = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,0);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.ITEMS);
 
         int count = stackCurrent.stream()
                 .map(itemStack -> itemStack.getCount())
@@ -65,7 +65,7 @@ public class FilterRestricted extends BaseFilter{
     @Override
     public int canAcceptCountFluids(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack) {
         ItemStack filterStack = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,1);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.FLUIDS);
 
         int count = stackCurrent.stream()
                 .map(itemStack -> itemStack.getCount())
@@ -84,7 +84,7 @@ public class FilterRestricted extends BaseFilter{
     @Override
     public int canAcceptCountEnergy(BasePedestalBlockEntity pedestal, int incomingEnergyAmount) {
         ItemStack filterStack = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,2);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.ENERGY);
 
         int count = stackCurrent.stream()
                 .map(itemStack -> itemStack.getCount())
@@ -103,7 +103,7 @@ public class FilterRestricted extends BaseFilter{
     @Override
     public int canAcceptCountExperience(BasePedestalBlockEntity pedestal, int incomingExperienceAmount) {
         ItemStack filterStack = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,3);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.EXPERIENCE);
 
         int count = stackCurrent.stream()
                 .map(itemStack -> itemStack.getCount())
@@ -122,7 +122,7 @@ public class FilterRestricted extends BaseFilter{
     @Override
     public int canAcceptCountDust(BasePedestalBlockEntity pedestal, DustMagic incomingDust) {
         ItemStack filterStack = pedestal.getFilterInPedestal();
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,4);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.DUST);
 
         int count = stackCurrent.stream()
                 .map(itemStack -> itemStack.getCount())
@@ -164,16 +164,13 @@ public class FilterRestricted extends BaseFilter{
 
     //Allows all mode to use inventory as a filter for the counter to check
     @Override
-    public boolean canModeUseInventoryAsFilter(int mode)
-    {
+    public boolean canModeUseInventoryAsFilter(ItemTransferMode mode) {
         return true;
     }
 
-
     //Cant set white or blacklist for any mode if false
     @Override
-    public boolean canSetFilterType(int mode)
-    {
+    public boolean canSetFilterType(ItemTransferMode mode) {
         return false;
     }
 
@@ -185,7 +182,7 @@ public class FilterRestricted extends BaseFilter{
         MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
         MutableComponent enchants = Component.literal("1");
-        List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,PedestalModesAndTypes.getModeFromStack(filterStack));
+        List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,getItemTransportMode(filterStack));
         int range = filterQueue.size();
         if(range>0)
         {

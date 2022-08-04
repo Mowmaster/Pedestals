@@ -1153,6 +1153,25 @@ public class BasePedestalBlockEntity extends BlockEntity
         return stack;
     }
 
+    public ItemStack removeItemStack(ItemStack stackToRemove, boolean simulate) {
+        IItemHandler h = handler.orElse(null);
+        int matchingSlotNumber = 0;
+        if(h.getSlots()>1)
+        {
+            for(int i=0;i<h.getSlots();i++)
+            {
+                if(ItemHandlerHelper.canItemStacksStack(h.getStackInSlot(i),stackToRemove))
+                {
+                    matchingSlotNumber = i;
+                    break;
+                }
+            }
+        }
+        ItemStack stack = h.extractItem(matchingSlotNumber,stackToRemove.getCount(),simulate);
+
+        return stack;
+    }
+
     public ItemStack removeItem(boolean simulate) {
         IItemHandler h = handler.orElse(null);
         int firstNonEmptySlot = 0;
@@ -2982,9 +3001,9 @@ public class BasePedestalBlockEntity extends BlockEntity
 
 
     //The actual transfer methods for items
-    public boolean sendItemsToPedestal(BlockPos pedestalToSendTo, ItemStack itemStackIncoming)
+    public boolean sendItemsToPedestal(BlockPos pedestalToSendTo, List<ItemStack> itemStacksIncoming)
     {
-        if(!itemStackIncoming.isEmpty())
+        if(itemStacksIncoming.size()>0)
         {
             if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
@@ -2992,26 +3011,34 @@ public class BasePedestalBlockEntity extends BlockEntity
                 if(cap.isPresent())
                 {
                     IItemHandler handler = cap.orElse(null);
-                    //Our Item Handler doesnt require a slot value so default == 0
-                    if(handler.isItemValid(0,itemStackIncoming))
+                    int difference = 0;
+                    ItemStack stackToRemove = ItemStack.EMPTY;
+                    for (ItemStack stack: itemStacksIncoming)
                     {
-                        ItemStack notInsertedStackSimulation = tilePedestalToSendTo.addItemStack(itemStackIncoming,true);
+                        ItemStack notInsertedStackSimulation = tilePedestalToSendTo.addItemStack(stack,true);
                         //this means some items were inserted OR the full stack was inserted
-                        int difference = (notInsertedStackSimulation.isEmpty())?(itemStackIncoming.getCount()):(itemStackIncoming.getCount() - notInsertedStackSimulation.getCount());
-                        if(difference > 0)
+                        difference = (notInsertedStackSimulation.isEmpty())?(stack.getCount()):(stack.getCount() - notInsertedStackSimulation.getCount());
+                        //Our Item Handler doesnt require a slot value for isValid so default == 0
+                        if(difference>0 && handler.isItemValid(0,stackToRemove))
                         {
-                            int countToSend = Math.min(getItemTransferRate(),difference);
-                            if(countToSend >=1)
+                            stackToRemove=notInsertedStackSimulation;
+                            break;
+                        }
+                    }
+
+                    if(difference > 0)
+                    {
+                        int countToSend = Math.min(getItemTransferRate(),difference);
+                        if(countToSend >=1)
+                        {
+                            ItemStack copyIncomingStack = stackToRemove.copy();
+                            copyIncomingStack.setCount(countToSend);
+                            //Send items
+                            if(tilePedestalToSendTo.addItem(copyIncomingStack,true))
                             {
-                                ItemStack copyIncomingStack = itemStackIncoming.copy();
-                                copyIncomingStack.setCount(countToSend);
-                                //Send items
-                                if(tilePedestalToSendTo.addItem(copyIncomingStack,true))
-                                {
-                                    removeItem(copyIncomingStack.getCount(),false);
-                                    tilePedestalToSendTo.addItem(copyIncomingStack,false);
-                                    return true;
-                                }
+                                removeItemStack(copyIncomingStack,false);
+                                tilePedestalToSendTo.addItem(copyIncomingStack,false);
+                                return true;
                             }
                         }
                     }
@@ -3170,7 +3197,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                     if(canSendToPedestal(pedestal))
                     {
                         boolean hasSent = false;
-                        if(sendItemsToPedestal(posReceiver,removeItem(true)))hasSent = true;
+                        if(sendItemsToPedestal(posReceiver,getItemStacks()))hasSent = true;
                         if(sendFluidsToPedestal(posReceiver,getStoredFluid()))hasSent = true;
                         if(sendEnergyToPedestal(posReceiver,getStoredEnergy()))hasSent = true;
                         if(sendExperienceToPedestal(posReceiver,getStoredExperience()))hasSent = true;
@@ -3193,7 +3220,7 @@ public class BasePedestalBlockEntity extends BlockEntity
                         if(canSendToPedestal(pedestal))
                         {
                             boolean hasSent = false;
-                            if(sendItemsToPedestal(posReceiver,removeItem(true)))hasSent = true;
+                            if(sendItemsToPedestal(posReceiver,getItemStacks()))hasSent = true;
                             if(sendFluidsToPedestal(posReceiver,getStoredFluid()))hasSent = true;
                             if(sendEnergyToPedestal(posReceiver,getStoredEnergy()))hasSent = true;
                             if(sendExperienceToPedestal(posReceiver,getStoredExperience()))hasSent = true;

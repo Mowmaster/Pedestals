@@ -33,15 +33,15 @@ public class FilterTag extends BaseFilter{
     }
 
     @Override
-    public boolean canModeUseInventoryAsFilter(int mode) {
+    public boolean canModeUseInventoryAsFilter(ItemTransferMode mode) {
         switch (mode)
         {
-            case 0: return true;
-            case 1: return true;
-            case 2: return false;
-            case 3: return false;
-            case 4: return false;
-            default: return false;
+            case ITEMS:         return true;
+            case FLUIDS:        return true;
+            case ENERGY:        return false;
+            case EXPERIENCE:    return false;
+            case DUST:          return false;
+            default:            return false;
         }
     }
 
@@ -49,7 +49,7 @@ public class FilterTag extends BaseFilter{
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
         boolean filterBool = super.canAcceptItems(filter, incomingStack);
 
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.ITEMS);
         int range = stackCurrent.size();
 
         ItemStack itemFromInv = ItemStack.EMPTY;
@@ -70,7 +70,7 @@ public class FilterTag extends BaseFilter{
     public boolean canAcceptFluids(ItemStack filter, FluidStack incomingFluidStack) {
         boolean filterBool = super.canAcceptFluids(filter, incomingFluidStack);
 
-        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,1);
+        List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.FLUIDS);
         int range = stackCurrent.size();
 
         ItemStack itemFromInv = ItemStack.EMPTY;
@@ -94,7 +94,23 @@ public class FilterTag extends BaseFilter{
             MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
             //For each Mode
-            for(int i=0;i<4;i++)
+            for (ItemTransferMode mode: ItemTransferMode.values())
+            {
+                List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,mode);
+                if(filterQueue.size()>0)
+                {
+                    MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
+
+                    for(int j=0;j<filterQueue.size();j++) {
+
+                        if(!filterQueue.get(j).isEmpty())
+                        {
+                            MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GRAY,filterQueue.get(j).getDisplayName().getString());
+                        }
+                    }
+                }
+            }
+            /*for(int i=0;i<4;i++)
             {
                 List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,i);
                 if(filterQueue.size()>0)
@@ -109,7 +125,7 @@ public class FilterTag extends BaseFilter{
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 }

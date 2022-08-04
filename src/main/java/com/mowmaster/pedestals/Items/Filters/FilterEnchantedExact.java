@@ -38,15 +38,15 @@ public class FilterEnchantedExact extends BaseFilter{
     }
 
     @Override
-    public boolean canModeUseInventoryAsFilter(int mode) {
+    public boolean canModeUseInventoryAsFilter(ItemTransferMode mode) {
         switch (mode)
         {
-            case 0: return true;
-            case 1: return false;
-            case 2: return false;
-            case 3: return false;
-            case 4: return false;
-            default: return false;
+            case ITEMS:         return true;
+            case FLUIDS:        return false;
+            case ENERGY:        return false;
+            case EXPERIENCE:    return false;
+            case DUST:          return false;
+            default:            return false;
         }
     }
 
@@ -57,7 +57,7 @@ public class FilterEnchantedExact extends BaseFilter{
         if(incomingStack.isEnchanted() || incomingStack.getItem().equals(Items.ENCHANTED_BOOK))
         {
             int countAnyMatches = 0;
-            List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,0);
+            List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.ITEMS);
             int range = stackCurrent.size();
 
             Map<Enchantment, Integer> mapIncomming = EnchantmentHelper.getEnchantments(incomingStack);
@@ -97,7 +97,7 @@ public class FilterEnchantedExact extends BaseFilter{
 
         MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
-        List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,PedestalModesAndTypes.getModeFromStack(filterStack));
+        List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,getItemTransportMode(filterStack));
         if(filterQueue.size()>0)
         {
             MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
