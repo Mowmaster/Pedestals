@@ -968,15 +968,37 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
         int hasItem=0;
         BlockEntity blockEntity = worldIn.getBlockEntity(pos);
         if(blockEntity instanceof BasePedestalBlockEntity pedestal) {
-            ItemStack itemstack = pedestal.getItemInPedestal();
+            List<ItemStack> itemstacks = pedestal.getItemStacks();
             if(pedestal.getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
             {
                 return upgrade.getComparatorRedstoneLevel(worldIn,pos);
             }
-            if(!itemstack.isEmpty())
+            if(itemstacks.size()>0)
             {
-                float f = (float)itemstack.getCount()/(float)itemstack.getMaxStackSize();
-                hasItem = (int)Math.floor(f*14.0F)+1;
+                int maxStackSizeDefault = 64;
+                if(pedestal.hasFilter())
+                {
+                    IPedestalFilter filter =pedestal.getIPedestalFilter();
+                    if(filter != null && filter.getFilterDirection().insert())
+                    {
+                        maxStackSizeDefault = Math.max(1,filter.canAcceptCountItems(pedestal,new ItemStack(Items.STONE,64)));
+                    }
+                }
+                int counter = 0;
+                int maxStorageCount = Math.max(1,(pedestal.getPedestalSlots()-1)) * maxStackSizeDefault;
+                for (ItemStack stack : itemstacks)
+                {
+                    //adjust max storage possible based on itemstacks present
+                    if(stack.getMaxStackSize()<maxStackSizeDefault)
+                    {
+                        maxStorageCount-=maxStackSizeDefault;
+                        maxStorageCount+=stack.getMaxStackSize();
+                    }
+
+                    counter+=stack.getCount();
+                }
+                float f = (float)counter/(float)maxStorageCount;
+                hasItem = (int)Math.floor(f*15.0F);
             }
         }
 
