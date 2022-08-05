@@ -250,7 +250,6 @@ public class BaseFilter extends Item implements IPedestalFilter
         return (getFilterType(filterItem))?(2763306):(16777215);
     }
 
-
     @Override
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) { return !getFilterType(filter,ItemTransferMode.ITEMS); }
 

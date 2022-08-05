@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.PedestalUtils;
 
-import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

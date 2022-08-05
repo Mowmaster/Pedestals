@@ -1081,6 +1081,14 @@ public class BasePedestalBlockEntity extends BlockEntity
         else return ItemStack.EMPTY;
     }
 
+    public int getPedestalSlots()
+    {
+        IItemHandler h = handler.orElse(null);
+        if(h !=null)return h.getSlots();
+
+        return 1;
+    }
+
     public List<ItemStack> getItemStacks()
     {
         IItemHandler h = handler.orElse(null);
@@ -3021,13 +3029,14 @@ public class BasePedestalBlockEntity extends BlockEntity
                         //Our Item Handler doesnt require a slot value for isValid so default == 0
                         if(difference>0 && handler.isItemValid(0,stackToRemove))
                         {
-                            stackToRemove=notInsertedStackSimulation;
+                            stackToRemove=stack.copy();
                             break;
                         }
                     }
 
                     if(difference > 0)
                     {
+
                         int countToSend = Math.min(getItemTransferRate(),difference);
                         if(countToSend >=1)
                         {
