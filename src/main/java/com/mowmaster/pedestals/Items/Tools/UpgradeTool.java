@@ -21,7 +21,6 @@ public class UpgradeTool extends BaseTool implements IPedestalTool
         super(p_41383_.stacksTo(1));
     }
 
-
     @Override
     public InteractionResultHolder<ItemStack> use(Level p_41432_, Player p_41433_, InteractionHand p_41434_) {
         Level world = p_41432_;
@@ -37,7 +36,7 @@ public class UpgradeTool extends BaseTool implements IPedestalTool
             {
                 if(stackInHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
                 {
-                    ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_TOOLSWAPPER.get());
+                    ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_TOOLSWAPPER.get(),stackInHand.getCount(),stackInHand.getTag());
                     player.setItemInHand(hand, newTool);
 
                     MowLibMessageUtils.messagePopup(player,ChatFormatting.GREEN,"pedestals.tool_change");

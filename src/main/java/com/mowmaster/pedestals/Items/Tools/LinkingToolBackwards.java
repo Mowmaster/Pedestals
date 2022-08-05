@@ -70,7 +70,7 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                 {
                     if(stackInHand.getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get()))
                     {
-                        ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_LINKINGTOOL.get());
+                        ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_LINKINGTOOL.get(),stackInHand.getCount(),stackInHand.getTag());
                         if(stackInHand.isEnchanted())
                         {
                             writePosToNBT(newTool);

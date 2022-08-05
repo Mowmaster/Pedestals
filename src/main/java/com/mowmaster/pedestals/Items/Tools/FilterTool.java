@@ -35,7 +35,7 @@ public class FilterTool extends BaseTool implements IPedestalTool
             {
                 if(stackInHand.getItem().equals(DeferredRegisterItems.TOOL_FILTERTOOL.get()))
                 {
-                    ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_TAGTOOL.get());
+                    ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_TAGTOOL.get(),stackInHand.getCount(),stackInHand.getTag());
                     player.setItemInHand(hand, newTool);
                     MowLibMessageUtils.messagePopup(player,ChatFormatting.GREEN,"pedestals.tool_change");
                     return InteractionResultHolder.success(stackInHand);
