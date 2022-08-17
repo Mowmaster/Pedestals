@@ -1,36 +1,22 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-import net.minecraft.world.item.Item.Properties;
 import net.minecraftforge.fluids.FluidStack;
 
 public class FilterRestricted extends BaseFilter{
@@ -44,8 +30,7 @@ public class FilterRestricted extends BaseFilter{
     }
 
     @Override
-    public int canAcceptCountItems(BasePedestalBlockEntity pedestal, ItemStack itemStackIncoming) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public int canAcceptCountItems(MowLibBaseBlockEntity filterableBlockEntity, ItemStack filterStack, int maxSpaceSize, int spaceAvailable, ItemStack itemStackIncoming) {
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.ITEMS);
 
         int count = stackCurrent.stream()
@@ -56,15 +41,15 @@ public class FilterRestricted extends BaseFilter{
 
         if(count > 0)
         {
-            return (count > itemStackIncoming.getMaxStackSize())?(itemStackIncoming.getMaxStackSize()):(count);
+            return (count > maxSpaceSize)?(maxSpaceSize):(count);
+            //return (count > itemStackIncoming.getMaxStackSize())?(itemStackIncoming.getMaxStackSize()):(count);
         }
 
-        return (stackCurrent.size()<=0)?(super.canAcceptCountItems(pedestal, itemStackIncoming)):(0);
+        return (stackCurrent.size()<=0)?(super.canAcceptCountItems(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable, itemStackIncoming)):(0);
     }
 
     @Override
-    public int canAcceptCountFluids(BasePedestalBlockEntity pedestal, FluidStack incomingFluidStack) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public int canAcceptCountFluids(MowLibBaseBlockEntity filterableBlockEntity, ItemStack filterStack, int maxSpaceSize, int spaceAvailable, FluidStack incomingFluidStack) {
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.FLUIDS);
 
         int count = stackCurrent.stream()
@@ -75,15 +60,15 @@ public class FilterRestricted extends BaseFilter{
 
         if(count > 0)
         {
-            return (count > pedestal.getFluidCapacity())?(pedestal.getFluidCapacity()):(count);
+            return (count > maxSpaceSize)?(maxSpaceSize):(count);
+            //return (count > filterableBlockEntity.getFluidCapacity())?(filterableBlockEntity.getFluidCapacity()):(count);
         }
 
-        return (stackCurrent.size()<=0)?(super.canAcceptCountFluids(pedestal, incomingFluidStack)):(0);
+        return (stackCurrent.size()<=0)?(super.canAcceptCountFluids(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable, incomingFluidStack)):(0);
     }
 
     @Override
-    public int canAcceptCountEnergy(BasePedestalBlockEntity pedestal, int incomingEnergyAmount) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public int canAcceptCountEnergy(MowLibBaseBlockEntity filterableBlockEntity, ItemStack filterStack, int maxSpaceSize, int spaceAvailable, int incomingEnergyAmount) {
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.ENERGY);
 
         int count = stackCurrent.stream()
@@ -94,15 +79,15 @@ public class FilterRestricted extends BaseFilter{
 
         if(count > 0)
         {
-            return (count > pedestal.getEnergyCapacity())?(pedestal.getEnergyCapacity()):(count);
+            return (count > maxSpaceSize)?(maxSpaceSize):(count);
+            //return (count > filterableBlockEntity.getEnergyCapacity())?(filterableBlockEntity.getEnergyCapacity()):(count);
         }
 
-        return (stackCurrent.size()<=0)?(super.canAcceptCountEnergy(pedestal, incomingEnergyAmount)):(0);
+        return (stackCurrent.size()<=0)?(super.canAcceptCountEnergy(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable, incomingEnergyAmount)):(0);
     }
 
     @Override
-    public int canAcceptCountExperience(BasePedestalBlockEntity pedestal, int incomingExperienceAmount) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public int canAcceptCountExperience(MowLibBaseBlockEntity filterableBlockEntity, ItemStack filterStack, int maxSpaceSize, int spaceAvailable, int incomingExperienceAmount) {
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.EXPERIENCE);
 
         int count = stackCurrent.stream()
@@ -113,15 +98,15 @@ public class FilterRestricted extends BaseFilter{
 
         if(count > 0)
         {
-            return (count > pedestal.getExperienceCapacity())?(pedestal.getExperienceCapacity()):(count);
+            return (count > maxSpaceSize)?(maxSpaceSize):(count);
+            //return (count > filterableBlockEntity.getExperienceCapacity())?(filterableBlockEntity.getExperienceCapacity()):(count);
         }
 
-        return (stackCurrent.size()<=0)?(super.canAcceptCountExperience(pedestal, incomingExperienceAmount)):(0);
+        return (stackCurrent.size()<=0)?(super.canAcceptCountExperience(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable, incomingExperienceAmount)):(0);
     }
 
     @Override
-    public int canAcceptCountDust(BasePedestalBlockEntity pedestal, DustMagic incomingDust) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public int canAcceptCountDust(MowLibBaseBlockEntity filterableBlockEntity, ItemStack filterStack, int maxSpaceSize, int spaceAvailable, DustMagic incomingDust) {
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filterStack,ItemTransferMode.DUST);
 
         int count = stackCurrent.stream()
@@ -132,10 +117,11 @@ public class FilterRestricted extends BaseFilter{
 
         if(count > 0)
         {
-            return (count > pedestal.getDustCapacity())?(pedestal.getDustCapacity()):(count);
+            return (count > maxSpaceSize)?(maxSpaceSize):(count);
+            //return (count > filterableBlockEntity.getDustCapacity())?(filterableBlockEntity.getDustCapacity()):(count);
         }
 
-        return (stackCurrent.size()<=0)?(super.canAcceptCountDust(pedestal, incomingDust)):(0);
+        return (stackCurrent.size()<=0)?(super.canAcceptCountDust(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable, incomingDust)):(0);
     }
 
     /*
@@ -175,8 +161,7 @@ public class FilterRestricted extends BaseFilter{
     }
 
     @Override
-    public void chatDetails(Player player, BasePedestalBlockEntity pedestal) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public void chatDetails(Player player, MowLibBaseBlockEntity pedestal, ItemStack filterStack) {
         MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
         MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");

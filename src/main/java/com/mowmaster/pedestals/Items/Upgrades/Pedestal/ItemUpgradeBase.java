@@ -4,14 +4,12 @@ import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
-import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
-import static com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes.getModeLocalizedString;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
@@ -188,7 +186,50 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
 
 
+    public static ChatFormatting getModeColorFormat(int mode)
+    {
+        ChatFormatting color;
+        switch (mode)
+        {
+            case 0: color = ChatFormatting.GOLD; break;
+            case 1: color = ChatFormatting.BLUE; break;
+            case 2: color = ChatFormatting.RED; break;
+            case 3: color = ChatFormatting.GREEN; break;
+            case 4: color = ChatFormatting.LIGHT_PURPLE; break;
+            default: color = ChatFormatting.WHITE; break;
+        }
 
+        return color;
+    }
+
+    public static String getModeStringFromInt(int mode) {
+
+        switch(mode)
+        {
+            case 0: return "item";
+            case 1: return "fluid";
+            case 2: return "energy";
+            case 3: return "xp";
+            case 4: return "dust";
+            default: return "item";
+        }
+    }
+
+    public static String getModeLocalizedString(int mode)
+    {
+        String typeString = "";
+        switch(mode)
+        {
+            case 0: typeString = ".mode_items"; break;
+            case 1: typeString = ".mode_fluids"; break;
+            case 2: typeString = ".mode_energy"; break;
+            case 3: typeString = ".mode_experience"; break;
+            case 4: typeString = ".mode_dust"; break;
+            default: typeString = ".error"; break;
+        }
+
+        return typeString;
+    }
 
     /*
     MODES
@@ -206,7 +247,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         {
             compound = filterStack.getTag();
         }
-        compound.putBoolean(MODID + "_" + PedestalModesAndTypes.getModeStringFromInt(mode)+"_transport_mode",allowed);
+        compound.putBoolean(MODID + "_" + getModeStringFromInt(mode)+"_transport_mode",allowed);
         filterStack.setTag(compound);
     }
 
@@ -215,7 +256,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         if(filterStack.hasTag())
         {
             CompoundTag getCompound = filterStack.getTag();
-            String tag = MODID + "_" + PedestalModesAndTypes.getModeStringFromInt(mode)+"_transport_mode";
+            String tag = MODID + "_" + getModeStringFromInt(mode)+"_transport_mode";
             if(filterStack.getTag().contains(tag))
             {
                 allowed = getCompound.getBoolean(tag);
@@ -246,7 +287,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             saveUpgradeModeToNBT(heldItem,setNewMode);
             player.setItemInHand(hand,heldItem);
 
-            ChatFormatting colorChange = PedestalModesAndTypes.getModeColorFormat(setNewMode);
+            ChatFormatting colorChange = getModeColorFormat(setNewMode);
             String typeString = getModeLocalizedString(setNewMode);
 
             List<String> listed = new ArrayList<>();
@@ -842,10 +883,10 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     {
         if(pedestal.hasFilter())
         {
-            Item filterInPedestal = pedestal.getFilterInPedestal().getItem();
-            if(filterInPedestal instanceof IPedestalFilter filter)
+            ItemStack filterStackInPedestal = pedestal.getFilterInPedestal();
+            if(filterStackInPedestal.getItem() instanceof IPedestalFilter filter)
             {
-                return filter.canAcceptCountItems(pedestal,stackIn);
+                return filter.canAcceptCountItems(pedestal,filterStackInPedestal,stackIn.getMaxStackSize(),pedestal.getSlotSizeLimit(),stackIn);
             }
         }
 

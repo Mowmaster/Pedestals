@@ -1,17 +1,13 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
-import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-
-import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
-import net.minecraft.core.BlockPos;
+import com.mowmaster.mowlib.MowLibUtils.MowLibFluidUtils;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
-import net.minecraft.world.item.Item.Properties;
 import net.minecraftforge.fluids.FluidStack;
 
 public class FilterItemStack extends BaseFilter{
@@ -64,8 +60,8 @@ public class FilterItemStack extends BaseFilter{
         ItemStack itemFromInv = ItemStack.EMPTY;
         itemFromInv = IntStream.range(0,range)//Int Range
                 .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                .filter(itemStack -> !getFluidStackFromItemStack(itemStack).isEmpty())
-                .filter(itemStack -> getFluidStackFromItemStack(itemStack).equals(incomingFluidStack))
+                .filter(itemStack -> !MowLibFluidUtils.getFluidStackFromItemStack(itemStack).isEmpty())
+                .filter(itemStack -> MowLibFluidUtils.getFluidStackFromItemStack(itemStack).equals(incomingFluidStack))
                 .findFirst().orElse(ItemStack.EMPTY);
 
         if(!itemFromInv.isEmpty())

@@ -3,8 +3,7 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustTank;
-import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
-import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
+import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
@@ -17,7 +16,6 @@ import static com.mowmaster.pedestals.PedestalUtils.PedestalUtilities.*;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -61,7 +59,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             int transferRate = getItemTransferRate(coinInPedestal);
 
             ItemStack itemFromInv = ItemStack.EMPTY;
-            LazyOptional<IItemHandler> cap = PedestalUtilities.findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
             if(!isInventoryEmpty(cap))
             {
                 if(cap.isPresent())
@@ -122,7 +120,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
         //Fluids
         if(canTransferFluids(coinInPedestal))
         {
-            LazyOptional<IFluidHandler> cap = findFluidHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IFluidHandler> cap = MowLibFluidUtils.findFluidHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
             if(cap.isPresent())
             {
                 IFluidHandler handler = cap.orElse(null);
@@ -227,7 +225,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
         {
             int getMaxEnergyValue = pedestal.getEnergyCapacity();
 
-            LazyOptional<IEnergyStorage> cap = findEnergyHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IEnergyStorage> cap = MowLibEnergyUtils.findEnergyHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
             if(cap.isPresent())
             {
@@ -258,7 +256,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
         {
             int getMaxExperienceValue = pedestal.getExperienceCapacity();
 
-            LazyOptional<IExperienceStorage> cap = PedestalUtilities.findExperienceHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IExperienceStorage> cap = MowLibXpUtils.findExperienceHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
 
             //Gets inventory TE then makes sure its not a pedestal
             BlockEntity invToPushTo = world.getBlockEntity(posInventory);
@@ -290,7 +288,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
         }
         if(canTransferDust(coinInPedestal))
         {
-            LazyOptional<IDustHandler> cap = PedestalUtilities.findDustHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal));
+            LazyOptional<IDustHandler> cap = MowLibDustUtils.findDustHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal));
 
             if(cap.isPresent())
             {
@@ -366,7 +364,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                     if(currentlyStoredExp < pedestal.getExperienceCapacity())
                     {
                         int transferRate = pedestal.getExperienceTransferRate();
-                        int value = removeXp(player, transferRate);
+                        int value = MowLibXpUtils.removeXp(player, transferRate);
                         if(value > 0)
                         {
                             pedestal.addExperience(value,false);

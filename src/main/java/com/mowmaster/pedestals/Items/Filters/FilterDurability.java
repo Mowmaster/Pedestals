@@ -1,37 +1,20 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-
-import net.minecraft.world.item.Item.Properties;
 
 public class FilterDurability extends BaseFilter
 {
@@ -106,8 +89,7 @@ public class FilterDurability extends BaseFilter
 
 
     @Override
-    public void chatDetails(Player player, BasePedestalBlockEntity pedestal) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public void chatDetails(Player player, MowLibBaseBlockEntity pedestal, ItemStack filterStack) {
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
             MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.WHITE,filterStack.getDisplayName().getString());
@@ -124,7 +106,7 @@ public class FilterDurability extends BaseFilter
             {
                 MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
 
-                MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GRAY,""+getDurabilityTarget(pedestal.getFilterInPedestal())+"");
+                MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GRAY,""+getDurabilityTarget(filterStack)+"");
             }
         }
         else

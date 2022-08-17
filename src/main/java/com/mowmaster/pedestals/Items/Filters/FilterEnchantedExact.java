@@ -1,36 +1,21 @@
 package com.mowmaster.pedestals.Items.Filters;
 
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
-
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.item.Item.Properties;
 
 public class FilterEnchantedExact extends BaseFilter{
     public FilterEnchantedExact(Properties p_41383_) {
@@ -92,8 +77,7 @@ public class FilterEnchantedExact extends BaseFilter{
     }
 
     @Override
-    public void chatDetails(Player player, BasePedestalBlockEntity pedestal) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public void chatDetails(Player player, MowLibBaseBlockEntity pedestal, ItemStack filterStack) {
 
         MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 

@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Filters;
 
-
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraft.ChatFormatting;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
@@ -64,8 +66,7 @@ public class FilterEnchantCount extends BaseFilter{
     }
 
     @Override
-    public void chatDetails(Player player, BasePedestalBlockEntity pedestal) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public void chatDetails(Player player, MowLibBaseBlockEntity pedestal, ItemStack filterStack) {
 
         MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());
 
@@ -87,5 +88,4 @@ public class FilterEnchantCount extends BaseFilter{
         enchants.withStyle();
         player.displayClientMessage(enchants, false);
     }
-
 }

@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
@@ -25,8 +26,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
-
-import static com.mowmaster.pedestals.PedestalUtils.PedestalUtilities.removeXp;
 
 import net.minecraft.world.item.Item.Properties;
 
@@ -311,7 +310,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
                     if(currentlyStoredExp < pedestal.getExperienceCapacity())
                     {
                         int transferRate = pedestal.getExperienceTransferRate();
-                        int value = removeXp(player, transferRate);
+                        int value = MowLibXpUtils.removeXp(player, transferRate);
                         if(value > 0)
                         {
                             pedestal.addExperience(value,false);

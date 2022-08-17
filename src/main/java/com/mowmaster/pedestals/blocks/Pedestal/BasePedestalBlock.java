@@ -1,8 +1,9 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.mowlib.Blocks.BaseBlocks.BaseColoredBlock;
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlock;
 import com.mowmaster.mowlib.Items.ColorApplicator;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibReferences;
@@ -10,16 +11,13 @@ import com.mowmaster.pedestals.Items.Augments.AugmentTieredCapacity;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredRange;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredSpeed;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredStorage;
-import com.mowmaster.pedestals.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
-import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -35,7 +33,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownTrident;
@@ -73,16 +70,13 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.mowmaster.mowlib.MowLibUtils.MowLibColorReference.getIntColor;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
-public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterloggedBlock, EntityBlock
+public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterloggedBlock, EntityBlock
 {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -217,8 +211,6 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                 return (p_152021_.getValue(LIT)) ? (this.LCUP) : (this.CUP);
         }
     }
-
-
 
     public BlockState updateShape(BlockState p_152036_, Direction p_152037_, BlockState p_152038_, LevelAccessor p_152039_, BlockPos p_152040_, BlockPos p_152041_) {
         if (p_152036_.getValue(WATERLOGGED)) {
@@ -959,6 +951,23 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
     }*/
 
     @Override
+    public boolean shouldCheckWeakPower(BlockState state, LevelReader world, BlockPos pos, Direction side) {
+        return true;
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState p_60457_) {
+        //super.hasAnalogOutputSignal(p_60457_);
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState p_60487_, Level p_60488_, BlockPos p_60489_) {
+        //super.getAnalogOutputSignal(p_60487_, p_60488_, p_60489_);
+        return getRedstoneLevelPedestal(p_60488_,p_60489_);
+    }
+
+    @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction direction) {
         return true;
     }
@@ -981,7 +990,7 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
                     IPedestalFilter filter =pedestal.getIPedestalFilter();
                     if(filter != null && filter.getFilterDirection().insert())
                     {
-                        maxStackSizeDefault = Math.max(1,filter.canAcceptCountItems(pedestal,new ItemStack(Items.STONE,64)));
+                        maxStackSizeDefault = Math.max(1,filter.canAcceptCountItems(pedestal,pedestal.getFilterInPedestal(), new ItemStack(Items.STONE,64).getMaxStackSize(), pedestal.getSlotSizeLimit(), new ItemStack(Items.STONE,64)));
                     }
                 }
                 int counter = 0;
@@ -1003,21 +1012,6 @@ public class BasePedestalBlock extends BaseColoredBlock implements SimpleWaterlo
         }
 
         return hasItem;
-    }
-
-    @Override
-    public boolean shouldCheckWeakPower(BlockState state, LevelReader world, BlockPos pos, Direction side) {
-        return true;
-    }
-
-    @Override
-    public boolean hasAnalogOutputSignal(BlockState p_60457_) {
-        return true;
-    }
-
-    @Override
-    public int getAnalogOutputSignal(BlockState p_60487_, Level p_60488_, BlockPos p_60489_) {
-        return getRedstoneLevelPedestal(p_60488_,p_60489_);
     }
 
     public RenderShape getRenderShape(BlockState p_50950_) {

@@ -1,25 +1,21 @@
 package com.mowmaster.pedestals.Items.Filters;
 
-import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
+import com.mowmaster.mowlib.MowLibUtils.MowLibFluidUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -75,7 +71,7 @@ public class FilterMod extends BaseFilter{
         ItemStack itemFromInv = ItemStack.EMPTY;
         itemFromInv = IntStream.range(0,range)//Int Range
                 .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                .filter(itemStack -> ForgeRegistries.FLUIDS.getKey(getFluidStackFromItemStack(itemStack).getFluid()).getNamespace()==ForgeRegistries.FLUIDS.getKey(incomingFluidStack.getFluid()).getNamespace())
+                .filter(itemStack -> ForgeRegistries.FLUIDS.getKey(MowLibFluidUtils.getFluidStackFromItemStack(itemStack).getFluid()).getNamespace()==ForgeRegistries.FLUIDS.getKey(incomingFluidStack.getFluid()).getNamespace())
                 .findFirst().orElse(ItemStack.EMPTY);
 
         if(!itemFromInv.isEmpty())
@@ -87,8 +83,7 @@ public class FilterMod extends BaseFilter{
 
 
     @Override
-    public void chatDetails(Player player, BasePedestalBlockEntity pedestal) {
-        ItemStack filterStack = pedestal.getFilterInPedestal();
+    public void chatDetails(Player player, MowLibBaseBlockEntity pedestal, ItemStack filterStack) {
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
             MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.GOLD,filterStack.getDisplayName().getString());

@@ -7,7 +7,7 @@ import com.mowmaster.pedestals.Items.Filters.FilterItem;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeExport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeImport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeMagnet;
-import com.mowmaster.pedestals.PedestalUtils.PedestalModesAndTypes;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

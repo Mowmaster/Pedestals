@@ -1,7 +1,7 @@
 {
   "itemGroup.tab_pedestaltab": "Pedestals",
 
-  "pedestals.jei.cobble_gen": "Cobble Generator Recipes",
+  "pedestals.jei.cobble_gen": "Material Generator",
   "pedestals.cobble_gen.warning": "§cOutput affected by enchants like silk touch, fortune, etc.",
   "pedestals.cobble_gen.fluid": "Fluid Needed: ",
   "pedestals.cobble_gen.fluidna": "None",
@@ -63,29 +63,6 @@
   "pedestals.mode_augment_iu": "Disable: Item & Upgrade Render",
   "pedestals.mode_augment_piu": "Disable: Particles / Item & Upgrade Render",
 
-  "pedestals.filter_changed": "Filter Changed",
-  "pedestals.filter_type_changed": "Filter Type Change: ",
-  "pedestals.filter_type": "Filter Type: ",
-  "pedestals.filter_type_whitelist": "Whitelist",
-  "pedestals.filter_type_blacklist": "Blacklist",
-  "pedestals.filter_type_above": "Durability Above",
-  "pedestals.filter_type_below": "Durability Below",
-
-  "pedestals.filter.message_twohanded": "Cannot Be Holding Filters in Both Hands for this Action",
-
-  "pedestals.filter.tooltip_filterdirection": "Filter applies on ",
-  "mowlib.enum.filterdirection_insert": "Inserting",
-  "mowlib.enum.filterdirection_extract": "Extracting",
-  "mowlib.enum.filterdirection_neutral": "Machines",
-  "mowlib.enum.filterdirection_none": "§cFilter Error",
-
-  "pedestals.enum.filtertransfermode_item": "Item",
-  "pedestals.enum.filtertransfermode_fluid": "Fluid",
-  "pedestals.enum.filtertransfermode_energy": "Energy",
-  "pedestals.enum.filtertransfermode_experience": "Experience",
-  "pedestals.enum.filtertransfermode_dust": "Dust",
-  "pedestals.enum.filtertransfermode_default": "§cFilter Transfer Mode Error",
-
   "pedestals.tool_link_success": "Linked Successfully",
   "pedestals.tool_link_unsucess": "Linking Failed, Max Connections Reached",
   "pedestals.tool_link_removed": "Connection Removed",
@@ -107,7 +84,7 @@
   "pedestals.tool_tip_Y": "y ",
   "pedestals.tool_tip_Z": "z",
 
-  "pedestals.tooltip_mode": "Mode: ",
+
   "pedestals.pedestal.message_redstone_disable": "Redstone Signal Strength Needed to Activate Pedestal: ",
   "pedestals.pedestal.message_separator1": ": ",
   "pedestals.pedestal.message_separator2": "/",
@@ -136,6 +113,12 @@
   "item.pedestals.tool_devtool": "Dev Tool (Creative Only)",
   "jei.pedestals.tool_devtool.interaction": "§3 Offhand Left Tool and Left Click to Break Pedestals if in Creative Mode",
 
+
+  "pedestals.filter_type": "Filter Type: ",
+  "pedestals.filter_type_above": "Equal To and Above",
+  "pedestals.filter_type_below": "Equal To and Below",
+
+  "pedestals.filter.tooltip_filterbase": "THIS FILTER BASE IS JUST A CRAFTING COMPONENT!!!",
   "item.pedestals.filter_base": "Filter Base",
   "item.pedestals.filter_base.base_description": "THIS FILTER BASE IS JUST A CRAFTING COMPONENT!!!",
   "jei.pedestals.filter_base.base_description": "THIS FILTER BASE IS JUST A CRAFTING COMPONENT!!!",
@@ -241,9 +224,7 @@
   "pedestals.augments_storage_energyrate": "Increases Energy Buffer In Pedestal: ",
   "pedestals.augments_storage_xprate": "Increases Xp Level Buffer In Pedestal: ",
 
-
   "item.pedestals.mechanical_storage_dust": "Packaged Dust",
-
 
   "item.pedestals.upgrade_pedestal_base": "Upgrade Base",
   "item.pedestals.upgrade_pedestal_base.base_description": "THIS UPGRADE BASE IS JUST A CRAFTING COMPONENT!!!",
@@ -257,7 +238,7 @@
   "item.pedestals.upgrade_pedestal_magnet": "Magnet Upgrade",
   "jei.pedestals.upgrade_pedestal_magnet.description": "§5'Magnets' up items in the selected work area.",
 
-  "item.pedestals.upgrade_pedestal_cobblegen": "Cobble Generator",
+  "item.pedestals.upgrade_pedestal_cobblegen": "Material Generator",
   "jei.pedestals.upgrade_pedestal_cobblegen.description": "§5Based on the 'Below' Block and Inserted Tool, will generate items putting the outputs in the pedestal.",
 
   "block.pedestals.block_pedestal": "Pedestal",
