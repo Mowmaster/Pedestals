@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Recipes;
 
 import com.google.gson.JsonObject;
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,8 +37,10 @@ public class CobbleGenRecipe implements Recipe<Container>
     private final int experience;
     private final String fluidName;
     private final int fluid;
+    private final int dustColor;
+    private final int dustAmount;
 
-    public CobbleGenRecipe(ResourceLocation id, String group, @Nullable Ingredient blockBelow, ItemStack generatedItemOrBlock, @Nullable int energy, @Nullable int experience, @Nullable String fluidName, @Nullable int fluid)
+    public CobbleGenRecipe(ResourceLocation id, String group, @Nullable Ingredient blockBelow, ItemStack generatedItemOrBlock, @Nullable int energy, @Nullable int experience, @Nullable String fluidName, @Nullable int fluid, @Nullable int dustColor, @Nullable int dustAmount)
     {
         this.group = group;
         this.id = id;
@@ -47,6 +50,8 @@ public class CobbleGenRecipe implements Recipe<Container>
         this.experience = experience;
         this.fluidName = fluidName;
         this.fluid = fluid;
+        this.dustColor = dustColor;
+        this.dustAmount = dustAmount;
     }
 
     @Override
@@ -113,6 +118,11 @@ public class CobbleGenRecipe implements Recipe<Container>
         return getFluidStack();
     }
 
+    public DustMagic getResultDustNeeded()
+    {
+        return getDustMagic();
+    }
+
     @Override
     public ResourceLocation getId()
     {
@@ -153,6 +163,12 @@ public class CobbleGenRecipe implements Recipe<Container>
 
     public FluidStack getFluidStack() { return (fluidName != "" && fluid > 0)?(new FluidStack(ForgeRegistries.FLUIDS.getValue(new ResourceLocation(fluidName)),fluid)):(FluidStack.EMPTY); }
 
+    public DustMagic getDustMagic()
+    {
+        DustMagic dust = new DustMagic(dustColor,dustAmount);
+        return (!dust.isEmpty())?(dust):(DustMagic.EMPTY);
+    }
+
     public Ingredient getPattern()
     {
         return blockBelow != null ? blockBelow : Ingredient.EMPTY;
@@ -163,9 +179,9 @@ public class CobbleGenRecipe implements Recipe<Container>
         public static final ResourceLocation ID =
                 new ResourceLocation(MODID,"cobblegen");
 
-        protected CobbleGenRecipe createRecipe(ResourceLocation recipeId, String group, Ingredient blockBelow, ItemStack result, @Nullable int energy, @Nullable int experience, @Nullable String fluidName, @Nullable int fluid)
+        protected CobbleGenRecipe createRecipe(ResourceLocation recipeId, String group, Ingredient blockBelow, ItemStack result, @Nullable int energy, @Nullable int experience, @Nullable String fluidName, @Nullable int fluid, @Nullable int dustColor, @Nullable int dustAmount)
         {
-            return new CobbleGenRecipe(recipeId, group, blockBelow, result, energy, experience, fluidName, fluid);
+            return new CobbleGenRecipe(recipeId, group, blockBelow, result, energy, experience, fluidName, fluid, dustColor, dustAmount);
         }
 
         @Override
@@ -178,7 +194,9 @@ public class CobbleGenRecipe implements Recipe<Container>
             int experience = json.has("experience") ? GsonHelper.getAsInt(json,"experience") : 0;
             String fluidName = json.has("fluidName") ? GsonHelper.getAsString(json,"fluidName") : "";
             int fluid = json.has("fluid") ? GsonHelper.getAsInt(json,"fluid") : 0;
-            return createRecipe(recipeId, group, blockBelow, result, energy, experience, fluidName, fluid);
+            int dustColor = json.has("dustcolor") ? GsonHelper.getAsInt(json,"dustcolor") : 0;
+            int dustAmount = json.has("dustamount") ? GsonHelper.getAsInt(json,"dustamount") : 0;
+            return createRecipe(recipeId, group, blockBelow, result, energy, experience, fluidName, fluid, dustColor, dustAmount);
         }
 
         @Override
@@ -192,7 +210,9 @@ public class CobbleGenRecipe implements Recipe<Container>
             int experience = buffer.readInt();
             String fluidName = buffer.readUtf(32767);
             int fluid = buffer.readInt();
-            return createRecipe(recipeId, group,  blockBelow, result, energy, experience, fluidName, fluid);
+            int dustColor = buffer.readInt();
+            int dustAmount = buffer.readInt();
+            return createRecipe(recipeId, group,  blockBelow, result, energy, experience, fluidName, fluid, dustColor, dustAmount);
         }
 
         @Override
@@ -207,6 +227,8 @@ public class CobbleGenRecipe implements Recipe<Container>
             buffer.writeInt(recipe.experience);
             buffer.writeUtf(recipe.fluidName);
             buffer.writeInt(recipe.fluid);
+            buffer.writeInt(recipe.dustColor);
+            buffer.writeInt(recipe.dustAmount);
         }
 
         public RecipeSerializer<?> setRegistryName(ResourceLocation name) {

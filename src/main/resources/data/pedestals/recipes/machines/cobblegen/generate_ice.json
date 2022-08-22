@@ -8,6 +8,8 @@
   },
   "energy": 0,
   "experience": 0,
-  "fluidName": "",
-  "fluid": 0
+  "fluidName": "minecraft:water",
+  "fluid": 1000,
+  "dustcolor": 0,
+  "dustamount": 0
 }

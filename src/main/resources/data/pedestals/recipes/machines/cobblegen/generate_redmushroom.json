@@ -9,5 +9,7 @@
   "energy": 0,
   "experience": 0,
   "fluidName": "",
-  "fluid": 0
+  "fluid": 0,
+  "dustcolor": 0,
+  "dustamount": 0
 }

@@ -48,6 +48,12 @@ public class ClientRegistry
         {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_TAG.get());
 
         event.register((stack, color) ->
+        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_EXACT.get());
+        event.register((stack, color) ->
+        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
+
+
+        event.register((stack, color) ->
         {if (color == 1) {return BaseDustBulkStorageItem.getItemColor();} else {return -1;}}, DeferredRegisterItems.MECHANICAL_STORAGE_DUST.get());
 
 
@@ -68,6 +74,9 @@ public class ClientRegistry
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_MOD.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_RESTRICTED.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_TAG.get());
+
+        //ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_EXACT.get());
+        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get());
 

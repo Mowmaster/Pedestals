@@ -1,15 +1,15 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:soul_soil"
+    "item": "minecraft:dead_fire_coral_block"
   },
   "result": {
-    "item": "minecraft:soul_sand"
+    "item": "minecraft:fire_coral_block"
   },
   "energy": 0,
   "experience": 0,
   "fluidName": "",
   "fluid": 0,
-  "dustcolor": 0,
-  "dustamount": 0
+  "dustcolor": 11141120,
+  "dustamount": 20
 }

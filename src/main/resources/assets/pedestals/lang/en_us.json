@@ -7,6 +7,7 @@
   "pedestals.cobble_gen.fluidna": "None",
   "pedestals.cobble_gen.energy": "Energy Needed: ",
   "pedestals.cobble_gen.xp": "Exp Needed: ",
+  "pedestals.cobble_gen.dust": "Dust Needed: ",
 
 
   "pedestals.transport_mode_changed_true": "Mode Enabled",
@@ -117,6 +118,9 @@
   "pedestals.filter_type": "Filter Type: ",
   "pedestals.filter_type_above": "Equal To and Above",
   "pedestals.filter_type_below": "Equal To and Below",
+  "pedestals.filter_changed_added": "Block Added To Filter",
+  "pedestals.filter_changed_removed": "Block Removed From Filter",
+
 
   "pedestals.filter.tooltip_filterbase": "THIS FILTER BASE IS JUST A CRAFTING COMPONENT!!!",
   "item.pedestals.filter_base": "Filter Base",
@@ -157,6 +161,15 @@
   "item.pedestals.filter_tag": "Tag Filter",
   "jei.pedestals.filter_tag.description": "§5 This Filter Filters By The Tags on an Item (Items in the filter must be renamed with tag names, like 'forge:stone'",
   "jei.pedestals.filter_tag.interaction": "§3 Offhand Filter and Right Click to switch TYPES, Crouch Right Click to switch MODES",
+
+  "item.pedestals.filter_blocksonclickexact": "Blocks Filter (Exact)",
+  "jei.pedestals.filter_blocksonclickexact.description": "§5 This Filter Filters Similar to an ItemStack Filter",
+  "jei.pedestals.filter_blocksonclickexact.interaction": "§3 Offhand Filter and Right Click in Air to switch TYPES, Crouch Right Click in Air to switch MODES, Crouch Right Clicking a block when in the offhand adds/removes it from the filter.",
+  "item.pedestals.filter_blocksonclickfuzzy": "Blocks Filter (Fuzzy)",
+  "jei.pedestals.filter_blocksonclickfuzzy.description": "§5 This Filter Filters Similar to an Item Filter",
+  "jei.pedestals.filter_blocksonclickfuzzy.interaction": "§3 Offhand Filter and Right Click in Air to switch TYPES, Crouch Right Click in Air to switch MODES, Crouch Right Clicking a block when in the offhand adds/removes it from the filter.",
+
+
 
   "item.pedestals.augment_pedestal_nocollide": "No Collision Effects Augment",
   "jei.pedestals.augment_pedestal_nocollide.description": "§5 Prevents onCollision Pedestal Effects.",

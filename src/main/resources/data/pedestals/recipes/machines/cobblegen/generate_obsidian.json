@@ -1,15 +1,15 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:soul_soil"
+    "item": "minecraft:crying_obsidian"
   },
   "result": {
-    "item": "minecraft:soul_sand"
+    "item": "minecraft:obsidian"
   },
   "energy": 0,
   "experience": 0,
-  "fluidName": "",
-  "fluid": 0,
+  "fluidName": "minecraft:lava",
+  "fluid": 1000,
   "dustcolor": 0,
   "dustamount": 0
 }

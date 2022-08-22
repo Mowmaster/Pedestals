@@ -2,6 +2,9 @@ package com.mowmaster.pedestals.Compat.JEI.recipes;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibReferences;
 import com.mowmaster.pedestals.Compat.JEI.JEIPedestalsRecipeTypes;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
@@ -25,6 +28,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
+import static com.mowmaster.mowlib.MowLibUtils.MowLibReferences.MODID;
+
 public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
 {
     private final IDrawable background;
@@ -35,7 +40,7 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
 
     public CobbleGenRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createDrawable(
-                new ResourceLocation(References.MODID, "textures/gui/jei/cobble_gen.png"), 0, 0, 128, 128);
+                new ResourceLocation(References.MODID, "textures/gui/jei/cobble_gen.png"), 0, 0, 128, 146);
         this.localizedName = Component.translatable(References.MODID + ".jei.cobble_gen");
         //this.overlay =
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, this.renderStack);
@@ -101,5 +106,20 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
         exp.append(Component.literal("" + recipe.getResultExperienceNeeded() + ""));
         exp.withStyle(ChatFormatting.BLACK);
         fontRenderer.draw(stack,exp,10,112,0xffffffff);
+
+        DustMagic dustNeeded = recipe.getResultDustNeeded();
+        MutableComponent dust = Component.translatable(References.MODID + ".cobble_gen.dust");
+        if(dustNeeded.getDustColor() > 0)
+        {
+            dust = Component.translatable(MowLibReferences.MODID + "." + MowLibColorReference.getColorName(dustNeeded.getDustColor()));
+            dust.append(Component.literal(": " + dustNeeded.getDustAmount() + ""));
+        }
+        else
+        {
+            dust.append(Component.literal(dustNeeded.getDustAmount() + ""));
+        }
+        dust.withStyle(ChatFormatting.BLACK);
+
+        fontRenderer.draw(stack,dust,10,130,0xffffffff);
     }
 }

@@ -202,7 +202,6 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
                 else return;
             }
 
-
             if(getExperienceNeeded>0)
             {
                 if(pedestal.removeExperience(getExperienceNeeded, true)>0)

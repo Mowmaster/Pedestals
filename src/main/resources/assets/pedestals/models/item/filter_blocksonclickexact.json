@@ -1,0 +1,15 @@
+{
+"parent": "pedestals:item/filters/itemfilter",
+  "textures": {
+    "0": "pedestals:items/models/filters/filteritemdefault_item",
+    "1": "pedestals:items/models/filters/filterblockexact",
+    "particle": "pedestals:items/models/filters/filteritemdefault_item"
+  },
+  "overrides": [
+    { "predicate": { "pedestals:filter_mode": 0}, "model": "pedestals:item/filters/blocks_itemstack/filter_item"},
+    { "predicate": { "pedestals:filter_mode": 1}, "model": "pedestals:item/filters/blocks_itemstack/filter_fluid"},
+    { "predicate": { "pedestals:filter_mode": 2}, "model": "pedestals:item/filters/blocks_itemstack/filter_energy"},
+    { "predicate": { "pedestals:filter_mode": 3}, "model": "pedestals:item/filters/blocks_itemstack/filter_xp"},
+    { "predicate": { "pedestals:filter_mode": 4}, "model": "pedestals:item/filters/blocks_itemstack/filter_dust"}
+  ]
+}

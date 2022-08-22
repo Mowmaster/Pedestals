@@ -1,7 +1,5 @@
 package com.mowmaster.pedestals.Registry;
 
-import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
-import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.*;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseDustBulkStorageItem;
@@ -67,6 +65,12 @@ public class DeferredRegisterItems
             () -> new FilterRestricted(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> FILTER_TAG = ITEMS.register("filter_tag",
             () -> new FilterTag(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
+    public static final RegistryObject<Item> FILTER_BLOCKS_ON_CLICK_EXACT = ITEMS.register("filter_blocksonclickexact",
+            () -> new FilterBlocksByClickExact(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> FILTER_BLOCKS_ON_CLICK_FUZZY = ITEMS.register("filter_blocksonclickfuzzy",
+            () -> new FilterBlocksByClickFuzzy(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_BASE = ITEMS.register("upgrade_pedestal_base",
             () -> new ItemUpgradeBase(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
