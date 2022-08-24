@@ -25,10 +25,12 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 
-import static com.mowmaster.mowlib.MowLibUtils.MowLibReferences.MODID;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
 {
@@ -71,7 +73,7 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
     public void setRecipe(IRecipeLayoutBuilder builder, CobbleGenRecipe recipe, IFocusGroup focuses) {
 
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 33,18)
-                .addItemStack(new ItemStack(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get()));
+                .addItemStack(new ItemStack(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get()).setHoverName(Component.translatable(References.MODID + ".cobble_gen.warning")));
 
         //Block Below
         builder.addSlot(RecipeIngredientRole.INPUT, 33, 41)
@@ -79,7 +81,7 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
 
         //Result
         builder.addSlot(RecipeIngredientRole.OUTPUT, 79, 41)
-                .addItemStack(recipe.getResultItem().setHoverName(Component.translatable(References.MODID + ".cobble_gen.warning")));
+                .addItemStack(recipe.getResultItem());
     }
 
     @Override

@@ -113,6 +113,18 @@ public class ClientRegistry
         {
 
             event.addSprite(new ResourceLocation(MODID, "util/pedestal_render"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_1"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_2"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_3"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_4"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_5"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_6"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_7"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_8"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_9"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_10"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_11"));
+            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_12"));
             event.addSprite(new ResourceLocation(MODID, "util/upgrade_render"));
 
             event.addSprite(new ResourceLocation(MODID, "util/crystal_dust"));

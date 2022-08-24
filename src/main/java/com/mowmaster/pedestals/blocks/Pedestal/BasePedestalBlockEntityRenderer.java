@@ -7,8 +7,12 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.mowmaster.pedestals.Items.Upgrades.IUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ISelectableArea;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ISelectablePoints;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.PedestalUtils.References;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
@@ -22,12 +26,15 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
@@ -45,6 +52,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             List<ItemStack> listed = p_112307_.getItemStacks();
             ItemStack stack = p_112307_.getItemInPedestalFirst();
             ItemStack coin = p_112307_.getCoinOnPedestal();
+            List<BlockPos> linkedLocations = p_112307_.getLocationList();
             Level world = p_112307_.getLevel();
             // 0 - No Particles
             // 1 - No Render Item
@@ -114,13 +122,44 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 //You have to client register this too!!!
                 @SuppressWarnings("deprecation")
                 TextureAtlasSprite whiteTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/pedestal_render"));
-
                 AABB aabb = new AABB(pos.getX() - range, pos.getY() - range, pos.getZ() - range,pos.getX() + range, pos.getY() + range, pos.getZ() + range);
                 renderBoundingBox(pos, aabb, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.2f, 0.2f, 1f);
                 renderFaces(whiteTextureSprite,pos,aabb,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.2f, 0.2f, 0.5f);
 
                 //Orange Color = 1f, 0.42f, 0f,
                 //Light Blue Color = 0f, 0.58f, 1f,
+
+
+                if(linkedLocations.size()>0)
+                {
+                    List<BlockPos> resetList = new ArrayList<>();
+                    //resetList = linkedLocations;
+                    p_112309_.pushPose();
+                    for (BlockPos posPoints : linkedLocations)
+                    //for(int i=0;i<linkedLocations.size();i++)
+                    {
+                        if(resetList.contains(posPoints))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            //AABB aabbCoin = new AABB(linkedLocations.get(i));
+                            AABB aabbCoin = new AABB(posPoints);
+                            if(aabbCoin != new AABB(BlockPos.ZERO))
+                            {
+                                //You have to client register this too!!!
+                                @SuppressWarnings("deprecation")
+                                TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/pedestal_render_" + (linkedLocations.indexOf(posPoints)+1) + ""));
+                                renderBoundingBox(pos, aabbCoin, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 0.0f,0.0f, 1f, 1f);
+                                renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 0.0f, 0.0f, 1f, 0.5f);
+                                resetList.add(posPoints);
+                            }
+                        }
+                    }
+                    p_112309_.popPose();
+                }
+                /*
                 int locSize = p_112307_.getNumberOfStoredLocations();
                 if(locSize>0)
                 {
@@ -135,12 +174,14 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                         }
                     }
                 }
+                 */
 
 
                 if(coin.getItem() instanceof ISelectableArea)
                 {
                     if(coin.getItem() instanceof ItemUpgradeBase upgradeCoin)
                     {
+                        p_112309_.pushPose();
                         AABB aabbCoin = upgradeCoin.getAABBonUpgrade(coin);
                         if(aabbCoin != new AABB(BlockPos.ZERO))
                         {
@@ -152,6 +193,32 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                             renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
 
                         }
+                        p_112309_.popPose();
+                    }
+                }
+
+                if(coin.getItem() instanceof ISelectablePoints)
+                {
+                    if(coin.getItem() instanceof ItemUpgradeBase upgradeCoin)
+                    {
+                        p_112309_.pushPose();
+                        List<BlockPos> locations = upgradeCoin.readBlockPosListFromNBT(coin);
+                        if(locations.size()>0)
+                        {
+                            for (BlockPos posPoints : locations) {
+                                AABB aabbCoin = new AABB(posPoints);
+                                if(aabbCoin != new AABB(BlockPos.ZERO))
+                                {
+                                    Boolean inSelectedInRange = upgradeCoin.selectedPointWithinRange(p_112307_,posPoints);
+                                    //You have to client register this too!!!
+                                    @SuppressWarnings("deprecation")
+                                    TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
+                                    renderBoundingBox(pos, aabbCoin, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 1f);
+                                    renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
+                                }
+                            }
+                        }
+                        p_112309_.popPose();
                     }
                 }
             }
@@ -413,10 +480,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
 
     public void renderFaces(TextureAtlasSprite sprite, BlockPos pos, AABB aabb, PoseStack matrixStack, VertexConsumer buffer, BasePedestalBlockEntity blockEntity, float red, float green, float blue, float alpha)
     {
-
         Matrix4f matrix4f = matrixStack.last().pose();
-
-        //new ResourceLocation(MODID, "textures/util/whiteimage.png") --- Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply()
 
         float minX = (float)(aabb.minX - pos.getX());
         float minY = (float)(aabb.minY - pos.getY());

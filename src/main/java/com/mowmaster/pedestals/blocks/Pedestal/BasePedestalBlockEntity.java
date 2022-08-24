@@ -3380,9 +3380,11 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         int[] storedIY = p_155245_.getIntArray("intArrayYPos");
         int[] storedIZ = p_155245_.getIntArray("intArrayZPos");
 
+        /*
         int[] storedIXS = p_155245_.getIntArray("intArrayXSPos");
         int[] storedIYS = p_155245_.getIntArray("intArrayYSPos");
         int[] storedIZS = p_155245_.getIntArray("intArrayZSPos");
+        */
 
         for(int i=0;i<storedIX.length;i++)
         {
@@ -3422,10 +3424,11 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         List<Integer> storedY = new ArrayList<Integer>();
         List<Integer> storedZ = new ArrayList<Integer>();
 
+        /*
         List<Integer> storedXS = new ArrayList<Integer>();
         List<Integer> storedYS = new ArrayList<Integer>();
         List<Integer> storedZS = new ArrayList<Integer>();
-
+        */
         for(int i=0;i<getNumberOfStoredLocations();i++)
         {
             storedX.add(storedLocations.get(i).getX());
@@ -3439,9 +3442,11 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         p_58888_.putIntArray("intArrayYPos",storedY);
         p_58888_.putIntArray("intArrayZPos",storedZ);
 
+        /*
         p_58888_.putIntArray("intArrayXSPos",storedXS);
         p_58888_.putIntArray("intArrayYSPos",storedYS);
         p_58888_.putIntArray("intArrayZSPos",storedZS);
+        */
 
         return DustMagic.setDustMagicInTag(p_58888_,this.storedDust);
     }

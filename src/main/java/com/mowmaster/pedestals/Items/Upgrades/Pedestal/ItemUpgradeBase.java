@@ -354,6 +354,72 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         upgrade.setTag(compound);
     }
 
+    //returns true for an add, false for a remove.
+    public static boolean addBlockPosToList(ItemStack upgrade, BlockPos posOfBlock)
+    {
+        List<BlockPos> currentList = readBlockPosListFromNBT(upgrade);
+        if(currentList.contains(posOfBlock))
+        {
+            currentList.remove(posOfBlock);
+            saveBlockPosListToNBT(upgrade,currentList);
+            return false;
+        }
+        else
+        {
+            currentList.add(posOfBlock);
+            saveBlockPosListToNBT(upgrade,currentList);
+            return true;
+        }
+    }
+
+    public static void saveBlockPosListToNBT(ItemStack upgrade, List<BlockPos> posListToSave)
+    {
+        CompoundTag compound = new CompoundTag();
+        if(upgrade.hasTag())
+        {
+            compound = upgrade.getTag();
+        }
+        List<Integer> storedX = new ArrayList<Integer>();
+        List<Integer> storedY = new ArrayList<Integer>();
+        List<Integer> storedZ = new ArrayList<Integer>();
+
+        for(int i=0;i<posListToSave.size();i++)
+        {
+            storedX.add(posListToSave.get(i).getX());
+            storedY.add(posListToSave.get(i).getY());
+            storedZ.add(posListToSave.get(i).getZ());
+        }
+
+        compound.putIntArray(MODID+"_intArrayXPos",storedX);
+        compound.putIntArray(MODID+"_intArrayYPos",storedY);
+        compound.putIntArray(MODID+"_intArrayZPos",storedZ);
+        upgrade.setTag(compound);
+    }
+
+    public static List<BlockPos> readBlockPosListFromNBT(ItemStack upgrade) {
+        List<BlockPos> posList = new ArrayList<>();
+        if(upgrade.hasTag())
+        {
+            String tagX = MODID+"_intArrayXPos";
+            String tagY = MODID+"_intArrayYPos";
+            String tagZ = MODID+"_intArrayZPos";
+            CompoundTag getCompound = upgrade.getTag();
+            if(upgrade.getTag().contains(tagX) && upgrade.getTag().contains(tagY) && upgrade.getTag().contains(tagZ))
+            {
+                int[] storedIX = getCompound.getIntArray(tagX);
+                int[] storedIY = getCompound.getIntArray(tagY);
+                int[] storedIZ = getCompound.getIntArray(tagZ);
+
+                for(int i=0;i<storedIX.length;i++)
+                {
+                    BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
+                    posList.add(gotPos);
+                }
+            }
+        }
+        return posList;
+    }
+
     public static void saveBlockPosToNBT(ItemStack upgrade, int num, BlockPos posToSave)
     {
         CompoundTag compound = new CompoundTag();
@@ -427,6 +493,16 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean selectedAreaWithinRange(BasePedestalBlockEntity pedestal)
     {
         if(pedestal.isPedestalInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1)) && pedestal.isPedestalInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2)))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean selectedPointWithinRange(BasePedestalBlockEntity pedestal, BlockPos posPoint)
+    {
+        if(pedestal.isPedestalInRange(pedestal, posPoint))
         {
             return true;
         }
@@ -585,6 +661,20 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 {
                     saveBlockPosToNBT(itemInHand,1,BlockPos.ZERO);
                     saveBlockPosToNBT(itemInHand,2,BlockPos.ZERO);
+                    MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
+                }
+            }
+            else if(hand.equals(InteractionHand.MAIN_HAND) && itemInHand.getItem() instanceof ISelectablePoints)
+            {
+                if(result.getType().equals(HitResult.Type.BLOCK))
+                {
+                    boolean added = addBlockPosToList(itemInHand,atLocation);
+                    player.setItemInHand(hand,itemInHand);
+                    MowLibMessageUtils.messagePopup(player,(added)?(ChatFormatting.WHITE):(ChatFormatting.BLACK),(added)?(MODID + ".upgrade_blockpos_added"):(MODID + ".upgrade_blockpos_removed"));
+                }
+                else if(result.getType().equals(HitResult.Type.MISS) && readBlockPosListFromNBT(itemInHand).size()>0 && player.isShiftKeyDown())
+                {
+                    saveBlockPosListToNBT(itemInHand, new ArrayList<>());
                     MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
                 }
             }
@@ -1061,6 +1151,33 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                     posTwo.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
                     posTwo.append(posTwoPos);
                     p_41423_.add(posTwo);
+                }
+            }
+        }
+
+        if(p_41421_.getItem() instanceof ISelectablePoints)
+        {
+            List<BlockPos> getList = readBlockPosListFromNBT(p_41421_);
+            if(getList.size()>0)
+            {
+                if (!Screen.hasAltDown()) {
+                    MutableComponent base = Component.translatable(MODID + ".upgrade_description_alt");
+                    base.withStyle(ChatFormatting.WHITE);
+                    p_41423_.add(base);
+                } else {
+                    MutableComponent posTitle = Component.translatable(MODID + ".upgrade_tooltip_blockpos_title");
+                    posTitle.withStyle(ChatFormatting.GOLD);
+                    p_41423_.add(posTitle);
+
+                    //Separator
+                    MutableComponent separator = Component.translatable(MODID + ".tooltip_separator");
+                    p_41423_.add(separator);
+
+                    for (BlockPos pos : getList) {
+                        MutableComponent posOnePos = Component.literal(pos.getX() + "x " + pos.getY() + "y " + pos.getZ()+ "z");
+                        posOnePos.withStyle(ChatFormatting.GRAY);
+                        p_41423_.add(posOnePos);
+                    }
                 }
             }
         }

@@ -40,6 +40,8 @@
   "pedestals.upgrade_blockpos_first": "Point 1 Selected",
   "pedestals.upgrade_blockpos_second": "Point 2 Selected",
   "pedestals.upgrade_blockpos_point_out_of_range": "Invalid Selection Size",
+  "pedestals.upgrade_blockpos_added": "Block Position Added",
+  "pedestals.upgrade_blockpos_removed": "Block Position Removed",
 
 
   "pedestals.upgrade_description_shift": "§7Press 'Shift' to Show Enabled Transfer Types",
