@@ -53,6 +53,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             ItemStack stack = p_112307_.getItemInPedestalFirst();
             ItemStack coin = p_112307_.getCoinOnPedestal();
             List<BlockPos> linkedLocations = p_112307_.getLocationList();
+            BlockPos pos = p_112307_.getPos();
             Level world = p_112307_.getLevel();
             // 0 - No Particles
             // 1 - No Render Item
@@ -118,17 +119,16 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             if(p_112307_.getRenderRange())
             {
                 int range = p_112307_.getLinkingRange();
-                BlockPos pos = p_112307_.getPos();
                 //You have to client register this too!!!
                 @SuppressWarnings("deprecation")
                 TextureAtlasSprite whiteTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/pedestal_render"));
                 AABB aabb = new AABB(pos.getX() - range, pos.getY() - range, pos.getZ() - range,pos.getX() + range, pos.getY() + range, pos.getZ() + range);
+                p_112309_.pushPose();
                 renderBoundingBox(pos, aabb, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.2f, 0.2f, 1f);
                 renderFaces(whiteTextureSprite,pos,aabb,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.2f, 0.2f, 0.5f);
-
+                p_112309_.popPose();
                 //Orange Color = 1f, 0.42f, 0f,
                 //Light Blue Color = 0f, 0.58f, 1f,
-
 
                 if(linkedLocations.size()>0)
                 {
@@ -181,19 +181,22 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 {
                     if(coin.getItem() instanceof ItemUpgradeBase upgradeCoin)
                     {
-                        p_112309_.pushPose();
-                        AABB aabbCoin = upgradeCoin.getAABBonUpgrade(coin);
-                        if(aabbCoin != new AABB(BlockPos.ZERO))
+                        if(upgradeCoin.hasTwoPointsSelected(coin))
                         {
-                            Boolean inSelectedInRange = upgradeCoin.selectedAreaWithinRange(p_112307_);
-                            //You have to client register this too!!!
-                            @SuppressWarnings("deprecation")
-                            TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
-                            renderBoundingBox(pos, aabbCoin, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 1f);
-                            renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
+                            p_112309_.pushPose();
+                            AABB aabbCoin = upgradeCoin.getAABBonUpgrade(coin);
+                            if(aabbCoin != new AABB(BlockPos.ZERO))
+                            {
+                                Boolean inSelectedInRange = upgradeCoin.selectedAreaWithinRange(p_112307_);
+                                //You have to client register this too!!!
+                                @SuppressWarnings("deprecation")
+                                TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
+                                renderBoundingBox(pos, aabbCoin, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 1f);
+                                renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
 
+                            }
+                            p_112309_.popPose();
                         }
-                        p_112309_.popPose();
                     }
                 }
 
@@ -201,27 +204,32 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 {
                     if(coin.getItem() instanceof ItemUpgradeBase upgradeCoin)
                     {
-                        p_112309_.pushPose();
-                        List<BlockPos> locations = upgradeCoin.readBlockPosListFromNBT(coin);
-                        if(locations.size()>0)
+                        if(!upgradeCoin.hasTwoPointsSelected(coin))
                         {
-                            for (BlockPos posPoints : locations) {
-                                AABB aabbCoin = new AABB(posPoints);
-                                if(aabbCoin != new AABB(BlockPos.ZERO))
-                                {
-                                    Boolean inSelectedInRange = upgradeCoin.selectedPointWithinRange(p_112307_,posPoints);
-                                    //You have to client register this too!!!
-                                    @SuppressWarnings("deprecation")
-                                    TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
-                                    renderBoundingBox(pos, aabbCoin, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 1f);
-                                    renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
+                            p_112309_.pushPose();
+                            List<BlockPos> locations = upgradeCoin.readBlockPosListFromNBT(coin);
+                            if(locations.size()>0)
+                            {
+                                for (BlockPos posPoints : locations) {
+                                    AABB aabbCoin = new AABB(posPoints);
+                                    if(aabbCoin != new AABB(BlockPos.ZERO))
+                                    {
+                                        Boolean inSelectedInRange = upgradeCoin.selectedPointWithinRange(p_112307_,posPoints);
+                                        //You have to client register this too!!!
+                                        @SuppressWarnings("deprecation")
+                                        TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
+                                        renderBoundingBox(pos, aabbCoin, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 1f);
+                                        renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
+                                    }
                                 }
                             }
+                            p_112309_.popPose();
                         }
-                        p_112309_.popPose();
                     }
                 }
             }
+
+
         }
     }
     //public static void  renderTile(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, ItemStack coin, ItemStack item, int p_112311_, int p_112312_, int renderAugmentType)

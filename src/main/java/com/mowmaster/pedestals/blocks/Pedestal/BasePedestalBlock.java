@@ -918,6 +918,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 //Method for upgrades to do things before removal
                 pedestal.actionOnRemovedFromPedestal(0);
                 pedestal.dropInventoryItemsPrivate(p_60516_,p_60517_);
+                //Fixed to drop an item and not spill out
                 pedestal.dropLiquidsInWorld(p_60516_,p_60517_);
                 pedestal.removeEnergyFromBrokenPedestal(p_60516_,p_60517_);
                 pedestal.dropXPInWorld(p_60516_,p_60517_);

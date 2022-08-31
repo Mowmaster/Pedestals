@@ -7,12 +7,16 @@ import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.mowlib.Capabilities.Experience.CapabilityExperience;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
+import com.mowmaster.mowlib.Items.BaseEnergyDropItem;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.*;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseEnergyBulkStorageItem;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageItem;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -794,17 +798,43 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public void dropLiquidsInWorld(Level worldIn, BlockPos pos) {
         IFluidHandler fluids = fluidHandler.orElse(null);
-        MowLibFluidUtils.dropLiquidsInWorld(worldIn,pos,fluids);
+        FluidStack inTank = fluids.getFluidInTank(0);
+        if(inTank.getAmount()>0)
+        {
+            ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
+            if(toDrop.getItem() instanceof BaseFluidBulkStorageItem droppedItemFluid)
+            {
+                droppedItemFluid.setFluidStack(toDrop,inTank);
+            }
+            MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
+        }
     }
 
     public void removeEnergyFromBrokenPedestal(Level worldIn, BlockPos pos) {
         IEnergyStorage energy = energyHandler.orElse(null);
-        MowLibEnergyUtils.removeEnergy(worldIn,pos,energy);
+        if(energy.getEnergyStored()>0)
+        {
+            ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());
+            if(toDrop.getItem() instanceof BaseEnergyBulkStorageItem droppedItemEnergy)
+            {
+                droppedItemEnergy.setEnergy(toDrop,energy.getEnergyStored());
+            }
+            MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
+        }
     }
 
     public void dropXPInWorld(Level worldIn, BlockPos pos) {
         IExperienceStorage experience = experienceHandler.orElse(null);
-        MowLibXpUtils.dropXPInWorld(worldIn,pos,experience);
+        if(experience.getExperienceStored()>0)
+        {
+            ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_XP.get());
+            if(toDrop.getItem() instanceof BaseXpBulkStorageItem droppedItemEnergy)
+            {
+                droppedItemEnergy.setXp(toDrop,experience.getExperienceStored());
+                System.out.println("stored xp: "+ droppedItemEnergy.getXp(toDrop));
+            }
+            MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
+        }
     }
 
     public void dropDustInWorld(Level worldIn, BlockPos pos) {
