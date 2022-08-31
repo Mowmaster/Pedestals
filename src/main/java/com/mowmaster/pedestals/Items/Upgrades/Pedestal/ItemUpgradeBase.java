@@ -620,7 +620,22 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
         if(itemInHand.getItem() instanceof ItemUpgradeBase)
         {
-            if(hand.equals(InteractionHand.MAIN_HAND) && itemInHand.getItem() instanceof ISelectableArea)
+            if(hand.equals(InteractionHand.MAIN_HAND) && !player.isShiftKeyDown() && itemInHand.getItem() instanceof ISelectablePoints)
+            {
+                if(result.getType().equals(HitResult.Type.BLOCK))
+                {
+                    boolean added = addBlockPosToList(itemInHand,atLocation);
+                    player.setItemInHand(hand,itemInHand);
+                    MowLibMessageUtils.messagePopup(player,(added)?(ChatFormatting.WHITE):(ChatFormatting.BLACK),(added)?(MODID + ".upgrade_blockpos_added"):(MODID + ".upgrade_blockpos_removed"));
+                }
+                else if(result.getType().equals(HitResult.Type.MISS) && readBlockPosListFromNBT(itemInHand).size()>0)
+                {
+                    saveBlockPosListToNBT(itemInHand, new ArrayList<>());
+                    MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
+                }
+            }
+
+            if(hand.equals(InteractionHand.MAIN_HAND) && player.isShiftKeyDown() && itemInHand.getItem() instanceof ISelectableArea)
             {
                 if(result.getType().equals(HitResult.Type.BLOCK))
                 {
@@ -664,21 +679,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                     MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
                 }
             }
-            else if(hand.equals(InteractionHand.MAIN_HAND) && itemInHand.getItem() instanceof ISelectablePoints)
-            {
-                if(result.getType().equals(HitResult.Type.BLOCK))
-                {
-                    boolean added = addBlockPosToList(itemInHand,atLocation);
-                    player.setItemInHand(hand,itemInHand);
-                    MowLibMessageUtils.messagePopup(player,(added)?(ChatFormatting.WHITE):(ChatFormatting.BLACK),(added)?(MODID + ".upgrade_blockpos_added"):(MODID + ".upgrade_blockpos_removed"));
-                }
-                else if(result.getType().equals(HitResult.Type.MISS) && readBlockPosListFromNBT(itemInHand).size()>0 && player.isShiftKeyDown())
-                {
-                    saveBlockPosListToNBT(itemInHand, new ArrayList<>());
-                    MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
-                }
-            }
-            else if(hand.equals(InteractionHand.OFF_HAND) && itemInHand.getItem() instanceof IHasModeTypes)
+
+            if(hand.equals(InteractionHand.OFF_HAND) && itemInHand.getItem() instanceof IHasModeTypes)
             {
                 if(result.getType().equals(HitResult.Type.MISS))
                 {
@@ -1155,7 +1157,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
         }
 
-        if(p_41421_.getItem() instanceof ISelectablePoints)
+        if(p_41421_.getItem() instanceof ISelectablePoints && !hasTwoPointsSelected(p_41421_))
         {
             List<BlockPos> getList = readBlockPosListFromNBT(p_41421_);
             if(getList.size()>0)

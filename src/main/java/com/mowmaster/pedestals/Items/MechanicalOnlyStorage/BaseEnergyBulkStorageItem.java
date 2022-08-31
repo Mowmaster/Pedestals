@@ -2,7 +2,10 @@ package com.mowmaster.pedestals.Items.MechanicalOnlyStorage;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Items.BaseDustDropItem;
+import com.mowmaster.mowlib.Items.BaseEnergyDropItem;
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibTooltipUtils;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import net.minecraft.ChatFormatting;
@@ -12,29 +15,27 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class BaseDustBulkStorageItem extends BaseDustDropItem {
+public class BaseEnergyBulkStorageItem extends BaseEnergyDropItem {
 
-    public BaseDustBulkStorageItem(Properties p_41383_) {
+    public BaseEnergyBulkStorageItem(Properties p_41383_) {
         super(p_41383_);
     }
 
@@ -86,18 +87,57 @@ public class BaseDustBulkStorageItem extends BaseDustDropItem {
 
     public static int getItemColor()
     {
-        return 13659647;
+        return 16723484;
     }
 
     public int getMaxAllowedStorage()
     {
-        return PedestalConfig.COMMON.pedestal_baseDustStorage.get() + (PedestalConfig.COMMON.augment_t4StorageDust.get() * PedestalConfig.COMMON.augment_t4StorageInsertSize.get());
+        return PedestalConfig.COMMON.pedestal_baseEnergyStorage.get() + (PedestalConfig.COMMON.augment_t4StorageEnergy.get() * PedestalConfig.COMMON.augment_t4StorageInsertSize.get());
+    }
+
+    public void setEnergy(ItemStack stack, int amount)
+    {
+        CompoundTag tag = new CompoundTag();
+        if(stack.hasTag()) tag = stack.getTag();
+        CompoundTag returnerTag = MowLibCompoundTagUtils.writeIntegerToNBT(MODID, tag, amount,"_bulkenergystorage");
+        stack.setTag(returnerTag);
+    }
+
+    public int getEnergy(ItemStack stack)
+    {
+        int currentStored = 0;
+        CompoundTag tag = new CompoundTag();
+        if(stack.hasTag()) tag = stack.getTag();
+        if(tag.contains(MODID+"_bulkenergystorage"))currentStored = readIntegerFromNBT(MODID, tag,"_bulkenergystorage");
+
+        return currentStored;
+    }
+
+    public void addEnergy(ItemStack stack, int added)
+    {
+        int currentStored = 0;
+        CompoundTag tag = new CompoundTag();
+        if(stack.hasTag()) tag = stack.getTag();
+        if(tag.contains(MODID+"_bulkenergystorage"))currentStored = readIntegerFromNBT(MODID, tag,"_bulkenergystorage");
+        int difference = currentStored + added;
+        CompoundTag returnerTag = MowLibCompoundTagUtils.writeIntegerToNBT(MODID, tag, (difference>getMaxAllowedStorage())?(getMaxAllowedStorage()):(difference),"_bulkenergystorage");
+        stack.setTag(returnerTag);
+    }
+
+    public void removeEnergy(ItemStack stack, int removed)
+    {
+        int currentStored = 0;
+        CompoundTag tag = new CompoundTag();
+        if(stack.hasTag()) tag = stack.getTag();
+        if(tag.contains(MODID+"_bulkenergystorage"))currentStored = readIntegerFromNBT(MODID, tag,"_bulkenergystorage");
+        int difference = currentStored - removed;
+        CompoundTag returnerTag = MowLibCompoundTagUtils.writeIntegerToNBT(MODID, tag, (difference>0)?(difference):(0),"_bulkenergystorage");
+        stack.setTag(returnerTag);
     }
 
     public int getItemVariant(ItemStack stack) {
-        DustMagic dust = DustMagic.getDustMagicInItemStack(stack);
-        if (!dust.isEmpty()) {
-            double renderDevider = 100.0D * (double)(dust.getDustAmount() / this.getMaxAllowedStorage());
+        if (getEnergy(stack) > 0) {
+            double renderDevider = 100.0D * (double)(this.getEnergy(stack) / this.getMaxAllowedStorage());
             if (renderDevider <= 25.0D) {
                 return 0;
             }
@@ -131,10 +171,10 @@ public class BaseDustBulkStorageItem extends BaseDustDropItem {
                 if(player.isCreative()) survival = false;
             }
 
-            if(survival && PedestalConfig.COMMON.bulkstorage_dustDischarge_toggle.get())
+            if(survival && PedestalConfig.COMMON.bulkstorage_energyDischarge_toggle.get())
             {
-                DustMagic dust = DustMagic.getDustMagicInItemStack(p_41404_);
-                if(!dust.isEmpty())
+                int stored = getEnergy(p_41404_);
+                if(stored>5000)
                 {
                     counter++;
                     if(counter>=20)
@@ -144,67 +184,43 @@ public class BaseDustBulkStorageItem extends BaseDustDropItem {
                     }
                 }
 
-                if(getDischargeCounter(p_41404_) >= PedestalConfig.COMMON.bulkstorage_dustDischarge.get())
+                if(getDischargeCounter(p_41404_) >= PedestalConfig.COMMON.bulkstorage_energyDischarge.get())
                 {
-                    if(p_41406_ instanceof LivingEntity livingEntity)
-                    {
-                        removeDust(livingEntity,p_41404_);
-                    }
+                    removeEnergy(p_41405_,p_41406_.getOnPos());
                     p_41404_.shrink(1);
                 }
             }
         }
     }
 
-    //Maybe replace this with the actual reciped effects???(Would have to make part of mowlib natively though)
-    public MobEffect getEffect()
-    {
+    public void removeEnergy(Level worldIn, BlockPos pos) {
         Random rand = new Random();
-        Map<Integer, MobEffect> NEGEFFECT = Map.ofEntries(
-                Map.entry(0, MobEffects.BAD_OMEN),
-                Map.entry(1,MobEffects.BLINDNESS),
-                Map.entry(2,MobEffects.GLOWING),
-                Map.entry(3,MobEffects.HUNGER),
-                Map.entry(4,MobEffects.HARM),
-                Map.entry(5,MobEffects.LEVITATION),
-                Map.entry(6,MobEffects.DIG_SLOWDOWN),
-                Map.entry(7,MobEffects.CONFUSION),
-                Map.entry(8,MobEffects.POISON),
-                Map.entry(9,MobEffects.MOVEMENT_SLOWDOWN),
-                Map.entry(10,MobEffects.UNLUCK),
-                Map.entry(11,MobEffects.WEAKNESS),
-                Map.entry(12,MobEffects.WITHER),
-                Map.entry(13,MobEffects.INVISIBILITY),
-                Map.entry(14,MobEffects.DARKNESS),
-                Map.entry(15,MobEffects.SLOW_FALLING)
-        );
-
-        return NEGEFFECT.getOrDefault(rand.nextInt(16),MobEffects.DARKNESS);
-    }
-
-    public void removeDust(LivingEntity entity, ItemStack stack) {
-        DustMagic dust = DustMagic.getDustMagicInItemStack(stack);
-        if(!dust.isEmpty())
-        {
-            entity.addEffect(new MobEffectInstance(getEffect(),dust.getDustAmount(),getItemVariant(stack)));
+        int count = getItemVariant()+1;
+        while(count > 0) {
+            LightningBolt lightningbolt = (LightningBolt)EntityType.LIGHTNING_BOLT.create(worldIn);
+            lightningbolt.moveTo(Vec3.atBottomCenterOf(pos.offset(rand.nextInt(10), -1, rand.nextInt(10))));
+            lightningbolt.setCause((ServerPlayer)null);
+            worldIn.addFreshEntity(lightningbolt);
+            worldIn.playSound((Player)null, pos, SoundEvents.TRIDENT_THUNDER, SoundSource.WEATHER, 5.0F, 1.0F);
+            count--;
         }
     }
 
     @Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
-        DustMagic stored = DustMagic.getDustMagicInItemStack(p_41421_);
-        if(!stored.isEmpty())
+        int stored = getEnergy(p_41421_);
+        if(stored>0)
         {
-            MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,Component.translatable(MODID + ".bulkstorage_dust"), ChatFormatting.GOLD);
-            MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,Component.literal(MowLibColorReference.getColorName(stored.getDustColor()) + ": " + stored.getDustAmount()), ChatFormatting.WHITE);
+            MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,Component.translatable(MODID + ".bulkstorage_energy"), ChatFormatting.GOLD);
+            MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,Component.literal("" + stored + ""), ChatFormatting.WHITE);
         }
 
         int charge = getDischargeCounter(p_41421_);
         if(charge>0)
         {
-            MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,Component.translatable(MODID + ".bulkstorage_dust_discharge"), ChatFormatting.RED);
-            MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,Component.literal("" + charge + "/" + PedestalConfig.COMMON.bulkstorage_dustDischarge.get() +""), ChatFormatting.WHITE);
+            MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,Component.translatable(MODID + ".bulkstorage_energy_discharge"), ChatFormatting.RED);
+            MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,Component.literal("" + charge + "/" + PedestalConfig.COMMON.bulkstorage_energyDischarge.get() +""), ChatFormatting.WHITE);
         }
     }
 }

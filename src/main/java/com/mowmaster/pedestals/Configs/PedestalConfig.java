@@ -120,6 +120,15 @@ public class PedestalConfig
 
         public final ForgeConfigSpec.BooleanValue upgrade_require_sized_selectable_area;
 
+        public final ForgeConfigSpec.IntValue bulkstorage_fluidDischarge;
+        public final ForgeConfigSpec.BooleanValue bulkstorage_fluidDischarge_toggle;
+        public final ForgeConfigSpec.IntValue bulkstorage_energyDischarge;
+        public final ForgeConfigSpec.BooleanValue bulkstorage_energyDischarge_toggle;
+        public final ForgeConfigSpec.IntValue bulkstorage_xpDischarge;
+        public final ForgeConfigSpec.BooleanValue bulkstorage_xpDischarge_toggle;
+        public final ForgeConfigSpec.IntValue bulkstorage_dustDischarge;
+        public final ForgeConfigSpec.BooleanValue bulkstorage_dustDischarge_toggle;
+
         Common(ForgeConfigSpec.Builder builder) {
 
             builder.comment("Tiered Augments").push("Augment_Tiers");
@@ -273,6 +282,43 @@ public class PedestalConfig
             upgrade_magnet_selectedMultiplier = builder
                     .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula)")
                     .defineInRange("upgrade_magnet_selected_modifier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+
+            builder.pop();
+
+
+            builder.comment("Bulk Storage Options").push("Bulk_Storage");
+
+            bulkstorage_fluidDischarge = builder
+                    .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (Fluid)")
+                    .defineInRange("bulkstorage_fluid_discharge_time", 5, 1, Integer.MAX_VALUE);
+
+            bulkstorage_fluidDischarge_toggle = builder
+                    .comment("Weather bulk storage discharge is allowed to trigger or not (Fluid)")
+                    .define("bulkstorage_fluid_discharge_toggle",  true);
+
+            bulkstorage_energyDischarge = builder
+                    .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (Energy)")
+                    .defineInRange("bulkstorage_energy_discharge_time", 5, 1, Integer.MAX_VALUE);
+
+            bulkstorage_energyDischarge_toggle = builder
+                    .comment("Weather bulk storage discharge is allowed to trigger or not (Energy)")
+                    .define("bulkstorage_energy_discharge_toggle",  true);
+
+            bulkstorage_xpDischarge = builder
+                    .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (XP)")
+                    .defineInRange("bulkstorage_xp_discharge_time", 5, 1, Integer.MAX_VALUE);
+
+            bulkstorage_xpDischarge_toggle = builder
+                    .comment("Weather bulk storage discharge is allowed to trigger or not (XP)")
+                    .define("bulkstorage_xp_discharge_toggle",  true);
+
+            bulkstorage_dustDischarge = builder
+                    .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (Dust)")
+                    .defineInRange("bulkstorage_dust_discharge_time", 5, 1, Integer.MAX_VALUE);
+
+            bulkstorage_dustDischarge_toggle = builder
+                    .comment("Weather bulk storage discharge is allowed to trigger or not (Dust)")
+                    .define("bulkstorage_dust_discharge_toggle",  true);
 
             builder.pop();
         }

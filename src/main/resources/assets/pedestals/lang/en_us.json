@@ -9,7 +9,6 @@
   "pedestals.cobble_gen.xp": "Exp Needed: ",
   "pedestals.cobble_gen.dust": "Dust Needed: ",
 
-
   "pedestals.transport_mode_changed_true": "Mode Enabled",
   "pedestals.transport_mode_changed_false": "Mode Disabled",
 
@@ -239,7 +238,22 @@
   "pedestals.augments_storage_energyrate": "Increases Energy Buffer In Pedestal: ",
   "pedestals.augments_storage_xprate": "Increases Xp Level Buffer In Pedestal: ",
 
+  "item.pedestals.mechanical_storage_fluid": "Packaged Fluid",
+  "pedestals.bulkstorage_fluid": "Fluid Stored",
+  "pedestals.bulkstorage_fluid_discharge": "Time Until Discharge",
+  "jei.pedestals.mechanical_storage_fluid.description": "Stores a lot of Fluid, Will Discharge the Fluid after a short duration if held by a living entity/player.",
+  "item.pedestals.mechanical_storage_energy": "Packaged Energy",
+  "pedestals.bulkstorage_energy": "Energy Stored",
+  "pedestals.bulkstorage_energy_discharge": "Time Until Discharge",
+  "jei.pedestals.mechanical_storage_energy.description": "Stores a lot of Energy, Will Discharge the Energy after a short duration if held by a living entity/player.",
+  "item.pedestals.mechanical_storage_xp": "Packaged Xp",
+  "pedestals.bulkstorage_xp": "Xp Stored",
+  "pedestals.bulkstorage_xp_discharge": "Time Until Discharge",
+  "jei.pedestals.mechanical_storage_xp.description": "Stores a lot of XP, Will Discharge the XP after a short duration if held by a living entity/player.",
   "item.pedestals.mechanical_storage_dust": "Packaged Dust",
+  "pedestals.bulkstorage_dust": "Dust Stored",
+  "pedestals.bulkstorage_dust_discharge": "Time Until Discharge",
+  "jei.pedestals.mechanical_storage_dust.description": "Stores a lot of Dust, Will Discharge the Dust after a short duration if held by a living entity/player.",
 
   "item.pedestals.upgrade_pedestal_base": "Upgrade Base",
   "item.pedestals.upgrade_pedestal_base.base_description": "THIS UPGRADE BASE IS JUST A CRAFTING COMPONENT!!!",
@@ -252,6 +266,11 @@
 
   "item.pedestals.upgrade_pedestal_magnet": "Magnet Upgrade",
   "jei.pedestals.upgrade_pedestal_magnet.description": "§5'Magnets' up items in the selected work area.",
+  "jei.pedestals.upgrade_pedestal_magnet.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points.",
+  "item.pedestals.upgrade_pedestal_packager": "Packager",
+  "jei.pedestals.upgrade_pedestal_packager.description": "§5Waits till the Pedestal is Full of Fluid/Energy/XP/Dust and then Packages it up into an Item.",
+  "item.pedestals.upgrade_pedestal_unpackager": "Un-Packager",
+  "jei.pedestals.upgrade_pedestal_unpackager.description": "§5Takes Packages and Un-Packages them into the pedestals buffer.",
 
   "item.pedestals.upgrade_pedestal_cobblegen": "Material Generator",
   "jei.pedestals.upgrade_pedestal_cobblegen.description": "§5Based on the 'Below' Block and Inserted Tool, will generate items putting the outputs in the pedestal.",

@@ -3,9 +3,13 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.*;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseDustBulkStorageItem;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseEnergyBulkStorageItem;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageItem;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
 //import com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines.ItemUpgradeCobbleGenerator;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.InProgressPorting.ItemUpgradeBlockBreaker;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines.ItemUpgradeCobbleGenerator;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import net.minecraft.world.item.Item;
@@ -82,6 +86,12 @@ public class DeferredRegisterItems
             () -> new ItemUpgradeBlockBreaker(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_PACKAGER = ITEMS.register("upgrade_pedestal_packager",
+            () -> new ItemUpgradePackager(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_UNPACKAGER = ITEMS.register("upgrade_pedestal_unpackager",
+            () -> new ItemUpgradeUnPackager(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
+
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_COBBLEGEN = ITEMS.register("upgrade_pedestal_cobblegen",
             () -> new ItemUpgradeCobbleGenerator(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
@@ -132,11 +142,14 @@ public class DeferredRegisterItems
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_RANGE = ITEMS.register("augment_pedestal_t4_range",
             () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
-
-
+    public static final RegistryObject<Item> MECHANICAL_STORAGE_FLUID = ITEMS.register("mechanical_storage_fluid",
+            () -> new BaseFluidBulkStorageItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS).stacksTo(1)));
+    public static final RegistryObject<Item> MECHANICAL_STORAGE_ENERGY = ITEMS.register("mechanical_storage_energy",
+            () -> new BaseEnergyBulkStorageItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS).stacksTo(1)));
+    public static final RegistryObject<Item> MECHANICAL_STORAGE_XP = ITEMS.register("mechanical_storage_xp",
+            () -> new BaseXpBulkStorageItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS).stacksTo(1)));
     public static final RegistryObject<Item> MECHANICAL_STORAGE_DUST = ITEMS.register("mechanical_storage_dust",
-            () -> new BaseDustBulkStorageItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
-
+            () -> new BaseDustBulkStorageItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS).stacksTo(1)));
 
 
     public static void register(IEventBus eventBus) {
