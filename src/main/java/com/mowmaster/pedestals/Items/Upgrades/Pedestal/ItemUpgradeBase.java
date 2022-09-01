@@ -342,7 +342,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
 
-
+    //ToDo: Add to mowlib and remove from here
     public static void saveStringToNBT(ItemStack upgrade, String nbtTag, String string)
     {
         CompoundTag compound = new CompoundTag();
@@ -354,6 +354,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         upgrade.setTag(compound);
     }
 
+    //ToDo: Add to mowlib and remove from here
     //returns true for an add, false for a remove.
     public static boolean addBlockPosToList(ItemStack upgrade, BlockPos posOfBlock)
     {
@@ -372,6 +373,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
     }
 
+    //ToDo: Add to mowlib and remove from here
     public static void saveBlockPosListToNBT(ItemStack upgrade, List<BlockPos> posListToSave)
     {
         CompoundTag compound = new CompoundTag();
@@ -396,6 +398,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         upgrade.setTag(compound);
     }
 
+    //ToDo: Add to mowlib and remove from here
     public static List<BlockPos> readBlockPosListFromNBT(ItemStack upgrade) {
         List<BlockPos> posList = new ArrayList<>();
         if(upgrade.hasTag())
@@ -420,6 +423,67 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return posList;
     }
 
+    public static void saveBlockPosListCustomToNBT(ItemStack upgrade, String tagGenericName, List<BlockPos> posListToSave)
+    {
+        CompoundTag compound = new CompoundTag();
+        if(upgrade.hasTag())
+        {
+            compound = upgrade.getTag();
+        }
+        List<Integer> storedX = new ArrayList<Integer>();
+        List<Integer> storedY = new ArrayList<Integer>();
+        List<Integer> storedZ = new ArrayList<Integer>();
+
+        for(int i=0;i<posListToSave.size();i++)
+        {
+            storedX.add(posListToSave.get(i).getX());
+            storedY.add(posListToSave.get(i).getY());
+            storedZ.add(posListToSave.get(i).getZ());
+        }
+
+        compound.putIntArray(MODID+tagGenericName+"_X",storedX);
+        compound.putIntArray(MODID+tagGenericName+"_Y",storedY);
+        compound.putIntArray(MODID+tagGenericName+"_Z",storedZ);
+        upgrade.setTag(compound);
+    }
+
+    public static List<BlockPos> readBlockPosListCustomFromNBT(ItemStack upgrade, String tagGenericName) {
+        List<BlockPos> posList = new ArrayList<>();
+        if(upgrade.hasTag())
+        {
+            String tagX = MODID+tagGenericName+"_X";
+            String tagY = MODID+tagGenericName+"_Y";
+            String tagZ = MODID+tagGenericName+"_Z";
+            CompoundTag getCompound = upgrade.getTag();
+            if(upgrade.getTag().contains(tagX) && upgrade.getTag().contains(tagY) && upgrade.getTag().contains(tagZ))
+            {
+                int[] storedIX = getCompound.getIntArray(tagX);
+                int[] storedIY = getCompound.getIntArray(tagY);
+                int[] storedIZ = getCompound.getIntArray(tagZ);
+
+                for(int i=0;i<storedIX.length;i++)
+                {
+                    BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
+                    posList.add(gotPos);
+                }
+            }
+        }
+        return posList;
+    }
+
+    public void removeBlockListCustomNBTTags(ItemStack upgrade, String tagGenericName)
+    {
+        String tagX = MODID+tagGenericName+"_X";
+        String tagY = MODID+tagGenericName+"_Y";
+        String tagZ = MODID+tagGenericName+"_Z";
+        CompoundTag getTags = upgrade.getTag();
+        if(getTags.contains(tagX))getTags.remove(tagX);
+        if(getTags.contains(tagY))getTags.remove(tagY);
+        if(getTags.contains(tagZ))getTags.remove(tagZ);
+        upgrade.setTag(getTags);
+    }
+
+    //ToDo: Add to mowlib and remove from here
     public static void saveBlockPosToNBT(ItemStack upgrade, int num, BlockPos posToSave)
     {
         CompoundTag compound = new CompoundTag();
@@ -435,6 +499,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         upgrade.setTag(compound);
     }
 
+    //ToDo: Add to mowlib and remove from here
     public static BlockPos readBlockPosFromNBT(ItemStack upgrade, int num) {
         if(upgrade.hasTag())
         {
@@ -449,11 +514,13 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return BlockPos.ZERO;
     }
 
+    //ToDo: Add to mowlib and remove from here
     public static BlockPos getBlockPosOnUpgrade(ItemStack stack, int num) {
 
         return readBlockPosFromNBT(stack,num);
     }
 
+    //ToDo: Add to mowlib and remove from here
     public boolean hasOneBlockPos(ItemStack stack) {
         return !readBlockPosFromNBT(stack,1).equals(BlockPos.ZERO) || !readBlockPosFromNBT(stack,2).equals(BlockPos.ZERO);
     }
@@ -490,6 +557,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return new AABB(BlockPos.ZERO);
     }
 
+    //ToDo: Add to mowlib and remove from here
     public boolean selectedAreaWithinRange(BasePedestalBlockEntity pedestal)
     {
         if(pedestal.isPedestalInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1)) && pedestal.isPedestalInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2)))
@@ -500,6 +568,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return false;
     }
 
+    //ToDo: Add to mowlib and remove from here
     public boolean selectedPointWithinRange(BasePedestalBlockEntity pedestal, BlockPos posPoint)
     {
         if(pedestal.isPedestalInRange(pedestal, posPoint))

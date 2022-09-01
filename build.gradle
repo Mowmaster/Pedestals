@@ -161,8 +161,8 @@ dependencies {
     // at runtime, use the full JEI jar for Forge
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
 
-    compileOnly fg.deobf("curse.maven:mowlib-631455:3960017")
-    runtimeOnly fg.deobf("curse.maven:mowlib-631455:3960017")
+    compileOnly fg.deobf("curse.maven:mowlib-631455:3961647")
+    runtimeOnly fg.deobf("curse.maven:mowlib-631455:3961647")
 
     //runtimeOnly fg.deobf("curse.maven:effect-scrolls-632865:3901386")
 

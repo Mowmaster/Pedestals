@@ -791,9 +791,29 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         MowLibItemUtils.dropInventoryItems(worldIn,pos,h);
     }
 
+    public List<ItemStack> dropInventoryItemsList() {
+        IItemHandler h = handler.orElse(null);
+        List<ItemStack> returner = new ArrayList<>();
+        for(int i = 0; i < h.getSlots(); ++i) {
+            returner.add(h.getStackInSlot(i));
+        }
+
+        return returner;
+    }
+
     public void dropInventoryItemsPrivate(Level worldIn, BlockPos pos) {
         IItemHandler ph = privateHandler.orElse(null);
         MowLibItemUtils.dropInventoryItems(worldIn,pos,ph);
+    }
+
+    public List<ItemStack> dropInventoryItemsPrivateList() {
+        IItemHandler h = privateHandler.orElse(null);
+        List<ItemStack> returner = new ArrayList<>();
+        for(int i = 0; i < h.getSlots(); ++i) {
+            returner.add(h.getStackInSlot(i));
+        }
+
+        return returner;
     }
 
     public void dropLiquidsInWorld(Level worldIn, BlockPos pos) {
