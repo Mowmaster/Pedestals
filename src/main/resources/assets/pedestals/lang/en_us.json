@@ -272,6 +272,16 @@
   "item.pedestals.upgrade_pedestal_unpackager": "Un-Packager",
   "jei.pedestals.upgrade_pedestal_unpackager.description": "§5Takes Packages and Un-Packages them into the pedestals buffer.",
 
+  "item.pedestals.upgrade_pedestal_breaker": "Breaker Upgrade",
+  "jei.pedestals.upgrade_pedestal_breaker.description": "§5'Breaks Blocks in the selected work area. Uses a Stone Pickaxe by default",
+  "jei.pedestals.upgrade_pedestal_breaker.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points. ALSO Regular Right Click blocks to select single block targets, right click in air to clear the list.",
+  "item.pedestals.upgrade_pedestal_quarry": "Quarry Upgrade",
+  "jei.pedestals.upgrade_pedestal_quarry.description": "§5'Breaks Blocks in the selected work area, from bedrock to world height. Uses a Iron Pickaxe by default.",
+  "jei.pedestals.upgrade_pedestal_quarry.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points.",
+  "item.pedestals.upgrade_pedestal_chopper": "Chopper Upgrade",
+  "jei.pedestals.upgrade_pedestal_chopper.description": "§5'Chops Wood/Mushroom/Leaf Blocks in the selected work area. Uses a Iron Axe by default.",
+  "jei.pedestals.upgrade_pedestal_chopper.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points.",
+
   "item.pedestals.upgrade_pedestal_cobblegen": "Material Generator",
   "jei.pedestals.upgrade_pedestal_cobblegen.description": "§5Based on the 'Below' Block and Inserted Tool, will generate items putting the outputs in the pedestal.",
 

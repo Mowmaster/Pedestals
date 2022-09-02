@@ -9,7 +9,7 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
 //import com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines.ItemUpgradeCobbleGenerator;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.InProgressPorting.ItemUpgradeBlockBreaker;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBlockBreaker;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines.ItemUpgradeCobbleGenerator;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import net.minecraft.world.item.Item;
@@ -84,6 +84,10 @@ public class DeferredRegisterItems
             () -> new ItemUpgradeMagnet(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_BREAKER = ITEMS.register("upgrade_pedestal_breaker",
             () -> new ItemUpgradeBlockBreaker(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_QUARRY = ITEMS.register("upgrade_pedestal_quarry",
+            () -> new ItemUpgradeQuarry(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_CHOPPER = ITEMS.register("upgrade_pedestal_chopper",
+            () -> new ItemUpgradeChopper(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_PACKAGER = ITEMS.register("upgrade_pedestal_packager",

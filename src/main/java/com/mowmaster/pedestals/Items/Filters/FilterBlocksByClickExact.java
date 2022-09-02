@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class FilterBlocksByClickExact extends BaseFilter{
+public class FilterBlocksByClickExact extends BaseFilter {
     public FilterBlocksByClickExact(Properties p_41383_) {
         super(p_41383_, FilterDirection.NEUTRAL);
     }
@@ -85,7 +85,7 @@ public class FilterBlocksByClickExact extends BaseFilter{
             }
         }
 
-        return InteractionResultHolder.fail(itemInOffhand);
+        return InteractionResultHolder.fail(p_41433_.getItemInHand(p_41434_));
     }
 
     private List<ItemStack> addNonMatchRemoveMatching(List<ItemStack> list, ItemStack stackToCheck)

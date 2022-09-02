@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class FilterBlocksByClickFuzzy extends BaseFilter{
+public class FilterBlocksByClickFuzzy extends BaseFilter {
     public FilterBlocksByClickFuzzy(Properties p_41383_) {
         super(p_41383_, FilterDirection.NEUTRAL);
     }
@@ -81,7 +81,7 @@ public class FilterBlocksByClickFuzzy extends BaseFilter{
             }
         }
 
-        return InteractionResultHolder.fail(itemInOffhand);
+        return InteractionResultHolder.fail(p_41433_.getItemInHand(p_41434_));
     }
 
     private List<ItemStack> addNonMatchRemoveMatching(List<ItemStack> list, ItemStack stackToCheck)
@@ -104,8 +104,6 @@ public class FilterBlocksByClickFuzzy extends BaseFilter{
 
     @Override
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
-        boolean filterBool = super.canAcceptItems(filter, incomingStack);
-
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.ITEMS);
         int range = stackCurrent.size();
 
@@ -117,10 +115,9 @@ public class FilterBlocksByClickFuzzy extends BaseFilter{
 
         if(!itemFromInv.isEmpty())
         {
-            return filterBool;
+            return true;
         }
-        else return !filterBool;
-
+        else return false;
     }
 
     @Override
