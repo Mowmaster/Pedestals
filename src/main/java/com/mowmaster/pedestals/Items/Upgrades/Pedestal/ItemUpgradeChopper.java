@@ -295,35 +295,6 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
             boolean runsOnce = true;
             boolean stop = false;
 
-            if((currentPosition)>=listed.size())
-            {
-                if(runsOnce)
-                {
-                    //ToDo: Make this value a config
-                    //1 minute
-                    int delay = listed.size() * Math.abs((maxY-minY));
-                    if(getCurrentDelay(pedestal)>=delay)
-                    {
-                        setCurrentPosition(pedestal,0);
-                        stop = false;
-                        setCurrentDelay(pedestal,0);
-                    }
-                    else
-                    {
-                        iterateCurrentDelay(pedestal);
-                        stop = true;
-                    }
-                }
-                else
-                {
-                    setCurrentPosition(pedestal,0);
-                }
-            }
-            else
-            {
-                iterateCurrentPosition(pedestal);
-            }
-
             if(!stop)
             {
                 for(int y=minY;y<=maxY;y++)
@@ -332,7 +303,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
                     BlockState blockAtPoint = level.getBlockState(adjustedPoint);
                     blockAtPoint.requiresCorrectToolForDrops();
 
-                    if(!blockAtPoint.getBlock().equals(Blocks.AIR))
+                    if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
                     {
                         if(canMine(pedestal, blockAtPoint, adjustedPoint))
                         {
@@ -381,7 +352,8 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
                                                     blockAtPoint.onRemove(level,adjustedPoint,blockAtPoint,true);
                                                     dropXP(level, pedestal, blockAtPoint, adjustedPoint);
                                                     level.removeBlockEntity(adjustedPoint);
-                                                    level.removeBlock(adjustedPoint, true);
+                                                    //level.removeBlock(adjustedPoint, true);
+                                                    level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                     //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                     if(damage)pedestal.damageInsertedTool(1,false);
                                                 }
@@ -389,7 +361,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
                                             else
                                             {
                                                 dropXP(level, pedestal, blockAtPoint, adjustedPoint);
-                                                level.removeBlock(adjustedPoint, true);
+                                                level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                 //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                 if(damage)pedestal.damageInsertedTool(1,false);
                                             }
@@ -411,6 +383,35 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
             else
             {
                 if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
+            }
+
+            if((currentPosition+1)>=listed.size())
+            {
+                if(runsOnce)
+                {
+                    //ToDo: Make this value a config
+                    //1 minute
+                    int delay = listed.size() * Math.abs((maxY-minY));
+                    if(getCurrentDelay(pedestal)>=delay)
+                    {
+                        setCurrentPosition(pedestal,0);
+                        stop = false;
+                        setCurrentDelay(pedestal,0);
+                    }
+                    else
+                    {
+                        iterateCurrentDelay(pedestal);
+                        stop = true;
+                    }
+                }
+                else
+                {
+                    setCurrentPosition(pedestal,0);
+                }
+            }
+            else
+            {
+                iterateCurrentPosition(pedestal);
             }
         }
     }

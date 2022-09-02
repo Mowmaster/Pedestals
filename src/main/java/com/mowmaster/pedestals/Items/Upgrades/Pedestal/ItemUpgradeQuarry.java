@@ -295,34 +295,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
             boolean runsOnce = true;
             boolean stop = false;
 
-            if((currentPosition)>=listed.size())
-            {
-                if(runsOnce)
-                {
-                    //ToDo: Make this 1200 value a config
-                    int delay = listed.size() * Math.abs((level.getMaxBuildHeight()-level.getMinBuildHeight()));
-                    if(getCurrentDelay(pedestal)>=delay)
-                    {
-                        setCurrentPosition(pedestal,0);
-                        stop = false;
-                        setCurrentDelay(pedestal,0);
-                    }
-                    else
-                    {
-                        iterateCurrentDelay(pedestal);
-                        stop = true;
-                    }
-                }
-                else
-                {
-                    setCurrentPosition(pedestal,0);
-                }
-            }
-            else
-            {
-                iterateCurrentPosition(pedestal);
-            }
-
             if(!stop)
             {
                 for(int y=level.getMinBuildHeight();y<=level.getMaxBuildHeight();y++)
@@ -331,7 +303,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                     BlockState blockAtPoint = level.getBlockState(adjustedPoint);
                     blockAtPoint.requiresCorrectToolForDrops();
 
-                    if(!blockAtPoint.getBlock().equals(Blocks.AIR))
+                    if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
                     {
                         //checking to make sure we cant mine chopper blocks
                         if(!canMine(pedestal, blockAtPoint, adjustedPoint))
@@ -381,7 +353,8 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                                                     blockAtPoint.onRemove(level,adjustedPoint,blockAtPoint,true);
                                                     dropXP(level, pedestal, blockAtPoint, adjustedPoint);
                                                     level.removeBlockEntity(adjustedPoint);
-                                                    level.removeBlock(adjustedPoint, true);
+                                                    //level.removeBlock(adjustedPoint, true);
+                                                    level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                     //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                     if(damage)pedestal.damageInsertedTool(1,false);
                                                 }
@@ -389,7 +362,8 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                                             else
                                             {
                                                 dropXP(level, pedestal, blockAtPoint, adjustedPoint);
-                                                level.removeBlock(adjustedPoint, true);
+                                                //level.removeBlock(adjustedPoint, true);
+                                                level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                 //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                 if(damage)pedestal.damageInsertedTool(1,false);
                                             }
@@ -411,6 +385,34 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
             else
             {
                 if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
+            }
+
+            if((currentPosition+1)>=listed.size())
+            {
+                if(runsOnce)
+                {
+                    //ToDo: Make this 1200 value a config
+                    int delay = listed.size() * Math.abs((level.getMaxBuildHeight()-level.getMinBuildHeight()));
+                    if(getCurrentDelay(pedestal)>=delay)
+                    {
+                        setCurrentPosition(pedestal,0);
+                        stop = false;
+                        setCurrentDelay(pedestal,0);
+                    }
+                    else
+                    {
+                        iterateCurrentDelay(pedestal);
+                        stop = true;
+                    }
+                }
+                else
+                {
+                    setCurrentPosition(pedestal,0);
+                }
+            }
+            else
+            {
+                iterateCurrentPosition(pedestal);
             }
         }
     }

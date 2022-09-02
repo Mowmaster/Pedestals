@@ -25,7 +25,10 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
@@ -319,7 +322,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
 
             blockAtPoint.requiresCorrectToolForDrops();
 
-            if(!blockAtPoint.getBlock().equals(Blocks.AIR))
+            if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
             {
                 if(passesFilter(pedestal, blockAtPoint, currentPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList().contains(blockAtPoint.getBlock())))
                 {
@@ -366,7 +369,8 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
                                         blockAtPoint.onRemove(level,currentPoint,blockAtPoint,true);
                                         dropXP(level, pedestal, blockAtPoint, currentPoint);
                                         level.removeBlockEntity(currentPoint);
-                                        level.removeBlock(currentPoint, true);
+                                        //level.removeBlock(adjustedPoint, true);
+                                        level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                         //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                         if(damage)pedestal.damageInsertedTool(1,false);
                                     }
@@ -374,7 +378,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
                                 else
                                 {
                                     dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                    level.removeBlock(currentPoint, true);
+                                    level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                     //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                     if(damage)pedestal.damageInsertedTool(1,false);
                                 }
