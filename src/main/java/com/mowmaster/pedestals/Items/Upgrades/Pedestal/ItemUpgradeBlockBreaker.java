@@ -5,18 +5,13 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
-import com.mowmaster.mowlib.api.IColorableBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tier;
@@ -26,21 +21,15 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -179,11 +168,13 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
         {
             if(listed.size()>0)
             {
+                //System.out.println("RunAction");
                 upgradeAction(world,pedestal);
             }
             else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
             {
                 buildValidBlockListArea(pedestal);
+                //System.out.println("ListBuilt: "+ getValidList(pedestal));
             }
             else if(!pedestal.getRenderRange())
             {
@@ -257,7 +248,6 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
         {
             if(isToolHighEnoughLevelForBlock(getToolFromPedestal, blockTarget))
             {
-
                 Level level = pedestal.getLevel();
                 if(blockTarget.getBlock() != Blocks.AIR)
                 {
@@ -326,18 +316,16 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
             int currentPosition = getCurrentPosition(pedestal);
             BlockPos currentPoint = listed.get(currentPosition);
             BlockState blockAtPoint = level.getBlockState(currentPoint);
-            boolean fuelRemoved = false;
+            boolean fuelRemoved = true;
 
-            blockAtPoint.requiresCorrectToolForDrops();
-
+            //System.out.println(blockAtPoint);
+            //System.out.println(blockAtPoint.getBlock());
+            //System.out.println(blockAtPoint.getDestroySpeed(level,currentPoint));
             if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
             {
                 if(passesFilter(pedestal, blockAtPoint, currentPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList().contains(blockAtPoint.getBlock())))
                 {
-                    //ToDo: config option
-
                     boolean damage = false;
-
                     if(!currentPoint.equals(pedestal.getPos()))
                     {
                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
@@ -369,7 +357,6 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
 
                             if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                             {
-                                fuelRemoved = true;
                                 boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
                                 List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint);
                                 if(level.getBlockEntity(currentPoint) !=null){
@@ -407,6 +394,8 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
                 }
             }
 
+            //System.out.println("CurrentPoint: "+ currentPosition);
+            //System.out.println("ListSize: "+ listed.size());
             if((currentPosition+1)>=listed.size())
             {
                 setCurrentPosition(pedestal,0);

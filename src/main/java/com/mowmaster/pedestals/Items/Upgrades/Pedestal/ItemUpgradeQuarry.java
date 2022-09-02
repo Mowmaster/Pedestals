@@ -341,7 +341,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
             boolean minMaxHeight = maxY - minY > 0;
             int max = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
             int min = (minMaxHeight)?(minY):(level.getMinBuildHeight());
-            boolean fuelRemoved = false;
+            boolean fuelRemoved = true;
             //ToDo: make this a modifier for later
             boolean runsOnce = true;
             boolean stop = getStopped(pedestal);
@@ -396,7 +396,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
 
                                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                                         {
-                                            fuelRemoved = true;
                                             boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
                                             List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint);
                                             if(level.getBlockEntity(adjustedPoint) !=null){

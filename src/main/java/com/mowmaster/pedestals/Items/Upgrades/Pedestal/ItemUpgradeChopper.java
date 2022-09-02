@@ -332,7 +332,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
             AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
             int maxY = (int)area.maxY;
             int minY = (int)area.minY;
-            boolean fuelRemoved = false;
+            boolean fuelRemoved = true;
 
             //ToDo: make this a modifier for later
             boolean runsOnce = true;
@@ -387,7 +387,6 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
 
                                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                                         {
-                                            fuelRemoved = true;
                                             boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
                                             List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint);
                                             if(level.getBlockEntity(adjustedPoint) !=null){
