@@ -66,6 +66,8 @@ public class DeferredRegisterItems
             () -> new FilterRestricted(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> FILTER_TAG = ITEMS.register("filter_tag",
             () -> new FilterTag(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> FILTER_TAG_MACHINE = ITEMS.register("filter_tag_machine",
+            () -> new FilterTagMachines(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> FILTER_BLOCKS_ON_CLICK_EXACT = ITEMS.register("filter_blocksonclickexact",
             () -> new FilterBlocksByClickExact(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));

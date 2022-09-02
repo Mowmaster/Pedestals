@@ -112,14 +112,17 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     //Requires energy
     public boolean requiresEnergy() { return baseEnergyCostPerDistance()>0; }
+    public boolean energyDistanceAsModifier() {return true;}
     public int baseEnergyCostPerDistance(){ return 0; }
     public double energyCostMultiplier(){ return 1.0D; }
 
     public boolean requiresXp() { return baseXpCostPerDistance()>0; }
+    public boolean xpDistanceAsModifier() {return true;}
     public int baseXpCostPerDistance(){ return 0; }
     public double xpCostMultiplier(){ return 1.0D; }
 
     public boolean requiresDust() { return !baseDustCostPerDistance().isEmpty(); }
+    public boolean dustDistanceAsModifier() {return true;}
     public DustMagic baseDustCostPerDistance(){ return new DustMagic(-1,0); }
     public double dustCostMultiplier(){ return 1.0D; }
 
@@ -142,20 +145,20 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
             if(requiresEnergy())
             {
-                int energyCost = (int)Math.round(((double)baseEnergyCostPerDistance() + ((hasSelectedAreaModifier())?((double)(distance * selectedAreaCostMultiplier())):(0.0D))) * energyCostMultiplier());
+                int energyCost = (int)Math.round(((double)baseEnergyCostPerDistance() + ((hasSelectedAreaModifier())?((double)(((energyDistanceAsModifier())?(distance):(1)) * selectedAreaCostMultiplier())):(0.0D))) * energyCostMultiplier());
                 energy = pedestal.removeEnergy(energyCost,simulate)>=energyCost;
             }
 
             if(requiresXp())
             {
-                int xpCost = (int)Math.round(((double)baseXpCostPerDistance() + ((hasSelectedAreaModifier())?((double)(distance * selectedAreaCostMultiplier())):(0.0D))) * xpCostMultiplier());
+                int xpCost = (int)Math.round(((double)baseXpCostPerDistance() + ((hasSelectedAreaModifier())?((double)(((xpDistanceAsModifier())?(distance):(1)) * selectedAreaCostMultiplier())):(0.0D))) * xpCostMultiplier());
                 xp = pedestal.removeExperience(xpCost,simulate)>=xpCost;
             }
 
             //Need to add dust stuff to pedestal yet...
             if(requiresDust())
             {
-                int dustAmountNeeded = (int)Math.round(((double)baseDustCostPerDistance().getDustAmount() + ((hasSelectedAreaModifier())?((double)(distance * selectedAreaCostMultiplier())):(0.0D))) * dustCostMultiplier());
+                int dustAmountNeeded = (int)Math.round(((double)baseDustCostPerDistance().getDustAmount() + ((hasSelectedAreaModifier())?((double)(((dustDistanceAsModifier())?(distance):(1)) * selectedAreaCostMultiplier())):(0.0D))) * dustCostMultiplier());
 
                 //dust = pedestal.removeDust(dustAmountNeeded,simulate)>=dustAmountNeeded;
             }
@@ -1265,6 +1268,32 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                         p_41423_.add(posOnePos);
                     }
                 }
+            }
+        }
+
+        if(requiresFuelForUpgradeAction())
+        {
+            if(requiresEnergy())
+            {
+                MutableComponent base = Component.translatable(MODID + ".upgrade_fuel_energy");
+                base.withStyle(ChatFormatting.RED);
+                p_41423_.add(base);
+            }
+            if(requiresXp())
+            {
+                MutableComponent base = Component.translatable(MODID + ".upgrade_fuel_xp");
+                base.withStyle(ChatFormatting.GREEN);
+                p_41423_.add(base);
+            }
+            if(requiresDust())
+            {
+                MutableComponent base = Component.translatable(MODID + ".upgrade_fuel_dust");
+                base.append(Component.translatable(MODID + ".upgrade_tooltip_separator"));
+                base.withStyle(ChatFormatting.LIGHT_PURPLE);
+                MutableComponent dust = Component.translatable(MowLibReferences.MODID + "." + MowLibColorReference.getColorName(baseDustCostPerDistance().getDustColor()));
+                dust.withStyle(ChatFormatting.WHITE);
+                base.append(dust);
+                p_41423_.add(base);
             }
         }
 

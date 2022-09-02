@@ -1,0 +1,8 @@
+{
+"parent": "pedestals:item/filter_tag",
+  "textures": {
+    "0": "pedestals:items/models/filters/filteritemdefault_fluid",
+    "1": "pedestals:items/models/filters/filtertagmachine",
+    "particle": "pedestals:items/models/filters/filteritemdefault_fluid"
+  }
+}

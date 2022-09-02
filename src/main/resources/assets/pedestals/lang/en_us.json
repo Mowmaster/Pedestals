@@ -42,6 +42,9 @@
   "pedestals.upgrade_blockpos_added": "Block Position Added",
   "pedestals.upgrade_blockpos_removed": "Block Position Removed",
 
+  "pedestals.upgrade_fuel_energy": "Requires Energy",
+  "pedestals.upgrade_fuel_xp": "Requires XP",
+  "pedestals.upgrade_fuel_energy": "Requires Dust: ",
 
   "pedestals.upgrade_description_shift": "§7Press 'Shift' to Show Enabled Transfer Types",
   "pedestals.upgrade_description_alt": "§8Press 'Alt' to Show Selected Block Points",
@@ -163,6 +166,11 @@
   "jei.pedestals.filter_tag.description": "§5 This Filter Filters By The Tags on an Item (Items in the filter must be renamed with tag names, like 'forge:stone'",
   "jei.pedestals.filter_tag.interaction": "§3 Offhand Filter and Right Click to switch TYPES, Crouch Right Click to switch MODES",
 
+
+
+  "item.pedestals.filter_tag_machine": "Tag Filter (Machines)",
+  "jei.pedestals.filter_tag_machine.description": "§5 This Filter Filters By The Tags on an Item (Items in the filter must be renamed with tag names, like 'forge:stone'",
+  "jei.pedestals.filter_tag_machine.interaction": "§3 Offhand Filter and Right Click to switch TYPES, Crouch Right Click to switch MODES",
   "item.pedestals.filter_blocksonclickexact": "Blocks Filter (Exact)",
   "jei.pedestals.filter_blocksonclickexact.description": "§5 This Filter Filters Similar to an ItemStack Filter",
   "jei.pedestals.filter_blocksonclickexact.interaction": "§3 Offhand Filter and Right Click in Air to switch TYPES, Crouch Right Click in Air to switch MODES, Crouch Right Clicking a block when in the offhand adds/removes it from the filter.",
@@ -277,7 +285,7 @@
   "jei.pedestals.upgrade_pedestal_breaker.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points. ALSO Regular Right Click blocks to select single block targets, right click in air to clear the list.",
   "item.pedestals.upgrade_pedestal_quarry": "Quarry Upgrade",
   "jei.pedestals.upgrade_pedestal_quarry.description": "§5'Breaks Blocks in the selected work area, from bedrock to world height. Uses a Iron Pickaxe by default.",
-  "jei.pedestals.upgrade_pedestal_quarry.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points.",
+  "jei.pedestals.upgrade_pedestal_quarry.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points. If you select a 1 high area itll quarry from bedrock to world height, otherwise it'll clear out the selected area",
   "item.pedestals.upgrade_pedestal_chopper": "Chopper Upgrade",
   "jei.pedestals.upgrade_pedestal_chopper.description": "§5'Chops Wood/Mushroom/Leaf Blocks in the selected work area. Uses a Iron Axe by default.",
   "jei.pedestals.upgrade_pedestal_chopper.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points.",

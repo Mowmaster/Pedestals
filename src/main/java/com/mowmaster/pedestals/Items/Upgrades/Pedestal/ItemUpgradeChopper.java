@@ -9,6 +9,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -29,6 +30,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,15 +49,21 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
     @Override
     public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_chopper_baseEnergyCost.get(); }
     @Override
+    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_chopper_energy_distance_multiplier.get();}
+    @Override
     public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_chopper_energyMultiplier.get(); }
 
     @Override
     public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_chopper_baseXpCost.get(); }
     @Override
+    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_chopper_xp_distance_multiplier.get();}
+    @Override
     public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_chopper_xpMultiplier.get(); }
 
     @Override
     public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_chopper_dustColor.get(),PedestalConfig.COMMON.upgrade_chopper_baseDustAmount.get()); }
+    @Override
+    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_chopper_dust_distance_multiplier.get();}
     @Override
     public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_chopper_dustMultiplier.get(); }
 
@@ -64,6 +72,40 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
     @Override
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_chopper_selectedMultiplier.get(); }
 
+    //
+    //  Add To MowLib
+    //
+    public static boolean readBooleanFromNBT(String ModID, CompoundTag tag, String identifier)
+    {
+        return tag.contains(ModID + identifier) ? tag.getBoolean(ModID + identifier) : false;
+    }
+
+    public static CompoundTag writeBooleanToNBT(String ModID, @Nullable CompoundTag tag, boolean value, String identifier) {
+        CompoundTag compound = tag != null ? tag : new CompoundTag();
+        compound.putBoolean(ModID + identifier, value);
+        return compound;
+    }
+
+    public static void removeBooleanFromNBT(String ModID, CompoundTag tag, String identifier) {
+        if (tag.contains(ModID + identifier)) {
+            tag.remove(ModID + identifier);
+        }
+    }
+    //
+    //
+    //
+
+    private boolean getStopped(BasePedestalBlockEntity pedestal)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        return readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
+    }
+
+    private void setStopped(BasePedestalBlockEntity pedestal, boolean value)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
+    }
 
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
@@ -215,7 +257,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
                             .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
                             .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
-                    return blockTarget.getDrops(builder);
+                    return blockTarget.getBlock().getDrops(blockTarget,builder);
                 }
             }
         }
@@ -229,7 +271,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
                         .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
                         .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
-                return blockTarget.getDrops(builder);
+                return blockTarget.getBlock().getDrops(blockTarget,builder);
             }
         }
 
@@ -290,10 +332,11 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
             AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
             int maxY = (int)area.maxY;
             int minY = (int)area.minY;
+            boolean fuelRemoved = false;
 
             //ToDo: make this a modifier for later
             boolean runsOnce = true;
-            boolean stop = false;
+            boolean stop = getStopped(pedestal);
 
             if(!stop)
             {
@@ -344,6 +387,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
 
                                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                                         {
+                                            fuelRemoved = true;
                                             boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
                                             List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint);
                                             if(level.getBlockEntity(adjustedPoint) !=null){
@@ -373,6 +417,9 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
                                                 }
                                             }
                                         }
+                                        else {
+                                            fuelRemoved = false;
+                                        }
                                     }
                                 }
                             }
@@ -389,19 +436,18 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
             {
                 if(runsOnce)
                 {
-                    //ToDo: Make this value a config
-                    //1 minute
-                    int delay = listed.size() * Math.abs((maxY-minY));
+                    //ToDo: Make this 1200 value a config
+                    int delay = listed.size() * Math.abs((level.getMaxBuildHeight()-level.getMinBuildHeight()));
                     if(getCurrentDelay(pedestal)>=delay)
                     {
                         setCurrentPosition(pedestal,0);
-                        stop = false;
+                        setStopped(pedestal,false);
                         setCurrentDelay(pedestal,0);
                     }
                     else
                     {
                         iterateCurrentDelay(pedestal);
-                        stop = true;
+                        setStopped(pedestal,true);
                     }
                 }
                 else
@@ -411,7 +457,9 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
             }
             else
             {
-                iterateCurrentPosition(pedestal);
+                if(fuelRemoved){
+                    iterateCurrentPosition(pedestal);
+                }
             }
         }
     }

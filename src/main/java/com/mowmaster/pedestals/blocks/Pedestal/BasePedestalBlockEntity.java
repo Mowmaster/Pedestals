@@ -851,7 +851,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             if(toDrop.getItem() instanceof BaseXpBulkStorageItem droppedItemEnergy)
             {
                 droppedItemEnergy.setXp(toDrop,experience.getExperienceStored());
-                System.out.println("stored xp: "+ droppedItemEnergy.getXp(toDrop));
+                //System.out.println("stored xp: "+ droppedItemEnergy.getXp(toDrop));
             }
             MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
         }

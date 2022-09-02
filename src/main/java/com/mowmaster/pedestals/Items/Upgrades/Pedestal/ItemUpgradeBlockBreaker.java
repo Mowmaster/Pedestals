@@ -5,6 +5,7 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import com.mowmaster.mowlib.api.IColorableBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
@@ -56,15 +57,21 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
     @Override
     public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_blockbreaker_baseEnergyCost.get(); }
     @Override
+    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_blockbreaker_energy_distance_multiplier.get();}
+    @Override
     public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_blockbreaker_energyMultiplier.get(); }
 
     @Override
     public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_blockbreaker_baseXpCost.get(); }
     @Override
+    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_blockbreaker_xp_distance_multiplier.get();}
+    @Override
     public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_blockbreaker_xpMultiplier.get(); }
 
     @Override
     public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_blockbreaker_dustColor.get(),PedestalConfig.COMMON.upgrade_blockbreaker_baseDustAmount.get()); }
+    @Override
+    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_blockbreaker_dust_distance_multiplier.get();}
     @Override
     public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_blockbreaker_dustMultiplier.get(); }
 
@@ -72,7 +79,6 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
     public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_blockbreaker_selectedAllowed.get(); }
     @Override
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_blockbreaker_selectedMultiplier.get(); }
-
 
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
@@ -251,6 +257,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
         {
             if(isToolHighEnoughLevelForBlock(getToolFromPedestal, blockTarget))
             {
+
                 Level level = pedestal.getLevel();
                 if(blockTarget.getBlock() != Blocks.AIR)
                 {
@@ -259,7 +266,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
                             .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
                             .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
-                    return blockTarget.getDrops(builder);
+                    return blockTarget.getBlock().getDrops(blockTarget,builder);
                 }
             }
         }
@@ -273,7 +280,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
                         .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
                         .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
-                return blockTarget.getDrops(builder);
+                return blockTarget.getBlock().getDrops(blockTarget,builder);
             }
         }
 
@@ -319,6 +326,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
             int currentPosition = getCurrentPosition(pedestal);
             BlockPos currentPoint = listed.get(currentPosition);
             BlockState blockAtPoint = level.getBlockState(currentPoint);
+            boolean fuelRemoved = false;
 
             blockAtPoint.requiresCorrectToolForDrops();
 
@@ -361,6 +369,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
 
                             if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                             {
+                                fuelRemoved = true;
                                 boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
                                 List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint);
                                 if(level.getBlockEntity(currentPoint) !=null){
@@ -390,6 +399,9 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
                                     }
                                 }
                             }
+                            else {
+                                fuelRemoved = false;
+                            }
                         }
                     }
                 }
@@ -401,7 +413,9 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
             }
             else
             {
-                iterateCurrentPosition(pedestal);
+                if(fuelRemoved){
+                    iterateCurrentPosition(pedestal);
+                }
             }
         }
     }
