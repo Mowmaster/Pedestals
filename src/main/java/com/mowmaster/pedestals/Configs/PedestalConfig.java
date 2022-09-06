@@ -417,7 +417,7 @@ public class PedestalConfig
                     .defineInRange("upgrade_quarry_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
             upgrade_quarry_baseBlocksMined = builder
                     .comment("Base Amount of Blocks the Quarry will Mine at a Time. [Quarry]")
-                    .defineInRange("upgrade_quarry_base_blocks_mined", 16, 0, Integer.MAX_VALUE);
+                    .defineInRange("upgrade_quarry_base_blocks_mined", 4, 0, Integer.MAX_VALUE);
 
 
 
