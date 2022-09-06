@@ -137,6 +137,7 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_quarry_dustMultiplier;
         public final ForgeConfigSpec.BooleanValue upgrade_quarry_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_quarry_selectedMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_quarry_baseBlocksMined;
 
         public final ForgeConfigSpec.BooleanValue chopperDamageTools;
         public final ForgeConfigSpec.IntValue upgrade_chopper_baseEnergyCost;
@@ -414,6 +415,9 @@ public class PedestalConfig
             upgrade_quarry_selectedMultiplier = builder
                     .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Quarry]")
                     .defineInRange("upgrade_quarry_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_quarry_baseBlocksMined = builder
+                    .comment("Base Amount of Blocks the Quarry will Mine at a Time. [Quarry]")
+                    .defineInRange("upgrade_quarry_base_blocks_mined", 16, 0, Integer.MAX_VALUE);
 
 
 

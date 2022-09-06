@@ -135,7 +135,9 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
         removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
         MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numposition");
         MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numdelay");
+        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numheight");
         removeBooleanFromNBT(MODID, coinInPedestal.getTag(),"_boolstop");
+
     }
 
     @Override
@@ -197,6 +199,31 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
         writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
     }
 
+    private int getHeightIteratorValue()
+    {
+        //TODO: make a modifier for this
+        return PedestalConfig.COMMON.upgrade_quarry_baseBlocksMined.get();
+    }
+
+    private int getCurrentHeight(BasePedestalBlockEntity pedestal)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        return (coin.getOrCreateTag().contains(MODID + "_numheight"))?(MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getOrCreateTag(), "_numheight")):(pedestal.getLevel().getMinBuildHeight());
+    }
+
+    private void setCurrentHeight(BasePedestalBlockEntity pedestal, int num)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numheight");
+    }
+
+    private void iterateCurrentHeight(BasePedestalBlockEntity pedestal)
+    {
+        ItemStack coin = pedestal.getCoinOnPedestal();
+        int current = getCurrentHeight(pedestal);
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+getHeightIteratorValue()), "_numheight");
+    }
+
     private int getCurrentDelay(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
@@ -212,7 +239,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
     private void iterateCurrentDelay(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        int current = getCurrentPosition(pedestal);
+        int current = getCurrentDelay(pedestal);
         MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numdelay");
     }
 
@@ -339,8 +366,12 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
             int maxY = (int)area.maxY;
             int minY = (int)area.minY;
             boolean minMaxHeight = maxY - minY > 0;
-            int max = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
-            int min = (minMaxHeight)?(minY):(level.getMinBuildHeight());
+            int currentYMin = (minMaxHeight)?(0):(getCurrentHeight(pedestal));
+            int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue());
+            boolean ySpread = currentYMax - currentYMin > 0;
+            int max = (minMaxHeight)?(maxY):(currentYMax);
+            int min = (minMaxHeight)?(minY):(currentYMin);
+            int absoluteMax = level.getMaxBuildHeight();
             boolean fuelRemoved = true;
             //ToDo: make this a modifier for later
             boolean runsOnce = true;
@@ -441,7 +472,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                 if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
             }
 
-            if((currentPosition+1)>=listed.size())
+            if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
             {
                 if(runsOnce)
                 {
@@ -463,6 +494,11 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                 {
                     setCurrentPosition(pedestal,0);
                 }
+            }
+            else if((currentPosition+1)>=listed.size())
+            {
+                setCurrentPosition(pedestal,0);
+                iterateCurrentHeight(pedestal);
             }
             else
             {
