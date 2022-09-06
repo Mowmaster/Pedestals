@@ -36,6 +36,39 @@ public class FilterTagMachines extends BaseFilter{
         }
     }
 
+    private static String[] decompose(String p_135833_, char p_135834_) {
+        String[] astring = new String[]{"minecraft", p_135833_};
+        int i = p_135833_.indexOf(p_135834_);
+        if (i >= 0) {
+            astring[1] = p_135833_.substring(i + 1, p_135833_.length());
+            if (i >= 1) {
+                astring[0] = p_135833_.substring(0, i);
+            }
+        }
+
+        return astring;
+    }
+
+    protected ResourceLocation getLocationFromStringName(String input)
+    {
+        String[] getStringy = decompose(input, ':');
+        String one = getStringy[0];
+        String two = getStringy[1];
+
+        if(one.contains("["))
+        {
+            one = getStringy[0].substring(1,one.length());
+        }
+
+        if(two.contains("]"))
+        {
+            two = getStringy[1].substring(0,two.length()-1);
+        }
+
+        return new ResourceLocation(one,two);
+    }
+
+
     @Override
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
         boolean filterBool = super.canAcceptItems(filter, incomingStack);
@@ -46,7 +79,7 @@ public class FilterTagMachines extends BaseFilter{
         ItemStack itemFromInv = ItemStack.EMPTY;
         itemFromInv = IntStream.range(0,range)//Int Range
                 .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                .filter(itemStack -> ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation(itemStack.getDisplayName().getString()))).stream().toList().contains(incomingStack.getItem()))
+                .filter(itemStack -> ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(getLocationFromStringName(itemStack.getDisplayName().getString()))).stream().toList().contains(incomingStack.getItem()))
                 .findFirst().orElse(ItemStack.EMPTY);
 
         if(!itemFromInv.isEmpty())
