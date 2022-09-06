@@ -20,6 +20,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -35,12 +36,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -79,8 +82,14 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     @Override
-    public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
+    public void actionOnAddedToPedestal(Player player, BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
+        MowLibOwnerUtils.writeNameToStackNBT(coinInPedestal,player.getName().getString());
+        MowLibOwnerUtils.writeUUIDToNBT(coinInPedestal, player.getUUID());
+    }
 
+    @Override
+    public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
+        MowLibOwnerUtils.removePlayerFromStack(coinInPedestal);
     }
 
     /*
@@ -1307,27 +1316,16 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     ==============================================================================
     ============================================================================*/
 
-    /*public WeakReference<FakePlayer> fakePedestalPlayer(BasePedestalBlockEntity pedestal)
+    public WeakReference<FakePlayer> fakeUpgradePlayer(BasePedestalBlockEntity pedestal)
     {
         Level world = pedestal.getLevel();
         ItemStack upgrade = pedestal.getCoinOnPedestal();
         if(world instanceof ServerLevel slevel)
         {
-            return new WeakReference<FakePlayer>(new MowLibFakePlayer(slevel , OwnerUtil.getPlayerFromStack(upgrade), OwnerUtil.getPlayerNameFromStack(upgrade)));
+            return new WeakReference<FakePlayer>(new MowLibFakePlayer(slevel , MowLibOwnerUtils.getPlayerFromStack(upgrade), MowLibOwnerUtils.getPlayerNameFromStack(upgrade),pedestal.getPos(),pedestal.getToolStack(),"[Pedestal_"+ pedestal.getPos().getX() + pedestal.getPos().getY() + pedestal.getPos().getZ() +"]"));
         }
         else return null;
     }
-
-    public WeakReference<FakePlayer> fakePedestalPlayer(BasePedestalBlockEntity pedestal, ItemStack itemInHand)
-    {
-        Level world = pedestal.getLevel();
-        ItemStack upgrade = pedestal.getCoinOnPedestal();
-        if(world instanceof ServerLevel slevel)
-        {
-            return new WeakReference<FakePlayer>(new PedestalFakePlayer(slevel,OwnerUtil.getPlayerFromStack(upgrade), OwnerUtil.getPlayerNameFromStack(upgrade),pedestal.getPos(),itemInHand));
-        }
-        else return null;
-    }*/
 
     /*============================================================================
     ==============================================================================

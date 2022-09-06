@@ -7,7 +7,6 @@ import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.mowlib.Capabilities.Experience.CapabilityExperience;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
-import com.mowmaster.mowlib.Items.BaseEnergyDropItem;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -29,6 +28,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -39,21 +39,22 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +67,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     private LazyOptional<IExperienceStorage> experienceHandler = LazyOptional.of(this::createHandlerPedestalExperience);
     private LazyOptional<IDustHandler> dustHandler = LazyOptional.of(this::createDustHandler);
     private List<ItemStack> stacksList = new ArrayList<>();
+    private WeakReference<FakePlayer> pedestalPlayer = null;
     private MobEffectInstance storedPotionEffect = null;
     private int storedPotionEffectDuration = 0;
     private int storedEnergy = 0;
@@ -765,13 +767,13 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return handler.cast();
         }
-        if ((cap == CapabilityEnergy.ENERGY)) {
+        if ((cap == ForgeCapabilities.ENERGY)) {
             return energyHandler.cast();
         }
-        if ((cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)) {
+        if ((cap == ForgeCapabilities.FLUID_HANDLER)) {
             return fluidHandler.cast();
         }
         if ((cap == CapabilityExperience.EXPERIENCE)) {
@@ -782,6 +784,46 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         }
         return super.getCapability(cap, side);
     }
+
+    /*==========================================================
+    ============================================================
+    =====                Fake Player Start                ======
+    ============================================================
+    ==========================================================*/
+
+    public WeakReference<FakePlayer> getPedestalPlayer() {
+        if(pedestalPlayer == null)
+        {
+            pedestalPlayer = fakePedestalPlayer(this);
+        }
+
+        return pedestalPlayer;
+    }
+
+    public void updatePedestalPlayer()
+    {
+        if(pedestalPlayer != null)
+        {
+            pedestalPlayer = fakePedestalPlayer(this);
+        }
+    }
+
+    public WeakReference<FakePlayer> fakePedestalPlayer(BasePedestalBlockEntity pedestal)
+    {
+        Level world = pedestal.getLevel();
+        ItemStack upgrade = pedestal.getCoinOnPedestal();
+        if(world instanceof ServerLevel slevel)
+        {
+            return new WeakReference<FakePlayer>(new MowLibFakePlayer(slevel , MowLibOwnerUtils.getPlayerFromStack(upgrade), MowLibOwnerUtils.getPlayerNameFromStack(upgrade),pedestal.getPos(),pedestal.getToolStack(),"[Pedestal_"+ pedestal.getPos().getX() + pedestal.getPos().getY() + pedestal.getPos().getZ() +"]"));
+        }
+        else return null;
+    }
+
+    /*==========================================================
+    ============================================================
+    =====                 Fake Player End                 ======
+    ============================================================
+    ==========================================================*/
 
 
 
@@ -3075,7 +3117,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         {
             if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
-                LazyOptional<IItemHandler> cap = tilePedestalToSendTo.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP);
+                LazyOptional<IItemHandler> cap = tilePedestalToSendTo.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP);
                 if(cap.isPresent())
                 {
                     IItemHandler handler = cap.orElse(null);
@@ -3128,7 +3170,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         {
             if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
-                LazyOptional<IFluidHandler> cap = tilePedestalToSendTo.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, Direction.UP);
+                LazyOptional<IFluidHandler> cap = tilePedestalToSendTo.getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.UP);
                 if(cap.isPresent())
                 {
                     IFluidHandler handler = cap.orElse(null);
@@ -3161,7 +3203,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         {
             if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
             {
-                LazyOptional<IEnergyStorage> cap = tilePedestalToSendTo.getCapability(CapabilityEnergy.ENERGY, Direction.UP);
+                LazyOptional<IEnergyStorage> cap = tilePedestalToSendTo.getCapability(ForgeCapabilities.ENERGY, Direction.UP);
                 if(cap.isPresent())
                 {
                     IEnergyStorage handler = cap.orElse(null);
@@ -3441,7 +3483,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
             storedLocations.add(gotPos);
         }
-
     }
 
     @Override

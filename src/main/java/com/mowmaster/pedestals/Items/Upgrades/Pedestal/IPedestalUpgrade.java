@@ -4,6 +4,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -17,6 +18,8 @@ public interface IPedestalUpgrade
     void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn);
     //Used When a block below has changed and the upgrade needs to update its behavior
     void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock);
+    //Used when addeed to the pedestal.
+    void actionOnAddedToPedestal(Player player, BasePedestalBlockEntity pedestal, ItemStack coinInPedestal);
     //Used when removed from pedestal, or when pedestal breaks and its dropped.
     void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal);
 
