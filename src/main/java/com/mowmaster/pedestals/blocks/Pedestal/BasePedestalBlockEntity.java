@@ -17,6 +17,7 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseEnergyBulkStorage
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageItem;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -812,9 +813,10 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     {
         Level world = pedestal.getLevel();
         ItemStack upgrade = pedestal.getCoinOnPedestal();
+        ItemStack tool = pedestal.getToolStack();
         if(world instanceof ServerLevel slevel)
         {
-            return new WeakReference<FakePlayer>(new MowLibFakePlayer(slevel , MowLibOwnerUtils.getPlayerFromStack(upgrade), MowLibOwnerUtils.getPlayerNameFromStack(upgrade),pedestal.getPos(),pedestal.getToolStack(),"[Pedestal_"+ pedestal.getPos().getX() + pedestal.getPos().getY() + pedestal.getPos().getZ() +"]"));
+            return new WeakReference<FakePlayer>(new MowLibFakePlayer(slevel , MowLibOwnerUtils.getPlayerFromStack(upgrade), MowLibOwnerUtils.getPlayerNameFromStack(upgrade),pedestal.getPos(),tool,"[Pedestal_"+ pedestal.getPos().getX() + pedestal.getPos().getY() + pedestal.getPos().getZ() +"]"));
         }
         else return null;
     }
@@ -2468,10 +2470,25 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return false;
     }
 
-    public ItemStack getToolStack()
+    public ItemStack getActualToolStack()
     {
         IItemHandler ph = privateHandler.orElse(null);
         return ph.getStackInSlot(11);
+    }
+
+    public ItemStack getToolStack()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        ItemStack toolInPed = ph.getStackInSlot(11);
+        ItemStack coinTool = ItemStack.EMPTY;
+        if(hasCoin())
+        {
+            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
+            {
+                coinTool = upgrade.getUpgradeDefaultTool();
+            }
+        }
+        return (!toolInPed.isEmpty())?(toolInPed):(coinTool);
     }
 
     public boolean canInsertTool(ItemStack tool)

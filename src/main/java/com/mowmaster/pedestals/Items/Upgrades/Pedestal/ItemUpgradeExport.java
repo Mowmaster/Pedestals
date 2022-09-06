@@ -43,7 +43,8 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
 
         if(canTransferItems(coinInPedestal))
         {
-            int transferRate = getItemTransferRate(coinInPedestal);
+            //TODO: make this a modifier
+            int transferRate = getItemTransferRate(coinInPedestal) + pedestal.getItemTransferRateIncreaseFromCapacity();
 
             ItemStack stackInPedestal = pedestal.removeItem(true);
             ItemStack itemFromInv = ItemStack.EMPTY;

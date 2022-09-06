@@ -56,7 +56,8 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
 
         if(canTransferItems(coinInPedestal))
         {
-            int transferRate = getItemTransferRate(coinInPedestal);
+            //TODO: make this a modifier
+            int transferRate = getItemTransferRate(coinInPedestal) + pedestal.getItemTransferRateIncreaseFromCapacity();
 
             ItemStack itemFromInv = ItemStack.EMPTY;
             LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
