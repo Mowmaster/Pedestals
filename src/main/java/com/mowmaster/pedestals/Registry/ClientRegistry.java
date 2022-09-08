@@ -73,6 +73,7 @@ public class ClientRegistry
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_MAGNET.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_PACKAGER.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_UNPACKAGER.get());
+        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_VOID.get());
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ITEM.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ITEMSTACK.get());
@@ -85,6 +86,7 @@ public class ClientRegistry
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_MOD.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_RESTRICTED.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_TAG.get());
+        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_TAG_MACHINE.get());
 
         //ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_EXACT.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
