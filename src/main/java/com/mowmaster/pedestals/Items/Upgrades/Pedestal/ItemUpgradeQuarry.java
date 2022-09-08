@@ -382,7 +382,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
             boolean ySpread = currentYMax - currentYMin > 0;
             int max = (minMaxHeight)?(maxY):(currentYMax);
             int min = (minMaxHeight)?(minY):(currentYMin);
-            int absoluteMax = level.getMaxBuildHeight();
+            int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
             WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer();
             boolean fuelRemoved = true;
             //ToDo: make this a modifier for later
@@ -449,6 +449,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                                                     if(level.getBlockEntity(adjustedPoint) !=null){
                                                         if(canRemoveBlockEntities)
                                                         {
+
                                                             blockAtPoint.onRemove(level,adjustedPoint,blockAtPoint,true);
                                                             dropXP(level, pedestal, blockAtPoint, adjustedPoint);
                                                             level.removeBlockEntity(adjustedPoint);
@@ -496,7 +497,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                 if(runsOnce)
                 {
                     //ToDo: Make this 1200 value a config
-                    int delay = listed.size() * Math.abs((level.getMaxBuildHeight()-level.getMinBuildHeight()));
+                    int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
                     if(getCurrentDelay(pedestal)>=delay)
                     {
                         setCurrentPosition(pedestal,0);

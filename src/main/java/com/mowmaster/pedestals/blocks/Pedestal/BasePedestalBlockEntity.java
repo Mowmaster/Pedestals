@@ -1284,6 +1284,13 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return stack;
     }
 
+    public ItemStack removeItemStack(int slot, boolean simulate) {
+        IItemHandler h = handler.orElse(null);
+        ItemStack stack = h.extractItem(slot,h.getStackInSlot(slot).getCount(),simulate);
+
+        return stack;
+    }
+
     public ItemStack removeItem(boolean simulate) {
         IItemHandler h = handler.orElse(null);
         int firstNonEmptySlot = 0;
