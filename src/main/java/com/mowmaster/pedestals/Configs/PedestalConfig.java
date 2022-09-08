@@ -123,6 +123,19 @@ public class PedestalConfig
         public final ForgeConfigSpec.BooleanValue upgrade_blockbreaker_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_blockbreaker_selectedMultiplier;
 
+        public final ForgeConfigSpec.IntValue upgrade_blockplacer_baseEnergyCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_blockplacer_energy_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_blockplacer_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_blockplacer_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_blockplacer_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_blockplacer_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_blockplacer_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_blockplacer_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_blockplacer_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_blockplacer_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_blockplacer_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_blockplacer_selectedMultiplier;
+
         public final ForgeConfigSpec.BooleanValue quarryDamageTools;
         public final ForgeConfigSpec.IntValue upgrade_quarry_baseEnergyCost;
         public final ForgeConfigSpec.DoubleValue upgrade_quarry_energyMultiplier;
@@ -382,6 +395,46 @@ public class PedestalConfig
             upgrade_blockbreaker_selectedMultiplier = builder
                     .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Block Breaker]")
                     .defineInRange("upgrade_blockbreaker_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            builder.pop();
+
+
+            builder.comment("Breaker Configs").push("Breaker_Configs");
+            upgrade_blockplacer_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Block Breaker]")
+                    .defineInRange("upgrade_blockplacer_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_blockplacer_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Chopper]")
+                    .define("upgrade_blockplacer_energy_distance_multiplier",  true);
+            upgrade_blockplacer_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Block Breaker]")
+                    .defineInRange("upgrade_blockplacer_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_blockplacer_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Block Breaker]")
+                    .defineInRange("upgrade_blockplacer_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_blockplacer_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Chopper]")
+                    .define("upgrade_blockplacer_xp_distance_multiplier",  true);
+            upgrade_blockplacer_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Block Breaker]")
+                    .defineInRange("upgrade_blockplacer_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_blockplacer_dustColor = builder
+                    .comment("Dust Color Required to do action [Block Breaker]")
+                    .defineInRange("upgrade_blockplacer_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_blockplacer_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Block Breaker]")
+                    .defineInRange("upgrade_blockplacer_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_blockplacer_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Chopper]")
+                    .define("upgrade_blockplacer_dust_distance_multiplier",  true);
+            upgrade_blockplacer_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Block Breaker]")
+                    .defineInRange("upgrade_blockplacer_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_blockplacer_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Block Breaker]")
+                    .define("upgrade_blockplacer_selected_allowed",  false);
+            upgrade_blockplacer_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Block Breaker]")
+                    .defineInRange("upgrade_blockplacer_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
             builder.pop();
 
 

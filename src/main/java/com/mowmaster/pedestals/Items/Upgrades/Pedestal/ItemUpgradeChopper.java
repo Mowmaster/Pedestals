@@ -349,6 +349,8 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
             int minY = (int)area.minY;
             boolean fuelRemoved = true;
 
+
+
             //ToDo: make this a modifier for later
             boolean runsOnce = true;
             boolean stop = getStopped(pedestal);

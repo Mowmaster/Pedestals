@@ -94,6 +94,8 @@ public class DeferredRegisterItems
             () -> new ItemUpgradeHarvester(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_VOID = ITEMS.register("upgrade_pedestal_void",
             () -> new ItemUpgradeVoid(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_PLACER = ITEMS.register("upgrade_pedestal_placer",
+            () -> new ItemUpgradeBlockPlacer(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_PACKAGER = ITEMS.register("upgrade_pedestal_packager",
