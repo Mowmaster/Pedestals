@@ -2,7 +2,7 @@
 "parent": "pedestals:item/upgrades/pedestal_upgrade",
 "textures": {
 "coin": "pedestals:items/models/upgrades/pedestal_upgrade",
-"letter": "pedestals:items/models/upgrades/pedestals_upgrade_harvester",
+"letter": "pedestals:items/models/upgrades/pedestal_upgrade_harvester",
 "part": "pedestals:items/models/upgrades/pedestal_upgrade"
 }
 }

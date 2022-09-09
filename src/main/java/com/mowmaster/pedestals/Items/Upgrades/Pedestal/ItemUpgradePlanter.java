@@ -1,41 +1,28 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
-import com.mojang.math.Vector3d;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
-import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
-import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
@@ -45,39 +32,39 @@ import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectablePoints, ISelectableArea
+public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePoints, ISelectableArea
 {
-    public ItemUpgradeBlockPlacer(Properties p_41383_) {
+    public ItemUpgradePlanter(Properties p_41383_) {
         super(new Properties());
     }
 
     //Requires energy
 
     @Override
-    public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_blockplacer_baseEnergyCost.get(); }
+    public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_planter_baseEnergyCost.get(); }
     @Override
-    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_blockplacer_energy_distance_multiplier.get();}
+    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_energy_distance_multiplier.get();}
     @Override
-    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_blockplacer_energyMultiplier.get(); }
+    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_energyMultiplier.get(); }
 
     @Override
-    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_blockplacer_baseXpCost.get(); }
+    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_planter_baseXpCost.get(); }
     @Override
-    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_blockplacer_xp_distance_multiplier.get();}
+    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_xp_distance_multiplier.get();}
     @Override
-    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_blockplacer_xpMultiplier.get(); }
+    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_xpMultiplier.get(); }
 
     @Override
-    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_blockplacer_dustColor.get(),PedestalConfig.COMMON.upgrade_blockplacer_baseDustAmount.get()); }
+    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_planter_dustColor.get(),PedestalConfig.COMMON.upgrade_planter_baseDustAmount.get()); }
     @Override
-    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_blockplacer_dust_distance_multiplier.get();}
+    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_dust_distance_multiplier.get();}
     @Override
-    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_blockplacer_dustMultiplier.get(); }
+    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_dustMultiplier.get(); }
 
     @Override
-    public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_blockplacer_selectedAllowed.get(); }
+    public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_planter_selectedAllowed.get(); }
     @Override
-    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_blockplacer_selectedMultiplier.get(); }
+    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_selectedMultiplier.get(); }
 
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
@@ -239,8 +226,6 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
         MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numposition");
     }
 
-
-
     private boolean passesFilter(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)
     {
         if(pedestal.hasFilter())
@@ -277,7 +262,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
                         possibleBlock instanceof ChorusFlowerBlock
                 )
                 {
-                    return false;
+                    return true;
                 }
             }
         }
@@ -286,7 +271,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
             return false;
         }
 
-        return true;
+        return false;
     }
 
     public BlockState getState(Block getBlock, ItemStack itemForBlock)
@@ -321,7 +306,6 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
         }
     }
 
-
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
@@ -336,20 +320,17 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
             {
                 if(passesFilter(pedestal, blockAtPoint, currentPoint))
                 {
-                    if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() == Blocks.AIR)
+                    if(!currentPoint.equals(pedestal.getPos()))
                     {
-                        UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                        InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                        if (result == InteractionResult.CONSUME) {
-                            pedestal.removeItem(1,true);
+                        if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
+                        {
+                            UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                            if (result == InteractionResult.CONSUME) {
+                                pedestal.removeItem(1,true);
+                            }
                         }
                     }
-                /*if(ForgeEventFactory.onBlockPlace(getPlayer.get(), BlockSnapshot.create(level.dimension(),level,currentPoint), Direction.UP)) {
-                    BlockEvent.EntityPlaceEvent e = new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(level.dimension(),level,currentPoint),level.getBlockState(getPosOfBlockBelow(level,currentPoint,1)), getPlayer.get());
-                    if (!MinecraftForge.EVENT_BUS.post(e)) {
-
-                    }
-                }*/
                 }
             }
 
