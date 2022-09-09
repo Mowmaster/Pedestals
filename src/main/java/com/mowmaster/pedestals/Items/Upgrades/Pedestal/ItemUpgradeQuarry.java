@@ -383,7 +383,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
             int max = (minMaxHeight)?(maxY):(currentYMax);
             int min = (minMaxHeight)?(minY):(currentYMin);
             int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer();
+            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
 
             boolean fuelRemoved = true;
             //ToDo: make this a modifier for later

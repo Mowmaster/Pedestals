@@ -327,7 +327,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
             int currentPosition = getCurrentPosition(pedestal);
             BlockPos currentPoint = listed.get(currentPosition);
             BlockState blockAtPoint = level.getBlockState(currentPoint);
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer();
+            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
 
             boolean fuelRemoved = true;
 

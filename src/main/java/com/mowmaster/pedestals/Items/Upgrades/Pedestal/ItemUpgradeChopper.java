@@ -344,7 +344,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
             int currentPosition = getCurrentPosition(pedestal);
             BlockPos currentPoint = listed.get(currentPosition);
             AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer();
+            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
             int maxY = (int)area.maxY;
             int minY = (int)area.minY;
             boolean fuelRemoved = true;

@@ -41,6 +41,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -50,7 +51,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -792,20 +792,20 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ============================================================
     ==========================================================*/
 
-    public WeakReference<FakePlayer> getPedestalPlayer() {
-        if(pedestalPlayer == null)
+    public WeakReference<FakePlayer> getPedestalPlayer(BasePedestalBlockEntity pedestal) {
+        if(pedestal.pedestalPlayer == null)
         {
-            pedestalPlayer = fakePedestalPlayer(this);
+            pedestal.pedestalPlayer = pedestal.fakePedestalPlayer(pedestal);
         }
 
-        return pedestalPlayer;
+        return pedestal.pedestalPlayer;
     }
 
-    public void updatePedestalPlayer()
+    public void updatePedestalPlayer(BasePedestalBlockEntity pedestal)
     {
-        if(pedestalPlayer != null)
+        if(pedestal.pedestalPlayer != null)
         {
-            pedestalPlayer = fakePedestalPlayer(this);
+            pedestal.pedestalPlayer = fakePedestalPlayer(this);
         }
     }
 

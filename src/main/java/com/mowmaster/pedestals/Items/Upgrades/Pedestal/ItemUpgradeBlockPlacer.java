@@ -292,7 +292,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
             int currentPosition = getCurrentPosition(pedestal);
             BlockPos currentPoint = listed.get(currentPosition);
             BlockState blockAtPoint = level.getBlockState(currentPoint);
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer();
+            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
 
 
             if(passesFilter(pedestal, blockAtPoint, currentPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_place"))).stream().toList().contains(blockAtPoint.getBlock())))

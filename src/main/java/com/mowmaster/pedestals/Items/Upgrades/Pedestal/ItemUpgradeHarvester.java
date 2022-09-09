@@ -373,7 +373,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase implements ISelectable
             int currentPosition = getCurrentPosition(pedestal);
             BlockPos currentPoint = listed.get(currentPosition);
             BlockState blockAtPoint = level.getBlockState(currentPoint);
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer();
+            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
             boolean fuelRemoved = true;
 
             if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
@@ -382,6 +382,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase implements ISelectable
                 {
                     if(canMine(pedestal,blockAtPoint,currentPoint))
                     {
+
                         if(ForgeEventFactory.doPlayerHarvestCheck(getPlayer.get(), blockAtPoint, true)) {
                             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, currentPoint, blockAtPoint, getPlayer.get());
                             if (!MinecraftForge.EVENT_BUS.post(e)) {

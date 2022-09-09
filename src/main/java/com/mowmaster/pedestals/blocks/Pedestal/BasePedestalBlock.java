@@ -396,7 +396,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 else if(pedestal.hasTool() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
                 {
                     pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60499_, p_60501_, 1));
-                    pedestal.updatePedestalPlayer();
+                    pedestal.updatePedestalPlayer(pedestal);
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
                 }
                 else if(pedestal.hasFilter() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_FILTERTOOL.get()))
@@ -634,7 +634,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         if(pedestal.addTool(p_60506_.getOffhandItem()))
                         {
                             pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60503_, p_60505_, 1));
-                            pedestal.updatePedestalPlayer();
+                            pedestal.updatePedestalPlayer(pedestal);
                             p_60506_.getOffhandItem().shrink(1);
                             return InteractionResult.SUCCESS;
                         }
