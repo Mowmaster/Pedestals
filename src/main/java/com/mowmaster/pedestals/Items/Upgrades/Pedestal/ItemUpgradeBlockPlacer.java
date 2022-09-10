@@ -334,14 +334,14 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
 
             if(canPlace(pedestal))
             {
-                if(passesFilter(pedestal, blockAtPoint, currentPoint))
+                if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
                 {
                     if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() == Blocks.AIR)
                     {
-                        UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                        UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
                         InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                         if (result == InteractionResult.CONSUME) {
-                            pedestal.removeItem(1,true);
+                            pedestal.removeItem(1,false);
                         }
                     }
                 /*if(ForgeEventFactory.onBlockPlace(getPlayer.get(), BlockSnapshot.create(level.dimension(),level,currentPoint), Direction.UP)) {

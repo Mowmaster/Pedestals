@@ -112,8 +112,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
                                     //Turn bucket back into an empty one
                                     itemStack = new ItemStack(Items.BUCKET,1);
                                     item.setItem(itemStack);
-                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,0,255));
-                                    actionDone = true;
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),0,0,180));                                    actionDone = true;
                                 }
                             }
                         }
@@ -145,7 +144,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
                             pedestal.addExperience(value,false);
                             itemStack = new ItemStack(Items.GLASS_BOTTLE,itemStack.getCount());
                             item.setItem(itemStack);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
+                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),0,180,0));
                             actionDone = true;
                         }
                     }
@@ -165,7 +164,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
 
                 ItemStack stackInPedestal = pedestal.getItemInPedestal();
                 boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
-                if((!pedestal.hasItem() || stacksMatch) && passesItemFilter(pedestal,itemStack))
+                if((pedestal.addItem(itemStack,true)) && passesItemFilter(pedestal,itemStack))
                 {
                     int spaceInPed = stackInPedestal.getMaxStackSize()-stackInPedestal.getCount();
                     int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
@@ -181,7 +180,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
                             item.getItem().setCount(itemInCount-countToAdd);
                             if(itemInCount<=countToAdd)item.remove(Entity.RemovalReason.DISCARDED);
                             pedestal.addItem(stackToAdd,false);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,180));
+                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),180,180,0));
                             actionDone = true;
                         }
                     }

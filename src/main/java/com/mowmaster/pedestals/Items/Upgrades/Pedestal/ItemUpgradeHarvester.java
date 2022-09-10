@@ -430,7 +430,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase implements ISelectable
                                                     level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                     //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                     if(damage)pedestal.damageInsertedTool(1,false);
-                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
+                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
                                                 }
                                             }
                                             else
@@ -439,7 +439,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase implements ISelectable
                                                 level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                 //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                 if(damage)pedestal.damageInsertedTool(1,false);
-                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
+                                                //if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
                                             }
 
                                             if(drops.size()>0)

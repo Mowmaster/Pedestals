@@ -104,6 +104,7 @@ public class FilterBlocksByClickFuzzy extends BaseFilter {
 
     @Override
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
+        boolean filterBool = super.canAcceptItems(filter, incomingStack);
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.ITEMS);
         int range = stackCurrent.size();
 
@@ -115,9 +116,9 @@ public class FilterBlocksByClickFuzzy extends BaseFilter {
 
         if(!itemFromInv.isEmpty())
         {
-            return true;
+            return filterBool;
         }
-        else return false;
+        else return !filterBool;
     }
 
     @Override

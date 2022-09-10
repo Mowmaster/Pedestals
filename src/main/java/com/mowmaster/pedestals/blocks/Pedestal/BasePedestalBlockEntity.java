@@ -1633,7 +1633,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public int getExperienceTransferRate()
     {
-        //im assuming # = rf value???
+        //im assuming # = xp value???
         int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
         int experienceTransferRateConverted = MowLibXpUtils.getExpCountByLevel(baseValue);
 

@@ -10,63 +10,76 @@ import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.entity.player.BonemealEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePoints, ISelectableArea
+public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectablePoints, ISelectableArea
 {
-    public ItemUpgradePlanter(Properties p_41383_) {
+    public ItemUpgradeFertilizer(Properties p_41383_) {
         super(new Properties());
     }
 
     //Requires energy
 
     @Override
-    public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_planter_baseEnergyCost.get(); }
+    public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_fertilizer_baseEnergyCost.get(); }
     @Override
-    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_energy_distance_multiplier.get();}
+    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_fertilizer_energy_distance_multiplier.get();}
     @Override
-    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_energyMultiplier.get(); }
+    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_fertilizer_energyMultiplier.get(); }
 
     @Override
-    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_planter_baseXpCost.get(); }
+    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_fertilizer_baseXpCost.get(); }
     @Override
-    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_xp_distance_multiplier.get();}
+    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_fertilizer_xp_distance_multiplier.get();}
     @Override
-    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_xpMultiplier.get(); }
+    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_fertilizer_xpMultiplier.get(); }
 
     @Override
-    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_planter_dustColor.get(),PedestalConfig.COMMON.upgrade_planter_baseDustAmount.get()); }
+    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_fertilizer_dustColor.get(),PedestalConfig.COMMON.upgrade_fertilizer_baseDustAmount.get()); }
     @Override
-    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_dust_distance_multiplier.get();}
+    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_fertilizer_dust_distance_multiplier.get();}
     @Override
-    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_dustMultiplier.get(); }
+    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_fertilizer_dustMultiplier.get(); }
 
     @Override
-    public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_planter_selectedAllowed.get(); }
+    public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_fertilizer_selectedAllowed.get(); }
     @Override
-    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_selectedMultiplier.get(); }
+    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_fertilizer_selectedMultiplier.get(); }
 
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
@@ -163,7 +176,7 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
         boolean override = hasTwoPointsSelected(coin);
         List<BlockPos> listed = getValidList(pedestal);
 
-        if(override && pedestal.hasItem())
+        if(override)
         {
             if(listed.size()>0)
             {
@@ -228,6 +241,8 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
         MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numposition");
     }
 
+
+
     private boolean passesFilter(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)
     {
         if(pedestal.hasFilter())
@@ -237,11 +252,8 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
             {
                 if(filter.getFilterDirection().neutral())
                 {
-                    ItemStack blockToCheck = pedestal.getItemInPedestal();
-                    if(Block.byItem(blockToCheck.getItem()) != Blocks.AIR)
-                    {
-                        return filter.canAcceptItems(filterInPedestal,blockToCheck);
-                    }
+                    ItemStack itemToCheck = pedestal.getItemInPedestal();
+                    return filter.canAcceptItems(filterInPedestal,itemToCheck);
                 }
             }
         }
@@ -249,29 +261,50 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
         return true;
     }
 
-    private boolean canPlace(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack getPlaceItem = pedestal.getItemInPedestal();
-        Block possibleBlock = Block.byItem(getPlaceItem.getItem());
-        if(possibleBlock != Blocks.AIR)
-        {
-            if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_place"))).stream().toList().contains(getPlaceItem))
-            {
-                if(possibleBlock instanceof IPlantable ||
-                        possibleBlock instanceof BushBlock ||
-                        possibleBlock instanceof StemBlock ||
-                        possibleBlock instanceof BonemealableBlock ||
-                        possibleBlock instanceof ChorusFlowerBlock
-                )
-                {
-                    return true;
-                }
+    public static IntegerProperty getBlockPropertyAge(BlockState blockState) {
+        for (Property<?> prop : blockState.getProperties()) {
+            if (prop != null && prop.getName() != null && prop instanceof IntegerProperty && prop.getName().equalsIgnoreCase("age")) {
+                return (IntegerProperty) prop;
             }
         }
-        else
+        return null;
+    }
+
+    private boolean canUseOn(BasePedestalBlockEntity pedestal, BlockState useOnState, BlockPos useOnPosition)
+    {
+        //ItemStack getItem = pedestal.getItemInPedestal();
+        Block getBlockToUseOn = useOnState.getBlock();
+        if(getBlockToUseOn instanceof IPlantable || getBlockToUseOn instanceof BonemealableBlock)
         {
-            return false;
+            IntegerProperty propInt = getBlockPropertyAge(useOnState);
+            if(useOnState.hasProperty(propInt))
+            {
+                int current = useOnState.getValue(propInt);
+                //int min = Collections.min(propInt.getPossibleValues());
+                int max = Collections.max(propInt.getPossibleValues());
+                if(max>0)
+                {
+                    if(current == max)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                return true;
+            }
         }
+
+        /*if(getBlockToUseOn instanceof BonemealableBlock)
+        {
+
+        }*/
+
 
         return false;
     }
@@ -308,6 +341,7 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
         }
     }
 
+
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
@@ -317,21 +351,46 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
             BlockPos currentPoint = listed.get(currentPosition);
             BlockState blockAtPoint = level.getBlockState(currentPoint);
             WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
+            ItemStack stackInPed = pedestal.getItemInPedestal();
 
-            if(canPlace(pedestal))
+            if(canUseOn(pedestal,blockAtPoint,currentPoint))
             {
                 if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
                 {
-                    if(!currentPoint.equals(pedestal.getPos()))
+                    if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
                     {
-                        if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
+                        if(pedestal.hasItem() && blockAtPoint.getBlock() instanceof BonemealableBlock)
                         {
-                            UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == InteractionResult.CONSUME) {
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,100,255,100));
-                                pedestal.removeItem(1,false);
+                            if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
+                            {
+                                UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                InteractionResult result = bonerItem.useOn(blockContext);
+                                if (result == InteractionResult.CONSUME) {
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
+                                    pedestal.removeItem(1,false);
+                                }
+                                /*BonemealEvent event = new BonemealEvent(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed);
+                                if (!MinecraftForge.EVENT_BUS.post(event))
+                                {
+                                    if (event.getResult() != Event.Result.DENY)
+                                    {
+
+
+                                    }
+                                }*/
                             }
+
+                            /*if(ForgeEventFactory.onApplyBonemeal(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed)>0)
+                            {
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
+                                //pedestal.removeItem(1,true);
+                            }*/
+                        }
+                        else if(blockAtPoint.getBlock() instanceof IPlantable)
+                        {
+                            blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
+                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
+                            //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
                         }
                     }
                 }

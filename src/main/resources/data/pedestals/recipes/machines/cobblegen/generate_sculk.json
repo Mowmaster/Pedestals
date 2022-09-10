@@ -1,13 +1,13 @@
 {
   "type": "pedestals:cobblegen",
   "blockBelow": {
-    "item": "minecraft:warped_nylium"
+    "item": "minecraft:sculk_catalyst"
   },
   "result": {
-    "item": "minecraft:brown_mushroom_block"
+    "item": "minecraft:sculk"
   },
   "energy": 0,
-  "experience": 0,
+  "experience": 1,
   "fluidName": "",
   "fluid": 0,
   "dustcolor": 0,

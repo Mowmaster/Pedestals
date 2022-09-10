@@ -202,6 +202,38 @@ public class PedestalConfig
         public final ForgeConfigSpec.BooleanValue upgrade_planter_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_planter_selectedMultiplier;
 
+        public final ForgeConfigSpec.IntValue upgrade_fertilizer_baseEnergyCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_fertilizer_energy_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_fertilizer_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_fertilizer_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_fertilizer_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_fertilizer_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_fertilizer_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_fertilizer_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_fertilizer_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_fertilizer_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_fertilizer_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_fertilizer_selectedMultiplier;
+
+        public final ForgeConfigSpec.BooleanValue upgrade_dropper_canDropBolt;
+        public final ForgeConfigSpec.IntValue upgrade_dropper_costPerBolt;
+
+        public final ForgeConfigSpec.IntValue upgrade_pump_baseEnergyCost;
+        public final ForgeConfigSpec.DoubleValue upgrade_pump_energyMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_pump_energy_distance_multiplier;
+        public final ForgeConfigSpec.IntValue upgrade_pump_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_pump_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_pump_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_pump_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_pump_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_pump_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_pump_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_pump_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_pump_selectedMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_pump_baseBlocksPumped;
+
+
+
         public final ForgeConfigSpec.BooleanValue upgrade_require_sized_selectable_area;
 
         public final ForgeConfigSpec.IntValue bulkstorage_fluidDischarge;
@@ -467,7 +499,7 @@ public class PedestalConfig
                     .defineInRange("upgrade_quarry_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
             upgrade_quarry_baseXpCost = builder
                     .comment("Base XP cost per upgrade operation [Quarry]")
-                    .defineInRange("upgrade_quarry_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+                    .defineInRange("upgrade_quarry_base_xp_cost", 1, 0, Integer.MAX_VALUE);
             upgrade_quarry_xp_distance_multiplier = builder
                     .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Quarry]")
                     .define("upgrade_quarry_xp_distance_multiplier",  true);
@@ -514,7 +546,7 @@ public class PedestalConfig
                     .defineInRange("upgrade_chopper_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
             upgrade_chopper_baseXpCost = builder
                     .comment("Base XP cost per upgrade operation [Chopper]")
-                    .defineInRange("upgrade_chopper_base_xp_cost", 1, 0, Integer.MAX_VALUE);
+                    .defineInRange("upgrade_chopper_base_xp_cost", 0, 0, Integer.MAX_VALUE);
             upgrade_chopper_xp_distance_multiplier = builder
                     .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Chopper]")
                     .define("upgrade_chopper_xp_distance_multiplier",  true);
@@ -627,36 +659,125 @@ public class PedestalConfig
             builder.pop();
 
 
-            builder.comment("Bulk Storage Options").push("Bulk_Storage");
 
+            builder.comment("Fertilizer Configs").push("Fertilizer_Configs");
+            upgrade_fertilizer_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Fertilizer]")
+                    .defineInRange("upgrade_fertilizer_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_fertilizer_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Fertilizer]")
+                    .define("upgrade_fertilizer_energy_distance_multiplier",  true);
+            upgrade_fertilizer_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Fertilizer]")
+                    .defineInRange("upgrade_fertilizer_energy_multiplier", 1.0D, 0.0D, Double.MAX_VALUE);
+            upgrade_fertilizer_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Fertilizer]")
+                    .defineInRange("upgrade_fertilizer_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_fertilizer_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Fertilizer]")
+                    .define("upgrade_fertilizer_xp_distance_multiplier",  true);
+            upgrade_fertilizer_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Fertilizer]")
+                    .defineInRange("upgrade_fertilizer_xp_multiplier", 1.0D, 0.0D, Double.MAX_VALUE);
+            upgrade_fertilizer_dustColor = builder
+                    .comment("Dust Color Required to do action [Fertilizer]")
+                    .defineInRange("upgrade_fertilizer_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_fertilizer_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Fertilizer]")
+                    .defineInRange("upgrade_fertilizer_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_fertilizer_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Fertilizer]")
+                    .define("upgrade_fertilizer_dust_distance_multiplier",  true);
+            upgrade_fertilizer_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Fertilizer]")
+                    .defineInRange("upgrade_fertilizer_dust_multiplier", 1.0D, 0.0D, Double.MAX_VALUE);
+            upgrade_fertilizer_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Fertilizer]")
+                    .define("upgrade_fertilizer_selected_allowed",  false);
+            upgrade_fertilizer_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Fertilizer]")
+                    .defineInRange("upgrade_fertilizer_selected_multiplier", 1.0D, 0.0D, Double.MAX_VALUE);
+            builder.pop();
+
+
+
+            builder.comment("Dropper Configs").push("Dropper_Configs");
+            upgrade_dropper_canDropBolt = builder
+                    .comment("Is Dropper Allowed to Drop Lightning")
+                    .define("upgrade_dropper_can_drop_bolt",  true);
+            upgrade_dropper_costPerBolt = builder
+                    .comment("Base Energy needed per Bolt of Lightning 'Dropped' ")
+                    .defineInRange("upgrade_dropper_cost_per_bolt", 5000, 0, Integer.MAX_VALUE);
+            builder.pop();
+
+
+
+            builder.comment("Pump Configs").push("Pump_Configs");
+            upgrade_pump_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Pump]")
+                    .defineInRange("upgrade_pump_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_pump_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Pump]")
+                    .define("upgrade_pump_energy_distance_multiplier",  true);
+            upgrade_pump_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Pump]")
+                    .defineInRange("upgrade_pump_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_pump_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Pump]")
+                    .defineInRange("upgrade_pump_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_pump_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Pump]")
+                    .define("upgrade_pump_xp_distance_multiplier",  true);
+            upgrade_pump_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Pump]")
+                    .defineInRange("upgrade_pump_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_pump_dustColor = builder
+                    .comment("Dust Color Required to do action [Pump]")
+                    .defineInRange("upgrade_pump_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_pump_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Pump]")
+                    .defineInRange("upgrade_pump_based_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_pump_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Pump]")
+                    .define("upgrade_pump_dust_distance_multiplier",  true);
+            upgrade_pump_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Pump]")
+                    .defineInRange("upgrade_pump_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_pump_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Pump]")
+                    .define("upgrade_pump_selected_allowed",  false);
+            upgrade_pump_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Pump]")
+                    .defineInRange("upgrade_pump_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_pump_baseBlocksPumped = builder
+                    .comment("Base Amount of Blocks the Quarry will Mine at a Time. [Pump]")
+                    .defineInRange("upgrade_pump_base_blocks_mined", 4, 0, Integer.MAX_VALUE);
+            builder.pop();
+
+
+
+            builder.comment("Bulk Storage Options").push("Bulk_Storage");
             bulkstorage_fluidDischarge = builder
                     .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (Fluid)")
                     .defineInRange("bulkstorage_fluid_discharge_time", 5, 1, Integer.MAX_VALUE);
-
             bulkstorage_fluidDischarge_toggle = builder
                     .comment("Weather bulk storage discharge is allowed to trigger or not (Fluid)")
                     .define("bulkstorage_fluid_discharge_toggle",  true);
-
             bulkstorage_energyDischarge = builder
                     .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (Energy)")
                     .defineInRange("bulkstorage_energy_discharge_time", 5, 1, Integer.MAX_VALUE);
-
             bulkstorage_energyDischarge_toggle = builder
                     .comment("Weather bulk storage discharge is allowed to trigger or not (Energy)")
                     .define("bulkstorage_energy_discharge_toggle",  true);
-
             bulkstorage_xpDischarge = builder
                     .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (XP)")
                     .defineInRange("bulkstorage_xp_discharge_time", 5, 1, Integer.MAX_VALUE);
-
             bulkstorage_xpDischarge_toggle = builder
                     .comment("Weather bulk storage discharge is allowed to trigger or not (XP)")
                     .define("bulkstorage_xp_discharge_toggle",  true);
-
             bulkstorage_dustDischarge = builder
                     .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (Dust)")
                     .defineInRange("bulkstorage_dust_discharge_time", 5, 1, Integer.MAX_VALUE);
-
             bulkstorage_dustDischarge_toggle = builder
                     .comment("Weather bulk storage discharge is allowed to trigger or not (Dust)")
                     .define("bulkstorage_dust_discharge_toggle",  true);
