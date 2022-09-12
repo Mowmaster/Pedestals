@@ -317,20 +317,30 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
             BlockPos currentPoint = listed.get(currentPosition);
             BlockState blockAtPoint = level.getBlockState(currentPoint);
             WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
+            boolean fuelRemoved = true;
 
-            if(canPlace(pedestal))
+            if(!pedestal.removeItem(1,true).isEmpty())
             {
-                if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
+                if(canPlace(pedestal))
                 {
-                    if(!currentPoint.equals(pedestal.getPos()))
+                    if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
                     {
-                        if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
+                        if(!currentPoint.equals(pedestal.getPos()))
                         {
-                            UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == InteractionResult.CONSUME) {
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,100,255,100));
-                                pedestal.removeItem(1,false);
+                            if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
+                            {
+                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                {
+                                    UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                    if (result == InteractionResult.CONSUME) {
+                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,100,255,100));
+                                        pedestal.removeItem(1,false);
+                                    }
+                                }
+                                else {
+                                    fuelRemoved = false;
+                                }
                             }
                         }
                     }
@@ -343,7 +353,9 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
             }
             else
             {
-                iterateCurrentPosition(pedestal);
+                if(fuelRemoved){
+                    iterateCurrentPosition(pedestal);
+                }
             }
         }
     }

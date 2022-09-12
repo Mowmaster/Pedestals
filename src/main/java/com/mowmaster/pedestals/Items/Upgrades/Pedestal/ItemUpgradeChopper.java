@@ -361,7 +361,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
                 {
                     BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
                     BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                    blockAtPoint.requiresCorrectToolForDrops();
+                    //blockAtPoint.requiresCorrectToolForDrops();
 
                     if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
                     {

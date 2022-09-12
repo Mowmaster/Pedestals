@@ -136,6 +136,20 @@ public class PedestalConfig
         public final ForgeConfigSpec.BooleanValue upgrade_blockplacer_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_blockplacer_selectedMultiplier;
 
+        public final ForgeConfigSpec.IntValue upgrade_filler_baseEnergyCost;
+        public final ForgeConfigSpec.DoubleValue upgrade_filler_energyMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_filler_energy_distance_multiplier;
+        public final ForgeConfigSpec.IntValue upgrade_filler_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_filler_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_filler_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_filler_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_filler_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_filler_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_filler_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_filler_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_filler_selectedMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_filler_baseBlocksPlaced;
+
         public final ForgeConfigSpec.BooleanValue quarryDamageTools;
         public final ForgeConfigSpec.IntValue upgrade_quarry_baseEnergyCost;
         public final ForgeConfigSpec.DoubleValue upgrade_quarry_energyMultiplier;
@@ -215,6 +229,20 @@ public class PedestalConfig
         public final ForgeConfigSpec.BooleanValue upgrade_fertilizer_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_fertilizer_selectedMultiplier;
 
+        public final ForgeConfigSpec.BooleanValue hiveharvester_DamageTools;
+        public final ForgeConfigSpec.IntValue upgrade_hiveharvester_baseEnergyCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_hiveharvester_energy_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_hiveharvester_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_hiveharvester_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_hiveharvester_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_hiveharvester_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_hiveharvester_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_hiveharvester_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_hiveharvester_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_hiveharvester_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_hiveharvester_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_hiveharvester_selectedMultiplier;
+
         public final ForgeConfigSpec.BooleanValue upgrade_dropper_canDropBolt;
         public final ForgeConfigSpec.IntValue upgrade_dropper_costPerBolt;
 
@@ -231,6 +259,21 @@ public class PedestalConfig
         public final ForgeConfigSpec.BooleanValue upgrade_pump_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_pump_selectedMultiplier;
         public final ForgeConfigSpec.IntValue upgrade_pump_baseBlocksPumped;
+        public final ForgeConfigSpec.BooleanValue upgrade_pump_waterlogged;
+
+        public final ForgeConfigSpec.IntValue upgrade_drain_baseEnergyCost;
+        public final ForgeConfigSpec.DoubleValue upgrade_drain_energyMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_drain_energy_distance_multiplier;
+        public final ForgeConfigSpec.IntValue upgrade_drain_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_drain_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_drain_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_drain_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_drain_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_drain_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_drain_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_drain_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_drain_selectedMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_drain_baseBlocksPlaced;
 
 
 
@@ -483,6 +526,49 @@ public class PedestalConfig
             builder.pop();
 
 
+            builder.comment("Filler Configs").push("Filler_Configs");
+            upgrade_filler_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Filler]")
+                    .defineInRange("upgrade_filler_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_filler_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Filler]")
+                    .define("upgrade_filler_energy_distance_multiplier",  true);
+            upgrade_filler_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Filler]")
+                    .defineInRange("upgrade_filler_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_filler_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Filler]")
+                    .defineInRange("upgrade_filler_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_filler_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Filler]")
+                    .define("upgrade_filler_xp_distance_multiplier",  true);
+            upgrade_filler_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Filler]")
+                    .defineInRange("upgrade_filler_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_filler_dustColor = builder
+                    .comment("Dust Color Required to do action [Filler]")
+                    .defineInRange("upgrade_filler_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_filler_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Filler]")
+                    .defineInRange("upgrade_filler_based_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_filler_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Filler]")
+                    .define("upgrade_filler_dust_distance_multiplier",  true);
+            upgrade_filler_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Filler]")
+                    .defineInRange("upgrade_filler_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_filler_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(placing a block or picking up items as an example) from pedestal [Filler]")
+                    .define("upgrade_filler_selected_allowed",  false);
+            upgrade_filler_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Filler]")
+                    .defineInRange("upgrade_filler_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_filler_baseBlocksPlaced = builder
+                    .comment("Base Amount of Blocks the Filler will Place at a Time. [Filler]")
+                    .defineInRange("upgrade_filler_base_blocks_placed", 4, 0, Integer.MAX_VALUE);
+            builder.pop();
+
+
 
             builder.comment("Quarry Configs").push("Quarry_Configs");
             quarryDamageTools = builder
@@ -701,6 +787,50 @@ public class PedestalConfig
 
 
 
+            builder.comment("Hive Harvester Configs").push("Hive_Harvester_Configs");
+            hiveharvester_DamageTools = builder
+                    .comment("Hive Harvester Damages Inserted Tools")
+                    .define("hiveharvester_damage_tools",false);
+            upgrade_hiveharvester_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Hive Harvester]")
+                    .defineInRange("upgrade_hiveharvester_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_hiveharvester_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Hive Harvester]")
+                    .define("upgrade_hiveharvester_energy_distance_multiplier",  true);
+            upgrade_hiveharvester_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Hive Harvester]")
+                    .defineInRange("upgrade_hiveharvester_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_hiveharvester_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Hive Harvester]")
+                    .defineInRange("upgrade_hiveharvester_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_hiveharvester_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Hive Harvester]")
+                    .define("upgrade_hiveharvester_xp_distance_multiplier",  true);
+            upgrade_hiveharvester_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Hive Harvester]")
+                    .defineInRange("upgrade_hiveharvester_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_hiveharvester_dustColor = builder
+                    .comment("Dust Color Required to do action [Hive Harvester]")
+                    .defineInRange("upgrade_hiveharvester_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_hiveharvester_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Hive Harvester]")
+                    .defineInRange("upgrade_hiveharvester_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_hiveharvester_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Hive Harvester]")
+                    .define("upgrade_hiveharvester_dust_distance_multiplier",  true);
+            upgrade_hiveharvester_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Hive Harvester]")
+                    .defineInRange("upgrade_hiveharvester_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_hiveharvester_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Hive Harvester]")
+                    .define("upgrade_hiveharvester_selected_allowed",  false);
+            upgrade_hiveharvester_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Hive Harvester]")
+                    .defineInRange("upgrade_hiveharvester_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            builder.pop();
+
+
+
             builder.comment("Dropper Configs").push("Dropper_Configs");
             upgrade_dropper_canDropBolt = builder
                     .comment("Is Dropper Allowed to Drop Lightning")
@@ -752,6 +882,53 @@ public class PedestalConfig
             upgrade_pump_baseBlocksPumped = builder
                     .comment("Base Amount of Blocks the Quarry will Mine at a Time. [Pump]")
                     .defineInRange("upgrade_pump_base_blocks_mined", 4, 0, Integer.MAX_VALUE);
+            upgrade_pump_waterlogged = builder
+                    .comment("Remove water from Waterlogged Blocks [Pump]")
+                    .define("upgrade_pump_waterlogged",  false);
+            builder.pop();
+
+
+
+            builder.comment("Drain Configs").push("Drain_Configs");
+            upgrade_drain_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Drain]")
+                    .defineInRange("upgrade_drain_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_drain_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Drain]")
+                    .define("upgrade_drain_energy_distance_multiplier",  true);
+            upgrade_drain_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Drain]")
+                    .defineInRange("upgrade_drain_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_drain_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Drain]")
+                    .defineInRange("upgrade_drain_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_drain_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Drain]")
+                    .define("upgrade_drain_xp_distance_multiplier",  true);
+            upgrade_drain_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Drain]")
+                    .defineInRange("upgrade_drain_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_drain_dustColor = builder
+                    .comment("Dust Color Required to do action [Drain]")
+                    .defineInRange("upgrade_drain_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_drain_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Drain]")
+                    .defineInRange("upgrade_drain_based_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_drain_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Drain]")
+                    .define("upgrade_drain_dust_distance_multiplier",  true);
+            upgrade_drain_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Drain]")
+                    .defineInRange("upgrade_drain_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_drain_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(placing a block or picking up items as an example) from pedestal [Drain]")
+                    .define("upgrade_drain_selected_allowed",  false);
+            upgrade_drain_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Drain]")
+                    .defineInRange("upgrade_drain_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_drain_baseBlocksPlaced = builder
+                    .comment("Base Amount of Blocks the Drain will Place at a Time. [Drain]")
+                    .defineInRange("upgrade_drain_base_blocks_placed", 4, 0, Integer.MAX_VALUE);
             builder.pop();
 
 

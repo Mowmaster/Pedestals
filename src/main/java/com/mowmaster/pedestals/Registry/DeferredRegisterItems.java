@@ -88,6 +88,8 @@ public class DeferredRegisterItems
             () -> new ItemUpgradeBlockBreaker(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_PLACER = ITEMS.register("upgrade_pedestal_placer",
             () -> new ItemUpgradeBlockPlacer(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_FILLER = ITEMS.register("upgrade_pedestal_filler",
+            () -> new ItemUpgradeFiller(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_QUARRY = ITEMS.register("upgrade_pedestal_quarry",
             () -> new ItemUpgradeQuarry(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_CHOPPER = ITEMS.register("upgrade_pedestal_chopper",
@@ -98,10 +100,16 @@ public class DeferredRegisterItems
             () -> new ItemUpgradePlanter(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_FERTILIZER = ITEMS.register("upgrade_pedestal_fertilizer",
             () -> new ItemUpgradeFertilizer(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_HIVEHARVESTER = ITEMS.register("upgrade_pedestal_hiveharvester",
+            () -> new ItemUpgradeHiveHarvester(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_VOID = ITEMS.register("upgrade_pedestal_void",
             () -> new ItemUpgradeVoid(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_DROPPER = ITEMS.register("upgrade_pedestal_dropper",
             () -> new ItemUpgradeDropper(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_PUMP = ITEMS.register("upgrade_pedestal_pump",
+            () -> new ItemUpgradePump(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_DRAIN = ITEMS.register("upgrade_pedestal_drain",
+            () -> new ItemUpgradeDrain(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_PACKAGER = ITEMS.register("upgrade_pedestal_packager",

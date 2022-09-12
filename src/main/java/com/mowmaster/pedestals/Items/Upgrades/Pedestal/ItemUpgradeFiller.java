@@ -15,19 +15,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.material.FlowingFluid;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.WaterFluid;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
@@ -37,15 +34,9 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.common.extensions.IForgeFluid;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.fluids.FluidInteractionRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,42 +46,39 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
+public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableArea
 {
-    public ItemUpgradePump(Properties p_41383_) {
+    public ItemUpgradeFiller(Properties p_41383_) {
         super(new Properties());
     }
 
     //Requires energy
 
     @Override
-    public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_pump_baseEnergyCost.get(); }
+    public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_filler_baseEnergyCost.get(); }
     @Override
-    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_pump_energy_distance_multiplier.get();}
+    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_filler_energy_distance_multiplier.get();}
     @Override
-    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_pump_energyMultiplier.get(); }
+    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_filler_energyMultiplier.get(); }
 
     @Override
-    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_pump_baseXpCost.get(); }
+    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_filler_baseXpCost.get(); }
     @Override
-    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_pump_xp_distance_multiplier.get();}
+    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_filler_xp_distance_multiplier.get();}
     @Override
-    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_pump_xpMultiplier.get(); }
+    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_filler_xpMultiplier.get(); }
 
     @Override
-    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_pump_dustColor.get(),PedestalConfig.COMMON.upgrade_pump_baseDustAmount.get()); }
+    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_filler_dustColor.get(),PedestalConfig.COMMON.upgrade_filler_baseDustAmount.get()); }
     @Override
-    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_pump_dust_distance_multiplier.get();}
+    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_filler_dust_distance_multiplier.get();}
     @Override
-    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_pump_dustMultiplier.get(); }
+    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_filler_dustMultiplier.get(); }
 
     @Override
-    public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_pump_selectedAllowed.get(); }
+    public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_filler_selectedAllowed.get(); }
     @Override
-    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_pump_selectedMultiplier.get(); }
-
-    public boolean removeWaterFromLoggedBlocks() { return PedestalConfig.COMMON.upgrade_pump_waterlogged.get(); }
-
+    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_filler_selectedMultiplier.get(); }
 
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
@@ -171,7 +159,7 @@ public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
         {
             if(listed.size()>0)
             {
-                if(pedestal.spaceForFluid()>=1000)upgradeAction(world,pedestal);
+                if(pedestal.hasItem())upgradeAction(world,pedestal);
             }
             else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
             {
@@ -222,7 +210,7 @@ public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
     private int getHeightIteratorValue(BasePedestalBlockEntity pedestal)
     {
         //TODO: make a modifier for this
-        return PedestalConfig.COMMON.upgrade_pump_baseBlocksPumped.get() + pedestal.getItemTransferRateIncreaseFromCapacity();
+        return PedestalConfig.COMMON.upgrade_filler_baseBlocksPlaced.get() + pedestal.getItemTransferRateIncreaseFromCapacity();
     }
 
     private int getCurrentHeight(BasePedestalBlockEntity pedestal)
@@ -293,75 +281,6 @@ public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
         return false;
     }
 
-    private List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockState blockTarget, BlockPos posTarget)
-    {
-        ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(new ItemStack(Items.IRON_AXE)):(pedestal.getToolStack());
-
-        Level level = pedestal.getLevel();
-        if(blockTarget.getBlock() != Blocks.AIR)
-        {
-            LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                    .withRandom(level.random)
-                    .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                    .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-            return blockTarget.getBlock().getDrops(blockTarget,builder);
-        }
-        /*if(blockTarget.requiresCorrectToolForDrops())
-        {
-            if(isToolHighEnoughLevelForBlock(getToolFromPedestal, blockTarget))
-            {
-                Level level = pedestal.getLevel();
-                if(blockTarget.getBlock() != Blocks.AIR)
-                {
-                    LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                            .withRandom(level.random)
-                            .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                            .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                    return blockTarget.getBlock().getDrops(blockTarget,builder);
-                }
-            }
-        }
-        else
-        {
-            Level level = pedestal.getLevel();
-            if(blockTarget.getBlock() != Blocks.AIR)
-            {
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                return blockTarget.getBlock().getDrops(blockTarget,builder);
-            }
-        }*/
-
-        return new ArrayList<>();
-    }
-
-    private boolean canMine(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)
-    {
-        boolean returner = false;
-        if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation("pedestals","pedestals_cant_pump"))).stream().toList().contains(canMineBlock.getBlock()))
-        {
-            FluidState fluidState = pedestal.getLevel().getFluidState(canMinePos);
-            if(fluidState.isSource())
-            {
-                FluidStack fluidStack = new FluidStack(fluidState.getType(), 1000);
-                if(pedestal.canAcceptFluid(fluidStack))
-                {
-                    if(pedestal.spaceForFluid() >= 1000)
-                    {
-                        returner = pedestal.addFluid(fluidStack, IFluidHandler.FluidAction.SIMULATE)>0;
-                    }
-                }
-            }
-        }
-
-        return returner;
-    }
-
     private boolean passesFilter(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)
     {
         if(pedestal.hasFilter())
@@ -371,25 +290,16 @@ public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
             {
                 if(filter.getFilterDirection().neutral())
                 {
-                    FluidState fluidState = pedestal.getLevel().getFluidState(canMinePos);
-                    if(fluidState.isSource())
+                    ItemStack blockToCheck = pedestal.getItemInPedestal();
+                    if(Block.byItem(blockToCheck.getItem()) != Blocks.AIR)
                     {
-                        FluidStack fluidStack = new FluidStack(fluidState.getType(), 1000);
-                        return filter.canAcceptFluids(filterInPedestal,fluidStack);
+                        return filter.canAcceptItems(filterInPedestal,blockToCheck);
                     }
                 }
             }
         }
 
         return true;
-    }
-
-    private void dropXP(Level level, BasePedestalBlockEntity pedestal, BlockState blockAtPoint, BlockPos currentPoint)
-    {
-        int fortune = (EnchantmentHelper.getEnchantments(pedestal.getToolStack()).containsKey(Enchantments.BLOCK_FORTUNE))?(EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE,pedestal.getToolStack())):(0);
-        int silky = (EnchantmentHelper.getEnchantments(pedestal.getToolStack()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH,pedestal.getToolStack())):(0);
-        int xpdrop = blockAtPoint.getBlock().getExpDrop(blockAtPoint,level, level.random,currentPoint,fortune,silky);
-        if(xpdrop>0)blockAtPoint.getBlock().popExperience((ServerLevel)level,currentPoint,xpdrop);
     }
 
     private boolean canPlace(BasePedestalBlockEntity pedestal)
@@ -419,27 +329,6 @@ public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
         return true;
     }
 
-    private boolean passesFilterItems(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)
-    {
-        if(pedestal.hasFilter())
-        {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if(filterInPedestal.getItem() instanceof BaseFilter filter)
-            {
-                if(filter.getFilterDirection().neutral())
-                {
-                    ItemStack blockToCheck = pedestal.getItemInPedestal();
-                    if(Block.byItem(blockToCheck.getItem()) != Blocks.AIR)
-                    {
-                        return filter.canAcceptItems(filterInPedestal,blockToCheck);
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
@@ -451,11 +340,13 @@ public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
             int maxY = (int)area.maxY;
             int minY = (int)area.minY;
             int ySpread = maxY - minY;
-            boolean minMaxHeight = (maxY - minY > 0) || listed.size()<=4;
+            boolean minMaxHeight = ySpread > 0;
             if(ySpread>getHeightIteratorValue(pedestal))setCurrentHeight(pedestal,minY);
+
             int currentYMin = getCurrentHeight(pedestal);
             //int currentYMin = (minMaxHeight)?(0):(getCurrentHeight(pedestal));
             int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue(pedestal));
+
             int min = (minMaxHeight)?(minY):(currentYMin);
             int max = (minMaxHeight)?((ySpread>getHeightIteratorValue(pedestal))?(minY+getHeightIteratorValue(pedestal)):(maxY)):(currentYMax);
             int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
@@ -472,63 +363,24 @@ public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
                 {
                     BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
                     BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-
-                    if(!adjustedPoint.equals(pedestal.getPos()))
+                    if(!pedestal.removeItem(1,true).isEmpty())
                     {
-                        if(canMine(pedestal, blockAtPoint, adjustedPoint))
+                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                         {
-                            if(passesFilter(pedestal, blockAtPoint, adjustedPoint))
+                            if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, adjustedPoint))
                             {
-                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true))
+                                if(!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR)
                                 {
-                                    FluidState fluidState = pedestal.getLevel().getFluidState(adjustedPoint);
-                                    if(fluidState.isSource())
-                                    {
-                                        FluidStack fluidStack = new FluidStack(fluidState.getType(), 1000);
-                                        if(pedestal.canAcceptFluid(fluidStack))
-                                        {
-                                            if(pedestal.spaceForFluid() >= 1000)
-                                            {
-                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
-                                                {
-                                                    //Store Fluid
-                                                    pedestal.addFluid(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-
-                                                    if(blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED))
-                                                    {
-                                                        if(removeWaterFromLoggedBlocks())level.setBlockAndUpdate(adjustedPoint,blockAtPoint.setValue(BlockStateProperties.WATERLOGGED,false));
-                                                    }
-                                                    else
-                                                    {
-                                                        if(!pedestal.removeItem(1,true).isEmpty())
-                                                        {
-                                                            level.setBlockAndUpdate(adjustedPoint,Blocks.AIR.defaultBlockState());
-                                                            if(canPlace(pedestal) && passesFilterItems(pedestal, level.getBlockState(adjustedPoint), adjustedPoint))
-                                                            {
-                                                                if(!adjustedPoint.equals(pedestal.getPos()))
-                                                                {
-                                                                    UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
-                                                                    InteractionResult resultPlace = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                                                    if (resultPlace == InteractionResult.CONSUME) {
-                                                                        pedestal.removeItem(1,false);
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            level.setBlockAndUpdate(adjustedPoint,Blocks.AIR.defaultBlockState());
-                                                        }
-                                                    }
-                                                }
-                                                else {
-                                                    fuelRemoved = false;
-                                                }
-                                            }
-                                        }
+                                    UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
+                                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                    if (result == InteractionResult.CONSUME) {
+                                        pedestal.removeItem(1,false);
                                     }
                                 }
                             }
+                        }
+                        else {
+                            fuelRemoved = false;
                         }
                     }
                 }

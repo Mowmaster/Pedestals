@@ -376,12 +376,16 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
             AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
             int maxY = (int)area.maxY;
             int minY = (int)area.minY;
-            boolean minMaxHeight = maxY - minY > 0;
-            int currentYMin = (minMaxHeight)?(0):(getCurrentHeight(pedestal));
+            int ySpread = maxY - minY;
+            boolean minMaxHeight = ySpread > 0;
+            if(ySpread>getHeightIteratorValue(pedestal))setCurrentHeight(pedestal,minY);
+
+            int currentYMin = getCurrentHeight(pedestal);
+            //int currentYMin = (minMaxHeight)?(0):(getCurrentHeight(pedestal));
             int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue(pedestal));
-            boolean ySpread = currentYMax - currentYMin > 0;
-            int max = (minMaxHeight)?(maxY):(currentYMax);
+
             int min = (minMaxHeight)?(minY):(currentYMin);
+            int max = (minMaxHeight)?((ySpread>getHeightIteratorValue(pedestal))?(minY+getHeightIteratorValue(pedestal)):(maxY)):(currentYMax);
             int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
             WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
 
@@ -396,7 +400,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                 {
                     BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
                     BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                    blockAtPoint.requiresCorrectToolForDrops();
+                    //blockAtPoint.requiresCorrectToolForDrops();
 
                     if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
                     {

@@ -274,7 +274,14 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectabl
     {
         //ItemStack getItem = pedestal.getItemInPedestal();
         Block getBlockToUseOn = useOnState.getBlock();
-        if(getBlockToUseOn instanceof IPlantable || getBlockToUseOn instanceof BonemealableBlock)
+        if(getBlockToUseOn instanceof StemGrownBlock ||
+                getBlockToUseOn instanceof BonemealableBlock ||
+                getBlockToUseOn instanceof IPlantable ||
+                getBlockToUseOn instanceof ChorusFlowerBlock)
+        {
+            return true;
+        }
+        else if(getBlockToUseOn instanceof IPlantable || getBlockToUseOn instanceof BonemealableBlock)
         {
             IntegerProperty propInt = getBlockPropertyAge(useOnState);
             if(useOnState.hasProperty(propInt))
@@ -355,11 +362,11 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectabl
 
             if(canUseOn(pedestal,blockAtPoint,currentPoint))
             {
-                if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
+                if(passesFilter(pedestal, blockAtPoint, currentPoint))
                 {
                     if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
                     {
-                        if(pedestal.hasItem() && blockAtPoint.getBlock() instanceof BonemealableBlock)
+                        if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
                         {
                             if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
                             {
@@ -386,7 +393,7 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectabl
                                 //pedestal.removeItem(1,true);
                             }*/
                         }
-                        else if(blockAtPoint.getBlock() instanceof IPlantable)
+                        else if(canUseOn(pedestal, blockAtPoint, currentPoint))
                         {
                             blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
                             if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
