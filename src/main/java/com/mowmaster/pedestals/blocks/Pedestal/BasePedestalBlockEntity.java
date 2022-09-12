@@ -2477,6 +2477,28 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return false;
     }
 
+    public boolean damageTool(ItemStack stackTool, int damageAmount, boolean simulate)
+    {
+        if(stackTool.isDamageableItem())
+        {
+            if((stackTool.getMaxDamage() - stackTool.getDamageValue())>damageAmount)
+            {
+                if(!simulate)
+                {
+                    if(stackTool.isDamageableItem())
+                    {
+                        int newDamageAmount = stackTool.getDamageValue() + damageAmount;
+                        stackTool.setDamageValue(newDamageAmount);
+                        return true;
+                    }
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public ItemStack getActualToolStack()
     {
         IItemHandler ph = privateHandler.orElse(null);

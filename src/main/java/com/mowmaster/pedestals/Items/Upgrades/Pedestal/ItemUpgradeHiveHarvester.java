@@ -11,7 +11,9 @@ import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
 import net.minecraft.core.BlockSourceImpl;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.resources.ResourceLocation;
@@ -19,9 +21,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -35,6 +40,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.TierSortingRegistry;
@@ -51,6 +58,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import static net.minecraft.world.level.block.BeehiveBlock.HONEY_LEVEL;
 
 public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelectablePoints, ISelectableArea
 {
@@ -280,7 +288,6 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
         {
             if(isToolHighEnoughLevelForBlock(getToolFromPedestal, blockTarget))
             {
-
             }
         }
         else
@@ -292,7 +299,6 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
                         .withRandom(level.random)
                         .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
                         .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
                 return blockTarget.getBlock().getDrops(blockTarget,builder);
             }
         }*/
@@ -335,33 +341,15 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
     private boolean canMine(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)
     {
         if (canMineBlock.is(BlockTags.BEEHIVES, (p_202454_) -> {
-            return p_202454_.hasProperty(BeehiveBlock.HONEY_LEVEL) && p_202454_.getBlock() instanceof BeehiveBlock;
+            return p_202454_.hasProperty(HONEY_LEVEL) && p_202454_.getBlock() instanceof BeehiveBlock;
         })) {
-            int i = canMineBlock.getValue(BeehiveBlock.HONEY_LEVEL);
+            int i = canMineBlock.getValue(HONEY_LEVEL);
             if (i >= 5) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    private static final Map<Item, DispenseItemBehavior> DISPENSER_REGISTRY = Util.make(new Object2ObjectOpenHashMap<>(), (p_52723_) -> {
-        p_52723_.defaultReturnValue(new DefaultDispenseItemBehavior());
-    });
-
-    protected void dispenseFrom(ServerLevel p_52665_, BlockPos p_52666_, BasePedestalBlockEntity pedestal) {
-        BlockSourceImpl blocksourceimpl = new BlockSourceImpl(p_52665_, p_52666_);
-
-        ItemStack itemstack = (pedestal.hasItem())?(pedestal.getItemInPedestal().copy()):(pedestal.getToolStack());
-        DispenseItemBehavior dispenseitembehavior = this.getDispenseMethod(itemstack);
-        if (dispenseitembehavior != DispenseItemBehavior.NOOP) {
-            MowLibItemUtils.spawnItemStack(pedestal.getLevel(),p_52666_.getX()+0.5D,p_52666_.getY()+1.0D,p_52666_.getZ()+0.5D,dispenseitembehavior.dispense(blocksourceimpl, itemstack));
-        }
-    }
-
-    protected DispenseItemBehavior getDispenseMethod(ItemStack p_52667_) {
-        return DISPENSER_REGISTRY.get(p_52667_.getItem());
     }
 
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
@@ -417,9 +405,38 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
 
                                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                         {
-                                            dispenseFrom((ServerLevel)level,currentPoint,pedestal);
-                                            if(damage)pedestal.damageInsertedTool(1,false);
-                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
+                                            BlockSourceImpl p_123444_ = new BlockSourceImpl((ServerLevel)level, currentPoint);
+                                            if (blockAtPoint.is(BlockTags.BEEHIVES, (p_123442_) -> {
+                                                return p_123442_.hasProperty(HONEY_LEVEL) && p_123442_.getBlock() instanceof BeehiveBlock;
+                                            }) && blockAtPoint.getValue(HONEY_LEVEL) >= 5) {
+                                                ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
+                                                getPlayer.get().setItemInHand(InteractionHand.MAIN_HAND,toolStack);
+                                                UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, toolStack.copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                                BlockHitResult resulted = new BlockHitResult(blockContext.getClickLocation(),blockContext.getClickedFace(),blockContext.getClickedPos(),blockContext.isInside());
+                                                if(resulted.getType() == HitResult.Type.BLOCK)
+                                                {
+                                                    ((BeehiveBlock)blockAtPoint.getBlock()).use(blockAtPoint,level,currentPoint, getPlayer.get(), InteractionHand.MAIN_HAND,resulted);
+                                                    NonNullList<ItemStack> getItemsInPlayer = getPlayer.get().getInventory().items;
+                                                    for(int i=0;i<getItemsInPlayer.size();i++)
+                                                    {
+                                                        ItemStack stackInPlayer = getItemsInPlayer.get(i);
+                                                        if(!stackInPlayer.isEmpty() && !toolStack.getItem().equals(stackInPlayer.getItem()))
+                                                        {
+                                                            MowLibItemUtils.spawnItemStack(level,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),stackInPlayer);
+                                                            if(toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize()<=1)
+                                                            {
+                                                                if(damage)pedestal.damageTool(toolStack,1,false);
+                                                            }
+                                                            else
+                                                            {
+                                                                pedestal.removeItem(1,false);
+                                                            }
+                                                        }
+                                                    }
+                                                    if(damage)pedestal.damageInsertedTool(1,false);
+                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
+                                                }
+                                            }
                                         }
                                         else {
                                             fuelRemoved = false;
@@ -432,52 +449,6 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
                 }
             }
 
-            //ShearsDispenseItemBehavior
-            /*
-
-            private static boolean tryShearBeehive(ServerLevel p_123577_, BlockPos p_123578_) {
-      BlockState blockstate = p_123577_.getBlockState(p_123578_);
-      if (blockstate.is(BlockTags.BEEHIVES, (p_202454_) -> {
-         return p_202454_.hasProperty(BeehiveBlock.HONEY_LEVEL) && p_202454_.getBlock() instanceof BeehiveBlock;
-      })) {
-         int i = blockstate.getValue(BeehiveBlock.HONEY_LEVEL);
-         if (i >= 5) {
-            p_123577_.playSound((Player)null, p_123578_, SoundEvents.BEEHIVE_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
-            BeehiveBlock.dropHoneycomb(p_123577_, p_123578_);
-            ((BeehiveBlock)blockstate.getBlock()).releaseBeesAndResetHoneyLevel(p_123577_, blockstate, p_123578_, (Player)null, BeehiveBlockEntity.BeeReleaseStatus.BEE_RELEASED);
-            p_123577_.gameEvent((Entity)null, GameEvent.SHEAR, p_123578_);
-            return true;
-         }
-      }
-
-      return false;
-   }
-             */
-
-            /*
-            Glass Bottle Interaction
-            public ItemStack execute(BlockSource p_123444_, ItemStack p_123445_) {
-            this.setSuccess(false);
-            ServerLevel serverlevel = p_123444_.getLevel();
-            BlockPos blockpos = p_123444_.getPos().relative(p_123444_.getBlockState().getValue(DispenserBlock.FACING));
-            BlockState blockstate = serverlevel.getBlockState(blockpos);
-            if (blockstate.is(BlockTags.BEEHIVES, (p_123442_) -> {
-               return p_123442_.hasProperty(BeehiveBlock.HONEY_LEVEL) && p_123442_.getBlock() instanceof BeehiveBlock;
-            }) && blockstate.getValue(BeehiveBlock.HONEY_LEVEL) >= 5) {
-               ((BeehiveBlock)blockstate.getBlock()).releaseBeesAndResetHoneyLevel(serverlevel, blockstate, blockpos, (Player)null, BeehiveBlockEntity.BeeReleaseStatus.BEE_RELEASED);
-               this.setSuccess(true);
-               return this.takeLiquid(p_123444_, p_123445_, new ItemStack(Items.HONEY_BOTTLE));
-            } else if (serverlevel.getFluidState(blockpos).is(FluidTags.WATER)) {
-               this.setSuccess(true);
-               return this.takeLiquid(p_123444_, p_123445_, PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER));
-            } else {
-               return super.execute(p_123444_, p_123445_);
-            }
-         }
-             */
-
-            //System.out.println("CurrentPoint: "+ currentPosition);
-            //System.out.println("ListSize: "+ listed.size());
             if((currentPosition+1)>=listed.size())
             {
                 setCurrentPosition(pedestal,0);
