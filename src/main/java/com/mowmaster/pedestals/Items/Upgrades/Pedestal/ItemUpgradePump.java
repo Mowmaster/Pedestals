@@ -41,10 +41,7 @@ import net.minecraftforge.common.extensions.IForgeFluid;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.fluids.FluidInteractionRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.fluids.*;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
@@ -484,10 +481,10 @@ public class ItemUpgradePump extends ItemUpgradeBase implements ISelectableArea
                                     FluidState fluidState = pedestal.getLevel().getFluidState(adjustedPoint);
                                     if(fluidState.isSource())
                                     {
-                                        FluidStack fluidStack = new FluidStack(fluidState.getType(), 1000);
+                                        FluidStack fluidStack = new FluidStack(fluidState.getType(), FluidType.BUCKET_VOLUME);
                                         if(pedestal.canAcceptFluid(fluidStack))
                                         {
-                                            if(pedestal.spaceForFluid() >= 1000)
+                                            if(pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME)
                                             {
                                                 if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                                                 {

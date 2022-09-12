@@ -275,6 +275,48 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_drain_selectedMultiplier;
         public final ForgeConfigSpec.IntValue upgrade_drain_baseBlocksPlaced;
 
+        public final ForgeConfigSpec.BooleanValue sheerer_DamageTools;
+        public final ForgeConfigSpec.IntValue upgrade_sheerer_baseEnergyCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_sheerer_energy_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_sheerer_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_sheerer_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_sheerer_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_sheerer_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_sheerer_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_sheerer_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_sheerer_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_sheerer_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_sheerer_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_sheerer_selectedMultiplier;
+
+        public final ForgeConfigSpec.BooleanValue milker_DamageTools;
+        public final ForgeConfigSpec.IntValue upgrade_milker_baseEnergyCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_milker_energy_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_milker_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_milker_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_milker_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_milker_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_milker_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_milker_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_milker_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_milker_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_milker_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_milker_selectedMultiplier;
+
+        public final ForgeConfigSpec.BooleanValue breeder_DamageTools;
+        public final ForgeConfigSpec.IntValue upgrade_breeder_baseEnergyCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_breeder_energy_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_breeder_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_breeder_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_breeder_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_breeder_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_breeder_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_breeder_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_breeder_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_breeder_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_breeder_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_breeder_selectedMultiplier;
+
 
 
         public final ForgeConfigSpec.BooleanValue upgrade_require_sized_selectable_area;
@@ -929,6 +971,133 @@ public class PedestalConfig
             upgrade_drain_baseBlocksPlaced = builder
                     .comment("Base Amount of Blocks the Drain will Place at a Time. [Drain]")
                     .defineInRange("upgrade_drain_base_blocks_placed", 4, 0, Integer.MAX_VALUE);
+            builder.pop();
+
+
+            builder.comment("Sheerer Configs").push("Sheerer_Configs");
+            sheerer_DamageTools = builder
+                    .comment("Sheerer Damages Inserted Tools")
+                    .define("chopperDamageTools",false);
+            upgrade_sheerer_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Sheerer]")
+                    .defineInRange("upgrade_sheerer_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_sheerer_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Sheerer]")
+                    .define("upgrade_sheerer_energy_distance_multiplier",  true);
+            upgrade_sheerer_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Sheerer]")
+                    .defineInRange("upgrade_sheerer_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_sheerer_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Sheerer]")
+                    .defineInRange("upgrade_sheerer_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_sheerer_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Sheerer]")
+                    .define("upgrade_sheerer_xp_distance_multiplier",  true);
+            upgrade_sheerer_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Sheerer]")
+                    .defineInRange("upgrade_sheerer_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_sheerer_dustColor = builder
+                    .comment("Dust Color Required to do action [Sheerer]")
+                    .defineInRange("upgrade_sheerer_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_sheerer_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Sheerer]")
+                    .defineInRange("upgrade_sheerer_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_sheerer_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Sheerer]")
+                    .define("upgrade_sheerer_dust_distance_multiplier",  true);
+            upgrade_sheerer_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Sheerer]")
+                    .defineInRange("upgrade_sheerer_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_sheerer_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Sheerer]")
+                    .define("upgrade_sheerer_selected_allowed",  false);
+            upgrade_sheerer_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Sheerer]")
+                    .defineInRange("upgrade_sheerer_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            builder.pop();
+
+            builder.comment("Milker Configs").push("Milker_Configs");
+            milker_DamageTools = builder
+                    .comment("Milker Damages Inserted Tools")
+                    .define("chopperDamageTools",false);
+            upgrade_milker_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Milker]")
+                    .defineInRange("upgrade_milker_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_milker_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Milker]")
+                    .define("upgrade_milker_energy_distance_multiplier",  true);
+            upgrade_milker_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Milker]")
+                    .defineInRange("upgrade_milker_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_milker_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Milker]")
+                    .defineInRange("upgrade_milker_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_milker_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Milker]")
+                    .define("upgrade_milker_xp_distance_multiplier",  true);
+            upgrade_milker_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Milker]")
+                    .defineInRange("upgrade_milker_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_milker_dustColor = builder
+                    .comment("Dust Color Required to do action [Milker]")
+                    .defineInRange("upgrade_milker_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_milker_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Milker]")
+                    .defineInRange("upgrade_milker_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_milker_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Milker]")
+                    .define("upgrade_milker_dust_distance_multiplier",  true);
+            upgrade_milker_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Milker]")
+                    .defineInRange("upgrade_milker_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_milker_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Milker]")
+                    .define("upgrade_milker_selected_allowed",  false);
+            upgrade_milker_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Milker]")
+                    .defineInRange("upgrade_milker_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            builder.pop();
+
+            builder.comment("Mob Breeder Configs").push("Mob_Breeder_Configs");
+            breeder_DamageTools = builder
+                    .comment("Mob Breeder Damages Inserted Tools")
+                    .define("chopperDamageTools",false);
+            upgrade_breeder_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Mob Breeder]")
+                    .defineInRange("upgrade_breeder_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_breeder_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Mob Breeder]")
+                    .define("upgrade_breeder_energy_distance_multiplier",  true);
+            upgrade_breeder_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Mob Breeder]")
+                    .defineInRange("upgrade_breeder_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_breeder_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Mob Breeder]")
+                    .defineInRange("upgrade_breeder_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_breeder_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Mob Breeder]")
+                    .define("upgrade_breeder_xp_distance_multiplier",  true);
+            upgrade_breeder_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Mob Breeder]")
+                    .defineInRange("upgrade_breeder_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_breeder_dustColor = builder
+                    .comment("Dust Color Required to do action [Mob Breeder]")
+                    .defineInRange("upgrade_breeder_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_breeder_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Mob Breeder]")
+                    .defineInRange("upgrade_breeder_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_breeder_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Mob Breeder]")
+                    .define("upgrade_breeder_dust_distance_multiplier",  true);
+            upgrade_breeder_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Mob Breeder]")
+                    .defineInRange("upgrade_breeder_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_breeder_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Mob Breeder]")
+                    .define("upgrade_breeder_selected_allowed",  false);
+            upgrade_breeder_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Mob Breeder]")
+                    .defineInRange("upgrade_breeder_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
             builder.pop();
 
 

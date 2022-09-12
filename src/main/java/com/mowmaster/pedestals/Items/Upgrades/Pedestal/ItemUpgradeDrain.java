@@ -32,6 +32,7 @@ import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.DispenseFluidContainer;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
@@ -455,7 +456,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
             WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
             boolean fuelRemoved = true;
 
-            if(pedestal.removeFluid(1000, IFluidHandler.FluidAction.SIMULATE).getAmount() == 1000)
+            if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.SIMULATE).getAmount() == FluidType.BUCKET_VOLUME)
             {
                 if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                 {
@@ -473,7 +474,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                                     {
                                         if(blockAtPoint.getValue(BlockStateProperties.WATERLOGGED)==false)
                                         {
-                                            if(pedestal.removeFluid(1000, IFluidHandler.FluidAction.EXECUTE).getFluid().equals(Fluids.WATER))
+                                            if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).getFluid().equals(Fluids.WATER))
                                             {
                                                 level.setBlockAndUpdate(currentPoint,blockAtPoint.setValue(BlockStateProperties.WATERLOGGED,true));
                                             }
@@ -481,7 +482,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                                     }
                                     else
                                     {
-                                        if(!pedestal.removeFluid(1000, IFluidHandler.FluidAction.EXECUTE).isEmpty())
+                                        if(!pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).isEmpty())
                                         {
                                             level.setBlockAndUpdate(currentPoint,stackInPedestal.getFluid().defaultFluidState().createLegacyBlock());
                                         }
@@ -540,7 +541,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                 {
                     BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
                     BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                    if(pedestal.removeFluid(1000, IFluidHandler.FluidAction.SIMULATE).getAmount() == 1000)
+                    if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.SIMULATE).getAmount() == FluidType.BUCKET_VOLUME)
                     {
                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true))
                         {
@@ -559,7 +560,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                                             {
                                                 if(blockAtPoint.getValue(BlockStateProperties.WATERLOGGED)==false)
                                                 {
-                                                    if(pedestal.removeFluid(1000, IFluidHandler.FluidAction.EXECUTE).getFluid().equals(Fluids.WATER))
+                                                    if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).getFluid().equals(Fluids.WATER))
                                                     {
                                                         level.setBlockAndUpdate(adjustedPoint,blockAtPoint.setValue(BlockStateProperties.WATERLOGGED,true));
                                                     }
@@ -567,7 +568,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                                             }
                                             else
                                             {
-                                                if(!pedestal.removeFluid(1000, IFluidHandler.FluidAction.EXECUTE).isEmpty())
+                                                if(!pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).isEmpty())
                                                 {
                                                     level.setBlockAndUpdate(adjustedPoint,stackInPedestal.getFluid().defaultFluidState().createLegacyBlock());
                                                 }

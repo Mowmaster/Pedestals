@@ -110,6 +110,12 @@ public class DeferredRegisterItems
             () -> new ItemUpgradePump(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_DRAIN = ITEMS.register("upgrade_pedestal_drain",
             () -> new ItemUpgradeDrain(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_SHEERER = ITEMS.register("upgrade_pedestal_sheerer",
+            () -> new ItemUpgradeSheerer(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_MILKER = ITEMS.register("upgrade_pedestal_milker",
+            () -> new ItemUpgradeMilker(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_BREEDER = ITEMS.register("upgrade_pedestal_breeder",
+            () -> new ItemUpgradeBreeder(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_PACKAGER = ITEMS.register("upgrade_pedestal_packager",

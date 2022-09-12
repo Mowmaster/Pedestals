@@ -67,7 +67,6 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
     }
 
     //Requires energy
-
     @Override
     public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_hiveharvester_baseEnergyCost.get(); }
     @Override
@@ -369,7 +368,6 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
                 {
                     if(canMine(pedestal,blockAtPoint,currentPoint))
                     {
-
                         if(ForgeEventFactory.doPlayerHarvestCheck(getPlayer.get(), blockAtPoint, true)) {
                             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, currentPoint, blockAtPoint, getPlayer.get());
                             if (!MinecraftForge.EVENT_BUS.post(e)) {
