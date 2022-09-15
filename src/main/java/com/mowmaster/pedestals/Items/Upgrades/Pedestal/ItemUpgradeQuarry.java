@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -142,11 +143,10 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
         removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numposition");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numdelay");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numheight");
-        removeBooleanFromNBT(MODID, coinInPedestal.getTag(),"_boolstop");
-
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numheight");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_boolstop");
     }
 
     @Override
@@ -173,39 +173,18 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
         }
     }
 
-    //
-    //  Add To MowLib
-    //
-    public static boolean readBooleanFromNBT(String ModID, CompoundTag tag, String identifier)
-    {
-        return tag.contains(ModID + identifier) ? tag.getBoolean(ModID + identifier) : false;
-    }
 
-    public static CompoundTag writeBooleanToNBT(String ModID, @Nullable CompoundTag tag, boolean value, String identifier) {
-        CompoundTag compound = tag != null ? tag : new CompoundTag();
-        compound.putBoolean(ModID + identifier, value);
-        return compound;
-    }
-
-    public static void removeBooleanFromNBT(String ModID, CompoundTag tag, String identifier) {
-        if (tag.contains(ModID + identifier)) {
-            tag.remove(ModID + identifier);
-        }
-    }
-    //
-    //
-    //
 
     private boolean getStopped(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
+        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
     }
 
     private void setStopped(BasePedestalBlockEntity pedestal, boolean value)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
+        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
     }
 
     private int getHeightIteratorValue(BasePedestalBlockEntity pedestal)
@@ -269,17 +248,6 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
         ItemStack coin = pedestal.getCoinOnPedestal();
         int current = getCurrentPosition(pedestal);
         MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numposition");
-    }
-
-    private boolean isToolHighEnoughLevelForBlock(ItemStack toolIn, BlockState getBlock)
-    {
-        if(toolIn.getItem() instanceof TieredItem tieredItem)
-        {
-            Tier toolTier = tieredItem.getTier();
-            return TierSortingRegistry.isCorrectTierForDrops(toolTier,getBlock);
-        }
-
-        return false;
     }
 
     private List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockState blockTarget, BlockPos posTarget)

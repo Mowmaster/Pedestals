@@ -317,6 +317,33 @@ public class PedestalConfig
         public final ForgeConfigSpec.BooleanValue upgrade_breeder_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_breeder_selectedMultiplier;
 
+        public final ForgeConfigSpec.BooleanValue attacker_DamageTools;
+        public final ForgeConfigSpec.IntValue upgrade_attacker_baseEnergyCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_attacker_energy_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_attacker_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_attacker_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_attacker_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_attacker_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_attacker_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_attacker_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_attacker_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_attacker_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_attacker_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_attacker_selectedMultiplier;
+
+        public final ForgeConfigSpec.IntValue upgrade_fan_baseEnergyCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_fan_energy_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_fan_energyMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_fan_baseXpCost;
+        public final ForgeConfigSpec.BooleanValue upgrade_fan_xp_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_fan_xpMultiplier;
+        public final ForgeConfigSpec.IntValue upgrade_fan_dustColor;
+        public final ForgeConfigSpec.IntValue upgrade_fan_baseDustAmount;
+        public final ForgeConfigSpec.BooleanValue upgrade_fan_dust_distance_multiplier;
+        public final ForgeConfigSpec.DoubleValue upgrade_fan_dustMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_fan_selectedAllowed;
+        public final ForgeConfigSpec.DoubleValue upgrade_fan_selectedMultiplier;
+
 
 
         public final ForgeConfigSpec.BooleanValue upgrade_require_sized_selectable_area;
@@ -1098,6 +1125,91 @@ public class PedestalConfig
             upgrade_breeder_selectedMultiplier = builder
                     .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Mob Breeder]")
                     .defineInRange("upgrade_breeder_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            builder.pop();
+
+
+
+            builder.comment("Attacker Configs").push("Attacker_Configs");
+            attacker_DamageTools = builder
+                    .comment("Attacker Damages Inserted Tools")
+                    .define("chopperDamageTools",false);
+            upgrade_attacker_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Attacker]")
+                    .defineInRange("upgrade_attacker_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_attacker_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Attacker]")
+                    .define("upgrade_attacker_energy_distance_multiplier",  true);
+            upgrade_attacker_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Attacker]")
+                    .defineInRange("upgrade_attacker_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_attacker_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Attacker]")
+                    .defineInRange("upgrade_attacker_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_attacker_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Attacker]")
+                    .define("upgrade_attacker_xp_distance_multiplier",  true);
+            upgrade_attacker_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Attacker]")
+                    .defineInRange("upgrade_attacker_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_attacker_dustColor = builder
+                    .comment("Dust Color Required to do action [Attacker]")
+                    .defineInRange("upgrade_attacker_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_attacker_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Attacker]")
+                    .defineInRange("upgrade_attacker_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_attacker_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Attacker]")
+                    .define("upgrade_attacker_dust_distance_multiplier",  true);
+            upgrade_attacker_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Attacker]")
+                    .defineInRange("upgrade_attacker_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_attacker_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Attacker]")
+                    .define("upgrade_attacker_selected_allowed",  false);
+            upgrade_attacker_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Attacker]")
+                    .defineInRange("upgrade_attacker_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            builder.pop();
+
+
+
+            builder.comment("Fan Configs").push("Fan_Configs");
+            upgrade_fan_baseEnergyCost = builder
+                    .comment("Base RF cost per upgrade operation [Fan]")
+                    .defineInRange("upgrade_fan_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_fan_energy_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Fan]")
+                    .define("upgrade_fan_energy_distance_multiplier",  true);
+            upgrade_fan_energyMultiplier = builder
+                    .comment("Energy Multiplier, total cost x multiplier [Fan]")
+                    .defineInRange("upgrade_fan_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_fan_baseXpCost = builder
+                    .comment("Base XP cost per upgrade operation [Fan]")
+                    .defineInRange("upgrade_fan_base_xp_cost", 0, 0, Integer.MAX_VALUE);
+            upgrade_fan_xp_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Fan]")
+                    .define("upgrade_fan_xp_distance_multiplier",  true);
+            upgrade_fan_xpMultiplier = builder
+                    .comment("XP Multiplier, total cost x multiplier [Fan]")
+                    .defineInRange("upgrade_fan_xp_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_fan_dustColor = builder
+                    .comment("Dust Color Required to do action [Fan]")
+                    .defineInRange("upgrade_fan_dust_color", -1, -1, Integer.MAX_VALUE);
+            upgrade_fan_baseDustAmount = builder
+                    .comment("Base Dust amount needed per upgrade operation [Fan]")
+                    .defineInRange("upgrade_fan_base_dust_amount", 0, 0, Integer.MAX_VALUE);
+            upgrade_fan_dust_distance_multiplier = builder
+                    .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Fan]")
+                    .define("upgrade_fan_dust_distance_multiplier",  true);
+            upgrade_fan_dustMultiplier = builder
+                    .comment("Dust Amount Multiplier, total cost x multiplier [Fan]")
+                    .defineInRange("upgrade_fan_dust_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_fan_selectedAllowed = builder
+                    .comment("Additional Modifier based on distance of work(breaking a block or picking up items as an example) from pedestal [Fan]")
+                    .define("upgrade_fan_selected_allowed",  false);
+            upgrade_fan_selectedMultiplier = builder
+                    .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Fan]")
+                    .defineInRange("upgrade_fan_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
             builder.pop();
 
 

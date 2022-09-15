@@ -58,12 +58,12 @@ public class FilterBlocksByClickFuzzy extends BaseFilter {
         if (!p_41432_.isClientSide()) {
             if (itemInOffhand.getItem() instanceof IPedestalFilter && !(itemInMainhand.getItem() instanceof IPedestalFilter)) {
                 if (result.getType().equals(HitResult.Type.MISS)) {
-                    if (p_41433_.isCrouching()) {
+                    if (p_41433_.isShiftKeyDown()) {
                         setFilterMode(p_41433_, itemInOffhand, InteractionHand.OFF_HAND);
                     } else {
                         setFilterType(p_41433_, itemInOffhand);
                     }
-                } else if (result.getType().equals(HitResult.Type.BLOCK) && p_41433_.isCrouching()) {
+                } else if (result.getType().equals(HitResult.Type.BLOCK) && p_41433_.isShiftKeyDown()) {
                     UseOnContext context = new UseOnContext(p_41433_, p_41434_, (BlockHitResult)result);
                     BlockHitResult res = new BlockHitResult(context.getClickLocation(), context.getHorizontalDirection(), context.getClickedPos(), false);
                     BlockPos posBlock = res.getBlockPos();

@@ -82,7 +82,7 @@ public class AugmentRenderDiffuser extends AugmentBase
                 HitResult result = player.pick(5,0,false);
                 if(result.getType().equals(HitResult.Type.MISS))
                 {
-                    if(player.isCrouching())
+                    if(player.isShiftKeyDown())
                     {
                         int mode = getAugmentMode(itemInOffhand)+1;
                         int setNewMode = (mode<=6)?(mode):(0);

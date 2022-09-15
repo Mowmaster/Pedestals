@@ -108,17 +108,21 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
 
 
     @Override
-    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn) {
-        if(entityIn instanceof ItemEntity itemEntity)
+    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal) {
+        List<Entity> entitiesColliding = pedestal.getLevel().getEntitiesOfClass(Entity.class,new AABB(pedestal.getPos()));
+        for(Entity getEntity : entitiesColliding)
         {
-            if(passesFilter(pedestal,itemEntity.getItem(),null,null,0,0, IItemMode.ItemTransferMode.ITEMS))
+            if(getEntity instanceof ItemEntity itemEntity)
             {
-                itemEntity.remove(Entity.RemovalReason.DISCARDED);
+                if(passesFilter(pedestal,itemEntity.getItem(),null,null,0,0, IItemMode.ItemTransferMode.ITEMS))
+                {
+                    itemEntity.remove(Entity.RemovalReason.DISCARDED);
+                }
             }
-        }
-        else if (entityIn instanceof LivingEntity livingEntity)
-        {
-            livingEntity.kill();
+            else if (getEntity instanceof LivingEntity livingEntity)
+            {
+                livingEntity.kill();
+            }
         }
     }
 }

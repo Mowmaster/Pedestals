@@ -409,7 +409,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 }
                 else if(pedestal.hasRedstone() && itemInOffHand.getItem().equals(Items.REDSTONE))
                 {
-                    if(p_60502_.isCrouching())
+                    if(p_60502_.isShiftKeyDown())
                     {
                         ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRedstone());
                     }
@@ -432,27 +432,27 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 }
                 else if(pedestal.hasSpeed() && itemInOffHand.getItem() instanceof AugmentTieredSpeed)
                 {
-                    if(p_60502_.isCrouching()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllSpeed());}
+                    if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllSpeed());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeSpeed(1));
                 }
                 else if(pedestal.hasCapacity() && itemInOffHand.getItem() instanceof AugmentTieredCapacity)
                 {
-                    if(p_60502_.isCrouching()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllCapacity());}
+                    if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllCapacity());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCapacity(1));
                 }
                 else if(pedestal.hasStorage() && itemInOffHand.getItem() instanceof AugmentTieredStorage)
                 {
-                    if(p_60502_.isCrouching()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllStorage());}
+                    if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllStorage());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeStorage(1));
                 }
                 else if(pedestal.hasRange() && itemInOffHand.getItem() instanceof AugmentTieredRange)
                 {
-                    if(p_60502_.isCrouching()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRange());}
+                    if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRange());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRange(1));
                 }
                 else if(pedestal.hasItemFirst())
                 {
-                    if(p_60502_.isCrouching())
+                    if(p_60502_.isShiftKeyDown())
                     {
                         ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(false));
                     }
@@ -656,7 +656,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 }
                 else if(itemInHand.isEmpty())
                 {
-                    if(p_60506_.isCrouching())
+                    if(p_60506_.isShiftKeyDown())
                     {
                         boolean displayOther = false;
                         MutableComponent displayOtherComponent = Component.literal("");

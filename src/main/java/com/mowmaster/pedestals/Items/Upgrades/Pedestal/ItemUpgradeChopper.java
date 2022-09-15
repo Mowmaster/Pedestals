@@ -82,39 +82,16 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
         return new ItemStack(Items.IRON_AXE);
     }
 
-    //
-    //  Add To MowLib
-    //
-    public static boolean readBooleanFromNBT(String ModID, CompoundTag tag, String identifier)
-    {
-        return tag.contains(ModID + identifier) ? tag.getBoolean(ModID + identifier) : false;
-    }
-
-    public static CompoundTag writeBooleanToNBT(String ModID, @Nullable CompoundTag tag, boolean value, String identifier) {
-        CompoundTag compound = tag != null ? tag : new CompoundTag();
-        compound.putBoolean(ModID + identifier, value);
-        return compound;
-    }
-
-    public static void removeBooleanFromNBT(String ModID, CompoundTag tag, String identifier) {
-        if (tag.contains(ModID + identifier)) {
-            tag.remove(ModID + identifier);
-        }
-    }
-    //
-    //
-    //
-
     private boolean getStopped(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
+        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
     }
 
     private void setStopped(BasePedestalBlockEntity pedestal, boolean value)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
+        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
     }
 
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
@@ -174,8 +151,9 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
         removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numposition");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numdelay");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_boolstop");
     }
 
     @Override

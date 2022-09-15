@@ -72,7 +72,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     @Override
-    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn) {
+    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal) {
 
     }
 
@@ -109,6 +109,11 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean hasAdvancedOne()
     {
         return false;
+    }
+
+    public void runClientStuff(BasePedestalBlockEntity pedestal)
+    {
+        return;
     }
 
 
@@ -785,7 +790,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             {
                 if(result.getType().equals(HitResult.Type.MISS))
                 {
-                    if(player.isCrouching())
+                    if(player.isShiftKeyDown())
                     {
                         incrementUpgradeMode(player,itemInOffhand,hand);
                     }

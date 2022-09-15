@@ -1,4 +1,4 @@
-package com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines;
+package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
@@ -30,9 +30,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
+public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
 
-    public ItemUpgradeCobbleGenerator(Properties p_41383_) {
+    public ItemUpgradeMaterialGenerator(Properties p_41383_) {
         super(p_41383_);
     }
 
@@ -138,8 +138,8 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
         CompoundTag tagCoin = new CompoundTag();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         if(coinInPedestal.hasTag()) { tagCoin = coinInPedestal.getTag(); }
-        tagCoin = MowLibCompoundTagUtils.writeItemStackListToNBT(References.MODID, tagCoin, getStackList);
-        tagCoin = MowLibCompoundTagUtils.writeFluidStackToNBT(References.MODID, tagCoin, getFluidStackNeeded);
+        tagCoin = MowLibCompoundTagUtils.writeItemStackListToNBT(References.MODID, tagCoin, getStackList,"_stackList");
+        tagCoin = MowLibCompoundTagUtils.writeFluidStackToNBT(References.MODID, tagCoin, getFluidStackNeeded,"_fluidStack");
         tagCoin = MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tagCoin,getEnergyNeeded, "_energyNeeded");
         tagCoin = MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tagCoin,getExperienceNeeded, "_xpNeeded");
 
@@ -149,10 +149,10 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         //remove NBT saved on upgrade here
-        MowLibCompoundTagUtils.removeItemStackFromNBT(References.MODID, coinInPedestal.getTag());
-        MowLibCompoundTagUtils.removeFluidStackFromNBT(References.MODID, coinInPedestal.getTag());
-        MowLibCompoundTagUtils.removeIntegerFromNBT(References.MODID, coinInPedestal.getTag(), "_energyNeeded");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(References.MODID, coinInPedestal.getTag(), "_xpNeeded");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(),"_stackList");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(),"_fluidStack");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_energyNeeded");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_xpNeeded");
     }
 
 
@@ -169,13 +169,13 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
         //int modifier = getCobbleGenSpawnRate(pedestal.getCoinOnPedestal());
 
         //if itemstacklist is null, populate nbt. then rely on block below updates to modify things.
-        if(MowLibCompoundTagUtils.readItemStackListFromNBT(References.MODID,coin.getTag()) == null)actionOnNeighborBelowChange(pedestal, posBelow);
+        if(MowLibCompoundTagUtils.readItemStackListFromNBT(References.MODID,coin.getTag(),"_stackList") == null)actionOnNeighborBelowChange(pedestal, posBelow);
 
-        ItemStack getCobbleGenOutput = MowLibCompoundTagUtils.readItemStackListFromNBT(References.MODID,coin.getTag()).get(0);
+        ItemStack getCobbleGenOutput = MowLibCompoundTagUtils.readItemStackListFromNBT(References.MODID,coin.getTag(),"_stackList").get(0);
         if(!getCobbleGenOutput.isEmpty())
         {
             List<ItemStack> getCobbleGenOutputs = getItemsToGenerate(pedestal,getCobbleGenOutput);
-            FluidStack getFluidStackNeeded = MowLibCompoundTagUtils.readFluidStackFromNBT(References.MODID,coin.getTag());
+            FluidStack getFluidStackNeeded = MowLibCompoundTagUtils.readFluidStackFromNBT(References.MODID,coin.getTag(),"_fluidStack");
             int getEnergyNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_energyNeeded");
             int getExperienceNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_xpNeeded");
 
@@ -260,11 +260,6 @@ public class ItemUpgradeCobbleGenerator extends ItemUpgradeBase {
                 }
             }
         }
-    }
-
-    @Override
-    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn) {
-        return;
     }
 
 }

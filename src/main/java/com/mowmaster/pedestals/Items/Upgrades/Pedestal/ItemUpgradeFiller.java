@@ -141,9 +141,9 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
         removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numposition");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numdelay");
-        MowLibCompoundTagUtils.removeIntegerFromNBT(MODID, coinInPedestal.getTag(),"_numheight");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numposition");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numdelay");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numheight");
         removeBooleanFromNBT(MODID, coinInPedestal.getTag(),"_boolstop");
 
     }
@@ -310,12 +310,12 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
         {
             if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_place"))).stream().toList().contains(getPlaceItem))
             {
-                if(possibleBlock instanceof IPlantable ||
+                if(possibleBlock instanceof IPlantable && (
                         possibleBlock instanceof BushBlock ||
-                        possibleBlock instanceof StemBlock ||
-                        possibleBlock instanceof BonemealableBlock ||
-                        possibleBlock instanceof ChorusFlowerBlock
-                )
+                                possibleBlock instanceof StemBlock ||
+                                possibleBlock instanceof BonemealableBlock ||
+                                possibleBlock instanceof ChorusFlowerBlock
+                ))
                 {
                     return false;
                 }

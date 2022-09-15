@@ -15,7 +15,7 @@ public interface IPedestalUpgrade
     //Main Method Call that allows the upgrade to do things
     void updateAction(Level world, BasePedestalBlockEntity pedestal);
     //Used when Entities Collide with Pedestal
-    void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn);
+    void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal);
     //Used When a block below has changed and the upgrade needs to update its behavior
     void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock);
     //Used when addeed to the pedestal.

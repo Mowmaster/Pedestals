@@ -115,7 +115,7 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableAr
                             if(animal.getAge() == 0 && animal.canFallInLove())
                             {
                                 InteractionResult result = animal.mobInteract(getPlayer.get(), InteractionHand.MAIN_HAND);
-                                System.out.println(result.toString());
+                                //System.out.println(result.toString());
                                 if(result == InteractionResult.SUCCESS)
                                 {
                                     if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))

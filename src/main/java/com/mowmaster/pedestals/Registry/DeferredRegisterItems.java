@@ -8,9 +8,7 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageI
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
-//import com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines.ItemUpgradeCobbleGenerator;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBlockBreaker;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.Machines.ItemUpgradeCobbleGenerator;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -116,6 +114,10 @@ public class DeferredRegisterItems
             () -> new ItemUpgradeMilker(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_BREEDER = ITEMS.register("upgrade_pedestal_breeder",
             () -> new ItemUpgradeBreeder(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_ATTACKER = ITEMS.register("upgrade_pedestal_attacker",
+            () -> new ItemUpgradeAttacker(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_FAN = ITEMS.register("upgrade_pedestal_fan",
+            () -> new ItemUpgradeFan(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_PACKAGER = ITEMS.register("upgrade_pedestal_packager",
@@ -125,7 +127,7 @@ public class DeferredRegisterItems
 
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_COBBLEGEN = ITEMS.register("upgrade_pedestal_cobblegen",
-            () -> new ItemUpgradeCobbleGenerator(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+            () -> new ItemUpgradeMaterialGenerator(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_ROUNDROBIN = ITEMS.register("augment_pedestal_roundrobin",
             () -> new AugmentBase(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));

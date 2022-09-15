@@ -26,6 +26,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
@@ -33,6 +34,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
@@ -352,33 +354,35 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
 
 
     @Override
-    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal, Entity entityIn) {
+    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal) {
 
-
-        if(canTransferXP(pedestal.getCoinOnPedestal()) && pedestal.canAcceptExperience())
+        List<Entity> entitiesColliding = pedestal.getLevel().getEntitiesOfClass(Entity.class,new AABB(pedestal.getPos()));
+        for(Entity entityIn : entitiesColliding)
         {
-            if (entityIn instanceof Player player) {
+            if(canTransferXP(pedestal.getCoinOnPedestal()) && pedestal.canAcceptExperience())
+            {
+                if (entityIn instanceof Player player) {
 
-                if(!player.isCrouching())
-                {
-                    int currentlyStoredExp = pedestal.getStoredExperience();
-                    if(currentlyStoredExp < pedestal.getExperienceCapacity())
+                    if(!player.isShiftKeyDown())
                     {
-                        int transferRate = pedestal.getExperienceTransferRate();
-                        int value = MowLibXpUtils.removeXp(player, transferRate);
-                        if(value > 0)
+                        int currentlyStoredExp = pedestal.getStoredExperience();
+                        if(currentlyStoredExp < pedestal.getExperienceCapacity())
                         {
-                            pedestal.addExperience(value,false);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
+                            int transferRate = pedestal.getExperienceTransferRate();
+                            int value = MowLibXpUtils.removeXp(player, transferRate);
+                            if(value > 0)
+                            {
+                                pedestal.addExperience(value,false);
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
+                            }
                         }
                     }
                 }
             }
-        }
 
 
-        if(canTransferDust(pedestal.getCoinOnPedestal()))
-        {
+            if(canTransferDust(pedestal.getCoinOnPedestal()))
+            {
             /*if(entityIn instanceof ItemEntity)
             {
                 ItemEntity itemEntity = ((ItemEntity) entityIn);
@@ -470,7 +474,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             }*/
             /*else if (entityIn instanceof Player) {
                 Player player = ((Player) entityIn);
-                if(!player.isCrouching())
+                if(!player.isShiftKeyDown())
                 {
                     //.filter(itemStack -> passesDustFilter(pedestal,itemStack))
                     ItemStack dustItemStack = IntStream.range(0,(player.getInventory().items.size()))//Int Range
@@ -527,51 +531,16 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                     }
                 }
             }*/
-        }
-
-        if(canTransferFluids(pedestal.getCoinOnPedestal()))
-        {
-            if(entityIn instanceof ItemEntity)
-            {
-                ItemEntity itemEntity = ((ItemEntity) entityIn);
-                ItemStack itemStack = itemEntity.getItem();
-                if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket && passesFluidFilter(pedestal,getFluidStackFromItemStack(itemStack)))
-                {
-                    Fluid bucketFluid = bucket.getFluid();
-                    FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
-                    int fluidSpaceInPedestal = pedestal.spaceForFluid();
-
-                    FluidStack fluidInPedestal = pedestal.getStoredFluid();
-                    if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
-                    {
-                        int transferRate = 1000;
-                        if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
-                        {
-                            FluidStack fluidDrained = fluidInTank.copy();
-                            if(!fluidInTank.isEmpty())
-                            {
-                                pedestal.addFluid(fluidDrained,IFluidHandler.FluidAction.EXECUTE);
-                                itemEntity.setItem(new ItemStack(Items.BUCKET,1));
-                            }
-                        }
-                    }
-                }
             }
-            else if (entityIn instanceof Player) {
-                Player player = ((Player) entityIn);
-                if(!player.isCrouching())
-                {
-                    ItemStack bucketItemStack = IntStream.range(0,(player.getInventory().items.size()))//Int Range
-                            .mapToObj((player.getInventory().items)::get)//Function being applied to each interval
-                            .filter(itemStack -> !itemStack.isEmpty())
-                            .filter(itemStack -> !itemStack.getItem().equals(Items.BUCKET))
-                            .filter(itemStack -> itemStack.getItem() instanceof BucketItem)
-                            .filter(itemStack -> passesFluidFilter(pedestal,getFluidStackFromItemStack(itemStack)))
-                            .findFirst().orElse(ItemStack.EMPTY);
 
-                    if(!bucketItemStack.isEmpty())
+            if(canTransferFluids(pedestal.getCoinOnPedestal()))
+            {
+                if(entityIn instanceof ItemEntity)
+                {
+                    ItemEntity itemEntity = ((ItemEntity) entityIn);
+                    ItemStack itemStack = itemEntity.getItem();
+                    if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket && passesFluidFilter(pedestal,getFluidStackFromItemStack(itemStack)))
                     {
-                        BucketItem bucket = ((BucketItem)bucketItemStack.getItem());
                         Fluid bucketFluid = bucket.getFluid();
                         FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
                         int fluidSpaceInPedestal = pedestal.spaceForFluid();
@@ -586,85 +555,121 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                                 if(!fluidInTank.isEmpty())
                                 {
                                     pedestal.addFluid(fluidDrained,IFluidHandler.FluidAction.EXECUTE);
-                                    int slot = player.getInventory().findSlotMatchingItem(bucketItemStack);
-                                    if(!player.isCreative())player.getInventory().getItem(slot).shrink(1);
-                                    if(!player.isCreative())ItemHandlerHelper.giveItemToPlayer(player,new ItemStack(Items.BUCKET,1));
+                                    itemEntity.setItem(new ItemStack(Items.BUCKET,1));
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (entityIn instanceof Player) {
+                    Player player = ((Player) entityIn);
+                    if(!player.isShiftKeyDown())
+                    {
+                        ItemStack bucketItemStack = IntStream.range(0,(player.getInventory().items.size()))//Int Range
+                                .mapToObj((player.getInventory().items)::get)//Function being applied to each interval
+                                .filter(itemStack -> !itemStack.isEmpty())
+                                .filter(itemStack -> !itemStack.getItem().equals(Items.BUCKET))
+                                .filter(itemStack -> itemStack.getItem() instanceof BucketItem)
+                                .filter(itemStack -> passesFluidFilter(pedestal,getFluidStackFromItemStack(itemStack)))
+                                .findFirst().orElse(ItemStack.EMPTY);
 
-                                    String fluid = pedestal.getStoredFluid().getDisplayName().getString() +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
-                                    MowLibMessageUtils.messagePopupText(player,ChatFormatting.WHITE,fluid);
+                        if(!bucketItemStack.isEmpty())
+                        {
+                            BucketItem bucket = ((BucketItem)bucketItemStack.getItem());
+                            Fluid bucketFluid = bucket.getFluid();
+                            FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
+                            int fluidSpaceInPedestal = pedestal.spaceForFluid();
+
+                            FluidStack fluidInPedestal = pedestal.getStoredFluid();
+                            if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
+                            {
+                                int transferRate = 1000;
+                                if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
+                                {
+                                    FluidStack fluidDrained = fluidInTank.copy();
+                                    if(!fluidInTank.isEmpty())
+                                    {
+                                        pedestal.addFluid(fluidDrained,IFluidHandler.FluidAction.EXECUTE);
+                                        int slot = player.getInventory().findSlotMatchingItem(bucketItemStack);
+                                        if(!player.isCreative())player.getInventory().getItem(slot).shrink(1);
+                                        if(!player.isCreative())ItemHandlerHelper.giveItemToPlayer(player,new ItemStack(Items.BUCKET,1));
+
+                                        String fluid = pedestal.getStoredFluid().getDisplayName().getString() +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
+                                        MowLibMessageUtils.messagePopupText(player,ChatFormatting.WHITE,fluid);
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        if(canTransferItems(pedestal.getCoinOnPedestal()))
-        {
-            if(entityIn instanceof ItemEntity)
+            if(canTransferItems(pedestal.getCoinOnPedestal()))
             {
-                ItemEntity itemEntity = ((ItemEntity) entityIn);
-                ItemStack itemStack = itemEntity.getItem();
-                ItemStack stackInPedestal = pedestal.getItemInPedestal();
-                boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
-                if((!pedestal.hasItem() || stacksMatch) && passesItemFilter(pedestal,itemStack))
+                if(entityIn instanceof ItemEntity)
                 {
-                    int spaceInPed = stackInPedestal.getMaxStackSize()-stackInPedestal.getCount();
-                    int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
-                    int actualSpaceInPed = (filterAllowedSpace>spaceInPed)?(spaceInPed):(filterAllowedSpace);
-                    if(actualSpaceInPed>0)
+                    ItemEntity itemEntity = ((ItemEntity) entityIn);
+                    ItemStack itemStack = itemEntity.getItem();
+                    ItemStack stackInPedestal = pedestal.getItemInPedestal();
+                    boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
+                    if((!pedestal.hasItem() || stacksMatch) && passesItemFilter(pedestal,itemStack))
                     {
-                        int itemInCount = itemStack.getCount();
-                        int countToAdd = ( itemInCount<= actualSpaceInPed)?(itemInCount):(actualSpaceInPed);
-                        ItemStack stackToAdd = itemStack.copy();
-                        stackToAdd.setCount(countToAdd);
-                        if(pedestal.addItem(stackToAdd,true))
+                        int spaceInPed = stackInPedestal.getMaxStackSize()-stackInPedestal.getCount();
+                        int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
+                        int actualSpaceInPed = (filterAllowedSpace>spaceInPed)?(spaceInPed):(filterAllowedSpace);
+                        if(actualSpaceInPed>0)
                         {
-                            itemEntity.getItem().setCount(itemInCount-countToAdd);
-                            if(itemInCount<=countToAdd)itemEntity.remove(Entity.RemovalReason.DISCARDED);
-                            pedestal.addItem(stackToAdd,false);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,180));
+                            int itemInCount = itemStack.getCount();
+                            int countToAdd = ( itemInCount<= actualSpaceInPed)?(itemInCount):(actualSpaceInPed);
+                            ItemStack stackToAdd = itemStack.copy();
+                            stackToAdd.setCount(countToAdd);
+                            if(pedestal.addItem(stackToAdd,true))
+                            {
+                                itemEntity.getItem().setCount(itemInCount-countToAdd);
+                                if(itemInCount<=countToAdd)itemEntity.remove(Entity.RemovalReason.DISCARDED);
+                                pedestal.addItem(stackToAdd,false);
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,180));
+                            }
                         }
                     }
                 }
-            }
-            else if (entityIn instanceof Player)
-            {
-                Player player = ((Player) entityIn);
-                if(!player.isCrouching())
+                else if (entityIn instanceof Player)
                 {
-                    ItemStack itemFromInv = ItemStack.EMPTY;
-
-                    itemFromInv = IntStream.range(0,(player.getInventory().items.size()))//Int Range
-                            .mapToObj((player.getInventory().items)::get)//Function being applied to each interval
-                            .filter(itemStack -> !itemStack.isEmpty())
-                            .filter(itemStack -> passesItemFilter(pedestal,itemStack))
-                            .findFirst().orElse(ItemStack.EMPTY);
-
-                    if(!itemFromInv.isEmpty())
+                    Player player = ((Player) entityIn);
+                    if(!player.isShiftKeyDown())
                     {
-                        ItemStack itemStack = itemFromInv;
-                        ItemStack stackInPedestal = pedestal.getItemInPedestal();
-                        boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
-                        if((!pedestal.hasItem() || stacksMatch) && passesItemFilter(pedestal,itemStack))
+                        ItemStack itemFromInv = ItemStack.EMPTY;
+
+                        itemFromInv = IntStream.range(0,(player.getInventory().items.size()))//Int Range
+                                .mapToObj((player.getInventory().items)::get)//Function being applied to each interval
+                                .filter(itemStack -> !itemStack.isEmpty())
+                                .filter(itemStack -> passesItemFilter(pedestal,itemStack))
+                                .findFirst().orElse(ItemStack.EMPTY);
+
+                        if(!itemFromInv.isEmpty())
                         {
-                            int spaceInPed = stackInPedestal.getMaxStackSize()-stackInPedestal.getCount();
-                            int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
-                            int actualSpaceInPed = (filterAllowedSpace>spaceInPed)?(spaceInPed):(filterAllowedSpace);
-                            if(actualSpaceInPed>0)
+                            ItemStack itemStack = itemFromInv;
+                            ItemStack stackInPedestal = pedestal.getItemInPedestal();
+                            boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
+                            if((!pedestal.hasItem() || stacksMatch) && passesItemFilter(pedestal,itemStack))
                             {
-                                int itemInCount = itemStack.getCount();
-                                int countToAdd = ( itemInCount<= actualSpaceInPed)?(itemInCount):(actualSpaceInPed);
-                                ItemStack stackToAdd = itemStack.copy();
-                                stackToAdd.setCount(countToAdd);
-                                if(pedestal.addItem(stackToAdd,true))
+                                int spaceInPed = stackInPedestal.getMaxStackSize()-stackInPedestal.getCount();
+                                int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
+                                int actualSpaceInPed = (filterAllowedSpace>spaceInPed)?(spaceInPed):(filterAllowedSpace);
+                                if(actualSpaceInPed>0)
                                 {
-                                    ItemStack newStackInPlayer = (itemInCount>countToAdd)?(itemStack.copy()):(ItemStack.EMPTY);
-                                    if(!newStackInPlayer.isEmpty())newStackInPlayer.setCount(itemInCount-countToAdd);
-                                    int slot = player.getInventory().findSlotMatchingItem(itemStack);
-                                    player.getInventory().setItem(slot,newStackInPlayer);
-                                    pedestal.addItem(stackToAdd,false);
-                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,0));
+                                    int itemInCount = itemStack.getCount();
+                                    int countToAdd = ( itemInCount<= actualSpaceInPed)?(itemInCount):(actualSpaceInPed);
+                                    ItemStack stackToAdd = itemStack.copy();
+                                    stackToAdd.setCount(countToAdd);
+                                    if(pedestal.addItem(stackToAdd,true))
+                                    {
+                                        ItemStack newStackInPlayer = (itemInCount>countToAdd)?(itemStack.copy()):(ItemStack.EMPTY);
+                                        if(!newStackInPlayer.isEmpty())newStackInPlayer.setCount(itemInCount-countToAdd);
+                                        int slot = player.getInventory().findSlotMatchingItem(itemStack);
+                                        player.getInventory().setItem(slot,newStackInPlayer);
+                                        pedestal.addItem(stackToAdd,false);
+                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),180,180,0));
+                                    }
                                 }
                             }
                         }

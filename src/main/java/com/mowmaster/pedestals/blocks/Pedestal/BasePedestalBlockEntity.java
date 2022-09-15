@@ -1398,20 +1398,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return (h != null)?(h.getSlotLimit(firstNonEmptySlot)):(0);
     }
 
-    public void collideWithPedestal(Level world, BasePedestalBlockEntity pedestal, BlockPos posPedestal, BlockState state, Entity entityIn)
-    {
-        if(!world.isClientSide) {
-            if(pedestal.hasCoin())
-            {
-                Item coinInPed = pedestal.getCoinOnPedestal().getItem();
-                if(coinInPed instanceof IPedestalUpgrade upgrade)
-                {
-                    upgrade.actionOnCollideWithBlock(pedestal, entityIn);
-                }
-            }
-        }
-    }
-
     /*============================================================================
     ==============================================================================
     ===========================      ITEM END        =============================
@@ -3436,8 +3422,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     int pedTicker = 0;
 
     public void tick() {
-
-        if(!level.isClientSide() && level.isAreaLoaded(getPos(),1))
+        if(!level.isClientSide() &&level.isAreaLoaded(getPos(),1))
         {
             pedTicker++;
             //if (pedTicker%getOperationSpeed() == 0) {
@@ -3451,31 +3436,37 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 if(!isPedestalBlockPowered(getPedestal()))
                 {
                     if(getNumberOfStoredLocations() > 0) { transferAction(); }
+                }
+                //make sure we dont go over max int limit, regardless of config
+                if(pedTicker >= maxRate-1){pedTicker=0;}
+            }
 
-                    if(hasCoin())
-                    {
-                        Item coinInPed = getCoinOnPedestal().getItem();
-                        if(coinInPed instanceof IPedestalUpgrade upgrade) { upgrade.updateAction(level,this); }
-                    }
+            if(hasCoin())
+            {
+                Item coinInPed = getCoinOnPedestal().getItem();
+                if(coinInPed instanceof IPedestalUpgrade upgrade) {
+                    upgrade.updateAction(level,this);
 
                     if(!hasNoCollide())
                     {
-                        List<Entity> entitiesColliding = level.getEntitiesOfClass(Entity.class,new AABB(getPos()));
-                        for(Entity getEntity : entitiesColliding)
-                        {
-                            collideWithPedestal(level, getPedestal(), getPos(), getBlockState(), getEntity);
-                        }
+                        upgrade.actionOnCollideWithBlock(this);
                     }
                 }
 
-                //make sure we dont go over max int limit, regardless of config
-                if(pedTicker >= maxRate-1){pedTicker=0;}
             }
         }
     }
 
     public void tickClient()
     {
+        /*if(hasCoin())
+        {
+            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
+            {
+                upgrade.runClientStuff(this);
+            }
+        }*/
+
         if(getRenderRange()){ if(getLevel().getGameTime()%20 == 0)MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,getPos().getX(),getPos().getY(),getPos().getZ(),0,0,0)); }
 
         if(canSpawnParticles())
