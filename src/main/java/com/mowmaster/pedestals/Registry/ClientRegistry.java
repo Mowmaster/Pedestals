@@ -75,6 +75,7 @@ public class ClientRegistry
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_UNPACKAGER.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_VOID.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_DROPPER.get());
+        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_RECYCLER.get());
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ITEM.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ITEMSTACK.get());

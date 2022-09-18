@@ -2,9 +2,15 @@ package com.mowmaster.pedestals.Compat.JEI;
 
 import com.mowmaster.mowlib.Compat.JEI.JEIRecipeTypes;
 import com.mowmaster.mowlib.Compat.JEI.JEISettings;
+import com.mowmaster.pedestals.Compat.JEI.recipes.BottlerRecipeCategory;
 import com.mowmaster.pedestals.Compat.JEI.recipes.CobbleGenRecipeCategory;
+import com.mowmaster.pedestals.Compat.JEI.recipes.FluidConverterRecipeCategory;
+import com.mowmaster.pedestals.Compat.JEI.recipes.UnBottlerRecipeCategory;
 import com.mowmaster.pedestals.PedestalUtils.References;
+import com.mowmaster.pedestals.Recipes.BottlerRecipe;
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
+import com.mowmaster.pedestals.Recipes.FluidConverterRecipe;
+import com.mowmaster.pedestals.Recipes.UnBottlerRecipe;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import mezz.jei.api.IModPlugin;
@@ -45,7 +51,9 @@ public class JeiPedestalsPlugin implements IModPlugin
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new CobbleGenRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
-
+        registration.addRecipeCategories(new BottlerRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new UnBottlerRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new FluidConverterRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -55,7 +63,12 @@ public class JeiPedestalsPlugin implements IModPlugin
 
         List<CobbleGenRecipe> cobbleGenRecipes = recipeManager.getAllRecipesFor(CobbleGenRecipe.Type.INSTANCE);
         registration.addRecipes(JEIPedestalsRecipeTypes.COBBLE_GEN_RECIPE, cobbleGenRecipes);
-
+        List<BottlerRecipe> bottlerRecipes = recipeManager.getAllRecipesFor(BottlerRecipe.Type.INSTANCE);
+        registration.addRecipes(JEIPedestalsRecipeTypes.BOTTLER_RECIPE, bottlerRecipes);
+        List<UnBottlerRecipe> unbottlerRecipes = recipeManager.getAllRecipesFor(UnBottlerRecipe.Type.INSTANCE);
+        registration.addRecipes(JEIPedestalsRecipeTypes.UNBOTTLER_RECIPE, unbottlerRecipes);
+        List<FluidConverterRecipe> fluidconverterRecipes = recipeManager.getAllRecipesFor(FluidConverterRecipe.Type.INSTANCE);
+        registration.addRecipes(JEIPedestalsRecipeTypes.FLUIDCONVERTER_RECIPE, fluidconverterRecipes);
 
 
 
@@ -145,10 +158,48 @@ public class JeiPedestalsPlugin implements IModPlugin
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BREAKER.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BREAKER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_PLACER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_PLACER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_FILLER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_FILLER.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_QUARRY.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_QUARRY.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_CHOPPER.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_CHOPPER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_HARVESTER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_HARVESTER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_PLANTER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_PLANTER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_FERTILIZER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_FERTILIZER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_HIVEHARVESTER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_HIVEHARVESTER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_VOID.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_VOID.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_RECYCLER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_RECYCLER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_FLUIDCONVERTER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_FLUIDCONVERTER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_DROPPER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_DROPPER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_PUMP.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_PUMP.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_DRAIN.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_DRAIN.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_SHEERER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_SHEERER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MILKER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MILKER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BREEDER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BREEDER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_ATTACKER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_ATTACKER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_FAN.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_FAN.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BOTTLER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BOTTLER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_UNBOTTLER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_UNBOTTLER.get());
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());
@@ -173,7 +224,12 @@ public class JeiPedestalsPlugin implements IModPlugin
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_COBBLEGEN.get()),
                 JEIPedestalsRecipeTypes.COBBLE_GEN_RECIPE);
-
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_BOTTLER.get()),
+                JEIPedestalsRecipeTypes.BOTTLER_RECIPE);
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_UNBOTTLER.get()),
+                JEIPedestalsRecipeTypes.UNBOTTLER_RECIPE);
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_FLUIDCONVERTER.get()),
+                JEIPedestalsRecipeTypes.FLUIDCONVERTER_RECIPE);
     }
 
     @Override

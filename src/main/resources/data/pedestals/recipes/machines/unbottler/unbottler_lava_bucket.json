@@ -1,0 +1,24 @@
+{
+  "type": "pedestals:unbottler",
+  "inputStack": {
+    "item": "minecraft:lava_bucket"
+  },
+  "inputFluidStack": {
+    "fluid": "minecraft:lava",
+    "count": 1000
+  },
+  "energy": {
+    "energyValue": 0
+  },
+  "experience": {
+    "experienceValue": 0
+  },
+  "dust": {
+    "dustColor": -1,
+    "dustAmount": 0
+  },
+  "result": {
+    "item": "minecraft:bucket"
+  }
+
+}

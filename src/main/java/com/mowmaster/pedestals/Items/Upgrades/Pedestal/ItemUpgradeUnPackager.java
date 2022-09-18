@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseDustBulkStorageItem;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseEnergyBulkStorageItem;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageItem;
@@ -28,7 +29,15 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
         || pedestal.getItemInPedestal().getItem() instanceof BaseXpBulkStorageItem
         || pedestal.getItemInPedestal().getItem() instanceof BaseDustBulkStorageItem)
         {
-            upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
+            int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
+            int speed = configSpeed;
+            if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
+            //Make sure speed has at least a value of 1
+            if(speed<=0)speed = 1;
+            if(world.getGameTime()%speed == 0 )
+            {
+                upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
+            }
         }
     }
 

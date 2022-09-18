@@ -60,20 +60,29 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
     @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
 
-        if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
+        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
+        int speed = configSpeed;
+        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
+        //Make sure speed has at least a value of 1
+        if(speed<=0)speed = 1;
+        if(world.getGameTime()%speed == 0 )
         {
-            if(selectedAreaWithinRange(pedestal))
+            if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
             {
-                upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
-            }
-            else
-            {
-                if(!pedestal.getRenderRange())
+                if(selectedAreaWithinRange(pedestal))
                 {
-                    pedestal.setRenderRange(true);
+                    upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
+                }
+                else
+                {
+                    if(!pedestal.getRenderRange())
+                    {
+                        pedestal.setRenderRange(true);
+                    }
                 }
             }
         }
+
     }
 
     public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)

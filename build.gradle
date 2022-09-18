@@ -9,7 +9,7 @@ plugins {
 //gradlew -PUPDATE_SRGS="https://gist.githubusercontent.com/amadornes/e00ea624b3cccc84fbca0800f651b546/raw/raw_mappings.tsrg;https://gist.githubusercontent.com/SizableShrimp/882a671ff74256d150776da08c89ef72/raw/forge_1.19_renames.tsrg" updateEverything
 
 
-version = '0.2.10'
+version = '0.2.11'
 group = 'com.mowmaster.pedestals' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'pedestals'
 
@@ -161,8 +161,8 @@ dependencies {
     // at runtime, use the full JEI jar for Forge
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
 
-    compileOnly fg.deobf("curse.maven:mowlib-631455:3987691")
-    runtimeOnly fg.deobf("curse.maven:mowlib-631455:3987691")
+    compileOnly fg.deobf("curse.maven:mowlib-631455:3994712")
+    runtimeOnly fg.deobf("curse.maven:mowlib-631455:3994712")
 
     //runtimeOnly fg.deobf("curse.maven:effect-scrolls-632865:3901386")
 

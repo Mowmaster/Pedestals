@@ -1,0 +1,12 @@
+{
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "item": "minecraft:glass_bottle"
+  },
+  "experience": {
+    "experienceValue": 11
+  },
+  "result": {
+    "item": "minecraft:experience_bottle"
+  }
+}

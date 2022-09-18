@@ -151,23 +151,31 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
     @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
 
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        boolean override = hasTwoPointsSelected(coin);
-        List<BlockPos> listed = getValidList(pedestal);
-
-        if(override)
+        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
+        int speed = configSpeed;
+        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
+        //Make sure speed has at least a value of 1
+        if(speed<=0)speed = 1;
+        if(world.getGameTime()%speed == 0 )
         {
-            if(listed.size()>0)
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            boolean override = hasTwoPointsSelected(coin);
+            List<BlockPos> listed = getValidList(pedestal);
+
+            if(override)
             {
-                if(pedestal.hasItem())upgradeAction(world,pedestal);
-            }
-            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-            {
-                buildValidBlockListArea(pedestal);
-            }
-            else if(!pedestal.getRenderRange())
-            {
-                pedestal.setRenderRange(true);
+                if(listed.size()>0)
+                {
+                    if(pedestal.hasItem())upgradeAction(world,pedestal);
+                }
+                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+                {
+                    buildValidBlockListArea(pedestal);
+                }
+                else if(!pedestal.getRenderRange())
+                {
+                    pedestal.setRenderRange(true);
+                }
             }
         }
     }

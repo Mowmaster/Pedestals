@@ -102,6 +102,10 @@ public class DeferredRegisterItems
             () -> new ItemUpgradeHiveHarvester(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_VOID = ITEMS.register("upgrade_pedestal_void",
             () -> new ItemUpgradeVoid(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_RECYCLER = ITEMS.register("upgrade_pedestal_recycler",
+            () -> new ItemUpgradeRecycler(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_FLUIDCONVERTER = ITEMS.register("upgrade_pedestal_fluidconverter",
+            () -> new ItemUpgradeFluidConverter(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_DROPPER = ITEMS.register("upgrade_pedestal_dropper",
             () -> new ItemUpgradeDropper(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_PUMP = ITEMS.register("upgrade_pedestal_pump",
@@ -119,7 +123,10 @@ public class DeferredRegisterItems
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_FAN = ITEMS.register("upgrade_pedestal_fan",
             () -> new ItemUpgradeFan(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
-
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_BOTTLER = ITEMS.register("upgrade_pedestal_bottler",
+            () -> new ItemUpgradeBottler(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_UNBOTTLER = ITEMS.register("upgrade_pedestal_unbottler",
+            () -> new ItemUpgradeUnBottler(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_PACKAGER = ITEMS.register("upgrade_pedestal_packager",
             () -> new ItemUpgradePackager(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_UNPACKAGER = ITEMS.register("upgrade_pedestal_unpackager",

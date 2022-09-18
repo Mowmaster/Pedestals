@@ -173,54 +173,61 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
     @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
 
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        boolean override = hasTwoPointsSelected(coin);
-        List<BlockPos> listed = getValidList(pedestal);
+        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
+        int speed = configSpeed;
+        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
+        //Make sure speed has at least a value of 1
+        if(speed<=0)speed = 1;
+        if(world.getGameTime()%speed == 0 )
+        {
+            ItemStack coin = pedestal.getCoinOnPedestal();
+            boolean override = hasTwoPointsSelected(coin);
+            List<BlockPos> listed = getValidList(pedestal);
 
-        if(override)
-        {
-            if(listed.size()>0)
+            if(override)
             {
-                //System.out.println("RunAction");
-                upgradeAction(world,pedestal);
-            }
-            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-            {
-                buildValidBlockListArea(pedestal);
-                //System.out.println("ListBuilt: "+ getValidList(pedestal));
-            }
-            else if(!pedestal.getRenderRange())
-            {
-                pedestal.setRenderRange(true);
-            }
-        }
-        else
-        {
-            List<BlockPos> getList = readBlockPosListFromNBT(coin);
-            if(!override && listed.size()>0)
-            {
-                upgradeAction(world,pedestal);
-            }
-            else if(getList.size()>0)
-            {
-                if(!hasBlockListCustomNBTTags(coin,"_validlist"))
+                if(listed.size()>0)
                 {
-                    BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
-                            .mapToObj((getList)::get)
-                            .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-                            .findFirst().orElse(BlockPos.ZERO);
-                    if(!hasValidPos.equals(BlockPos.ZERO))
-                    {
-                        buildValidBlockList(pedestal);
-                    }
+                    //System.out.println("RunAction");
+                    upgradeAction(world,pedestal);
+                }
+                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+                {
+                    buildValidBlockListArea(pedestal);
+                    //System.out.println("ListBuilt: "+ getValidList(pedestal));
                 }
                 else if(!pedestal.getRenderRange())
                 {
                     pedestal.setRenderRange(true);
                 }
             }
+            else
+            {
+                List<BlockPos> getList = readBlockPosListFromNBT(coin);
+                if(!override && listed.size()>0)
+                {
+                    upgradeAction(world,pedestal);
+                }
+                else if(getList.size()>0)
+                {
+                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
+                    {
+                        BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
+                                .mapToObj((getList)::get)
+                                .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
+                                .findFirst().orElse(BlockPos.ZERO);
+                        if(!hasValidPos.equals(BlockPos.ZERO))
+                        {
+                            buildValidBlockList(pedestal);
+                        }
+                    }
+                    else if(!pedestal.getRenderRange())
+                    {
+                        pedestal.setRenderRange(true);
+                    }
+                }
+            }
         }
-
     }
 
     private int getCurrentPosition(BasePedestalBlockEntity pedestal)

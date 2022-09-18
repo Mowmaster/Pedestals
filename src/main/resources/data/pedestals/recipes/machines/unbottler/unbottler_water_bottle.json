@@ -1,0 +1,28 @@
+{
+  "type": "pedestals:unbottler",
+  "inputStack": {
+    "item": "minecraft:potion",
+    "type": "forge:nbt",
+    "nbt": {
+      "Potion": "minecraft:water"
+    }
+  },
+  "inputFluidStack": {
+    "fluid": "minecraft:water",
+    "count": 250
+  },
+  "energy": {
+    "energyValue": 0
+  },
+  "experience": {
+    "experienceValue": 0
+  },
+  "dust": {
+    "dustColor": -1,
+    "dustAmount": 0
+  },
+  "result": {
+    "item": "minecraft:glass_bottle"
+  }
+
+}
