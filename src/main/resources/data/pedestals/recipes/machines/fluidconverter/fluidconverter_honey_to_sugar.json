@@ -6,6 +6,12 @@
   },
   "result": {
     "item": "minecraft:sugar"
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:tag_empty",
+      "tag": "forge:honey"
+    }
+  ]
 
 }

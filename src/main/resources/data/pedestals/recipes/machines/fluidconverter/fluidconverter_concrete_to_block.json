@@ -6,13 +6,12 @@
   },
   "result": {
     "item": "immersiveengineering:concrete",
-    "count": 4,
-    "conditions": [
-      {
-        "type": "forge:mod_loaded",
-        "modid": "immersiveengineering"
-      }
-    ]
-  }
-
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "immersiveengineering"
+    }
+  ]
 }

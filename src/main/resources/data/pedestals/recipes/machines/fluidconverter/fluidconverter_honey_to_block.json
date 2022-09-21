@@ -6,6 +6,12 @@
   },
   "result": {
     "item": "minecraft:honey_block"
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:tag_empty",
+      "tag": "forge:honey"
+    }
+  ]
 
 }

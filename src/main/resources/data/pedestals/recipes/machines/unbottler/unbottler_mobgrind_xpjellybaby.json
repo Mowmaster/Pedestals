@@ -1,18 +1,18 @@
 {
   "type": "pedestals:unbottler",
   "inputStack": {
-    "item": "mob_grinding_utils:solid_xp_baby",
-    "conditions": [
-      {
-        "type": "forge:mod_loaded",
-        "modid": "mob_grinding_utils"
-      }
-    ]
+    "item": "mob_grinding_utils:solid_xp_baby"
   },
   "experience": {
     "experienceValue": 12
   },
   "result": {
     "item": ""
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mob_grinding_utils"
+    }
+  ]
 }

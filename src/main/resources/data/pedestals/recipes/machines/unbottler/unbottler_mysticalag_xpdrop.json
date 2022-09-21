@@ -1,18 +1,18 @@
 {
   "type": "pedestals:unbottler",
   "inputStack": {
-    "item": "mysticalagriculture:experience_droplet",
-    "conditions": [
-      {
-        "type": "forge:mod_loaded",
-        "modid": "mysticalagriculture"
-      }
-    ]
+    "item": "mysticalagriculture:experience_droplet"
   },
   "experience": {
     "experienceValue": 12
   },
   "result": {
     "item": ""
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mysticalagriculture"
+    }
+  ]
 }

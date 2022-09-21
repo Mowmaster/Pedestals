@@ -1,0 +1,20 @@
+{
+  "type": "pedestals:unbottler",
+  "inputStack": {
+    "item": "minecraft:milk_bucket"
+  },
+  "inputFluidStack": {
+    "fluid": "minecraft:milk",
+    "count": 1000
+  },
+  "result": {
+    "item": "minecraft:bucket"
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "minecraft:milk"
+    }
+  ]
+
+}

@@ -16,6 +16,12 @@
   },
   "result": {
     "item": ""
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:tag_empty",
+      "tag": "forge:experience"
+    }
+  ]
 
 }

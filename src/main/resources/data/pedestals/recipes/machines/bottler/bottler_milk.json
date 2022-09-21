@@ -8,12 +8,12 @@
     "count": 250
   },
   "result": {
-    "item": "farmersdelight:milk_bottle",
-    "conditions": [
-      {
-        "type": "forge:mod_loaded",
-        "modid": "farmersdelight"
-      }
-    ]
-  }
+    "item": "farmersdelight:milk_bottle"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "farmersdelight"
+    }
+  ]
 }

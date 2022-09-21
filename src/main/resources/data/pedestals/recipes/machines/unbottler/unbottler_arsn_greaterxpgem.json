@@ -1,18 +1,18 @@
 {
   "type": "pedestals:unbottler",
   "inputStack": {
-    "item": "ars_nouveau:greater_experience_gem",
-    "conditions": [
-      {
-        "type": "forge:mod_loaded",
-        "modid": "ars_nouveau"
-      }
-    ]
+    "item": "ars_nouveau:greater_experience_gem"
   },
   "experience": {
     "experienceValue": 12
   },
   "result": {
     "item": ""
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "ars_nouveau"
+    }
+  ]
 }

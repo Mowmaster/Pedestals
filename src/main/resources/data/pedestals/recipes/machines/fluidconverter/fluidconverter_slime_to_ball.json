@@ -6,6 +6,12 @@
   },
   "result": {
     "item": "minecraft:slime_ball"
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:tag_empty",
+      "tag": "forge:slime"
+    }
+  ]
 
 }

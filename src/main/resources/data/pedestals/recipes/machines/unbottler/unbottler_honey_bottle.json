@@ -9,6 +9,12 @@
   },
   "result": {
     "item": "minecraft:glass_bottle"
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:tag_empty",
+      "tag": "forge:honey"
+    }
+  ]
 
 }
