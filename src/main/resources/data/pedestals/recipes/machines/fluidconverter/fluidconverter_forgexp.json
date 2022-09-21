@@ -1,0 +1,21 @@
+{
+  "type": "pedestals:fluidconverter",
+  "inputFluidStack": {
+    "fluid": "forge:experience",
+    "count": 1000
+  },
+  "energy": {
+    "energyValue": 0
+  },
+  "experience": {
+    "experienceValue": 11
+  },
+  "dust": {
+    "dustColor": -1,
+    "dustAmount": 0
+  },
+  "result": {
+    "item": ""
+  }
+
+}

@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:fluidconverter",
+  "inputFluidStack": {
+    "fluid": "forge:slime",
+    "count": 125
+  },
+  "result": {
+    "item": "minecraft:slime_ball"
+  }
+
+}

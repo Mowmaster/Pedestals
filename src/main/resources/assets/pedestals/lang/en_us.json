@@ -28,7 +28,7 @@
   "pedestals.unbottler.dust": "Dust Returned: ",
 
   "pedestals.jei.fluidconverter": "Fluid Converter",
-  "pedestals.fluidconverter.returnedstack": "Returned Items: ",
+  "pedestals.fluidconverter.returnedstack": "Converts fluids in the Pedestals Inventory",
   "pedestals.fluidconverter.fluid": "Fluid Needed: ",
   "pedestals.fluidconverter.fluidna": "None",
   "pedestals.fluidconverter.energy": "Energy Returned: ",

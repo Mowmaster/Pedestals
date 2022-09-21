@@ -1,7 +1,7 @@
 {
   "type": "mowlib:dualhandedcrafting",
   "blockTarget": {
-    "item": "minecraft:bookshelf"
+    "tag": "forge:bookshelves"
   },
   "mainhandTool": {
     "tag": "forge:rods"
@@ -13,11 +13,8 @@
     "item": "pedestals:tool_upgradetool",
     "conditions": [
       {
-        "type": "forge:not",
-        "value": {
-          "type": "forge:mod_loaded",
-          "modid": "quark"
-        }
+        "type": "forge:mod_loaded",
+        "modid": "quark"
       }
     ]
   }

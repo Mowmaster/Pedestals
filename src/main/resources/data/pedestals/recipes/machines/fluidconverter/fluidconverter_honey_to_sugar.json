@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:fluidconverter",
+  "inputFluidStack": {
+    "fluid": "forge:honey",
+    "count": 250
+  },
+  "result": {
+    "item": "minecraft:sugar"
+  }
+
+}

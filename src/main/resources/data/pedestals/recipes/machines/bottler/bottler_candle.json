@@ -1,0 +1,14 @@
+{
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "tag": "forge:string"
+  },
+  "inputFluidStack": {
+    "fluid": "forge:wax",
+    "count": 250
+  },
+  "result": {
+    "item": "minecraft:candle",
+    "count": 2
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:fluidconverter",
+  "inputFluidStack": {
+    "fluid": "immersiveengineering:concrete",
+    "count": 500
+  },
+  "result": {
+    "item": "immersiveengineering:concrete",
+    "count": 4,
+    "conditions": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "immersiveengineering"
+      }
+    ]
+  }
+
+}

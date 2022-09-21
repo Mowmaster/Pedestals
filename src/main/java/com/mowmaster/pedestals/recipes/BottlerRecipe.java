@@ -257,7 +257,8 @@ public class BottlerRecipe implements Recipe<MowLibMultiContainer>
             String group = buffer.readUtf(32767);
             boolean hasInput = buffer.readBoolean();
             Ingredient inputStack = hasInput ? Ingredient.fromNetwork(buffer) : null;
-            FluidTagIngredient ingredientFluid = FluidTagIngredient.readFromPacket(buffer);
+            boolean hasInputFluid = buffer.readBoolean();
+            FluidTagIngredient ingredientFluid = hasInputFluid ? FluidTagIngredient.readFromPacket(buffer) : null;
             EnergyIngredient energyIngredient = new EnergyIngredient(buffer.readInt());
             ExperienceIngredient experienceIngredient = new ExperienceIngredient(buffer.readInt());
             DustIngredient dustIngredient = new DustIngredient(buffer.readInt(),buffer.readInt());
@@ -271,7 +272,10 @@ public class BottlerRecipe implements Recipe<MowLibMultiContainer>
             buffer.writeUtf(recipe.group);
             boolean hasInput = recipe.inputStack != null;
             buffer.writeBoolean(hasInput);
-            recipe.fluidIng.writeToPacket(buffer);
+            if (hasInput) recipe.inputStack.toNetwork(buffer);
+            boolean hasInputFluid = recipe.fluidIng != null;
+            buffer.writeBoolean(hasInputFluid);
+            if (hasInputFluid) recipe.fluidIng.writeToPacket(buffer);
             buffer.writeInt(recipe.energy.getEnergyNeeded());
             buffer.writeInt(recipe.experience.getExperienceRequired());
             buffer.writeInt(recipe.dust.getDustMagic().getDustColor());

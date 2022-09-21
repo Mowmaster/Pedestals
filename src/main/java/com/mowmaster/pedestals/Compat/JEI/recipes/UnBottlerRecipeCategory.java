@@ -73,11 +73,11 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
                 .addIngredients(recipe.getIngredients().get(0));
 
         //Pedestal
-        builder.addSlot(RecipeIngredientRole.INPUT, 56, 17)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 17)
                 .addItemStack(new ItemStack(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get()).setHoverName(Component.translatable(References.MODID + ".bottler.placementpedestal")));
 
         //Chest
-        builder.addSlot(RecipeIngredientRole.INPUT, 56, 41)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 41)
                 .addItemStack(new ItemStack(Items.CHEST).setHoverName(Component.translatable(References.MODID + ".bottler.placementinventory")));
 
         //Result

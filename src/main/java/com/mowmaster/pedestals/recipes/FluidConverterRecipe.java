@@ -40,7 +40,7 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
     private final DustIngredient dust;
     private final ItemStack generatedItemOrBlock;
 
-    public FluidConverterRecipe(ResourceLocation id, String group, @Nullable FluidTagIngredient fluidIng, @Nullable EnergyIngredient energy, @Nullable ExperienceIngredient experience, @Nullable DustIngredient dust, ItemStack generatedItemOrBlock)
+    public FluidConverterRecipe(ResourceLocation id, String group, @Nullable FluidTagIngredient fluidIng, @Nullable EnergyIngredient energy, @Nullable ExperienceIngredient experience, @Nullable DustIngredient dust, @Nullable ItemStack generatedItemOrBlock)
     {
         this.group = group;
         this.id = id;
@@ -87,7 +87,7 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
         MowLibMultiContainer cont = p_44002_;
         //Dont allow recipes that dont return anything to be allowed
         //System.out.println(fluidIng == null && energy == null && experience == null && dust == null);
-        if(fluidIng == null && energy == null && experience == null && dust == null)return false;
+        if(fluidIng == null && energy == null && experience == null && dust == null && generatedItemOrBlock == null)return false;
         //System.out.println(energy.getEnergyNeeded()<=0 && experience.getExperienceRequired()<=0 && dust.getDustMagic().isEmpty() && generatedItemOrBlock.isEmpty());
         if(energy.getEnergyNeeded()<=0 && experience.getExperienceRequired()<=0 && dust.getDustMagic().isEmpty() && generatedItemOrBlock.isEmpty())return false;
 
@@ -210,7 +210,7 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
             EnergyIngredient energyIngredient = new EnergyIngredient(json);
             ExperienceIngredient experienceIngredient = new ExperienceIngredient(json);
             DustIngredient dustIngredient = DustIngredient.parseData(json);
-            ItemStack result = CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true);
+            ItemStack result = json.has("result") ? CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true) : null;
             return createRecipe(recipeId, group, fluidTagIngredient, energyIngredient, experienceIngredient, dustIngredient, result);
         }
 
@@ -218,11 +218,13 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
         public FluidConverterRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer)
         {
             String group = buffer.readUtf(32767);
-            FluidTagIngredient ingredientFluid = FluidTagIngredient.readFromPacket(buffer);
+            boolean hasInputFluid = buffer.readBoolean();
+            FluidTagIngredient ingredientFluid = hasInputFluid ? FluidTagIngredient.readFromPacket(buffer) : null;
             EnergyIngredient energyIngredient = new EnergyIngredient(buffer.readInt());
             ExperienceIngredient experienceIngredient = new ExperienceIngredient(buffer.readInt());
             DustIngredient dustIngredient = new DustIngredient(buffer.readInt(),buffer.readInt());
-            ItemStack result = buffer.readItem();
+            boolean hasResult = buffer.readBoolean();
+            ItemStack result = hasResult ? buffer.readItem() : null;
             return createRecipe(recipeId, group, ingredientFluid, energyIngredient, experienceIngredient, dustIngredient, result);
         }
 
@@ -230,12 +232,16 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
         public void toNetwork(FriendlyByteBuf buffer, FluidConverterRecipe recipe)
         {
             buffer.writeUtf(recipe.group);
-            recipe.fluidIng.writeToPacket(buffer);
+            boolean hasInputFluid = recipe.fluidIng != null;
+            buffer.writeBoolean(hasInputFluid);
+            if (hasInputFluid) recipe.fluidIng.writeToPacket(buffer);
             buffer.writeInt(recipe.energy.getEnergyNeeded());
             buffer.writeInt(recipe.experience.getExperienceRequired());
             buffer.writeInt(recipe.dust.getDustMagic().getDustColor());
             buffer.writeInt(recipe.dust.getDustMagic().getDustAmount());
-            buffer.writeItem(recipe.generatedItemOrBlock);
+            boolean hasResultItem = recipe.generatedItemOrBlock != null;
+            buffer.writeBoolean(hasResultItem);
+            if (hasResultItem) buffer.writeItem(recipe.generatedItemOrBlock);
         }
 
         public RecipeSerializer<?> setRegistryName(ResourceLocation name) {

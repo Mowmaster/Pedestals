@@ -1,0 +1,19 @@
+{
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "item": "minecraft:glass_bottle"
+  },
+  "inputFluidStack": {
+    "fluid": "minecraft:milk",
+    "count": 250
+  },
+  "result": {
+    "item": "farmersdelight:milk_bottle",
+    "conditions": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "farmersdelight"
+      }
+    ]
+  }
+}

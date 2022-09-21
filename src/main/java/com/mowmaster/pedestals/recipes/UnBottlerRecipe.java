@@ -20,6 +20,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ObjectHolder;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +43,7 @@ public class UnBottlerRecipe implements Recipe<Container>
     private final DustIngredient dust;
     private final ItemStack generatedItemOrBlock;
 
-    public UnBottlerRecipe(ResourceLocation id, String group, @Nullable Ingredient inputStack, @Nullable FluidTagIngredient fluidIng, @Nullable EnergyIngredient energy, @Nullable ExperienceIngredient experience, @Nullable DustIngredient dust, ItemStack generatedItemOrBlock)
+    public UnBottlerRecipe(ResourceLocation id, String group, @Nullable Ingredient inputStack, @Nullable FluidTagIngredient fluidIng, @Nullable EnergyIngredient energy, @Nullable ExperienceIngredient experience, @Nullable DustIngredient dust, @Nullable ItemStack generatedItemOrBlock)
     {
         this.group = group;
         this.id = id;
@@ -200,7 +201,7 @@ public class UnBottlerRecipe implements Recipe<Container>
             EnergyIngredient energyIngredient = new EnergyIngredient(json);
             ExperienceIngredient experienceIngredient = new ExperienceIngredient(json);
             DustIngredient dustIngredient = DustIngredient.parseData(json);
-            ItemStack result = CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true);
+            ItemStack result = json.has("result") ? CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true) : null;
             return createRecipe(recipeId, group, inputStack, fluidTagIngredient, energyIngredient, experienceIngredient, dustIngredient, result);
         }
 
@@ -210,11 +211,13 @@ public class UnBottlerRecipe implements Recipe<Container>
             String group = buffer.readUtf(32767);
             boolean hasInput = buffer.readBoolean();
             Ingredient inputStack = hasInput ? Ingredient.fromNetwork(buffer) : null;
-            FluidTagIngredient ingredientFluid = FluidTagIngredient.readFromPacket(buffer);
+            boolean hasInputFluid = buffer.readBoolean();
+            FluidTagIngredient ingredientFluid = hasInputFluid ? FluidTagIngredient.readFromPacket(buffer) : null;
             EnergyIngredient energyIngredient = new EnergyIngredient(buffer.readInt());
             ExperienceIngredient experienceIngredient = new ExperienceIngredient(buffer.readInt());
             DustIngredient dustIngredient = new DustIngredient(buffer.readInt(),buffer.readInt());
-            ItemStack result = buffer.readItem();
+            boolean hasResult = buffer.readBoolean();
+            ItemStack result = hasResult ? buffer.readItem() : null;
             return createRecipe(recipeId, group, inputStack, ingredientFluid, energyIngredient, experienceIngredient, dustIngredient, result);
         }
 
@@ -224,12 +227,17 @@ public class UnBottlerRecipe implements Recipe<Container>
             buffer.writeUtf(recipe.group);
             boolean hasInput = recipe.inputStack != null;
             buffer.writeBoolean(hasInput);
-            recipe.fluidIng.writeToPacket(buffer);
+            if (hasInput) recipe.inputStack.toNetwork(buffer);
+            boolean hasInputFluid = recipe.fluidIng != null;
+            buffer.writeBoolean(hasInputFluid);
+            if (hasInputFluid) recipe.fluidIng.writeToPacket(buffer);
             buffer.writeInt(recipe.energy.getEnergyNeeded());
             buffer.writeInt(recipe.experience.getExperienceRequired());
             buffer.writeInt(recipe.dust.getDustMagic().getDustColor());
             buffer.writeInt(recipe.dust.getDustMagic().getDustAmount());
-            buffer.writeItem(recipe.generatedItemOrBlock);
+            boolean hasResult = recipe.generatedItemOrBlock != null;
+            buffer.writeBoolean(hasResult);
+            if (hasResult) buffer.writeItem(recipe.generatedItemOrBlock);
         }
 
         public RecipeSerializer<?> setRegistryName(ResourceLocation name) {

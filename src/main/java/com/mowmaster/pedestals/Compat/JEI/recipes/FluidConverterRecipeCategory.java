@@ -11,6 +11,7 @@ import com.mowmaster.pedestals.Recipes.FluidConverterRecipe;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -37,7 +38,7 @@ public class FluidConverterRecipeCategory implements IRecipeCategory<FluidConver
 
     public FluidConverterRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createDrawable(
-                new ResourceLocation(References.MODID, "textures/gui/jei/fluidconverter.png"), 0, 0, 128, 146);
+                new ResourceLocation(References.MODID, "textures/gui/jei/fluidconverter.png"), 0, 0, 128, 96);
         this.localizedName = Component.translatable(References.MODID + ".jei.fluidconverter");
         //this.overlay =
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, this.renderStack);
@@ -67,12 +68,16 @@ public class FluidConverterRecipeCategory implements IRecipeCategory<FluidConver
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, FluidConverterRecipe recipe, IFocusGroup focuses) {
 
+        //Fluid
+        builder.addSlot(RecipeIngredientRole.INPUT, 7, 19)
+                .setFluidRenderer(10,false,16,16).addIngredient(ForgeTypes.FLUID_STACK,recipe.getFluidRequired());
+
         //Pedestal
-        builder.addSlot(RecipeIngredientRole.INPUT, 7, 69)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 53, 19)
                 .addItemStack(new ItemStack(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get()).setHoverName(Component.translatable(References.MODID + ".fluidconverter.returnedstack")));
 
         //Result
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 53, 69)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 99, 19)
                 .addItemStack(recipe.getResultItem());
     }
 
@@ -81,25 +86,15 @@ public class FluidConverterRecipeCategory implements IRecipeCategory<FluidConver
         RenderSystem.enableBlend();
         Font fontRenderer = Minecraft.getInstance().font;
 
-        MutableComponent fluidneeded = Component.translatable(References.MODID + ".fluidconverter.fluid");
-        fluidneeded.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,fluidneeded,10,14,0xffffffff);
-
-        MutableComponent fluid = recipe.getFluidRequired().getDisplayName().copy();
-        if(recipe.getFluidRequired().getAmount()<=0){fluid = Component.translatable(References.MODID + ".fluidconverter.fluidna");}
-        else{fluid.append(Component.literal(": " + recipe.getFluidRequired().getAmount() + ""));}
-        fluid.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,fluid,10,24,0xffffffff);
-
         MutableComponent energy = Component.translatable(References.MODID + ".fluidconverter.energy");
         energy.append(Component.literal("" + recipe.getEnergyReturned() + ""));
         energy.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,energy,10,94,0xffffffff);
+        fontRenderer.draw(stack,energy,10,44,0xffffffff);
 
         MutableComponent exp = Component.translatable(References.MODID + ".fluidconverter.xp");
         exp.append(Component.literal("" + recipe.getExperienceReturned() + ""));
         exp.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,exp,10,112,0xffffffff);
+        fontRenderer.draw(stack,exp,10,62,0xffffffff);
 
         DustMagic dustNeeded = recipe.getDustReturned();
         MutableComponent dust = Component.translatable(References.MODID + ".fluidconverter.dust");
@@ -114,6 +109,6 @@ public class FluidConverterRecipeCategory implements IRecipeCategory<FluidConver
         }
         dust.withStyle(ChatFormatting.BLACK);
 
-        fontRenderer.draw(stack,dust,10,130,0xffffffff);
+        fontRenderer.draw(stack,dust,10,80,0xffffffff);
     }
 }

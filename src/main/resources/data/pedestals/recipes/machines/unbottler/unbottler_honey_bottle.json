@@ -1,0 +1,14 @@
+{
+  "type": "pedestals:unbottler",
+  "inputStack": {
+    "item": "honey_bottle"
+  },
+  "inputFluidStack": {
+    "fluid": "forge:honey",
+    "count": 250
+  },
+  "result": {
+    "item": "minecraft:glass_bottle"
+  }
+
+}
