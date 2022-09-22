@@ -11,6 +11,7 @@ import com.mowmaster.pedestals.Recipes.BottlerRecipe;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -69,19 +70,23 @@ public class BottlerRecipeCategory implements IRecipeCategory<BottlerRecipe>
     public void setRecipe(IRecipeLayoutBuilder builder, BottlerRecipe recipe, IFocusGroup focuses) {
 
         //Input
-        builder.addSlot(RecipeIngredientRole.INPUT, 10, 41)
+        builder.addSlot(RecipeIngredientRole.INPUT, 10, 93)
                 .addIngredients(recipe.getIngredients().get(0));
 
+        //Fluid Input
+        builder.addSlot(RecipeIngredientRole.INPUT, 10, 69)
+                .setFluidRenderer(10,false,16,16).addIngredient(ForgeTypes.FLUID_STACK,recipe.getFluidNeeded());
+
         //Pedestal
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 17)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 69)
                 .addItemStack(new ItemStack(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get()).setHoverName(Component.translatable(References.MODID + ".bottler.placementpedestal")));
 
         //Chest
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 41)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 93)
                 .addItemStack(new ItemStack(Items.CHEST).setHoverName(Component.translatable(References.MODID + ".bottler.placementinventory")));
 
         //Result
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 102, 17)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 102, 69)
                 .addItemStack(recipe.getResultItem());
     }
 
@@ -90,25 +95,15 @@ public class BottlerRecipeCategory implements IRecipeCategory<BottlerRecipe>
         RenderSystem.enableBlend();
         Font fontRenderer = Minecraft.getInstance().font;
 
-        MutableComponent fluidneeded = Component.translatable(References.MODID + ".bottler.fluid");
-        fluidneeded.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,fluidneeded,10,66,0xffffffff);
-
-        MutableComponent fluid = recipe.getFluidNeeded().getDisplayName().copy();
-        if(recipe.getFluidNeeded().getAmount()<=0){fluid = Component.translatable(References.MODID + ".bottler.fluidna");}
-        else{fluid.append(Component.literal(": " + recipe.getFluidNeeded().getAmount() + ""));}
-        fluid.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,fluid,10,76,0xffffffff);
-
         MutableComponent energy = Component.translatable(References.MODID + ".bottler.energy");
         energy.append(Component.literal("" + recipe.getEnergyNeeded() + ""));
         energy.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,energy,10,94,0xffffffff);
+        fontRenderer.draw(stack,energy,10,10,0xffffffff);
 
         MutableComponent exp = Component.translatable(References.MODID + ".bottler.xp");
         exp.append(Component.literal("" + recipe.getExperienceNeeded() + ""));
         exp.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,exp,10,112,0xffffffff);
+        fontRenderer.draw(stack,exp,10,28,0xffffffff);
 
         DustMagic dustNeeded = recipe.getDustNeeded();
         MutableComponent dust = Component.translatable(References.MODID + ".bottler.dust");
@@ -123,6 +118,6 @@ public class BottlerRecipeCategory implements IRecipeCategory<BottlerRecipe>
         }
         dust.withStyle(ChatFormatting.BLACK);
 
-        fontRenderer.draw(stack,dust,10,130,0xffffffff);
+        fontRenderer.draw(stack,dust,10,46,0xffffffff);
     }
 }

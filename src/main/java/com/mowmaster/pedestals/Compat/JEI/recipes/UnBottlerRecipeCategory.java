@@ -11,6 +11,7 @@ import com.mowmaster.pedestals.Recipes.UnBottlerRecipe;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -38,7 +39,7 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
 
     public UnBottlerRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createDrawable(
-                new ResourceLocation(References.MODID, "textures/gui/jei/bottler.png"), 0, 0, 128, 146);
+                new ResourceLocation(References.MODID, "textures/gui/jei/unbottler.png"), 0, 0, 128, 120);
         this.localizedName = Component.translatable(References.MODID + ".jei.unbottler");
         //this.overlay =
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, this.renderStack);
@@ -69,19 +70,23 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
     public void setRecipe(IRecipeLayoutBuilder builder, UnBottlerRecipe recipe, IFocusGroup focuses) {
 
         //Input
-        builder.addSlot(RecipeIngredientRole.INPUT, 10, 41)
+        builder.addSlot(RecipeIngredientRole.INPUT, 10, 35)
                 .addIngredients(recipe.getIngredients().get(0));
 
         //Pedestal
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 17)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 11)
                 .addItemStack(new ItemStack(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get()).setHoverName(Component.translatable(References.MODID + ".bottler.placementpedestal")));
 
         //Chest
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 41)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56, 35)
                 .addItemStack(new ItemStack(Items.CHEST).setHoverName(Component.translatable(References.MODID + ".bottler.placementinventory")));
 
+        //Fluid Input
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 102, 35)
+                .setFluidRenderer(10,false,16,16).addIngredient(ForgeTypes.FLUID_STACK,recipe.getFluidReturned());
+
         //Result
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 102, 17)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 102, 11)
                 .addItemStack(recipe.getResultItem());
     }
 
@@ -90,25 +95,15 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
         RenderSystem.enableBlend();
         Font fontRenderer = Minecraft.getInstance().font;
 
-        MutableComponent fluidneeded = Component.translatable(References.MODID + ".unbottler.fluid");
-        fluidneeded.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,fluidneeded,10,66,0xffffffff);
-
-        MutableComponent fluid = recipe.getFluidReturned().getDisplayName().copy();
-        if(recipe.getFluidReturned().getAmount()<=0){fluid = Component.translatable(References.MODID + ".unbottler.fluidna");}
-        else{fluid.append(Component.literal(": " + recipe.getFluidReturned().getAmount() + ""));}
-        fluid.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,fluid,10,76,0xffffffff);
-
         MutableComponent energy = Component.translatable(References.MODID + ".unbottler.energy");
         energy.append(Component.literal("" + recipe.getEnergyReturned() + ""));
         energy.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,energy,10,94,0xffffffff);
+        fontRenderer.draw(stack,energy,10,64,0xffffffff);
 
         MutableComponent exp = Component.translatable(References.MODID + ".unbottler.xp");
         exp.append(Component.literal("" + recipe.getExperienceReturned() + ""));
         exp.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,exp,10,112,0xffffffff);
+        fontRenderer.draw(stack,exp,10,82,0xffffffff);
 
         DustMagic dustNeeded = recipe.getDustReturned();
         MutableComponent dust = Component.translatable(References.MODID + ".unbottler.dust");
@@ -123,6 +118,6 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
         }
         dust.withStyle(ChatFormatting.BLACK);
 
-        fontRenderer.draw(stack,dust,10,130,0xffffffff);
+        fontRenderer.draw(stack,dust,10,100,0xffffffff);
     }
 }
