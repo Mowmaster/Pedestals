@@ -3,13 +3,11 @@
   "blockBelow": {
     "item": "minecraft:dead_tube_coral_block"
   },
+  "dust": {
+    "dustColor": 5592575,
+    "dustAmount": 20
+  },
   "result": {
     "item": "minecraft:tube_coral_block"
-  },
-  "energy": 0,
-  "experience": 0,
-  "fluidName": "",
-  "fluid": 0,
-  "dustcolor": 5592575,
-  "dustamount": 20
+  }
 }

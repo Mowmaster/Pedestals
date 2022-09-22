@@ -3,13 +3,11 @@
   "blockBelow": {
     "item": "minecraft:dead_fire_coral_block"
   },
+  "dust": {
+    "dustColor": 11141120,
+    "dustAmount": 20
+  },
   "result": {
     "item": "minecraft:fire_coral_block"
-  },
-  "energy": 0,
-  "experience": 0,
-  "fluidName": "",
-  "fluid": 0,
-  "dustcolor": 11141120,
-  "dustamount": 20
+  }
 }

@@ -3,13 +3,11 @@
   "blockBelow": {
     "item": "minecraft:crying_obsidian"
   },
+  "inputFluidStack": {
+    "fluid": "minecraft:lava",
+    "count": 1000
+  },
   "result": {
     "item": "minecraft:obsidian"
-  },
-  "energy": 0,
-  "experience": 0,
-  "fluidName": "minecraft:lava",
-  "fluid": 1000,
-  "dustcolor": 0,
-  "dustamount": 0
+  }
 }

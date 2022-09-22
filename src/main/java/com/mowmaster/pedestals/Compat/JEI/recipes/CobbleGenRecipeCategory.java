@@ -11,6 +11,7 @@ import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -42,7 +43,7 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
 
     public CobbleGenRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createDrawable(
-                new ResourceLocation(References.MODID, "textures/gui/jei/cobble_gen.png"), 0, 0, 128, 146);
+                new ResourceLocation(References.MODID, "textures/gui/jei/cobble_gen.png"), 0, 0, 128, 122);
         this.localizedName = Component.translatable(References.MODID + ".jei.cobble_gen");
         //this.overlay =
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, this.renderStack);
@@ -72,15 +73,18 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, CobbleGenRecipe recipe, IFocusGroup focuses) {
 
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 33,18)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 56,17)
                 .addItemStack(new ItemStack(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get()).setHoverName(Component.translatable(References.MODID + ".cobble_gen.warning")));
+        //Fluid Input
+        builder.addSlot(RecipeIngredientRole.INPUT, 10, 17)
+                .setFluidRenderer(10,false,16,16).addIngredient(ForgeTypes.FLUID_STACK,recipe.getResultFluidNeeded());
 
         //Block Below
-        builder.addSlot(RecipeIngredientRole.INPUT, 33, 41)
+        builder.addSlot(RecipeIngredientRole.INPUT, 56, 41)
                 .addIngredients(recipe.getIngredients().get(0));
 
         //Result
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 79, 41)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 102, 41)
                 .addItemStack(recipe.getResultItem());
     }
 
@@ -89,25 +93,15 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
         RenderSystem.enableBlend();
         Font fontRenderer = Minecraft.getInstance().font;
 
-        MutableComponent fluidneeded = Component.translatable(References.MODID + ".cobble_gen.fluid");
-        fluidneeded.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,fluidneeded,10,66,0xffffffff);
-
-        MutableComponent fluid = recipe.getResultFluidNeeded().getDisplayName().copy();
-        if(recipe.getResultFluidNeeded().getAmount()<=0){fluid = Component.translatable(References.MODID + ".cobble_gen.fluidna");}
-        else{fluid.append(Component.literal(": " + recipe.getResultFluidNeeded().getAmount() + ""));}
-        fluid.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,fluid,10,76,0xffffffff);
-
         MutableComponent energy = Component.translatable(References.MODID + ".cobble_gen.energy");
         energy.append(Component.literal("" + recipe.getResultEnergyNeeded() + ""));
         energy.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,energy,10,94,0xffffffff);
+        fontRenderer.draw(stack,energy,10,66,0xffffffff);
 
         MutableComponent exp = Component.translatable(References.MODID + ".cobble_gen.xp");
         exp.append(Component.literal("" + recipe.getResultExperienceNeeded() + ""));
         exp.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,exp,10,112,0xffffffff);
+        fontRenderer.draw(stack,exp,10,84,0xffffffff);
 
         DustMagic dustNeeded = recipe.getResultDustNeeded();
         MutableComponent dust = Component.translatable(References.MODID + ".cobble_gen.dust");
@@ -122,6 +116,6 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
         }
         dust.withStyle(ChatFormatting.BLACK);
 
-        fontRenderer.draw(stack,dust,10,130,0xffffffff);
+        fontRenderer.draw(stack,dust,10,102,0xffffffff);
     }
 }

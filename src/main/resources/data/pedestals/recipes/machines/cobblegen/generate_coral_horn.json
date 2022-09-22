@@ -3,13 +3,11 @@
   "blockBelow": {
     "item": "minecraft:dead_horn_coral_block"
   },
+  "dust": {
+    "dustColor": 16776960,
+    "dustAmount": 20
+  },
   "result": {
     "item": "minecraft:horn_coral_block"
-  },
-  "energy": 0,
-  "experience": 0,
-  "fluidName": "",
-  "fluid": 0,
-  "dustcolor": 16776960,
-  "dustamount": 20
+  }
 }

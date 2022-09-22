@@ -3,13 +3,11 @@
   "blockBelow": {
     "item": "minecraft:dead_bubble_coral_block"
   },
+  "dust": {
+    "dustColor": 16733695,
+    "dustAmount": 20
+  },
   "result": {
     "item": "minecraft:bubble_coral_block"
-  },
-  "energy": 0,
-  "experience": 0,
-  "fluidName": "",
-  "fluid": 0,
-  "dustcolor": 16733695,
-  "dustamount": 20
+  }
 }

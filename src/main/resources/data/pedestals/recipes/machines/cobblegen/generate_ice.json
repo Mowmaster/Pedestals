@@ -3,13 +3,11 @@
   "blockBelow": {
     "item": "minecraft:packed_ice"
   },
+  "inputFluidStack": {
+    "fluid": "minecraft:water",
+    "count": 1000
+  },
   "result": {
     "item": "minecraft:ice"
-  },
-  "energy": 0,
-  "experience": 0,
-  "fluidName": "minecraft:water",
-  "fluid": 1000,
-  "dustcolor": 0,
-  "dustamount": 0
+  }
 }
