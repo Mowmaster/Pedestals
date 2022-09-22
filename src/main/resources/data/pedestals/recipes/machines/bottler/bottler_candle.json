@@ -13,8 +13,11 @@
   },
   "conditions": [
     {
-      "type": "forge:tag_empty",
-      "tag": "forge:wax"
+      "type": "forge:not",
+      "value": {
+        "type": "forge:tag_empty",
+        "tag": "forge:wax"
+      }
     }
   ]
 }

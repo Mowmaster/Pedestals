@@ -38,7 +38,7 @@ public class BottlerRecipeCategory implements IRecipeCategory<BottlerRecipe>
 
     public BottlerRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createDrawable(
-                new ResourceLocation(References.MODID, "textures/gui/jei/bottler.png"), 0, 0, 128, 146);
+                new ResourceLocation(References.MODID, "textures/gui/jei/bottler.png"), 0, 0, 128, 120);
         this.localizedName = Component.translatable(References.MODID + ".jei.bottler");
         //this.overlay =
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, this.renderStack);

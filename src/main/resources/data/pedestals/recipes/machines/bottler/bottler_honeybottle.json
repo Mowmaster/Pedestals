@@ -12,8 +12,11 @@
   },
   "conditions": [
     {
-      "type": "forge:tag_empty",
-      "tag": "forge:honey"
+      "type": "forge:not",
+      "value": {
+        "type": "forge:tag_empty",
+        "tag": "forge:honey"
+      }
     }
   ]
 }
