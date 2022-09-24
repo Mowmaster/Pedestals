@@ -15,6 +15,7 @@ import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
+import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
@@ -969,54 +970,12 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
     @Override
     public int getAnalogOutputSignal(BlockState p_60487_, Level p_60488_, BlockPos p_60489_) {
         //super.getAnalogOutputSignal(p_60487_, p_60488_, p_60489_);
-        return getRedstoneLevelPedestal(p_60488_,p_60489_);
+        return PedestalUtilities.getRedstoneLevelPedestal(p_60488_,p_60489_);
     }
 
     @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction direction) {
         return true;
-    }
-
-    private static int getRedstoneLevelPedestal(Level worldIn, BlockPos pos)
-    {
-        int hasItem=0;
-        BlockEntity blockEntity = worldIn.getBlockEntity(pos);
-        if(blockEntity instanceof BasePedestalBlockEntity pedestal) {
-            List<ItemStack> itemstacks = pedestal.getItemStacks();
-            if(pedestal.getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
-            {
-                return upgrade.getComparatorRedstoneLevel(worldIn,pos);
-            }
-            if(itemstacks.size()>0)
-            {
-                int maxStackSizeDefault = 64;
-                if(pedestal.hasFilter())
-                {
-                    IPedestalFilter filter =pedestal.getIPedestalFilter();
-                    if(filter != null && filter.getFilterDirection().insert())
-                    {
-                        maxStackSizeDefault = Math.max(1,filter.canAcceptCountItems(pedestal,pedestal.getFilterInPedestal(), new ItemStack(Items.STONE,64).getMaxStackSize(), pedestal.getSlotSizeLimit(), new ItemStack(Items.STONE,64)));
-                    }
-                }
-                int counter = 0;
-                int maxStorageCount = Math.max(1,(pedestal.getPedestalSlots()-1)) * maxStackSizeDefault;
-                for (ItemStack stack : itemstacks)
-                {
-                    //adjust max storage possible based on itemstacks present
-                    if(stack.getMaxStackSize()<maxStackSizeDefault)
-                    {
-                        maxStorageCount-=maxStackSizeDefault;
-                        maxStorageCount+=stack.getMaxStackSize();
-                    }
-
-                    counter+=stack.getCount();
-                }
-                float f = (float)counter/(float)maxStorageCount;
-                hasItem = (int)Math.floor(f*15.0F);
-            }
-        }
-
-        return hasItem;
     }
 
     public RenderShape getRenderShape(BlockState p_50950_) {

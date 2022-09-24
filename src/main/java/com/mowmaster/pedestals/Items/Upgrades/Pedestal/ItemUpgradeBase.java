@@ -63,7 +63,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
      */
     @Override
     public int getComparatorRedstoneLevel(Level worldIn, BlockPos pos) {
-        return PedestalUtilities.getRedstoneLevelPedestal(worldIn, pos);
+        return -1;
     }
 
     @Override
