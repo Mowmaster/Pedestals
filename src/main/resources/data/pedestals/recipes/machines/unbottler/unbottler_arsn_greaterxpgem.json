@@ -6,9 +6,6 @@
   "experience": {
     "experienceValue": 12
   },
-  "result": {
-    "item": ""
-  },
   "conditions": [
     {
       "type": "forge:mod_loaded",

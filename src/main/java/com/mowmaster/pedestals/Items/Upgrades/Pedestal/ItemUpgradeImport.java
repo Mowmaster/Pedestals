@@ -19,6 +19,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
@@ -44,36 +45,26 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
         super(new Properties());
     }
 
+
+
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
-        {
-            upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
-        }
-    }
-
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getPosOfBlockBelow(level,pedestalPos,1);
 
-        if(canTransferItems(coinInPedestal))
+        if(canTransferItems(coin))
         {
             //TODO: make this a modifier
-            int transferRate = getItemTransferRate(coinInPedestal) + pedestal.getItemTransferRateIncreaseFromCapacity();
+            int transferRate = getItemTransferRate(coin) + pedestal.getItemTransferRateIncreaseFromCapacity();
 
             ItemStack itemFromInv = ItemStack.EMPTY;
-            LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
             if(!isInventoryEmpty(cap))
             {
                 if(cap.isPresent())
                 {
                     IItemHandler handler = cap.orElse(null);
-                    BlockEntity invToPullFrom = world.getBlockEntity(posInventory);
+                    BlockEntity invToPullFrom = level.getBlockEntity(posInventory);
                     if(invToPullFrom instanceof BasePedestalBlockEntity) {
                         itemFromInv = ItemStack.EMPTY;
 
@@ -126,9 +117,9 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             }
         }
         //Fluids
-        if(canTransferFluids(coinInPedestal))
+        if(canTransferFluids(coin))
         {
-            LazyOptional<IFluidHandler> cap = MowLibFluidUtils.findFluidHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IFluidHandler> cap = MowLibFluidUtils.findFluidHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
             if(cap.isPresent())
             {
                 IFluidHandler handler = cap.orElse(null);
@@ -229,11 +220,11 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             }
         }
         //Energy
-        if(canTransferEnergy(coinInPedestal))
+        if(canTransferEnergy(coin))
         {
             int getMaxEnergyValue = pedestal.getEnergyCapacity();
 
-            LazyOptional<IEnergyStorage> cap = MowLibEnergyUtils.findEnergyHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IEnergyStorage> cap = MowLibEnergyUtils.findEnergyHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
 
             if(cap.isPresent())
             {
@@ -260,14 +251,14 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                 }
             }
         }
-        if(canTransferXP(coinInPedestal))
+        if(canTransferXP(coin))
         {
             int getMaxExperienceValue = pedestal.getExperienceCapacity();
 
-            LazyOptional<IExperienceStorage> cap = MowLibXpUtils.findExperienceHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IExperienceStorage> cap = MowLibXpUtils.findExperienceHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
 
             //Gets inventory TE then makes sure its not a pedestal
-            BlockEntity invToPushTo = world.getBlockEntity(posInventory);
+            BlockEntity invToPushTo = level.getBlockEntity(posInventory);
 
             if(cap.isPresent())
             {
@@ -294,9 +285,9 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                 }
             }
         }
-        if(canTransferDust(coinInPedestal))
+        if(canTransferDust(coin))
         {
-            LazyOptional<IDustHandler> cap = MowLibDustUtils.findDustHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal));
+            LazyOptional<IDustHandler> cap = MowLibDustUtils.findDustHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos));
 
             if(cap.isPresent())
             {
@@ -388,6 +379,20 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                                     pedestal.addExperience(value,false);
                                     if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
                                 }
+                            }
+                        }
+                    }
+                    else if (entityIn instanceof ExperienceOrb xpOrb) {
+
+                        int currentlyStoredExp = pedestal.getStoredExperience();
+                        if(currentlyStoredExp < pedestal.getExperienceCapacity())
+                        {
+                            int value = xpOrb.getValue();
+                            if(value > 0)
+                            {
+                                pedestal.addExperience(value,false);
+                                xpOrb.remove(Entity.RemovalReason.DISCARDED);
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
                             }
                         }
                     }

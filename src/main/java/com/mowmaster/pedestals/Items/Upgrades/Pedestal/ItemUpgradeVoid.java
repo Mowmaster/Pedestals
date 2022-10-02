@@ -62,23 +62,13 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
         return true;
     }
 
-    @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
-        {
-            upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
-        }
-    }
 
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+
+    @Override
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         //Items
-        if(canTransferItems(coinInPedestal))
+        if(canTransferItems(coin))
         {
             if(pedestal.hasItem())
             {
@@ -86,28 +76,31 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
                 {
                     if(passesFilter(pedestal,pedestal.getItemInPedestal(i),null,null,0,0, IItemMode.ItemTransferMode.ITEMS))
                     {
-                        pedestal.removeItemStack(i,true);
+                        if(!pedestal.removeItemStack(i,true).isEmpty())
+                        {
+                            pedestal.removeItemStack(i,false);
+                        }
                     }
                 }
             }
         }
         //Fluids
-        if(canTransferFluids(coinInPedestal))
+        if(canTransferFluids(coin))
         {
             if(pedestal.hasFluid() && passesFilter(pedestal,null,pedestal.getStoredFluid(),null,0,0, IItemMode.ItemTransferMode.FLUIDS))pedestal.removeFluid(pedestal.getStoredFluid(), IFluidHandler.FluidAction.EXECUTE);
         }
         //Energy
-        if(canTransferEnergy(coinInPedestal))
+        if(canTransferEnergy(coin))
         {
-            if(pedestal.hasEnergy() && passesFilter(pedestal,null,null,null,pedestal.getStoredEnergy(),0, IItemMode.ItemTransferMode.ENERGY))pedestal.removeEnergy(pedestal.getStoredEnergy(),true);
+            if(pedestal.hasEnergy() && passesFilter(pedestal,null,null,null,pedestal.getStoredEnergy(),0, IItemMode.ItemTransferMode.ENERGY))pedestal.removeEnergy(pedestal.getStoredEnergy(),false);
         }
         //XP
-        if(canTransferXP(coinInPedestal))
+        if(canTransferXP(coin))
         {
-            if(pedestal.hasExperience() && passesFilter(pedestal,null,null,null,0,pedestal.getStoredExperience(), IItemMode.ItemTransferMode.EXPERIENCE))pedestal.removeExperience(pedestal.getStoredExperience(),true);
+            if(pedestal.hasExperience() && passesFilter(pedestal,null,null,null,0,pedestal.getStoredExperience(), IItemMode.ItemTransferMode.EXPERIENCE))pedestal.removeExperience(pedestal.getStoredExperience(),false);
         }
         //Dust
-        if(canTransferDust(coinInPedestal))
+        if(canTransferDust(coin))
         {
             if(pedestal.hasDust() && passesFilter(pedestal,null,null,pedestal.getStoredDust(),0,0, IItemMode.ItemTransferMode.DUST))pedestal.removeDust(pedestal.getStoredDust(), IDustHandler.DustAction.EXECUTE);
         }
@@ -130,6 +123,10 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
             else if (getEntity instanceof LivingEntity livingEntity)
             {
                 livingEntity.kill();
+            }
+            else
+            {
+                getEntity.remove(Entity.RemovalReason.DISCARDED);
             }
         }
     }

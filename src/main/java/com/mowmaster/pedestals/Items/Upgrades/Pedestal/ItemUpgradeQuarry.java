@@ -150,33 +150,23 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        boolean override = hasTwoPointsSelected(coin);
+        List<BlockPos> listed = getValidList(pedestal);
 
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
+        if(override)
         {
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            boolean override = hasTwoPointsSelected(coin);
-            List<BlockPos> listed = getValidList(pedestal);
-
-            if(override)
+            if(listed.size()>0)
             {
-                if(listed.size()>0)
-                {
-                    upgradeAction(world,pedestal);
-                }
-                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                {
-                    buildValidBlockListArea(pedestal);
-                }
-                else if(!pedestal.getRenderRange())
-                {
-                    pedestal.setRenderRange(true);
-                }
+                quarryAction(level,pedestal);
+            }
+            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+            {
+                buildValidBlockListArea(pedestal);
+            }
+            else if(!pedestal.getRenderRange())
+            {
+                pedestal.setRenderRange(true);
             }
         }
     }
@@ -342,7 +332,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
         if(xpdrop>0)blockAtPoint.getBlock().popExperience((ServerLevel)level,currentPoint,xpdrop);
     }
 
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
+    public void quarryAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
         {
@@ -369,45 +359,52 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
             //ToDo: make this a modifier for later
             boolean runsOnce = true;
             boolean stop = getStopped(pedestal);
-
-            if(!stop)
+            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
             {
-                for(int y=min;y<=max;y++)
+                if(!stop)
                 {
-                    BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
-                    BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                    //blockAtPoint.requiresCorrectToolForDrops();
-
-                    if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
+                    for(int y=min;y<=max;y++)
                     {
-                        if(ForgeEventFactory.doPlayerHarvestCheck(getPlayer.get(), blockAtPoint, true))
+                        BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
+                        BlockState blockAtPoint = level.getBlockState(adjustedPoint);
+                        //blockAtPoint.requiresCorrectToolForDrops();
+
+                        if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
                         {
-                            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, adjustedPoint, blockAtPoint, getPlayer.get());
-                            if(!MinecraftForge.EVENT_BUS.post(e))
+                            if(ForgeEventFactory.doPlayerHarvestCheck(getPlayer.get(), blockAtPoint, true))
                             {
-                                //checking to make sure we cant mine chopper blocks
-                                if(!canMine(pedestal, blockAtPoint, adjustedPoint))
+                                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, adjustedPoint, blockAtPoint, getPlayer.get());
+                                if(!MinecraftForge.EVENT_BUS.post(e))
                                 {
-                                    if(passesFilter(pedestal, blockAtPoint, adjustedPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList().contains(blockAtPoint.getBlock())))
+                                    //checking to make sure we cant mine chopper blocks
+                                    if(!canMine(pedestal, blockAtPoint, adjustedPoint))
                                     {
-                                        //ToDo: config option
-
-                                        boolean damage = false;
-
-                                        if(!adjustedPoint.equals(pedestal.getPos()))
+                                        if(passesFilter(pedestal, blockAtPoint, adjustedPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList().contains(blockAtPoint.getBlock())))
                                         {
-                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true))
+                                            //ToDo: config option
+
+                                            boolean damage = false;
+
+                                            if(!adjustedPoint.equals(pedestal.getPos()))
                                             {
-                                                if(PedestalConfig.COMMON.quarryDamageTools.get())
+                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true))
                                                 {
-                                                    if(pedestal.hasTool())
+                                                    if(PedestalConfig.COMMON.quarryDamageTools.get())
                                                     {
-                                                        BlockPos pedestalPos = pedestal.getPos();
-                                                        if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                                                        if(pedestal.hasTool())
                                                         {
-                                                            if(pedestal.damageInsertedTool(1,true))
+                                                            BlockPos pedestalPos = pedestal.getPos();
+                                                            if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
                                                             {
-                                                                damage = true;
+                                                                if(pedestal.damageInsertedTool(1,true))
+                                                                {
+                                                                    damage = true;
+                                                                }
+                                                                else
+                                                                {
+                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                                                    return;
+                                                                }
                                                             }
                                                             else
                                                             {
@@ -415,49 +412,44 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                                                                 return;
                                                             }
                                                         }
+                                                    }
+
+                                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
+                                                    {
+                                                        boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
+                                                        List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint, adjustedPoint);
+                                                        if(level.getBlockEntity(adjustedPoint) !=null){
+                                                            if(canRemoveBlockEntities)
+                                                            {
+
+                                                                blockAtPoint.onRemove(level,adjustedPoint,blockAtPoint,true);
+                                                                dropXP(level, pedestal, blockAtPoint, adjustedPoint);
+                                                                level.removeBlockEntity(adjustedPoint);
+                                                                //level.removeBlock(adjustedPoint, true);
+                                                                level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
+                                                                //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
+                                                                if(damage)pedestal.damageInsertedTool(1,false);
+                                                            }
+                                                        }
                                                         else
                                                         {
-                                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                                            return;
-                                                        }
-                                                    }
-                                                }
-
-                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
-                                                {
-                                                    boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
-                                                    List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint, adjustedPoint);
-                                                    if(level.getBlockEntity(adjustedPoint) !=null){
-                                                        if(canRemoveBlockEntities)
-                                                        {
-
-                                                            blockAtPoint.onRemove(level,adjustedPoint,blockAtPoint,true);
                                                             dropXP(level, pedestal, blockAtPoint, adjustedPoint);
-                                                            level.removeBlockEntity(adjustedPoint);
                                                             //level.removeBlock(adjustedPoint, true);
                                                             level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                             //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                             if(damage)pedestal.damageInsertedTool(1,false);
                                                         }
-                                                    }
-                                                    else
-                                                    {
-                                                        dropXP(level, pedestal, blockAtPoint, adjustedPoint);
-                                                        //level.removeBlock(adjustedPoint, true);
-                                                        level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
-                                                        //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                        if(damage)pedestal.damageInsertedTool(1,false);
-                                                    }
 
-                                                    if(drops.size()>0)
-                                                    {
-                                                        for (ItemStack stack: drops) {
-                                                            MowLibItemUtils.spawnItemStack(level,adjustedPoint.getX(),adjustedPoint.getY(),adjustedPoint.getZ(),stack);
+                                                        if(drops.size()>0)
+                                                        {
+                                                            for (ItemStack stack: drops) {
+                                                                MowLibItemUtils.spawnItemStack(level,adjustedPoint.getX(),adjustedPoint.getY(),adjustedPoint.getZ(),stack);
+                                                            }
                                                         }
                                                     }
-                                                }
-                                                else {
-                                                    fuelRemoved = false;
+                                                    else {
+                                                        fuelRemoved = false;
+                                                    }
                                                 }
                                             }
                                         }
@@ -467,44 +459,44 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase implements ISelectableAre
                         }
                     }
                 }
-            }
-            else
-            {
-                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
-            }
-
-            if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
-            {
-                if(runsOnce)
+                else
                 {
-                    //ToDo: Make this 1200 value a config
-                    int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
-                    if(getCurrentDelay(pedestal)>=delay)
+                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
+                }
+
+                if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
+                {
+                    if(runsOnce)
                     {
-                        setCurrentPosition(pedestal,0);
-                        setStopped(pedestal,false);
-                        setCurrentDelay(pedestal,0);
+                        //ToDo: Make this 1200 value a config
+                        int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
+                        if(getCurrentDelay(pedestal)>=delay)
+                        {
+                            setCurrentPosition(pedestal,0);
+                            setStopped(pedestal,false);
+                            setCurrentDelay(pedestal,0);
+                        }
+                        else
+                        {
+                            iterateCurrentDelay(pedestal);
+                            setStopped(pedestal,true);
+                        }
                     }
                     else
                     {
-                        iterateCurrentDelay(pedestal);
-                        setStopped(pedestal,true);
+                        setCurrentPosition(pedestal,0);
                     }
+                }
+                else if((currentPosition+1)>=listed.size())
+                {
+                    setCurrentPosition(pedestal,0);
+                    iterateCurrentHeight(pedestal);
                 }
                 else
                 {
-                    setCurrentPosition(pedestal,0);
-                }
-            }
-            else if((currentPosition+1)>=listed.size())
-            {
-                setCurrentPosition(pedestal,0);
-                iterateCurrentHeight(pedestal);
-            }
-            else
-            {
-                if(fuelRemoved){
-                    iterateCurrentPosition(pedestal);
+                    if(fuelRemoved){
+                        iterateCurrentPosition(pedestal);
+                    }
                 }
             }
         }

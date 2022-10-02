@@ -144,75 +144,43 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numposition");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numdelay");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numheight");
-        removeBooleanFromNBT(MODID, coinInPedestal.getTag(),"_boolstop");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_boolstop");
 
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
+        boolean override = hasTwoPointsSelected(coin);
+        List<BlockPos> listed = getValidList(pedestal);
+
+        if(override)
         {
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            boolean override = hasTwoPointsSelected(coin);
-            List<BlockPos> listed = getValidList(pedestal);
-
-            if(override)
+            if(listed.size()>0)
             {
-                if(listed.size()>0)
-                {
-                    if(pedestal.hasItem())upgradeAction(world,pedestal);
-                }
-                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                {
-                    buildValidBlockListArea(pedestal);
-                }
-                else if(!pedestal.getRenderRange())
-                {
-                    pedestal.setRenderRange(true);
-                }
+                if(pedestal.hasItem())fillerAction(level,pedestal);
+            }
+            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+            {
+                buildValidBlockListArea(pedestal);
+            }
+            else if(!pedestal.getRenderRange())
+            {
+                pedestal.setRenderRange(true);
             }
         }
     }
 
-    //
-    //  Add To MowLib
-    //
-    public static boolean readBooleanFromNBT(String ModID, CompoundTag tag, String identifier)
-    {
-        return tag.contains(ModID + identifier) ? tag.getBoolean(ModID + identifier) : false;
-    }
-
-    public static CompoundTag writeBooleanToNBT(String ModID, @Nullable CompoundTag tag, boolean value, String identifier) {
-        CompoundTag compound = tag != null ? tag : new CompoundTag();
-        compound.putBoolean(ModID + identifier, value);
-        return compound;
-    }
-
-    public static void removeBooleanFromNBT(String ModID, CompoundTag tag, String identifier) {
-        if (tag.contains(ModID + identifier)) {
-            tag.remove(ModID + identifier);
-        }
-    }
-    //
-    //
-    //
-
     private boolean getStopped(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
+        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
     }
 
     private void setStopped(BasePedestalBlockEntity pedestal, boolean value)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
+        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
     }
 
     private int getHeightIteratorValue(BasePedestalBlockEntity pedestal)
@@ -337,7 +305,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
         return true;
     }
 
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
+    public void fillerAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
         {
@@ -365,71 +333,74 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
             boolean runsOnce = true;
             boolean stop = getStopped(pedestal);
 
-            if(!stop)
+            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
             {
-                for(int y=min;y<=max;y++)
+                if(!stop)
                 {
-                    BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
-                    BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                    if(!pedestal.removeItem(1,true).isEmpty())
+                    for(int y=min;y<=max;y++)
                     {
-                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
+                        BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
+                        BlockState blockAtPoint = level.getBlockState(adjustedPoint);
+                        if(!pedestal.removeItem(1,true).isEmpty())
                         {
-                            if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, adjustedPoint))
+                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                             {
-                                if(!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR)
+                                if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, adjustedPoint))
                                 {
-                                    UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
-                                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                    if (result == InteractionResult.CONSUME) {
-                                        pedestal.removeItem(1,false);
+                                    if(!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR)
+                                    {
+                                        UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
+                                        InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                        if (result == InteractionResult.CONSUME) {
+                                            pedestal.removeItem(1,false);
+                                        }
                                     }
                                 }
                             }
+                            else {
+                                fuelRemoved = false;
+                            }
                         }
-                        else {
-                            fuelRemoved = false;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
-            }
-
-            if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
-            {
-                if(runsOnce)
-                {
-                    //ToDo: Make this 1200 value a config
-                    int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
-                    if(getCurrentDelay(pedestal)>=delay)
-                    {
-                        setCurrentPosition(pedestal,0);
-                        setStopped(pedestal,false);
-                        setCurrentDelay(pedestal,0);
-                    }
-                    else
-                    {
-                        iterateCurrentDelay(pedestal);
-                        setStopped(pedestal,true);
                     }
                 }
                 else
                 {
-                    setCurrentPosition(pedestal,0);
+                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
                 }
-            }
-            else if((currentPosition+1)>=listed.size())
-            {
-                setCurrentPosition(pedestal,0);
-                iterateCurrentHeight(pedestal);
-            }
-            else
-            {
-                if(fuelRemoved){
-                    iterateCurrentPosition(pedestal);
+
+                if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
+                {
+                    if(runsOnce)
+                    {
+                        //ToDo: Make this 1200 value a config
+                        int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
+                        if(getCurrentDelay(pedestal)>=delay)
+                        {
+                            setCurrentPosition(pedestal,0);
+                            setStopped(pedestal,false);
+                            setCurrentDelay(pedestal,0);
+                        }
+                        else
+                        {
+                            iterateCurrentDelay(pedestal);
+                            setStopped(pedestal,true);
+                        }
+                    }
+                    else
+                    {
+                        setCurrentPosition(pedestal,0);
+                    }
+                }
+                else if((currentPosition+1)>=listed.size())
+                {
+                    setCurrentPosition(pedestal,0);
+                    iterateCurrentHeight(pedestal);
+                }
+                else
+                {
+                    if(fuelRemoved){
+                        iterateCurrentPosition(pedestal);
+                    }
                 }
             }
         }

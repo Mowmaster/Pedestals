@@ -23,25 +23,17 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
 
     @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-
         if(pedestal.getItemInPedestal().getItem() instanceof BaseFluidBulkStorageItem
-        || pedestal.getItemInPedestal().getItem() instanceof BaseEnergyBulkStorageItem
-        || pedestal.getItemInPedestal().getItem() instanceof BaseXpBulkStorageItem
-        || pedestal.getItemInPedestal().getItem() instanceof BaseDustBulkStorageItem)
+                || pedestal.getItemInPedestal().getItem() instanceof BaseEnergyBulkStorageItem
+                || pedestal.getItemInPedestal().getItem() instanceof BaseXpBulkStorageItem
+                || pedestal.getItemInPedestal().getItem() instanceof BaseDustBulkStorageItem)
         {
-            int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-            int speed = configSpeed;
-            if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-            //Make sure speed has at least a value of 1
-            if(speed<=0)speed = 1;
-            if(world.getGameTime()%speed == 0 )
-            {
-                upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
-            }
+            super.updateAction(world, pedestal);
         }
     }
 
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    @Override
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         ItemStack stackInPed = pedestal.getItemInPedestal();
         int fluidSpace = pedestal.spaceForFluid();
@@ -49,7 +41,7 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
         int xpSpace = pedestal.spaceForExperience();
         int dustSpace = pedestal.spaceForDust();
 
-        if(stackInPed.getItem() instanceof BaseFluidBulkStorageItem fluidItem && canTransferFluids(coinInPedestal))
+        if(stackInPed.getItem() instanceof BaseFluidBulkStorageItem fluidItem && canTransferFluids(coin))
         {
             if(fluidSpace>0)
             {
@@ -74,7 +66,7 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
                 }
             }
         }
-        if(stackInPed.getItem() instanceof BaseEnergyBulkStorageItem energyItem && canTransferEnergy(coinInPedestal))
+        if(stackInPed.getItem() instanceof BaseEnergyBulkStorageItem energyItem && canTransferEnergy(coin))
         {
             if(energySpace>0)
             {
@@ -99,7 +91,7 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
                 }
             }
         }
-        if(stackInPed.getItem() instanceof BaseXpBulkStorageItem xpItem && canTransferXP(coinInPedestal))
+        if(stackInPed.getItem() instanceof BaseXpBulkStorageItem xpItem && canTransferXP(coin))
         {
             if(xpSpace>0)
             {
@@ -124,7 +116,7 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
                 }
             }
         }
-        if(stackInPed.getItem() instanceof BaseDustBulkStorageItem && canTransferDust(coinInPedestal))
+        if(stackInPed.getItem() instanceof BaseDustBulkStorageItem && canTransferDust(coin))
         {
             if(dustSpace>0)
             {

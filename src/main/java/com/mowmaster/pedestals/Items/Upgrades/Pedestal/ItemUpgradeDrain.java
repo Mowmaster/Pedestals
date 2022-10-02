@@ -224,62 +224,54 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
+        boolean override = hasTwoPointsSelected(coin);
+        List<BlockPos> listed = getValidList(pedestal);
+
+        if(override)
         {
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            boolean override = hasTwoPointsSelected(coin);
-            List<BlockPos> listed = getValidList(pedestal);
-
-            if(override)
+            if(listed.size()>0)
             {
-                if(listed.size()>0)
+                //System.out.println("RunAction");
+                if(pedestal.hasFluid())drainAction(level,pedestal);
+            }
+            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+            {
+                buildValidBlockListArea(pedestal);
+                //System.out.println("ListBuilt: "+ getValidList(pedestal));
+            }
+            else if(!pedestal.getRenderRange())
+            {
+                pedestal.setRenderRange(true);
+            }
+        }
+        else
+        {
+            List<BlockPos> getList = readBlockPosListFromNBT(coin);
+            if(!override && listed.size()>0)
+            {
+                if(pedestal.hasFluid())drainAction(level,pedestal);
+            }
+            else if(getList.size()>0)
+            {
+                if(!hasBlockListCustomNBTTags(coin,"_validlist"))
                 {
-                    //System.out.println("RunAction");
-                    if(pedestal.hasFluid())upgradeAction(world,pedestal);
-                }
-                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                {
-                    buildValidBlockListArea(pedestal);
-                    //System.out.println("ListBuilt: "+ getValidList(pedestal));
+                    BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
+                            .mapToObj((getList)::get)
+                            .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
+                            .findFirst().orElse(BlockPos.ZERO);
+                    if(!hasValidPos.equals(BlockPos.ZERO))
+                    {
+                        buildValidBlockList(pedestal);
+                    }
                 }
                 else if(!pedestal.getRenderRange())
                 {
                     pedestal.setRenderRange(true);
                 }
             }
-            else
-            {
-                List<BlockPos> getList = readBlockPosListFromNBT(coin);
-                if(!override && listed.size()>0)
-                {
-                    if(pedestal.hasFluid())upgradeAction(world,pedestal);
-                }
-                else if(getList.size()>0)
-                {
-                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
-                                .mapToObj((getList)::get)
-                                .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-                                .findFirst().orElse(BlockPos.ZERO);
-                        if(!hasValidPos.equals(BlockPos.ZERO))
-                        {
-                            buildValidBlockList(pedestal);
-                        }
-                    }
-                    else if(!pedestal.getRenderRange())
-                    {
-                        pedestal.setRenderRange(true);
-                    }
-                }
-            }
+        }
 
         /*ItemStack coin = pedestal.getCoinOnPedestal();
         boolean override = hasTwoPointsSelected(coin);
@@ -289,7 +281,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
         {
             if(listed.size()>0)
             {
-                if(pedestal.hasFluid())upgradeAction(world,pedestal);
+                if(pedestal.hasFluid())upgradeAction(level,pedestal);
             }
             else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
             {
@@ -300,42 +292,6 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                 pedestal.setRenderRange(true);
             }
         }*/
-        }
-    }
-
-    //
-    //  Add To MowLib
-    //
-    public static boolean readBooleanFromNBT(String ModID, CompoundTag tag, String identifier)
-    {
-        return tag.contains(ModID + identifier) ? tag.getBoolean(ModID + identifier) : false;
-    }
-
-    public static CompoundTag writeBooleanToNBT(String ModID, @Nullable CompoundTag tag, boolean value, String identifier) {
-        CompoundTag compound = tag != null ? tag : new CompoundTag();
-        compound.putBoolean(ModID + identifier, value);
-        return compound;
-    }
-
-    public static void removeBooleanFromNBT(String ModID, CompoundTag tag, String identifier) {
-        if (tag.contains(ModID + identifier)) {
-            tag.remove(ModID + identifier);
-        }
-    }
-    //
-    //
-    //
-
-    private boolean getStopped(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
-    }
-
-    private void setStopped(BasePedestalBlockEntity pedestal, boolean value)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
     }
 
     private int getHeightIteratorValue(BasePedestalBlockEntity pedestal)
@@ -453,7 +409,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
         return false;
     }
 
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
+    public void drainAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
         {

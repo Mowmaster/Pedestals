@@ -155,29 +155,11 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_xpNeeded");
     }
 
-
-
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
-        {
-            upgradeAction(world, pedestal);
-        }
-    }
-
-    public void upgradeAction(Level world, BasePedestalBlockEntity pedestal)
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        BlockPos pedestalPos = pedestal.getPos();
-        BlockPos posBelow = getPosOfBlockBelow(world,pedestalPos,1);
-        ItemStack itemBlockBelow = new ItemStack(world.getBlockState(posBelow).getBlock().asItem());
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        Level level = pedestal.getLevel();
+        BlockPos posBelow = getPosOfBlockBelow(level,pedestalPos,1);
+        ItemStack itemBlockBelow = new ItemStack(level.getBlockState(posBelow).getBlock().asItem());
 
         //TODO: Add in Capacity modifier for generation.
         //int modifier = getCobbleGenSpawnRate(pedestal.getCoinOnPedestal());

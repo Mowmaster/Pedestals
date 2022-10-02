@@ -168,16 +168,8 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
-        {
-            ItemStack coin = pedestal.getCoinOnPedestal();
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
+    {
             boolean override = hasTwoPointsSelected(coin);
             List<BlockPos> listed = getValidList(pedestal);
 
@@ -186,7 +178,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
                 if(listed.size()>0)
                 {
                     //System.out.println("RunAction");
-                    if(pedestal.hasItem())upgradeAction(world,pedestal);
+                    if(pedestal.hasItem())placerAction(level,pedestal);
                 }
                 else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
                 {
@@ -203,7 +195,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
                 List<BlockPos> getList = readBlockPosListFromNBT(coin);
                 if(!override && listed.size()>0)
                 {
-                    upgradeAction(world,pedestal);
+                    placerAction(level,pedestal);
                 }
                 else if(getList.size()>0)
                 {
@@ -224,7 +216,6 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
                     }
                 }
             }
-        }
     }
 
     private int getCurrentPosition(BasePedestalBlockEntity pedestal)
@@ -296,7 +287,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
         return true;
     }
 
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
+    public void placerAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
         {
@@ -306,24 +297,37 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
             BlockState blockAtPoint = level.getBlockState(currentPoint);
             WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
             boolean fuelRemoved = true;
-
-            if(!pedestal.removeItem(1,true).isEmpty())
+            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
             {
-                if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, currentPoint))
+                if(!pedestal.removeItem(1,true).isEmpty())
                 {
-                    if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() == Blocks.AIR)
+                    if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, currentPoint))
                     {
-                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                        if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() == Blocks.AIR)
                         {
-                            UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == InteractionResult.CONSUME) {
-                                pedestal.removeItem(1,false);
+                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                            {
+                                UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                if (result == InteractionResult.CONSUME) {
+                                    pedestal.removeItem(1,false);
+                                }
+                            }
+                            else {
+                                fuelRemoved = false;
                             }
                         }
-                        else {
-                            fuelRemoved = false;
-                        }
+                    }
+                }
+
+                if((currentPosition+1)>=listed.size())
+                {
+                    setCurrentPosition(pedestal,0);
+                }
+                else
+                {
+                    if(fuelRemoved){
+                        iterateCurrentPosition(pedestal);
                     }
                 }
             }
@@ -343,16 +347,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
             }
              */
 
-            if((currentPosition+1)>=listed.size())
-            {
-                setCurrentPosition(pedestal,0);
-            }
-            else
-            {
-                if(fuelRemoved){
-                    iterateCurrentPosition(pedestal);
-                }
-            }
+
         }
     }
 }

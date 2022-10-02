@@ -58,34 +58,25 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_magnet_selectedMultiplier.get(); }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
+        if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
         {
-            if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
+            if(selectedAreaWithinRange(pedestal))
             {
-                if(selectedAreaWithinRange(pedestal))
+                magnetAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
+            }
+            else
+            {
+                if(!pedestal.getRenderRange())
                 {
-                    upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
-                }
-                else
-                {
-                    if(!pedestal.getRenderRange())
-                    {
-                        pedestal.setRenderRange(true);
-                    }
+                    pedestal.setRenderRange(true);
                 }
             }
         }
-
     }
 
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void magnetAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
         boolean needsEnergy = requiresFuelForUpgradeAction();
         boolean actionDone = false;

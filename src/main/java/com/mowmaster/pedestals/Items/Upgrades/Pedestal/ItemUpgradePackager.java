@@ -44,114 +44,101 @@ public class ItemUpgradePackager extends ItemUpgradeBase implements IHasModeType
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-
-        boolean fluidFull = pedestal.getStoredFluid().getAmount() >= pedestal.getFluidCapacity();
-        boolean energyFull = pedestal.getStoredEnergy() >= pedestal.getEnergyCapacity();
-        boolean xpFull = pedestal.getStoredExperience() >= pedestal.getExperienceCapacity();
-        boolean dustFull = pedestal.getStoredDust().getDustAmount() >= pedestal.getDustCapacity();
-        if(fluidFull || energyFull || xpFull || dustFull)
-        {
-            int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-            int speed = configSpeed;
-            if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-            //Make sure speed has at least a value of 1
-            if(speed<=0)speed = 1;
-            if(world.getGameTime()%speed == 0 )
-            {
-                upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
-            }
-        }
-    }
-
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        FluidStack fluidInPed = pedestal.getStoredFluid().copy();
-        int energyInPed = pedestal.getStoredEnergy();
-        int xpInPed = pedestal.getStoredExperience();
-        DustMagic dustInPed = pedestal.getStoredDust();
+        boolean fluidFull1 = pedestal.getStoredFluid().getAmount() >= pedestal.getFluidCapacity();
+        boolean energyFull1 = pedestal.getStoredEnergy() >= pedestal.getEnergyCapacity();
+        boolean xpFull1 = pedestal.getStoredExperience() >= pedestal.getExperienceCapacity();
+        boolean dustFull1 = pedestal.getStoredDust().getDustAmount() >= pedestal.getDustCapacity();
+        if(fluidFull1 || energyFull1 || xpFull1 || dustFull1)
+        {
+            FluidStack fluidInPed = pedestal.getStoredFluid().copy();
+            int energyInPed = pedestal.getStoredEnergy();
+            int xpInPed = pedestal.getStoredExperience();
+            DustMagic dustInPed = pedestal.getStoredDust();
 
-        boolean fluidFull = fluidInPed.getAmount() >= pedestal.getFluidCapacity();
-        boolean energyFull = energyInPed >= pedestal.getEnergyCapacity();
-        boolean xpFull = xpInPed >= pedestal.getExperienceCapacity();
-        boolean dustFull = dustInPed.getDustAmount() >= pedestal.getDustCapacity();
+            boolean fluidFull = fluidInPed.getAmount() >= pedestal.getFluidCapacity();
+            boolean energyFull = energyInPed >= pedestal.getEnergyCapacity();
+            boolean xpFull = xpInPed >= pedestal.getExperienceCapacity();
+            boolean dustFull = dustInPed.getDustAmount() >= pedestal.getDustCapacity();
 
-        if(fluidFull && canTransferFluids(coinInPedestal))
-        {
-            if(fluidInPed.getAmount()>0)
+            if(fluidFull && canTransferFluids(coin))
             {
-                if(!pedestal.removeFluid(fluidInPed.getAmount(), IFluidHandler.FluidAction.SIMULATE).isEmpty())
+                if(fluidInPed.getAmount()>0)
                 {
-                    ItemStack toPackage = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
-                    if(pedestal.addItem(toPackage, true))
+                    if(!pedestal.removeFluid(fluidInPed.getAmount(), IFluidHandler.FluidAction.SIMULATE).isEmpty())
                     {
-                        //extract Fluid
-                        FluidStack toRemove = pedestal.removeFluid(fluidInPed.getAmount(), IFluidHandler.FluidAction.EXECUTE);
-                        if(toPackage.getItem() instanceof BaseFluidBulkStorageItem droppedItemFluid)
+                        ItemStack toPackage = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
+                        if(pedestal.addItem(toPackage, true))
                         {
-                            droppedItemFluid.setFluidStack(toPackage,toRemove);
+                            //extract Fluid
+                            FluidStack toRemove = pedestal.removeFluid(fluidInPed.getAmount(), IFluidHandler.FluidAction.EXECUTE);
+                            if(toPackage.getItem() instanceof BaseFluidBulkStorageItem droppedItemFluid)
+                            {
+                                droppedItemFluid.setFluidStack(toPackage,toRemove);
+                            }
+                            pedestal.addItem(toPackage, false);
                         }
-                        pedestal.addItem(toPackage, false);
                     }
                 }
             }
-        }
-        if(energyFull && canTransferEnergy(coinInPedestal))
-        {
-            if(energyInPed>0)
+            if(energyFull && canTransferEnergy(coin))
             {
-                if(pedestal.removeEnergy(energyInPed, true)>0)
+                if(energyInPed>0)
                 {
-                    ItemStack toPackage = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());
-                    if(pedestal.addItem(toPackage, true))
+                    if(pedestal.removeEnergy(energyInPed, true)>0)
                     {
-                        //extract Energy
-                        int energyToRemove = pedestal.removeEnergy(energyInPed,false);
-                        if(toPackage.getItem() instanceof BaseEnergyBulkStorageItem droppedItemEnergy)
+                        ItemStack toPackage = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());
+                        if(pedestal.addItem(toPackage, true))
                         {
-                            droppedItemEnergy.setEnergy(toPackage,energyToRemove);
+                            //extract Energy
+                            int energyToRemove = pedestal.removeEnergy(energyInPed,false);
+                            if(toPackage.getItem() instanceof BaseEnergyBulkStorageItem droppedItemEnergy)
+                            {
+                                droppedItemEnergy.setEnergy(toPackage,energyToRemove);
+                            }
+                            pedestal.addItem(toPackage, false);
                         }
-                        pedestal.addItem(toPackage, false);
                     }
                 }
             }
-        }
-        if(xpFull && canTransferXP(coinInPedestal))
-        {
-            if(xpInPed>0)
+            if(xpFull && canTransferXP(coin))
             {
-                if(pedestal.removeExperience(xpInPed, true)>0)
+                if(xpInPed>0)
                 {
-                    ItemStack toPackage = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_XP.get());
-                    if(pedestal.addItem(toPackage, true))
+                    if(pedestal.removeExperience(xpInPed, true)>0)
                     {
-                        //extract Energy
-                        int xpToRemove = pedestal.removeExperience(xpInPed,false);
-                        if(toPackage.getItem() instanceof BaseXpBulkStorageItem droppedItemXp)
+                        ItemStack toPackage = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_XP.get());
+                        if(pedestal.addItem(toPackage, true))
                         {
-                            droppedItemXp.setXp(toPackage,xpToRemove);
+                            //extract Energy
+                            int xpToRemove = pedestal.removeExperience(xpInPed,false);
+                            if(toPackage.getItem() instanceof BaseXpBulkStorageItem droppedItemXp)
+                            {
+                                droppedItemXp.setXp(toPackage,xpToRemove);
+                            }
+                            pedestal.addItem(toPackage, false);
                         }
-                        pedestal.addItem(toPackage, false);
                     }
                 }
             }
-        }
-        if(dustFull && canTransferDust(coinInPedestal))
-        {
-            if(dustInPed.getDustAmount()>0)
+            if(dustFull && canTransferDust(coin))
             {
-                if(!pedestal.removeDust(dustInPed, IDustHandler.DustAction.SIMULATE).isEmpty())
+                if(dustInPed.getDustAmount()>0)
                 {
-                    ItemStack toPackage = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_DUST.get());
-                    if(pedestal.addItem(toPackage, true))
+                    if(!pedestal.removeDust(dustInPed, IDustHandler.DustAction.SIMULATE).isEmpty())
                     {
-                        //extract Energy
-                        DustMagic dustToRemove = pedestal.removeDust(dustInPed, IDustHandler.DustAction.EXECUTE);
-                        if(toPackage.getItem() instanceof BaseDustBulkStorageItem droppedItemDust)
+                        ItemStack toPackage = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_DUST.get());
+                        if(pedestal.addItem(toPackage, true))
                         {
-                            droppedItemDust.setDustMagicInItem(toPackage,dustToRemove);
+                            //extract Energy
+                            DustMagic dustToRemove = pedestal.removeDust(dustInPed, IDustHandler.DustAction.EXECUTE);
+                            if(toPackage.getItem() instanceof BaseDustBulkStorageItem droppedItemDust)
+                            {
+                                droppedItemDust.setDustMagicInItem(toPackage,dustToRemove);
+                            }
+                            pedestal.addItem(toPackage, false);
                         }
-                        pedestal.addItem(toPackage, false);
                     }
                 }
             }

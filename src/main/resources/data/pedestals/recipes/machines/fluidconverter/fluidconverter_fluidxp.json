@@ -1,17 +1,16 @@
 {
   "type": "pedestals:fluidconverter",
   "inputFluidStack": {
-    "fluid": "productivebees:honey",
+    "fluid": "mob_grinding_utils:fluid_xp",
     "count": 250
   },
-  "result": {
-    "item": "minecraft:sugar",
-    "count": 3
+  "experience": {
+    "experienceValue": 11
   },
   "conditions": [
     {
       "type": "forge:mod_loaded",
-      "modid": "productivebees"
+      "modid": "mob_grinding_utils"
     }
   ]
 }

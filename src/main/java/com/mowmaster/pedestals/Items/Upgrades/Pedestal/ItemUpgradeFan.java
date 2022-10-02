@@ -214,13 +214,13 @@ public class ItemUpgradeFan extends ItemUpgradeBase implements ISelectableArea
         if(level.getGameTime()%speed == 0 )
         {
         }*/
-        if(level.getGameTime()%2 == 0 )
+        if(level.getGameTime()%2 == 0)
         {
-            if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))upgradeAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
+            if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))fanAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
         }
     }
 
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level level, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void fanAction(BasePedestalBlockEntity pedestal, Level level, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posOfPedestal), true))
         {

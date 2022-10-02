@@ -107,6 +107,7 @@ public class UnBottlerRecipe implements Recipe<Container>
     @Override
     public ItemStack getResultItem()
     {
+        if(generatedItemOrBlock == null)return ItemStack.EMPTY;
         if(generatedItemOrBlock != null || !generatedItemOrBlock.isEmpty())return generatedItemOrBlock;
         return ItemStack.EMPTY;
     }

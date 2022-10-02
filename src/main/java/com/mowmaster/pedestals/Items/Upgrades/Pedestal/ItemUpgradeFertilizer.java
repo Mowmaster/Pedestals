@@ -170,60 +170,51 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectabl
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
+        boolean override = hasTwoPointsSelected(coin);
+        List<BlockPos> listed = getValidList(pedestal);
+
+        if(override)
         {
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            boolean override = hasTwoPointsSelected(coin);
-            List<BlockPos> listed = getValidList(pedestal);
-
-            if(override)
+            if(listed.size()>0)
             {
-                if(listed.size()>0)
+                //System.out.println("RunAction");
+                fertilizerAction(level,pedestal);
+            }
+            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+            {
+                buildValidBlockListArea(pedestal);
+                //System.out.println("ListBuilt: "+ getValidList(pedestal));
+            }
+            else if(!pedestal.getRenderRange())
+            {
+                pedestal.setRenderRange(true);
+            }
+        }
+        else
+        {
+            List<BlockPos> getList = readBlockPosListFromNBT(coin);
+            if(!override && listed.size()>0)
+            {
+                fertilizerAction(level,pedestal);
+            }
+            else if(getList.size()>0)
+            {
+                if(!hasBlockListCustomNBTTags(coin,"_validlist"))
                 {
-                    //System.out.println("RunAction");
-                    upgradeAction(world,pedestal);
-                }
-                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                {
-                    buildValidBlockListArea(pedestal);
-                    //System.out.println("ListBuilt: "+ getValidList(pedestal));
+                    BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
+                            .mapToObj((getList)::get)
+                            .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
+                            .findFirst().orElse(BlockPos.ZERO);
+                    if(!hasValidPos.equals(BlockPos.ZERO))
+                    {
+                        buildValidBlockList(pedestal);
+                    }
                 }
                 else if(!pedestal.getRenderRange())
                 {
                     pedestal.setRenderRange(true);
-                }
-            }
-            else
-            {
-                List<BlockPos> getList = readBlockPosListFromNBT(coin);
-                if(!override && listed.size()>0)
-                {
-                    upgradeAction(world,pedestal);
-                }
-                else if(getList.size()>0)
-                {
-                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
-                                .mapToObj((getList)::get)
-                                .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-                                .findFirst().orElse(BlockPos.ZERO);
-                        if(!hasValidPos.equals(BlockPos.ZERO))
-                        {
-                            buildValidBlockList(pedestal);
-                        }
-                    }
-                    else if(!pedestal.getRenderRange())
-                    {
-                        pedestal.setRenderRange(true);
-                    }
                 }
             }
         }
@@ -356,7 +347,7 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectabl
     }
 
 
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
+    public void fertilizerAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
         {
@@ -367,22 +358,30 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectabl
             WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
             ItemStack stackInPed = pedestal.getItemInPedestal();
 
-            if(canUseOn(pedestal,blockAtPoint,currentPoint))
+            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
             {
-                if(passesFilter(pedestal, blockAtPoint, currentPoint))
+                if(canUseOn(pedestal,blockAtPoint,currentPoint))
                 {
-                    if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
+                    if(passesFilter(pedestal, blockAtPoint, currentPoint))
                     {
-                        if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
+                        if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
                         {
-                            if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
+
+                            if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
                             {
-                                UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                                InteractionResult result = bonerItem.useOn(blockContext);
-                                if (result == InteractionResult.CONSUME) {
-                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
-                                    pedestal.removeItem(1,false);
-                                }
+                                if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
+                                {
+                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                    {
+                                        UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                        InteractionResult result = bonerItem.useOn(blockContext);
+                                        if (result == InteractionResult.CONSUME) {
+
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
+                                            pedestal.removeItem(1,false);
+                                        }
+                                    }
+
                                 /*BonemealEvent event = new BonemealEvent(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed);
                                 if (!MinecraftForge.EVENT_BUS.post(event))
                                 {
@@ -392,31 +391,35 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectabl
 
                                     }
                                 }*/
-                            }
+                                }
 
                             /*if(ForgeEventFactory.onApplyBonemeal(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed)>0)
                             {
                                 if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
                                 //pedestal.removeItem(1,true);
                             }*/
-                        }
-                        else if(canUseOn(pedestal, blockAtPoint, currentPoint))
-                        {
-                            blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
-                            //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
+                            }
+                            else if(canUseOn(pedestal, blockAtPoint, currentPoint))
+                            {
+                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                {
+                                    blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
+                                    //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            if((currentPosition+1)>=listed.size())
-            {
-                setCurrentPosition(pedestal,0);
-            }
-            else
-            {
-                iterateCurrentPosition(pedestal);
+                if((currentPosition+1)>=listed.size())
+                {
+                    setCurrentPosition(pedestal,0);
+                }
+                else
+                {
+                    iterateCurrentPosition(pedestal);
+                }
             }
         }
     }

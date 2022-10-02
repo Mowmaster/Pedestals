@@ -69,19 +69,7 @@ public class ItemUpgradeFluidConverter extends ItemUpgradeBase
     }
 
     @Override
-    public void updateAction(Level level, BasePedestalBlockEntity pedestal) {
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(level.getGameTime()%speed == 0 )
-        {
-            upgradeAction(pedestal, level, pedestal.getPos(), pedestal.getCoinOnPedestal());
-        }
-    }
-
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         if(pedestal.hasFluid())
         {

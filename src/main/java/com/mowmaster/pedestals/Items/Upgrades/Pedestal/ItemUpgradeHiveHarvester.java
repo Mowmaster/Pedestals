@@ -187,59 +187,50 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
-        {
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            boolean override = hasTwoPointsSelected(coin);
-            List<BlockPos> listed = getValidList(pedestal);
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        boolean override = hasTwoPointsSelected(coin);
+        List<BlockPos> listed = getValidList(pedestal);
 
-            if(override)
+        if(override)
+        {
+            if(listed.size()>0)
             {
-                if(listed.size()>0)
+                //System.out.println("RunAction");
+                harvesterAction(level,pedestal);
+            }
+            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+            {
+                buildValidBlockListArea(pedestal);
+                //System.out.println("ListBuilt: "+ getValidList(pedestal));
+            }
+            else if(!pedestal.getRenderRange())
+            {
+                pedestal.setRenderRange(true);
+            }
+        }
+        else
+        {
+            List<BlockPos> getList = readBlockPosListFromNBT(coin);
+            if(!override && listed.size()>0)
+            {
+                harvesterAction(level,pedestal);
+            }
+            else if(getList.size()>0)
+            {
+                if(!hasBlockListCustomNBTTags(coin,"_validlist"))
                 {
-                    //System.out.println("RunAction");
-                    upgradeAction(world,pedestal);
-                }
-                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                {
-                    buildValidBlockListArea(pedestal);
-                    //System.out.println("ListBuilt: "+ getValidList(pedestal));
+                    BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
+                            .mapToObj((getList)::get)
+                            .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
+                            .findFirst().orElse(BlockPos.ZERO);
+                    if(!hasValidPos.equals(BlockPos.ZERO))
+                    {
+                        buildValidBlockList(pedestal);
+                    }
                 }
                 else if(!pedestal.getRenderRange())
                 {
                     pedestal.setRenderRange(true);
-                }
-            }
-            else
-            {
-                List<BlockPos> getList = readBlockPosListFromNBT(coin);
-                if(!override && listed.size()>0)
-                {
-                    upgradeAction(world,pedestal);
-                }
-                else if(getList.size()>0)
-                {
-                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
-                                .mapToObj((getList)::get)
-                                .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-                                .findFirst().orElse(BlockPos.ZERO);
-                        if(!hasValidPos.equals(BlockPos.ZERO))
-                        {
-                            buildValidBlockList(pedestal);
-                        }
-                    }
-                    else if(!pedestal.getRenderRange())
-                    {
-                        pedestal.setRenderRange(true);
-                    }
                 }
             }
         }
@@ -357,7 +348,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
         return false;
     }
 
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
+    public void harvesterAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
         {
@@ -368,19 +359,19 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
             WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
             boolean fuelRemoved = true;
 
-            if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
+            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
             {
-                if(passesFilter(pedestal, blockAtPoint, currentPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList().contains(blockAtPoint.getBlock())))
+                if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
                 {
-                    if(canMine(pedestal,blockAtPoint,currentPoint))
+                    if(passesFilter(pedestal, blockAtPoint, currentPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList().contains(blockAtPoint.getBlock())))
                     {
-                        if(ForgeEventFactory.doPlayerHarvestCheck(getPlayer.get(), blockAtPoint, true)) {
-                            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, currentPoint, blockAtPoint, getPlayer.get());
-                            if (!MinecraftForge.EVENT_BUS.post(e)) {
-                                boolean damage = false;
-                                if(!currentPoint.equals(pedestal.getPos()))
-                                {
-                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                        if(canMine(pedestal,blockAtPoint,currentPoint))
+                        {
+                            if(ForgeEventFactory.doPlayerHarvestCheck(getPlayer.get(), blockAtPoint, true)) {
+                                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, currentPoint, blockAtPoint, getPlayer.get());
+                                if (!MinecraftForge.EVENT_BUS.post(e)) {
+                                    boolean damage = false;
+                                    if(!currentPoint.equals(pedestal.getPos()))
                                     {
                                         if(PedestalConfig.COMMON.blockBreakerDamageTools.get())
                                         {
@@ -451,16 +442,16 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase implements ISelect
                         }
                     }
                 }
-            }
 
-            if((currentPosition+1)>=listed.size())
-            {
-                setCurrentPosition(pedestal,0);
-            }
-            else
-            {
-                if(fuelRemoved){
-                    iterateCurrentPosition(pedestal);
+                if((currentPosition+1)>=listed.size())
+                {
+                    setCurrentPosition(pedestal,0);
+                }
+                else
+                {
+                    if(fuelRemoved){
+                        iterateCurrentPosition(pedestal);
+                    }
                 }
             }
         }

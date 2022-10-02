@@ -75,27 +75,15 @@ public class ItemUpgradeBottler extends ItemUpgradeBase
     }
 
     @Override
-    public void updateAction(Level level, BasePedestalBlockEntity pedestal) {
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(level.getGameTime()%speed == 0 )
-        {
-            upgradeAction(pedestal, level, pedestal.getPos(), pedestal.getCoinOnPedestal());
-        }
-    }
-
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getPosOfBlockBelow(level,pedestalPos,1);
         ItemStack itemFromInv = ItemStack.EMPTY;
-        LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+        LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
         if(!isInventoryEmpty(cap)) {
             if (cap.isPresent()) {
                 IItemHandler handler = cap.orElse(null);
-                BlockEntity invToPullFrom = world.getBlockEntity(posInventory);
+                BlockEntity invToPullFrom = level.getBlockEntity(posInventory);
                 if(invToPullFrom instanceof BasePedestalBlockEntity) {
                     itemFromInv = ItemStack.EMPTY;
 

@@ -1,12 +1,14 @@
 {
-  "type": "pedestals:fluidconverter",
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "item": "minecraft:bucket"
+  },
   "inputFluidStack": {
     "fluid": "productivebees:honey",
-    "count": 250
+    "count": 1000
   },
   "result": {
-    "item": "minecraft:sugar",
-    "count": 3
+    "item": "productivebees:honey_bucket"
   },
   "conditions": [
     {

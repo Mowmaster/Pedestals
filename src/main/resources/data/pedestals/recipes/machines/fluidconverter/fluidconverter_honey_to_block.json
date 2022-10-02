@@ -1,7 +1,7 @@
 {
   "type": "pedestals:fluidconverter",
   "inputFluidStack": {
-    "fluid": "forge:honey",
+    "fluid": "productivebees:honey",
     "count": 1000
   },
   "result": {
@@ -9,11 +9,8 @@
   },
   "conditions": [
     {
-      "type": "forge:not",
-      "value": {
-        "type": "forge:tag_empty",
-        "tag": "forge:honey"
-      }
+      "type": "forge:mod_loaded",
+      "modid": "productivebees"
     }
   ]
 

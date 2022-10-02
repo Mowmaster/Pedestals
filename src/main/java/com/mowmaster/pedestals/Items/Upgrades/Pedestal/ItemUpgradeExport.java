@@ -30,31 +30,18 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
-        {
-            upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
-        }
-    }
-
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        BlockPos posInventory = getPosOfBlockBelow(world,posOfPedestal,1);
+        BlockPos posInventory = getPosOfBlockBelow(level,pedestalPos,1);
 
-        if(canTransferItems(coinInPedestal))
+        if(canTransferItems(coin))
         {
             //TODO: make this a modifier
-            int transferRate = getItemTransferRate(coinInPedestal) + pedestal.getItemTransferRateIncreaseFromCapacity();
+            int transferRate = getItemTransferRate(coin) + pedestal.getItemTransferRateIncreaseFromCapacity();
 
             ItemStack stackInPedestal = pedestal.removeItem(true);
             ItemStack itemFromInv = ItemStack.EMPTY;
-            LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
 
             if(!stackInPedestal.isEmpty() && !stackInPedestal.equals(ItemStack.EMPTY))
             {
@@ -62,7 +49,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                 {
                     IItemHandler handler = cap.orElse(null);
 
-                    BlockEntity invToPullFrom = world.getBlockEntity(posInventory);
+                    BlockEntity invToPullFrom = level.getBlockEntity(posInventory);
                     if(invToPullFrom instanceof BasePedestalBlockEntity) {
                         itemFromInv = ItemStack.EMPTY;
 
@@ -109,9 +96,9 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
             }
         }
 
-        if(canTransferFluids(coinInPedestal))
+        if(canTransferFluids(coin))
         {
-            LazyOptional<IFluidHandler> cap = MowLibFluidUtils.findFluidHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IFluidHandler> cap = MowLibFluidUtils.findFluidHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
             if(cap.isPresent())
             {
                 IFluidHandler handler = cap.orElse(null);
@@ -229,9 +216,9 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
             }
         }
         //Energy
-        if(canTransferEnergy(coinInPedestal))
+        if(canTransferEnergy(coin))
         {
-            LazyOptional<IEnergyStorage> cap = MowLibEnergyUtils.findEnergyHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IEnergyStorage> cap = MowLibEnergyUtils.findEnergyHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
 
             if(cap.isPresent())
             {
@@ -259,9 +246,9 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
             }
         }
         //XP
-        if(canTransferXP(coinInPedestal))
+        if(canTransferXP(coin))
         {
-            LazyOptional<IExperienceStorage> cap = MowLibXpUtils.findExperienceHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal),true);
+            LazyOptional<IExperienceStorage> cap = MowLibXpUtils.findExperienceHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
 
             if(cap.isPresent())
             {
@@ -289,9 +276,9 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
             }
         }
         //Dust
-        if(canTransferDust(coinInPedestal))
+        if(canTransferDust(coin))
         {
-            LazyOptional<IDustHandler> cap = MowLibDustUtils.findDustHandlerAtPos(world,posInventory,getPedestalFacing(world, posOfPedestal));
+            LazyOptional<IDustHandler> cap = MowLibDustUtils.findDustHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos));
 
             if(cap.isPresent())
             {

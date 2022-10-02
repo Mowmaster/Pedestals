@@ -171,60 +171,51 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
+        boolean override = hasTwoPointsSelected(coin);
+        List<BlockPos> listed = getValidList(pedestal);
+
+        if(override)
         {
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            boolean override = hasTwoPointsSelected(coin);
-            List<BlockPos> listed = getValidList(pedestal);
-
-            if(override)
+            if(listed.size()>0)
             {
-                if(listed.size()>0)
+                //System.out.println("RunAction");
+                breakerAction(level,pedestal);
+            }
+            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+            {
+                buildValidBlockListArea(pedestal);
+                //System.out.println("ListBuilt: "+ getValidList(pedestal));
+            }
+            else if(!pedestal.getRenderRange())
+            {
+                pedestal.setRenderRange(true);
+            }
+        }
+        else
+        {
+            List<BlockPos> getList = readBlockPosListFromNBT(coin);
+            if(!override && listed.size()>0)
+            {
+                breakerAction(level,pedestal);
+            }
+            else if(getList.size()>0)
+            {
+                if(!hasBlockListCustomNBTTags(coin,"_validlist"))
                 {
-                    //System.out.println("RunAction");
-                    upgradeAction(world,pedestal);
-                }
-                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                {
-                    buildValidBlockListArea(pedestal);
-                    //System.out.println("ListBuilt: "+ getValidList(pedestal));
+                    BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
+                            .mapToObj((getList)::get)
+                            .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
+                            .findFirst().orElse(BlockPos.ZERO);
+                    if(!hasValidPos.equals(BlockPos.ZERO))
+                    {
+                        buildValidBlockList(pedestal);
+                    }
                 }
                 else if(!pedestal.getRenderRange())
                 {
                     pedestal.setRenderRange(true);
-                }
-            }
-            else
-            {
-                List<BlockPos> getList = readBlockPosListFromNBT(coin);
-                if(!override && listed.size()>0)
-                {
-                    upgradeAction(world,pedestal);
-                }
-                else if(getList.size()>0)
-                {
-                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
-                                .mapToObj((getList)::get)
-                                .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-                                .findFirst().orElse(BlockPos.ZERO);
-                        if(!hasValidPos.equals(BlockPos.ZERO))
-                        {
-                            buildValidBlockList(pedestal);
-                        }
-                    }
-                    else if(!pedestal.getRenderRange())
-                    {
-                        pedestal.setRenderRange(true);
-                    }
                 }
             }
         }
@@ -329,7 +320,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase implements ISelecta
         if(xpdrop>0)blockAtPoint.getBlock().popExperience((ServerLevel)level,currentPoint,xpdrop);
     }
 
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
+    public void breakerAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
         {

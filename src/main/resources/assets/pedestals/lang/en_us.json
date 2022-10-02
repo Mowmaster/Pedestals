@@ -70,7 +70,7 @@
 
   "pedestals.upgrade_fuel_energy": "Requires Energy",
   "pedestals.upgrade_fuel_xp": "Requires XP",
-  "pedestals.upgrade_fuel_energy": "Requires Dust: ",
+  "pedestals.upgrade_fuel_dust": "Requires Dust: ",
 
   "pedestals.upgrade_description_shift": "§7Press 'Shift' to Show Enabled Transfer Types",
   "pedestals.upgrade_description_alt": "§8Press 'Alt' to Show Selected Block Points",

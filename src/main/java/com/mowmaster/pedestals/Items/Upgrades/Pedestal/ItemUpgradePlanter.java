@@ -157,60 +157,51 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
+        boolean override = hasTwoPointsSelected(coin);
+        List<BlockPos> listed = getValidList(pedestal);
+
+        if(override && pedestal.hasItem())
         {
-            ItemStack coin = pedestal.getCoinOnPedestal();
-            boolean override = hasTwoPointsSelected(coin);
-            List<BlockPos> listed = getValidList(pedestal);
-
-            if(override && pedestal.hasItem())
+            if(listed.size()>0)
             {
-                if(listed.size()>0)
+                //System.out.println("RunAction");
+                planterAction(level,pedestal);
+            }
+            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+            {
+                buildValidBlockListArea(pedestal);
+                //System.out.println("ListBuilt: "+ getValidList(pedestal));
+            }
+            else if(!pedestal.getRenderRange())
+            {
+                pedestal.setRenderRange(true);
+            }
+        }
+        else
+        {
+            List<BlockPos> getList = readBlockPosListFromNBT(coin);
+            if(!override && listed.size()>0)
+            {
+                planterAction(level,pedestal);
+            }
+            else if(getList.size()>0)
+            {
+                if(!hasBlockListCustomNBTTags(coin,"_validlist"))
                 {
-                    //System.out.println("RunAction");
-                    upgradeAction(world,pedestal);
-                }
-                else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                {
-                    buildValidBlockListArea(pedestal);
-                    //System.out.println("ListBuilt: "+ getValidList(pedestal));
+                    BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
+                            .mapToObj((getList)::get)
+                            .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
+                            .findFirst().orElse(BlockPos.ZERO);
+                    if(!hasValidPos.equals(BlockPos.ZERO))
+                    {
+                        buildValidBlockList(pedestal);
+                    }
                 }
                 else if(!pedestal.getRenderRange())
                 {
                     pedestal.setRenderRange(true);
-                }
-            }
-            else
-            {
-                List<BlockPos> getList = readBlockPosListFromNBT(coin);
-                if(!override && listed.size()>0)
-                {
-                    upgradeAction(world,pedestal);
-                }
-                else if(getList.size()>0)
-                {
-                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
-                                .mapToObj((getList)::get)
-                                .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-                                .findFirst().orElse(BlockPos.ZERO);
-                        if(!hasValidPos.equals(BlockPos.ZERO))
-                        {
-                            buildValidBlockList(pedestal);
-                        }
-                    }
-                    else if(!pedestal.getRenderRange())
-                    {
-                        pedestal.setRenderRange(true);
-                    }
                 }
             }
         }
@@ -315,10 +306,11 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
         }
     }
 
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal)
+    public void planterAction(Level level, BasePedestalBlockEntity pedestal)
     {
         if(!level.isClientSide())
         {
+
             List<BlockPos> listed = getValidList(pedestal);
             int currentPosition = getCurrentPosition(pedestal);
             BlockPos currentPoint = listed.get(currentPosition);
@@ -326,42 +318,45 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
             WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
             boolean fuelRemoved = true;
 
-            if(!pedestal.removeItem(1,true).isEmpty())
+            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
             {
-                if(canPlace(pedestal))
+                if(!pedestal.removeItem(1,true).isEmpty())
                 {
-                    if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
+                    if(canPlace(pedestal))
                     {
-                        if(!currentPoint.equals(pedestal.getPos()))
+                        if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
                         {
-                            if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
+                            if(!currentPoint.equals(pedestal.getPos()))
                             {
-                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
                                 {
-                                    UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                    if (result == InteractionResult.CONSUME) {
-                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,100,255,100));
-                                        pedestal.removeItem(1,false);
+                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                    {
+                                        UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                        InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                        if (result == InteractionResult.CONSUME) {
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,100,255,100));
+                                            pedestal.removeItem(1,false);
+                                        }
                                     }
-                                }
-                                else {
-                                    fuelRemoved = false;
+                                    else {
+                                        fuelRemoved = false;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            }
 
-            if((currentPosition+1)>=listed.size())
-            {
-                setCurrentPosition(pedestal,0);
-            }
-            else
-            {
-                if(fuelRemoved){
-                    iterateCurrentPosition(pedestal);
+                    if((currentPosition+1)>=listed.size())
+                    {
+                        setCurrentPosition(pedestal,0);
+                    }
+                    else
+                    {
+                        if(fuelRemoved){
+                            iterateCurrentPosition(pedestal);
+                        }
+                    }
                 }
             }
         }

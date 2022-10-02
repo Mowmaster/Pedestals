@@ -59,30 +59,20 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableAr
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_breeder_selectedMultiplier.get(); }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-        int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-        int speed = configSpeed;
-        if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
-        //Make sure speed has at least a value of 1
-        if(speed<=0)speed = 1;
-        if(world.getGameTime()%speed == 0 )
-        {
-            if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))upgradeAction(pedestal, world,pedestal.getPos(),pedestal.getCoinOnPedestal());
-        }
-    }
-
-    public void upgradeAction(BasePedestalBlockEntity pedestal, Level level, BlockPos posOfPedestal, ItemStack coinInPedestal)
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        boolean canRun = true;
-        //boolean damage = false;
-
-        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posOfPedestal), true))
+        if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
         {
-            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
-            AABB getArea = getAABBonUpgrade(coinInPedestal);
-            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-            ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
-            getPlayer.get().setItemInHand(InteractionHand.MAIN_HAND,toolStack.copy());
+            boolean canRun = true;
+            //boolean damage = false;
+
+            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
+            {
+                WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
+                AABB getArea = getAABBonUpgrade(coin);
+                List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
+                ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
+                getPlayer.get().setItemInHand(InteractionHand.MAIN_HAND,toolStack.copy());
 
             /*if(PedestalConfig.COMMON.breeder_DamageTools.get())
             {
@@ -109,26 +99,27 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableAr
                 }
             }*/
 
-            if(canRun)
-            {
-                for (LivingEntity getEntity : entities)
+                if(canRun)
                 {
-                    if(getEntity == null)continue;
-
-                    BlockPos getEntityPos = getEntity.getOnPos();
-                    if(getEntity instanceof Animal animal)
+                    for (LivingEntity getEntity : entities)
                     {
-                        if(animal.isFood(toolStack))
+                        if(getEntity == null)continue;
+
+                        BlockPos getEntityPos = getEntity.getOnPos();
+                        if(getEntity instanceof Animal animal)
                         {
-                            if(animal.getAge() == 0 && animal.canFallInLove())
+                            if(animal.isFood(toolStack))
                             {
-                                InteractionResult result = animal.mobInteract(getPlayer.get(), InteractionHand.MAIN_HAND);
-                                //System.out.println(result.toString());
-                                if(result == InteractionResult.SUCCESS)
+                                if(animal.getAge() == 0 && animal.canFallInLove())
                                 {
-                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
+                                    InteractionResult result = animal.mobInteract(getPlayer.get(), InteractionHand.MAIN_HAND);
+                                    //System.out.println(result.toString());
+                                    if(result == InteractionResult.SUCCESS)
                                     {
-                                        pedestal.removeItem(1,false);
+                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
+                                        {
+                                            pedestal.removeItem(1,false);
+                                        }
                                     }
                                 }
                             }

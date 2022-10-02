@@ -89,7 +89,7 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
         //System.out.println(fluidIng == null && energy == null && experience == null && dust == null);
         if(fluidIng == null && energy == null && experience == null && dust == null && generatedItemOrBlock == null)return false;
         //System.out.println(energy.getEnergyNeeded()<=0 && experience.getExperienceRequired()<=0 && dust.getDustMagic().isEmpty() && generatedItemOrBlock.isEmpty());
-        if(energy.getEnergyNeeded()<=0 && experience.getExperienceRequired()<=0 && dust.getDustMagic().isEmpty() && generatedItemOrBlock.isEmpty())return false;
+        if(energy.getEnergyNeeded()<=0 && experience.getExperienceRequired()<=0 && dust.getDustMagic().isEmpty())return false;
 
         //System.out.println(fluidIng != null && !fluidIng.getFluidStack().isEmpty());
         if(fluidIng != null && !fluidIng.getFluidStack().isEmpty())
@@ -117,6 +117,8 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
     @Override
     public ItemStack getResultItem()
     {
+        if(generatedItemOrBlock == null)return ItemStack.EMPTY;
+
         if(generatedItemOrBlock != null || !generatedItemOrBlock.isEmpty())return generatedItemOrBlock;
         return ItemStack.EMPTY;
     }
