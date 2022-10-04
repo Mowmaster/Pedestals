@@ -191,7 +191,15 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
 
     public float getToolDamage(ItemStack stack)
     {
-        if(stack.getItem() instanceof Tier tiered)
+        if(stack.getItem() instanceof SwordItem sward)
+        {
+            return sward.getDamage();
+        }
+        else if(stack.getItem() instanceof DiggerItem digdug)
+        {
+            return digdug.getAttackDamage();
+        }
+        else if(stack.getItem() instanceof Tier tiered)
         {
             return tiered.getAttackDamageBonus();
         }
@@ -365,21 +373,29 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
 
             if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
             {
-                WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
-                AABB getArea = getAABBonUpgrade(coin);
-                List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                ItemStack toolStack = pedestal.getToolStack();
-                getPlayer.get().setItemInHand(InteractionHand.MAIN_HAND,toolStack.copy());
-
-                if(PedestalConfig.COMMON.attacker_DamageTools.get())
+                WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+                if(getPlayer != null && getPlayer.get() != null)
                 {
-                    if(pedestal.hasTool())
+                    AABB getArea = getAABBonUpgrade(coin);
+                    List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
+                    ItemStack toolStack = pedestal.getToolStack();
+                    tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
+
+                    if(PedestalConfig.COMMON.attacker_DamageTools.get())
                     {
-                        if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                        if(pedestal.hasTool())
                         {
-                            if(pedestal.damageInsertedTool(1,true))
+                            if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
                             {
-                                damage = true;
+                                if(pedestal.damageInsertedTool(1,true))
+                                {
+                                    damage = true;
+                                }
+                                else
+                                {
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                    canRun = false;
+                                }
                             }
                             else
                             {
@@ -387,27 +403,22 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
                                 canRun = false;
                             }
                         }
-                        else
-                        {
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                            canRun = false;
-                        }
                     }
-                }
 
-                if(canRun)
-                {
-                    for (LivingEntity getEntity : entities)
+                    if(canRun)
                     {
-                        if(getEntity == null)continue;
-                        //BlockPos getEntityPos = getEntity.getOnPos();
-
-                        if(allowEntity(coin,getEntity))
+                        for (LivingEntity getEntity : entities)
                         {
-                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), false))
+                            if(getEntity == null)continue;
+                            //BlockPos getEntityPos = getEntity.getOnPos();
+
+                            if(allowEntity(coin,getEntity))
                             {
-                                doAttack(pedestal, getPlayer.get(),getEntity);
-                                if(damage)pedestal.damageInsertedTool(1,false);
+                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), false))
+                                {
+                                    doAttack(pedestal, getPlayer.get(),getEntity);
+                                    if(damage)pedestal.damageInsertedTool(1,false);
+                                }
                             }
                         }
                     }

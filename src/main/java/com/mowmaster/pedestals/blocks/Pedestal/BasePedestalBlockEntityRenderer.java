@@ -65,57 +65,6 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             // 7 - No Augment exists and thus all rendering is fine.
             int renderAugmentType = p_112307_.getRendererType();
 
-            if(renderAugmentType !=6)
-            {
-                if(facing== Direction.UP)//when placed on ground
-                {
-                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
-                }
-                if(facing== Direction.DOWN) {
-                    //p_112309_.rotate(new Quaternion(0, 0, 1,180));
-                    p_112309_.mulPose(Vector3f.ZP.rotationDegrees(180));
-                    p_112309_.translate(0, -1, 0);
-                    p_112309_.translate(-1, 0, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
-                }
-                if(facing== Direction.NORTH) {
-                    //p_112309_.rotate(new Quaternion(1, 0, 0,270));
-                    p_112309_.mulPose(Vector3f.XP.rotationDegrees(270));
-                    p_112309_.translate(0, -1, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
-                }
-                if(facing== Direction.EAST) {
-                    //p_112309_.mulPose(270, 0, 0, 1);
-                    p_112309_.mulPose(Vector3f.ZP.rotationDegrees(270));
-                    p_112309_.translate(-1, 0, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
-                }
-                if(facing== Direction.SOUTH) {
-                    //p_112309_.mulPose(90, 1, 0, 0);
-                    p_112309_.mulPose(Vector3f.XP.rotationDegrees(90));
-                    p_112309_.translate(0, 0, -1);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
-                }
-                if(facing== Direction.WEST) {
-                    //p_112309_.mulPose(90, 0, 0, 1);
-                    p_112309_.mulPose(Vector3f.ZP.rotationDegrees(90));
-                    p_112309_.translate(0, -1, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
-                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
-                }
-            }
-
             if(p_112307_.getRenderRange())
             {
                 int range = p_112307_.getLinkingRange();
@@ -230,6 +179,57 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             }
 
 
+
+            if(renderAugmentType !=6)
+            {
+                if(facing== Direction.UP)//when placed on ground
+                {
+                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                }
+                if(facing== Direction.DOWN) {
+                    //p_112309_.rotate(new Quaternion(0, 0, 1,180));
+                    p_112309_.mulPose(Vector3f.ZP.rotationDegrees(180));
+                    p_112309_.translate(0, -1, 0);
+                    p_112309_.translate(-1, 0, 0);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
+                }
+                if(facing== Direction.NORTH) {
+                    //p_112309_.rotate(new Quaternion(1, 0, 0,270));
+                    p_112309_.mulPose(Vector3f.XP.rotationDegrees(270));
+                    p_112309_.translate(0, -1, 0);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
+                }
+                if(facing== Direction.EAST) {
+                    //p_112309_.mulPose(270, 0, 0, 1);
+                    p_112309_.mulPose(Vector3f.ZP.rotationDegrees(270));
+                    p_112309_.translate(-1, 0, 0);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
+                }
+                if(facing== Direction.SOUTH) {
+                    //p_112309_.mulPose(90, 1, 0, 0);
+                    p_112309_.mulPose(Vector3f.XP.rotationDegrees(90));
+                    p_112309_.translate(0, 0, -1);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
+                }
+                if(facing== Direction.WEST) {
+                    //p_112309_.mulPose(90, 0, 0, 1);
+                    p_112309_.mulPose(Vector3f.ZP.rotationDegrees(90));
+                    p_112309_.translate(0, -1, 0);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
+                    //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
+                }
+            }
         }
     }
     //public static void  renderTile(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, ItemStack coin, ItemStack item, int p_112311_, int p_112312_, int renderAugmentType)

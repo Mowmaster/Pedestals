@@ -236,68 +236,71 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
     {
         if(!level.isClientSide())
         {
-            List<BlockPos> listed = getValidList(pedestal);
-            int currentPosition = getCurrentPosition(pedestal);
-            BlockPos currentPoint = listed.get(currentPosition);
-            BlockState blockAtPoint = level.getBlockState(currentPoint);
-            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
-            ItemStack coinUpgrade = pedestal.getCoinOnPedestal();
-
-            if(canTransferItems(coinUpgrade) && pedestal.hasItem())
+            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+            if(getPlayer != null && getPlayer.get() != null)
             {
-                if(passesFilter(pedestal, blockAtPoint, currentPoint))
-                {
-                    if(!currentPoint.equals(pedestal.getPos()) && (level.getBlockState(currentPoint).getBlock() == Blocks.AIR || level.getBlockState(currentPoint).getBlock() instanceof IFluidBlock))
-                    {
-                        ItemStack itemToDrop = pedestal.getItemInPedestal().copy();
-                        int countToDrop = (pedestal.getItemTransferRate()>=itemToDrop.getMaxStackSize())?(itemToDrop.getMaxStackSize()):(pedestal.getItemTransferRate());
-                        if(!pedestal.removeItem(countToDrop,true).isEmpty())
-                        {
-                            ItemStack dropMe = pedestal.removeItem(countToDrop,false);
-                            ItemEntity itementity = new ItemEntity(level, (double)currentPoint.getX() + 0.5D, (double)currentPoint.getY() + 0.5D, (double)currentPoint.getZ() + 0.5D, dropMe);
-                            itementity.setDefaultPickUpDelay();
-                            itementity.moveTo(Vec3.atCenterOf(currentPoint));
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),255,255,255));
-                            level.addFreshEntity(itementity);
-                        }
+                List<BlockPos> listed = getValidList(pedestal);
+                int currentPosition = getCurrentPosition(pedestal);
+                BlockPos currentPoint = listed.get(currentPosition);
+                BlockState blockAtPoint = level.getBlockState(currentPoint);
+                ItemStack coinUpgrade = pedestal.getCoinOnPedestal();
 
+                if(canTransferItems(coinUpgrade) && pedestal.hasItem())
+                {
+                    if(passesFilter(pedestal, blockAtPoint, currentPoint))
+                    {
+                        if(!currentPoint.equals(pedestal.getPos()) && (level.getBlockState(currentPoint).getBlock() == Blocks.AIR || level.getBlockState(currentPoint).getBlock() instanceof IFluidBlock))
+                        {
+                            ItemStack itemToDrop = pedestal.getItemInPedestal().copy();
+                            int countToDrop = (pedestal.getItemTransferRate()>=itemToDrop.getMaxStackSize())?(itemToDrop.getMaxStackSize()):(pedestal.getItemTransferRate());
+                            if(!pedestal.removeItem(countToDrop,true).isEmpty())
+                            {
+                                ItemStack dropMe = pedestal.removeItem(countToDrop,false);
+                                ItemEntity itementity = new ItemEntity(level, (double)currentPoint.getX() + 0.5D, (double)currentPoint.getY() + 0.5D, (double)currentPoint.getZ() + 0.5D, dropMe);
+                                itementity.setDefaultPickUpDelay();
+                                itementity.moveTo(Vec3.atCenterOf(currentPoint));
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),255,255,255));
+                                level.addFreshEntity(itementity);
+                            }
+
+                        }
                     }
                 }
-            }
 
-            if(canTransferEnergy(coinUpgrade) && canDropBolts() && pedestal.getStoredEnergy() >= baseEnergyCostPerDrop())
-            {
-                if(pedestal.removeEnergy(baseEnergyCostPerDrop(),true)>0)
+                if(canTransferEnergy(coinUpgrade) && canDropBolts() && pedestal.getStoredEnergy() >= baseEnergyCostPerDrop())
                 {
-                    Random rand = new Random();
-                    LightningBolt lightningbolt = (LightningBolt) EntityType.LIGHTNING_BOLT.create(level);
-                    lightningbolt.moveTo(Vec3.atBottomCenterOf(currentPoint));
-                    lightningbolt.setCause(getPlayer.get());
-                    pedestal.removeEnergy(baseEnergyCostPerDrop(),false);
-                    level.addFreshEntity(lightningbolt);
-                    level.playSound((Player)null, currentPoint, SoundEvents.TRIDENT_THUNDER, SoundSource.WEATHER, 5.0F, 1.0F);
+                    if(pedestal.removeEnergy(baseEnergyCostPerDrop(),true)>0)
+                    {
+                        Random rand = new Random();
+                        LightningBolt lightningbolt = (LightningBolt) EntityType.LIGHTNING_BOLT.create(level);
+                        lightningbolt.moveTo(Vec3.atBottomCenterOf(currentPoint));
+                        lightningbolt.setCause(getPlayer.get());
+                        pedestal.removeEnergy(baseEnergyCostPerDrop(),false);
+                        level.addFreshEntity(lightningbolt);
+                        level.playSound((Player)null, currentPoint, SoundEvents.TRIDENT_THUNDER, SoundSource.WEATHER, 5.0F, 1.0F);
+                    }
                 }
-            }
 
-            if(canTransferXP(coinUpgrade) && pedestal.hasExperience())
-            {
-                int getxpAmountToDrop = (pedestal.getExperienceTransferRate() >= pedestal.getStoredExperience())?(pedestal.getStoredExperience()):(pedestal.getExperienceTransferRate());
-                if(pedestal.removeExperience(getxpAmountToDrop,true)>0)
+                if(canTransferXP(coinUpgrade) && pedestal.hasExperience())
                 {
-                    ExperienceOrb xpEntity = new ExperienceOrb(level, (double)currentPoint.getX(), (double)currentPoint.getY(), (double)currentPoint.getZ(), pedestal.removeExperience(getxpAmountToDrop,false));
-                    xpEntity.moveTo(Vec3.atCenterOf(currentPoint));
-                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,0,255,50));
-                    level.addFreshEntity(xpEntity);
+                    int getxpAmountToDrop = (pedestal.getExperienceTransferRate() >= pedestal.getStoredExperience())?(pedestal.getStoredExperience()):(pedestal.getExperienceTransferRate());
+                    if(pedestal.removeExperience(getxpAmountToDrop,true)>0)
+                    {
+                        ExperienceOrb xpEntity = new ExperienceOrb(level, (double)currentPoint.getX(), (double)currentPoint.getY(), (double)currentPoint.getZ(), pedestal.removeExperience(getxpAmountToDrop,false));
+                        xpEntity.moveTo(Vec3.atCenterOf(currentPoint));
+                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,0,255,50));
+                        level.addFreshEntity(xpEntity);
+                    }
                 }
-            }
 
-            if((currentPosition+1)>=listed.size())
-            {
-                setCurrentPosition(pedestal,0);
-            }
-            else
-            {
-                iterateCurrentPosition(pedestal);
+                if((currentPosition+1)>=listed.size())
+                {
+                    setCurrentPosition(pedestal,0);
+                }
+                else
+                {
+                    iterateCurrentPosition(pedestal);
+                }
             }
         }
     }

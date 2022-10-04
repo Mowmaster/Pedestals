@@ -291,46 +291,48 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
     {
         if(!level.isClientSide())
         {
-            List<BlockPos> listed = getValidList(pedestal);
-            int currentPosition = getCurrentPosition(pedestal);
-            BlockPos currentPoint = listed.get(currentPosition);
-            BlockState blockAtPoint = level.getBlockState(currentPoint);
-            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
-            boolean fuelRemoved = true;
-            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+            if(getPlayer != null && getPlayer.get() != null)
             {
-                if(!pedestal.removeItem(1,true).isEmpty())
+                List<BlockPos> listed = getValidList(pedestal);
+                int currentPosition = getCurrentPosition(pedestal);
+                BlockPos currentPoint = listed.get(currentPosition);
+                BlockState blockAtPoint = level.getBlockState(currentPoint);
+                boolean fuelRemoved = true;
+                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                 {
-                    if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, currentPoint))
+                    if(!pedestal.removeItem(1,true).isEmpty())
                     {
-                        if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() == Blocks.AIR)
+                        if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, currentPoint))
                         {
-                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                            if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() == Blocks.AIR)
                             {
-                                UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                                InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                if (result == InteractionResult.CONSUME) {
-                                    pedestal.removeItem(1,false);
+                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                {
+                                    UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                    if (result == InteractionResult.CONSUME) {
+                                        pedestal.removeItem(1,false);
+                                    }
                                 }
-                            }
-                            else {
-                                fuelRemoved = false;
+                                else {
+                                    fuelRemoved = false;
+                                }
                             }
                         }
                     }
-                }
 
-                if((currentPosition+1)>=listed.size())
-                {
-                    setCurrentPosition(pedestal,0);
-                }
-                else
-                {
-                    if(fuelRemoved){
-                        iterateCurrentPosition(pedestal);
+                    if((currentPosition+1)>=listed.size())
+                    {
+                        setCurrentPosition(pedestal,0);
+                    }
+                    else
+                    {
+                        if(fuelRemoved){
+                            iterateCurrentPosition(pedestal);
+                        }
                     }
                 }
-            }
 
             /*
             //Wither Skull Placement
@@ -348,6 +350,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
              */
 
 
+            }
         }
     }
 }

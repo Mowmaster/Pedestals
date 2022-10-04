@@ -413,67 +413,69 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
     {
         if(!level.isClientSide())
         {
-            List<BlockPos> listed = getValidList(pedestal);
-            int currentPosition = getCurrentPosition(pedestal);
-            BlockPos currentPoint = listed.get(currentPosition);
-            BlockState blockAtPoint = level.getBlockState(currentPoint);
-            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
-            boolean fuelRemoved = true;
-
-            if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.SIMULATE).getAmount() == FluidType.BUCKET_VOLUME)
+            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+            if(getPlayer != null && getPlayer.get() != null)
             {
-                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                List<BlockPos> listed = getValidList(pedestal);
+                int currentPosition = getCurrentPosition(pedestal);
+                BlockPos currentPoint = listed.get(currentPosition);
+                BlockState blockAtPoint = level.getBlockState(currentPoint);
+                boolean fuelRemoved = true;
+
+                if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.SIMULATE).getAmount() == FluidType.BUCKET_VOLUME)
                 {
-                    if(canPlace(pedestal,blockAtPoint,currentPoint) && passesFilter(pedestal, blockAtPoint, currentPoint))
+                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                     {
-                        FluidStack stackInPedestal = pedestal.getStoredFluid().copy();
-                        if(stackInPedestal.getFluid().defaultFluidState() != null && stackInPedestal.getFluid().defaultFluidState().createLegacyBlock() != null)
+                        if(canPlace(pedestal,blockAtPoint,currentPoint) && passesFilter(pedestal, blockAtPoint, currentPoint))
                         {
-                            UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, FluidUtil.getFilledBucket(stackInPedestal), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                            if (result == InteractionResult.PASS) {
-                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
-                                {
-                                    if(blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED))
+                            FluidStack stackInPedestal = pedestal.getStoredFluid().copy();
+                            if(stackInPedestal.getFluid().defaultFluidState() != null && stackInPedestal.getFluid().defaultFluidState().createLegacyBlock() != null)
+                            {
+                                UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, FluidUtil.getFilledBucket(stackInPedestal), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                if (result == InteractionResult.PASS) {
+                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                     {
-                                        if(blockAtPoint.getValue(BlockStateProperties.WATERLOGGED)==false)
+                                        if(blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED))
                                         {
-                                            if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).getFluid().equals(Fluids.WATER))
+                                            if(blockAtPoint.getValue(BlockStateProperties.WATERLOGGED)==false)
                                             {
-                                                level.setBlockAndUpdate(currentPoint,blockAtPoint.setValue(BlockStateProperties.WATERLOGGED,true));
+                                                if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).getFluid().equals(Fluids.WATER))
+                                                {
+                                                    level.setBlockAndUpdate(currentPoint,blockAtPoint.setValue(BlockStateProperties.WATERLOGGED,true));
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if(!pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).isEmpty())
+                                            {
+                                                level.setBlockAndUpdate(currentPoint,stackInPedestal.getFluid().defaultFluidState().createLegacyBlock());
                                             }
                                         }
                                     }
-                                    else
-                                    {
-                                        if(!pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).isEmpty())
-                                        {
-                                            level.setBlockAndUpdate(currentPoint,stackInPedestal.getFluid().defaultFluidState().createLegacyBlock());
-                                        }
+                                    else {
+                                        fuelRemoved = false;
                                     }
-                                }
-                                else {
-                                    fuelRemoved = false;
                                 }
                             }
                         }
                     }
+                    else {
+                        fuelRemoved = false;
+                    }
                 }
-                else {
-                    fuelRemoved = false;
-                }
-            }
 
-            if((currentPosition+1)>=listed.size())
-            {
-                setCurrentPosition(pedestal,0);
-            }
-            else
-            {
-                if(fuelRemoved){
-                    iterateCurrentPosition(pedestal);
+                if((currentPosition+1)>=listed.size())
+                {
+                    setCurrentPosition(pedestal,0);
                 }
-            }
+                else
+                {
+                    if(fuelRemoved){
+                        iterateCurrentPosition(pedestal);
+                    }
+                }
 
             /*List<BlockPos> listed = getValidList(pedestal);
             int currentPosition = getCurrentPosition(pedestal);
@@ -590,6 +592,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                     iterateCurrentPosition(pedestal);
                 }
             }*/
+            }
         }
     }
 }

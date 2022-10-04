@@ -68,11 +68,13 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableAr
 
             if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
             {
-                WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
-                AABB getArea = getAABBonUpgrade(coin);
-                List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
-                getPlayer.get().setItemInHand(InteractionHand.MAIN_HAND,toolStack.copy());
+                WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+                if(getPlayer != null && getPlayer.get() != null)
+                {
+                    AABB getArea = getAABBonUpgrade(coin);
+                    List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
+                    ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
+                    tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
 
             /*if(PedestalConfig.COMMON.breeder_DamageTools.get())
             {
@@ -99,26 +101,27 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableAr
                 }
             }*/
 
-                if(canRun)
-                {
-                    for (LivingEntity getEntity : entities)
+                    if(canRun)
                     {
-                        if(getEntity == null)continue;
-
-                        BlockPos getEntityPos = getEntity.getOnPos();
-                        if(getEntity instanceof Animal animal)
+                        for (LivingEntity getEntity : entities)
                         {
-                            if(animal.isFood(toolStack))
+                            if(getEntity == null)continue;
+
+                            BlockPos getEntityPos = getEntity.getOnPos();
+                            if(getEntity instanceof Animal animal)
                             {
-                                if(animal.getAge() == 0 && animal.canFallInLove())
+                                if(animal.isFood(toolStack))
                                 {
-                                    InteractionResult result = animal.mobInteract(getPlayer.get(), InteractionHand.MAIN_HAND);
-                                    //System.out.println(result.toString());
-                                    if(result == InteractionResult.SUCCESS)
+                                    if(animal.getAge() == 0 && animal.canFallInLove())
                                     {
-                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
+                                        InteractionResult result = animal.mobInteract((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND);
+                                        //System.out.println(result.toString());
+                                        if(result == InteractionResult.SUCCESS)
                                         {
-                                            pedestal.removeItem(1,false);
+                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
+                                            {
+                                                pedestal.removeItem(1,false);
+                                            }
                                         }
                                     }
                                 }

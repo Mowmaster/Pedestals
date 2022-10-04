@@ -68,7 +68,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     private LazyOptional<IExperienceStorage> experienceHandler = LazyOptional.of(this::createHandlerPedestalExperience);
     private LazyOptional<IDustHandler> dustHandler = LazyOptional.of(this::createDustHandler);
     private List<ItemStack> stacksList = new ArrayList<>();
-    private WeakReference<FakePlayer> pedestalPlayer = null;
+    private WeakReference<FakePlayer> pedestalPlayer;
     private MobEffectInstance storedPotionEffect = null;
     private int storedPotionEffectDuration = 0;
     private int storedEnergy = 0;
@@ -792,20 +792,30 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ============================================================
     ==========================================================*/
 
+    public WeakReference<FakePlayer> getFakePlayer()
+    {
+        return pedestalPlayer;
+    }
+
+    public void setFakePlayer()
+    {
+        pedestalPlayer = fakePedestalPlayer(getPedestal());
+    }
+
     public WeakReference<FakePlayer> getPedestalPlayer(BasePedestalBlockEntity pedestal) {
-        if(pedestal.pedestalPlayer == null)
+        if(pedestal.getFakePlayer() == null || pedestal.getFakePlayer().get() == null)
         {
-            pedestal.pedestalPlayer = pedestal.fakePedestalPlayer(pedestal);
+            pedestal.setFakePlayer();
         }
 
-        return pedestal.pedestalPlayer;
+        return pedestal.getFakePlayer();
     }
 
     public void updatePedestalPlayer(BasePedestalBlockEntity pedestal)
     {
-        if(pedestal.pedestalPlayer != null)
+        if(pedestal.getFakePlayer() != null)
         {
-            pedestal.pedestalPlayer = fakePedestalPlayer(this);
+            pedestal.setFakePlayer();
         }
     }
 

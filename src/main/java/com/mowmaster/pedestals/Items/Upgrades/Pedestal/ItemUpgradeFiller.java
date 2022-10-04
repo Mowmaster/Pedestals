@@ -309,97 +309,100 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
     {
         if(!level.isClientSide())
         {
-            List<BlockPos> listed = getValidList(pedestal);
-            int currentPosition = getCurrentPosition(pedestal);
-            BlockPos currentPoint = listed.get(currentPosition);
-            AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
-            int maxY = (int)area.maxY;
-            int minY = (int)area.minY;
-            int ySpread = maxY - minY;
-            boolean minMaxHeight = ySpread > 0;
-            if(ySpread>getHeightIteratorValue(pedestal))setCurrentHeight(pedestal,minY);
-
-            int currentYMin = getCurrentHeight(pedestal);
-            //int currentYMin = (minMaxHeight)?(0):(getCurrentHeight(pedestal));
-            int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue(pedestal));
-
-            int min = (minMaxHeight)?(minY):(currentYMin);
-            int max = (minMaxHeight)?((ySpread>getHeightIteratorValue(pedestal))?(minY+getHeightIteratorValue(pedestal)):(maxY)):(currentYMax);
-            int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
-            WeakReference<FakePlayer> getPlayer = pedestal.fakePedestalPlayer(pedestal);
-
-            boolean fuelRemoved = true;
-            //ToDo: make this a modifier for later
-            boolean runsOnce = true;
-            boolean stop = getStopped(pedestal);
-
-            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+            if(getPlayer != null && getPlayer.get() != null)
             {
-                if(!stop)
+                List<BlockPos> listed = getValidList(pedestal);
+                int currentPosition = getCurrentPosition(pedestal);
+                BlockPos currentPoint = listed.get(currentPosition);
+                AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
+                int maxY = (int)area.maxY;
+                int minY = (int)area.minY;
+                int ySpread = maxY - minY;
+                boolean minMaxHeight = ySpread > 0;
+                if(ySpread>getHeightIteratorValue(pedestal))setCurrentHeight(pedestal,minY);
+
+                int currentYMin = getCurrentHeight(pedestal);
+                //int currentYMin = (minMaxHeight)?(0):(getCurrentHeight(pedestal));
+                int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue(pedestal));
+
+                int min = (minMaxHeight)?(minY):(currentYMin);
+                int max = (minMaxHeight)?((ySpread>getHeightIteratorValue(pedestal))?(minY+getHeightIteratorValue(pedestal)):(maxY)):(currentYMax);
+                int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
+
+                boolean fuelRemoved = true;
+                //ToDo: make this a modifier for later
+                boolean runsOnce = true;
+                boolean stop = getStopped(pedestal);
+
+                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                 {
-                    for(int y=min;y<=max;y++)
+                    if(!stop)
                     {
-                        BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
-                        BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                        if(!pedestal.removeItem(1,true).isEmpty())
+                        for(int y=min;y<=max;y++)
                         {
-                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
+                            BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
+                            BlockState blockAtPoint = level.getBlockState(adjustedPoint);
+                            if(!pedestal.removeItem(1,true).isEmpty())
                             {
-                                if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, adjustedPoint))
+                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                                 {
-                                    if(!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR)
+                                    if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, adjustedPoint))
                                     {
-                                        UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
-                                        InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                        if (result == InteractionResult.CONSUME) {
-                                            pedestal.removeItem(1,false);
+                                        if(!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR)
+                                        {
+                                            UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
+                                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                            if (result == InteractionResult.CONSUME) {
+                                                pedestal.removeItem(1,false);
+                                            }
                                         }
                                     }
                                 }
+                                else {
+                                    fuelRemoved = false;
+                                }
                             }
-                            else {
-                                fuelRemoved = false;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
-                }
-
-                if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
-                {
-                    if(runsOnce)
-                    {
-                        //ToDo: Make this 1200 value a config
-                        int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
-                        if(getCurrentDelay(pedestal)>=delay)
-                        {
-                            setCurrentPosition(pedestal,0);
-                            setStopped(pedestal,false);
-                            setCurrentDelay(pedestal,0);
-                        }
-                        else
-                        {
-                            iterateCurrentDelay(pedestal);
-                            setStopped(pedestal,true);
                         }
                     }
                     else
                     {
-                        setCurrentPosition(pedestal,0);
+                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
                     }
-                }
-                else if((currentPosition+1)>=listed.size())
-                {
-                    setCurrentPosition(pedestal,0);
-                    iterateCurrentHeight(pedestal);
-                }
-                else
-                {
-                    if(fuelRemoved){
-                        iterateCurrentPosition(pedestal);
+
+                    if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
+                    {
+                        if(runsOnce)
+                        {
+                            //ToDo: Make this 1200 value a config
+                            int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
+                            if(getCurrentDelay(pedestal)>=delay)
+                            {
+                                setCurrentPosition(pedestal,0);
+                                setStopped(pedestal,false);
+                                setCurrentDelay(pedestal,0);
+                            }
+                            else
+                            {
+                                iterateCurrentDelay(pedestal);
+                                setStopped(pedestal,true);
+                            }
+                        }
+                        else
+                        {
+                            setCurrentPosition(pedestal,0);
+                        }
+                    }
+                    else if((currentPosition+1)>=listed.size())
+                    {
+                        setCurrentPosition(pedestal,0);
+                        iterateCurrentHeight(pedestal);
+                    }
+                    else
+                    {
+                        if(fuelRemoved){
+                            iterateCurrentPosition(pedestal);
+                        }
                     }
                 }
             }
