@@ -800,6 +800,11 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     public void setFakePlayer()
     {
         pedestalPlayer = fakePedestalPlayer(getPedestal());
+        if(pedestalPlayer.get() != null)
+        {
+            pedestalPlayer.get().setPos(getPos().getX(),getPos().getY(),getPos().getZ());
+            pedestalPlayer.get().setRespawnPosition(pedestalPlayer.get().getRespawnDimension(), getPos(),0F,false,false);
+        }
     }
 
     public WeakReference<FakePlayer> getPedestalPlayer(BasePedestalBlockEntity pedestal) {

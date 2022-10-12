@@ -192,6 +192,13 @@
   "jei.pedestals.filter_tag.description": "§5 This Filter Filters By The Tags on an Item (Items in the filter must be renamed with tag names, like 'forge:stone'",
   "jei.pedestals.filter_tag.interaction": "§3 Offhand Filter and Right Click to switch TYPES, Crouch Right Click to switch MODES",
 
+  "item.pedestals.tag_getter": "Tag Getter",
+  "jei.pedestals.tag_getter.description": "§5 This Gets Tags off Items and Blocks for use when setting up the Tag Filter",
+  "jei.pedestals.tag_getter.interaction": "§3 For Blocks: Offhand Item and Crouch Right Click to get Tags from a block in-world.(Clicking in the air will instead cycle the selected tag) For Items: Offhand the item and with this in your main hand, right click.(No item in offhand will cycle the selected tag) While the item in in you main hand, crouch right click to clear all tags.",
+  "pedestals.taggetter.clear": "Tags Cleared",
+  "pedestals.taggetter.created": "Tags Grabbed - ",
+  "pedestals.taggetter.changed_to": "Currently Selected: ",
+  "pedestals.taggetter.tooltip_header": " ===== ",
 
 
   "item.pedestals.filter_tag_machine": "Tag Filter (Machines)",

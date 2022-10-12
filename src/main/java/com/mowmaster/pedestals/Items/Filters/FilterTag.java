@@ -53,7 +53,8 @@ public class FilterTag extends BaseFilter{
 
     protected ResourceLocation getLocationFromStringName(String input)
     {
-        String[] getStringy = decompose(input, ':');
+        String strung = input.substring(1,input.length()-1);
+        /*String[] getStringy = decompose(input, ':');
         String one = getStringy[0];
         String two = getStringy[1];
 
@@ -65,9 +66,9 @@ public class FilterTag extends BaseFilter{
         if(two.contains("]"))
         {
             two = getStringy[1].substring(0,two.length()-1);
-        }
+        }*/
 
-        return new ResourceLocation(one,two);
+        return new ResourceLocation(strung);
     }
 
     @Override

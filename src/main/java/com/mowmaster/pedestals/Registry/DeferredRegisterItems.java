@@ -6,6 +6,7 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseDustBulkStorageIt
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseEnergyBulkStorageItem;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageItem;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
+import com.mowmaster.pedestals.Items.Misc.TagGetterItem;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBlockBreaker;
@@ -66,6 +67,9 @@ public class DeferredRegisterItems
             () -> new FilterTag(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> FILTER_TAG_MACHINE = ITEMS.register("filter_tag_machine",
             () -> new FilterTagMachines(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TAG_GETTER = ITEMS.register("tag_getter",
+            () -> new TagGetterItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
 
     public static final RegistryObject<Item> FILTER_BLOCKS_ON_CLICK_EXACT = ITEMS.register("filter_blocksonclickexact",
             () -> new FilterBlocksByClickExact(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
