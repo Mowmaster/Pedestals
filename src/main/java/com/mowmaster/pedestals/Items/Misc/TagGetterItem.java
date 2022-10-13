@@ -82,9 +82,7 @@ public class TagGetterItem extends Item
                         MutableComponent modifiedComp = Component.literal(listy.get(nextSelected));
                         modifiedComp.withStyle(ChatFormatting.WHITE);
                         comp.append(modifiedComp);
-                        //TODO: Add Components that dont require color formats to MOWLIB
-                        player.displayClientMessage(comp, true);
-                        //MowLibMessageUtils.messagePopup(p_41433_,comp,ChatFormatting.GOLD);
+                        MowLibMessageUtils.messagePopupWithoutStyle(player,comp);
                     }
                 }
                 else
@@ -128,9 +126,7 @@ public class TagGetterItem extends Item
                         MutableComponent modifiedComp = Component.literal(listy.get(nextSelected));
                         modifiedComp.withStyle(ChatFormatting.WHITE);
                         comp.append(modifiedComp);
-                        //TODO: Add Components that dont require color formats to MOWLIB
-                        player.displayClientMessage(comp, true);
-                        //MowLibMessageUtils.messagePopup(p_41433_,comp,ChatFormatting.GOLD);
+                        MowLibMessageUtils.messagePopupWithoutStyle(player,comp);
                     }
                 }
                 else if(result.getType().equals(HitResult.Type.BLOCK))
@@ -171,6 +167,7 @@ public class TagGetterItem extends Item
             }
         }
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,stackTagGetter.getOrCreateTag(),"_stringlistsize");
+        stackTagGetter.resetHoverName();
     }
 
 
