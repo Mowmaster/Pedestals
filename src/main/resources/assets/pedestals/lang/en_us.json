@@ -213,8 +213,8 @@
 
 
 
-  "item.pedestals.augment_pedestal_nocollide": "No Collision Effects Augment",
-  "jei.pedestals.augment_pedestal_nocollide.description": "§5 Prevents onCollision Pedestal Effects.",
+  "item.pedestals.augment_pedestal_nocollide": "Collision Effect Augment",
+  "jei.pedestals.augment_pedestal_nocollide.description": "§5 Adds onCollision Pedestal Effects.",
   "jei.pedestals.augment_pedestal_nocollide.crafting": "Crafted when a Linking Tool is Right Clicked on the ground while paper collides with an animal.",
   "item.pedestals.augment_pedestal_roundrobin": "Round Robin Augment",
   "jei.pedestals.augment_pedestal_roundrobin.description": "§5 Makes the Pedestal Transfer 'Round Robin'.",
@@ -379,6 +379,9 @@
   "jei.pedestals.upgrade_pedestal_fan.description": "§5Moves Entities in the selected area. Direction of Movement based on Pedestals Placement Direction",
   "jei.pedestals.upgrade_pedestal_fan.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points. Placing a block below this pedestal can change what Mob is targeted. (All possible options in JEI 'Mob Filters')",
 
+  "item.pedestals.upgrade_pedestal_modifications": "Modification Infusion Upgrade",
+  "jei.pedestals.upgrade_pedestal_modifications.description": "§5Infuses modifications into upgrades to enhance them.",
+  "jei.pedestals.upgrade_pedestal_modifications.interaction": "§3(In the Main Hand)Right Click Pedestal Blocks to select single block targets, right click in air to clear the list.",
 
   "item.pedestals.upgrade_pedestal_dropper": "Dropper Upgrade",
   "jei.pedestals.upgrade_pedestal_dropper.description": "§5'Drops' or Spawns in Items/XP/Energy in world in the selected locations/areas",

@@ -611,9 +611,31 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     //ToDo: Add to mowlib and remove from here
+
+    public boolean isSelectionInRange(BasePedestalBlockEntity pedestalCurrent, BlockPos currentSelectedPoint)
+    {
+        //ToDo: Range Modifier from Upgrade
+        int range = 8;
+        int x = currentSelectedPoint.getX();
+        int y = currentSelectedPoint.getY();
+        int z = currentSelectedPoint.getZ();
+        int x1 = pedestalCurrent.getPos().getX();
+        int y1 = pedestalCurrent.getPos().getY();
+        int z1 = pedestalCurrent.getPos().getZ();
+        int xF = Math.abs(Math.subtractExact(x,x1));
+        int yF = Math.abs(Math.subtractExact(y,y1));
+        int zF = Math.abs(Math.subtractExact(z,z1));
+
+        if(xF>range || yF>range || zF>range)
+        {
+            return false;
+        }
+        else return true;
+    }
+
     public boolean selectedAreaWithinRange(BasePedestalBlockEntity pedestal)
     {
-        if(pedestal.isPedestalInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1)) && pedestal.isPedestalInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2)))
+        if(isSelectionInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1)) && isSelectionInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2)))
         {
             return true;
         }
@@ -624,7 +646,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     //ToDo: Add to mowlib and remove from here
     public boolean selectedPointWithinRange(BasePedestalBlockEntity pedestal, BlockPos posPoint)
     {
-        if(pedestal.isPedestalInRange(pedestal, posPoint))
+        if(isSelectionInRange(pedestal, posPoint))
         {
             return true;
         }
@@ -1365,6 +1387,42 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     /*============================================================================
     ==============================================================================
     =========================     FAKE PLAYER  END     ===========================
+    ==============================================================================
+    ============================================================================*/
+
+
+    /*============================================================================
+    ==============================================================================
+    =========================    Modifications Start   ===========================
+    ==============================================================================
+    ============================================================================*/
+
+
+
+
+    /*
+    Modifications List
+
+    recipes need to have how much it adds, and the max limit for what it can add up to.
+    Speed ln 75 (most Upgrades)[uses ticks reduced]
+    Capacity (import, export, magnet, pumps)
+    Area
+    Range ln 617 - Needed for valid selection areas distance from pedestal
+    ----------------------------------------------------------------------
+    Magnet
+    Gentle Harvest
+
+
+ill probably do 2 kinds recipes for this
+a global one to default to, and an upgrade specific one
+     */
+
+
+
+
+    /*============================================================================
+    ==============================================================================
+    =========================     Modifications End    ===========================
     ==============================================================================
     ============================================================================*/
 

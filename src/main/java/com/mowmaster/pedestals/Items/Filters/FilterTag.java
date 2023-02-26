@@ -76,8 +76,15 @@ public class FilterTag extends BaseFilter{
     public boolean canAcceptItems(ItemStack filter, ItemStack incomingStack) {
         boolean filterBool = super.canAcceptItems(filter, incomingStack);
 
+
+
         List<ItemStack> stackCurrent = readFilterQueueFromNBT(filter,ItemTransferMode.ITEMS);
         int range = stackCurrent.size();
+
+        //Another BETTER way to compare tags???
+        //ForgeRegistries.<registry>.tags().getTag(tagKey).contains(<object>)
+        //OR
+        //.filter(itemStack -> itemStack.is(ItemTags.create(new ResourceLocation(((TagGetterItem)itemStack.getItem()).getSelectedTagString(itemStack)))))
 
         ItemStack itemFromInv = ItemStack.EMPTY;
         itemFromInv = IntStream.range(0,range)//Int Range

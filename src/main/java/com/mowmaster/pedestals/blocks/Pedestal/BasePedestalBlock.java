@@ -15,6 +15,7 @@ import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeModifications;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -472,7 +473,15 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
     @Override
     public InteractionResult use(BlockState p_60503_, Level p_60504_, BlockPos p_60505_, Player p_60506_, InteractionHand p_60507_, BlockHitResult p_60508_) {
 
-        if(!p_60504_.isClientSide())
+        if(p_60504_.isClientSide())
+        {
+            ItemStack itemInHand = p_60506_.getMainHandItem();
+            if(itemInHand.getItem() instanceof ItemUpgradeModifications)
+            {
+                return InteractionResult.FAIL;
+            }
+        }
+        else
         {
             BlockEntity blockEntity = p_60504_.getBlockEntity(p_60505_);
             if(blockEntity instanceof BasePedestalBlockEntity pedestal)
@@ -825,14 +834,21 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
 
                     if(!itemInHand.isEmpty())
                     {
-                        ItemStack stackNotInsert = pedestal.addItemStack(itemInHand,true);
-                        if(itemInHand.getCount() > stackNotInsert.getCount())
+                        if(itemInHand.getItem() instanceof ItemUpgradeModifications)
                         {
-                            int shrinkAmount = itemInHand.getCount() - pedestal.addItemStack(itemInHand,false).getCount();
-                            itemInHand.shrink(shrinkAmount);
-                            return InteractionResult.SUCCESS;
+                            return InteractionResult.FAIL;
                         }
-                        else return InteractionResult.FAIL;
+                        else
+                        {
+                            ItemStack stackNotInsert = pedestal.addItemStack(itemInHand,true);
+                            if(itemInHand.getCount() > stackNotInsert.getCount())
+                            {
+                                int shrinkAmount = itemInHand.getCount() - pedestal.addItemStack(itemInHand,false).getCount();
+                                itemInHand.shrink(shrinkAmount);
+                                return InteractionResult.SUCCESS;
+                            }
+                            else return InteractionResult.FAIL;
+                        }
                     }
                     else return InteractionResult.FAIL;
 
@@ -858,8 +874,8 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 }
 
             }
-
         }
+
         return InteractionResult.SUCCESS;
     }
 

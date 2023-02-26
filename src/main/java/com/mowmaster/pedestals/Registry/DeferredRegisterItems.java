@@ -136,6 +136,9 @@ public class DeferredRegisterItems
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_UNPACKAGER = ITEMS.register("upgrade_pedestal_unpackager",
             () -> new ItemUpgradeUnPackager(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_MODIFICATIONS = ITEMS.register("upgrade_pedestal_modifications",
+            () -> new ItemUpgradeModifications(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_COBBLEGEN = ITEMS.register("upgrade_pedestal_cobblegen",
             () -> new ItemUpgradeMaterialGenerator(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));

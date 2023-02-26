@@ -464,7 +464,7 @@ public class PedestalConfig
             builder.comment("Global Upgrade Configs").push("Global_Upgrade_Configs");
             blockBreakerBreakEntities = builder
                     .comment("Allows the breaking of Block Entities")
-                    .define("allowBreakEntities",true);
+                    .define("allowBreakEntities",false);
             upgrade_require_sized_selectable_area = builder
                     .comment("Restrict the Selectable Area Size based on the Upgrades AOE modifier")
                     .define("upgrade_toggleable_require_selectable_size",  false);

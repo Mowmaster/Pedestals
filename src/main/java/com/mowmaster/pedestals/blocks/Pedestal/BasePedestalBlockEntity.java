@@ -3462,7 +3462,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 if(coinInPed instanceof IPedestalUpgrade upgrade) {
                     upgrade.updateAction(level,this);
 
-                    if(!hasNoCollide())
+                    if(hasNoCollide())
                     {
                         upgrade.actionOnCollideWithBlock(this);
                     }

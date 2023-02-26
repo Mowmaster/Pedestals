@@ -9,5 +9,11 @@
   },
   "result": {
     "item": "minecraft:fire_coral_block"
-  }
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "effectscrolls"
+    }
+  ]
 }
