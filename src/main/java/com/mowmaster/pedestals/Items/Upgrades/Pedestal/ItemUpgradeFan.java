@@ -51,6 +51,21 @@ public class ItemUpgradeFan extends ItemUpgradeBase implements ISelectableArea
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyRange(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyArea(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
+    }
+
     //Requires energy
     @Override
     public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_fan_baseEnergyCost.get(); }
@@ -216,7 +231,14 @@ public class ItemUpgradeFan extends ItemUpgradeBase implements ISelectableArea
         }*/
         if(level.getGameTime()%2 == 0)
         {
-            if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))fanAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
+            if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
+            {
+                fanAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
+            }
+            else if(!pedestal.getRenderRange())
+            {
+                pedestal.setRenderRange(true);
+            }
         }
     }
 
@@ -236,7 +258,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase implements ISelectableArea
                     if(getEntity instanceof Player player && player.isCrouching())continue;
 
                     Direction facing = getPedestalFacing(level,posOfPedestal);
-                    addMotion((((facing == Direction.UP)?(0.2D):(0.1D)) + (double)(((pedestal.getTicksReduced()==0)?(1):(pedestal.getTicksReduced()))/PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get())), facing,getEntity);
+                    addMotion((((facing == Direction.UP)?(0.2D):(0.1D)) + (double)(((getSpeedTicksReduced(coinInPedestal)==0)?(1):(getSpeedTicksReduced(coinInPedestal)))/PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get())), facing,getEntity);
                 }
             }
         }

@@ -37,6 +37,11 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase implements IHasModeType
     }
 
     @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         //remove NBT saved on upgrade here
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_storedExpUnderOne");

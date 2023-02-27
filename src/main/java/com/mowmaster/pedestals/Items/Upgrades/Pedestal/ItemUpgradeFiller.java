@@ -52,6 +52,26 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyBlockCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyRange(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyArea(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
+    }
+
     //Requires energy
 
     @Override
@@ -185,8 +205,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
 
     private int getHeightIteratorValue(BasePedestalBlockEntity pedestal)
     {
-        //TODO: make a modifier for this
-        return PedestalConfig.COMMON.upgrade_filler_baseBlocksPlaced.get() + pedestal.getItemTransferRateIncreaseFromCapacity();
+        return PedestalConfig.COMMON.upgrade_filler_baseBlocksPlaced.get() + getBlockCapacityIncrease(pedestal.getCoinOnPedestal());
     }
 
     private int getCurrentHeight(BasePedestalBlockEntity pedestal)
@@ -224,7 +243,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         int current = getCurrentDelay(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numdelay");
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1+getSpeedTicksReduced(pedestal.getCoinOnPedestal())), "_numdelay");
     }
 
     private int getCurrentPosition(BasePedestalBlockEntity pedestal)

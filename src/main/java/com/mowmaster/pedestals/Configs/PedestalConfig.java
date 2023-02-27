@@ -82,6 +82,11 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue pedestal_baseXpTransferRate;
         public final ForgeConfigSpec.IntValue pedestal_baseDustTransferRate;
 
+        public final ForgeConfigSpec.IntValue pedestal_baseLinkingRange;
+
+        public final ForgeConfigSpec.IntValue upgrades_baseSelectionRange;
+
+
 
 
 
@@ -359,6 +364,19 @@ public class PedestalConfig
 
         Common(ForgeConfigSpec.Builder builder) {
 
+            builder.comment("Pedestal Defaults").push("Global Pedestal Defaults");
+
+            pedestal_baseItemTransferRate = builder.comment("Base Item Transfer Rate").defineInRange("pedestal_baseItemTransferRate", 4, 1, Integer.MAX_VALUE);
+            pedestal_baseFluidTransferRate = builder.comment("Base Fluid Transfer Rate").defineInRange("pedestal_baseFluidTransferRate", 1000, 1, Integer.MAX_VALUE);
+            pedestal_baseEnergyTransferRate = builder.comment("Base Energy Transfer Rate").defineInRange("pedestal_baseEnergyTransferRate", 5000, 1, Integer.MAX_VALUE);
+            pedestal_baseXpTransferRate = builder.comment("Base Xp Transfer Rate [In Levels]").defineInRange("pedestal_baseXpTransferRate", 1, 1, Integer.MAX_VALUE);
+            pedestal_baseDustTransferRate = builder.comment("Base Dust Transfer Rate").defineInRange("pedestal_baseDustTransferRate", 10, 1, Integer.MAX_VALUE);
+            pedestal_baseLinkingRange = builder.comment("The Base Distance between Pedestals for Linking").defineInRange("pedestal_baseLinkingRange", 8, 1, Integer.MAX_VALUE);
+
+            builder.pop();
+
+
+
             builder.comment("Tiered Augments").push("Augment_Tiers");
 
             augment_t1CapacityItem = builder.comment("Tier 1, Capacity Item Transfer Increase").defineInRange("t1_increaseItemTransfer", 2, 0, Integer.MAX_VALUE);
@@ -427,14 +445,6 @@ public class PedestalConfig
             pedestal_baseXpStorage = builder.comment("The initial xp storage for pedestals [In levels] (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseXpStorage", 30, 1, 21000);
             pedestal_baseDustStorage = builder.comment("The initial dust storage for pedestals (max values are definitive max values including with upgrades)").defineInRange("pedestal_baseDustStorage", 200, 1,  Integer.MAX_VALUE);
 
-            pedestal_baseItemTransferRate = builder.comment("Base Item Transfer Rate").defineInRange("pedestal_baseItemTransferRate", 4, 1, Integer.MAX_VALUE);
-            pedestal_baseFluidTransferRate = builder.comment("Base Fluid Transfer Rate").defineInRange("pedestal_baseFluidTransferRate", 1000, 1, Integer.MAX_VALUE);
-            pedestal_baseEnergyTransferRate = builder.comment("Base Energy Transfer Rate").defineInRange("pedestal_baseEnergyTransferRate", 5000, 1, Integer.MAX_VALUE);
-            pedestal_baseXpTransferRate = builder.comment("Base Xp Transfer Rate [In Levels]").defineInRange("pedestal_baseXpTransferRate", 1, 1, Integer.MAX_VALUE);
-            pedestal_baseDustTransferRate = builder.comment("Base Dust Transfer Rate").defineInRange("pedestal_baseDustTransferRate", 10, 1, Integer.MAX_VALUE);
-
-
-
             //4:30 so 2 ticks reduced for 5 upgrades?
             augment_t1SpeedReduction = builder.comment("Tier 1, Number of Ticks Reduced").defineInRange("t1_ticksReduced", 2, 0, Integer.MAX_VALUE);
             augment_t1SpeedInsertable = builder.comment("Tier 1, Max Allowed To Insert of this Tier").defineInRange("t1_speedInsertable", 5, 1, 64);
@@ -468,6 +478,9 @@ public class PedestalConfig
             upgrade_require_sized_selectable_area = builder
                     .comment("Restrict the Selectable Area Size based on the Upgrades AOE modifier")
                     .define("upgrade_toggleable_require_selectable_size",  false);
+            upgrades_baseSelectionRange = builder
+                    .comment("The Base Distance from the Pedestal for Upgrade Block Selections to be 'In Range' ")
+                    .defineInRange("upgrades_baseSelectionRange", 8, 1, Integer.MAX_VALUE);
             builder.pop();
 
 

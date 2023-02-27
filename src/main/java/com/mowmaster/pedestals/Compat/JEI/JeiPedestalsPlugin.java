@@ -7,10 +7,7 @@ import com.mowmaster.pedestals.Compat.JEI.recipes.CobbleGenRecipeCategory;
 import com.mowmaster.pedestals.Compat.JEI.recipes.FluidConverterRecipeCategory;
 import com.mowmaster.pedestals.Compat.JEI.recipes.UnBottlerRecipeCategory;
 import com.mowmaster.pedestals.PedestalUtils.References;
-import com.mowmaster.pedestals.Recipes.BottlerRecipe;
-import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
-import com.mowmaster.pedestals.Recipes.FluidConverterRecipe;
-import com.mowmaster.pedestals.Recipes.UnBottlerRecipe;
+import com.mowmaster.pedestals.Recipes.*;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import mezz.jei.api.IModPlugin;
@@ -69,6 +66,12 @@ public class JeiPedestalsPlugin implements IModPlugin
         registration.addRecipes(JEIPedestalsRecipeTypes.UNBOTTLER_RECIPE, unbottlerRecipes);
         List<FluidConverterRecipe> fluidconverterRecipes = recipeManager.getAllRecipesFor(FluidConverterRecipe.Type.INSTANCE);
         registration.addRecipes(JEIPedestalsRecipeTypes.FLUIDCONVERTER_RECIPE, fluidconverterRecipes);
+        /*
+        List<UpgradeModificationRecipe> upgradeModRecipes = recipeManager.getAllRecipesFor(UpgradeModificationRecipe.Type.INSTANCE);
+        registration.addRecipes(JEIPedestalsRecipeTypes.UPGRADEMODIFICATION_RECIPE, upgradeModRecipes);
+        List<UpgradeModificationGlobalRecipe> upgradeModGlobalRecipes = recipeManager.getAllRecipesFor(UpgradeModificationGlobalRecipe.Type.INSTANCE);
+        registration.addRecipes(JEIPedestalsRecipeTypes.UPGRADEMODIFICATIONGLOBAL_RECIPE, upgradeModGlobalRecipes);
+        */
 
 
 

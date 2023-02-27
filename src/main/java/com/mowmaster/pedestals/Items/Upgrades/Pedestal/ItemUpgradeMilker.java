@@ -43,6 +43,26 @@ public class ItemUpgradeMilker extends ItemUpgradeBase implements ISelectableAre
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifySuperSpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyRange(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyArea(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
+    }
+
     //Requires energy
     @Override
     public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_milker_baseEnergyCost.get(); }
@@ -150,7 +170,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase implements ISelectableAre
                                                         if(pedestal.addFluid(getFluid, IFluidHandler.FluidAction.SIMULATE)>0)
                                                         {
                                                             pedestal.addFluid(getFluid, IFluidHandler.FluidAction.EXECUTE);
-                                                            break;
+                                                            if(!hasAdvancedOne(coin))break;
                                                         }
                                                     }
                                                 }
@@ -162,7 +182,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase implements ISelectableAre
                                                     {
                                                         MowLibItemUtils.spawnItemStack(level,getEntityPos.getX(),getEntityPos.getY(),getEntityPos.getZ(),stackInPlayer);
                                                         pedestal.removeItem(1,false);
-                                                        break;
+                                                        if(!hasAdvancedOne(coin))break;
                                                     }
                                                 }
                                             }

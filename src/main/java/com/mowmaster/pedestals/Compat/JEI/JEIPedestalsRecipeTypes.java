@@ -1,10 +1,7 @@
 package com.mowmaster.pedestals.Compat.JEI;
 
 import com.mowmaster.mowlib.Recipes.*;
-import com.mowmaster.pedestals.Recipes.BottlerRecipe;
-import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
-import com.mowmaster.pedestals.Recipes.FluidConverterRecipe;
-import com.mowmaster.pedestals.Recipes.UnBottlerRecipe;
+import com.mowmaster.pedestals.Recipes.*;
 import mezz.jei.api.recipe.RecipeType;
 
 import static com.mowmaster.mowlib.MowLibUtils.MowLibReferences.MODID;
@@ -22,6 +19,12 @@ public class JEIPedestalsRecipeTypes
 
     public static final RecipeType<FluidConverterRecipe> FLUIDCONVERTER_RECIPE =
             RecipeType.create(MODID, "fluidconverter", FluidConverterRecipe.class);
+
+    public static final RecipeType<UpgradeModificationRecipe> UPGRADEMODIFICATION_RECIPE =
+            RecipeType.create(MODID, "upgrademodification", UpgradeModificationRecipe.class);
+
+    public static final RecipeType<UpgradeModificationGlobalRecipe> UPGRADEMODIFICATIONGLOBAL_RECIPE =
+            RecipeType.create(MODID, "upgrademodification_global", UpgradeModificationGlobalRecipe.class);
 
 
 

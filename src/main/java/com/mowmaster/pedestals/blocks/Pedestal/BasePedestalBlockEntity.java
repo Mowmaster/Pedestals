@@ -1006,7 +1006,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public int getLinkingRange()
     {
-        int range = 8;
+        int range = PedestalConfig.COMMON.pedestal_baseLinkingRange.get();
         return  range + getRangeIncrease();
     }
 

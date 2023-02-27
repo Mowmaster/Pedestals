@@ -30,14 +30,44 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
     }
 
     @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyItemCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyFluidCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyEnergyCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyXPCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyDustCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         BlockPos posInventory = getPosOfBlockBelow(level,pedestalPos,1);
 
         if(canTransferItems(coin))
         {
-            //TODO: make this a modifier
-            int transferRate = getItemTransferRate(coin) + pedestal.getItemTransferRateIncreaseFromCapacity();
+            int baseRate = PedestalConfig.COMMON.pedestal_baseItemTransferRate.get();
+            int transferRate = baseRate + getItemCapacityIncrease(pedestal.getCoinOnPedestal());
 
             ItemStack stackInPedestal = pedestal.removeItem(true);
             ItemStack itemFromInv = ItemStack.EMPTY;
@@ -132,7 +162,8 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                             int spaceInTank = getTankCapacity-tankCurrentlyStored;
                             int amountInCoin = fluidInPedestal.getAmount();
 
-                            int rate = pedestal.getFluidTransferRate();
+                            int baseRate = PedestalConfig.COMMON.pedestal_baseFluidTransferRate.get();
+                            int rate = baseRate + getFluidCapacityIncrease(pedestal.getCoinOnPedestal());
                             int actualCoinRate = (spaceInTank>=rate)?(rate):(spaceInTank);
                             int transferRate = (amountInCoin>=actualCoinRate)?(actualCoinRate):(amountInCoin);
 
@@ -165,7 +196,8 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                             int spaceInTank = getTankCapacity-tankCurrentlyStored;
                             int amountInCoin = fluidInPedestal.getAmount();
 
-                            int rate = pedestal.getFluidTransferRate();
+                            int baseRate = PedestalConfig.COMMON.pedestal_baseFluidTransferRate.get();
+                            int rate = baseRate + getFluidCapacityIncrease(pedestal.getCoinOnPedestal());
                             int actualCoinRate = (spaceInTank>=rate)?(rate):(spaceInTank);
                             int transferRate = (amountInCoin>=actualCoinRate)?(actualCoinRate):(amountInCoin);
 
@@ -195,7 +227,8 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                             int spaceInTank = getTankCapacity-tankCurrentlyStored;
                             int amountInCoin = fluidInPedestal.getAmount();
 
-                            int rate = pedestal.getFluidTransferRate();
+                            int baseRate = PedestalConfig.COMMON.pedestal_baseFluidTransferRate.get();
+                            int rate = baseRate + getFluidCapacityIncrease(pedestal.getCoinOnPedestal());
                             int actualCoinRate = (spaceInTank>=rate)?(rate):(spaceInTank);
                             int transferRate = (amountInCoin>=actualCoinRate)?(actualCoinRate):(amountInCoin);
                             if(spaceInTank >= transferRate)
@@ -232,7 +265,9 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                         int containerCurrentEnergy = handler.getEnergyStored();
                         int containerEnergySpace = containerMaxEnergy - containerCurrentEnergy;
                         int getCurrentEnergy = pedestal.getStoredEnergy();
-                        int transferRate = (containerEnergySpace >= pedestal.getEnergyTransferRate())?(pedestal.getEnergyTransferRate()):(containerEnergySpace);
+                        int baseRate = PedestalConfig.COMMON.pedestal_baseEnergyTransferRate.get();
+                        int maxRate = baseRate + getEnergyCapacityIncrease(pedestal.getCoinOnPedestal());
+                        int transferRate = (containerEnergySpace >= maxRate)?(maxRate):(containerEnergySpace);
                         if (getCurrentEnergy < transferRate) {transferRate = getCurrentEnergy;}
 
                         //transferRate at this point is equal to what we can send.
@@ -262,7 +297,9 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                         int containerCurrentExperience = handler.getExperienceStored();
                         int containerExperienceSpace = containerMaxExperience - containerCurrentExperience;
                         int getCurrentExperience = pedestal.getStoredExperience();
-                        int transferRate = (containerExperienceSpace >= pedestal.getExperienceTransferRate())?(pedestal.getExperienceTransferRate()):(containerExperienceSpace);
+                        int baseRate = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
+                        int maxRate = baseRate + MowLibXpUtils.getExpCountByLevel(getXPCapacityIncrease(pedestal.getCoinOnPedestal()));
+                        int transferRate = (containerExperienceSpace >= maxRate)?(maxRate):(containerExperienceSpace);
                         if (getCurrentExperience < transferRate) {transferRate = getCurrentExperience;}
 
                         //transferRate at this point is equal to what we can send.
@@ -292,8 +329,10 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                         int containerMaxDust = handler.getTankCapacity(0);
                         int containerCurrentDustAmount = handler.getDustMagicInTank(0).getDustAmount();
                         int containerDustSpace = containerMaxDust - containerCurrentDustAmount;
+                        int baseRate = PedestalConfig.COMMON.pedestal_baseDustTransferRate.get();
+                        int maxRate = baseRate + getDustCapacityIncrease(pedestal.getCoinOnPedestal());
                         int getCurrentDustInPedestal = dustInPedestal.getDustAmount();
-                        int transferRate = Math.min(getCurrentDustInPedestal, (containerDustSpace >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(containerDustSpace));
+                        int transferRate = Math.min(getCurrentDustInPedestal, (containerDustSpace >= maxRate)?(maxRate):(containerDustSpace));
 
                         /*int transferRate = (containerDustSpace >= pedestal.getDustTransferRate())?(pedestal.getDustTransferRate()):(containerDustSpace);
                         if (getCurrentDustInPedestal < transferRate) {transferRate = getCurrentDustInPedestal;}

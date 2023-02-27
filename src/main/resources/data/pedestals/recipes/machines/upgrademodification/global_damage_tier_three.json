@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "upgradeInput": {
+    "item": "pedestals:upgrade_pedestal_base"
+  },
+  "ingredients": [
+    {
+      "tag": "forge:gems/diamond"
+    },
+    {
+      "item": "minecraft:diamond_sword"
+    }
+  ],
+  "inputIngredientsCount": 2,
+  "resultModificationName": "upgradedamagecapacity",
+  "resultModificationValue": 1,
+  "resultModificationMaxValue": 9
+}

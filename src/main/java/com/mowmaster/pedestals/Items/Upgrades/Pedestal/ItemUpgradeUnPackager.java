@@ -22,6 +22,11 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
     }
 
     @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
         if(pedestal.getItemInPedestal().getItem() instanceof BaseFluidBulkStorageItem
                 || pedestal.getItemInPedestal().getItem() instanceof BaseEnergyBulkStorageItem

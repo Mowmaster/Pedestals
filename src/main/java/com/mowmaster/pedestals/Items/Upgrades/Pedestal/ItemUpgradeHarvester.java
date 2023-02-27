@@ -48,6 +48,21 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase implements ISelectable
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyRange(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyArea(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
+    }
+
     //Requires energy
 
     @Override

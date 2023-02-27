@@ -2,6 +2,8 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.*;
+import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
+import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
@@ -11,6 +13,7 @@ import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import static net.minecraft.world.level.block.Block.pushEntitiesUp;
 
 
 import net.minecraft.ChatFormatting;
@@ -67,17 +70,17 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     @Override
-    public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
+    public void updateAction(Level level, BasePedestalBlockEntity pedestal) {
         if(!pedestal.isPedestalBlockPowered(pedestal))
         {
             int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
             int speed = configSpeed;
-            if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - pedestal.getTicksReduced();
+            if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getSpeedTicksReduced(pedestal.getCoinOnPedestal());
             //Make sure speed has at least a value of 1
             if(speed<=0)speed = 1;
-            if(world.getGameTime()%speed == 0 )
+            if(level.getGameTime()%speed == 0 )
             {
-                upgradeAction(world, pedestal,pedestal.getPos(),pedestal.getCoinOnPedestal());
+                upgradeAction(level, pedestal,pedestal.getPos(),pedestal.getCoinOnPedestal());
             }
         }
     }
@@ -89,6 +92,22 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     @Override
     public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal) {
+        if(!pedestal.isPedestalBlockPowered(pedestal))
+        {
+            int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
+            int speed = configSpeed;
+            if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getSpeedTicksReduced(pedestal.getCoinOnPedestal());
+            //Make sure speed has at least a value of 1
+            if(speed<=0)speed = 1;
+            if(pedestal.getLevel().getGameTime()%speed == 0 )
+            {
+                onCollideAction(pedestal);
+            }
+        }
+    }
+
+
+    public void onCollideAction(BasePedestalBlockEntity pedestal) {
 
     }
 
@@ -122,8 +141,13 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     //This is for things that have for loops, normally they break after each working loop,
     // but this would remove that break and allow it to process all in the for loop
-    public boolean hasAdvancedOne()
+    public boolean hasAdvancedOne(ItemStack upgradeStack)
     {
+        if(canModifySuperSpeed(upgradeStack))
+        {
+            return getSuperSpeed(upgradeStack);
+        }
+
         return false;
     }
 
@@ -137,10 +161,10 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
 
     //If toggled in config, this is the max allowed size of selectable area
-    public int getUpgradeSelectableAreaSize()
+    public int getUpgradeSelectableAreaSize(ItemStack upgradeStack)
     {
         //For a default 3x3x3 area the value is 2
-        return 2;
+        return 2 + getAreaIncrease(upgradeStack);
     }
 
 
@@ -614,8 +638,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     public boolean isSelectionInRange(BasePedestalBlockEntity pedestalCurrent, BlockPos currentSelectedPoint)
     {
-        //ToDo: Range Modifier from Upgrade
-        int range = 8;
+        int range = PedestalConfig.COMMON.upgrades_baseSelectionRange.get() + getRangeIncrease(pedestalCurrent.getCoinOnPedestal());
         int x = currentSelectedPoint.getX();
         int y = currentSelectedPoint.getY();
         int z = currentSelectedPoint.getZ();
@@ -771,6 +794,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                     boolean added = addBlockPosToList(itemInHand,atLocation);
                     player.setItemInHand(hand,itemInHand);
                     MowLibMessageUtils.messagePopup(player,(added)?(ChatFormatting.WHITE):(ChatFormatting.BLACK),(added)?(MODID + ".upgrade_blockpos_added"):(MODID + ".upgrade_blockpos_removed"));
+                    MowLibPacketHandler.sendToNearby(p_41432_,player.getOnPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,atLocation.getX(),atLocation.getY()+1.0D,atLocation.getZ(),0,(added)?(200):(0),0));
+
                 }
                 else if(result.getType().equals(HitResult.Type.MISS) && readBlockPosListFromNBT(itemInHand).size()>0)
                 {
@@ -791,7 +816,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                     {
                         if(PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get())
                         {
-                            if(getDistanceBetweenPoints(readBlockPosFromNBT(itemInHand,1),atLocation) <= getUpgradeSelectableAreaSize())
+                            if(getDistanceBetweenPoints(readBlockPosFromNBT(itemInHand,1),atLocation) <= getUpgradeSelectableAreaSize(itemInHand))
                             {
                                 saveBlockPosToNBT(itemInHand,2,atLocation);
                                 player.setItemInHand(hand,itemInHand);
@@ -903,36 +928,6 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     {
         BlockState state = world.getBlockState(posOfPedestal);
         return state.getValue(FACING);
-    }
-
-    public int getItemTransferRate(ItemStack stack)
-    {
-        int transferRate = 1;
-        int speed = 1;
-        switch (speed)
-        {
-            case 0:
-                transferRate = 1;
-                break;
-            case 1:
-                transferRate=4;
-                break;
-            case 2:
-                transferRate = 8;
-                break;
-            case 3:
-                transferRate = 16;
-                break;
-            case 4:
-                transferRate = 32;
-                break;
-            case 5:
-                transferRate=64;
-                break;
-            default: transferRate=1;
-        }
-
-        return  transferRate;
     }
 
     public boolean isInventoryEmpty(LazyOptional<IItemHandler> cap)
@@ -1198,11 +1193,6 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
 
 
-
-
-
-
-
     @Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
@@ -1257,6 +1247,294 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 }
             }
         }
+
+        /*=====================================
+        =======================================
+        =====================================*/
+
+        if(canModifySpeed(p_41421_))
+        {
+            if(getSpeedTicksReduced(p_41421_)>0)
+            {
+                MutableComponent speedLabel = Component.translatable(MODID + ".upgrade_tooltip_speed_label");
+                speedLabel.withStyle(ChatFormatting.AQUA);
+                MutableComponent speedAmount = Component.literal(""+getSpeedTicksReduced(p_41421_)+"");
+                MutableComponent separator = Component.translatable(MODID + ".upgrade_tooltip_separator_slash");
+                MutableComponent speedMax = Component.literal(""+PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get()+"");
+                speedAmount.append(separator);
+                speedAmount.append(speedMax);
+                speedAmount.withStyle(ChatFormatting.WHITE);
+
+                speedLabel.append(speedAmount);
+                p_41423_.add(speedLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_speed_allowed",ChatFormatting.AQUA);
+            }
+        }
+
+        //Group All Capacities together unless shift is pressed
+        if(canModifyDamageCapacity(p_41421_) ||
+                canModifyBlockCapacity(p_41421_) ||
+                canModifyItemCapacity(p_41421_) ||
+                canModifyFluidCapacity(p_41421_) ||
+                canModifyEnergyCapacity(p_41421_) ||
+                canModifyXPCapacity(p_41421_) ||
+                canModifyDustCapacity(p_41421_))
+        {
+            if(Screen.hasShiftDown())
+            {
+                if(canModifyDamageCapacity(p_41421_))
+                {
+                    if(getDamageCapacityIncrease(p_41421_)>0)
+                    {
+                        MutableComponent itemCapacityLabel = Component.translatable(MODID + ".upgrade_tooltip_damagecapacity_label");
+                        itemCapacityLabel.withStyle(ChatFormatting.DARK_RED);
+                        MutableComponent capacityAmount = Component.literal(""+getDamageCapacityIncrease(p_41421_)+"");
+                        capacityAmount.withStyle(ChatFormatting.WHITE);
+                        itemCapacityLabel.append(capacityAmount);
+                        p_41423_.add(itemCapacityLabel);
+                    }
+                    else { MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_damagecapacity_allowed",ChatFormatting.DARK_RED); }
+                }
+
+                if(canModifyBlockCapacity(p_41421_))
+                {
+                    if(getBlockCapacityIncrease(p_41421_)>0)
+                    {
+                        MutableComponent itemCapacityLabel = Component.translatable(MODID + ".upgrade_tooltip_blockcapacity_label");
+                        itemCapacityLabel.withStyle(ChatFormatting.GRAY);
+                        MutableComponent capacityAmount = Component.literal(""+getBlockCapacityIncrease(p_41421_)+"");
+                        capacityAmount.withStyle(ChatFormatting.WHITE);
+                        itemCapacityLabel.append(capacityAmount);
+                        p_41423_.add(itemCapacityLabel);
+                    }
+                    else { MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_blockcapacity_allowed",ChatFormatting.GRAY); }
+                }
+
+                if(canModifyItemCapacity(p_41421_))
+                {
+                    if(getItemCapacityIncrease(p_41421_)>0)
+                    {
+                        MutableComponent itemCapacityLabel = Component.translatable(MODID + ".upgrade_tooltip_itemcapacity_label");
+                        itemCapacityLabel.withStyle(ChatFormatting.GOLD);
+                        MutableComponent capacityAmount = Component.literal(""+getItemCapacityIncrease(p_41421_)+"");
+                        capacityAmount.withStyle(ChatFormatting.WHITE);
+                        itemCapacityLabel.append(capacityAmount);
+                        p_41423_.add(itemCapacityLabel);
+                    }
+                    else { MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_itemcapacity_allowed",ChatFormatting.GOLD); }
+
+                }
+
+                if(canModifyFluidCapacity(p_41421_))
+                {
+                    if(getFluidCapacityIncrease(p_41421_)>0)
+                    {
+                        MutableComponent fluidCapacityLabel = Component.translatable(MODID + ".upgrade_tooltip_fluidcapacity_label");
+                        fluidCapacityLabel.withStyle(ChatFormatting.BLUE);
+                        MutableComponent capacityAmount = Component.literal(""+getFluidCapacityIncrease(p_41421_)+"");
+                        capacityAmount.withStyle(ChatFormatting.WHITE);
+                        fluidCapacityLabel.append(capacityAmount);
+                        p_41423_.add(fluidCapacityLabel);
+                    }
+                    else { MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_fluidcapacity_allowed",ChatFormatting.BLUE); }
+
+                }
+
+                if(canModifyEnergyCapacity(p_41421_))
+                {
+                    if(getEnergyCapacityIncrease(p_41421_)>0)
+                    {
+                        MutableComponent energyCapacityLabel = Component.translatable(MODID + ".upgrade_tooltip_energycapacity_label");
+                        energyCapacityLabel.withStyle(ChatFormatting.RED);
+                        MutableComponent capacityAmount = Component.literal(""+getEnergyCapacityIncrease(p_41421_)+"");
+                        capacityAmount.withStyle(ChatFormatting.WHITE);
+                        energyCapacityLabel.append(capacityAmount);
+                        p_41423_.add(energyCapacityLabel);
+                    }
+                    else { MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_energycapacity_allowed",ChatFormatting.RED); }
+
+                }
+
+                if(canModifyXPCapacity(p_41421_))
+                {
+                    if(getItemCapacityIncrease(p_41421_)>0)
+                    {
+                        MutableComponent xpCapacityLabel = Component.translatable(MODID + ".upgrade_tooltip_xpcapacity_label");
+                        xpCapacityLabel.withStyle(ChatFormatting.GREEN);
+                        MutableComponent capacityAmount = Component.literal(""+getXPCapacityIncrease(p_41421_)+"");
+                        capacityAmount.withStyle(ChatFormatting.WHITE);
+                        xpCapacityLabel.append(capacityAmount);
+                        p_41423_.add(xpCapacityLabel);
+                    }
+                    else { MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_xpcapacity_allowed",ChatFormatting.GREEN); }
+
+                }
+
+                if(canModifyDustCapacity(p_41421_))
+                {
+                    if(getItemCapacityIncrease(p_41421_)>0)
+                    {
+                        MutableComponent dustCapacityLabel = Component.translatable(MODID + ".upgrade_tooltip_dustcapacity_label");
+                        dustCapacityLabel.withStyle(ChatFormatting.LIGHT_PURPLE);
+                        MutableComponent capacityAmount = Component.literal(""+getDustCapacityIncrease(p_41421_)+"");
+                        capacityAmount.withStyle(ChatFormatting.WHITE);
+                        dustCapacityLabel.append(capacityAmount);
+                        p_41423_.add(dustCapacityLabel);
+                    }
+                    else { MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_dustcapacity_allowed",ChatFormatting.LIGHT_PURPLE); }
+                }
+            }
+            else
+            {
+                MutableComponent capacityLabel = Component.translatable(MODID + ".upgrade_tooltip_capacity_label");
+                capacityLabel.withStyle(ChatFormatting.GREEN);
+                MutableComponent separator_space = Component.translatable(MODID + ".upgrade_tooltip_separator_space");
+
+                MutableComponent capacityDamageAmount = Component.literal("?");
+                MutableComponent capacityBlockAmount = Component.literal("?");
+                MutableComponent capacityItemAmount = Component.literal("?");
+                MutableComponent capacityFluidAmount = Component.literal("?");
+                MutableComponent capacityEnergyAmount = Component.literal("?");
+                MutableComponent capacityXPAmount = Component.literal("?");
+                MutableComponent capacityDustAmount = Component.literal("?");
+
+                if(getDamageCapacityIncrease(p_41421_)>0) { capacityDamageAmount = Component.literal(""+getDamageCapacityIncrease(p_41421_)+""); }
+                if(getBlockCapacityIncrease(p_41421_)>0) { capacityBlockAmount = Component.literal(""+getBlockCapacityIncrease(p_41421_)+""); }
+                if(getItemCapacityIncrease(p_41421_)>0) { capacityItemAmount = Component.literal(""+getItemCapacityIncrease(p_41421_)+""); }
+                if(getFluidCapacityIncrease(p_41421_)>0) { capacityFluidAmount = Component.literal(""+getFluidCapacityIncrease(p_41421_)+"");}
+                if(getEnergyCapacityIncrease(p_41421_)>0) { capacityEnergyAmount = Component.literal(""+getEnergyCapacityIncrease(p_41421_)+""); }
+                if(getItemCapacityIncrease(p_41421_)>0) { capacityXPAmount = Component.literal(""+getXPCapacityIncrease(p_41421_)+""); }
+                if(getItemCapacityIncrease(p_41421_)>0) { capacityDustAmount = Component.literal(""+getDustCapacityIncrease(p_41421_)+""); }
+
+                capacityDamageAmount.withStyle(ChatFormatting.DARK_RED);
+                capacityBlockAmount.withStyle(ChatFormatting.GRAY);
+                capacityItemAmount.withStyle(ChatFormatting.GOLD);
+                capacityFluidAmount.withStyle(ChatFormatting.BLUE);
+                capacityEnergyAmount.withStyle(ChatFormatting.RED);
+                capacityXPAmount.withStyle(ChatFormatting.GREEN);
+                capacityDustAmount.withStyle(ChatFormatting.LIGHT_PURPLE);
+
+                if(canModifyDamageCapacity(p_41421_))
+                {
+                    capacityLabel.append(capacityDamageAmount);
+                }
+                if(canModifyBlockCapacity(p_41421_))
+                {
+                    capacityLabel.append(capacityBlockAmount);
+                }
+                if(canModifyItemCapacity(p_41421_))
+                {
+                    capacityLabel.append(capacityItemAmount);
+                }
+                if(canModifyFluidCapacity(p_41421_))
+                {
+                    capacityLabel.append(separator_space);
+                    capacityLabel.append(capacityFluidAmount);
+                }
+                if(canModifyEnergyCapacity(p_41421_))
+                {
+                    capacityLabel.append(separator_space);
+                    capacityLabel.append(capacityEnergyAmount);
+                }
+                if(canModifyXPCapacity(p_41421_))
+                {
+                    capacityLabel.append(separator_space);
+                    capacityLabel.append(capacityXPAmount);
+                }
+                if(canModifyDustCapacity(p_41421_))
+                {
+                    capacityLabel.append(separator_space);
+                    capacityLabel.append(capacityDustAmount);
+                }
+
+                p_41423_.add(capacityLabel);
+            }
+        }
+
+        if(canModifyArea(p_41421_))
+        {
+            if(getAreaIncrease(p_41421_)>0)
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_area_label");
+                areaLabel.withStyle(ChatFormatting.GRAY);
+                MutableComponent areaAmount = Component.literal(""+getAreaIncrease(p_41421_)+"");
+                areaAmount.withStyle(ChatFormatting.WHITE);
+
+                areaLabel.append(areaAmount);
+                p_41423_.add(areaLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_area_allowed",ChatFormatting.GRAY);
+            }
+        }
+
+        if(canModifyRange(p_41421_))
+        {
+            if(getRangeIncrease(p_41421_)>0)
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_range_label");
+                areaLabel.withStyle(ChatFormatting.GOLD);
+                MutableComponent areaAmount = Component.literal(""+getRangeIncrease(p_41421_)+"");
+                areaAmount.withStyle(ChatFormatting.WHITE);
+
+                areaLabel.append(areaAmount);
+                p_41423_.add(areaLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_range_allowed",ChatFormatting.GOLD);
+            }
+        }
+
+        if(canModifyMagnet(p_41421_))
+        {
+            if(getMagnet(p_41421_))
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_magnet_label");
+                areaLabel.withStyle(ChatFormatting.DARK_RED);
+                p_41423_.add(areaLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_magnet_allowed",ChatFormatting.DARK_RED);
+            }
+        }
+
+        if(canModifyGentleHarvest(p_41421_))
+        {
+            if(getGentleHarvest(p_41421_))
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_gentle_label");
+                areaLabel.withStyle(ChatFormatting.YELLOW);
+                p_41423_.add(areaLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_gentle_allowed",ChatFormatting.YELLOW);
+            }
+        }
+
+        if(canModifySuperSpeed(p_41421_))
+        {
+            if(getSuperSpeed(p_41421_))
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_superspeed_label");
+                areaLabel.withStyle(ChatFormatting.DARK_AQUA);
+                p_41423_.add(areaLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_superspeed_allowed",ChatFormatting.DARK_AQUA);
+            }
+        }
+
+        /*=====================================
+        =======================================
+        =====================================*/
 
         if(Screen.hasShiftDown() && Screen.hasAltDown())
         {
@@ -1397,28 +1675,58 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     ==============================================================================
     ============================================================================*/
 
+    //Allow Upgrades to Individually allow various modifications
+    public boolean canModifySpeed(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyDamageCapacity(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyBlockCapacity(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyItemCapacity(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyFluidCapacity(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyEnergyCapacity(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyXPCapacity(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyDustCapacity(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyArea(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyRange(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyMagnet(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyGentleHarvest(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifySuperSpeed(ItemStack upgradeItemStack) { return false; }
 
+    public boolean canAddModifierToUpgrade(ItemStack upgradeItemStack, String nbtTagString)
+    {
+        switch(nbtTagString)
+        {
+            case "upgradespeed": return canModifySpeed(upgradeItemStack);
+            case "upgradedamagecapacity": return canModifyDamageCapacity(upgradeItemStack);
+            case "upgradeblockcapacity": return canModifyDamageCapacity(upgradeItemStack);
+            case "upgradeitemcapacity": return canModifyItemCapacity(upgradeItemStack);
+            case "upgradefluidcapacity": return canModifyFluidCapacity(upgradeItemStack);
+            case "upgradeenergycapacity": return canModifyEnergyCapacity(upgradeItemStack);
+            case "upgradexpcapacity": return canModifyXPCapacity(upgradeItemStack);
+            case "upgradedustcapacity": return canModifyDustCapacity(upgradeItemStack);
+            case "upgradearea": return canModifyArea(upgradeItemStack);
+            case "upgraderange": return canModifyRange(upgradeItemStack);
+            case "upgrademagnet": return canModifyMagnet(upgradeItemStack);
+            case "upgradegentle": return canModifyGentleHarvest(upgradeItemStack);
+            case "upgradesuperspeed": return canModifySuperSpeed(upgradeItemStack);
+            default: return false;
+        }
+    }
 
+    public int getSpeedTicksReduced(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradespeed"); }
 
-    /*
-    Modifications List
+    public int getDamageCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradedamagecapacity"); }
+    public int getBlockCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeblockcapacity"); }
+    public int getItemCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeitemcapacity"); }
+    public int getFluidCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradefluidcapacity"); }
+    public int getEnergyCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeenergycapacity"); }
+    public int getXPCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradexpcapacity"); }
+    public int getDustCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradedustcapacity"); }
 
-    recipes need to have how much it adds, and the max limit for what it can add up to.
-    Speed ln 75 (most Upgrades)[uses ticks reduced]
-    Capacity (import, export, magnet, pumps)
-    Area
-    Range ln 617 - Needed for valid selection areas distance from pedestal
-    ----------------------------------------------------------------------
-    Magnet
-    Gentle Harvest
+    public int getAreaIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradearea"); }
+    public int getRangeIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgraderange"); }
 
-
-ill probably do 2 kinds recipes for this
-a global one to default to, and an upgrade specific one
-     */
-
-
-
+    public boolean getMagnet(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgrademagnet")>=1; }
+    public boolean getGentleHarvest(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradegentle")>=1; }
+    public boolean getSuperSpeed(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradesuperspeed")>=1; }
 
     /*============================================================================
     ==============================================================================

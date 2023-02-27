@@ -60,6 +60,26 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyDamageCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyRange(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyArea(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
+    }
+
     //Requires energy
     @Override
     public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_attacker_baseEnergyCost.get(); }
@@ -214,7 +234,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
         if (!net.minecraftforge.common.ForgeHooks.onPlayerAttackTarget(player, toAttack)) return;
         if (toAttack.isAttackable()) {
             if (!toAttack.skipAttackInteraction(player)) {
-                float damageFloat = 1.0F + (pedestal.getItemTransferRateIncreaseFromCapacity() * 0.1F) + getToolDamage(pedestal.getToolStack());
+                float damageFloat = 1.0F + (getToolDamage(pedestal.getToolStack()));
                 float f1;
                 if (toAttack instanceof LivingEntity) {
                     f1 = EnchantmentHelper.getDamageBonus(player.getMainHandItem(), ((LivingEntity)toAttack).getMobType());
@@ -266,7 +286,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
                     List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10", "pedestal11", "pedestal12");
                     Random rn = new Random();
                     DamageSource source = new EntityDamageSource(list.get(rn.nextInt(list.size())), player);
-                    boolean flag5 = toAttack.hurt(source, damageFloat);
+                    boolean flag5 = toAttack.hurt(source, damageFloat+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 1.0F));
                     if (flag5) {
                         if (i > 0) {
                             if (toAttack instanceof LivingEntity) {
@@ -285,7 +305,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
                             for(LivingEntity livingentity : player.level.getEntitiesOfClass(LivingEntity.class, player.getItemInHand(InteractionHand.MAIN_HAND).getSweepHitBox(player, toAttack))) {
                                 if (livingentity != player && livingentity != toAttack && !player.isAlliedTo(livingentity) && (!(livingentity instanceof ArmorStand) || !((ArmorStand)livingentity).isMarker()) && player.canHit(livingentity, 0)) { // Original check was dist < 3, range is 3, so vanilla used padding=0
                                     livingentity.knockback((double)0.4F, (double)Mth.sin(player.getYRot() * ((float)Math.PI / 180F)), (double)(-Mth.cos(player.getYRot() * ((float)Math.PI / 180F))));
-                                    livingentity.hurt(DamageSource.playerAttack(player), f3);
+                                    livingentity.hurt(DamageSource.playerAttack(player), f3+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 0.5F));
                                 }
                             }
 
@@ -364,7 +384,19 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
     }
 
     @Override
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+
+        if(hasTwoPointsSelected(coin))
+        {
+            attackerAction(level, pedestal, pedestalPos, coin);
+        }
+        else if(!pedestal.getRenderRange())
+        {
+            pedestal.setRenderRange(true);
+        }
+    }
+
+    public void attackerAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
         {

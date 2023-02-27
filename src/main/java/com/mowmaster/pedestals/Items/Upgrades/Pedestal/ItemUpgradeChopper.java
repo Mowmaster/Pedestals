@@ -49,6 +49,21 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyRange(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyArea(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
+    }
+
     //Requires energy
 
     @Override
@@ -194,7 +209,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         int current = getCurrentPosition(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numdelay");
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1+getSpeedTicksReduced(pedestal.getCoinOnPedestal())), "_numdelay");
     }
 
     private int getCurrentPosition(BasePedestalBlockEntity pedestal)

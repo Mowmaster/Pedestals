@@ -75,6 +75,49 @@
   "pedestals.upgrade_description_shift": "§7Press 'Shift' to Show Enabled Transfer Types",
   "pedestals.upgrade_description_alt": "§8Press 'Alt' to Show Selected Block Points",
 
+
+
+
+  "pedestals.upgrade_tooltip_separator_slash": "/",
+  "pedestals.upgrade_tooltip_separator_space": " ",
+  "pedestals.upgrade_tooltip_speed_allowed": "Can Increase Speed",
+  "pedestals.upgrade_tooltip_speed_label": "Speed: ",
+
+  "pedestals.upgrade_tooltip_capacity_label": "Capacity Increase: ",
+  "pedestals.upgrade_tooltip_damagecapacity_allowed": "Can Increase Damage",
+  "pedestals.upgrade_tooltip_damagecapacity_label": "Damage Tiers : ",
+  "pedestals.upgrade_tooltip_blockcapacity_allowed": "Can Increase Blocks Manipulated",
+  "pedestals.upgrade_tooltip_blockcapacity_label": "Extra Blocks Manipulated: ",
+  "pedestals.upgrade_tooltip_itemcapacity_allowed": "Can Increase Item Capacity",
+  "pedestals.upgrade_tooltip_itemcapacity_label": "Item Capacity Increase: ",
+  "pedestals.upgrade_tooltip_fluidcapacity_allowed": "Can Increase Fluid Capacity",
+  "pedestals.upgrade_tooltip_fluidcapacity_label": "Fluid Capacity Increase: ",
+  "pedestals.upgrade_tooltip_energycapacity_allowed": "Can Increase Energy Capacity",
+  "pedestals.upgrade_tooltip_energycapacity_label": "Energy Capacity Increase: ",
+  "pedestals.upgrade_tooltip_xpcapacity_allowed": "Can Increase XP Capacity",
+  "pedestals.upgrade_tooltip_xpcapacity_label": "XP Capacity Increase: ",
+  "pedestals.upgrade_tooltip_dustcapacity_allowed": "Can Increase Dust Capacity",
+  "pedestals.upgrade_tooltip_dustcapacity_label": "Dust Capacity Increase: ",
+
+
+  "pedestals.upgrade_tooltip_area_allowed": "Can Increase Area Selection Size",
+  "pedestals.upgrade_tooltip_area_label": "Area Increase: ",
+
+  "pedestals.upgrade_tooltip_range_allowed": "Can Increase Range Selection Distance",
+  "pedestals.upgrade_tooltip_range_label": "Range Increase: ",
+
+  "pedestals.upgrade_tooltip_magnet_allowed": "Can Add Magnet Effects",
+  "pedestals.upgrade_tooltip_magnet_label": "Has Magnet Effects",
+
+  "pedestals.upgrade_tooltip_gentle_allowed": "Can Add Gentle Harvest",
+  "pedestals.upgrade_tooltip_gentle_label": "Has Gentle Harvest",
+
+  "pedestals.upgrade_tooltip_superspeed_allowed": "Can Add Super Speed",
+  "pedestals.upgrade_tooltip_superspeed_label": "Has Super Speed",
+
+
+
+
   "pedestals.error": "ERROR",
   "pedestals.description_shift": "Press 'Shift' for More Info",
   "pedestals.description_alt": "Press 'Alt' for More Info",

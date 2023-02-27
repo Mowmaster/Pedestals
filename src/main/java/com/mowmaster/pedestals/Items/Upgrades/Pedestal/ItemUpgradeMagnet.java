@@ -35,6 +35,31 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifySuperSpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyXPCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyRange(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyArea(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
+    }
+
     //Requires energy
 
     @Override
@@ -188,7 +213,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
             }
 
             if(needsEnergy && actionDone)removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,item.getOnPos()),false);
-            if(!hasAdvancedOne() && actionDone)break;
+            if(!hasAdvancedOne(coinInPedestal) && actionDone)break;
         }
 
         List<ExperienceOrb> listXP = world.getEntitiesOfClass(ExperienceOrb.class, aabb);
@@ -214,7 +239,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
                         if(value<=added)orb.remove(Entity.RemovalReason.DISCARDED);
                         if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
                         if(needsEnergy && !actionDone)removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,orb.getOnPos()),false);
-                        if(!hasAdvancedOne())break;
+                        if(!hasAdvancedOne(coinInPedestal))break;
                     }
                 }
             }
@@ -224,7 +249,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
 
 
     @Override
-    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal) {
+    public void onCollideAction(BasePedestalBlockEntity pedestal) {
 
         List<Entity> entitiesColliding = pedestal.getLevel().getEntitiesOfClass(Entity.class,new AABB(pedestal.getPos()));
         for(Entity entityIn : entitiesColliding)
@@ -312,7 +337,8 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
                         int currentlyStoredExp = pedestal.getStoredExperience();
                         if(currentlyStoredExp < pedestal.getExperienceCapacity())
                         {
-                            int transferRate = pedestal.getExperienceTransferRate();
+                            int baseRate = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
+                            int transferRate = baseRate + MowLibXpUtils.getExpCountByLevel(getXPCapacityIncrease(pedestal.getCoinOnPedestal()));
                             int value = MowLibXpUtils.removeXp(player, transferRate);
                             if(value > 0)
                             {

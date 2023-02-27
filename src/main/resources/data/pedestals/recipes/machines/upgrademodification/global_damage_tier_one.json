@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "upgradeInput": {
+    "item": "pedestals:upgrade_pedestal_base"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:stone_sword"
+    }
+  ],
+  "inputIngredientsCount": 2,
+  "resultModificationName": "upgradedamagecapacity",
+  "resultModificationValue": 1,
+  "resultModificationMaxValue": 3
+}

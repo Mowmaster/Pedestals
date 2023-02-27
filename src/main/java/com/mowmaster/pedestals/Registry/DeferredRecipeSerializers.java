@@ -1,9 +1,6 @@
 package com.mowmaster.pedestals.Registry;
 
-import com.mowmaster.pedestals.Recipes.BottlerRecipe;
-import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
-import com.mowmaster.pedestals.Recipes.FluidConverterRecipe;
-import com.mowmaster.pedestals.Recipes.UnBottlerRecipe;
+import com.mowmaster.pedestals.Recipes.*;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -28,6 +25,12 @@ public final class DeferredRecipeSerializers
 
     public static final RegistryObject<RecipeSerializer<FluidConverterRecipe>> FLUIDCONVERTER_SERIALIZER =
             SERIALIZERS.register("fluidconverter", () -> FluidConverterRecipe.Serializer.INSTANCE);
+
+    public static final RegistryObject<RecipeSerializer<UpgradeModificationRecipe>> UPGRADEMODIFICATION_SERIALIZER =
+            SERIALIZERS.register("upgrademodification", () -> UpgradeModificationRecipe.Serializer.INSTANCE);
+
+    public static final RegistryObject<RecipeSerializer<UpgradeModificationGlobalRecipe>> UPGRADEMODIFICATIONGLOBAL_SERIALIZER =
+            SERIALIZERS.register("upgrademodification_global", () -> UpgradeModificationGlobalRecipe.Serializer.INSTANCE);
 
     public static void register(IEventBus eventBus) {
         SERIALIZERS.register(eventBus);

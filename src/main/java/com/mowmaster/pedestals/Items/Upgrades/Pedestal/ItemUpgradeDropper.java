@@ -52,6 +52,31 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyItemCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyXPCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyRange(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyArea(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
+    }
+
     public boolean canDropBolts(){ return PedestalConfig.COMMON.upgrade_dropper_canDropBolt.get(); }
     public int baseEnergyCostPerDrop(){ return PedestalConfig.COMMON.upgrade_dropper_costPerBolt.get(); }
 
@@ -252,7 +277,9 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
                         if(!currentPoint.equals(pedestal.getPos()) && (level.getBlockState(currentPoint).getBlock() == Blocks.AIR || level.getBlockState(currentPoint).getBlock() instanceof IFluidBlock))
                         {
                             ItemStack itemToDrop = pedestal.getItemInPedestal().copy();
-                            int countToDrop = (pedestal.getItemTransferRate()>=itemToDrop.getMaxStackSize())?(itemToDrop.getMaxStackSize()):(pedestal.getItemTransferRate());
+                            int baseRate = PedestalConfig.COMMON.pedestal_baseItemTransferRate.get();
+                            int maxRate = baseRate + getItemCapacityIncrease(pedestal.getCoinOnPedestal());
+                            int countToDrop = (maxRate>=itemToDrop.getMaxStackSize())?(itemToDrop.getMaxStackSize()):(maxRate);
                             if(!pedestal.removeItem(countToDrop,true).isEmpty())
                             {
                                 ItemStack dropMe = pedestal.removeItem(countToDrop,false);
@@ -283,7 +310,9 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
 
                 if(canTransferXP(coinUpgrade) && pedestal.hasExperience())
                 {
-                    int getxpAmountToDrop = (pedestal.getExperienceTransferRate() >= pedestal.getStoredExperience())?(pedestal.getStoredExperience()):(pedestal.getExperienceTransferRate());
+                    int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
+                    int maxValue = baseValue + getXPCapacityIncrease(pedestal.getCoinOnPedestal());
+                    int getxpAmountToDrop = (maxValue >= pedestal.getStoredExperience())?(pedestal.getStoredExperience()):(maxValue);
                     if(pedestal.removeExperience(getxpAmountToDrop,true)>0)
                     {
                         ExperienceOrb xpEntity = new ExperienceOrb(level, (double)currentPoint.getX(), (double)currentPoint.getY(), (double)currentPoint.getZ(), pedestal.removeExperience(getxpAmountToDrop,false));

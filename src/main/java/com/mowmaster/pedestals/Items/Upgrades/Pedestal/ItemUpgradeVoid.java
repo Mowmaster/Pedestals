@@ -41,6 +41,11 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
         super(new Properties());
     }
 
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
     private boolean passesFilter(BasePedestalBlockEntity pedestal, @Nullable ItemStack stackIn, @Nullable FluidStack fluidIn, @Nullable DustMagic magicIn, int energy, int exp, IItemMode.ItemTransferMode mode)
     {
         if(pedestal.hasFilter())
@@ -109,7 +114,7 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
 
 
     @Override
-    public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal) {
+    public void onCollideAction(BasePedestalBlockEntity pedestal) {
         List<Entity> entitiesColliding = pedestal.getLevel().getEntitiesOfClass(Entity.class,new AABB(pedestal.getPos()));
         for(Entity getEntity : entitiesColliding)
         {

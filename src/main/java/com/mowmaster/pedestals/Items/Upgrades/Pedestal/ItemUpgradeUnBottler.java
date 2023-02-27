@@ -31,6 +31,11 @@ public class ItemUpgradeUnBottler extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         //remove NBT saved on upgrade here
 

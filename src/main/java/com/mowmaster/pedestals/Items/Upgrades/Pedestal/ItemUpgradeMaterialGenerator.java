@@ -36,9 +36,23 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         super(p_41383_);
     }
 
-    public int getCobbleGenSpawnRate(ItemStack stack)
+    @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyItemCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    public int getCobbleGenSpawnRate(ItemStack upgradeStack)
     {
-        int capacity = UpgradeUtils.getCapacityOnItem(stack);
+        if(getItemCapacityIncrease(upgradeStack)>0)
+        {
+            return getItemCapacityIncrease(upgradeStack);
+        }
+
         return 1;
     }
 
@@ -161,8 +175,8 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         BlockPos posBelow = getPosOfBlockBelow(level,pedestalPos,1);
         ItemStack itemBlockBelow = new ItemStack(level.getBlockState(posBelow).getBlock().asItem());
 
-        //TODO: Add in Capacity modifier for generation.
-        //int modifier = getCobbleGenSpawnRate(pedestal.getCoinOnPedestal());
+
+        int modifier = getCobbleGenSpawnRate(coin);
 
         //if itemstacklist is null, populate nbt. then rely on block below updates to modify things.
         if(MowLibCompoundTagUtils.readItemStackListFromNBT(References.MODID,coin.getTag(),"_stackList") == null)actionOnNeighborBelowChange(pedestal, posBelow);
@@ -240,10 +254,27 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
                 {
                     if(getCobbleGenOutputs.get(i).isEmpty()) continue;
 
-                    if(pedestal.addItem(getCobbleGenOutputs.get(i), true))
+                    ItemStack stacked = getCobbleGenOutputs.get(i);
+                    boolean hadSpacePreModifier = pedestal.hasSpaceForItem(stacked);
+                    ItemStack stackedCopy = stacked.copy();
+                    if(modifier>1) { stackedCopy.shrink(-modifier); }
+                    if(pedestal.addItem(stackedCopy, true))
                     {
-                        pedestal.addItem(getCobbleGenOutputs.get(i), false);
+                        pedestal.addItem(stackedCopy, false);
                         itemsInserted = true;
+                    }
+                    else if(hadSpacePreModifier)
+                    {
+                        if(pedestal.addItem(stacked, true))
+                        {
+                            pedestal.addItem(stacked, false);
+                            itemsInserted = true;
+                        }
+                    }
+                    else
+                    {
+                        BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestal.getPos(),-1);
+                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),50,50,50));
                     }
                 }
 

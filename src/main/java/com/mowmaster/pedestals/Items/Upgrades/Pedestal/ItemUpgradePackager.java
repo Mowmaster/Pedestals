@@ -44,12 +44,49 @@ public class ItemUpgradePackager extends ItemUpgradeBase implements IHasModeType
     }
 
     @Override
+    public boolean canModifySpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyFluidCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyEnergyCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyXPCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canModifyDustCapacity(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        boolean fluidFull1 = pedestal.getStoredFluid().getAmount() >= pedestal.getFluidCapacity();
-        boolean energyFull1 = pedestal.getStoredEnergy() >= pedestal.getEnergyCapacity();
-        boolean xpFull1 = pedestal.getStoredExperience() >= pedestal.getExperienceCapacity();
-        boolean dustFull1 = pedestal.getStoredDust().getDustAmount() >= pedestal.getDustCapacity();
+        int baseFluidRate = PedestalConfig.COMMON.pedestal_baseFluidTransferRate.get();
+        int fluidRate = baseFluidRate + getFluidCapacityIncrease(pedestal.getCoinOnPedestal());
+
+        int baseEnergyRate = PedestalConfig.COMMON.pedestal_baseEnergyTransferRate.get();
+        int energyRate = baseEnergyRate + getEnergyCapacityIncrease(pedestal.getCoinOnPedestal());
+
+        int baseXPRate = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
+        int xpRate = baseXPRate + MowLibXpUtils.getExpCountByLevel(getXPCapacityIncrease(pedestal.getCoinOnPedestal()));
+
+        int baseDustRate = PedestalConfig.COMMON.pedestal_baseDustTransferRate.get();
+        int dustRate = baseDustRate + getDustCapacityIncrease(pedestal.getCoinOnPedestal());
+
+        boolean fluidFull1 = pedestal.getStoredFluid().getAmount() >= fluidRate;
+        boolean energyFull1 = pedestal.getStoredEnergy() >= energyRate;
+        boolean xpFull1 = pedestal.getStoredExperience() >= xpRate;
+        boolean dustFull1 = pedestal.getStoredDust().getDustAmount() >= dustRate;
         if(fluidFull1 || energyFull1 || xpFull1 || dustFull1)
         {
             FluidStack fluidInPed = pedestal.getStoredFluid().copy();
@@ -57,10 +94,10 @@ public class ItemUpgradePackager extends ItemUpgradeBase implements IHasModeType
             int xpInPed = pedestal.getStoredExperience();
             DustMagic dustInPed = pedestal.getStoredDust();
 
-            boolean fluidFull = fluidInPed.getAmount() >= pedestal.getFluidCapacity();
-            boolean energyFull = energyInPed >= pedestal.getEnergyCapacity();
-            boolean xpFull = xpInPed >= pedestal.getExperienceCapacity();
-            boolean dustFull = dustInPed.getDustAmount() >= pedestal.getDustCapacity();
+            boolean fluidFull = fluidInPed.getAmount() >= fluidRate;
+            boolean energyFull = energyInPed >= energyRate;
+            boolean xpFull = xpInPed >= xpRate;
+            boolean dustFull = dustInPed.getDustAmount() >= dustRate;
 
             if(fluidFull && canTransferFluids(coin))
             {
