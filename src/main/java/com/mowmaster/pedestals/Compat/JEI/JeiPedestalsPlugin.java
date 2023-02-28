@@ -2,10 +2,7 @@ package com.mowmaster.pedestals.Compat.JEI;
 
 import com.mowmaster.mowlib.Compat.JEI.JEIRecipeTypes;
 import com.mowmaster.mowlib.Compat.JEI.JEISettings;
-import com.mowmaster.pedestals.Compat.JEI.recipes.BottlerRecipeCategory;
-import com.mowmaster.pedestals.Compat.JEI.recipes.CobbleGenRecipeCategory;
-import com.mowmaster.pedestals.Compat.JEI.recipes.FluidConverterRecipeCategory;
-import com.mowmaster.pedestals.Compat.JEI.recipes.UnBottlerRecipeCategory;
+import com.mowmaster.pedestals.Compat.JEI.recipes.*;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Recipes.*;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -51,6 +48,7 @@ public class JeiPedestalsPlugin implements IModPlugin
         registration.addRecipeCategories(new BottlerRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new UnBottlerRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new FluidConverterRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new UpgradeModifierCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -66,11 +64,12 @@ public class JeiPedestalsPlugin implements IModPlugin
         registration.addRecipes(JEIPedestalsRecipeTypes.UNBOTTLER_RECIPE, unbottlerRecipes);
         List<FluidConverterRecipe> fluidconverterRecipes = recipeManager.getAllRecipesFor(FluidConverterRecipe.Type.INSTANCE);
         registration.addRecipes(JEIPedestalsRecipeTypes.FLUIDCONVERTER_RECIPE, fluidconverterRecipes);
+        List<UpgradeModificationGlobalRecipe> upgradeModGlobalRecipes = recipeManager.getAllRecipesFor(UpgradeModificationGlobalRecipe.Type.INSTANCE);
+        registration.addRecipes(JEIPedestalsRecipeTypes.UPGRADEMODIFICATIONGLOBAL_RECIPE, upgradeModGlobalRecipes);
         /*
         List<UpgradeModificationRecipe> upgradeModRecipes = recipeManager.getAllRecipesFor(UpgradeModificationRecipe.Type.INSTANCE);
         registration.addRecipes(JEIPedestalsRecipeTypes.UPGRADEMODIFICATION_RECIPE, upgradeModRecipes);
-        List<UpgradeModificationGlobalRecipe> upgradeModGlobalRecipes = recipeManager.getAllRecipesFor(UpgradeModificationGlobalRecipe.Type.INSTANCE);
-        registration.addRecipes(JEIPedestalsRecipeTypes.UPGRADEMODIFICATIONGLOBAL_RECIPE, upgradeModGlobalRecipes);
+
         */
 
 
@@ -206,6 +205,8 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BOTTLER.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_UNBOTTLER.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_UNBOTTLER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MODIFICATIONS.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MODIFICATIONS.get());
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());
@@ -236,6 +237,8 @@ public class JeiPedestalsPlugin implements IModPlugin
                 JEIPedestalsRecipeTypes.UNBOTTLER_RECIPE);
         registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_FLUIDCONVERTER.get()),
                 JEIPedestalsRecipeTypes.FLUIDCONVERTER_RECIPE);
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_MODIFICATIONS.get()),
+                JEIPedestalsRecipeTypes.UPGRADEMODIFICATIONGLOBAL_RECIPE);
     }
 
     @Override

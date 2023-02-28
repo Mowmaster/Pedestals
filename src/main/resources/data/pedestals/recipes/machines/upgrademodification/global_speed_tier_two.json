@@ -1,9 +1,10 @@
 {
   "type": "pedestals:upgrademodification_global",
-  "upgradeInput": {
-    "item": "pedestals:upgrade_pedestal_base"
-  },
+
   "ingredients": [
+    {
+      "tag": "pedestals:upgrades"
+    },
     {
       "tag": "forge:gems/diamond"
     },
@@ -14,7 +15,6 @@
       "item": "minecraft:sugar"
     }
   ],
-  "inputIngredientsCount": 3,
   "resultModificationName": "upgradespeed",
   "resultModificationValue": 2,
   "resultModificationMaxValue": 20

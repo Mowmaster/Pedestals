@@ -1,9 +1,10 @@
 {
   "type": "pedestals:upgrademodification_global",
-  "upgradeInput": {
-    "item": "pedestals:upgrade_pedestal_base"
-  },
+
   "ingredients": [
+    {
+      "tag": "pedestals:upgrades"
+    },
     {
       "tag": "forge:dusts/redstone"
     },
@@ -11,7 +12,6 @@
       "item": "minecraft:iron_sword"
     }
   ],
-  "inputIngredientsCount": 2,
   "resultModificationName": "upgradedamagecapacity",
   "resultModificationValue": 1,
   "resultModificationMaxValue": 6

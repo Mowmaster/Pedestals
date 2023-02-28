@@ -1,9 +1,10 @@
 {
   "type": "pedestals:upgrademodification_global",
-  "upgradeInput": {
-    "item": "pedestals:upgrade_pedestal_base"
-  },
+
   "ingredients": [
+    {
+      "tag": "pedestals:upgrades"
+    },
     {
       "tag": "forge:gems/emerald"
     },
@@ -11,7 +12,6 @@
       "tag": "forge:chests/wooden"
     }
   ],
-  "inputIngredientsCount": 2,
   "resultModificationName": "upgradeitemcapacity",
   "resultModificationValue": 4,
   "resultModificationMaxValue": 64

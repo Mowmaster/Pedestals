@@ -35,6 +35,27 @@
   "pedestals.fluidconverter.xp": "Exp Returned: ",
   "pedestals.fluidconverter.dust": "Dust Returned: ",
 
+  "pedestals.jei.upgrade_modification": "Upgrade Modifier",
+  "pedestals.upgrade_modification.pedestalsetup": "Bind Surrounding pedestals with the modification upgrade to the pedestal above the input chest",
+  "pedestals.upgrade_modification.placementinventory": "Input Chest (Below Upgraded Pedestal)",
+  "pedestals.upgrade_modification.type": "Modification: ",
+  "pedestals.upgrade_modification.upgradespeed": "Speed",
+  "pedestals.upgrade_modification.upgradedamagecapacity": "Damage",
+  "pedestals.upgrade_modification.upgradeblockcapacity": "Block Manipulation",
+  "pedestals.upgrade_modification.upgradeitemcapacity": "Item Capacity",
+  "pedestals.upgrade_modification.upgradefluidcapacity": "Fluid Capacity",
+  "pedestals.upgrade_modification.upgradeenergycapacity": "Energy Capacity",
+  "pedestals.upgrade_modification.upgradexpcapacity": "XP Capacity",
+  "pedestals.upgrade_modification.upgradedustcapacity": "Dust Capacity",
+  "pedestals.upgrade_modification.upgradearea": "Area",
+  "pedestals.upgrade_modification.upgraderange": "Range",
+  "pedestals.upgrade_modification.upgrademagnet": "Magnet Effects",
+  "pedestals.upgrade_modification.upgradegentle": "Gentle Harvest",
+  "pedestals.upgrade_modification.upgradesuperspeed": "Super Speed",
+  "pedestals.upgrade_modification.separatorone": " +",
+  "pedestals.upgrade_modification.separatortwo": " ",
+  "pedestals.upgrade_modification.separatorthree": "Max: ",
+
   "pedestals.transport_mode_changed_true": "Mode Enabled",
   "pedestals.transport_mode_changed_false": "Mode Disabled",
 
@@ -423,7 +444,7 @@
   "jei.pedestals.upgrade_pedestal_fan.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points. Placing a block below this pedestal can change what Mob is targeted. (All possible options in JEI 'Mob Filters')",
 
   "item.pedestals.upgrade_pedestal_modifications": "Modification Infusion Upgrade",
-  "jei.pedestals.upgrade_pedestal_modifications.description": "§5Infuses modifications into upgrades to enhance them.",
+  "jei.pedestals.upgrade_pedestal_modifications.description": "§5Infuses modifications into upgrades to enhance them. Bind pedestals to the upgrade, the bound order matters! insert upgrade into pedestal on top of chest, and insert infusion items in order (upgrade goes in below chest)",
   "jei.pedestals.upgrade_pedestal_modifications.interaction": "§3(In the Main Hand)Right Click Pedestal Blocks to select single block targets, right click in air to clear the list.",
 
   "item.pedestals.upgrade_pedestal_dropper": "Dropper Upgrade",

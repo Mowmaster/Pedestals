@@ -1,9 +1,9 @@
 {
   "type": "pedestals:upgrademodification_global",
-  "upgradeInput": {
-    "item": "pedestals:upgrade_pedestal_base"
-  },
   "ingredients": [
+    {
+      "tag": "pedestals:upgrades"
+    },
     {
       "item": "minecraft:nether_star"
     },
@@ -11,34 +11,27 @@
       "tag": "forge:storage_blocks/netherite"
     },
     {
+      "item": "minecraft:nether_star"
+    },
+    {
       "tag": "forge:storage_blocks/diamond"
+    },
+    {
+      "item": "minecraft:nether_star"
     },
     {
       "tag": "forge:storage_blocks/emerald"
     },
     {
+      "item": "minecraft:nether_star"
+    },
+    {
       "tag": "forge:storage_blocks/gold"
     },
     {
-      "tag": "forge:storage_blocks/iron"
-    },
-    {
-      "tag": "forge:storage_blocks/lapis"
-    },
-    {
-      "tag": "forge:storage_blocks/coal"
-    },
-    {
-      "tag": "forge:storage_blocks/copper"
-    },
-    {
-      "tag": "forge:chests/wooden"
-    },
-    {
-      "tag": "minecraft:saplings"
+      "item": "minecraft:nether_star"
     }
   ],
-  "inputIngredientsCount": 11,
   "resultModificationName": "upgradesuperspeed",
   "resultModificationValue": 1,
   "resultModificationMaxValue": 1

@@ -175,9 +175,9 @@ public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelect
 
 
 
-    protected boolean upgradeModifiedSuccessfully(UpgradeModificationGlobalRecipe recipe, ItemStack upgradeInput) {
+    protected boolean upgradeModifiedSuccessfully(UpgradeModificationGlobalRecipe recipe, ItemStack upgradeInput, boolean simulate) {
         //System.out.println("upgradeModifiedSuccessfully Method: "+recipe.getResultingModifiedItem(upgradeInput));
-        return (recipe == null)?(false):(recipe.getResultingModifiedItem(upgradeInput));
+        return (recipe == null)?(false):(recipe.getResultingModifiedItem(upgradeInput,simulate));
     }
 
 
@@ -224,7 +224,7 @@ public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelect
                                     if(recipeGlobal != null)
                                     {
                                         //System.out.println("upgradeModifiedSuccessfully Call: "+upgradeModifiedSuccessfully(recipeGlobal,copyIncoming));
-                                        if(upgradeModifiedSuccessfully(recipeGlobal,copyIncoming))
+                                        if(upgradeModifiedSuccessfully(recipeGlobal,copyIncoming, true))
                                         {
                                             if(!handler.extractItem(i,1 ,true ).isEmpty())
                                             {
@@ -243,6 +243,7 @@ public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelect
                                                         }
                                                     }
                                                     handler.extractItem(i,1 ,false );
+                                                    upgradeModifiedSuccessfully(recipeGlobal,copyIncoming, false);
                                                     pedestal.addItem(copyIncoming,false);
                                                     BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestal.getPos(),-1);
                                                     if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),0,255,0));
