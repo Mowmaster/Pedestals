@@ -140,6 +140,8 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         return PedestalUtilities.getRedstoneLevelPedestal(worldIn, pos);
     }
 
+    //To save a recipe and verify if it hasnt changed so we dont have to keep pulling it every time
+    //https://github.com/oierbravo/createsifter/blob/mc1.19/dev/src/main/java/com/oierbravo/createsifter/content/contraptions/components/sifter/SifterTileEntity.java
     @Override
     public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
         CobbleGenRecipe recipe = getRecipe(pedestal.getLevel(),new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem()));

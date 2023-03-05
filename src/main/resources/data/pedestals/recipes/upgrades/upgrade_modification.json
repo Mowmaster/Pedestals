@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_base"
+    },
+    {
+      "item": "pedestals:augment_pedestal_t1_capacity"
+    },
+    {
+      "item": "pedestals:augment_pedestal_t1_storage"
+    },
+    {
+      "item": "pedestals:augment_pedestal_t1_speed"
+    },
+    {
+      "item": "pedestals:augment_pedestal_t1_range"
+    },
+    {
+      "item": "pedestals:augment_pedestal_nocollide"
+    }
+  ],
+  "result": {
+    "item": "pedestals:upgrade_pedestal_modifications"
+  }
+}

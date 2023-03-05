@@ -73,9 +73,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public void updateAction(Level level, BasePedestalBlockEntity pedestal) {
         if(!pedestal.isPedestalBlockPowered(pedestal))
         {
-            int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-            int speed = configSpeed;
-            if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getSpeedTicksReduced(pedestal.getCoinOnPedestal());
+            int speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getSpeedTicksReduced(pedestal.getCoinOnPedestal());
             //Make sure speed has at least a value of 1
             if(speed<=0)speed = 1;
             if(level.getGameTime()%speed == 0 )
@@ -94,9 +92,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public void actionOnCollideWithBlock(BasePedestalBlockEntity pedestal) {
         if(!pedestal.isPedestalBlockPowered(pedestal))
         {
-            int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-            int speed = configSpeed;
-            if(pedestal.hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getSpeedTicksReduced(pedestal.getCoinOnPedestal());
+            int speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getSpeedTicksReduced(pedestal.getCoinOnPedestal());
             //Make sure speed has at least a value of 1
             if(speed<=0)speed = 1;
             if(pedestal.getLevel().getGameTime()%speed == 0 )
@@ -133,6 +129,15 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
      * END
      *
      */
+
+    public int getUpgradeExperienceTransferRate(ItemStack upgradeStack)
+    {
+        int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
+        int experienceTransferRateConverted = MowLibXpUtils.getExpCountByLevel(baseValue);
+        int upgradeIncrease = getXPCapacityIncrease(upgradeStack);
+
+        return  (upgradeIncrease>0)?(MowLibXpUtils.getExpCountByLevel(upgradeIncrease+baseValue)):(experienceTransferRateConverted);
+    }
 
     public ItemStack getUpgradeDefaultTool()
     {
