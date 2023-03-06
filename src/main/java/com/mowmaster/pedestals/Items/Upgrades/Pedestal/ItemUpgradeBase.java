@@ -1428,10 +1428,12 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 }
                 if(canModifyBlockCapacity(p_41421_))
                 {
+                    capacityLabel.append(separator_space);
                     capacityLabel.append(capacityBlockAmount);
                 }
                 if(canModifyItemCapacity(p_41421_))
                 {
+                    capacityLabel.append(separator_space);
                     capacityLabel.append(capacityItemAmount);
                 }
                 if(canModifyFluidCapacity(p_41421_))

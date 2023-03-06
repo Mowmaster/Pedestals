@@ -41,6 +41,9 @@ public class DeferredRegisterItems
     public static final RegistryObject<Item> TOOL_DEVTOOL = ITEMS.register("tool_devtool",
             () -> new DevTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
 
+    public static final RegistryObject<Item> TOOL_MANIFEST = ITEMS.register("tool_manifesttool",
+            () -> new PedestalManifestTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+
     public static final RegistryObject<Item> FILTER_BASE = ITEMS.register("filter_base",
             () -> new FilterBaseItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> FILTER_ITEM = ITEMS.register("filter_item",

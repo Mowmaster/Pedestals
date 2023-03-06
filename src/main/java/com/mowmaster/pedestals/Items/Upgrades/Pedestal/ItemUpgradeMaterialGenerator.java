@@ -175,8 +175,6 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         BlockPos posBelow = getPosOfBlockBelow(level,pedestalPos,1);
-        ItemStack itemBlockBelow = new ItemStack(level.getBlockState(posBelow).getBlock().asItem());
-
 
         int modifier = getCobbleGenSpawnRate(coin);
 
@@ -248,7 +246,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             }
 
             if(getCobbleGenOutputs.size()<=0){return;}
-            else
+            else if(getCobbleGenOutputs.size()>0)
             {
                 boolean itemsInserted = false;
 
@@ -259,24 +257,21 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
                     ItemStack stacked = getCobbleGenOutputs.get(i);
                     boolean hadSpacePreModifier = pedestal.hasSpaceForItem(stacked);
                     ItemStack stackedCopy = stacked.copy();
+                    ItemStack testStack = pedestal.addItemStack(stackedCopy, true);
                     if(modifier>1) { stackedCopy.shrink(-modifier); }
-                    if(pedestal.addItem(stackedCopy, true))
+                    if(testStack.isEmpty())
                     {
                         pedestal.addItem(stackedCopy, false);
                         itemsInserted = true;
                     }
-                    else if(hadSpacePreModifier)
+                    else if(testStack.getCount()>0)
                     {
-                        if(pedestal.addItem(stacked, true))
+                        stackedCopy.shrink(testStack.getCount());
+                        if(pedestal.addItem(stackedCopy, true))
                         {
-                            pedestal.addItem(stacked, false);
+                            pedestal.addItem(stackedCopy, false);
                             itemsInserted = true;
                         }
-                    }
-                    else
-                    {
-                        BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestal.getPos(),-1);
-                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),50,50,50));
                     }
                 }
 
@@ -288,6 +283,10 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
                     if(damage)pedestal.damageInsertedTool(1,false);
                 }
             }
+        }
+        else
+        {
+            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY(),pedestalPos.getZ(),50,50,50));
         }
     }
 

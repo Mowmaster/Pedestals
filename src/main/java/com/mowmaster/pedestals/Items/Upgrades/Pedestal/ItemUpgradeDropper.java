@@ -283,13 +283,13 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
                             if(!pedestal.removeItem(countToDrop,true).isEmpty())
                             {
                                 ItemStack dropMe = pedestal.removeItem(countToDrop,false);
-                                ItemEntity itementity = new ItemEntity(level, (double)currentPoint.getX() + 0.5D, (double)currentPoint.getY() + 0.5D, (double)currentPoint.getZ() + 0.5D, dropMe);
+                                ItemEntity itementity = new ItemEntity(level, (double)currentPoint.getX(), (double)currentPoint.getY(), (double)currentPoint.getZ(), dropMe);
                                 itementity.setDefaultPickUpDelay();
+                                itementity.setDeltaMovement(0.0,0.0,0.0);
                                 itementity.moveTo(Vec3.atCenterOf(currentPoint));
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),255,255,255));
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,255,255,255));
                                 level.addFreshEntity(itementity);
                             }
-
                         }
                     }
                 }

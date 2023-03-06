@@ -1905,6 +1905,11 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return 0;
     }
 
+    public int getCurrentSpeed()
+    {
+        return PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getTicksReduced();
+    }
+
     /*============================================================================
     ==============================================================================
     ===========================      SPEED END       =============================
@@ -2929,7 +2934,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         }
     }
 
-    public int getRendererType()
+    public int  getRendererType()
     {
         // 0 - No Particles
         // 1 - No Render Item
