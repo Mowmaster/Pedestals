@@ -9,6 +9,7 @@ import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
+import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
@@ -121,6 +122,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         MowLibOwnerUtils.removePlayerFromStack(coinInPedestal);
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_string_last_clicked_direction");
     }
 
     /*

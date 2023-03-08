@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "USS",
+    "PPP"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:paper"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "U": {
+      "item": "pedestals:tool_upgradetool"
+    }
+  },
+  "result": {
+    "item": "pedestals:tool_manifesttool"
+  }
+}

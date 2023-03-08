@@ -502,6 +502,16 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         boolean getCurrentRender = pedestal.getRenderRange();
                         pedestal.setRenderRange(!getCurrentRender);
                     }
+                    else if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_MANIFEST.get())){
+
+                        MutableComponent manifest = Component.translatable(MODID + ".manifest.color");
+                        MutableComponent color = Component.translatable(MowLibReferences.MODID + "." +MowLibColorReference.getColorName(MowLibColorReference.getColorFromStateInt(p_60503_)));
+                        manifest.withStyle(ChatFormatting.GOLD);
+                        color.withStyle(ChatFormatting.WHITE);
+                        manifest.append(color);
+
+                        p_60506_.displayClientMessage(manifest, true);
+                    }
                     return InteractionResult.FAIL;
                 }
                 else if (p_60506_.getItemInHand(p_60507_).getItem() instanceof ColorApplicator) {

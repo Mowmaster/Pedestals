@@ -51,6 +51,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             Direction facing = p_112307_.getBlockState().getValue(FACING);
             List<ItemStack> listed = p_112307_.getItemStacks();
             ItemStack stack = p_112307_.getItemInPedestalFirst();
+            ItemStack toolStack = p_112307_.getToolStack();
             ItemStack coin = p_112307_.getCoinOnPedestal();
             List<BlockPos> linkedLocations = p_112307_.getLocationList();
             BlockPos pos = p_112307_.getPos();
@@ -186,14 +187,14 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 {
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
                 }
                 if(facing== Direction.DOWN) {
                     //p_112309_.rotate(new Quaternion(0, 0, 1,180));
                     p_112309_.mulPose(Vector3f.ZP.rotationDegrees(180));
                     p_112309_.translate(0, -1, 0);
                     p_112309_.translate(-1, 0, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -201,7 +202,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //p_112309_.rotate(new Quaternion(1, 0, 0,270));
                     p_112309_.mulPose(Vector3f.XP.rotationDegrees(270));
                     p_112309_.translate(0, -1, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -209,7 +210,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //p_112309_.mulPose(270, 0, 0, 1);
                     p_112309_.mulPose(Vector3f.ZP.rotationDegrees(270));
                     p_112309_.translate(-1, 0, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -217,7 +218,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //p_112309_.mulPose(90, 1, 0, 0);
                     p_112309_.mulPose(Vector3f.XP.rotationDegrees(90));
                     p_112309_.translate(0, 0, -1);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -225,7 +226,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //p_112309_.mulPose(90, 0, 0, 1);
                     p_112309_.mulPose(Vector3f.ZP.rotationDegrees(90));
                     p_112309_.translate(0, -1, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -302,7 +303,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         }
     }
 
-    public static void  renderTileItems(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, List<ItemStack> item, ItemStack coin, int p_112311_, int p_112312_, int renderAugmentType)
+    public static void  renderTileItems(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, List<ItemStack> item, ItemStack coin,ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType)
     {
         switch (renderAugmentType)
         {
@@ -312,12 +313,14 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
+                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
                 break;
             case 1:
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.3125f,0,0,0,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
+                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
                 break;
             case 2:
                 renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
@@ -327,6 +330,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
+                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
                 break;
             case 4:
                 renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
@@ -339,6 +343,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
+                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
                 break;
             default:
                 renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
@@ -346,6 +351,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
+                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
                 break;
 
         }
@@ -423,6 +429,21 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
             BakedModel baked = renderer.getModel(itemCoin,worldIn,null,0);
             renderer.render(itemCoin,ItemTransforms.TransformType.FIXED,true,p_112309_,p_112310_,p_112311_,p_112312_,baked);
+            //Minecraft.getInstance().getItemRenderer().renderItem(itemCoin, ItemCameraTransforms.TransformType.FIXED, p_112311_, p_112312_, p_112309_, p_112310_);
+            p_112309_.popPose();
+        }
+    }
+
+    public static void renderTool(Level worldIn,ItemStack itemTool, PoseStack p_112309_, MultiBufferSource p_112310_, int p_112311_, int p_112312_) {
+        if (!itemTool.isEmpty()) {
+            p_112309_.pushPose();
+            p_112309_.translate(0.5D, 0.75D, 0.5D);
+            p_112309_.scale(0.5F, 0.5F, 0.5F);
+            p_112309_.mulPose(Vector3f.YP.rotationDegrees(90));
+            p_112309_.mulPose(Vector3f.XP.rotationDegrees(90));
+            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+            BakedModel baked = renderer.getModel(itemTool,worldIn,null,0);
+            renderer.render(itemTool,ItemTransforms.TransformType.FIXED,true,p_112309_,p_112310_,p_112311_,p_112312_,baked);
             //Minecraft.getInstance().getItemRenderer().renderItem(itemCoin, ItemCameraTransforms.TransformType.FIXED, p_112311_, p_112312_, p_112309_, p_112310_);
             p_112309_.popPose();
         }

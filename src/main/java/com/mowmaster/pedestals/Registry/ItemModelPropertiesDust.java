@@ -4,6 +4,7 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.pedestals.Items.Augments.AugmentRenderDiffuser;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.Filters.FilterItem;
+import com.mowmaster.pedestals.Items.Tools.PedestalManifestTool;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeExport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeImport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeMagnet;
@@ -33,5 +34,8 @@ public class ItemModelPropertiesDust
 
         ItemProperties.register(item, new ResourceLocation(MODID + ":augment_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
             return AugmentRenderDiffuser.getAugmentMode(p_174625_);});
+
+        ItemProperties.register(item, new ResourceLocation(MODID + ":manifest_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
+            return PedestalManifestTool.getManifestType(p_174625_);});
     }
 }

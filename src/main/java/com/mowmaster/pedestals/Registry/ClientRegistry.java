@@ -95,6 +95,8 @@ public class ClientRegistry
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get());
 
+        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.TOOL_MANIFEST.get());
+
 
 
 

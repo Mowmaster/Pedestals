@@ -28,6 +28,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,8 +85,11 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
                 .addIngredients(recipe.getIngredients().get(0));
 
         //Result
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 102, 41)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 102, 17)
                 .addItemStack(recipe.getResultItem());
+
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 102,41)
+                .addItemStack(new ItemStack(Items.STONE_PICKAXE).setHoverName(Component.translatable(References.MODID + ".cobble_gen.tool")));
     }
 
     @Override

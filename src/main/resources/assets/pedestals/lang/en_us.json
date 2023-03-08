@@ -2,7 +2,8 @@
   "itemGroup.tab_pedestaltab": "Pedestals",
 
   "pedestals.jei.cobble_gen": "Material Generator",
-  "pedestals.cobble_gen.warning": "§cOutput affected by enchants like silk touch, fortune, etc.",
+  "pedestals.cobble_gen.warning": "§cThe Pedestal Simulates Breaking the Result Block, the Broken remains are what is Actually Generated",
+  "pedestals.cobble_gen.tool": "§cThe Default tool used is this, but Offhand inserting one can vastly change up what is produced (enchants factor in as well)",
   "pedestals.cobble_gen.fluid": "Fluid Needed: ",
   "pedestals.cobble_gen.fluidna": "None",
   "pedestals.cobble_gen.energy": "Energy Needed: ",
@@ -95,6 +96,55 @@
 
   "pedestals.upgrade_description_shift": "§7Press 'Shift' to Show Enabled Transfer Types",
   "pedestals.upgrade_description_alt": "§8Press 'Alt' to Show Selected Block Points",
+
+
+  "pedestals.manifest.clear": "Manifest Cleared",
+  "pedestals.manifest.create": "Manifest Created",
+  "pedestals.manifest.color": "Pedestal Color: ",
+
+  "pedestals.manifest.description.shift": "Press Shift for Augment Count",
+  "pedestals.manifest.description.alt": "Press Alt for Details",
+
+
+  "pedestals.manifest.description.augments.num": "Tiered Augments: ",
+
+  "pedestals.manifest.description.augments.has_render": "Has Render Augment",
+  "pedestals.manifest.description.augments.has_redstone": "Has Inserted Redstone",
+  "pedestals.manifest.description.augments.has_signal": "Is Receiving Redstone Signal",
+  "pedestals.manifest.description.augments.has_robin": "Has Round Robin Augment",
+  "pedestals.manifest.description.augments.has_collide": "Has Collide Effect Augment",
+
+  "pedestals.manifest.description.augments.has_speed": "Has Speed Augment",
+  "pedestals.manifest.description.augments.has_capacity": "Has Capacity Augment",
+  "pedestals.manifest.description.augments.has_storage": "Has Storage Augment",
+  "pedestals.manifest.description.augments.has_range": "Has Range Augment",
+
+  "pedestals.manifest.description.augments.numberof": "Number Of: ",
+  "pedestals.manifest.description.augments.augment_speed": "Speed Augments: ",
+  "pedestals.manifest.description.augments.augment_capacity": "Capacity Augments: ",
+  "pedestals.manifest.description.augments.augment_storage": "Storage Augments: ",
+  "pedestals.manifest.description.augments.augment_range": "Range Augments: ",
+
+  "pedestals.manifest.description.augments.redstoneneeded_alt": "Redstone Strength Till Disabled: ",
+  "pedestals.manifest.description.augments.num_alt": "==== Pedestal Stats ====",
+
+  "pedestals.manifest.description.augments.num_speed_alt": "Time Between Actions (In Ticks): ",
+  "pedestals.manifest.description.augments.num_range_alt": "Selection Range (From Pedestal): ",
+
+  "pedestals.manifest.description.augments.num_capstor_alt_item": "Item Transfer Rate/Stacks: ",
+  "pedestals.manifest.description.augments.num_capstor_alt_fluid": "Fluid Transfer Rate/Capacity: ",
+  "pedestals.manifest.description.augments.num_capstor_alt_energy": "Energy Transfer Rate/Capacity: ",
+  "pedestals.manifest.description.augments.num_capstor_alt_xp": "Exp Transfer Rate/Capacity: ",
+  "pedestals.manifest.description.augments.num_capstor_alt_dust": "Dust Transfer Rate/Capacity: ",
+
+
+
+
+
+
+
+
+
 
 
 
@@ -207,6 +257,9 @@
   "jei.pedestals.tool_toolswapper.interaction": "§3 Offhand Tool and Left Click to Remove Tool from Pedestal. Crouch Right Click in Air to Switch Tool.",
   "item.pedestals.tool_devtool": "Dev Tool (Creative Only)",
   "jei.pedestals.tool_devtool.interaction": "§3 Offhand Left Tool and Left Click to Break Pedestals if in Creative Mode",
+  "item.pedestals.tool_manifesttool": "Pedestal Manifest",
+  "jei.pedestals.tool_manifesttool.description": "§5 Gets the Current Details about the pedestal. Can be used to see what Augments a pedestal has.",
+  "jei.pedestals.tool_manifesttool.interaction": "§3 Crouch Right Click on Pedestal to Get Details, Right click to clear",
 
 
   "pedestals.filter_type": "Filter Type: ",
