@@ -501,6 +501,26 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                     if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOL.get()) || itemInHand.getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get())){
                         boolean getCurrentRender = pedestal.getRenderRange();
                         pedestal.setRenderRange(!getCurrentRender);
+
+                        MutableComponent render_on = Component.translatable(MODID + ".linkingtool.pedestal_render_on");
+                        MutableComponent render_off = Component.translatable(MODID + ".linkingtool.pedestal_render_off");
+                        MutableComponent render = (!getCurrentRender)?(render_on):(render_off);
+                        ChatFormatting color = (!getCurrentRender)?(ChatFormatting.RED):(ChatFormatting.DARK_RED);
+                        render.withStyle(color);
+
+                        p_60506_.displayClientMessage(render, true);
+                    }
+                    if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get())){
+                        boolean getCurrentRenderUpgrade = pedestal.getRenderRangeUpgrade();
+                        pedestal.setRenderRangeUpgrade(!getCurrentRenderUpgrade);
+
+                        MutableComponent render_on = Component.translatable(MODID + ".upgradetool.pedestal_render_on");
+                        MutableComponent render_off = Component.translatable(MODID + ".upgradetool.pedestal_render_off");
+                        MutableComponent render = (!getCurrentRenderUpgrade)?(render_on):(render_off);
+                        ChatFormatting color = (!getCurrentRenderUpgrade)?(ChatFormatting.BLUE):(ChatFormatting.DARK_BLUE);
+                        render.withStyle(color);
+
+                        p_60506_.displayClientMessage(render, true);
                     }
                     else if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_MANIFEST.get())){
 

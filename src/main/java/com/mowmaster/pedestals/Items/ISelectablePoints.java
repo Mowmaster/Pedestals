@@ -1,4 +1,4 @@
-package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
+package com.mowmaster.pedestals.Items;
 
 import net.minecraft.core.BlockPos;
 

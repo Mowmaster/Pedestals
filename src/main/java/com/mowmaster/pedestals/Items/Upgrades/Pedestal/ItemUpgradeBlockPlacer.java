@@ -1,41 +1,28 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
-import com.mojang.math.Vector3d;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
-import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
-import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
+import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.ISelectablePoints;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
@@ -200,9 +187,9 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
                     buildValidBlockListArea(pedestal);
                     //System.out.println("ListBuilt: "+ getValidList(pedestal));
                 }
-                else if(!pedestal.getRenderRange())
+                else if(!pedestal.getRenderRangeUpgrade())
                 {
-                    pedestal.setRenderRange(true);
+                    pedestal.setRenderRangeUpgrade(true);
                 }
             }
             else
@@ -225,9 +212,9 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase implements ISelectab
                             buildValidBlockList(pedestal);
                         }
                     }
-                    else if(!pedestal.getRenderRange())
+                    else if(!pedestal.getRenderRangeUpgrade())
                     {
-                        pedestal.setRenderRange(true);
+                        pedestal.setRenderRangeUpgrade(true);
                     }
                 }
             }

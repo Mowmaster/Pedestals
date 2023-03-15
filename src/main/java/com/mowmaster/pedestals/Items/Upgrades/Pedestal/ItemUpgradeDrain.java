@@ -2,15 +2,13 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
-import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
-import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
+import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.ISelectablePoints;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -20,24 +18,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.material.FlowingFluid;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fluids.DispenseFluidContainer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -46,7 +37,7 @@ import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoints, ISelectableArea
+public class ItemUpgradeDrain extends ItemUpgradeBase implements ISelectablePoints, ISelectableArea
 {
     public ItemUpgradeDrain(Properties p_41383_) {
         super(new Properties());
@@ -261,9 +252,9 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                 buildValidBlockListArea(pedestal);
                 //System.out.println("ListBuilt: "+ getValidList(pedestal));
             }
-            else if(!pedestal.getRenderRange())
+            else if(!pedestal.getRenderRangeUpgrade())
             {
-                pedestal.setRenderRange(true);
+                pedestal.setRenderRangeUpgrade(true);
             }
         }
         else
@@ -286,9 +277,9 @@ public class ItemUpgradeDrain extends ItemUpgradeBase implements  ISelectablePoi
                         buildValidBlockList(pedestal);
                     }
                 }
-                else if(!pedestal.getRenderRange())
+                else if(!pedestal.getRenderRangeUpgrade())
                 {
-                    pedestal.setRenderRange(true);
+                    pedestal.setRenderRangeUpgrade(true);
                 }
             }
         }

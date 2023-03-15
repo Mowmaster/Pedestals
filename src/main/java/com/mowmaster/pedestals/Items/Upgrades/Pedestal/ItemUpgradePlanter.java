@@ -7,6 +7,8 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
+import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.ISelectablePoints;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -189,9 +191,9 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
                 buildValidBlockListArea(pedestal);
                 //System.out.println("ListBuilt: "+ getValidList(pedestal));
             }
-            else if(!pedestal.getRenderRange())
+            else if(!pedestal.getRenderRangeUpgrade())
             {
-                pedestal.setRenderRange(true);
+                pedestal.setRenderRangeUpgrade(true);
             }
         }
         else
@@ -214,9 +216,9 @@ public class ItemUpgradePlanter extends ItemUpgradeBase implements ISelectablePo
                         buildValidBlockList(pedestal);
                     }
                 }
-                else if(!pedestal.getRenderRange())
+                else if(!pedestal.getRenderRangeUpgrade())
                 {
-                    pedestal.setRenderRange(true);
+                    pedestal.setRenderRangeUpgrade(true);
                 }
             }
         }

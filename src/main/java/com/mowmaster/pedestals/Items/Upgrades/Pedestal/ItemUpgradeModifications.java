@@ -1,55 +1,24 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
-import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
-import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibMultiContainer;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.Filters.BaseFilter;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ISelectableArea;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ISelectablePoints;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
-import com.mowmaster.pedestals.Recipes.BottlerRecipe;
+import com.mowmaster.pedestals.Items.ISelectablePoints;
 import com.mowmaster.pedestals.Recipes.UpgradeModificationGlobalRecipe;
-import com.mowmaster.pedestals.Recipes.UpgradeModificationRecipe;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
-import java.lang.ref.WeakReference;
 import java.util.*;
-import java.util.stream.IntStream;
-
-import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelectablePoints
 {
@@ -127,9 +96,9 @@ public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelect
             {
                 buildValidBlockList(pedestal);
             }
-            else if(!pedestal.getRenderRange())
+            else if(!pedestal.getRenderRangeUpgrade())
             {
-                pedestal.setRenderRange(true);
+                pedestal.setRenderRangeUpgrade(true);
             }
         }
     }

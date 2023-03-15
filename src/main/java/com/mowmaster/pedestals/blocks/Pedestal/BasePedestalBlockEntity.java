@@ -78,12 +78,17 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     private final List<BlockPos> storedLocations = new ArrayList<BlockPos>();
     private int storedValueForUpgrades = 0;
     private boolean showRenderRange = false;
+    private boolean showRenderRangeUpgrade = false;
     public BlockPos getPos() { return this.worldPosition; }
     private BasePedestalBlockEntity getPedestal() { return this; }
     private int maxRate = Integer.MAX_VALUE;
 
     public boolean getRenderRange(){return this.showRenderRange;}
     public void setRenderRange(boolean setRender){ this.showRenderRange = setRender; update();}
+
+    public boolean getRenderRangeUpgrade(){return this.showRenderRangeUpgrade;}
+    public void setRenderRangeUpgrade(boolean setRenderUpgrade){ this.showRenderRangeUpgrade = setRenderUpgrade; update();}
+
 
     public BasePedestalBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
         super(DeferredBlockEntityTypes.PEDESTAL.get(), p_155229_, p_155230_);
@@ -3525,6 +3530,13 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         this.storedPotionEffectDuration = p_155245_.getInt("storedEffectDuration");
         this.showRenderRange = p_155245_.getBoolean("showRenderRange");
 
+        //new value added in 0.2.30
+        if(p_155245_.contains("showRenderRangeUpgrade"))
+        {
+            this.showRenderRangeUpgrade = p_155245_.getBoolean("showRenderRangeUpgrade");
+        }
+        else this.showRenderRangeUpgrade = false;
+
         int[] storedIX = p_155245_.getIntArray("intArrayXPos");
         int[] storedIY = p_155245_.getIntArray("intArrayYPos");
         int[] storedIZ = p_155245_.getIntArray("intArrayZPos");
@@ -3567,6 +3579,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         if(storedPotionEffect!=null)storedPotionEffect.save(p_58888_);
         p_58888_.putInt("storedEffectDuration",storedPotionEffectDuration);
         p_58888_.putBoolean("showRenderRange",showRenderRange);
+        p_58888_.putBoolean("showRenderRangeUpgrade",showRenderRangeUpgrade);
 
         List<Integer> storedX = new ArrayList<Integer>();
         List<Integer> storedY = new ArrayList<Integer>();
@@ -3599,9 +3612,22 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return DustMagic.setDustMagicInTag(p_58888_,this.storedDust);
     }
 
+
+    //This is needed so that the render boxes show up when the player is just out of normal render range of the pedestal
     @Override
     public AABB getRenderBoundingBox() {
-        AABB aabb = new AABB(getPos().getX() - getLinkingRange(), getPos().getY() - getLinkingRange(), getPos().getZ() - getLinkingRange(),getPos().getX() + getLinkingRange(), getPos().getY() + getLinkingRange(), getPos().getZ() + getLinkingRange());
+        int range = getLinkingRange();
+        if(hasCoin())
+        {
+            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
+            {
+                int upgradeRange = upgrade.getUpgradeWorkRange(getCoinOnPedestal());
+                if(upgradeRange>range)range = upgradeRange;
+            }
+        }
+
+
+        AABB aabb = new AABB(getPos().getX() - range, getPos().getY() - range, getPos().getZ() - range,getPos().getX() + range, getPos().getY() + range, getPos().getZ() + range);
         return aabb;
     }
 

@@ -7,6 +7,7 @@ import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
+import com.mowmaster.pedestals.Items.ISelectableArea;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -26,8 +27,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
-
-import net.minecraft.world.item.Item.Properties;
 
 public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes, ISelectableArea
 {
@@ -93,9 +92,9 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
             }
             else
             {
-                if(!pedestal.getRenderRange())
+                if(!pedestal.getRenderRangeUpgrade())
                 {
-                    pedestal.setRenderRange(true);
+                    pedestal.setRenderRangeUpgrade(true);
                 }
             }
         }

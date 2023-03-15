@@ -7,14 +7,14 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
+import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.ISelectablePoints;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
-import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
-import static net.minecraft.world.level.block.Block.pushEntitiesUp;
 
 
 import net.minecraft.ChatFormatting;
@@ -28,7 +28,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -641,11 +640,18 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return new AABB(BlockPos.ZERO);
     }
 
-    //ToDo: Add to mowlib and remove from here
 
+
+    public int getUpgradeWorkRange(ItemStack coinUpgrade)
+    {
+        return PedestalConfig.COMMON.upgrades_baseSelectionRange.get() + getRangeIncrease(coinUpgrade);
+    }
+
+    //ToDo: Add to mowlib and remove from here
     public boolean isSelectionInRange(BasePedestalBlockEntity pedestalCurrent, BlockPos currentSelectedPoint)
     {
-        int range = PedestalConfig.COMMON.upgrades_baseSelectionRange.get() + getRangeIncrease(pedestalCurrent.getCoinOnPedestal());
+
+        int range = PedestalConfig.COMMON.upgrades_baseSelectionRange.get() + getUpgradeWorkRange(pedestalCurrent.getCoinOnPedestal());
         int x = currentSelectedPoint.getX();
         int y = currentSelectedPoint.getY();
         int z = currentSelectedPoint.getZ();
