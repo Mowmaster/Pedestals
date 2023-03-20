@@ -9,6 +9,7 @@ import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -124,12 +125,84 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_string_last_clicked_direction");
     }
 
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal)
+    {
+        List<String> messages = new ArrayList<>();
+        if(getWorkCardType()<0)return messages;
+
+        if(needsWorkCard() && !pedestal.hasWorkCard())
+        {
+            messages.add(ChatFormatting.WHITE + "Needs");
+            messages.add(ChatFormatting.WHITE + "----------------");
+            if(getWorkCardType() == 0)
+            {
+                messages.add(ChatFormatting.RED + "Work Area");
+                messages.add(ChatFormatting.WHITE + "OR");
+                messages.add(ChatFormatting.RED + "Work Locations");
+            }
+            if(getWorkCardType() == 1)
+            {
+                messages.add(ChatFormatting.RED + "Work Area");
+            }
+            if(getWorkCardType() == 2)
+            {
+                messages.add(ChatFormatting.RED + "Work Locations");
+            }
+        }
+        else if(pedestal.hasWorkCard())
+        {
+            if(pedestal.getWorkCardInPedestal().getItem() instanceof WorkCardBase workCardBase)
+            {
+                Boolean inSelectedInRange = workCardBase.selectedAreaWithinRange(pedestal);
+                if((getWorkCardType() == 1 && pedestal.getWorkCardInPedestal().getItem().equals(DeferredRegisterItems.WORKCARD_LOCATIONS.get())
+                        || (getWorkCardType() == 2 && pedestal.getWorkCardInPedestal().getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))))
+                {
+                    messages.add(ChatFormatting.RED + "Incorrect Card");
+                    messages.add(ChatFormatting.WHITE + "Needs:");
+                    messages.add(ChatFormatting.WHITE + "----------------");
+                    if(getWorkCardType() == 1)
+                    {
+                        messages.add(ChatFormatting.BLUE + "Work Area");
+                    }
+                    if(getWorkCardType() == 2)
+                    {
+                        messages.add(ChatFormatting.BLUE + "Work Locations");
+                    }
+                }
+                else if(!inSelectedInRange && pedestal.getWorkCardInPedestal().getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
+                {
+                    messages.add(ChatFormatting.RED + "Work Selection");
+                    messages.add(ChatFormatting.RED + "Is Invalid");
+                }
+            }
+        }
+
+        return messages;
+    }
+
     /*
      *
      * Methods Runs By Pedestal
      * END
      *
      */
+
+
+    public boolean needsWorkCard()
+    {
+        return false;
+    }
+
+    public int getWorkCardType()
+    {
+        //-1 = null
+        //0 = Either
+        //1 = Area
+        //2 = Locations
+        return -1;
+    }
+
+
 
     public int getUpgradeExperienceTransferRate(ItemStack upgradeStack)
     {

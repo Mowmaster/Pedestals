@@ -25,7 +25,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class ItemUpgradeMilker extends ItemUpgradeBase implements ISelectableArea
+public class ItemUpgradeMilker extends ItemUpgradeBase
 {
     public ItemUpgradeMilker(Properties p_41383_) {
         super(new Properties());
@@ -50,6 +50,12 @@ public class ItemUpgradeMilker extends ItemUpgradeBase implements ISelectableAre
     public boolean canModifyArea(ItemStack upgradeItemStack) {
         return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
     }
+
+    @Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 1; }
 
     //Requires energy
     @Override

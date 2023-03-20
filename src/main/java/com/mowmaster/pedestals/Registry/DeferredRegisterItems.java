@@ -10,6 +10,7 @@ import com.mowmaster.pedestals.Items.Misc.TagGetterItem;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBlockBreaker;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -43,6 +44,12 @@ public class DeferredRegisterItems
 
     public static final RegistryObject<Item> TOOL_MANIFEST = ITEMS.register("tool_manifesttool",
             () -> new PedestalManifestTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+
+
+    public static final RegistryObject<Item> WORKCARD_AREA = ITEMS.register("workcard_area",
+            () -> new WorkCardBase(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> WORKCARD_LOCATIONS = ITEMS.register("workcard_locations",
+            () -> new WorkCardBase(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> FILTER_BASE = ITEMS.register("filter_base",
             () -> new FilterBaseItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));

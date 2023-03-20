@@ -4,6 +4,7 @@ import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -17,7 +18,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableArea
+public class ItemUpgradeBreeder extends ItemUpgradeBase
 {
     public ItemUpgradeBreeder(Properties p_41383_) {
         super(new Properties());
@@ -37,6 +38,12 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableAr
     public boolean canModifyArea(ItemStack upgradeItemStack) {
         return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
     }
+
+    @Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 1; }
 
     //Requires energy
     @Override
@@ -68,20 +75,25 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableAr
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
+        if(pedestal.hasWorkCard())
         {
-            boolean canRun = true;
-            //boolean damage = false;
-
-            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-                if(getPlayer != null && getPlayer.get() != null)
+                if(workCardBase.hasTwoPointsSelected(card))
                 {
-                    AABB getArea = getAABBonUpgrade(coin);
-                    List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                    ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
-                    tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
+                    boolean canRun = true;
+                    //boolean damage = false;
+
+                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
+                    {
+                        WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+                        if(getPlayer != null && getPlayer.get() != null)
+                        {
+                            AABB getArea = workCardBase.getAABBonUpgrade(card);
+                            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
+                            ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
+                            tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
 
             /*if(PedestalConfig.COMMON.breeder_DamageTools.get())
             {
@@ -108,26 +120,28 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase implements ISelectableAr
                 }
             }*/
 
-                    if(canRun)
-                    {
-                        for (LivingEntity getEntity : entities)
-                        {
-                            if(getEntity == null)continue;
-
-                            BlockPos getEntityPos = getEntity.getOnPos();
-                            if(getEntity instanceof Animal animal)
+                            if(canRun)
                             {
-                                if(animal.isFood(toolStack))
+                                for (LivingEntity getEntity : entities)
                                 {
-                                    if(animal.getAge() == 0 && animal.canFallInLove())
+                                    if(getEntity == null)continue;
+
+                                    BlockPos getEntityPos = getEntity.getOnPos();
+                                    if(getEntity instanceof Animal animal)
                                     {
-                                        InteractionResult result = animal.mobInteract((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND);
-                                        //System.out.println(result.toString());
-                                        if(result == InteractionResult.SUCCESS)
+                                        if(animal.isFood(toolStack))
                                         {
-                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
+                                            if(animal.getAge() == 0 && animal.canFallInLove())
                                             {
-                                                pedestal.removeItem(1,false);
+                                                InteractionResult result = animal.mobInteract((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND);
+                                                //System.out.println(result.toString());
+                                                if(result == InteractionResult.SUCCESS)
+                                                {
+                                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
+                                                    {
+                                                        pedestal.removeItem(1,false);
+                                                    }
+                                                }
                                             }
                                         }
                                     }

@@ -9,6 +9,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -37,7 +38,7 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableArea
+public class ItemUpgradeChopper extends ItemUpgradeBase
 {
     public ItemUpgradeChopper(Properties p_41383_) {
         super(new Properties());
@@ -57,6 +58,12 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
     public boolean canModifyArea(ItemStack upgradeItemStack) {
         return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
     }
+
+    @Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 1; }
 
     //Requires energy
 
@@ -106,45 +113,60 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        List<BlockPos> listed = readBlockPosListFromNBT(coin);
-        List<BlockPos> valid = new ArrayList<>();
-        for (BlockPos pos:listed) {
-            if(selectedPointWithinRange(pedestal, pos))
+        if(pedestal.hasWorkCard())
+        {
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                valid.add(pos);
+                List<BlockPos> listed = workCardBase.readBlockPosListFromNBT(card);
+                List<BlockPos> valid = new ArrayList<>();
+                for (BlockPos pos:listed) {
+                    if(workCardBase.selectedPointWithinRange(pedestal, pos))
+                    {
+                        valid.add(pos);
+                    }
+                }
+
+                saveBlockPosListCustomToNBT(coin,"_validlist",valid);
             }
         }
-
-        saveBlockPosListCustomToNBT(coin,"_validlist",valid);
     }
 
     private void buildValidBlockListArea(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         List<BlockPos> valid = new ArrayList<>();
-        AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
-
-        int maxX = (int)area.maxX;
-        int maxY = (int)area.maxY;
-        int maxZ = (int)area.maxZ;
-
-        int minX = (int)area.minX;
-        int minY = (int)area.minY;
-        int minZ = (int)area.minZ;
-
-        BlockPos pedestalPos = pedestal.getPos();
-        for(int i=maxX;i>=minX;i--)
+        if(pedestal.hasWorkCard())
         {
-            for(int j=maxZ;j>=minZ;j--)
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                BlockPos newPoint = new BlockPos(i,pedestalPos.getY(),j);
-                //System.out.println("points: "+ newPoint);
-                if(selectedPointWithinRange(pedestal, newPoint))
+                AABB area = new AABB(workCardBase.readBlockPosFromNBT(card,1),workCardBase.readBlockPosFromNBT(card,2));
+
+                int maxX = (int)area.maxX;
+                int maxY = (int)area.maxY;
+                int maxZ = (int)area.maxZ;
+
+                int minX = (int)area.minX;
+                int minY = (int)area.minY;
+                int minZ = (int)area.minZ;
+
+                BlockPos pedestalPos = pedestal.getPos();
+                for(int i=maxX;i>=minX;i--)
                 {
-                    valid.add(newPoint);
+                    for(int j=maxZ;j>=minZ;j--)
+                    {
+                        BlockPos newPoint = new BlockPos(i,pedestalPos.getY(),j);
+                        //System.out.println("points: "+ newPoint);
+                        if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
+                        {
+                            valid.add(newPoint);
+                        }
+                    }
                 }
             }
         }
+
 
         //System.out.println("validList: "+ valid);
         saveBlockPosListCustomToNBT(coin,"_validlist",valid);
@@ -167,22 +189,25 @@ public class ItemUpgradeChopper extends ItemUpgradeBase implements ISelectableAr
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        boolean override = hasTwoPointsSelected(coin);
-        List<BlockPos> listed = getValidList(pedestal);
-
-        if(override)
+        if(pedestal.hasWorkCard())
         {
-            if(listed.size()>0)
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                chopperAction(level,pedestal);
-            }
-            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-            {
-                buildValidBlockListArea(pedestal);
-            }
-            else if(!pedestal.getRenderRangeUpgrade())
-            {
-                pedestal.setRenderRangeUpgrade(true);
+                boolean override = workCardBase.hasTwoPointsSelected(card);
+                List<BlockPos> listed = getValidList(pedestal);
+
+                if(override)
+                {
+                    if(listed.size()>0)
+                    {
+                        chopperAction(level,pedestal);
+                    }
+                    else if(workCardBase.selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+                    {
+                        buildValidBlockListArea(pedestal);
+                    }
+                }
             }
         }
     }

@@ -48,6 +48,12 @@ public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelect
         return false;
     }
 
+    /*@Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 2; }*/
+
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
         Level level = pedestal.getLevel();

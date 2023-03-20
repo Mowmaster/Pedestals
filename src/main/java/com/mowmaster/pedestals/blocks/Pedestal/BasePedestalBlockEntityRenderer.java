@@ -8,7 +8,10 @@ import com.mojang.math.Vector3f;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
@@ -26,6 +29,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +50,11 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             ItemStack stack = p_112307_.getItemInPedestalFirst();
             ItemStack toolStack = p_112307_.getToolStack();
             ItemStack coin = p_112307_.getCoinOnPedestal();
+            ItemStack workCard = p_112307_.getWorkCardInPedestal();
             List<BlockPos> linkedLocations = p_112307_.getLocationList();
             BlockPos pos = p_112307_.getPos();
             Level world = p_112307_.getLevel();
+            List<String> hudMessages = p_112307_.getHudLog();
             // 0 - No Particles
             // 1 - No Render Item
             // 2 - No Render Upgrade
@@ -124,17 +130,17 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     p_112309_.popPose();
 
 
-                    if(coin.getItem() instanceof ISelectableArea)
+                    if(workCard.getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
                     {
-                        if(coin.getItem() instanceof ItemUpgradeBase upgradeCoin)
+                        if(workCard.getItem() instanceof WorkCardBase cardBase)
                         {
-                            if(upgradeCoin.hasTwoPointsSelected(coin))
+                            if(cardBase.hasTwoPointsSelected(workCard))
                             {
                                 p_112309_.pushPose();
-                                AABB aabbCoin = upgradeCoin.getAABBonUpgrade(coin);
+                                AABB aabbCoin = cardBase.getAABBonUpgrade(workCard);
                                 if(aabbCoin != new AABB(BlockPos.ZERO))
                                 {
-                                    Boolean inSelectedInRange = upgradeCoin.selectedAreaWithinRange(p_112307_);
+                                    Boolean inSelectedInRange = cardBase.selectedAreaWithinRange(p_112307_);
                                     //You have to client register this too!!!
                                     @SuppressWarnings("deprecation")
                                     TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
@@ -147,21 +153,21 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                         }
                     }
 
-                    if(coin.getItem() instanceof ISelectablePoints)
+                    if(workCard.getItem().equals(DeferredRegisterItems.WORKCARD_LOCATIONS.get()))
                     {
-                        if(coin.getItem() instanceof ItemUpgradeBase upgradeCoin)
+                        if(workCard.getItem() instanceof WorkCardBase cardBase)
                         {
-                            if(!upgradeCoin.hasTwoPointsSelected(coin))
+                            if(!cardBase.hasTwoPointsSelected(workCard))
                             {
                                 p_112309_.pushPose();
-                                List<BlockPos> locations = upgradeCoin.readBlockPosListFromNBT(coin);
+                                List<BlockPos> locations = cardBase.readBlockPosListFromNBT(workCard);
                                 if(locations.size()>0)
                                 {
                                     for (BlockPos posPoints : locations) {
                                         AABB aabbCoin = new AABB(posPoints);
                                         if(aabbCoin != new AABB(BlockPos.ZERO))
                                         {
-                                            Boolean inSelectedInRange = upgradeCoin.selectedPointWithinRange(p_112307_,posPoints);
+                                            Boolean inSelectedInRange = cardBase.selectedPointWithinRange(p_112307_,posPoints);
                                             //You have to client register this too!!!
                                             @SuppressWarnings("deprecation")
                                             TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
@@ -185,14 +191,14 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 {
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType,hudMessages);
                 }
                 if(facing== Direction.DOWN) {
                     //p_112309_.rotate(new Quaternion(0, 0, 1,180));
                     p_112309_.mulPose(Vector3f.ZP.rotationDegrees(180));
                     p_112309_.translate(0, -1, 0);
                     p_112309_.translate(-1, 0, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType,hudMessages);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -200,7 +206,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //p_112309_.rotate(new Quaternion(1, 0, 0,270));
                     p_112309_.mulPose(Vector3f.XP.rotationDegrees(270));
                     p_112309_.translate(0, -1, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType,hudMessages);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -208,7 +214,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //p_112309_.mulPose(270, 0, 0, 1);
                     p_112309_.mulPose(Vector3f.ZP.rotationDegrees(270));
                     p_112309_.translate(-1, 0, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType,hudMessages);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -216,7 +222,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //p_112309_.mulPose(90, 1, 0, 0);
                     p_112309_.mulPose(Vector3f.XP.rotationDegrees(90));
                     p_112309_.translate(0, 0, -1);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType,hudMessages);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -224,7 +230,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //p_112309_.mulPose(90, 0, 0, 1);
                     p_112309_.mulPose(Vector3f.ZP.rotationDegrees(90));
                     p_112309_.translate(0, -1, 0);
-                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType);
+                    renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType,hudMessages);
                     //renderTile(world,p_112309_,p_112310_,stack,coin,p_112311_,p_112312_,renderAugmentType);
                     //renderTile(world,p_112309_,p_112310_,coin,stack,p_112311_,p_112312_,renderAugmentType);
                 }
@@ -301,7 +307,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         }
     }
 
-    public static void  renderTileItems(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, List<ItemStack> item, ItemStack coin,ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType)
+    public static void  renderTileItems(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, List<ItemStack> item, ItemStack coin,ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType, List<String> messages)
     {
         switch (renderAugmentType)
         {
@@ -312,6 +318,8 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
                 renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
                 break;
             case 1:
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.3125f,0,0,0,0,p_112311_,p_112312_);
@@ -319,9 +327,13 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
                 renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
                 break;
             case 2:
                 renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
                 break;
             case 3:
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.3125f,0,0,0,0,p_112311_,p_112312_);
@@ -329,9 +341,13 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
                 renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
                 break;
             case 4:
                 renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
                 break;
             case 5: break;
             case 6: break;
@@ -342,6 +358,8 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
                 renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
                 break;
             default:
                 renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
@@ -350,6 +368,8 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
                 renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
                 renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
+                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
                 break;
 
         }
@@ -596,6 +616,39 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         buffer.vertex(matrix4f, maxX, maxY - 0.01f, maxZ).color(red, green, blue, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(uvBrightness).normal(0, -1, 0).endVertex();
         buffer.vertex(matrix4f, minX, maxY - 0.01f, maxZ).color(red, green, blue, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(uvBrightness).normal(0, -1, 0).endVertex();
         buffer.vertex(matrix4f, minX, maxY - 0.01f, minZ).color(red, green, blue, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(uvBrightness).normal(0, -1, 0).endVertex();
+    }
+
+    private static void renderPedestalsHUD(PoseStack matrixStack, MultiBufferSource buffer, List<String> messages, float x, float y, float z, int angleX, int angleY) {
+
+
+        matrixStack.pushPose();
+        matrixStack.translate(x,y,z);
+        //float f3 = 0.0075F;
+        float f3 = 0.025F;
+        matrixStack.scale(f3 , f3 , f3);
+        matrixStack.mulPose(Vector3f.XP.rotationDegrees(angleX));
+        matrixStack.mulPose(Vector3f.YP.rotationDegrees(angleY));
+
+        Font fontrenderer = Minecraft.getInstance().font;
+        int lines = 11;
+        int currenty = 7;
+        int height = 10;
+        int logsize = messages.size();
+        int i = 0;
+        for (String s : messages) {
+            if (i >= logsize - lines) {
+                if (currenty + height <= 124) {
+                    String prefix = "";
+
+                    fontrenderer.drawInBatch(fontrenderer.plainSubstrByWidth(prefix + s, 115), 7, currenty, 0xffffff, false, matrixStack.last().pose(), buffer, false, 0, 0xf000f0);
+                    currenty += height;
+                }
+            }
+            i++;
+        }
+
+
+        matrixStack.popPose();
     }
 
 

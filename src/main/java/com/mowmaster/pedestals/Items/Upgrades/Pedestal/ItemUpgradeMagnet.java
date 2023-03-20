@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes, ISelectableArea
+public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
 {
     public ItemUpgradeMagnet(Properties p_41383_) {
         super(new Properties());
@@ -58,6 +58,12 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes,
     public boolean canModifyArea(ItemStack upgradeItemStack) {
         return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
     }
+
+    @Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 1; }
 
     //Requires energy
 

@@ -21,7 +21,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class ItemUpgradeSheerer extends ItemUpgradeBase implements ISelectableArea
+public class ItemUpgradeSheerer extends ItemUpgradeBase
 {
     public ItemUpgradeSheerer(Properties p_41383_) {
         super(new Properties());
@@ -46,6 +46,12 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase implements ISelectableAr
     public boolean canModifyArea(ItemStack upgradeItemStack) {
         return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
     }
+
+    @Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 1; }
 
     //Requires energy
     @Override

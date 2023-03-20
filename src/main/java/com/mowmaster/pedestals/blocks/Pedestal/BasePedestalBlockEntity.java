@@ -18,12 +18,14 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageI
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.*;
 
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -210,17 +212,17 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     private IItemHandler createHandlerPedestalPrivate() {
-        //going from 5 to 11 slots to future proof things
-        return new ItemStackHandler(12) {
+        //going from 11 to 20 slots to future proof things
+        return new ItemStackHandler(20) {
 
             @Override
             protected void onLoad() {
-                if(getSlots()<12)
+                if(getSlots()<20)
                 {
                     for(int i = 0; i < getSlots(); ++i) {
                         stacksList.add(i,getStackInSlot(i));
                     }
-                    setSize(12);
+                    setSize(20);
                     for(int j = 0;j<stacksList.size();j++) {
                         setStackInSlot(j, stacksList.get(j));
                     }
@@ -252,6 +254,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 if (slot == 9 && stack.getItem() instanceof AugmentTieredStorage && canInsertAugmentStorage(stack)) return true;
                 if (slot == 10 && stack.getItem() instanceof AugmentTieredRange && canInsertAugmentRange(stack)) return true;
                 if (slot == 11 && canInsertTool(stack)) return true;
+                if (slot == 12 && stack.getItem() instanceof IPedestalWorkCard && !hasWorkCard()) return true;
                 return false;
             }
         };
@@ -1736,6 +1739,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     public boolean hasCoin()
     {
         IItemHandler ph = privateHandler.orElse(null);
+        if(ph == null)return false;
         if(ph.getStackInSlot(0).isEmpty())
         {
             return false;
@@ -1746,6 +1750,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     public ItemStack getCoinOnPedestal()
     {
         IItemHandler ph = privateHandler.orElse(null);
+        if(ph == null)return ItemStack.EMPTY;
         if(hasCoin())
         {
             return ph.getStackInSlot(0);
@@ -1755,6 +1760,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public ItemStack removeCoin() {
         IItemHandler ph = privateHandler.orElse(null);
+        if(ph == null)return ItemStack.EMPTY;
         ItemStack stack = ph.getStackInSlot(0);
         ph.extractItem(0,stack.getCount(),false);
         //update();
@@ -1798,9 +1804,13 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         // 0 = Dropped
         // 1 = Removed
 
-        if(getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
+        //this way other things can trigger this, like the work cards...
+        if(hasCoin())
         {
-            upgrade.actionOnRemovedFromPedestal(getPedestal(), getCoinOnPedestal());
+            if(getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
+            {
+                upgrade.actionOnRemovedFromPedestal(getPedestal(), getCoinOnPedestal());
+            }
         }
     }
 
@@ -2740,6 +2750,81 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ==============================================================================
     ============================================================================*/
 
+
+
+    /*============================================================================
+    ==============================================================================
+    ===========================    WORKCARD START    =============================
+    ==============================================================================
+    ============================================================================*/
+
+    private int slotWorkCard = 12;
+    public boolean hasWorkCard()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        if(ph.getStackInSlot(slotWorkCard).isEmpty())
+        {
+            return false;
+        }
+        else  return true;
+    }
+
+    public ItemStack getWorkCardInPedestal()
+    {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.getStackInSlot(slotWorkCard);
+    }
+
+    public IPedestalWorkCard getIPedestalWorkCard()
+    {
+        if(hasWorkCard())
+        {
+            if(getWorkCardInPedestal().getItem() instanceof IPedestalWorkCard)
+            {
+                return ((IPedestalWorkCard)getWorkCardInPedestal().getItem());
+            }
+        }
+
+        return null;
+    }
+
+    public ItemStack removeWorkCard() {
+        IItemHandler ph = privateHandler.orElse(null);
+        return ph.extractItem(slotWorkCard,ph.getStackInSlot(slotWorkCard).getCount(),false);
+    }
+
+    public boolean addWorkCard(ItemStack filter, boolean simulate)
+    {
+        if(hasWorkCard())
+        {
+            return false;
+        }
+        else
+        {
+            IItemHandler ph = privateHandler.orElse(null);
+            ItemStack itemFromBlock = filter.copy();
+            itemFromBlock.setCount(1);
+            if(!hasWorkCard() && ph.isItemValid(slotWorkCard,itemFromBlock))
+            {
+                if(!simulate)
+                {
+                    ph.insertItem(slotWorkCard,itemFromBlock,false);
+                    update();
+                }
+                return true;
+            }
+            else return false;
+        }
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================    WORKCARD  END     =============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
     /*============================================================================
     ==============================================================================
     ===========================    REDSTONE START    =============================
@@ -3017,6 +3102,38 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ===========================    NO COLLIDE END   ==============================
     ==============================================================================
     ============================================================================*/
+
+
+
+    /*============================================================================
+    ==============================================================================
+    =========================== PEDESTALS HUD START ==============================
+    ==============================================================================
+    ============================================================================*/
+
+    public List<String> getHudLog()
+    {
+        List<String> messages = new ArrayList<>();
+
+        if(hasCoin())
+        {
+            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
+            {
+                return upgrade.getUpgradeHUD(this);
+            }
+        }
+
+        return messages;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    ===========================  PEDESTALS HUD END  ==============================
+    ==============================================================================
+    ============================================================================*/
+
+
+
 
 
 

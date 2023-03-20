@@ -16,6 +16,8 @@ import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeModifications;
+import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -452,6 +454,11 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                     if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRange());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRange(1));
                 }
+                else if(pedestal.hasWorkCard() && itemInOffHand.getItem() instanceof WorkCardBase)
+                {
+                    pedestal.actionOnRemovedFromPedestal(1);
+                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeWorkCard());
+                }
                 else if(pedestal.hasItemFirst())
                 {
                     if(p_60502_.isShiftKeyDown())
@@ -564,6 +571,15 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                     if(!pedestal.hasFilter() && pedestal.addFilter(itemInOffHand,true))
                     {
                         pedestal.addFilter(itemInOffHand,false);
+                        p_60506_.getOffhandItem().shrink(1);
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof IPedestalWorkCard)
+                {
+                    if(!pedestal.hasWorkCard() && pedestal.addWorkCard(itemInOffHand,true))
+                    {
+                        pedestal.addWorkCard(itemInOffHand,false);
                         p_60506_.getOffhandItem().shrink(1);
                         return InteractionResult.SUCCESS;
                     }

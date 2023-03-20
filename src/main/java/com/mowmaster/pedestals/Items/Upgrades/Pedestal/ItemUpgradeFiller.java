@@ -35,7 +35,7 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableArea
+public class ItemUpgradeFiller extends ItemUpgradeBase
 {
     public ItemUpgradeFiller(Properties p_41383_) {
         super(new Properties());
@@ -60,6 +60,12 @@ public class ItemUpgradeFiller extends ItemUpgradeBase implements ISelectableAre
     public boolean canModifyArea(ItemStack upgradeItemStack) {
         return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
     }
+
+    @Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 1; }
 
     //Requires energy
 

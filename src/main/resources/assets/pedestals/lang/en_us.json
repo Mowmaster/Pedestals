@@ -334,7 +334,10 @@
   "jei.pedestals.filter_blocksonclickfuzzy.description": "§5 This Filter Filters Similar to an Item Filter",
   "jei.pedestals.filter_blocksonclickfuzzy.interaction": "§3 Offhand Filter and Right Click in Air to switch TYPES, Crouch Right Click in Air to switch MODES, Crouch Right Clicking a block when in the offhand adds/removes it from the filter.",
 
-
+  "item.pedestals.workcard_area": "Work Area (Card)",
+  "jei.pedestals.workcard_area.description": "§5 Crouch Right Click on Two points to Select a 'Work Area' Crouch Right Click in the AIR to clear selection.",
+  "item.pedestals.workcard_locations": "Work Locations (Card)",
+  "jei.pedestals.workcard_locations.description": "§5 Click points to setup card, click in the air to clear all selections",
 
   "item.pedestals.augment_pedestal_nocollide": "Collision Effect Augment",
   "jei.pedestals.augment_pedestal_nocollide.description": "§5 Adds onCollision Pedestal Effects.",
@@ -486,7 +489,7 @@
   "item.pedestals.upgrade_pedestal_hiveharvester": "Hive Harvester Upgrade",
   "jei.pedestals.upgrade_pedestal_hiveharvester.description": "§5Harvests selected beehive blocks. Uses Sheers by default. Placing items in the pedestal will allow the upgrade to attempt to harvest the hive with those items instead.(Like Glass Bottles)",
   "jei.pedestals.upgrade_pedestal_hiveharvester.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points. ALSO Regular Right Click blocks to select single block targets, right click in air to clear the list.",
-  "item.pedestals.upgrade_pedestal_sheerer": "Sheerer Upgrade",
+  "item.pedestals.upgrade_pedestal_sheerer": "Shearing Upgrade",
   "jei.pedestals.upgrade_pedestal_sheerer.description": "§5Shears Animals in the selected area. Uses Shears by default. Placing items in the pedestal will allow the upgrade to attempt to shear with those items instead.",
   "jei.pedestals.upgrade_pedestal_sheerer.interaction": "§3(In the Main Hand)Crouch Right Click 2 blocks to setup the 'Work Area', Doing this in the air will Clear the Selected Points.",
   "item.pedestals.upgrade_pedestal_milker": "Milker Upgrade",

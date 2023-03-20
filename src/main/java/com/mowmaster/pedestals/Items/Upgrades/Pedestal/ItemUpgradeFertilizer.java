@@ -38,7 +38,7 @@ import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectablePoints, ISelectableArea
+public class ItemUpgradeFertilizer extends ItemUpgradeBase
 {
     public ItemUpgradeFertilizer(Properties p_41383_) {
         super(new Properties());
@@ -58,6 +58,12 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase implements ISelectabl
     public boolean canModifyArea(ItemStack upgradeItemStack) {
         return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
     }
+
+    @Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 0; }
 
     //Requires energy
 

@@ -9,6 +9,7 @@ import com.mowmaster.mowlib.Recipes.BaseBlockEntityFilter;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +43,7 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableArea
+public class ItemUpgradeAttacker extends ItemUpgradeBase
 {
     public ItemUpgradeAttacker(Properties p_41383_) {
         super(new Properties());
@@ -67,6 +68,12 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
     public boolean canModifyArea(ItemStack upgradeItemStack) {
         return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
     }
+
+    @Override
+    public boolean needsWorkCard() { return true; }
+
+    @Override
+    public int getWorkCardType() { return 1; }
 
     //Requires energy
     @Override
@@ -373,71 +380,80 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase implements ISelectableA
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-
-        if(hasTwoPointsSelected(coin))
+        if(pedestal.hasWorkCard())
         {
-            attackerAction(level, pedestal, pedestalPos, coin);
-        }
-        else if(!pedestal.getRenderRangeUpgrade())
-        {
-            pedestal.setRenderRangeUpgrade(true);
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
+            {
+                if(workCardBase.hasTwoPointsSelected(card))
+                {
+                    attackerAction(level, pedestal, pedestalPos, coin);
+                }
+            }
         }
     }
 
     public void attackerAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
+        if(pedestal.hasWorkCard())
         {
-            boolean canRun = true;
-            boolean damage = false;
-
-            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-                if(getPlayer != null && getPlayer.get() != null)
+                if(workCardBase.hasTwoPointsSelected(card))
                 {
-                    AABB getArea = getAABBonUpgrade(coin);
-                    List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                    ItemStack toolStack = pedestal.getToolStack();
-                    tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
+                    boolean canRun = true;
+                    boolean damage = false;
 
-                    if(PedestalConfig.COMMON.attacker_DamageTools.get())
+                    if(removeFuelForAction(pedestal, workCardBase.getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
                     {
-                        if(pedestal.hasTool())
+                        WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+                        if(getPlayer != null && getPlayer.get() != null)
                         {
-                            if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                            AABB getArea = workCardBase.getAABBonUpgrade(card);
+                            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
+                            ItemStack toolStack = pedestal.getToolStack();
+                            tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
+
+                            if(PedestalConfig.COMMON.attacker_DamageTools.get())
                             {
-                                if(pedestal.damageInsertedTool(1,true))
+                                if(pedestal.hasTool())
                                 {
-                                    damage = true;
-                                }
-                                else
-                                {
-                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                    canRun = false;
+                                    if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                                    {
+                                        if(pedestal.damageInsertedTool(1,true))
+                                        {
+                                            damage = true;
+                                        }
+                                        else
+                                        {
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                            canRun = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                        canRun = false;
+                                    }
                                 }
                             }
-                            else
-                            {
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                canRun = false;
-                            }
-                        }
-                    }
 
-                    if(canRun)
-                    {
-                        for (LivingEntity getEntity : entities)
-                        {
-                            if(getEntity == null)continue;
-                            //BlockPos getEntityPos = getEntity.getOnPos();
-
-                            if(allowEntity(coin,getEntity))
+                            if(canRun)
                             {
-                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), false))
+                                for (LivingEntity getEntity : entities)
                                 {
-                                    doAttack(pedestal, getPlayer.get(),getEntity);
-                                    if(damage)pedestal.damageInsertedTool(1,false);
+                                    if(getEntity == null)continue;
+                                    //BlockPos getEntityPos = getEntity.getOnPos();
+
+                                    if(allowEntity(coin,getEntity))
+                                    {
+                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), false))
+                                        {
+                                            doAttack(pedestal, getPlayer.get(),getEntity);
+                                            if(damage)pedestal.damageInsertedTool(1,false);
+                                        }
+                                    }
                                 }
                             }
                         }

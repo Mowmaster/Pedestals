@@ -10,6 +10,7 @@ import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IHasModeTypes;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -256,7 +257,7 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
 
     public AABB getAABBonUpgrade(ItemStack stack)
     {
-        if(stack.getItem() instanceof ISelectableArea && hasTwoPointsSelected(stack))
+        if(stack.getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()) && hasTwoPointsSelected(stack))
         {
             BlockPos posOne = readBlockPosFromNBT(stack,1);
             BlockPos posTwo = readBlockPosFromNBT(stack,2);
@@ -295,7 +296,7 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
 
     public boolean selectedAreaWithinRange(BasePedestalBlockEntity pedestal)
     {
-        if(isSelectionInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1)) && isSelectionInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2)))
+        if(isSelectionInRange(pedestal, readBlockPosFromNBT(pedestal.getWorkCardInPedestal(),1)) && isSelectionInRange(pedestal, readBlockPosFromNBT(pedestal.getWorkCardInPedestal(),2)))
         {
             return true;
         }
@@ -449,7 +450,7 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
 
         if(itemInHand.getItem() instanceof WorkCardBase)
         {
-            if(hand.equals(InteractionHand.MAIN_HAND) && !player.isShiftKeyDown() && itemInHand.getItem() instanceof ISelectablePoints)
+            if(hand.equals(InteractionHand.MAIN_HAND) && !player.isShiftKeyDown() && itemInHand.getItem().equals(DeferredRegisterItems.WORKCARD_LOCATIONS.get()))
             {
                 if(result.getType().equals(HitResult.Type.BLOCK))
                 {
@@ -466,7 +467,7 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
                 }
             }
 
-            if(hand.equals(InteractionHand.MAIN_HAND) && player.isShiftKeyDown() && itemInHand.getItem() instanceof ISelectableArea)
+            if(hand.equals(InteractionHand.MAIN_HAND) && player.isShiftKeyDown() && itemInHand.getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
             {
                 if(result.getType().equals(HitResult.Type.BLOCK))
                 {
@@ -534,12 +535,12 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
             p_41423_.add(Component.literal(""));
         }
 
-        if(p_41421_.getItem() instanceof ISelectableArea)
+        if(p_41421_.getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
         {
             if(hasOneBlockPos(p_41421_))
             {
-                if (!Screen.hasAltDown()) {
-                    MutableComponent base = Component.translatable(MODID + ".upgrade_description_alt");
+                if (!Screen.hasShiftDown()) {
+                    MutableComponent base = Component.translatable(MODID + ".upgrade_description_shift");
                     base.withStyle(ChatFormatting.WHITE);
                     p_41423_.add(base);
                 } else {
@@ -571,13 +572,13 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
             }
         }
 
-        if(p_41421_.getItem() instanceof ISelectablePoints && !hasTwoPointsSelected(p_41421_))
+        if(p_41421_.getItem().equals(DeferredRegisterItems.WORKCARD_LOCATIONS.get()) && !hasTwoPointsSelected(p_41421_))
         {
             List<BlockPos> getList = readBlockPosListFromNBT(p_41421_);
             if(getList.size()>0)
             {
-                if (!Screen.hasAltDown()) {
-                    MutableComponent base = Component.translatable(MODID + ".upgrade_description_alt");
+                if (!Screen.hasShiftDown()) {
+                    MutableComponent base = Component.translatable(MODID + ".upgrade_description_shift");
                     base.withStyle(ChatFormatting.WHITE);
                     p_41423_.add(base);
                 } else {
