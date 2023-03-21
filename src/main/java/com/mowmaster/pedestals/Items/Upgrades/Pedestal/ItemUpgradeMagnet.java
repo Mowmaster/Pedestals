@@ -8,6 +8,7 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -90,17 +91,17 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
+        if(pedestal.hasWorkCard())
         {
-            if(selectedAreaWithinRange(pedestal))
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                magnetAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
-            }
-            else
-            {
-                if(!pedestal.getRenderRangeUpgrade())
+                if(workCardBase.hasTwoPointsSelected(card))
                 {
-                    pedestal.setRenderRangeUpgrade(true);
+                    if(workCardBase.selectedAreaWithinRange(pedestal))
+                    {
+                        magnetAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
+                    }
                 }
             }
         }
@@ -108,143 +109,150 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
 
     public void magnetAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        boolean needsEnergy = requiresFuelForUpgradeAction();
-        boolean actionDone = false;
-        AABB aabb = getAABBonUpgrade(coinInPedestal);
-
-        List<ItemEntity> list = world.getEntitiesOfClass(ItemEntity.class, aabb);
-        for (ItemEntity item : list)
+        if(pedestal.hasWorkCard())
         {
-            if(needsEnergy) { if(!removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,item.getOnPos()),true))break; }
-
-            ItemStack itemStack = item.getItem();
-            //Fluid
-            if(canTransferFluids(coinInPedestal))
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket)
-                {
-                    Fluid bucketFluid = bucket.getFluid();
-                    FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
-                    if(passesFluidFilter(pedestal,fluidInTank))
-                    {
-                        int fluidSpaceInPedestal = pedestal.spaceForFluid();
+                boolean needsEnergy = requiresFuelForUpgradeAction();
+                boolean actionDone = false;
+                AABB aabb = workCardBase.getAABBonUpgrade(card);
 
-                        FluidStack fluidInPedestal = pedestal.getStoredFluid();
-                        if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
+                List<ItemEntity> list = world.getEntitiesOfClass(ItemEntity.class, aabb);
+                for (ItemEntity item : list)
+                {
+                    if(needsEnergy) { if(!removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,item.getOnPos()),true))break; }
+
+                    ItemStack itemStack = item.getItem();
+                    //Fluid
+                    if(canTransferFluids(coinInPedestal))
+                    {
+                        if(!itemStack.getItem().equals(Items.BUCKET) && itemStack.getItem() instanceof BucketItem bucket)
                         {
-                            int transferRate = 1000;
-                            if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
+                            Fluid bucketFluid = bucket.getFluid();
+                            FluidStack fluidInTank = new FluidStack(bucketFluid,1000);
+                            if(passesFluidFilter(pedestal,fluidInTank))
                             {
-                                FluidStack fluidDrained = fluidInTank.copy();
-                                if(!fluidInTank.isEmpty())
+                                int fluidSpaceInPedestal = pedestal.spaceForFluid();
+
+                                FluidStack fluidInPedestal = pedestal.getStoredFluid();
+                                if(fluidInPedestal.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
                                 {
-                                    pedestal.addFluid(fluidDrained, IFluidHandler.FluidAction.EXECUTE);
-                                    //Turn bucket back into an empty one
-                                    itemStack = new ItemStack(Items.BUCKET,1);
-                                    item.setItem(itemStack);
-                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),0,0,180));                                    actionDone = true;
+                                    int transferRate = 1000;
+                                    if(fluidSpaceInPedestal >= transferRate || pedestal.getStoredFluid().isEmpty())
+                                    {
+                                        FluidStack fluidDrained = fluidInTank.copy();
+                                        if(!fluidInTank.isEmpty())
+                                        {
+                                            pedestal.addFluid(fluidDrained, IFluidHandler.FluidAction.EXECUTE);
+                                            //Turn bucket back into an empty one
+                                            itemStack = new ItemStack(Items.BUCKET,1);
+                                            item.setItem(itemStack);
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),0,0,180));                                    actionDone = true;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            }
-            //Energy
-            if(canTransferEnergy(coinInPedestal))
-            {
-                //get only energy containers and maybe custom fluid items
-            }
-            //XP
-            if(canTransferXP(coinInPedestal))
-            {
-                //maybe also get xp custom items???
-                if(itemStack.getItem().equals(Items.EXPERIENCE_BOTTLE))
-                {
-                    int currentlyStoredExp = pedestal.getStoredExperience();
-                    if(currentlyStoredExp < pedestal.getExperienceCapacity())
+                    //Energy
+                    if(canTransferEnergy(coinInPedestal))
                     {
-                        //set value per bottle from 3 to 11?
-                        Random r = new Random();
-                        int low = 3;
-                        int high = 11;
-                        int result = r.nextInt(high-low) + low;
-                        int value = result * itemStack.getCount();
-                        if(value > 0 && pedestal.addExperience(value,true)>= value)
+                        //get only energy containers and maybe custom fluid items
+                    }
+                    //XP
+                    if(canTransferXP(coinInPedestal))
+                    {
+                        //maybe also get xp custom items???
+                        if(itemStack.getItem().equals(Items.EXPERIENCE_BOTTLE))
                         {
-                            pedestal.addExperience(value,false);
-                            itemStack = new ItemStack(Items.GLASS_BOTTLE,itemStack.getCount());
-                            item.setItem(itemStack);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),0,180,0));
-                            actionDone = true;
+                            int currentlyStoredExp = pedestal.getStoredExperience();
+                            if(currentlyStoredExp < pedestal.getExperienceCapacity())
+                            {
+                                //set value per bottle from 3 to 11?
+                                Random r = new Random();
+                                int low = 3;
+                                int high = 11;
+                                int result = r.nextInt(high-low) + low;
+                                int value = result * itemStack.getCount();
+                                if(value > 0 && pedestal.addExperience(value,true)>= value)
+                                {
+                                    pedestal.addExperience(value,false);
+                                    itemStack = new ItemStack(Items.GLASS_BOTTLE,itemStack.getCount());
+                                    item.setItem(itemStack);
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),0,180,0));
+                                    actionDone = true;
+                                }
+                            }
                         }
                     }
-                }
-            }
-            //Dust
-            if(canTransferDust(coinInPedestal))
-            {
-                //get custom dust items only, and maybe jars???
-            }
-
-            //Handle items last so that the others can do their action first
-            //Item
-            if(canTransferItems(coinInPedestal))
-            {
-                // if(canTransferDust(coinInPedestal)) then dont pick up dust items???
-
-                ItemStack stackInPedestal = pedestal.getItemInPedestal();
-                boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
-                if((pedestal.addItem(itemStack,true)) && passesItemFilter(pedestal,itemStack))
-                {
-                    int spaceInPed = stackInPedestal.getMaxStackSize()-stackInPedestal.getCount();
-                    int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
-                    int actualSpaceInPed = (filterAllowedSpace>spaceInPed)?(spaceInPed):(filterAllowedSpace);
-                    if(actualSpaceInPed>0)
+                    //Dust
+                    if(canTransferDust(coinInPedestal))
                     {
-                        int itemInCount = itemStack.getCount();
-                        int countToAdd = ( itemInCount<= actualSpaceInPed)?(itemInCount):(actualSpaceInPed);
-                        ItemStack stackToAdd = itemStack.copy();
-                        stackToAdd.setCount(countToAdd);
-                        if(pedestal.addItem(stackToAdd,true))
+                        //get custom dust items only, and maybe jars???
+                    }
+
+                    //Handle items last so that the others can do their action first
+                    //Item
+                    if(canTransferItems(coinInPedestal))
+                    {
+                        // if(canTransferDust(coinInPedestal)) then dont pick up dust items???
+
+                        ItemStack stackInPedestal = pedestal.getItemInPedestal();
+                        boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
+                        if((pedestal.addItem(itemStack,true)) && passesItemFilter(pedestal,itemStack))
                         {
-                            item.getItem().setCount(itemInCount-countToAdd);
-                            if(itemInCount<=countToAdd)item.remove(Entity.RemovalReason.DISCARDED);
-                            pedestal.addItem(stackToAdd,false);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),180,180,0));
-                            actionDone = true;
+                            int spaceInPed = stackInPedestal.getMaxStackSize()-stackInPedestal.getCount();
+                            int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
+                            int actualSpaceInPed = (filterAllowedSpace>spaceInPed)?(spaceInPed):(filterAllowedSpace);
+                            if(actualSpaceInPed>0)
+                            {
+                                int itemInCount = itemStack.getCount();
+                                int countToAdd = ( itemInCount<= actualSpaceInPed)?(itemInCount):(actualSpaceInPed);
+                                ItemStack stackToAdd = itemStack.copy();
+                                stackToAdd.setCount(countToAdd);
+                                if(pedestal.addItem(stackToAdd,true))
+                                {
+                                    item.getItem().setCount(itemInCount-countToAdd);
+                                    if(itemInCount<=countToAdd)item.remove(Entity.RemovalReason.DISCARDED);
+                                    pedestal.addItem(stackToAdd,false);
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),180,180,0));
+                                    actionDone = true;
+                                }
+                            }
                         }
                     }
+
+                    if(needsEnergy && actionDone)removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,item.getOnPos()),false);
+                    if(!hasAdvancedOne(coinInPedestal) && actionDone)break;
                 }
-            }
 
-            if(needsEnergy && actionDone)removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,item.getOnPos()),false);
-            if(!hasAdvancedOne(coinInPedestal) && actionDone)break;
-        }
-
-        List<ExperienceOrb> listXP = world.getEntitiesOfClass(ExperienceOrb.class, aabb);
-        for (ExperienceOrb orb : listXP)
-        {
-            if(needsEnergy) { if(!removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,orb.getOnPos()),true))break; }
-
-            if(canTransferXP(coinInPedestal))
-            {
-                int currentlyStoredExp = pedestal.getStoredExperience();
-                if(currentlyStoredExp < pedestal.getExperienceCapacity())
+                List<ExperienceOrb> listXP = world.getEntitiesOfClass(ExperienceOrb.class, aabb);
+                for (ExperienceOrb orb : listXP)
                 {
-                    //set value per bottle from 3 to 11?
-                    Random r = new Random();
-                    int low = 3;
-                    int high = 11;
-                    int result = r.nextInt(high-low) + low;
-                    int value = result * orb.getValue();
-                    if(value > 0 && pedestal.addExperience(value,true)>= value)
+                    if(needsEnergy) { if(!removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,orb.getOnPos()),true))break; }
+
+                    if(canTransferXP(coinInPedestal))
                     {
-                        int added = pedestal.addExperience(value,false);
-                        orb.value = value-added;
-                        if(value<=added)orb.remove(Entity.RemovalReason.DISCARDED);
-                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
-                        if(needsEnergy && !actionDone)removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,orb.getOnPos()),false);
-                        if(!hasAdvancedOne(coinInPedestal))break;
+                        int currentlyStoredExp = pedestal.getStoredExperience();
+                        if(currentlyStoredExp < pedestal.getExperienceCapacity())
+                        {
+                            //set value per bottle from 3 to 11?
+                            Random r = new Random();
+                            int low = 3;
+                            int high = 11;
+                            int result = r.nextInt(high-low) + low;
+                            int value = result * orb.getValue();
+                            if(value > 0 && pedestal.addExperience(value,true)>= value)
+                            {
+                                int added = pedestal.addExperience(value,false);
+                                orb.value = value-added;
+                                if(value<=added)orb.remove(Entity.RemovalReason.DISCARDED);
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
+                                if(needsEnergy && !actionDone)removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,orb.getOnPos()),false);
+                                if(!hasAdvancedOne(coinInPedestal))break;
+                            }
+                        }
                     }
                 }
             }

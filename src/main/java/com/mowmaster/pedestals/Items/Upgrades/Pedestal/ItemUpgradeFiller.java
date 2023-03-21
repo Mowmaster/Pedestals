@@ -8,6 +8,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -98,51 +99,82 @@ public class ItemUpgradeFiller extends ItemUpgradeBase
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        List<BlockPos> listed = readBlockPosListFromNBT(coin);
-        List<BlockPos> valid = new ArrayList<>();
-        for (BlockPos pos:listed) {
-            if(selectedPointWithinRange(pedestal, pos))
+        if(pedestal.hasWorkCard())
+        {
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                valid.add(pos);
+                List<BlockPos> listed = workCardBase.readBlockPosListFromNBT(card);
+                List<BlockPos> valid = new ArrayList<>();
+                for (BlockPos pos:listed) {
+                    if(workCardBase.selectedPointWithinRange(pedestal, pos))
+                    {
+                        valid.add(pos);
+                    }
+                }
+
+                saveBlockPosListCustomToNBT(coin,"_validlist",valid);
             }
         }
-
-        saveBlockPosListCustomToNBT(coin,"_validlist",valid);
     }
 
     private void buildValidBlockListArea(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         List<BlockPos> valid = new ArrayList<>();
-        AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
-
-        int maxX = (int)area.maxX;
-        int maxY = (int)area.maxY;
-        int maxZ = (int)area.maxZ;
-
-        //System.out.println("aabbMaxStuff: "+ maxX+","+maxY+","+maxZ);
-
-        int minX = (int)area.minX;
-        int minY = (int)area.minY;
-        int minZ = (int)area.minZ;
-
-        //System.out.println("aabbMinStuff: "+ minX+","+minY+","+minZ);
-
-        BlockPos pedestalPos = pedestal.getPos();
-        for(int i=maxX;i>=minX;i--)
+        if(pedestal.hasWorkCard())
         {
-            for(int j=maxZ;j>=minZ;j--)
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                BlockPos newPoint = new BlockPos(i,pedestalPos.getY(),j);
-                //System.out.println("points: "+ newPoint);
-                if(selectedPointWithinRange(pedestal, newPoint))
+                AABB area = new AABB(workCardBase.readBlockPosFromNBT(card,1),workCardBase.readBlockPosFromNBT(card,2));
+
+                int maxX = (int)area.maxX;
+                int maxY = (int)area.maxY;
+                int maxZ = (int)area.maxZ;
+
+                int minX = (int)area.minX;
+                int minY = (int)area.minY;
+                int minZ = (int)area.minZ;
+
+                BlockPos pedestalPos = pedestal.getPos();
+                if(minY < pedestalPos.getY())
                 {
-                    valid.add(newPoint);
+                    for(int i=maxX;i>=minX;i--)
+                    {
+                        for(int j=maxZ;j>=minZ;j--)
+                        {
+                            for(int k=maxY;k>=minY;k--)
+                            {
+                                BlockPos newPoint = new BlockPos(i,k,j);
+                                if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
+                                {
+                                    valid.add(newPoint);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for(int i= minX;i<=maxX;i++)
+                    {
+                        for(int j= minZ;j<=maxZ;j++)
+                        {
+                            for(int k= minY;k<=maxY;k++)
+                            {
+                                BlockPos newPoint = new BlockPos(i,k,j);
+                                if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
+                                {
+                                    valid.add(newPoint);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        //System.out.println("validList: "+ valid);
         saveBlockPosListCustomToNBT(coin,"_validlist",valid);
     }
 
@@ -166,22 +198,25 @@ public class ItemUpgradeFiller extends ItemUpgradeBase
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        boolean override = hasTwoPointsSelected(coin);
-        List<BlockPos> listed = getValidList(pedestal);
-
-        if(override)
+        if(pedestal.hasWorkCard())
         {
-            if(listed.size()>0)
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                if(pedestal.hasItem())fillerAction(level,pedestal);
-            }
-            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-            {
-                buildValidBlockListArea(pedestal);
-            }
-            else if(!pedestal.getRenderRangeUpgrade())
-            {
-                pedestal.setRenderRangeUpgrade(true);
+                boolean override = workCardBase.hasTwoPointsSelected(card);
+                List<BlockPos> listed = getValidList(pedestal);
+
+                if(override)
+                {
+                    if(listed.size()>0)
+                    {
+                        if(pedestal.hasItem())fillerAction(level,pedestal);
+                    }
+                    else if(workCardBase.selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+                    {
+                        buildValidBlockListArea(pedestal);
+                    }
+                }
             }
         }
     }
@@ -323,99 +358,106 @@ public class ItemUpgradeFiller extends ItemUpgradeBase
     {
         if(!level.isClientSide())
         {
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-            if(getPlayer != null && getPlayer.get() != null)
+            if(pedestal.hasWorkCard())
             {
-                List<BlockPos> listed = getValidList(pedestal);
-                int currentPosition = getCurrentPosition(pedestal);
-                BlockPos currentPoint = listed.get(currentPosition);
-                AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
-                int maxY = (int)area.maxY;
-                int minY = (int)area.minY;
-                int ySpread = maxY - minY;
-                boolean minMaxHeight = ySpread > 0;
-                if(ySpread>getHeightIteratorValue(pedestal))setCurrentHeight(pedestal,minY);
-
-                int currentYMin = getCurrentHeight(pedestal);
-                //int currentYMin = (minMaxHeight)?(0):(getCurrentHeight(pedestal));
-                int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue(pedestal));
-
-                int min = (minMaxHeight)?(minY):(currentYMin);
-                int max = (minMaxHeight)?((ySpread>getHeightIteratorValue(pedestal))?(minY+getHeightIteratorValue(pedestal)):(maxY)):(currentYMax);
-                int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
-
-                boolean fuelRemoved = true;
-                //ToDo: make this a modifier for later
-                boolean runsOnce = true;
-                boolean stop = getStopped(pedestal);
-
-                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                ItemStack card = pedestal.getWorkCardInPedestal();
+                if(card.getItem() instanceof WorkCardBase workCardBase)
                 {
-                    if(!stop)
+                    WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+                    if(getPlayer != null && getPlayer.get() != null)
                     {
-                        for(int y=min;y<=max;y++)
+                        List<BlockPos> listed = getValidList(pedestal);
+                        int currentPosition = getCurrentPosition(pedestal);
+                        BlockPos currentPoint = listed.get(currentPosition);
+                        AABB area = new AABB(workCardBase.readBlockPosFromNBT(card,1),workCardBase.readBlockPosFromNBT(card,2));
+                        int maxY = (int)area.maxY;
+                        int minY = (int)area.minY;
+                        int ySpread = maxY - minY;
+                        boolean minMaxHeight = ySpread > 0;
+                        if(ySpread>getHeightIteratorValue(pedestal))setCurrentHeight(pedestal,minY);
+
+                        int currentYMin = getCurrentHeight(pedestal);
+                        //int currentYMin = (minMaxHeight)?(0):(getCurrentHeight(pedestal));
+                        int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue(pedestal));
+
+                        int min = (minMaxHeight)?(minY):(currentYMin);
+                        int max = (minMaxHeight)?((ySpread>getHeightIteratorValue(pedestal))?(minY+getHeightIteratorValue(pedestal)):(maxY)):(currentYMax);
+                        int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
+
+                        boolean fuelRemoved = true;
+                        //ToDo: make this a modifier for later
+                        boolean runsOnce = true;
+                        boolean stop = getStopped(pedestal);
+
+                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                         {
-                            BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
-                            BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                            if(!pedestal.removeItem(1,true).isEmpty())
+                            if(!stop)
                             {
-                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
+                                for(int y=min;y<=max;y++)
                                 {
-                                    if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, adjustedPoint))
+                                    BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
+                                    BlockState blockAtPoint = level.getBlockState(adjustedPoint);
+                                    if(!pedestal.removeItem(1,true).isEmpty())
                                     {
-                                        if(!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR)
+                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                                         {
-                                            UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
-                                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                            if (result == InteractionResult.CONSUME) {
-                                                pedestal.removeItem(1,false);
+                                            if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, adjustedPoint))
+                                            {
+                                                if(!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR)
+                                                {
+                                                    UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
+                                                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                                    if (result == InteractionResult.CONSUME) {
+                                                        pedestal.removeItem(1,false);
+                                                    }
+                                                }
                                             }
+                                        }
+                                        else {
+                                            fuelRemoved = false;
                                         }
                                     }
                                 }
-                                else {
-                                    fuelRemoved = false;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
-                    }
-
-                    if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
-                    {
-                        if(runsOnce)
-                        {
-                            //ToDo: Make this 1200 value a config
-                            int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
-                            if(getCurrentDelay(pedestal)>=delay)
-                            {
-                                setCurrentPosition(pedestal,0);
-                                setStopped(pedestal,false);
-                                setCurrentDelay(pedestal,0);
                             }
                             else
                             {
-                                iterateCurrentDelay(pedestal);
-                                setStopped(pedestal,true);
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
                             }
-                        }
-                        else
-                        {
-                            setCurrentPosition(pedestal,0);
-                        }
-                    }
-                    else if((currentPosition+1)>=listed.size())
-                    {
-                        setCurrentPosition(pedestal,0);
-                        iterateCurrentHeight(pedestal);
-                    }
-                    else
-                    {
-                        if(fuelRemoved){
-                            iterateCurrentPosition(pedestal);
+
+                            if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
+                            {
+                                if(runsOnce)
+                                {
+                                    //ToDo: Make this 1200 value a config
+                                    int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
+                                    if(getCurrentDelay(pedestal)>=delay)
+                                    {
+                                        setCurrentPosition(pedestal,0);
+                                        setStopped(pedestal,false);
+                                        setCurrentDelay(pedestal,0);
+                                    }
+                                    else
+                                    {
+                                        iterateCurrentDelay(pedestal);
+                                        setStopped(pedestal,true);
+                                    }
+                                }
+                                else
+                                {
+                                    setCurrentPosition(pedestal,0);
+                                }
+                            }
+                            else if((currentPosition+1)>=listed.size())
+                            {
+                                setCurrentPosition(pedestal,0);
+                                iterateCurrentHeight(pedestal);
+                            }
+                            else
+                            {
+                                if(fuelRemoved){
+                                    iterateCurrentPosition(pedestal);
+                                }
+                            }
                         }
                     }
                 }

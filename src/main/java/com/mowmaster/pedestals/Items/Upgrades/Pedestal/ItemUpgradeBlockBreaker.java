@@ -345,12 +345,8 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                 BlockPos currentPoint = listed.get(currentPosition);
                 BlockState blockAtPoint = level.getBlockState(currentPoint);
 
-
                 boolean fuelRemoved = true;
 
-                //System.out.println(blockAtPoint);
-                //System.out.println(blockAtPoint.getBlock());
-                //System.out.println(blockAtPoint.getDestroySpeed(level,currentPoint));
                 if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
                 {
                     if(passesFilter(pedestal, blockAtPoint, currentPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList().contains(blockAtPoint.getBlock())))
@@ -402,6 +398,13 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                                                     level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                     //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                     if(damage)pedestal.damageInsertedTool(1,false);
+
+                                                    if(drops.size()>0)
+                                                    {
+                                                        for (ItemStack stack: drops) {
+                                                            MowLibItemUtils.spawnItemStack(level,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),stack);
+                                                        }
+                                                    }
                                                 }
                                             }
                                             else
@@ -410,12 +413,12 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                                                 level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                 //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                 if(damage)pedestal.damageInsertedTool(1,false);
-                                            }
 
-                                            if(drops.size()>0)
-                                            {
-                                                for (ItemStack stack: drops) {
-                                                    MowLibItemUtils.spawnItemStack(level,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),stack);
+                                                if(drops.size()>0)
+                                                {
+                                                    for (ItemStack stack: drops) {
+                                                        MowLibItemUtils.spawnItemStack(level,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),stack);
+                                                    }
                                                 }
                                             }
                                         }

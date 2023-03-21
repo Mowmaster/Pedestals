@@ -46,6 +46,11 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         return true;
     }
 
+    @Override
+    public ItemStack getUpgradeDefaultTool() {
+        return new ItemStack(Items.STONE_PICKAXE);
+    }
+
     public int getCobbleGenSpawnRate(ItemStack upgradeStack)
     {
         if(getItemCapacityIncrease(upgradeStack)>0)
@@ -91,7 +96,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         Block generatedBlock = Block.byItem(getInitialGeneratedItem.getItem());
         if(generatedBlock != Blocks.AIR)
         {
-            ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(new ItemStack(Items.STONE_PICKAXE)):(pedestal.getToolStack());
+            ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(getUpgradeDefaultTool()):(pedestal.getToolStack());
 //System.out.println(getToolFromPedestal);
 
             LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)

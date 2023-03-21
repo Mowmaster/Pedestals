@@ -9,6 +9,7 @@ import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -94,75 +95,82 @@ public class ItemUpgradePlanter extends ItemUpgradeBase
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        List<BlockPos> listed = readBlockPosListFromNBT(coin);
-        List<BlockPos> valid = new ArrayList<>();
-        for (BlockPos pos:listed) {
-            if(selectedPointWithinRange(pedestal, pos))
+        if(pedestal.hasWorkCard())
+        {
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                valid.add(pos);
+                List<BlockPos> listed = workCardBase.readBlockPosListFromNBT(card);
+                List<BlockPos> valid = new ArrayList<>();
+                for (BlockPos pos:listed) {
+                    if(workCardBase.selectedPointWithinRange(pedestal, pos))
+                    {
+                        valid.add(pos);
+                    }
+                }
+
+                saveBlockPosListCustomToNBT(coin,"_validlist",valid);
             }
         }
-
-        saveBlockPosListCustomToNBT(coin,"_validlist",valid);
     }
 
     private void buildValidBlockListArea(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         List<BlockPos> valid = new ArrayList<>();
-        AABB area = new AABB(readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1),readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2));
-
-        int maxX = (int)area.maxX;
-        int maxY = (int)area.maxY;
-        int maxZ = (int)area.maxZ;
-
-        //System.out.println("aabbMaxStuff: "+ maxX+","+maxY+","+maxZ);
-
-        int minX = (int)area.minX;
-        int minY = (int)area.minY;
-        int minZ = (int)area.minZ;
-
-        //System.out.println("aabbMinStuff: "+ minX+","+minY+","+minZ);
-
-        BlockPos pedestalPos = pedestal.getPos();
-        if(minY < pedestalPos.getY())
+        if(pedestal.hasWorkCard())
         {
-            for(int i=maxX;i>=minX;i--)
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                for(int j=maxZ;j>=minZ;j--)
+                AABB area = new AABB(workCardBase.readBlockPosFromNBT(card,1),workCardBase.readBlockPosFromNBT(card,2));
+
+                int maxX = (int)area.maxX;
+                int maxY = (int)area.maxY;
+                int maxZ = (int)area.maxZ;
+
+                int minX = (int)area.minX;
+                int minY = (int)area.minY;
+                int minZ = (int)area.minZ;
+
+                BlockPos pedestalPos = pedestal.getPos();
+                if(minY < pedestalPos.getY())
                 {
-                    for(int k=maxY;k>=minY;k--)
+                    for(int i=maxX;i>=minX;i--)
                     {
-                        BlockPos newPoint = new BlockPos(i,k,j);
-                        //System.out.println("points: "+ newPoint);
-                        if(selectedPointWithinRange(pedestal, newPoint))
+                        for(int j=maxZ;j>=minZ;j--)
                         {
-                            valid.add(newPoint);
+                            for(int k=maxY;k>=minY;k--)
+                            {
+                                BlockPos newPoint = new BlockPos(i,k,j);
+                                if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
+                                {
+                                    valid.add(newPoint);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for(int i= minX;i<=maxX;i++)
+                    {
+                        for(int j= minZ;j<=maxZ;j++)
+                        {
+                            for(int k= minY;k<=maxY;k++)
+                            {
+                                BlockPos newPoint = new BlockPos(i,k,j);
+                                if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
+                                {
+                                    valid.add(newPoint);
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-        else
-        {
-            for(int i= minX;i<=maxX;i++)
-            {
-                for(int j= minZ;j<=maxZ;j++)
-                {
-                    for(int k= minY;k<=maxY;k++)
-                    {
-                        BlockPos newPoint = new BlockPos(i,k,j);
-                        //System.out.println("points2: "+ newPoint);
-                        if(selectedPointWithinRange(pedestal, newPoint))
-                        {
-                            valid.add(newPoint);
-                        }
-                    }
-                }
-            }
-        }
 
-        //System.out.println("validList: "+ valid);
         saveBlockPosListCustomToNBT(coin,"_validlist",valid);
     }
 
@@ -182,49 +190,46 @@ public class ItemUpgradePlanter extends ItemUpgradeBase
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
-        boolean override = hasTwoPointsSelected(coin);
-        List<BlockPos> listed = getValidList(pedestal);
+        if(pedestal.hasWorkCard())
+        {
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
+            {
+                boolean override = workCardBase.hasTwoPointsSelected(card);
+                List<BlockPos> listed = getValidList(pedestal);
 
-        if(override && pedestal.hasItem())
-        {
-            if(listed.size()>0)
-            {
-                //System.out.println("RunAction");
-                planterAction(level,pedestal);
-            }
-            else if(selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-            {
-                buildValidBlockListArea(pedestal);
-                //System.out.println("ListBuilt: "+ getValidList(pedestal));
-            }
-            else if(!pedestal.getRenderRangeUpgrade())
-            {
-                pedestal.setRenderRangeUpgrade(true);
-            }
-        }
-        else
-        {
-            List<BlockPos> getList = readBlockPosListFromNBT(coin);
-            if(!override && listed.size()>0)
-            {
-                planterAction(level,pedestal);
-            }
-            else if(getList.size()>0)
-            {
-                if(!hasBlockListCustomNBTTags(coin,"_validlist"))
+                if(override && pedestal.hasItem())
                 {
-                    BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
-                            .mapToObj((getList)::get)
-                            .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-                            .findFirst().orElse(BlockPos.ZERO);
-                    if(!hasValidPos.equals(BlockPos.ZERO))
+                    if(listed.size()>0)
                     {
-                        buildValidBlockList(pedestal);
+                        planterAction(level,pedestal);
+                    }
+                    else if(workCardBase.selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+                    {
+                        buildValidBlockListArea(pedestal);
                     }
                 }
-                else if(!pedestal.getRenderRangeUpgrade())
+                else
                 {
-                    pedestal.setRenderRangeUpgrade(true);
+                    List<BlockPos> getList = workCardBase.readBlockPosListFromNBT(card);
+                    if(!override && listed.size()>0)
+                    {
+                        planterAction(level,pedestal);
+                    }
+                    else if(getList.size()>0)
+                    {
+                        if(!hasBlockListCustomNBTTags(coin,"_validlist"))
+                        {
+                            BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
+                                    .mapToObj((getList)::get)
+                                    .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
+                                    .findFirst().orElse(BlockPos.ZERO);
+                            if(!hasValidPos.equals(BlockPos.ZERO))
+                            {
+                                buildValidBlockList(pedestal);
+                            }
+                        }
+                    }
                 }
             }
         }

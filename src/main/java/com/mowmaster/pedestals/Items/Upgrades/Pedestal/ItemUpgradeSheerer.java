@@ -7,6 +7,7 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -90,71 +91,78 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
     {
         if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
         {
-            boolean canRun = true;
-            boolean damage = false;
-
-            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
+            if(pedestal.hasWorkCard())
             {
-                WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-                if(getPlayer != null && getPlayer.get() != null)
+                ItemStack card = pedestal.getWorkCardInPedestal();
+                if(card.getItem() instanceof WorkCardBase workCardBase)
                 {
-                    AABB getArea = getAABBonUpgrade(coin);
-                    List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                    ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
+                    boolean canRun = true;
+                    boolean damage = false;
 
-                    if(PedestalConfig.COMMON.sheerer_DamageTools.get())
+                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
                     {
-                        if(pedestal.hasTool())
+                        WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+                        if(getPlayer != null && getPlayer.get() != null)
                         {
-                            if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                            {
-                                if(pedestal.damageInsertedTool(1,true))
-                                {
-                                    damage = true;
-                                }
-                                else
-                                {
-                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                    canRun = false;
-                                }
-                            }
-                            else
-                            {
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                canRun = false;
-                            }
-                        }
-                    }
+                            AABB getArea = workCardBase.getAABBonUpgrade(card);
+                            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
+                            ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
 
-                    if(canRun)
-                    {
-                        for (LivingEntity getEntity : entities)
-                        {
-                            if(getEntity == null)continue;
-
-                            if(getEntity instanceof IForgeShearable shearMe)
+                            if(PedestalConfig.COMMON.sheerer_DamageTools.get())
                             {
-                                BlockPos posSheerMe = getEntity.getOnPos();
-                                if(shearMe.isShearable(toolStack.copy(),level,posSheerMe))
+                                if(pedestal.hasTool())
                                 {
-                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posSheerMe), false))
+                                    if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
                                     {
-                                        int fortune = (EnchantmentHelper.getEnchantments(toolStack).containsKey(Enchantments.BLOCK_FORTUNE))?(EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE,toolStack)):(0);
-                                        List<ItemStack> getReturns = shearMe.onSheared((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()),toolStack,level,posSheerMe,fortune);
-
-                                        if(getReturns.size()>0)
+                                        if(pedestal.damageInsertedTool(1,true))
                                         {
-                                            for (ItemStack itemstack : getReturns) {
-                                                if(!itemstack.isEmpty()) MowLibItemUtils.spawnItemStack(level,posSheerMe.getX(),posSheerMe.getY(),posSheerMe.getZ(),itemstack);
-                                            }
-                                            if(damage)
+                                            damage = true;
+                                        }
+                                        else
+                                        {
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                            canRun = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                        canRun = false;
+                                    }
+                                }
+                            }
+
+                            if(canRun)
+                            {
+                                for (LivingEntity getEntity : entities)
+                                {
+                                    if(getEntity == null)continue;
+
+                                    if(getEntity instanceof IForgeShearable shearMe)
+                                    {
+                                        BlockPos posSheerMe = getEntity.getOnPos();
+                                        if(shearMe.isShearable(toolStack.copy(),level,posSheerMe))
+                                        {
+                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posSheerMe), false))
                                             {
-                                                if(toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize()<=1)
+                                                int fortune = (EnchantmentHelper.getEnchantments(toolStack).containsKey(Enchantments.BLOCK_FORTUNE))?(EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE,toolStack)):(0);
+                                                List<ItemStack> getReturns = shearMe.onSheared((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()),toolStack,level,posSheerMe,fortune);
+
+                                                if(getReturns.size()>0)
                                                 {
-                                                    pedestal.damageTool(toolStack,1,false);
+                                                    for (ItemStack itemstack : getReturns) {
+                                                        if(!itemstack.isEmpty()) MowLibItemUtils.spawnItemStack(level,posSheerMe.getX(),posSheerMe.getY(),posSheerMe.getZ(),itemstack);
+                                                    }
+                                                    if(damage)
+                                                    {
+                                                        if(toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize()<=1)
+                                                        {
+                                                            pedestal.damageTool(toolStack,1,false);
+                                                        }
+                                                    }
+                                                    if(!hasAdvancedOne(coin))break;
                                                 }
                                             }
-                                            if(!hasAdvancedOne(coin))break;
                                         }
                                     }
                                 }

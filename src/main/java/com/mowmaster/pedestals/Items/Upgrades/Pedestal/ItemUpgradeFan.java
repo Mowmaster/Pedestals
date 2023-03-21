@@ -7,6 +7,7 @@ import com.mowmaster.mowlib.Recipes.BaseBlockEntityFilter;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -213,36 +214,46 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         if(level.getGameTime()%speed == 0 )
         {
         }*/
-        if(level.getGameTime()%2 == 0)
+        if(pedestal.hasWorkCard())
         {
-            if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                fanAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
-            }
-            else if(!pedestal.getRenderRangeUpgrade())
-            {
-                pedestal.setRenderRangeUpgrade(true);
+                if(level.getGameTime()%2 == 0)
+                {
+                    if(workCardBase.hasTwoPointsSelected(card))
+                    {
+                        fanAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
+                    }
+                }
             }
         }
     }
 
     public void fanAction(BasePedestalBlockEntity pedestal, Level level, BlockPos posOfPedestal, ItemStack coinInPedestal)
     {
-        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posOfPedestal), true))
+        if(pedestal.hasWorkCard())
         {
-            AABB getArea = getAABBonUpgrade(coinInPedestal);
-            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-
-            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posOfPedestal), false))
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                for (LivingEntity getEntity : entities)
+                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posOfPedestal), true))
                 {
-                    if(getEntity == null)continue;
-                    if(!allowEntity(coinInPedestal,getEntity))continue;
-                    if(getEntity instanceof Player player && player.isCrouching())continue;
+                    AABB getArea = workCardBase.getAABBonUpgrade(card);
+                    List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
 
-                    Direction facing = getPedestalFacing(level,posOfPedestal);
-                    addMotion((((facing == Direction.UP)?(0.2D):(0.1D)) + (double)(((getSpeedTicksReduced(coinInPedestal)==0)?(1):(getSpeedTicksReduced(coinInPedestal)))/PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get())), facing,getEntity);
+                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posOfPedestal), false))
+                    {
+                        for (LivingEntity getEntity : entities)
+                        {
+                            if(getEntity == null)continue;
+                            if(!allowEntity(coinInPedestal,getEntity))continue;
+                            if(getEntity instanceof Player player && player.isCrouching())continue;
+
+                            Direction facing = getPedestalFacing(level,posOfPedestal);
+                            addMotion((((facing == Direction.UP)?(0.2D):(0.1D)) + (double)(((getSpeedTicksReduced(coinInPedestal)==0)?(1):(getSpeedTicksReduced(coinInPedestal)))/PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get())), facing,getEntity);
+                        }
+                    }
                 }
             }
         }
