@@ -6,7 +6,7 @@ import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Items.ISelectablePoints;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.Recipes.UpgradeModificationGlobalRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
@@ -20,7 +20,7 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelectablePoints
+public class ItemUpgradeModifications extends ItemUpgradeBase
 {
     public ItemUpgradeModifications(Properties p_41383_) {
         super(new Properties());
@@ -48,24 +48,32 @@ public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelect
         return false;
     }
 
-    /*@Override
+    @Override
     public boolean needsWorkCard() { return true; }
 
     @Override
-    public int getWorkCardType() { return 2; }*/
+    public int getWorkCardType() { return 3; }
 
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
         Level level = pedestal.getLevel();
         ItemStack coin = pedestal.getCoinOnPedestal();
-        List<BlockPos> listed = readBlockPosListFromNBT(coin);
         List<BlockPos> valid = new ArrayList<>();
-        for (BlockPos pos:listed) {
-            if(selectedPointWithinRange(pedestal, pos))
+
+        if(pedestal.hasWorkCard())
+        {
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                if(level.getBlockState(pos).getBlock() instanceof BasePedestalBlock)
-                {
-                    valid.add(pos);
+                List<BlockPos> listed = workCardBase.readBlockPosListFromNBT(card);
+                for (BlockPos pos:listed) {
+                    if(selectedPointWithinRange(pedestal, pos))
+                    {
+                        if(level.getBlockState(pos).getBlock() instanceof BasePedestalBlock)
+                        {
+                            valid.add(pos);
+                        }
+                    }
                 }
             }
         }
@@ -91,20 +99,23 @@ public class ItemUpgradeModifications extends ItemUpgradeBase implements ISelect
 
         List<BlockPos> listed = getValidList(pedestal);
 
-        List<BlockPos> getList = readBlockPosListFromNBT(coin);
-        if(listed.size()>0)
+        if(pedestal.hasWorkCard())
         {
-            modifierAction(level,pedestal);
-        }
-        else if(getList.size()>0)
-        {
-            if(!hasBlockListCustomNBTTags(coin,"_validlist"))
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                buildValidBlockList(pedestal);
-            }
-            else if(!pedestal.getRenderRangeUpgrade())
-            {
-                pedestal.setRenderRangeUpgrade(true);
+                List<BlockPos> getList = workCardBase.readBlockPosListFromNBT(card);
+                if(listed.size()>0)
+                {
+                    modifierAction(level,pedestal);
+                }
+                else if(getList.size()>0)
+                {
+                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
+                    {
+                        buildValidBlockList(pedestal);
+                    }
+                }
             }
         }
     }

@@ -11,6 +11,7 @@ import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSourceImpl;
 import net.minecraft.core.NonNullList;
@@ -99,6 +100,42 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
     public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_hiveharvester_selectedAllowed.get(); }
     @Override
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_hiveharvester_selectedMultiplier.get(); }
+
+    @Override
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
+
+        List<String> messages = super.getUpgradeHUD(pedestal);
+
+        if(messages.size()<=0)
+        {
+            if(baseEnergyCostPerDistance()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.RED + "Needs Energy");
+                    messages.add(ChatFormatting.RED + "To Operate");
+                }
+            }
+            if(baseXpCostPerDistance()>0)
+            {
+                if(pedestal.getStoredExperience()<baseXpCostPerDistance())
+                {
+                    messages.add(ChatFormatting.GREEN + "Needs Experience");
+                    messages.add(ChatFormatting.GREEN + "To Operate");
+                }
+            }
+            if(baseDustCostPerDistance().getDustAmount()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
+                }
+            }
+        }
+
+        return messages;
+    }
 
     @Override
     public ItemStack getUpgradeDefaultTool() {
@@ -207,7 +244,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
             ItemStack card = pedestal.getWorkCardInPedestal();
             if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                boolean override = workCardBase.hasTwoPointsSelected(coin);
+                boolean override = workCardBase.hasTwoPointsSelected(card);
                 List<BlockPos> listed = getValidList(pedestal);
 
                 if(override)
@@ -223,7 +260,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
                 }
                 else
                 {
-                    List<BlockPos> getList = workCardBase.readBlockPosListFromNBT(coin);
+                    List<BlockPos> getList = workCardBase.readBlockPosListFromNBT(card);
                     if(!override && listed.size()>0)
                     {
                         harvesterAction(level,pedestal);

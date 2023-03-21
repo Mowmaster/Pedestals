@@ -30,6 +30,11 @@
     "pedestals:upgrade_pedestal_packager",
     "pedestals:upgrade_pedestal_unpackager",
     "pedestals:upgrade_pedestal_modifications",
+    "pedestals:upgrade_pedestal_generator",
+    "pedestals:upgrade_pedestal_smelter",
+    "pedestals:upgrade_pedestal_smoker",
+    "pedestals:upgrade_pedestal_blaster",
+    "pedestals:upgrade_pedestal_crafter",
     "pedestals:upgrade_pedestal_cobblegen"
   ]
 }

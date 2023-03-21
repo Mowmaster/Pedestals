@@ -1282,6 +1282,16 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 }
             }
         }
+        /*
+Extracts an ItemStack from the given slot.
+The returned value must be empty if nothing is extracted, otherwise its stack size must be less than or equal to amount and ItemStack.getMaxStackSize().
+Params:
+slot – Slot to extract from.
+amount – Amount to extract (may be greater than the current stack's max limit)
+simulate – If true, the extraction is only simulated
+Returns:
+ItemStack extracted from the slot, must be empty if nothing can be extracted. The returned ItemStack can be safely modified after, so item handlers should return a new or copied stack.
+         */
         ItemStack stack = h.extractItem(firstNonEmptySlot,numToRemove,simulate);
         //update();
 
@@ -1364,6 +1374,16 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             }
         }
 
+        /*
+        Inserts an ItemStack into the given slot and return the remainder. The ItemStack should not be modified in this function!
+Note: This behaviour is subtly different from IFluidHandler.fill(FluidStack, IFluidHandler.FluidAction)
+Params:
+slot – Slot to insert into.
+stack – ItemStack to insert. This must not be modified by the item handler.
+simulate – If true, the insertion is only simulated
+Returns:
+The remaining ItemStack that was not inserted (if the entire stack is accepted, then return an empty ItemStack). May be the same as the input ItemStack if unchanged, otherwise a new ItemStack. The returned ItemStack can be safely modified after.
+         */
 
         if(h.isItemValid(firstEmptyorMatchingSlot,itemFromBlock))
         {

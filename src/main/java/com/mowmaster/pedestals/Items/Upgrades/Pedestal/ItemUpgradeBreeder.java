@@ -5,6 +5,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -71,6 +72,42 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase
     public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_breeder_selectedAllowed.get(); }
     @Override
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_breeder_selectedMultiplier.get(); }
+
+    @Override
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
+
+        List<String> messages = super.getUpgradeHUD(pedestal);
+
+        if(messages.size()<=0)
+        {
+            if(baseEnergyCostPerDistance()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.RED + "Needs Energy");
+                    messages.add(ChatFormatting.RED + "To Operate");
+                }
+            }
+            if(baseXpCostPerDistance()>0)
+            {
+                if(pedestal.getStoredExperience()<baseXpCostPerDistance())
+                {
+                    messages.add(ChatFormatting.GREEN + "Needs Experience");
+                    messages.add(ChatFormatting.GREEN + "To Operate");
+                }
+            }
+            if(baseDustCostPerDistance().getDustAmount()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
+                }
+            }
+        }
+
+        return messages;
+    }
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)

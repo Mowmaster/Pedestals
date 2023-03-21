@@ -45,6 +45,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -148,25 +149,42 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             {
                 messages.add(ChatFormatting.RED + "Work Locations");
             }
+            if(getWorkCardType() == 3)
+            {
+                messages.add(ChatFormatting.RED + "Pedestal Locations");
+            }
         }
         else if(pedestal.hasWorkCard())
         {
             if(pedestal.getWorkCardInPedestal().getItem() instanceof WorkCardBase workCardBase)
             {
                 Boolean inSelectedInRange = workCardBase.selectedAreaWithinRange(pedestal);
-                if((getWorkCardType() == 1 && pedestal.getWorkCardInPedestal().getItem().equals(DeferredRegisterItems.WORKCARD_LOCATIONS.get())
-                        || (getWorkCardType() == 2 && pedestal.getWorkCardInPedestal().getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))))
+                boolean addmessages = false;
+                if(getWorkCardType()!=workCardBase.getWorkCardType())
                 {
-                    messages.add(ChatFormatting.RED + "Incorrect Card");
-                    messages.add(ChatFormatting.WHITE + "Needs:");
-                    messages.add(ChatFormatting.WHITE + "----------------");
-                    if(getWorkCardType() == 1)
+                    addmessages=true;
+                    if(getWorkCardType()==2 && (workCardBase.getWorkCardType()==1 || workCardBase.getWorkCardType()==2))
                     {
-                        messages.add(ChatFormatting.BLUE + "Work Area");
+                        addmessages=false;
                     }
-                    if(getWorkCardType() == 2)
+
+                    if(addmessages)
                     {
-                        messages.add(ChatFormatting.BLUE + "Work Locations");
+                        messages.add(ChatFormatting.RED + "Incorrect Card");
+                        messages.add(ChatFormatting.WHITE + "Needs:");
+                        messages.add(ChatFormatting.WHITE + "----------------");
+                        if(getWorkCardType() == 1)
+                        {
+                            messages.add(ChatFormatting.BLUE + "Work Area");
+                        }
+                        if(getWorkCardType() == 2)
+                        {
+                            messages.add(ChatFormatting.BLUE + "Work Locations");
+                        }
+                        if(getWorkCardType() == 3)
+                        {
+                            messages.add(ChatFormatting.BLUE + "Pedestal Locations");
+                        }
                     }
                 }
                 else if(!inSelectedInRange && pedestal.getWorkCardInPedestal().getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
@@ -199,6 +217,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         //0 = Either
         //1 = Area
         //2 = Locations
+        //3 = Pedestals
         return -1;
     }
 
@@ -1045,6 +1064,45 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
+    public boolean doItemsMatchWithEmpty(ItemStack stackPedestal, ItemStack itemStackIn)
+    {
+        if(stackPedestal.isEmpty() && itemStackIn.isEmpty())return true;
+
+        return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
+    }
+
+    public int getNextSlotWithItemsCapFilteredMachine(BasePedestalBlockEntity pedestal, LazyOptional<IItemHandler> cap)
+    {
+        AtomicInteger slot = new AtomicInteger(-1);
+        if(cap.isPresent()) {
+
+            cap.ifPresent(itemHandler -> {
+                int range = itemHandler.getSlots();
+                for(int i=0;i<range;i++)
+                {
+                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                    //find a slot with items
+                    if(!stackInSlot.isEmpty())
+                    {
+                        //check if it could pull the item out or not
+                        if(!itemHandler.extractItem(i,1 ,true ).equals(ItemStack.EMPTY))
+                        {
+                            //If pedestal is empty accept any items
+                            if(passesMachineFilter(pedestal,stackInSlot))
+                            {
+                                slot.set(i);
+                                break;
+                            }
+                        }
+                    }
+                }});
+
+
+        }
+
+        return slot.get();
+    }
+
     public int getNextSlotWithItemsCapFiltered(BasePedestalBlockEntity pedestal, LazyOptional<IItemHandler> cap)
     {
         AtomicInteger slot = new AtomicInteger(-1);
@@ -1125,6 +1183,25 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
         }
         return slot.get();
+    }
+
+    public boolean passesMachineFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn)
+    {
+        boolean returner = true;
+        if(pedestal.hasFilter())
+        {
+            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
+            {
+                if(filter.getFilterDirection().equals(IPedestalFilter.FilterDirection.NEUTRAL))
+                {
+                    returner = filter.canAcceptItems(filterInPedestal,stackIn);
+                }
+            }
+
+        }
+
+        return returner;
     }
 
     public boolean passesItemFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn)

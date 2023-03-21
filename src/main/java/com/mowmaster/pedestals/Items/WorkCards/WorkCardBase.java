@@ -43,6 +43,11 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
         super(p_41383_);
     }
 
+    public int getWorkCardType()
+    {
+        return -1;
+    }
+
     //ToDo: Add to mowlib and remove from here
     public static void saveStringToNBT(ItemStack upgrade, String nbtTag, String string)
     {
@@ -450,7 +455,7 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
 
         if(itemInHand.getItem() instanceof WorkCardBase)
         {
-            if(hand.equals(InteractionHand.MAIN_HAND) && !player.isShiftKeyDown() && itemInHand.getItem().equals(DeferredRegisterItems.WORKCARD_LOCATIONS.get()))
+            if(hand.equals(InteractionHand.MAIN_HAND) && !player.isShiftKeyDown() && itemInHand.getItem() instanceof WorkCardBase && itemInHand.getItem() instanceof ISelectablePoints)
             {
                 if(result.getType().equals(HitResult.Type.BLOCK))
                 {
@@ -467,7 +472,7 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
                 }
             }
 
-            if(hand.equals(InteractionHand.MAIN_HAND) && player.isShiftKeyDown() && itemInHand.getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
+            if(hand.equals(InteractionHand.MAIN_HAND) && player.isShiftKeyDown() && itemInHand.getItem() instanceof WorkCardBase && itemInHand.getItem() instanceof ISelectableArea)
             {
                 if(result.getType().equals(HitResult.Type.BLOCK))
                 {
@@ -535,7 +540,7 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
             p_41423_.add(Component.literal(""));
         }
 
-        if(p_41421_.getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
+        if(p_41421_.getItem() instanceof WorkCardBase && p_41421_.getItem() instanceof ISelectableArea)
         {
             if(hasOneBlockPos(p_41421_))
             {
@@ -572,7 +577,7 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
             }
         }
 
-        if(p_41421_.getItem().equals(DeferredRegisterItems.WORKCARD_LOCATIONS.get()) && !hasTwoPointsSelected(p_41421_))
+        if(p_41421_.getItem() instanceof WorkCardBase && p_41421_.getItem() instanceof ISelectablePoints && !hasTwoPointsSelected(p_41421_))
         {
             List<BlockPos> getList = readBlockPosListFromNBT(p_41421_);
             if(getList.size()>0)

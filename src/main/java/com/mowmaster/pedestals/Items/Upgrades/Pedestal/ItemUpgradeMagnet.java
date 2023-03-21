@@ -89,6 +89,42 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_magnet_selectedMultiplier.get(); }
 
     @Override
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
+
+        List<String> messages = super.getUpgradeHUD(pedestal);
+
+        if(messages.size()<=0)
+        {
+            if(baseEnergyCostPerDistance()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.RED + "Needs Energy");
+                    messages.add(ChatFormatting.RED + "To Operate");
+                }
+            }
+            if(baseXpCostPerDistance()>0)
+            {
+                if(pedestal.getStoredExperience()<baseXpCostPerDistance())
+                {
+                    messages.add(ChatFormatting.GREEN + "Needs Experience");
+                    messages.add(ChatFormatting.GREEN + "To Operate");
+                }
+            }
+            if(baseDustCostPerDistance().getDustAmount()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
+                }
+            }
+        }
+
+        return messages;
+    }
+
+    @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
         if(pedestal.hasWorkCard())

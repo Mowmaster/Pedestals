@@ -18,8 +18,8 @@ import java.util.stream.IntStream;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
-public class FilterTagMachines extends BaseFilter{
-    public FilterTagMachines(Properties p_41383_) {
+public class FilterTagMachine extends BaseFilter{
+    public FilterTagMachine(Properties p_41383_) {
         super(p_41383_, FilterDirection.NEUTRAL);
     }
 

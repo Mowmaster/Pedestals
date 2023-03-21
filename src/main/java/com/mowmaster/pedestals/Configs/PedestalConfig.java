@@ -349,6 +349,12 @@ public class PedestalConfig
         public final ForgeConfigSpec.BooleanValue upgrade_fan_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_fan_selectedMultiplier;
 
+        public final ForgeConfigSpec.IntValue upgrade_smelter_baseEnergyCost;
+        public final ForgeConfigSpec.IntValue upgrade_blast_baseEnergyCost;
+        public final ForgeConfigSpec.IntValue upgrade_smoker_baseEnergyCost;
+
+        public final ForgeConfigSpec.IntValue upgrade_generator_baseEnergyCost;
+
 
 
         public final ForgeConfigSpec.BooleanValue upgrade_require_sized_selectable_area;
@@ -658,16 +664,16 @@ public class PedestalConfig
                     .define("quarryDamageTools",false);
             upgrade_quarry_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Quarry]")
-                    .defineInRange("upgrade_quarry_base_energy_cost", 0, 0, Integer.MAX_VALUE);
+                    .defineInRange("upgrade_quarry_base_energy_cost", 500, 0, Integer.MAX_VALUE);
             upgrade_quarry_energy_distance_multiplier = builder
                     .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Quarry]")
-                    .define("upgrade_quarry_energy_distance_multiplier",  true);
+                    .define("upgrade_quarry_energy_distance_multiplier",  false);
             upgrade_quarry_energyMultiplier = builder
                     .comment("Energy Multiplier, total cost x multiplier [Quarry]")
                     .defineInRange("upgrade_quarry_energy_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
             upgrade_quarry_baseXpCost = builder
                     .comment("Base XP cost per upgrade operation [Quarry]")
-                    .defineInRange("upgrade_quarry_base_xp_cost", 1, 0, Integer.MAX_VALUE);
+                    .defineInRange("upgrade_quarry_base_xp_cost", 0, 0, Integer.MAX_VALUE);
             upgrade_quarry_xp_distance_multiplier = builder
                     .comment("Distance of Block Broken Used as a modifier (Requires selected_allowed = True) [Quarry]")
                     .define("upgrade_quarry_xp_distance_multiplier",  true);
@@ -1223,6 +1229,31 @@ public class PedestalConfig
             upgrade_fan_selectedMultiplier = builder
                     .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Fan]")
                     .defineInRange("upgrade_fan_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            builder.pop();
+
+
+            builder.comment("Smelter Configs").push("Smelter_Configs");
+            upgrade_smelter_baseEnergyCost = builder
+                    .comment("Base RF cost per tick")
+                    .defineInRange("upgrade_smelter_base_energy_cost", 20, 0, Integer.MAX_VALUE);
+            builder.pop();
+
+            builder.comment("BlastFurnace Configs").push("BlastFurnace_Configs");
+            upgrade_blast_baseEnergyCost = builder
+                    .comment("Base RF cost per tick")
+                    .defineInRange("upgrade_blast_base_energy_cost", 20, 0, Integer.MAX_VALUE);
+            builder.pop();
+
+            builder.comment("Smoking Configs").push("Smoking_Configs");
+            upgrade_smoker_baseEnergyCost = builder
+                    .comment("Base RF cost per tick")
+                    .defineInRange("upgrade_smoker_base_energy_cost", 20, 0, Integer.MAX_VALUE);
+            builder.pop();
+
+            builder.comment("RF Generator Configs").push("RFGenerator_Configs");
+            upgrade_generator_baseEnergyCost = builder
+                    .comment("Base RF generation per tick")
+                    .defineInRange("upgrade_generator_base_energy_production", 20, 0, Integer.MAX_VALUE);
             builder.pop();
 
 

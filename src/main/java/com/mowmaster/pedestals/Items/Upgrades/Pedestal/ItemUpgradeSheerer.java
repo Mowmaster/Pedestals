@@ -8,6 +8,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -82,6 +83,42 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_sheerer_selectedMultiplier.get(); }
 
     @Override
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
+
+        List<String> messages = super.getUpgradeHUD(pedestal);
+
+        if(messages.size()<=0)
+        {
+            if(baseEnergyCostPerDistance()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.RED + "Needs Energy");
+                    messages.add(ChatFormatting.RED + "To Operate");
+                }
+            }
+            if(baseXpCostPerDistance()>0)
+            {
+                if(pedestal.getStoredExperience()<baseXpCostPerDistance())
+                {
+                    messages.add(ChatFormatting.GREEN + "Needs Experience");
+                    messages.add(ChatFormatting.GREEN + "To Operate");
+                }
+            }
+            if(baseDustCostPerDistance().getDustAmount()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
+                }
+            }
+        }
+
+        return messages;
+    }
+
+    @Override
     public ItemStack getUpgradeDefaultTool() {
         return new ItemStack(Items.SHEARS);
     }
@@ -89,12 +126,12 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
-        if(hasTwoPointsSelected(pedestal.getCoinOnPedestal()))
+        if(pedestal.hasWorkCard())
         {
-            if(pedestal.hasWorkCard())
+            ItemStack card = pedestal.getWorkCardInPedestal();
+            if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                ItemStack card = pedestal.getWorkCardInPedestal();
-                if(card.getItem() instanceof WorkCardBase workCardBase)
+                if(workCardBase.hasTwoPointsSelected(card))
                 {
                     boolean canRun = true;
                     boolean damage = false;

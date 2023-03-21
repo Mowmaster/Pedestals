@@ -166,6 +166,7 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MAGNET.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_PACKAGER.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_UNPACKAGER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_CRAFTER.get());
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BREAKER.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BREAKER.get());
@@ -213,6 +214,18 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_UNBOTTLER.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MODIFICATIONS.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MODIFICATIONS.get());
+
+
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_SMELTER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_SMELTER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_SMOKER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_SMOKER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BLASTER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BLASTER.get());
+
+
+        this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_RFGENERATOR.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_RFGENERATOR.get());
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());

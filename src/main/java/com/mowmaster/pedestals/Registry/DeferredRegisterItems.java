@@ -10,7 +10,10 @@ import com.mowmaster.pedestals.Items.Misc.TagGetterItem;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBlockBreaker;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardLocations;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardPedestals;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -47,9 +50,11 @@ public class DeferredRegisterItems
 
 
     public static final RegistryObject<Item> WORKCARD_AREA = ITEMS.register("workcard_area",
-            () -> new WorkCardBase(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+            () -> new WorkCardArea(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> WORKCARD_LOCATIONS = ITEMS.register("workcard_locations",
-            () -> new WorkCardBase(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+            () -> new WorkCardLocations(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> WORKCARD_PEDESTALS = ITEMS.register("workcard_pedestals",
+            () -> new WorkCardPedestals(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> FILTER_BASE = ITEMS.register("filter_base",
             () -> new FilterBaseItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
@@ -76,7 +81,7 @@ public class DeferredRegisterItems
     public static final RegistryObject<Item> FILTER_TAG = ITEMS.register("filter_tag",
             () -> new FilterTag(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> FILTER_TAG_MACHINE = ITEMS.register("filter_tag_machine",
-            () -> new FilterTagMachines(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+            () -> new FilterTagMachine(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TAG_GETTER = ITEMS.register("tag_getter",
             () -> new TagGetterItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
@@ -145,9 +150,21 @@ public class DeferredRegisterItems
             () -> new ItemUpgradePackager(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_UNPACKAGER = ITEMS.register("upgrade_pedestal_unpackager",
             () -> new ItemUpgradeUnPackager(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_CRAFTER = ITEMS.register("upgrade_pedestal_crafter",
+            () -> new ItemUpgradeCrafter(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_MODIFICATIONS = ITEMS.register("upgrade_pedestal_modifications",
             () -> new ItemUpgradeModifications(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_SMELTER = ITEMS.register("upgrade_pedestal_smelter",
+            () -> new ItemUpgradeSmelter(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_SMOKER = ITEMS.register("upgrade_pedestal_smoker",
+            () -> new ItemUpgradeSmoker(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_BLASTER = ITEMS.register("upgrade_pedestal_blaster",
+            () -> new ItemUpgradeBlastFurnace(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
+    public static final RegistryObject<Item> PEDESTAL_UPGRADE_RFGENERATOR = ITEMS.register("upgrade_pedestal_generator",
+            () -> new ItemUpgradeGenerator_FurnaceFuels(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
     public static final RegistryObject<Item> PEDESTAL_UPGRADE_COBBLEGEN = ITEMS.register("upgrade_pedestal_cobblegen",

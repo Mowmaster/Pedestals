@@ -15,9 +15,9 @@ import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeModifications;
 import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardPedestals;
 import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -483,7 +483,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
         if(p_60504_.isClientSide())
         {
             ItemStack itemInHand = p_60506_.getMainHandItem();
-            if(itemInHand.getItem() instanceof ItemUpgradeModifications)
+            if(itemInHand.getItem() instanceof WorkCardPedestals)
             {
                 return InteractionResult.FAIL;
             }
@@ -880,7 +880,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
 
                     if(!itemInHand.isEmpty())
                     {
-                        if(itemInHand.getItem() instanceof ItemUpgradeModifications)
+                        if(itemInHand.getItem() instanceof WorkCardPedestals)
                         {
                             return InteractionResult.FAIL;
                         }

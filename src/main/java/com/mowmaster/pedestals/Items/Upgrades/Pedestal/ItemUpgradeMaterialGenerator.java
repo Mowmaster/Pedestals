@@ -13,9 +13,11 @@ import com.mowmaster.pedestals.PedestalUtils.UpgradeUtils;
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -149,6 +151,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     //https://github.com/oierbravo/createsifter/blob/mc1.19/dev/src/main/java/com/oierbravo/createsifter/content/contraptions/components/sifter/SifterTileEntity.java
     @Override
     public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
+
         CobbleGenRecipe recipe = getRecipe(pedestal.getLevel(),new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem()));
         ItemStack getOutput = getItemStackToGenerate(pedestal,recipe);
         List<ItemStack> getStackList = new ArrayList<>();

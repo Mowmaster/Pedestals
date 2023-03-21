@@ -97,7 +97,7 @@ public class ItemUpgradeBottler extends ItemUpgradeBase
                     if (handler != null) {
                         //Items
                         //Handle last, just incase any items match the other options
-                        int i = getNextSlotWithItemsCapFiltered(pedestal,cap);
+                        int i = getNextSlotWithItemsCapFilteredMachine(pedestal,cap);
                         if(i>=0)
                         {
                             itemFromInv = handler.getStackInSlot(i);

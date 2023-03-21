@@ -8,6 +8,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -77,6 +78,42 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_fan_selectedAllowed.get(); }
     @Override
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_fan_selectedMultiplier.get(); }
+
+    @Override
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
+
+        List<String> messages = super.getUpgradeHUD(pedestal);
+
+        if(messages.size()<=0)
+        {
+            if(baseEnergyCostPerDistance()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.RED + "Needs Energy");
+                    messages.add(ChatFormatting.RED + "To Operate");
+                }
+            }
+            if(baseXpCostPerDistance()>0)
+            {
+                if(pedestal.getStoredExperience()<baseXpCostPerDistance())
+                {
+                    messages.add(ChatFormatting.GREEN + "Needs Experience");
+                    messages.add(ChatFormatting.GREEN + "To Operate");
+                }
+            }
+            if(baseDustCostPerDistance().getDustAmount()>0)
+            {
+                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
+                {
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
+                }
+            }
+        }
+
+        return messages;
+    }
 
     @Override
     public ItemStack getUpgradeDefaultTool() {

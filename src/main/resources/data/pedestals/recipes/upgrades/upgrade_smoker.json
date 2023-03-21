@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_base"
+    },
+    {
+      "item": "minecraft:smoker"
+    }
+  ],
+  "result": {
+    "item": "pedestals:upgrade_pedestal_smoker"
+  }
+}
