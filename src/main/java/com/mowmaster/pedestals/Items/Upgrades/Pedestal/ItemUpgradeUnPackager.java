@@ -27,6 +27,9 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
     }
 
     @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
+    @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
         if(pedestal.getItemInPedestal().getItem() instanceof BaseFluidBulkStorageItem
                 || pedestal.getItemInPedestal().getItem() instanceof BaseEnergyBulkStorageItem

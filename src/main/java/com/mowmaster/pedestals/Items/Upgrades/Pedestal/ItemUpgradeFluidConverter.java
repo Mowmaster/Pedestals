@@ -32,6 +32,9 @@ public class ItemUpgradeFluidConverter extends ItemUpgradeBase
     }
 
     @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
+    @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         //remove NBT saved on upgrade here
 

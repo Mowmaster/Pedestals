@@ -46,6 +46,9 @@ public class ItemUpgradeSmoker extends ItemUpgradeBase
     public int baseEnergyCost(){ return PedestalConfig.COMMON.upgrade_smoker_baseEnergyCost.get(); }
 
     @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
+    @Override
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
         List<String> messages = new ArrayList<>();
 

@@ -60,6 +60,9 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
     }
 
     @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
+    @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         BlockPos posInventory = getPosOfBlockBelow(level,pedestalPos,1);

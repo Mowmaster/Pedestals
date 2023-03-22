@@ -67,7 +67,8 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
         return true;
     }
 
-
+    @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)

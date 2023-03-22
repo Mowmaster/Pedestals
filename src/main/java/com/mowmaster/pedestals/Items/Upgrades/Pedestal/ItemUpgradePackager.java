@@ -26,6 +26,9 @@ public class ItemUpgradePackager extends ItemUpgradeBase implements IHasModeType
     }
 
     @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
+    @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         int fluidCapacity = pedestal.getFluidCapacity();

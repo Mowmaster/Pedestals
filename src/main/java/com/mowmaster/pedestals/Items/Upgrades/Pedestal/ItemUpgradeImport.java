@@ -75,6 +75,9 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
         return true;
     }
 
+    @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
 
 
     @Override

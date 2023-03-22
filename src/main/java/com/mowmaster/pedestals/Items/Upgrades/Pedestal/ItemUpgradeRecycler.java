@@ -42,6 +42,9 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase implements IHasModeType
     }
 
     @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
+    @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         //remove NBT saved on upgrade here
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_storedExpUnderOne");

@@ -130,7 +130,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     p_112309_.popPose();
 
 
-                    if(workCard.getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
+                    if(workCard.getItem() instanceof ISelectableArea)
                     {
                         if(workCard.getItem() instanceof WorkCardBase cardBase)
                         {
@@ -153,7 +153,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                         }
                     }
 
-                    if(workCard.getItem().equals(DeferredRegisterItems.WORKCARD_LOCATIONS.get()))
+                    if(workCard.getItem() instanceof ISelectablePoints)
                     {
                         if(workCard.getItem() instanceof WorkCardBase cardBase)
                         {

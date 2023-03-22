@@ -10,6 +10,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -227,62 +229,96 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase
     {
         if(!level.isClientSide())
         {
+            boolean fullstop = false;
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
             List<BlockPos> listed = getValidList(pedestal);
             List<ItemStack> ingredientList = new ArrayList<>();
             for(int i=0; i<listed.size(); i++)
             {
                 BlockEntity invToCheck = level.getBlockEntity(listed.get(i));
-                if(invToCheck instanceof BasePedestalBlockEntity pedestalToCheck) {
+                if(invToCheck ==null)
+                {
+                    fullstop = true;
+                    break;
+                }
+                else if(invToCheck instanceof BasePedestalBlockEntity pedestalToCheck) {
                     ingredientList.add(pedestalToCheck.getItemInPedestal());
                 }
             }
 
-            if(ingredientList.size()>0)
+            if(!fullstop)
             {
-                if(hasCachedRecipe(coinInPedestal))
+                if(ingredientList.size()>0)
                 {
-                    //ItemStack result = stackResults.stream().findFirst().orElse(ItemStack.EMPTY);
-                    List<ItemStack> stackResult = getResultFromCachedRecipe(coinInPedestal,ingredientList);
-                    ItemStack copyIncoming = stackResult.copy();
-                    if(!stackResult.isEmpty())
+                    if(hasCachedRecipe(coinInPedestal))
                     {
-                        if(pedestal.addItem(copyIncoming,true))
-                        {
-                            for(int j=0; j<listed.size(); j++)
-                            {
-                                BlockEntity invToCheck = level.getBlockEntity(listed.get(j));
-                                if(invToCheck instanceof BasePedestalBlockEntity pedestalToCheck) {
 
-                                    ItemStack pedestalToCheckStack = pedestalToCheck.getItemInPedestal().copy();
-                                    if(!pedestalToCheck.removeItem(1,true).isEmpty())
+                        List<ItemStack> stackResult = getResultFromCachedRecipe(coinInPedestal,ingredientList);
+                        ItemStack result = stackResult.stream().findFirst().orElse(ItemStack.EMPTY);
+                        if(!result.isEmpty())
+                        {
+                            if(pedestal.addItem(result,true))
+                            {
+                                for(int j=0; j<listed.size(); j++)
+                                {
+                                    BlockEntity invToCheck = level.getBlockEntity(listed.get(j));
+                                    if(invToCheck ==null)
                                     {
-                                        pedestalToCheck.removeItem(1,false);
-                                        if(pedestalToCheckStack.hasCraftingRemainingItem())pedestal.addItem(pedestalToCheckStack.getCraftingRemainingItem(),false);
-                                        BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestalToCheck.getPos(),-1);
-                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestalToCheck.getLevel(),pedestalToCheck.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),50,200,0));
+                                        fullstop = true;
+                                        break;
+                                    }
+                                    else if(invToCheck instanceof BasePedestalBlockEntity pedestalToCheck) {
+
+                                        ItemStack pedestalToCheckStack = pedestalToCheck.getItemInPedestal().copy();
+                                        if(!pedestalToCheck.removeItem(1,true).isEmpty())
+                                        {
+                                            pedestalToCheck.removeItem(1,false);
+                                            if(pedestalToCheckStack.hasCraftingRemainingItem())pedestal.addItem(pedestalToCheckStack.getCraftingRemainingItem(),false);
+                                            BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestalToCheck.getPos(),-1);
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestalToCheck.getLevel(),pedestalToCheck.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),50,200,0));
+                                        }
                                     }
                                 }
-                            }
 
-                            pedestal.addItem(copyIncoming,false);
-                            BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestal.getPos(),-1);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),0,255,0));
+                                if(!fullstop)
+                                {
+                                    for(ItemStack stacks:stackResult)
+                                    {
+                                        if(pedestal.addItem(stacks,true))
+                                        {
+                                            pedestal.addItem(stacks,false);
+                                        }
+                                        else
+                                        {
+                                            BlockPos pedestalPos = getPosOfBlockBelow(level,pedestal.getPos(),-1);
+                                            ItemStack dropMe = stacks;
+                                            ItemEntity itementity = new ItemEntity(level, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), dropMe);
+                                            itementity.setDefaultPickUpDelay();
+                                            itementity.setDeltaMovement(0.0,0.0,0.0);
+                                            itementity.moveTo(Vec3.atCenterOf(pedestalPos));
+                                            level.addFreshEntity(itementity);
+                                        }
+                                    }
+
+                                    BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestal.getPos(),-1);
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),0,255,0));
+                                }
+                            }
+                            else
+                            {
+                                BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestal.getPos(),-1);
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),50,50,50));
+                            }
                         }
                         else
                         {
-                            BlockPos pedestalToCheckPoint = getPosOfBlockBelow(level,pedestal.getPos(),-1);
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalToCheckPoint.getX(),pedestalToCheckPoint.getY(),pedestalToCheckPoint.getZ(),50,50,50));
+                            cacheRecipe(pedestal,coinInPedestal,ingredientList);
                         }
                     }
                     else
                     {
                         cacheRecipe(pedestal,coinInPedestal,ingredientList);
                     }
-                }
-                else
-                {
-                    cacheRecipe(pedestal,coinInPedestal,ingredientList);
                 }
             }
         }

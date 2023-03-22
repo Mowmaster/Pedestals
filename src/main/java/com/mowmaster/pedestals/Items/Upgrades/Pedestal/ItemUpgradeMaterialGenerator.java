@@ -49,6 +49,9 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     }
 
     @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
+    @Override
     public ItemStack getUpgradeDefaultTool() {
         return new ItemStack(Items.STONE_PICKAXE);
     }

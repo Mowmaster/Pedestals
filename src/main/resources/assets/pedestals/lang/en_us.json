@@ -222,6 +222,7 @@
 
   "pedestals.upgradetool.pedestal_render_on": "Selectable Work Area Visualizer: ON",
   "pedestals.upgradetool.pedestal_render_off": "Selectable Work Area Visualizer: OFF",
+  "pedestals.upgradetool.pedestal_render_none": "Inserted Upgrade Has No Work Area",
 
   "pedestals.tool_chat_rrobin": "Transferring Mode: ",
   "pedestals.tool_chat_rrobin_true": "Round Robin",

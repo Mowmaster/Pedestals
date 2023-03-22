@@ -15,6 +15,7 @@ import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingTool;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardPedestals;
@@ -518,16 +519,32 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         p_60506_.displayClientMessage(render, true);
                     }
                     if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get())){
-                        boolean getCurrentRenderUpgrade = pedestal.getRenderRangeUpgrade();
-                        pedestal.setRenderRangeUpgrade(!getCurrentRenderUpgrade);
+                        if(pedestal.hasCoin())
+                        {
+                            if(pedestal.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
+                            {
+                                int value = upgrade.getUpgradeWorkRange(pedestal.getCoinOnPedestal());
+                                if(value>0)
+                                {
+                                    boolean getCurrentRenderUpgrade = pedestal.getRenderRangeUpgrade();
+                                    pedestal.setRenderRangeUpgrade(!getCurrentRenderUpgrade);
 
-                        MutableComponent render_on = Component.translatable(MODID + ".upgradetool.pedestal_render_on");
-                        MutableComponent render_off = Component.translatable(MODID + ".upgradetool.pedestal_render_off");
-                        MutableComponent render = (!getCurrentRenderUpgrade)?(render_on):(render_off);
-                        ChatFormatting color = (!getCurrentRenderUpgrade)?(ChatFormatting.BLUE):(ChatFormatting.DARK_BLUE);
-                        render.withStyle(color);
+                                    MutableComponent render_on = Component.translatable(MODID + ".upgradetool.pedestal_render_on");
+                                    MutableComponent render_off = Component.translatable(MODID + ".upgradetool.pedestal_render_off");
+                                    MutableComponent render = (!getCurrentRenderUpgrade)?(render_on):(render_off);
+                                    ChatFormatting color = (!getCurrentRenderUpgrade)?(ChatFormatting.BLUE):(ChatFormatting.DARK_BLUE);
+                                    render.withStyle(color);
 
-                        p_60506_.displayClientMessage(render, true);
+                                    p_60506_.displayClientMessage(render, true);
+                                }
+                                else
+                                {
+                                    MutableComponent render_none = Component.translatable(MODID + ".upgradetool.pedestal_render_none");
+                                    render_none.withStyle(ChatFormatting.WHITE);
+                                    p_60506_.displayClientMessage(render_none, true);
+                                }
+                            }
+                        }
                     }
                     else if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_MANIFEST.get())){
 

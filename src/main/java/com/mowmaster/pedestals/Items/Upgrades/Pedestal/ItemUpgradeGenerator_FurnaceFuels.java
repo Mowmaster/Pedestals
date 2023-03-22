@@ -46,6 +46,9 @@ public class ItemUpgradeGenerator_FurnaceFuels extends ItemUpgradeBase
     public int baseEnergyProduction(){ return PedestalConfig.COMMON.upgrade_generator_baseEnergyCost.get(); }
 
     @Override
+    public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
+
+    @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         //remove NBT saved on upgrade here
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coinInPedestal.getOrCreateTag(),"_numdelay");

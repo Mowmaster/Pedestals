@@ -163,7 +163,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 if(getWorkCardType()!=workCardBase.getWorkCardType())
                 {
                     addmessages=true;
-                    if(getWorkCardType()==2 && (workCardBase.getWorkCardType()==1 || workCardBase.getWorkCardType()==2))
+                    if(getWorkCardType()==0 && (workCardBase.getWorkCardType()==1 || workCardBase.getWorkCardType()==2))
                     {
                         addmessages=false;
                     }
@@ -172,8 +172,15 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                     {
                         messages.add(ChatFormatting.RED + "Incorrect Card");
                         messages.add(ChatFormatting.WHITE + "Needs:");
-                        messages.add(ChatFormatting.WHITE + "----------------");
-                        if(getWorkCardType() == 1)
+                        if(getWorkCardType() != 0){messages.add(ChatFormatting.WHITE + "----------------");}
+
+                        if(getWorkCardType() == 0)
+                        {
+                            messages.add(ChatFormatting.BLUE + "Work Area");
+                            messages.add(ChatFormatting.WHITE + "OR");
+                            messages.add(ChatFormatting.BLUE + "Work Locations");
+                        }
+                        if(getWorkCardType() == 1 )
                         {
                             messages.add(ChatFormatting.BLUE + "Work Area");
                         }
