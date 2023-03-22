@@ -89,6 +89,7 @@ public class JeiPedestalsPlugin implements IModPlugin
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.WORKCARD_AREA.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.WORKCARD_LOCATIONS.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.WORKCARD_PEDESTALS.get());
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_BASE.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_BASE.get());
@@ -167,6 +168,7 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_PACKAGER.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_UNPACKAGER.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_CRAFTER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_CRAFTER.get());
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BREAKER.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BREAKER.get());
@@ -222,8 +224,6 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_SMOKER.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BLASTER.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BLASTER.get());
-
-
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_RFGENERATOR.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_RFGENERATOR.get());
 
