@@ -2,10 +2,7 @@ package com.mowmaster.pedestals.Registry;
 
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.*;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseDustBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseEnergyBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.*;
 import com.mowmaster.pedestals.Items.Misc.TagGetterItem;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
@@ -217,6 +214,8 @@ public class DeferredRegisterItems
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_T4_RANGE = ITEMS.register("augment_pedestal_t4_range",
             () -> new AugmentTieredRange(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
+    public static final RegistryObject<Item> MECHANICAL_STORAGE_ITEM = ITEMS.register("mechanical_storage_item",
+            () -> new BaseItemBulkStorageItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS).stacksTo(1)));
     public static final RegistryObject<Item> MECHANICAL_STORAGE_FLUID = ITEMS.register("mechanical_storage_fluid",
             () -> new BaseFluidBulkStorageItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS).stacksTo(1)));
     public static final RegistryObject<Item> MECHANICAL_STORAGE_ENERGY = ITEMS.register("mechanical_storage_energy",

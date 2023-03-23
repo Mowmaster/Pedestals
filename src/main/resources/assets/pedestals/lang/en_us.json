@@ -408,6 +408,10 @@
   "pedestals.augments_storage_energyrate": "Increases Energy Buffer In Pedestal: ",
   "pedestals.augments_storage_xprate": "Increases Xp Level Buffer In Pedestal: ",
 
+  "item.pedestals.mechanical_storage_item": "Packaged Items",
+  "pedestals.bulkstorage_item": "ItemStacks Stored",
+  "pedestals.bulkstorage_item_discharge": "Time Until Discharge",
+  "jei.pedestals.mechanical_storage_item.description": "Stores a lot of the same Item Stacks, Will Discharge the Stacks after a short duration if held by a living entity/player.",
   "item.pedestals.mechanical_storage_fluid": "Packaged Fluid",
   "pedestals.bulkstorage_fluid": "Fluid Stored",
   "pedestals.bulkstorage_fluid_discharge": "Time Until Discharge",

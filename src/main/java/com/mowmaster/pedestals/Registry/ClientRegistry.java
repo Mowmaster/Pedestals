@@ -4,10 +4,7 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntityRenderer;
 import com.mowmaster.pedestals.Items.Filters.FilterRestricted;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseDustBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseEnergyBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
@@ -56,6 +53,8 @@ public class ClientRegistry
         {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
 
 
+        event.register((stack, color) ->
+        {if (color == 1) {return BaseItemBulkStorageItem.getItemColor();} else {return -1;}}, DeferredRegisterItems.MECHANICAL_STORAGE_ITEM.get());
         event.register((stack, color) ->
         {if (color == 1) {return BaseFluidBulkStorageItem.getItemColor();} else {return -1;}}, DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
         event.register((stack, color) ->

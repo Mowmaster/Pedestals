@@ -249,7 +249,11 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_hiveharvester_selectedMultiplier;
 
         public final ForgeConfigSpec.BooleanValue upgrade_dropper_canDropBolt;
-        public final ForgeConfigSpec.IntValue upgrade_dropper_costPerBolt;
+        public final ForgeConfigSpec.IntValue upgrade_dropper_baseItemDropAmount;
+        public final ForgeConfigSpec.IntValue upgrade_dropper_baseFluidDropAmount;
+        public final ForgeConfigSpec.IntValue upgrade_dropper_baseEnergyDropAmount;
+        public final ForgeConfigSpec.IntValue upgrade_dropper_baseExpDropAmount;
+        public final ForgeConfigSpec.IntValue upgrade_dropper_baseDustDropAmount;
 
         public final ForgeConfigSpec.IntValue upgrade_pump_baseEnergyCost;
         public final ForgeConfigSpec.DoubleValue upgrade_pump_energyMultiplier;
@@ -321,6 +325,8 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_breeder_dustMultiplier;
         public final ForgeConfigSpec.BooleanValue upgrade_breeder_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_breeder_selectedMultiplier;
+        public final ForgeConfigSpec.BooleanValue upgrade_breeder_entityBreedingLimit;
+        public final ForgeConfigSpec.IntValue upgrade_breeder_entityLimitBreedingCount;
 
         public final ForgeConfigSpec.BooleanValue attacker_DamageTools;
         public final ForgeConfigSpec.IntValue upgrade_attacker_baseEnergyCost;
@@ -356,9 +362,30 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue upgrade_generator_baseEnergyCost;
 
 
+        public final ForgeConfigSpec.IntValue upgrade_import_baseItemTransferSpeed;
+        public final ForgeConfigSpec.IntValue upgrade_import_baseFluidTransferSpeed;
+        public final ForgeConfigSpec.IntValue upgrade_import_baseEnergyTransferSpeed;
+        public final ForgeConfigSpec.IntValue upgrade_import_baseExpTransferSpeed;
+        public final ForgeConfigSpec.IntValue upgrade_import_baseDustTransferSpeed;
+
+        public final ForgeConfigSpec.IntValue upgrade_export_baseItemTransferSpeed;
+        public final ForgeConfigSpec.IntValue upgrade_export_baseFluidTransferSpeed;
+        public final ForgeConfigSpec.IntValue upgrade_export_baseEnergyTransferSpeed;
+        public final ForgeConfigSpec.IntValue upgrade_export_baseExpTransferSpeed;
+        public final ForgeConfigSpec.IntValue upgrade_export_baseDustTransferSpeed;
+
+
+
+
+
+
+
 
         public final ForgeConfigSpec.BooleanValue upgrade_require_sized_selectable_area;
 
+        public final ForgeConfigSpec.IntValue bulkstorage_itemDischarge;
+        public final ForgeConfigSpec.BooleanValue bulkstorage_itemDischarge_toggle;
+        public final ForgeConfigSpec.IntValue bulkstorage_maxItemStorage;
         public final ForgeConfigSpec.IntValue bulkstorage_fluidDischarge;
         public final ForgeConfigSpec.BooleanValue bulkstorage_fluidDischarge_toggle;
         public final ForgeConfigSpec.IntValue bulkstorage_energyDischarge;
@@ -495,6 +522,42 @@ public class PedestalConfig
             cobbleGeneratorDamageTools = builder
                     .comment("Material Generator Damages Inserted Tools")
                     .define("materialGenToolDamage",false);
+            builder.pop();
+
+            builder.comment("Import Upgrade Configs").push("Import_Upgrade_Configs");
+            upgrade_import_baseItemTransferSpeed = builder
+                    .comment("Base Import Speed (Item)")
+                    .defineInRange("upgrade_import_base_item_rate", 4, 0, Integer.MAX_VALUE);
+            upgrade_import_baseFluidTransferSpeed = builder
+                    .comment("Base Import Speed (Fluid)")
+                    .defineInRange("upgrade_import_base_fluid_rate", 1000, 0, Integer.MAX_VALUE);
+            upgrade_import_baseEnergyTransferSpeed = builder
+                    .comment("Base Import Speed (Energy)")
+                    .defineInRange("upgrade_import_base_energy_rate", 5000, 0, Integer.MAX_VALUE);
+            upgrade_import_baseExpTransferSpeed = builder
+                    .comment("Base Import Speed (Exp)")
+                    .defineInRange("upgrade_import_base_exp_rate", 7, 0, Integer.MAX_VALUE);
+            upgrade_import_baseDustTransferSpeed = builder
+                    .comment("Base Import Speed (Dust)")
+                    .defineInRange("upgrade_import_base_dust_rate", 200, 0, Integer.MAX_VALUE);
+            builder.pop();
+
+            builder.comment("Export Upgrade Configs").push("Export_Upgrade_Configs");
+            upgrade_export_baseItemTransferSpeed = builder
+                    .comment("Base Export Speed (Item)")
+                    .defineInRange("upgrade_export_base_item_rate", 4, 0, Integer.MAX_VALUE);
+            upgrade_export_baseFluidTransferSpeed = builder
+                    .comment("Base Export Speed (Fluid)")
+                    .defineInRange("upgrade_export_base_fluid_rate", 1000, 0, Integer.MAX_VALUE);
+            upgrade_export_baseEnergyTransferSpeed = builder
+                    .comment("Base Export Speed (Energy)")
+                    .defineInRange("upgrade_export_base_energy_rate", 5000, 0, Integer.MAX_VALUE);
+            upgrade_export_baseExpTransferSpeed = builder
+                    .comment("Base Export Speed (Exp)")
+                    .defineInRange("upgrade_export_base_exp_rate", 7, 0, Integer.MAX_VALUE);
+            upgrade_export_baseDustTransferSpeed = builder
+                    .comment("Base Export Speed (Dust)")
+                    .defineInRange("upgrade_export_base_dust_rate", 200, 0, Integer.MAX_VALUE);
             builder.pop();
 
 
@@ -923,9 +986,21 @@ public class PedestalConfig
             upgrade_dropper_canDropBolt = builder
                     .comment("Is Dropper Allowed to Drop Lightning")
                     .define("upgrade_dropper_can_drop_bolt",  true);
-            upgrade_dropper_costPerBolt = builder
-                    .comment("Base Energy needed per Bolt of Lightning 'Dropped' ")
-                    .defineInRange("upgrade_dropper_cost_per_bolt", 5000, 0, Integer.MAX_VALUE);
+            upgrade_dropper_baseItemDropAmount = builder
+                    .comment("Base Item Drop Amount ")
+                    .defineInRange("upgrade_dropper_base_drop_item_amount", 1, 0, Integer.MAX_VALUE);
+            upgrade_dropper_baseFluidDropAmount = builder
+                    .comment("Base Fluid Drop Amount ")
+                    .defineInRange("upgrade_dropper_base_drop_fluid_amount", 1000, 0, Integer.MAX_VALUE);
+            upgrade_dropper_baseEnergyDropAmount = builder
+                    .comment("Base Energy Drop Amount ")
+                    .defineInRange("upgrade_dropper_base_drop_energy_amount", 5000, 0, Integer.MAX_VALUE);
+            upgrade_dropper_baseExpDropAmount = builder
+                    .comment("Base Exp Drop Amount ")
+                    .defineInRange("upgrade_dropper_base_drop_exp_amount", 7, 0, Integer.MAX_VALUE);
+            upgrade_dropper_baseDustDropAmount = builder
+                    .comment("Base Dust Drop Amount ")
+                    .defineInRange("upgrade_dropper_base_drop_dust_amount", 200, 0, Integer.MAX_VALUE);
             builder.pop();
 
 
@@ -1144,6 +1219,12 @@ public class PedestalConfig
             upgrade_breeder_selectedMultiplier = builder
                     .comment("Modifier Amount, Distance x Modifier + Other 'Energy' BaseCost (this is the 'total cost' formula) [Mob Breeder]")
                     .defineInRange("upgrade_breeder_selected_multiplier", 1.0D, 0.0D, (double)Integer.MAX_VALUE);
+            upgrade_breeder_entityBreedingLimit = builder
+                    .comment("Checks for Entities in the Selected Area, if they exceed an amount, itll halt all breeding operations.")
+                    .define("upgrade_breeder_has_limit",  false);
+            upgrade_breeder_entityLimitBreedingCount = builder
+                    .comment("If the limiter is true, this is the entity count limit before it stop breeding")
+                    .defineInRange("upgrade_breeder_limit_count", 20, 1, Integer.MAX_VALUE);
             builder.pop();
 
 
@@ -1259,6 +1340,15 @@ public class PedestalConfig
 
 
             builder.comment("Bulk Storage Options").push("Bulk_Storage");
+            bulkstorage_itemDischarge = builder
+                    .comment("Time (In Seconds) for items to Discharge from Bulk Storage (Item)")
+                    .defineInRange("bulkstorage_item_discharge_time", 5, 1, Integer.MAX_VALUE);
+            bulkstorage_itemDischarge_toggle = builder
+                    .comment("Weather bulk storage discharge is allowed to trigger or not (Item)")
+                    .define("bulkstorage_item_discharge_toggle",  true);
+            bulkstorage_maxItemStorage = builder
+                    .comment("Set Max Item Stacks Allowed in a Package")
+                    .defineInRange("bulkstorage_item_max_stacks", 54, 1, Integer.MAX_VALUE);
             bulkstorage_fluidDischarge = builder
                     .comment("Time (In Seconds) for energy to Discharge from Bulk Storage (Fluid)")
                     .defineInRange("bulkstorage_fluid_discharge_time", 5, 1, Integer.MAX_VALUE);

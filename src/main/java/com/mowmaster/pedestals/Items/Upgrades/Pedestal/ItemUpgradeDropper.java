@@ -73,7 +73,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
     public int getWorkCardType() { return 0; }
 
     public boolean canDropBolts(){ return PedestalConfig.COMMON.upgrade_dropper_canDropBolt.get(); }
-    public int baseEnergyCostPerDrop(){ return PedestalConfig.COMMON.upgrade_dropper_costPerBolt.get(); }
+    public int baseEnergyCostPerDrop(){ return PedestalConfig.COMMON.upgrade_dropper_baseEnergyDropAmount.get(); }
 
     private void buildValidBlockList(BasePedestalBlockEntity pedestal)
     {
@@ -276,8 +276,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
                         if(!currentPoint.equals(pedestal.getPos()) && (level.getBlockState(currentPoint).getBlock() == Blocks.AIR || level.getBlockState(currentPoint).getBlock() instanceof IFluidBlock))
                         {
                             ItemStack itemToDrop = pedestal.getItemInPedestal().copy();
-                            //int baseRate = PedestalConfig.COMMON.pedestal_baseItemTransferRate.get();
-                            int baseRate = 1;
+                            int baseRate = PedestalConfig.COMMON.upgrade_dropper_baseItemDropAmount.get();
                             int maxRate = baseRate + getItemCapacityIncrease(pedestal.getCoinOnPedestal());
                             int countToDrop = (maxRate>=itemToDrop.getMaxStackSize())?(itemToDrop.getMaxStackSize()):(maxRate);
                             if(!pedestal.removeItem(countToDrop,true).isEmpty())
@@ -310,7 +309,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
 
                 if(canTransferXP(coinUpgrade) && pedestal.hasExperience())
                 {
-                    int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
+                    int baseValue = PedestalConfig.COMMON.upgrade_dropper_baseExpDropAmount.get();
                     int maxValue = baseValue + getXPCapacityIncrease(pedestal.getCoinOnPedestal());
                     int getxpAmountToDrop = (maxValue >= pedestal.getStoredExperience())?(pedestal.getStoredExperience()):(maxValue);
                     if(pedestal.removeExperience(getxpAmountToDrop,true)>0)

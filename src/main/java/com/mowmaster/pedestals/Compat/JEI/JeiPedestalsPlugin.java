@@ -227,6 +227,7 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_RFGENERATOR.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_RFGENERATOR.get());
 
+        this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_ITEM.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.MECHANICAL_STORAGE_XP.get());

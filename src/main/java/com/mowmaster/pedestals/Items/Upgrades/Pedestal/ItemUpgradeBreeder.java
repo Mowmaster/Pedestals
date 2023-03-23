@@ -73,6 +73,10 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase
     @Override
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_breeder_selectedMultiplier.get(); }
 
+
+    public boolean hasBreederLimit() { return PedestalConfig.COMMON.upgrade_breeder_entityBreedingLimit.get(); }
+    public int getBreederLimitCount() { return PedestalConfig.COMMON.upgrade_breeder_entityLimitBreedingCount.get(); }
+
     @Override
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
 
@@ -132,7 +136,15 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase
                             ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
                             tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
 
-            /*if(PedestalConfig.COMMON.breeder_DamageTools.get())
+                            if(hasBreederLimit())
+                            {
+                                if(entities.size()>=getBreederLimitCount())
+                                {
+                                    canRun = false;
+                                }
+                            }
+
+                            /*if(PedestalConfig.COMMON.breeder_DamageTools.get())
             {
                 if(pedestal.hasTool())
                 {

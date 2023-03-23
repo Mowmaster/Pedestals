@@ -4,16 +4,16 @@ import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseDustBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseEnergyBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageItem;
-import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
+import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.*;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTypes
 {
@@ -31,7 +31,8 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
 
     @Override
     public void updateAction(Level world, BasePedestalBlockEntity pedestal) {
-        if(pedestal.getItemInPedestal().getItem() instanceof BaseFluidBulkStorageItem
+        if(pedestal.getItemInPedestal().getItem() instanceof BaseItemBulkStorageItem
+                || pedestal.getItemInPedestal().getItem() instanceof BaseFluidBulkStorageItem
                 || pedestal.getItemInPedestal().getItem() instanceof BaseEnergyBulkStorageItem
                 || pedestal.getItemInPedestal().getItem() instanceof BaseXpBulkStorageItem
                 || pedestal.getItemInPedestal().getItem() instanceof BaseDustBulkStorageItem)
@@ -44,11 +45,50 @@ public class ItemUpgradeUnPackager extends ItemUpgradeBase implements IHasModeTy
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         ItemStack stackInPed = pedestal.getItemInPedestal();
+        ItemStack initialStackCopy = stackInPed.copy();
         int fluidSpace = pedestal.spaceForFluid();
         int energySpace = pedestal.spaceForEnergy();
         int xpSpace = pedestal.spaceForExperience();
         int dustSpace = pedestal.spaceForDust();
 
+        if(stackInPed.getItem() instanceof BaseItemBulkStorageItem packagedItems && canTransferItems(coin))
+        {
+            List<ItemStack> newList = new ArrayList<>();
+            List<ItemStack> stacks = packagedItems.getStacksList(stackInPed);
+            if(stacks.size()>0)
+            {
+                if(pedestal.addItemStack(stacks.get(0),true).isEmpty())
+                {
+                    for(ItemStack stack:stacks)
+                    {
+                        if(pedestal.addItem(stack,true))
+                        {
+                            pedestal.addItem(stack,false);
+                        }
+                        else
+                        {
+                            newList.add(stack);
+                        }
+                    }
+
+                    if(newList.size()>0)
+                    {
+                        packagedItems.setStacksList(initialStackCopy,newList);
+                        pedestal.removeItemStack(stackInPed,false);
+                        pedestal.addItemStack(initialStackCopy,false);
+                    }
+                    else
+                    {
+                        packagedItems.setStacksList(initialStackCopy,new ArrayList<>());
+                        pedestal.removeItemStack(stackInPed,false);
+                    }
+                }
+            }
+            else
+            {
+                pedestal.removeItemStack(stackInPed,false);
+            }
+        }
         if(stackInPed.getItem() instanceof BaseFluidBulkStorageItem fluidItem && canTransferFluids(coin))
         {
             if(fluidSpace>0)
