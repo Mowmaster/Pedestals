@@ -220,12 +220,12 @@ public class ItemUpgradeSmoker extends ItemUpgradeBase
                                     int xp = getXpFromCachedRecipe(coin,copyIncoming);
                                     ItemStack result = getResultFromCachedRecipe(coin,copyIncoming);
 
-                                    int currentCookTime = getCookTime(pedestal);
-                                    if(currentCookTime>=cooktime)
+                                    if(!result.isEmpty())
                                     {
-                                        resetCookTime(pedestal);
-                                        if(!result.isEmpty())
+                                        int currentCookTime = getCookTime(pedestal);
+                                        if(currentCookTime>=cooktime)
                                         {
+                                            resetCookTime(pedestal);
                                             if(!handler.extractItem(i,1 ,true ).isEmpty() && pedestal.addItemStack(result, true).isEmpty())
                                             {
                                                 handler.extractItem(i,1 ,false );
@@ -234,16 +234,20 @@ public class ItemUpgradeSmoker extends ItemUpgradeBase
                                                 if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+0.75D,pedestalPos.getZ(),255,150,0));
                                             }
                                         }
+                                        else
+                                        {
+                                            int cost = baseEnergyCost();
+                                            if(pedestal.removeEnergy(cost,true)>=cost)
+                                            {
+                                                pedestal.removeEnergy(cost,false);
+                                                incrementCookingTime(pedestal);
+                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+0.75D,pedestalPos.getZ(),0,0,0));
+                                            }
+                                        }
                                     }
                                     else
                                     {
-                                        int cost = baseEnergyCost();
-                                        if(pedestal.removeEnergy(cost,true)>=cost)
-                                        {
-                                            pedestal.removeEnergy(cost,false);
-                                            incrementCookingTime(pedestal);
-                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+0.75D,pedestalPos.getZ(),50,50,50));
-                                        }
+                                        cacheRecipe(pedestal,coin,copyIncoming);
                                     }
                                 }
                                 else
