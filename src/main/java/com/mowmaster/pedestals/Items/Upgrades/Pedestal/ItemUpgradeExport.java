@@ -222,10 +222,11 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
                     else
                     {
                         //should i just set this to zero???
-                        FluidStack fluidInTank = handler.getFluidInTank(tanks-1);
+                        int gettanks = (tanks-1 <=0)?(0):(tanks-1);
+                        FluidStack fluidInTank = handler.getFluidInTank(gettanks);
                         if(fluidInTank.isEmpty() || fluidInPedestal.isFluidEqual(fluidInTank))
                         {
-                            int getTankCapacity = handler.getTankCapacity(tanks-1);
+                            int getTankCapacity = handler.getTankCapacity(gettanks);
                             int tankCurrentlyStored = fluidInTank.getAmount();
                             int spaceInTank = getTankCapacity-tankCurrentlyStored;
                             int amountInCoin = fluidInPedestal.getAmount();

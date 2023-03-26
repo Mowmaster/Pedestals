@@ -74,6 +74,8 @@ public class ItemUpgradePackager extends ItemUpgradeBase implements IHasModeType
                         for(int i=0;i<handler.getSlots();i++)
                         {
                             ItemStack stackIn = handler.getStackInSlot(i);
+                            //Dont Allow Bulk Items to be Packaged
+                            if(stackIn.getItem() instanceof IBulkItem) { break; }
                             int maxSizeStack = stackIn.getMaxStackSize();
                             if(stackIn.getCount()>=maxSizeStack)
                             {
@@ -90,7 +92,6 @@ public class ItemUpgradePackager extends ItemUpgradeBase implements IHasModeType
                                 else {
                                     stacks.add(stackIn);
                                 }
-
                             }
                             else
                             {

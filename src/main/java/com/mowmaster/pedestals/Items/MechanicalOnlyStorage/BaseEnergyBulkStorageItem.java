@@ -33,7 +33,7 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class BaseEnergyBulkStorageItem extends BaseEnergyDropItem {
+public class BaseEnergyBulkStorageItem extends BaseEnergyDropItem implements IBulkItem {
 
     public BaseEnergyBulkStorageItem(Properties p_41383_) {
         super(p_41383_);

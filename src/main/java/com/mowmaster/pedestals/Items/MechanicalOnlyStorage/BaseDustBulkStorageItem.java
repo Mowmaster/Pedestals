@@ -32,7 +32,7 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class BaseDustBulkStorageItem extends BaseDustDropItem {
+public class BaseDustBulkStorageItem extends BaseDustDropItem implements IBulkItem {
 
     public BaseDustBulkStorageItem(Properties p_41383_) {
         super(p_41383_);

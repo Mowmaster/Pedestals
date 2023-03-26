@@ -179,6 +179,18 @@ public class ItemUpgradeBlastFurnace extends ItemUpgradeBase
         MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1+getSpeedTicksReduced(pedestal.getCoinOnPedestal())), "_numdelay");
     }
 
+    private void resetCache(BasePedestalBlockEntity pedestal, ItemStack coin)
+    {
+        if(hasCachedRecipe(coin))
+        {
+            MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coin.getOrCreateTag(),"input");
+            MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coin.getOrCreateTag(),"output");
+            MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coin.getOrCreateTag(),"cooktime");
+            MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coin.getOrCreateTag(),"xpamount");
+            MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coin.getOrCreateTag(),"_numdelay");
+        }
+    }
+
     @Override
     public void updateAction(Level level, BasePedestalBlockEntity pedestal)
     {

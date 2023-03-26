@@ -771,7 +771,7 @@ public class PedestalConfig
             builder.comment("Chopper Configs").push("Chopper_Configs");
             chopperDamageTools = builder
                     .comment("Chopper Damages Inserted Tools")
-                    .define("chopperDamageTools",false);
+                    .define("chopper_damages_tools",false);
             upgrade_chopper_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Chopper]")
                     .defineInRange("upgrade_chopper_base_energy_cost", 0, 0, Integer.MAX_VALUE);
@@ -1098,7 +1098,7 @@ public class PedestalConfig
             builder.comment("Sheerer Configs").push("Sheerer_Configs");
             sheerer_DamageTools = builder
                     .comment("Sheerer Damages Inserted Tools")
-                    .define("chopperDamageTools",false);
+                    .define("shearer_damages_tools",false);
             upgrade_sheerer_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Sheerer]")
                     .defineInRange("upgrade_sheerer_base_energy_cost", 0, 0, Integer.MAX_VALUE);
@@ -1140,7 +1140,7 @@ public class PedestalConfig
             builder.comment("Milker Configs").push("Milker_Configs");
             milker_DamageTools = builder
                     .comment("Milker Damages Inserted Tools")
-                    .define("chopperDamageTools",false);
+                    .define("milker_damages_tools",false);
             upgrade_milker_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Milker]")
                     .defineInRange("upgrade_milker_base_energy_cost", 0, 0, Integer.MAX_VALUE);
@@ -1182,7 +1182,7 @@ public class PedestalConfig
             builder.comment("Mob Breeder Configs").push("Mob_Breeder_Configs");
             breeder_DamageTools = builder
                     .comment("Mob Breeder Damages Inserted Tools")
-                    .define("chopperDamageTools",false);
+                    .define("breeder_damages_tools",false);
             upgrade_breeder_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Mob Breeder]")
                     .defineInRange("upgrade_breeder_base_energy_cost", 0, 0, Integer.MAX_VALUE);
@@ -1232,7 +1232,7 @@ public class PedestalConfig
             builder.comment("Attacker Configs").push("Attacker_Configs");
             attacker_DamageTools = builder
                     .comment("Attacker Damages Inserted Tools")
-                    .define("chopperDamageTools",false);
+                    .define("attacker_damages_tools",false);
             upgrade_attacker_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Attacker]")
                     .defineInRange("upgrade_attacker_base_energy_cost", 0, 0, Integer.MAX_VALUE);

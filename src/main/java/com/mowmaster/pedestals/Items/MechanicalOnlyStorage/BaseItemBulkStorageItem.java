@@ -1,7 +1,9 @@
 package com.mowmaster.pedestals.Items.MechanicalOnlyStorage;
 
 import com.mowmaster.mowlib.Items.BaseEnergyDropItem;
+import com.mowmaster.mowlib.Items.BaseItemStackDropItem;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibTooltipUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
@@ -32,7 +34,7 @@ import java.util.Random;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class BaseItemBulkStorageItem extends BaseEnergyDropItem {
+public class BaseItemBulkStorageItem extends BaseItemStackDropItem implements IBulkItem {
 
     public BaseItemBulkStorageItem(Properties p_41383_) {
         super(p_41383_);
@@ -169,15 +171,10 @@ public class BaseItemBulkStorageItem extends BaseEnergyDropItem {
 
     public void removeStacks(Level level, BlockPos pos, ItemStack packageItem) {
 
-        Random rand = new Random();
         List<ItemStack> stacked = getStacksList(packageItem);
         for(ItemStack stack:stacked)
         {
-            ItemStack dropMe = stack;
-            ItemEntity itementity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), dropMe);
-            itementity.setDefaultPickUpDelay();
-            itementity.setDeltaMovement((double)rand.nextInt(5),(double)Math.abs(rand.nextInt(5)),(double)rand.nextInt(5));
-            level.addFreshEntity(itementity);
+            MowLibItemUtils.spawnItemStack(level,pos.getX(),pos.getY(),pos.getZ(),stack);
         }
     }
 

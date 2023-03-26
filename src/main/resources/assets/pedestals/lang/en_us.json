@@ -547,8 +547,6 @@
   "block.pedestals.block_pedestal": "Pedestal",
   "jei.pedestals.block_pedestal.description": "§5Can Transport Items, Fluids, Energy, and XP - Can be Recolored with Applicator",
 
-
-
   "death.attack.pedestal1": "%1$s was poked one too many times.",
   "death.attack.pedestal2": "%1$s got the stabby stabby.",
   "death.attack.pedestal3": "%1$s was sliced into bits.",
@@ -561,5 +559,19 @@
   "death.attack.pedestal10": "%1$s was pricked to death.",
   "death.attack.pedestal11": "%1$s has kicked the bucket.",
   "death.attack.pedestal12": "%1$s, we told you not to play around with sharp things!",
-  "death.attack.pedestal13": "%1$s, became Holey, then they Ascended!"
+  "death.attack.pedestal13": "%1$s, became Holey, then they Ascended!",
+
+  "death.attack.pedestal1.item": "%1$s was poked one too many times.",
+  "death.attack.pedestal2.item": "%1$s got the stabby stabby.",
+  "death.attack.pedestal3.item": "%1$s was sliced into bits.",
+  "death.attack.pedestal4.item": "%1$s is having a bad day.",
+  "death.attack.pedestal5.item": "%1$s life was taken by a mysterious force.",
+  "death.attack.pedestal6.item": "%1$s caught a sword with their face.",
+  "death.attack.pedestal7.item": "%1$s was disemboweled.",
+  "death.attack.pedestal8.item": "%1$s wasn't carring the knife properly and slipped.",
+  "death.attack.pedestal9.item": "%1$s was turned into chop suey!",
+  "death.attack.pedestal10.item": "%1$s was pricked to death.",
+  "death.attack.pedestal11.item": "%1$s has kicked the bucket.",
+  "death.attack.pedestal12.item": "%1$s, we told you not to play around with sharp things!",
+  "death.attack.pedestal13.item": "%1$s, became Holey, then they Ascended!"
 }
