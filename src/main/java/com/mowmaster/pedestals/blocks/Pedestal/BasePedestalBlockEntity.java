@@ -19,6 +19,8 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
+import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
+import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -3567,7 +3569,30 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     }
 
 
+    public BlockPos getPosOfBlockBelowPedestal(Level world, int numBelow)
+    {
+        BlockState state = world.getBlockState(getPos());
 
+        Direction enumfacing = (state.hasProperty(FACING))?(state.getValue(FACING)):(Direction.UP);
+        BlockPos blockBelow = getPos();
+        switch (enumfacing)
+        {
+            case UP:
+                return blockBelow.offset(0,-numBelow,0);
+            case DOWN:
+                return blockBelow.offset(0,numBelow,0);
+            case NORTH:
+                return blockBelow.offset(0,0,numBelow);
+            case SOUTH:
+                return blockBelow.offset(0,0,-numBelow);
+            case EAST:
+                return blockBelow.offset(-numBelow,0,0);
+            case WEST:
+                return blockBelow.offset(numBelow,0,0);
+            default:
+                return blockBelow;
+        }
+    }
 
 
 
@@ -3616,6 +3641,27 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
                 }
 
             }
+
+            if(canSpawnParticles())
+            {
+                BlockPos posOrientated = getPosOfBlockBelowPedestal(level,0);
+                if(getRenderRange() && pedTicker%10 == 0){
+                    MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,getPos().getX(),getPos().getY()+1.0D,getPos().getZ(),0,0,0));
+                }
+
+                if(getRenderRangeUpgrade() && pedTicker%10 == 0){
+                    MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,getPos().getX(),getPos().getY()+1.0D,getPos().getZ(),50,50,50));
+                }
+
+                if(pedTicker%40 == 0){if(this.hasEnergy()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.25D,posOrientated.getY(),posOrientated.getZ()+0.25D,255,0,0));}}
+                if(pedTicker%40 == 0){if(this.hasExperience()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.75D,posOrientated.getY(),posOrientated.getZ()+0.75D,0,255,0));}}
+                if(pedTicker%40 == 0){if(this.hasFluid()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.75D,posOrientated.getY(),posOrientated.getZ()+0.25D,0,0,255));}}
+                if(References.isDustLoaded())
+                {
+                    if(pedTicker%40 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasDust()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.25D,posOrientated.getY(),posOrientated.getZ()+0.75D,178,0,255));}}
+                }
+            }
+
         }
     }
 
@@ -3629,24 +3675,10 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
             }
         }*/
 
-        if(getRenderRange()){ if(getLevel().getGameTime()%20 == 0)MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,getPos().getX(),getPos().getY(),getPos().getZ(),0,0,0)); }
 
-        if(canSpawnParticles())
-        {
-            BlockPos posDirectionalEnergy = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0D,0D,0D);
-            if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasEnergy()){MowLibPacketHandler.sendToNearby(level,posDirectionalEnergy,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalEnergy.getX(),posDirectionalEnergy.getY(),posDirectionalEnergy.getZ(),255,0,0));}}
-            BlockPos posDirectionalXP = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0.5D,0D,0.5D);
-            if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasExperience()){MowLibPacketHandler.sendToNearby(level,posDirectionalXP,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalXP.getX(),posDirectionalXP.getY(),posDirectionalXP.getZ(),0,255,0));}}
-            //System.out.println(getPos());
+        /*
 
-            BlockPos posDirectionalFluid = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),0.5D,0D,0D);
-            //System.out.println(getPos().offset(0.5D,0D,0D));
-            if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasFluid()){MowLibPacketHandler.sendToNearby(level,posDirectionalFluid,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalFluid.getX(),posDirectionalFluid.getY(),posDirectionalFluid.getZ(),0,0,255));}}
-
-            BlockPos posDirectionalDust = offsetBasedOnDirection(getPedestal().getBlockState().getValue(FACING),getPos(),-0.5D,0D,-0.5D);
-            //System.out.println(getPos().offset(0.5D,0D,0D));
-            if(getLevel().getGameTime()%20 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasDust()){MowLibPacketHandler.sendToNearby(level,posDirectionalDust,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posDirectionalDust.getX(),posDirectionalDust.getY(),posDirectionalDust.getZ(),178,0,255));}}
-        }
+         */
     }
 
     @Override

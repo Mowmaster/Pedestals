@@ -8,9 +8,12 @@ import com.mowmaster.pedestals.Recipes.*;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import mezz.jei.api.IModPlugin;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.helpers.IStackHelper;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
+import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -23,6 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.common.brewing.VanillaBrewingRecipe;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
@@ -259,6 +263,22 @@ public class JeiPedestalsPlugin implements IModPlugin
                 JEIPedestalsRecipeTypes.FLUIDCONVERTER_RECIPE);
         registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_MODIFICATIONS.get()),
                 JEIPedestalsRecipeTypes.UPGRADEMODIFICATIONGLOBAL_RECIPE);
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_ATTACKER.get()),
+                JEIRecipeTypes.MOB_FILTER);
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_FAN.get()),
+                JEIRecipeTypes.MOB_FILTER);
+
+        //Vanilla Recipe things
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_CRAFTER.get()),
+                RecipeTypes.CRAFTING);
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_SMELTER.get()),
+                RecipeTypes.SMELTING);
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_BLASTER.get()),
+                RecipeTypes.BLASTING);
+        registration.addRecipeCatalyst(new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_SMOKER.get()),
+                RecipeTypes.SMOKING);
+
+
     }
 
     @Override

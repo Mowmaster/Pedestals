@@ -11,10 +11,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -51,12 +53,15 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
         InteractionHand hand = p_41434_;
         ItemStack stackInHand = player.getItemInHand(hand);
 
-        String linksucess = MODID + ".tool_link_success";
+        String linksucess = MODID + ".tool_link_success_backwardslinkingtool";
         String linkunsuccess = MODID + ".tool_link_unsucess";
         String linkremoved = MODID + ".tool_link_removed";
         String linkitsself = MODID + ".tool_link_itsself";
         String linknetwork = MODID + ".tool_link_network";
         String linkdistance = MODID + ".tool_link_distance";
+        String linkstart = MODID + ".tool_link_start_backwardslinkingtool";
+        String linkclear = MODID + ".tool_link_cleared";
+        String toolchange = MODID + ".tool_change";
 
 
         if(!world.isClientSide())
@@ -78,7 +83,7 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                         }
                         player.setItemInHand(hand, newTool);
 
-                        MowLibMessageUtils.messagePopup(player,ChatFormatting.GREEN,"pedestals.tool_change");
+                        MowLibMessageUtils.messagePopup(player,ChatFormatting.GREEN,toolchange);
                         return InteractionResultHolder.success(stackInHand);
                     }
                 }
@@ -108,6 +113,9 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                             {
                                 stackInHand.enchant(Enchantments.UNBREAKING,-1);
                             }
+
+                            MowLibMessageUtils.messagePopup(player,ChatFormatting.AQUA,linkstart);
+
                             return InteractionResultHolder.success(stackInHand);
                         }
                         //If wrench has the compound stacks and has a position stored(is enchanted)
@@ -119,8 +127,7 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                             {
                                 //Checks Tile at location to make sure its a TilePedestal
                                 BlockEntity tileSenderBE = world.getBlockEntity(senderPos);
-                                if (tileSenderBE instanceof BasePedestalBlockEntity) {
-                                    BasePedestalBlockEntity tileSenderPedestal = (BasePedestalBlockEntity) tileSenderBE;
+                                if (tileSenderBE instanceof BasePedestalBlockEntity tileSenderPedestal) {
 
                                     //checks if connecting pedestal is out of range of the senderPedestal
                                     if(isPedestalInRange(tileSenderPedestal,pos))
@@ -155,10 +162,10 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                                                                 EnchantmentHelper.setEnchantments(enchantsNone,stackInHand);
                                                             }
                                                         }
-                                                        MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linksucess);
+                                                        MowLibMessageUtils.messagePopup(player,ChatFormatting.GREEN,linksucess);
                                                         return InteractionResultHolder.success(stackInHand);
                                                     }
-                                                    else MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linkunsuccess);
+                                                    else MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,linkunsuccess);
                                                 }
                                                 else
                                                 {
@@ -172,15 +179,15 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                                                             EnchantmentHelper.setEnchantments(enchantsNone,stackInHand);
                                                         }
                                                     }
-                                                    MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linkremoved);
+                                                    MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linkremoved);
                                                     return InteractionResultHolder.success(stackInHand);
                                                 }
                                             }
-                                            else MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linkitsself);
+                                            else MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linkitsself);
                                         }
-                                        else MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linknetwork);
+                                        else MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linknetwork);
                                     }
-                                    else MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.WHITE,linkdistance);
+                                    else MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linkdistance);
                                 }
                             }
                             return InteractionResultHolder.fail(stackInHand);
@@ -201,6 +208,7 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                             {
                                 Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
                                 EnchantmentHelper.setEnchantments(enchantsNone,stackInHand);
+                                MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linkclear);
                                 return InteractionResultHolder.success(stackInHand);
                             }
                         }
@@ -208,21 +216,27 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
 
                     return InteractionResultHolder.fail(stackInHand);
                 }
-                else
-                {
-                    if(world.getBlockState(pos).getBlock() instanceof BasePedestalBlock) {
-                        //Checks Tile at location to make sure its a TilePedestal
-                        BlockEntity tileEntity = world.getBlockEntity(pos);
-                        if (tileEntity instanceof BasePedestalBlockEntity) {
-                            BasePedestalBlockEntity tilePedestal = (BasePedestalBlockEntity) tileEntity;
+            }
+        }
 
-                            String rrobint = MODID + ".tool_chat_rrobin_true";
-                            String rrobinf = MODID + ".tool_chat_rrobin_false";
-                            List<String> listed = new ArrayList<>();
-                            listed.add(tilePedestal.hasRRobin()?(rrobint):(rrobinf));
-                            MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.LIGHT_PURPLE,MODID + ".tool_chat_rrobin",listed);
+        return InteractionResultHolder.fail(stackInHand);
+    }
 
-                            /*if(tilePedestal.getSpeed()>0)
+    @Override
+    public InteractionResult useOn(UseOnContext p_41427_) {
+        /*if(world.getBlockState(pos).getBlock() instanceof BasePedestalBlock) {
+            //Checks Tile at location to make sure its a TilePedestal
+            BlockEntity tileEntity = world.getBlockEntity(pos);
+            if (tileEntity instanceof BasePedestalBlockEntity) {
+                BasePedestalBlockEntity tilePedestal = (BasePedestalBlockEntity) tileEntity;
+
+                String rrobint = MODID + ".tool_chat_rrobin_true";
+                String rrobinf = MODID + ".tool_chat_rrobin_false";
+                List<String> listed = new ArrayList<>();
+                listed.add(tilePedestal.hasRRobin()?(rrobint):(rrobinf));
+                MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.LIGHT_PURPLE,MODID + ".tool_chat_rrobin",listed);
+
+                            *//*if(tilePedestal.getSpeed()>0)
                             {
                                 TranslatableComponent speed = new TranslatableComponent(MODID + ".tool_speed");
                                 speed.append(""+tilePedestal.getSpeed()+"");
@@ -236,35 +250,31 @@ public class LinkingToolBackwards extends BaseTool implements IPedestalTool
                                 capacity.append(""+tilePedestal.getCapacity()+"");
                                 capacity.withStyle(ChatFormatting.BLUE);
                                 player.sendMessage(capacity,Util.NIL_UUID);
-                            }*/
+                            }*//*
 
-                            /*System.out.println("Stored Energy: "+pedestal.getStoredEnergy());
+                            *//*System.out.println("Stored Energy: "+pedestal.getStoredEnergy());
                             System.out.println("Stored Fluid: "+pedestal.getStoredFluid().getDisplayName().getString() +": "+ pedestal.getStoredFluid().getAmount());
-                            System.out.println("Stored Exp: "+pedestal.getStoredExperience());*/
+                            System.out.println("Stored Exp: "+pedestal.getStoredExperience());*//*
 
-                            List<BlockPos> getLocations = tilePedestal.getLocationList();
-                            if(getLocations.size()>0)
-                            {
-                                MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.GOLD,MODID + ".tool_chat_linked");
+                List<BlockPos> getLocations = tilePedestal.getLocationList();
+                if(getLocations.size()>0)
+                {
+                    MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.GOLD,MODID + ".tool_chat_linked");
 
-                                List<String> appends = new ArrayList<>();
-                                for(int i = 0; i < getLocations.size();i++)
-                                {
-                                    String seperator = MODID + ".tool_chat_seperator";
-                                    appends.add(seperator);
-                                    appends.add("" + getLocations.get(i).getY() + "");
-                                    appends.add(seperator);
-                                    appends.add("" + getLocations.get(i).getZ() + "");
-                                    MowLibMessageUtils.messagePlayerChatWithAppend(MODID,player, ChatFormatting.GRAY, "   " + getLocations.get(i).getX() + "", appends);
-                                }
-                            }
-                        }
+                    List<String> appends = new ArrayList<>();
+                    for(int i = 0; i < getLocations.size();i++)
+                    {
+                        String seperator = MODID + ".tool_chat_seperator";
+                        appends.add(seperator);
+                        appends.add("" + getLocations.get(i).getY() + "");
+                        appends.add(seperator);
+                        appends.add("" + getLocations.get(i).getZ() + "");
+                        MowLibMessageUtils.messagePlayerChatWithAppend(MODID,player, ChatFormatting.GRAY, "   " + getLocations.get(i).getX() + "", appends);
                     }
                 }
             }
-        }
-
-        return InteractionResultHolder.fail(stackInHand);
+        }*/
+        return super.useOn(p_41427_);
     }
 
     int ticker=0;

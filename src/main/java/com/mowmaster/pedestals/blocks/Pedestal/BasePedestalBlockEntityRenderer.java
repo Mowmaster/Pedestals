@@ -109,6 +109,10 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     p_112309_.popPose();
                 }
             }
+            else
+            {
+                linkedLocations.clear();
+            }
 
             if(p_112307_.getRenderRangeUpgrade() && !coin.isEmpty())
             {

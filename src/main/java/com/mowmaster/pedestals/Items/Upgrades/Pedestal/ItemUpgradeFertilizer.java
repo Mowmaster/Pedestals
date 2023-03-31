@@ -157,50 +157,37 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
         List<BlockPos> valid = new ArrayList<>();
-        if(pedestal.hasWorkCard())
-        {
+        if(pedestal.hasWorkCard()) {
             ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                AABB area = new AABB(workCardBase.readBlockPosFromNBT(card,1),workCardBase.readBlockPosFromNBT(card,2));
+            if (card.getItem() instanceof WorkCardBase workCardBase) {
+                AABB area = new AABB(workCardBase.readBlockPosFromNBT(card, 1), workCardBase.readBlockPosFromNBT(card, 2));
 
-                int maxX = (int)area.maxX;
-                int maxY = (int)area.maxY;
-                int maxZ = (int)area.maxZ;
+                int maxX = (int) area.maxX;
+                int maxY = (int) area.maxY;
+                int maxZ = (int) area.maxZ;
 
-                int minX = (int)area.minX;
-                int minY = (int)area.minY;
-                int minZ = (int)area.minZ;
+                int minX = (int) area.minX;
+                int minY = (int) area.minY;
+                int minZ = (int) area.minZ;
 
                 BlockPos pedestalPos = pedestal.getPos();
-                if(minY < pedestalPos.getY())
-                {
-                    for(int i=maxX;i>=minX;i--)
-                    {
-                        for(int j=maxZ;j>=minZ;j--)
-                        {
-                            for(int k=maxY;k>=minY;k--)
-                            {
-                                BlockPos newPoint = new BlockPos(i,k,j);
-                                if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
-                                {
+                if (minY < pedestalPos.getY()) {
+                    for (int i = maxX; i >= minX; i--) {
+                        for (int j = maxZ; j >= minZ; j--) {
+                            for (int k = maxY; k >= minY; k--) {
+                                BlockPos newPoint = new BlockPos(i, k, j);
+                                if (workCardBase.selectedPointWithinRange(pedestal, newPoint)) {
                                     valid.add(newPoint);
                                 }
                             }
                         }
                     }
-                }
-                else
-                {
-                    for(int i= minX;i<=maxX;i++)
-                    {
-                        for(int j= minZ;j<=maxZ;j++)
-                        {
-                            for(int k= minY;k<=maxY;k++)
-                            {
-                                BlockPos newPoint = new BlockPos(i,k,j);
-                                if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
-                                {
+                } else {
+                    for (int i = minX; i <= maxX; i++) {
+                        for (int j = minZ; j <= maxZ; j++) {
+                            for (int k = minY; k <= maxY; k++) {
+                                BlockPos newPoint = new BlockPos(i, k, j);
+                                if (workCardBase.selectedPointWithinRange(pedestal, newPoint)) {
                                     valid.add(newPoint);
                                 }
                             }

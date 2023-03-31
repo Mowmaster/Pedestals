@@ -208,14 +208,27 @@
   "pedestals.mode_augment_iu": "Disable: Item & Upgrade Render",
   "pedestals.mode_augment_piu": "Disable: Particles / Item & Upgrade Render",
 
-  "pedestals.tool_link_success": "Linked Successfully",
+  "pedestals.tool_link_success_linkingtool": "Linked Successfully, Sending to Receiver",
+  "pedestals.tool_link_success_backwardslinkingtool": "Linked Successfully, Receiving from Sender",
   "pedestals.tool_link_unsucess": "Linking Failed, Max Connections Reached",
   "pedestals.tool_link_removed": "Connection Removed",
   "pedestals.tool_link_itsself": "Cannot be Linked to Itself",
   "pedestals.tool_link_network": "Cannot be Linked to Another Network",
   "pedestals.tool_link_distance": "Linking Failed, Out of Range",
+  "pedestals.tool_link_start_linkingtool": "Receiver Pedestal Position has been saved.",
+  "pedestals.tool_link_start_backwardslinkingtool": "Sender Pedestal Position has been saved.",
+  "pedestals.tool_link_cleared": "Saved Position Cleared",
+
+
 
   "pedestals.tool_change": "Tool Changed: ",
+  "pedestals.tool_toolinpedestal": "===== Tool In Pedestal =====",
+  "pedestals.tool_toolinpedestal_not": "No Inserted Tool",
+  "pedestals.tool_coininpedestal": "===== Upgrade In Pedestal =====",
+  "pedestals.tool_coininpedestal_not": "No Inserted Upgrade",
+  "pedestals.tool_filterinpedestal_not": "No Inserted Filter",
+
+
 
   "pedestals.linkingtool.pedestal_render_on": "Linking Range Visualizer: ON",
   "pedestals.linkingtool.pedestal_render_off": "Linking Range Visualizer: OFF",
@@ -274,6 +287,9 @@
   "pedestals.filter_type_below": "Equal To and Below",
   "pedestals.filter_changed_added": "Block Added To Filter",
   "pedestals.filter_changed_removed": "Block Removed From Filter",
+
+
+  "pedestals.filters.tooltip_filterlist": "===== Filter |---> Filter Contents =====",
 
 
   "pedestals.filter.tooltip_filterbase": "THIS FILTER BASE IS JUST A CRAFTING COMPONENT!!!",
@@ -347,7 +363,7 @@
   "jei.pedestals.augment_pedestal_nocollide.crafting": "Crafted when a Linking Tool is Right Clicked on the ground while paper collides with an animal.",
   "item.pedestals.augment_pedestal_roundrobin": "Round Robin Augment",
   "jei.pedestals.augment_pedestal_roundrobin.description": "§5 Makes the Pedestal Transfer 'Round Robin'.",
-  "jei.pedestals.augment_pedestal_roundrobin.crafting": "Crafted when a Linking Tool is Right Clicked on the ground near paper and parrots.",
+  "jei.pedestals.augment_pedestal_roundrobin.crafting": "Crafted when a Linking Tool is Right Clicked on the ground near paper and a bird animal, like a parrot.",
   "item.pedestals.augment_pedestal_renderdiffuser": "Particle & Render Augment",
   "jei.pedestals.augment_pedestal_renderdiffuser.description": "§5 Disables Particles and Item/Upgrade Render on Pedestals.",
   "jei.pedestals.augment_pedestal_renderdiffuser.interaction": "§3 Offhand Item, Crouch Right Click in Air to Toggle",
@@ -476,7 +492,7 @@
   "jei.pedestals.upgrade_pedestal_blaster.description": "§5Smelts Items like a Vanilla Blast Furnace Does",
   "jei.pedestals.upgrade_pedestal_blaster.interaction": "§3Requires a Chest below the Pedestal for Inputs.",
 
-  "item.pedestals.upgrade_pedestal_generator": "RF Generator Upgrade",
+  "item.pedestals.upgrade_pedestal_generator": "FE Generator Upgrade",
   "jei.pedestals.upgrade_pedestal_generator.description": "§5Burns Vanilla Furnace Fuels for RF Production",
   "jei.pedestals.upgrade_pedestal_generator.interaction": "§3Requires Fuel to be put into the pedestal.",
 

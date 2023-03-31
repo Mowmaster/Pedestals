@@ -135,7 +135,6 @@ public class BaseFilter extends MowLibBaseFilter
         if(!filterStack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get()))
         {
             List<String> listed = new ArrayList<>();
-            MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GOLD,filterStack.getDisplayName().getString(), listed);
 
             //For each Mode
             for (ItemTransferMode mode:ItemTransferMode.values())
@@ -150,10 +149,18 @@ public class BaseFilter extends MowLibBaseFilter
 
                         if(!filterQueue.get(j).isEmpty())
                         {
-                            enchantList.add(filterQueue.get(j).getDisplayName().getString() + ", ");
+                            if((j+1) >= filterQueue.size())
+                            {
+                                enchantList.add(filterQueue.get(j).getDisplayName().getString());
+                            }
+                            else
+                            {
+                                enchantList.add(filterQueue.get(j).getDisplayName().getString() + ", ");
+                            }
+
                         }
                     }
-                    MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GRAY,filterStack.getDisplayName().getString(), enchantList);
+                    MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GRAY,filterStack.getDisplayName().getString() + " |--->  ", enchantList);
                 }
             }
             /*for(int i=0; i < ItemTransferMode.values().length; i++)
