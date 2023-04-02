@@ -1,0 +1,17 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_harvester"
+    },
+    {
+      "item": "minecraft:nether_star"
+    },
+    {
+      "item": "minecraft:shears"
+    }
+  ],
+  "resultModificationName": "upgradegentle",
+  "resultModificationValue": 1,
+  "resultModificationMaxValue": 1
+}
