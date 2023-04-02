@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -23,6 +24,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
@@ -145,10 +147,48 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         return new ArrayList<>();
     }
 
-    @Override
+    /*@Override
     public int getComparatorRedstoneLevel(Level worldIn, BlockPos pos) {
-        return PedestalUtilities.getRedstoneLevelPedestal(worldIn, pos);
-    }
+        int hasItem=0;
+        BlockEntity blockEntity = worldIn.getBlockEntity(pos);
+        if(blockEntity instanceof BasePedestalBlockEntity pedestal) {
+            List<ItemStack> itemstacks = pedestal.getItemStacks();
+            if(itemstacks.size()>0)
+            {
+                int maxStackSizeDefault = 64;
+                if(pedestal.hasFilter())
+                {
+                    IPedestalFilter filter =pedestal.getIPedestalFilter();
+                    if(filter != null && filter.getFilterDirection().insert())
+                    {
+                        maxStackSizeDefault = Math.max(1,filter.canAcceptCountItems(pedestal,pedestal.getFilterInPedestal(), new ItemStack(Items.STONE,64).getMaxStackSize(), pedestal.getSlotSizeLimit(), new ItemStack(Items.STONE,64)));
+                    }
+                }
+                int counter = 0;
+                int maxStorageCount = Math.max(1,(pedestal.getPedestalSlots()-1)) * maxStackSizeDefault;
+                for (ItemStack stack : itemstacks)
+                {
+                    //adjust max storage possible based on itemstacks present
+                    if(stack.getMaxStackSize()<maxStackSizeDefault)
+                    {
+                        maxStorageCount-=maxStackSizeDefault;
+                        maxStorageCount+=stack.getMaxStackSize();
+                    }
+
+                    counter+=stack.getCount();
+                }
+                float f = (float)counter/(float)maxStorageCount;
+                hasItem = (int)Math.floor(f*15.0F);
+            }
+            else
+            {
+                float f = (float) pedestal.getItemInPedestal().getCount() / (float) pedestal.getItemInPedestal().getMaxStackSize();
+                return (int) Math.floor(f * 15.0F);
+            }
+        }
+
+        return hasItem;
+    }*/
 
     //To save a recipe and verify if it hasnt changed so we dont have to keep pulling it every time
     //https://github.com/oierbravo/createsifter/blob/mc1.19/dev/src/main/java/com/oierbravo/createsifter/content/contraptions/components/sifter/SifterTileEntity.java
