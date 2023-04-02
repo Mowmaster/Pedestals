@@ -62,6 +62,9 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifySuperSpeed(ItemStack upgradeItemStack) { return true; }
+
+    @Override
     public boolean needsWorkCard() { return true; }
 
     @Override
@@ -395,73 +398,132 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
             WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
             if(getPlayer != null && getPlayer.get() != null)
             {
-                List<BlockPos> listed = getValidList(pedestal);
-                int currentPosition = getCurrentPosition(pedestal);
-                BlockPos currentPoint = listed.get(currentPosition);
-                BlockState blockAtPoint = level.getBlockState(currentPoint);
-                ItemStack stackInPed = pedestal.getItemInPedestal();
-
-                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                if(hasSuperSpeed(pedestal.getCoinOnPedestal()))
                 {
-                    if(canUseOn(pedestal,blockAtPoint,currentPoint))
+                    List<BlockPos> listed = getValidList(pedestal);
+                    ItemStack stackInPed = pedestal.getItemInPedestal();
+                    for(BlockPos currentPoint:listed)
                     {
-                        if(passesFilter(pedestal, blockAtPoint, currentPoint))
+                        BlockState blockAtPoint = level.getBlockState(currentPoint);
+                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                         {
-                            if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
+                            if(canUseOn(pedestal,blockAtPoint,currentPoint))
                             {
-
-                                if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
+                                if(passesFilter(pedestal, blockAtPoint, currentPoint))
                                 {
-                                    if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
+                                    if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
                                     {
-                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
-                                        {
-                                            UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                                            InteractionResult result = bonerItem.useOn(blockContext);
-                                            if (result == InteractionResult.CONSUME) {
 
-                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
-                                                pedestal.removeItem(1,false);
+                                        if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
+                                        {
+                                            if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
+                                            {
+                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                                {
+                                                    UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                                    InteractionResult result = bonerItem.useOn(blockContext);
+                                                    if (result == InteractionResult.CONSUME) {
+
+                                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
+                                                        pedestal.removeItem(1,false);
+                                                    }
+                                                }
                                             }
                                         }
-
-                                /*BonemealEvent event = new BonemealEvent(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed);
-                                if (!MinecraftForge.EVENT_BUS.post(event))
-                                {
-                                    if (event.getResult() != Event.Result.DENY)
-                                    {
-
-
-                                    }
-                                }*/
-                                    }
-
-                            /*if(ForgeEventFactory.onApplyBonemeal(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed)>0)
-                            {
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
-                                //pedestal.removeItem(1,true);
-                            }*/
-                                }
-                                else if(canUseOn(pedestal, blockAtPoint, currentPoint))
-                                {
-                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
-                                    {
-                                        blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
-                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
-                                        //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
+                                        else if(canUseOn(pedestal, blockAtPoint, currentPoint))
+                                        {
+                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                            {
+                                                blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
+                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
+                                                //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
 
-                    if((currentPosition+1)>=listed.size())
+
+
+                    /*int currentPosition = getCurrentPosition(pedestal);
+                    BlockPos currentPoint = listed.get(currentPosition);
+                    */
+
+                }
+                else
+                {
+                    List<BlockPos> listed = getValidList(pedestal);
+                    int currentPosition = getCurrentPosition(pedestal);
+                    BlockPos currentPoint = listed.get(currentPosition);
+                    BlockState blockAtPoint = level.getBlockState(currentPoint);
+                    ItemStack stackInPed = pedestal.getItemInPedestal();
+
+                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                     {
-                        setCurrentPosition(pedestal,0);
-                    }
-                    else
-                    {
-                        iterateCurrentPosition(pedestal);
+                        if(canUseOn(pedestal,blockAtPoint,currentPoint))
+                        {
+                            if(passesFilter(pedestal, blockAtPoint, currentPoint))
+                            {
+                                if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
+                                {
+
+                                    if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
+                                    {
+                                        if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
+                                        {
+                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                            {
+                                                UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                                InteractionResult result = bonerItem.useOn(blockContext);
+                                                if (result == InteractionResult.CONSUME) {
+
+                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
+                                                    pedestal.removeItem(1,false);
+                                                }
+                                            }
+
+                                            /*BonemealEvent event = new BonemealEvent(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed);
+                                            if (!MinecraftForge.EVENT_BUS.post(event))
+                                            {
+                                                if (event.getResult() != Event.Result.DENY)
+                                                {
+
+
+                                                }
+                                            }*/
+
+                                        }
+
+                                        /*if(ForgeEventFactory.onApplyBonemeal(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed)>0)
+                                        {
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
+                                            //pedestal.removeItem(1,true);
+                                        }*/
+
+                                    }
+                                    else if(canUseOn(pedestal, blockAtPoint, currentPoint))
+                                    {
+                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                        {
+                                            blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
+                                            //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if((currentPosition+1)>=listed.size())
+                        {
+                            setCurrentPosition(pedestal,0);
+                        }
+                        else
+                        {
+                            iterateCurrentPosition(pedestal);
+                        }
                     }
                 }
             }

@@ -60,6 +60,11 @@ public class ItemUpgradePlanter extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifySuperSpeed(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public boolean needsWorkCard() { return true; }
 
     @Override
@@ -375,53 +380,90 @@ public class ItemUpgradePlanter extends ItemUpgradeBase
     {
         if(!level.isClientSide())
         {
-
             WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
             if(getPlayer != null && getPlayer.get() != null)
             {
-                List<BlockPos> listed = getValidList(pedestal);
-                int currentPosition = getCurrentPosition(pedestal);
-                BlockPos currentPoint = listed.get(currentPosition);
-                BlockState blockAtPoint = level.getBlockState(currentPoint);
-                boolean fuelRemoved = true;
-
-                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                if(hasSuperSpeed(pedestal.getCoinOnPedestal()))
                 {
-                    if(!pedestal.removeItem(1,true).isEmpty())
+                    List<BlockPos> listed = getValidList(pedestal);
+                    for(BlockPos currentPoint:listed)
                     {
-                        if(canPlace(pedestal))
+                        BlockState blockAtPoint = level.getBlockState(currentPoint);
+                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                         {
-                            if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
+                            if(!pedestal.removeItem(1,true).isEmpty())
                             {
-                                if(!currentPoint.equals(pedestal.getPos()))
+                                if(canPlace(pedestal))
                                 {
-                                    if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
+                                    if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
                                     {
-                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                        if(!currentPoint.equals(pedestal.getPos()))
                                         {
-                                            UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                            if (result == InteractionResult.CONSUME) {
-                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,100,255,100));
-                                                pedestal.removeItem(1,false);
+                                            if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
+                                            {
+                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                                {
+                                                    UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                                    if (result == InteractionResult.CONSUME) {
+                                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,100,255,100));
+                                                        pedestal.removeItem(1,false);
+                                                    }
+                                                }
                                             }
-                                        }
-                                        else {
-                                            fuelRemoved = false;
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                }
+                else
+                {
+                    List<BlockPos> listed = getValidList(pedestal);
+                    int currentPosition = getCurrentPosition(pedestal);
+                    BlockPos currentPoint = listed.get(currentPosition);
+                    BlockState blockAtPoint = level.getBlockState(currentPoint);
+                    boolean fuelRemoved = true;
 
-                        if((currentPosition+1)>=listed.size())
+                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                    {
+                        if(!pedestal.removeItem(1,true).isEmpty())
                         {
-                            setCurrentPosition(pedestal,0);
-                        }
-                        else
-                        {
-                            if(fuelRemoved){
-                                iterateCurrentPosition(pedestal);
+                            if(canPlace(pedestal))
+                            {
+                                if(passesFilter(pedestal, blockAtPoint, currentPoint) && !pedestal.removeItem(1,true).isEmpty())
+                                {
+                                    if(!currentPoint.equals(pedestal.getPos()))
+                                    {
+                                        if(level.getBlockState((getPedestalFacing(level,pedestal.getPos()) == Direction.DOWN)?(currentPoint.above()):(currentPoint.below())).canSustainPlant(level,getPosBasedOnPedestalDirection(pedestal,currentPoint),getPedestalFacing(level,pedestal.getPos()),(IPlantable) Block.byItem(pedestal.getItemInPedestal().getItem())))
+                                        {
+                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
+                                            {
+                                                UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                                                InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                                if (result == InteractionResult.CONSUME) {
+                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,currentPoint.getX()+0.5D,currentPoint.getY()+0.5D,currentPoint.getZ()+0.5D,100,255,100));
+                                                    pedestal.removeItem(1,false);
+                                                }
+                                            }
+                                            else {
+                                                fuelRemoved = false;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if((currentPosition+1)>=listed.size())
+                            {
+                                setCurrentPosition(pedestal,0);
+                            }
+                            else
+                            {
+                                if(fuelRemoved){
+                                    iterateCurrentPosition(pedestal);
+                                }
                             }
                         }
                     }

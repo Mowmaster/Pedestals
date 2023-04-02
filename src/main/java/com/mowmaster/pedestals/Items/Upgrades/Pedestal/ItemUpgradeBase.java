@@ -256,6 +256,26 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return false;
     }
 
+    public boolean hasSuperSpeed(ItemStack upgradeStack)
+    {
+        if(canModifySuperSpeed(upgradeStack))
+        {
+            return getSuperSpeed(upgradeStack);
+        }
+
+        return false;
+    }
+
+    public boolean hasGentleHarvest(ItemStack upgradeStack)
+    {
+        if(canModifyGentleHarvest(upgradeStack))
+        {
+            return getGentleHarvest(upgradeStack);
+        }
+
+        return false;
+    }
+
     public void runClientStuff(BasePedestalBlockEntity pedestal)
     {
         return;
