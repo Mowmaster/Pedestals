@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "item": "minecraft:bucket"
+  },
+  "experience": {
+    "experienceValue": 50
+  },
+  "result": {
+    "item": "mob_grinding_utils:fluid_xp_bucket"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mob_grinding_utils"
+    }
+  ]
+}

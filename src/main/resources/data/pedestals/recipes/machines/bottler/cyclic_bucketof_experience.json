@@ -1,0 +1,30 @@
+{
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "item": "minecraft:bucket"
+  },
+  "experience": {
+    "experienceValue": 44
+  },
+  "result": {
+    "item": "cyclic:xpjuice_bucket"
+  },
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "forge:not",
+          "value": {
+            "type": "forge:mod_loaded",
+            "modid": "mob_grinding_utils"
+          }
+        },
+        {
+          "type": "forge:mod_loaded",
+          "modid": "cyclic"
+        }
+      ]
+    }
+  ]
+}
