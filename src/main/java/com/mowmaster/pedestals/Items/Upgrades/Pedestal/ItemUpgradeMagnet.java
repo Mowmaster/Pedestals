@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.MowLibUtils.MowLibEnergyUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -21,6 +22,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -49,6 +53,9 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
     public boolean canModifyXPCapacity(ItemStack upgradeItemStack) {
         return true;
     }
+
+    @Override
+    public boolean canModifyEnergyCapacity(ItemStack upgradeItemStack) { return true; }
 
     @Override
     public boolean canModifyRange(ItemStack upgradeItemStack) {
@@ -194,7 +201,34 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                     //Energy
                     if(canTransferEnergy(coinInPedestal))
                     {
-                        //get only energy containers and maybe custom fluid items
+                        int getMaxEnergyValue = pedestal.getEnergyCapacity();
+                        LazyOptional<IEnergyStorage> cap = itemStack.getCapability(ForgeCapabilities.ENERGY);
+                        if(cap.isPresent())
+                        {
+                            IEnergyStorage handler = cap.orElse(null);
+
+                            if(handler != null)
+                            {
+                                if(handler.canExtract())
+                                {
+                                    int containerCurrentEnergy = handler.getEnergyStored();
+                                    int getMaxEnergy = getMaxEnergyValue;
+                                    int getCurrentEnergy = pedestal.getStoredEnergy();
+                                    int getSpaceForEnergy = getMaxEnergy - getCurrentEnergy;
+                                    int baseRate = PedestalConfig.COMMON.upgrade_import_baseEnergyTransferSpeed.get();
+                                    int maxRate = baseRate + getEnergyCapacityIncrease(pedestal.getCoinOnPedestal());
+                                    int transferRate = (getSpaceForEnergy >= maxRate)?(maxRate):(getSpaceForEnergy);
+                                    if (containerCurrentEnergy < transferRate) {transferRate = containerCurrentEnergy;}
+
+                                    //transferRate at this point is equal to what we can send.
+                                    if(handler.extractEnergy(transferRate,true) > 0)
+                                    {
+                                        pedestal.addEnergy(transferRate,false);
+                                        handler.extractEnergy(transferRate,false);
+                                    }
+                                }
+                            }
+                        }
                     }
                     //XP
                     if(canTransferXP(coinInPedestal))
