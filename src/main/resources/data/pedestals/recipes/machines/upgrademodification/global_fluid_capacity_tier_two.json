@@ -6,13 +6,13 @@
       "tag": "pedestals:upgrades"
     },
     {
-      "tag": "forge:gems/emerald"
+      "tag": "forge:storage_blocks/emerald"
     },
     {
       "item": "minecraft:bucket"
     }
   ],
   "resultModificationName": "upgradefluidcapacity",
-  "resultModificationValue": 4000,
+  "resultModificationValue": 16000,
   "resultModificationMaxValue": 64000
 }
