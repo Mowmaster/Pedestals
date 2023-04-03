@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import static com.mowmaster.pedestals.PedestalUtils.References.isQuarkLoaded;
 
 public class ItemUpgradeHarvester extends ItemUpgradeBase
 {
@@ -149,6 +150,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
 
     @Override
     public ItemStack getUpgradeDefaultTool() {
+        if(isQuarkLoaded()) { return new ItemStack(Items.STICK);}
         return new ItemStack(Items.STONE_HOE);
     }
 

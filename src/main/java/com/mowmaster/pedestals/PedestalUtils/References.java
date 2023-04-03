@@ -11,4 +11,8 @@ public class References {
     {
         return ModList.get().isLoaded("effectscrolls");
     }
+    public static boolean isQuarkLoaded()
+    {
+        return ModList.get().isLoaded("quark");
+    }
 }
