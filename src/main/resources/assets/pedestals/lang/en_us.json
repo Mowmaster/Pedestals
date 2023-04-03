@@ -271,6 +271,8 @@
   "jei.pedestals.tool_upgradetool.interaction": "§3 Offhand Tool and Left Click to Remove Upgrade from Pedestal, Crouch Right Click in Air to Switch Tool.",
   "item.pedestals.tool_filtertool": "Filter Tool",
   "jei.pedestals.tool_filtertool.interaction": "§3 Offhand Tool and Left Click to Remove Filter from Pedestal, Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_worktool": "Work Tool",
+  "jei.pedestals.tool_worktool.interaction": "§3 Offhand Tool and Left Click to Remove Work Card from Pedestal, Crouch Right Click in Air to Switch Tool.",
   "item.pedestals.tool_tagtool": "Tag Tool",
   "jei.pedestals.tool_tagtool.interaction": "§3 Offhand Items you want the tags of, and Right Click tool in your Main Hand. Crouch Right Click in Air to Switch Tool.",
   "item.pedestals.tool_toolswapper": "Tool Swapper",

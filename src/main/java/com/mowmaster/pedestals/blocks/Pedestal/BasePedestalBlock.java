@@ -455,7 +455,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                     if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRange());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRange(1));
                 }
-                else if(pedestal.hasWorkCard() && itemInOffHand.getItem() instanceof WorkCardBase)
+                else if(pedestal.hasWorkCard() && (itemInOffHand.getItem() instanceof WorkCardBase || itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_WORKTOOL.get())))
                 {
                     pedestal.actionOnRemovedFromPedestal(1);
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeWorkCard());

@@ -35,6 +35,8 @@ public class DeferredRegisterItems
             () -> new UpgradeTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_FILTERTOOL = ITEMS.register("tool_filtertool",
             () -> new FilterTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_WORKTOOL = ITEMS.register("tool_worktool",
+            () -> new WorkCardTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_TAGTOOL = ITEMS.register("tool_tagtool",
             () -> new TagTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_TOOLSWAPPER = ITEMS.register("tool_toolswapper",
