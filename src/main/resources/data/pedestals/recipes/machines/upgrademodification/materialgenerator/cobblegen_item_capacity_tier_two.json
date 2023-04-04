@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:upgrademodification_global",
+
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_cobblegen"
+    },
+    {
+      "tag": "forge:storage_blocks/emerald"
+    },
+    {
+      "tag": "forge:chests/wooden"
+    }
+  ],
+  "resultModificationName": "upgradeitemcapacity",
+  "resultModificationValue": 16,
+  "resultModificationMaxValue": 64
+}

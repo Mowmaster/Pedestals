@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:upgrademodification_global",
+
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_export"
+    },
+    {
+      "tag": "forge:gems/emerald"
+    },
+    {
+      "item": "minecraft:experience_bottle"
+    }
+  ],
+  "resultModificationName": "upgradexpcapacity",
+  "resultModificationValue": 2,
+  "resultModificationMaxValue": 100
+}

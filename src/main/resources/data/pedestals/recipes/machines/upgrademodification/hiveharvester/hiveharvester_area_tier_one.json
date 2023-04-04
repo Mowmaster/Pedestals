@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:upgrademodification_global",
+
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_hiveharvester"
+    },
+    {
+      "tag": "forge:ingots/gold"
+    },
+    {
+      "item": "minecraft:obsidian"
+    }
+  ],
+  "resultModificationName": "upgradearea",
+  "resultModificationValue": 1,
+  "resultModificationMaxValue": 21
+}

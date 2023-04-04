@@ -1,0 +1,20 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_filler"
+    },
+    {
+      "tag": "forge:gems/emerald"
+    },
+    {
+      "item": "minecraft:crying_obsidian"
+    },
+    {
+      "item": "minecraft:obsidian"
+    }
+  ],
+  "resultModificationName": "upgradeblockcapacity",
+  "resultModificationValue": 4,
+  "resultModificationMaxValue": 64
+}

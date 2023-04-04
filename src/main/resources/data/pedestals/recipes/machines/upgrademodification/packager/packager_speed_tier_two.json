@@ -1,0 +1,17 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_packager"
+    },
+    {
+      "tag": "forge:storage_blocks/diamond"
+    },
+    {
+      "item": "minecraft:obsidian"
+    }
+  ],
+  "resultModificationName": "upgradespeed",
+  "resultModificationValue": 10,
+  "resultModificationMaxValue": 40
+}

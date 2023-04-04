@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:upgrademodification_global",
+
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_breaker"
+    },
+    {
+      "item": "minecraft:nether_star"
+    },
+    {
+      "item": "minecraft:obsidian"
+    }
+  ],
+  "resultModificationName": "upgraderange",
+  "resultModificationValue": 4,
+  "resultModificationMaxValue": 64
+}

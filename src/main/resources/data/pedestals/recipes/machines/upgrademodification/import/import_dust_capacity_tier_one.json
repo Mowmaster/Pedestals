@@ -1,0 +1,24 @@
+{
+  "type": "pedestals:upgrademodification_global",
+
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_import"
+    },
+    {
+      "tag": "forge:gems/emerald"
+    },
+    {
+      "item": "effectscrolls:crystal"
+    }
+  ],
+  "resultModificationName": "upgradedustcapacity",
+  "resultModificationValue": 1000,
+  "resultModificationMaxValue": 100000,
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "effectscrolls"
+    }
+  ]
+}

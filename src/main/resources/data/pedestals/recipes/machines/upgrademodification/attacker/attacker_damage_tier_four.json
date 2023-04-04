@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:upgrademodification_global",
+
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_attacker"
+    },
+    {
+      "tag": "forge:ingots/netherite"
+    },
+    {
+      "item": "minecraft:netherite_sword"
+    }
+  ],
+  "resultModificationName": "upgradedamagecapacity",
+  "resultModificationValue": 1,
+  "resultModificationMaxValue": 12
+}
