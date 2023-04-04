@@ -316,14 +316,7 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
     {
         //ItemStack getItem = pedestal.getItemInPedestal();
         Block getBlockToUseOn = useOnState.getBlock();
-        if(getBlockToUseOn instanceof StemGrownBlock ||
-                getBlockToUseOn instanceof BonemealableBlock ||
-                getBlockToUseOn instanceof IPlantable ||
-                getBlockToUseOn instanceof ChorusFlowerBlock)
-        {
-            return true;
-        }
-        else if(getBlockToUseOn instanceof IPlantable || getBlockToUseOn instanceof BonemealableBlock)
+        if(getBlockToUseOn instanceof IPlantable || getBlockToUseOn instanceof BonemealableBlock)
         {
             IntegerProperty propInt = getBlockPropertyAge(useOnState);
             if(useOnState.hasProperty(propInt))
@@ -348,11 +341,12 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
                 return true;
             }
         }
-
-        /*if(getBlockToUseOn instanceof BonemealableBlock)
+        else if(getBlockToUseOn instanceof StemGrownBlock ||
+                getBlockToUseOn instanceof ChorusFlowerBlock ||
+                getBlockToUseOn instanceof BuddingAmethystBlock)
         {
-
-        }*/
+            return true;
+        }
 
 
         return false;
