@@ -467,7 +467,8 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
                 }
                 else if(result.getType().equals(HitResult.Type.MISS) && readBlockPosListFromNBT(itemInHand).size()>0)
                 {
-                    saveBlockPosListToNBT(itemInHand, new ArrayList<>());
+                    itemInHand.setTag(new CompoundTag());
+                    //saveBlockPosListToNBT(itemInHand, new ArrayList<>());
                     MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
                 }
             }
@@ -516,8 +517,9 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
                 }
                 else if(result.getType().equals(HitResult.Type.MISS) && hasOneBlockPos(itemInHand))
                 {
-                    saveBlockPosToNBT(itemInHand,1,BlockPos.ZERO);
-                    saveBlockPosToNBT(itemInHand,2,BlockPos.ZERO);
+                    itemInHand.setTag(new CompoundTag());
+                    //saveBlockPosToNBT(itemInHand,1,BlockPos.ZERO);
+                    //saveBlockPosToNBT(itemInHand,2,BlockPos.ZERO);
                     MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".upgrade_blockpos_clear");
                 }
             }
