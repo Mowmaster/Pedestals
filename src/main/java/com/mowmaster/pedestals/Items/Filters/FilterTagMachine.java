@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Items.Filters;
 
 import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import com.mowmaster.pedestals.Items.Misc.TagGetterItem;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceLocation;
@@ -79,7 +80,9 @@ public class FilterTagMachine extends BaseFilter{
         ItemStack itemFromInv = ItemStack.EMPTY;
         itemFromInv = IntStream.range(0,range)//Int Range
                 .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                .filter(itemStack -> ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(getLocationFromStringName(itemStack.getDisplayName().getString()))).stream().toList().contains(incomingStack.getItem()))
+                .filter(itemStack -> itemStack.getItem() instanceof TagGetterItem)
+                .filter(itemStack -> ((TagGetterItem)itemStack.getItem()).getSelectedTagString(itemStack) != "")
+                .filter(itemStack -> ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation(((TagGetterItem)itemStack.getItem()).getSelectedTagString(itemStack)))).stream().toList().contains(incomingStack.getItem()))
                 .findFirst().orElse(ItemStack.EMPTY);
 
         if(!itemFromInv.isEmpty())
@@ -100,7 +103,9 @@ public class FilterTagMachine extends BaseFilter{
         ItemStack itemFromInv = ItemStack.EMPTY;
         itemFromInv = IntStream.range(0,range)//Int Range
                 .mapToObj((stackCurrent)::get)//Function being applied to each interval
-                .filter(itemStack -> ForgeRegistries.FLUIDS.tags().getTag(FluidTags.create(new ResourceLocation(itemStack.getDisplayName().getString()))).stream().toList().contains(incomingFluidStack.getFluid()))
+                .filter(itemStack -> itemStack.getItem() instanceof TagGetterItem)
+                .filter(itemStack -> ((TagGetterItem)itemStack.getItem()).getSelectedTagString(itemStack) != "")
+                .filter(itemStack -> ForgeRegistries.FLUIDS.tags().getTag(FluidTags.create(new ResourceLocation(((TagGetterItem)itemStack.getItem()).getSelectedTagString(itemStack)))).stream().toList().contains(incomingFluidStack.getFluid()))
                 .findFirst().orElse(ItemStack.EMPTY);
 
         if(!itemFromInv.isEmpty())
