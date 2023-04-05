@@ -449,7 +449,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                         {
                             AABB getArea = workCardBase.getAABBonUpgrade(card);
                             List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                            ItemStack toolStack = pedestal.getToolStack();
+                            ItemStack toolStack = pedestal.getToolStack().copy();
                             tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
 
                             if(PedestalConfig.COMMON.attacker_DamageTools.get())
