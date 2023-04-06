@@ -1,0 +1,16 @@
+{
+  "name": "pedestal.book.upgrades.name.unpackager",
+  "icon": "pedestals:upgrade_pedestal_unpackager",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "pedestal.book.upgrades.desc.unpackager"
+    },
+    {
+      "type": "crafting",
+      "text": "pedestal.book.upgrades.name.unpackager",
+      "recipe": "pedestals:upgrades/upgrade_unpackager"
+    }
+  ]
+}
