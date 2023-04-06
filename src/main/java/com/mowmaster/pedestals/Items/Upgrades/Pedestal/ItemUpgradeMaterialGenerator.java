@@ -28,10 +28,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
@@ -104,14 +106,27 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         if(generatedBlock != Blocks.AIR)
         {
             ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(getUpgradeDefaultTool()):(pedestal.getToolStack());
-//System.out.println(getToolFromPedestal);
 
-            LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                    .withRandom(level.random)
-                    .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                    .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+            if(getPlayer != null && getPlayer.get() != null)
+            {
+                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
+                        .withRandom(level.random)
+                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
+                        .withParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
-            return generatedBlock.defaultBlockState().getDrops(builder);
+                return generatedBlock.defaultBlockState().getBlock().getDrops(generatedBlock.defaultBlockState(),builder);
+            }
+            else
+            {
+                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
+                        .withRandom(level.random)
+                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+
+                return generatedBlock.defaultBlockState().getBlock().getDrops(generatedBlock.defaultBlockState(),builder);
+            }
         }
 
         return new ArrayList<>();
@@ -136,12 +151,26 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         {
             ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(new ItemStack(Items.STONE_PICKAXE)):(pedestal.getToolStack());
 
-            LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                    .withRandom(level.random)
-                    .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                    .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+            if(getPlayer != null && getPlayer.get() != null)
+            {
+                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
+                        .withRandom(level.random)
+                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
+                        .withParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
-            return generatedBlock.defaultBlockState().getDrops(builder);
+                return generatedBlock.defaultBlockState().getDrops(builder);
+            }
+            else
+            {
+                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
+                        .withRandom(level.random)
+                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+
+                return generatedBlock.defaultBlockState().getDrops(builder);
+            }
         }
 
         return new ArrayList<>();

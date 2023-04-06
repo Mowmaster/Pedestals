@@ -310,12 +310,28 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         Level level = pedestal.getLevel();
         if(blockTarget.getBlock() != Blocks.AIR)
         {
-            LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                    .withRandom(level.random)
-                    .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                    .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+            if(getPlayer != null && getPlayer.get() != null)
+            {
+                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
+                        .withRandom(level.random)
+                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
+                        .withParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
-            return blockTarget.getBlock().getDrops(blockTarget,builder);
+                return blockTarget.getDrops(builder);
+                //return blockTarget.getBlock().getDrops(blockTarget,builder);
+            }
+            else
+            {
+                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
+                        .withRandom(level.random)
+                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+
+                return blockTarget.getDrops(builder);
+                //return blockTarget.getBlock().getDrops(blockTarget,builder);
+            }
         }
 
         /*if(blockTarget.requiresCorrectToolForDrops())
