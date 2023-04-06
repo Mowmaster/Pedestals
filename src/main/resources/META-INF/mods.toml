@@ -29,7 +29,7 @@ displayName="Pedestals" #mandatory
 # A file name (in the root of the mod JAR) containing a logo for display
 logoFile="pedestals.png" #optional
 # A text field displayed in the mod UI
-credits="Thanks to all my Patreons and Discord Community Members" #optional
+credits="Thanks to all my Patreons and Discord Community Members, Also huge thanks to Joprebond for the documentation work (patchouli guide)" #optional
 # A text field displayed in the mod UI
 authors="Mowmaster" #optional
 # The description text for the mod (multi line!) (#mandatory)
