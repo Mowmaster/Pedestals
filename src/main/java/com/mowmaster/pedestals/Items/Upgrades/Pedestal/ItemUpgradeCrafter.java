@@ -143,11 +143,21 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase
         if(ingredientStacks.size()>16)cont = MowLibContainerUtils.getContainerCrafting(5,5);
         if(ingredientStacks.size()>25)cont = MowLibContainerUtils.getContainerCrafting(6,6);
 
-        for(int i=0;i<ingredientStacks.size();i++)
+        int size = ingredientStacks.size();
+        int iteratorSize = (size<cont.getContainerSize())?(cont.getContainerSize()):(size);
+
+        for(int i=0;i<iteratorSize;i++)
         {
-            if(!ingredientStacks.get(i).isEmpty())
+            if(i<size)
             {
-                cont.setItem(-1,ingredientStacks.get(i));
+                if(!ingredientStacks.get(i).isEmpty())
+                {
+                    cont.setItem(-1,ingredientStacks.get(i));
+                }
+                else
+                {
+                    cont.setItem(-1,ItemStack.EMPTY);
+                }
             }
             else
             {
