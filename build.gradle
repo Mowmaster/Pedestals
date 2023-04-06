@@ -56,6 +56,8 @@ minecraft {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', 'pedestals'
 
+            property 'mixin.env.disableRefMap', 'true'
+
             mods {
                 pedestals {
                     source sourceSets.main
@@ -149,6 +151,9 @@ repositories {
         content {
             includeGroup "curse.maven"
         }
+    maven {
+        url "https://modmaven.dev/"
+        }
     }
 }
 
@@ -162,6 +167,9 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
     // at runtime, use the full JEI jar for Forge
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${mc_version}-${patchouli_version}")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${mc_version}-${patchouli_version}")
 
     implementation fg.deobf("curse.maven:mowlib-631455:4027223")
 

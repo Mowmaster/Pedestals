@@ -1,0 +1,16 @@
+{
+  "name": "pedestal.book.work.name.location",
+  "icon": "pedestals:workcard_locations",
+  "category": "pedestals:work_cards",
+  "pages": [
+    {
+      "type": "text",
+      "text": "pedestal.book.work.desc.location"
+    },
+    {
+      "type": "crafting",
+      "text": "pedestal.book.work.name.location",
+      "recipe": "pedestals:work_area/location_card"
+    }
+  ]
+}
