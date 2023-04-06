@@ -17,11 +17,14 @@ import static com.mowmaster.pedestals.PedestalUtils.PedestalUtilities.*;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -29,6 +32,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
@@ -76,9 +80,37 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
     }
 
     @Override
+    public boolean canModifyEntityContainers(ItemStack upgradeItemStack)  {
+        return true;
+    }
+
+    @Override
     public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
 
 
+    public static LazyOptional<IItemHandler> findItemHandlerAtPosEntity(Level world, BlockPos pos, Direction side, boolean allowEntity) {
+        BlockEntity neighbourTile = world.getBlockEntity(pos);
+        if (neighbourTile != null) {
+            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(ForgeCapabilities.ITEM_HANDLER, side);
+            if (cap.isPresent()) {
+                return cap;
+            }
+        }
+
+        if (allowEntity) {
+            List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), (entity) -> {
+                return entity instanceof Entity;
+            });
+            if (!list.isEmpty()) {
+                LazyOptional<IItemHandler> cap = ((Entity)list.get(world.random.nextInt(list.size()))).getCapability(ForgeCapabilities.ITEM_HANDLER);
+                if (cap.isPresent()) {
+                    return cap;
+                }
+            }
+        }
+
+        return LazyOptional.empty();
+    }
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
@@ -92,6 +124,12 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
 
             ItemStack itemFromInv = ItemStack.EMPTY;
             LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            if(hasEntityContainer(coin))
+            {
+                cap = findItemHandlerAtPosEntity(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            }
+
+
             if(!isInventoryEmpty(cap))
             {
                 if(cap.isPresent())
@@ -153,6 +191,10 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
         if(canTransferFluids(coin))
         {
             LazyOptional<IFluidHandler> cap = MowLibFluidUtils.findFluidHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            if(hasEntityContainer(coin))
+            {
+                cap = findItemHandlerAtPosEntityFluid(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            }
             if(cap.isPresent())
             {
                 IFluidHandler handler = cap.orElse(null);
@@ -261,7 +303,10 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             int getMaxEnergyValue = pedestal.getEnergyCapacity();
 
             LazyOptional<IEnergyStorage> cap = MowLibEnergyUtils.findEnergyHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
-
+            if(hasEntityContainer(coin))
+            {
+                cap = findItemHandlerAtPosEntityEnergy(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            }
             if(cap.isPresent())
             {
                 IEnergyStorage handler = cap.orElse(null);

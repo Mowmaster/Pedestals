@@ -9,9 +9,13 @@ import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import static com.mowmaster.pedestals.PedestalUtils.PedestalUtilities.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
@@ -19,6 +23,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 import net.minecraft.world.item.Item.Properties;
@@ -60,6 +65,11 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
     }
 
     @Override
+    public boolean canModifyEntityContainers(ItemStack upgradeItemStack)  {
+        return true;
+    }
+
+    @Override
     public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
 
     @Override
@@ -75,7 +85,10 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
             ItemStack stackInPedestal = pedestal.removeItem(true);
             ItemStack itemFromInv = ItemStack.EMPTY;
             LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
-
+            if(hasEntityContainer(coin))
+            {
+                cap = findItemHandlerAtPosEntity(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            }
             if(!stackInPedestal.isEmpty() && !stackInPedestal.equals(ItemStack.EMPTY))
             {
                 if(cap.isPresent())
@@ -132,6 +145,10 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
         if(canTransferFluids(coin))
         {
             LazyOptional<IFluidHandler> cap = MowLibFluidUtils.findFluidHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            if(hasEntityContainer(coin))
+            {
+                cap = findItemHandlerAtPosEntityFluid(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            }
             if(cap.isPresent())
             {
                 IFluidHandler handler = cap.orElse(null);
@@ -256,7 +273,10 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes
         if(canTransferEnergy(coin))
         {
             LazyOptional<IEnergyStorage> cap = MowLibEnergyUtils.findEnergyHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
-
+            if(hasEntityContainer(coin))
+            {
+                cap = findItemHandlerAtPosEntityEnergy(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+            }
             if(cap.isPresent())
             {
                 IEnergyStorage handler = cap.orElse(null);

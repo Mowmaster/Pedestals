@@ -29,6 +29,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -36,13 +37,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
@@ -271,6 +276,16 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         if(canModifyGentleHarvest(upgradeStack))
         {
             return getGentleHarvest(upgradeStack);
+        }
+
+        return false;
+    }
+
+    public boolean hasEntityContainer(ItemStack upgradeStack)
+    {
+        if(canModifyEntityContainers(upgradeStack))
+        {
+            return getEntityContainer(upgradeStack);
         }
 
         return false;
@@ -1646,6 +1661,20 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
         }
 
+        if(canModifyEntityContainers(p_41421_))
+        {
+            if(getEntityContainer(p_41421_))
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_entitycontainer_label");
+                areaLabel.withStyle(ChatFormatting.DARK_GREEN);
+                p_41423_.add(areaLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_entitycontainer_allowed",ChatFormatting.DARK_GREEN);
+            }
+        }
+
         if(canModifyArea(p_41421_))
         {
             if(getAreaIncrease(p_41421_)>0)
@@ -1860,6 +1889,78 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     ==============================================================================
     ============================================================================*/
 
+    public static LazyOptional<IItemHandler> findItemHandlerAtPosEntity(Level world, BlockPos pos, Direction side, boolean allowEntity) {
+        BlockEntity neighbourTile = world.getBlockEntity(pos);
+        if (neighbourTile != null) {
+            LazyOptional<IItemHandler> cap = neighbourTile.getCapability(ForgeCapabilities.ITEM_HANDLER, side);
+            if (cap.isPresent()) {
+                return cap;
+            }
+        }
+
+        if (allowEntity) {
+            List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), (entity) -> {
+                return entity instanceof Entity;
+            });
+            if (!list.isEmpty()) {
+                LazyOptional<IItemHandler> cap = ((Entity)list.get(world.random.nextInt(list.size()))).getCapability(ForgeCapabilities.ITEM_HANDLER);
+                if (cap.isPresent()) {
+                    return cap;
+                }
+            }
+        }
+
+        return LazyOptional.empty();
+    }
+
+    public static LazyOptional<IFluidHandler> findItemHandlerAtPosEntityFluid(Level world, BlockPos pos, Direction side, boolean allowEntity) {
+        BlockEntity neighbourTile = world.getBlockEntity(pos);
+        if (neighbourTile != null) {
+            LazyOptional<IFluidHandler> cap = neighbourTile.getCapability(ForgeCapabilities.FLUID_HANDLER, side);
+            if (cap.isPresent()) {
+                return cap;
+            }
+        }
+
+        if (allowEntity) {
+            List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), (entity) -> {
+                return entity instanceof Entity;
+            });
+            if (!list.isEmpty()) {
+                LazyOptional<IFluidHandler> cap = ((Entity)list.get(world.random.nextInt(list.size()))).getCapability(ForgeCapabilities.FLUID_HANDLER);
+                if (cap.isPresent()) {
+                    return cap;
+                }
+            }
+        }
+
+        return LazyOptional.empty();
+    }
+
+    public static LazyOptional<IEnergyStorage> findItemHandlerAtPosEntityEnergy(Level world, BlockPos pos, Direction side, boolean allowEntity) {
+        BlockEntity neighbourTile = world.getBlockEntity(pos);
+        if (neighbourTile != null) {
+            LazyOptional<IEnergyStorage> cap = neighbourTile.getCapability(ForgeCapabilities.ENERGY, side);
+            if (cap.isPresent()) {
+                return cap;
+            }
+        }
+
+        if (allowEntity) {
+            List<Entity> list = world.getEntitiesOfClass(Entity.class, new AABB(pos), (entity) -> {
+                return entity instanceof Entity;
+            });
+            if (!list.isEmpty()) {
+                LazyOptional<IEnergyStorage> cap = ((Entity)list.get(world.random.nextInt(list.size()))).getCapability(ForgeCapabilities.ENERGY);
+                if (cap.isPresent()) {
+                    return cap;
+                }
+            }
+        }
+
+        return LazyOptional.empty();
+    }
+
 
     /*============================================================================
     ==============================================================================
@@ -1881,6 +1982,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean canModifyMagnet(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyGentleHarvest(ItemStack upgradeItemStack) { return false; }
     public boolean canModifySuperSpeed(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyEntityContainers(ItemStack upgradeItemStack) { return false; }
 
     public boolean canAddModifierToUpgrade(ItemStack upgradeItemStack, String nbtTagString)
     {
@@ -1899,6 +2001,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             case "upgrademagnet": return canModifyMagnet(upgradeItemStack);
             case "upgradegentle": return canModifyGentleHarvest(upgradeItemStack);
             case "upgradesuperspeed": return canModifySuperSpeed(upgradeItemStack);
+            case "upgradeentitystorage": return canModifyEntityContainers(upgradeItemStack);
             default: return false;
         }
     }
@@ -1919,6 +2022,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean getMagnet(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgrademagnet")>=1; }
     public boolean getGentleHarvest(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradegentle")>=1; }
     public boolean getSuperSpeed(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradesuperspeed")>=1; }
+    public boolean getEntityContainer(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeentitystorage")>=1; }
 
     /*============================================================================
     ==============================================================================
