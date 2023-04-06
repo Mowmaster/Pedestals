@@ -1,0 +1,16 @@
+{
+  "name": "pedestal.book.upgrades.name.export",
+  "icon": "pedestals:upgrade_pedestal_export",
+  "category": "pedestals:upgrades",
+  "pages": [
+     {
+      "type": "text",
+      "text": "pedestal.book.upgrades.desc.export"
+    },
+    {
+      "type": "crafting",
+      "text": "Pedestal Export Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_export"
+    }
+  ]
+}

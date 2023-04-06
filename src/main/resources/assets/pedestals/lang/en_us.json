@@ -596,5 +596,55 @@
   "death.attack.pedestal10.item": "%1$s was pricked to death.",
   "death.attack.pedestal11.item": "%1$s has kicked the bucket.",
   "death.attack.pedestal12.item": "%1$s, we told you not to play around with sharp things!",
-  "death.attack.pedestal13.item": "%1$s, became Holey, then they Ascended!"
+  "death.attack.pedestal13.item": "%1$s, became Holey, then they Ascended!",
+
+  "pedestal.book.upgrades.name.base": "Upgrade Base",
+  "pedestal.book.upgrades.desc.base": "This is the base crafting item for all upgrades",
+  "pedestal.book.upgrades.name.attacker": "Attacker Upgrade",
+  "pedestal.book.upgrades.desc.attacker": "Will execute a player simulated attack in the defined work area",
+  "pedestal.book.upgrades.name.import": "Import Upgrade",
+  "pedestal.book.upgrades.desc.import": "Imports items/fluids/energy/xp from the 'Below' Inventory into the Pedestal.",
+
+  "pedestal.book.upgrades.name.export": "Export Upgrade",
+  "pedestal.book.upgrades.desc.export": "Exports items/fluids/energy/xp from the Pedestal into the 'Below' Inventory.",
+
+  "pedestal.book.upgrades.name.bottler": "Bottler Upgrade",
+  "pedestal.book.upgrades.desc.bottler": "Takes Inputs out of an Inventory Below the pedestal, \"Bottles\" Fluids and XP by default, but could also work with Energy and Dust containers too.",
+
+  "pedestal.book.upgrades.name.unbottler": "UnBottler Upgrade",
+  "pedestal.book.upgrades.desc.unbottler": "Takes Inputs out of an Inventory Below the pedestal, \"Unbottles\" Fluids and XP by default, but could also work with Energy and Dust containers too.",
+
+  "pedestal.book.upgrades.name.blaster": "Blaster Upgrade",
+  "pedestal.book.upgrades.desc.blaster": "Acts like a blast furnace and will use items from the inventory below",
+
+  "pedestal.book.upgrades.name.breaker": "Breaker Upgrade",
+  "pedestal.book.upgrades.desc.breaker": "Breaks Items in a work area or work locations",
+
+  "pedestal.book.upgrades.name.packager": "Packager Upgrade",
+  "pedestal.book.upgrades.desc.packager": "Fill the contents of a package",
+
+  "pedestal.book.upgrades.name.unpackager": "Unpackager Upgrade",
+  "pedestal.book.upgrades.desc.unpackager": "Empty the package of its contents",
+
+  "pedestal.book.upgrades.name.crafter": "Crafting Upgrade",
+  "pedestal.book.upgrades.desc.crafter": "Crafts items based on what is in the selected pedestals",
+
+  "pedestal.book.upgrades.name.generator": "Generator Upgrade",
+  "pedestal.book.upgrades.desc.generator": "Creates Energy at 20rf/t",
+
+  "pedestal.book.upgrades.name.smelter": "Smelter Upgrade",
+  "pedestal.book.upgrades.desc.smelter": "Smelts items provided from a 'Below Inventory'",
+
+  "pedestal.book.upgrades.name.smoker": "Smoker Upgrade",
+  "pedestal.book.upgrades.desc.smoker": "Smokes items provided from a 'Below Inventory'",
+
+  "pedestal.book.work.name.area": "Work Area",
+  "pedestal.book.work.desc.area": "Allows you to do define the area where the pedestal will work",
+
+  "pedestal.book.work.name.location": "Work Locations",
+  "pedestal.book.work.desc.location": "Allows you to set the locations where the pedestal will work",
+
+  "pedestal.book.work.name.pedestals": "Pedestal Locations",
+  "pedestal.book.work.desc.pedestals": "Pedestals set the pedestals to use in a operation"
+
 }
