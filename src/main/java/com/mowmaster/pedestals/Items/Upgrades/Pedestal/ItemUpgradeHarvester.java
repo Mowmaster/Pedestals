@@ -339,7 +339,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                 LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
                         .withRandom(level.random)
                         .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
+                        .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
                         .withParameter(LootContextParams.TOOL, getToolFromPedestal);
 
                 return blockTarget.getDrops(builder);
