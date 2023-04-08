@@ -1,0 +1,39 @@
+{
+  "name": "pedestal.book.augm.name.capacity",
+  "icon": "pedestals:augment_pedestal_t4_capacity",
+  "category": "pedestals:augments",
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t1_capacity"
+    },
+    {
+      "type": "text",
+      "text": "pedestal.book.augm.desc.t1capacity"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t2_capacity"
+    },
+    {
+      "type": "text",
+      "text": "pedestal.book.augm.desc.t2capacity"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t3_capacity"
+    },
+    {
+      "type": "text",
+      "text": "pedestal.book.augm.desc.t3capacity"
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t4_capacity"
+    },
+    {
+      "type": "text",
+      "text": "pedestal.book.augm.desc.t4capacity"
+    }
+  ]
+}

@@ -598,6 +598,9 @@
   "death.attack.pedestal12.item": "%1$s, we told you not to play around with sharp things!",
   "death.attack.pedestal13.item": "%1$s, became Holey, then they Ascended!",
 
+  "pedestal.book.name": "Pedestals Guide (Very WIP)",
+  "pedestal.book.landing.text": "Pedestals Manual",
+
   "pedestal.book.upgrades.name.base": "Upgrade Base",
   "pedestal.book.upgrades.desc.base": "This is the base crafting item for all upgrades",
   "pedestal.book.upgrades.name.attacker": "Attacker Upgrade",
@@ -638,6 +641,9 @@
   "pedestal.book.upgrades.name.smoker": "Smoker Upgrade",
   "pedestal.book.upgrades.desc.smoker": "Smokes items provided from a 'Below Inventory'",
 
+  "pedestal.book.work.category.name": "Work Cards",
+  "pedestal.book.work.category.desc": "This section shows the cards to define the operational work area of a pedestal upgrade",
+
   "pedestal.book.work.name.area": "Work Area",
   "pedestal.book.work.desc.area": "Allows you to do define the area where the pedestal will work",
 
@@ -645,6 +651,25 @@
   "pedestal.book.work.desc.location": "Allows you to set the locations where the pedestal will work",
 
   "pedestal.book.work.name.pedestals": "Pedestal Locations",
-  "pedestal.book.work.desc.pedestals": "Pedestals set the pedestals to use in a operation"
+  "pedestal.book.work.desc.pedestals": "Pedestals set the pedestals to use in a operation",
+
+  "pedestal.book.augm.category.name": "Augments",
+  "pedestal.book.augm.category.desc": "This section shows augment how the pedestals work",
+
+  "pedestal.book.augm.name.capacity": "Capacity Augments",
+  "pedestal.book.augm.desc.t1capacity": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 4$(li)Fluid: 2000mb$(li)Energy: 5000 Fe/t$(li)Experience - 1 level$(li)Dust Rate: 10$(li)Maximum Upgrades: 4",
+  "pedestal.book.augm.desc.t2capacity": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 16$(li)Fluid: 4000mb$(li)Energy: 10000 Fe/t$(li)Experience - 5 levels$(li)Dust Rate: 10$(li)Maximum Upgrades: 8",
+  "pedestal.book.augm.desc.t3capacity": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 32$(li)Fluid: 8000mb$(li)Energy: 100000 Fe/t$(li)Experience - 10 levels$(li)Dust Rate: 10$(li)Maximum Upgrades: 12",
+  "pedestal.book.augm.desc.t4capacity": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 64$(li)Fluid: 16000mb$(li)Energy: 1000000 Fe/t$(li)Experience - 14 levels$(li)Dust Rate: 10$(li)Maximum Upgrades: 16",
+  "pedestal.book.augm.name.speed": "Speed Augments",
+  "pedestal.book.augm.desc.t1speed": "Decreases the time between each transfer operation$(2br)$(li)Ticks Decreased: 2$(li)Maximum allowed: 5",
+  "pedestal.book.augm.desc.t2speed": "Decreases the time between each transfer operation$(2br)$(li)Ticks Decreased: 4$(li)Maximum allowed: 5",
+  "pedestal.book.augm.desc.t3speed": "Decreases the time between each transfer operation$(2br)$(li)Ticks Decreased: 6$(li)Maximum allowed: 5",
+  "pedestal.book.augm.desc.t4speed": "Decreases the time between each transfer operation$(2br)$(li)Ticks Decreased: 8$(li)Maximum allowed: 5",
+  "pedestal.book.augm.name.range": "Range Augments",
+  "pedestal.book.augm.desc.t1range": "Increases the distance to link pedestals$(2br)$(li)Increases range: 2 Blocks$(li)Maximum allowed: 4",
+  "pedestal.book.augm.desc.t2range": "Increases the distance to link pedestals$(2br)$(li)Increases range: 6 Blocks$(li)Maximum allowed: 4",
+  "pedestal.book.augm.desc.t3range": "Increases the distance to link pedestals$(2br)$(li)Increases range: 8 Blocks$(li)Maximum allowed: 5",
+  "pedestal.book.augm.desc.t4range": "Increases the distance to link pedestals$(2br)$(li)Increases range: 8 Blocks$(li)Maximum allowed: 7"
 
 }
