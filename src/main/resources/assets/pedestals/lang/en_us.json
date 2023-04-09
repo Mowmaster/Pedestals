@@ -600,6 +600,7 @@
 
   "pedestal.book.name": "Pedestals Guide (Very WIP)",
   "pedestal.book.landing.text": "Pedestals Manual",
+  "pedestal.book.common.crafting": "Crafting",
 
   "pedestal.book.upgrades.name.base": "Upgrade Base",
   "pedestal.book.upgrades.desc.base": "This is the base crafting item for all upgrades",
@@ -675,6 +676,15 @@
   "pedestal.book.augm.desc.t1storage": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 4,000Mb$(li)Energy: 20,000Fe$(li)Experience levels: 10$(li)Dust rate: 50$(li)Maximum allowed 3",
   "pedestal.book.augm.desc.t2storage": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 16,000Mb$(li)Energy: 100,000Fe$(li)Experience levels: 15$(li)Dust rate: 100$(li)Maximum allowed 7",
   "pedestal.book.augm.desc.t3storage": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 64,000Mb$(li)Energy: 1,000,000Fe$(li)Experience levels: 20$(li)Dust rate: 200$(li)Maximum allowed 11",
-  "pedestal.book.augm.desc.t4storage": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 256,000Mb$(li)Energy: 10,000,000Fe$(li)Experience levels: 25$(li)Dust rate: 500$(li)Maximum allowed 15"
+  "pedestal.book.augm.desc.t4storage": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 256,000Mb$(li)Energy: 10,000,000Fe$(li)Experience levels: 25$(li)Dust rate: 500$(li)Maximum allowed 15",
+  "pedestal.book.augm.name.roundrobin": "Round Robin Augment",
+  "pedestal.book.augm.crft.roundrobin": "To craft, drop a piece of paper near a parrot then shift right click with any linking wand",
+  "pedestal.book.augm.desc.roundrobin": "Makes the pedestal transfer in order of the first linked to its last. If the pedestal cannot send to another pedestal, it will move to the next one",
+  "pedestal.book.augm.name.renderdiffuser": "Particle and Render Augment",
+  "pedestal.book.augm.crft.renderdiffuser": "To craft, right click on a piece of paper with a linking wand when its raining outside",
+  "pedestal.book.augm.desc.renderdiffuser": "Makes the pedestal tranasfer in order of the first linked to its last. If the pedestal cannot send to another pedestal, it will move to the next one",
+  "pedestal.book.augm.name.collide": "Collision Effect Augment",
+  "pedestal.book.augm.crft.collide": "To craft, right click on a piece of paper when paper collides with an animal",
+  "pedestal.book.augm.desc.collide": "Makes the pedestal tranasfer in order of the first linked to its last. If the pedestal cannot send to another pedestal, it will move to the next one"
 
 }
