@@ -343,7 +343,8 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
         }
         else if(getBlockToUseOn instanceof StemGrownBlock ||
                 getBlockToUseOn instanceof ChorusFlowerBlock ||
-                getBlockToUseOn instanceof BuddingAmethystBlock)
+                getBlockToUseOn instanceof BuddingAmethystBlock ||
+                getBlockToUseOn instanceof PointedDripstoneBlock)
         {
             return true;
         }
