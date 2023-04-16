@@ -11,6 +11,7 @@ import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
@@ -406,14 +408,28 @@ public class ItemUpgradePump extends ItemUpgradeBase
         if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation("pedestals","pedestals_cant_pump"))).stream().toList().contains(canMineBlock.getBlock()))
         {
             FluidState fluidState = pedestal.getLevel().getFluidState(canMinePos);
+            //System.out.println("issource: "+fluidState.isSource());
+            //System.out.println("isblock: "+(canMineBlock.getBlock() instanceof AbstractCauldronBlock));
             if(fluidState.isSource())
             {
-                FluidStack fluidStack = new FluidStack(fluidState.getType(), 1000);
+                FluidStack fluidStack = new FluidStack(fluidState.getType(), FluidType.BUCKET_VOLUME);
                 if(pedestal.canAcceptFluid(fluidStack))
                 {
-                    if(pedestal.spaceForFluid() >= 1000)
+                    if(pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME)
                     {
                         returner = pedestal.addFluid(fluidStack, IFluidHandler.FluidAction.SIMULATE)>0;
+                    }
+                }
+            }
+            else if(canMineBlock.getBlock() instanceof AbstractCauldronBlock cauldronBlock)
+            {
+                //System.out.println("isfull: "+(cauldronBlock.isFull(canMineBlock)));
+                if(cauldronBlock.isFull(canMineBlock))
+                {
+                    //System.out.println("islavaORwater: "+(canMineBlock.getBlock().equals(Blocks.LAVA_CAULDRON) || canMineBlock.getBlock().equals(Blocks.WATER_CAULDRON)));
+                    if(canMineBlock.getBlock().equals(Blocks.LAVA_CAULDRON) || canMineBlock.getBlock().equals(Blocks.WATER_CAULDRON))
+                    {
+                        returner = true;
                     }
                 }
             }
@@ -432,9 +448,20 @@ public class ItemUpgradePump extends ItemUpgradeBase
                 if(filter.getFilterDirection().neutral())
                 {
                     FluidState fluidState = pedestal.getLevel().getFluidState(canMinePos);
-                    if(fluidState.isSource())
+                    if(fluidState.isSource() || canMineBlock.getBlock() instanceof AbstractCauldronBlock)
                     {
-                        FluidStack fluidStack = new FluidStack(fluidState.getType(), 1000);
+                        FluidStack fluidStack = new FluidStack(fluidState.getType(), FluidType.BUCKET_VOLUME);
+                        if(canMineBlock.getBlock() instanceof AbstractCauldronBlock)
+                        {
+                            if(canMineBlock.getBlock().equals(Blocks.WATER_CAULDRON))
+                            {
+                                fluidStack = new FluidStack(Fluids.WATER, FluidType.BUCKET_VOLUME);
+                            }
+                            else if(canMineBlock.getBlock().equals(Blocks.LAVA_CAULDRON))
+                            {
+                                fluidStack = new FluidStack(Fluids.LAVA, FluidType.BUCKET_VOLUME);
+                            }
+                        }
                         return filter.canAcceptFluids(filterInPedestal,fluidStack);
                     }
                 }
@@ -460,12 +487,12 @@ public class ItemUpgradePump extends ItemUpgradeBase
         {
             if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_place"))).stream().toList().contains(getPlaceItem))
             {
-                if(possibleBlock instanceof IPlantable ||
+                if(possibleBlock instanceof IPlantable && (
                         possibleBlock instanceof BushBlock ||
-                        possibleBlock instanceof StemBlock ||
-                        possibleBlock instanceof BonemealableBlock ||
-                        possibleBlock instanceof ChorusFlowerBlock
-                )
+                                possibleBlock instanceof StemBlock ||
+                                possibleBlock instanceof BonemealableBlock ||
+                                possibleBlock instanceof ChorusFlowerBlock
+                ))
                 {
                     return false;
                 }
@@ -544,16 +571,31 @@ public class ItemUpgradePump extends ItemUpgradeBase
 
                                     if(!adjustedPoint.equals(pedestal.getPos()))
                                     {
+                                        //System.out.println("Can Mine: "+ canMine(pedestal, blockAtPoint, adjustedPoint));
                                         if(canMine(pedestal, blockAtPoint, adjustedPoint))
                                         {
+                                            //System.out.println("Passes Filter: "+ passesFilter(pedestal, blockAtPoint, adjustedPoint));
                                             if(passesFilter(pedestal, blockAtPoint, adjustedPoint))
                                             {
                                                 if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true))
                                                 {
                                                     FluidState fluidState = pedestal.getLevel().getFluidState(adjustedPoint);
-                                                    if(fluidState.isSource())
+                                                    //System.out.println("source or cauldron: "+ (fluidState.isSource() || blockAtPoint.getBlock() instanceof AbstractCauldronBlock));
+                                                    if(fluidState.isSource() || blockAtPoint.getBlock() instanceof AbstractCauldronBlock)
                                                     {
                                                         FluidStack fluidStack = new FluidStack(fluidState.getType(), FluidType.BUCKET_VOLUME);
+                                                        if(blockAtPoint.getBlock() instanceof AbstractCauldronBlock)
+                                                        {
+                                                            if(blockAtPoint.getBlock().equals(Blocks.WATER_CAULDRON))
+                                                            {
+                                                                fluidStack = new FluidStack(Fluids.WATER, FluidType.BUCKET_VOLUME);
+                                                            }
+                                                            else if(blockAtPoint.getBlock().equals(Blocks.LAVA_CAULDRON))
+                                                            {
+                                                                fluidStack = new FluidStack(Fluids.LAVA, FluidType.BUCKET_VOLUME);
+                                                            }
+                                                        }
+                                                        //System.out.println("can accept: "+ pedestal.canAcceptFluid(fluidStack));
                                                         if(pedestal.canAcceptFluid(fluidStack))
                                                         {
                                                             if(pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME)
@@ -571,7 +613,15 @@ public class ItemUpgradePump extends ItemUpgradeBase
                                                                     {
                                                                         if(!pedestal.removeItem(1,true).isEmpty())
                                                                         {
-                                                                            level.setBlockAndUpdate(adjustedPoint,Blocks.AIR.defaultBlockState());
+                                                                            if(blockAtPoint.getBlock() instanceof AbstractCauldronBlock)
+                                                                            {
+                                                                                level.setBlockAndUpdate(adjustedPoint,Blocks.CAULDRON.defaultBlockState());
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                level.setBlockAndUpdate(adjustedPoint,Blocks.AIR.defaultBlockState());
+                                                                            }
+
                                                                             if(canPlace(pedestal) && passesFilterItems(pedestal, level.getBlockState(adjustedPoint), adjustedPoint))
                                                                             {
                                                                                 if(!adjustedPoint.equals(pedestal.getPos()))
@@ -586,7 +636,14 @@ public class ItemUpgradePump extends ItemUpgradeBase
                                                                         }
                                                                         else
                                                                         {
-                                                                            level.setBlockAndUpdate(adjustedPoint,Blocks.AIR.defaultBlockState());
+                                                                            if(blockAtPoint.getBlock() instanceof AbstractCauldronBlock)
+                                                                            {
+                                                                                level.setBlockAndUpdate(adjustedPoint,Blocks.CAULDRON.defaultBlockState());
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                level.setBlockAndUpdate(adjustedPoint,Blocks.AIR.defaultBlockState());
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
