@@ -1,8 +1,11 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibReferences;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
@@ -92,6 +95,10 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
 
     protected FluidStack getFluidRequiredForGeneration(CobbleGenRecipe recipe) {
         return (recipe == null)?(FluidStack.EMPTY):(recipe.getResultFluidNeeded());
+    }
+
+    protected DustMagic getDustRequiredForGeneration(CobbleGenRecipe recipe) {
+        return (recipe == null)?(DustMagic.EMPTY):(recipe.getResultDustNeeded());
     }
 
     public List<ItemStack> getItemToGenerate(BasePedestalBlockEntity pedestal, CobbleGenRecipe recipe)
@@ -231,6 +238,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         int getEnergyNeeded = getEnergyRequiredForGeneration(recipe);
         int getExperienceNeeded = getExperienceRequiredForGeneration(recipe);
         FluidStack getFluidStackNeeded = getFluidRequiredForGeneration(recipe);
+        DustMagic getDustNeeded = getDustRequiredForGeneration(recipe);
         CompoundTag tagCoin = new CompoundTag();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
         if(coinInPedestal.hasTag()) { tagCoin = coinInPedestal.getTag(); }
@@ -238,6 +246,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         tagCoin = MowLibCompoundTagUtils.writeFluidStackToNBT(References.MODID, tagCoin, getFluidStackNeeded,"_fluidStack");
         tagCoin = MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tagCoin,getEnergyNeeded, "_energyNeeded");
         tagCoin = MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tagCoin,getExperienceNeeded, "_xpNeeded");
+        DustMagic.setDustMagicInTag(coinInPedestal.getTag(),getDustNeeded);
 
         coinInPedestal.setTag(tagCoin);
     }
@@ -249,7 +258,130 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(),"_fluidStack");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_energyNeeded");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_xpNeeded");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MowLibReferences.MODID, coinInPedestal.getTag(), "_dustMagicColor");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MowLibReferences.MODID, coinInPedestal.getTag(), "_dustMagicAmount");
     }
+
+    private boolean needsFuel(FluidStack getFluidStackNeeded, int getEnergyNeeded, int getExperienceNeeded, DustMagic getDustNeeded)
+    {
+        if(!getFluidStackNeeded.isEmpty())return true;
+        if(getEnergyNeeded>0)return true;
+        if(getExperienceNeeded>0)return true;
+        if(!getDustNeeded.isEmpty())return true;
+        return false;
+    }
+
+    private boolean hasEnoughFuel(BasePedestalBlockEntity pedestal, FluidStack getFluidStackNeeded, int getEnergyNeeded, int getExperienceNeeded, DustMagic getDustNeeded,boolean toolDamage, int modifier)
+    {
+        FluidStack pedestalsFluid = pedestal.getStoredFluid();
+        int pedestalEnergy = pedestal.getStoredEnergy();
+        int pedestalExperience = pedestal.getStoredExperience();
+        DustMagic pedestalDust = pedestal.getStoredDust();
+
+        if(!getFluidStackNeeded.isEmpty())
+        {
+            int increase = getFluidStackNeeded.getAmount()*modifier;
+            if(pedestalsFluid.getAmount()<increase)
+            {
+                return false;
+            }
+        }
+        if(getEnergyNeeded>0)
+        {
+            int increase = pedestalEnergy*modifier;
+            if(pedestalEnergy<increase)
+            {
+                return false;
+            }
+        }
+        if(getExperienceNeeded>0)
+        {
+            int increase = pedestalExperience*modifier;
+            if(pedestalExperience<increase)
+            {
+                return false;
+            }
+        }
+        if(!getDustNeeded.isEmpty())
+        {
+            int increase = pedestalDust.getDustAmount()*modifier;
+            if(pedestalDust.getDustAmount()<increase)
+            {
+                return false;
+            }
+        }
+        if(toolDamage)
+        {
+            int increase = modifier;
+            if(!pedestal.damageInsertedTool(increase,true))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean removeFuel(BasePedestalBlockEntity pedestal, FluidStack getFluidStackNeeded, int getEnergyNeeded, int getExperienceNeeded, DustMagic getDustNeeded,boolean toolDamage, int modifier)
+    {
+        boolean returner = false;
+        FluidStack neededFluid = getFluidStackNeeded.copy();
+        int neededEnergy = getEnergyNeeded;
+        int neededExperience = getExperienceNeeded;
+        DustMagic neededDust = getDustNeeded.copy();
+
+        //Should be enough to trust that we can just check and remove
+        if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,toolDamage,modifier))
+        {
+            if(!neededFluid.isEmpty())
+            {
+                int increase = neededFluid.getAmount()*modifier;
+                neededFluid.setAmount(increase);
+                if(pedestal.removeFluid(neededFluid, IFluidHandler.FluidAction.SIMULATE).equals(neededFluid))
+                {
+                    returner = true;
+                    pedestal.removeFluid(neededFluid, IFluidHandler.FluidAction.EXECUTE);
+                }
+            }
+            if(neededEnergy>0)
+            {
+                int increase = neededEnergy*modifier;
+                if(pedestal.removeEnergy(increase, true)>0)
+                {
+                    returner = true;
+                    pedestal.removeEnergy(increase, false);
+                }
+            }
+            if(neededExperience>0)
+            {
+                int increase = neededExperience*modifier;
+                if(pedestal.removeExperience(increase, true)>0)
+                {
+                    returner = true;
+                    pedestal.removeExperience(increase, false);
+                }
+            }
+            if(!neededDust.isEmpty())
+            {
+                int increase = neededDust.getDustAmount()*modifier;
+                neededDust.setDustAmount(increase);
+                if(pedestal.removeDust(neededDust, IDustHandler.DustAction.SIMULATE).equals(neededDust))
+                {
+                    returner = true;
+                    pedestal.removeDust(neededDust, IDustHandler.DustAction.EXECUTE);
+                }
+            }
+            if(toolDamage)
+            {
+                int increase = modifier;
+                pedestal.damageInsertedTool(increase,false);
+                returner = true;
+            }
+        }
+
+        return returner;
+    }
+
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
@@ -268,38 +400,9 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             FluidStack getFluidStackNeeded = MowLibCompoundTagUtils.readFluidStackFromNBT(References.MODID,coin.getTag(),"_fluidStack");
             int getEnergyNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_energyNeeded");
             int getExperienceNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_xpNeeded");
+            DustMagic getDustNeeded = DustMagic.getDustMagicInTag(coin.getTag());
 
-            boolean fluid = false;
-            boolean energy = false;
-            boolean xp = false;
             boolean damage = false;
-
-            if(!getFluidStackNeeded.isEmpty())
-            {
-                if(!pedestal.removeFluid(getFluidStackNeeded, IFluidHandler.FluidAction.SIMULATE).isEmpty())
-                {
-                    fluid = true;
-                }
-                else return;
-            }
-
-            if(getEnergyNeeded>0)
-            {
-                if(pedestal.removeEnergy(getEnergyNeeded, true)>0)
-                {
-                    energy = true;
-                }
-                else return;
-            }
-
-            if(getExperienceNeeded>0)
-            {
-                if(pedestal.removeExperience(getExperienceNeeded, true)>0)
-                {
-                    xp = true;
-                }
-                else return;
-            }
 
             if(PedestalConfig.COMMON.cobbleGeneratorDamageTools.get())
             {
@@ -333,34 +436,36 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
                 for (int i=0; i < getCobbleGenOutputs.size(); i++)
                 {
                     if(getCobbleGenOutputs.get(i).isEmpty()) continue;
-
                     ItemStack stacked = getCobbleGenOutputs.get(i);
                     boolean hadSpacePreModifier = pedestal.hasSpaceForItem(stacked);
-                    ItemStack stackedCopy = stacked.copy();
-                    ItemStack testStack = pedestal.addItemStack(stackedCopy, true);
-                    if(modifier>1) { stackedCopy.shrink(-modifier); }
-                    if(testStack.isEmpty())
+                    if(hadSpacePreModifier)
                     {
-                        pedestal.addItem(stackedCopy, false);
-                        itemsInserted = true;
-                    }
-                    else if(testStack.getCount()>0)
-                    {
-                        stackedCopy.shrink(testStack.getCount());
-                        if(pedestal.addItem(stackedCopy, true))
+                        ItemStack stackedCopy = stacked.copy();
+                        int modifierAmount = stacked.getCount() * modifier;
+                        if(modifier>1) { stackedCopy.setCount(modifierAmount); }
+                        ItemStack testStack = pedestal.addItemStack(stackedCopy, true);
+                        if(testStack.isEmpty())
                         {
-                            pedestal.addItem(stackedCopy, false);
-                            itemsInserted = true;
+                            if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                            {
+                                if(removeFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                                {
+                                    pedestal.addItem(stackedCopy, false);
+                                }
+                            }
+                        }
+                        else if(testStack.getCount()>0)
+                        {
+                            stackedCopy.shrink(testStack.getCount());
+                            if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                            {
+                                if(removeFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                                {
+                                    pedestal.addItem(stackedCopy, false);
+                                }
+                            }
                         }
                     }
-                }
-
-                if(itemsInserted)
-                {
-                    if(fluid)pedestal.removeFluid(getFluidStackNeeded, IFluidHandler.FluidAction.EXECUTE);
-                    if(energy)pedestal.removeEnergy(getEnergyNeeded, false);
-                    if(xp)pedestal.removeExperience(getExperienceNeeded, false);
-                    if(damage)pedestal.damageInsertedTool(1,false);
                 }
             }
         }
