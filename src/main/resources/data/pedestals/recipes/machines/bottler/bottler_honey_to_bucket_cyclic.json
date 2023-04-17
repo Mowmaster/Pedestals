@@ -1,0 +1,19 @@
+{
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "item": "minecraft:glass_bottle"
+  },
+  "inputFluidStack": {
+    "fluid": "cyclic:honey",
+    "count": 1000
+  },
+  "result": {
+    "item": "cyclic:honey_bucket"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "cyclic"
+    }
+  ]
+}

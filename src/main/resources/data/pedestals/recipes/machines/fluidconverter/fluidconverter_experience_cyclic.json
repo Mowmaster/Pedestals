@@ -1,17 +1,16 @@
 {
   "type": "pedestals:fluidconverter",
   "inputFluidStack": {
-    "fluid": "productivebees:honey",
-    "count": 1000
+    "fluid": "cyclic:xpjuice",
+    "count": 250
   },
-  "result": {
-    "item": "minecraft:honey_block"
+  "experience": {
+    "experienceValue": 11
   },
   "conditions": [
     {
       "type": "forge:mod_loaded",
-      "modid": "productivebees"
+      "modid": "cyclic"
     }
   ]
-
 }

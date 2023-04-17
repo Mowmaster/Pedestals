@@ -1,0 +1,16 @@
+{
+  "type": "pedestals:fluidconverter",
+  "inputFluidStack": {
+    "fluid": "cofh_core:experience",
+    "count": 250
+  },
+  "experience": {
+    "experienceValue": 11
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "cofh_core"
+    }
+  ]
+}

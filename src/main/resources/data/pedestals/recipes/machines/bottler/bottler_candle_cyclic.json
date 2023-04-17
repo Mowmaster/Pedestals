@@ -1,19 +1,20 @@
 {
   "type": "pedestals:bottler",
   "inputStack": {
-    "item": "minecraft:bucket"
+    "tag": "forge:string"
   },
   "inputFluidStack": {
-    "fluid": "productivebees:honey",
-    "count": 1000
+    "fluid": "cyclic:wax",
+    "count": 250
   },
   "result": {
-    "item": "productivebees:honey_bucket"
+    "item": "minecraft:candle",
+    "count": 2
   },
   "conditions": [
     {
       "type": "forge:mod_loaded",
-      "modid": "productivebees"
+      "modid": "cyclic"
     }
   ]
 }

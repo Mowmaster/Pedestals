@@ -1,0 +1,16 @@
+{
+  "type": "pedestals:fluidconverter",
+  "inputFluidStack": {
+    "fluid": "cofh_core:honey",
+    "count": 1000
+  },
+  "result": {
+    "item": "minecraft:honey_block"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "cofh_core"
+    }
+  ]
+}

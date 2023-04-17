@@ -1,14 +1,10 @@
 {
   "type": "pedestals:unbottler",
   "inputStack": {
-    "item": "honey_bottle"
+    "item": "create:experience_nugget"
   },
-  "inputFluidStack": {
-    "fluid": "create:honey",
-    "count": 250
-  },
-  "result": {
-    "item": "minecraft:glass_bottle"
+  "experience": {
+    "experienceValue": 2
   },
   "conditions": [
     {
@@ -16,5 +12,4 @@
       "modid": "create"
     }
   ]
-
 }

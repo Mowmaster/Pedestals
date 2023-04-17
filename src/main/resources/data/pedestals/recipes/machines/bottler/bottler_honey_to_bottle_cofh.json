@@ -1,0 +1,19 @@
+{
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "item": "minecraft:glass_bottle"
+  },
+  "inputFluidStack": {
+    "fluid": "cofh_core:honey",
+    "count": 250
+  },
+  "result": {
+    "item": "minecraft:honey_bottle"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "cofh_core"
+    }
+  ]
+}

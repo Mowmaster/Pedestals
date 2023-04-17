@@ -1,7 +1,7 @@
 {
   "type": "pedestals:fluidconverter",
   "inputFluidStack": {
-    "fluid": "pneumaticcraft:memory_essence",
+    "fluid": "industrialforegoing:essence",
     "count": 250
   },
   "experience": {
@@ -10,7 +10,7 @@
   "conditions": [
     {
       "type": "forge:mod_loaded",
-      "modid": "pneumaticcraft"
+      "modid": "industrialforegoing"
     }
   ]
 }

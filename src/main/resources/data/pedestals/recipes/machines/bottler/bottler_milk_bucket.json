@@ -1,23 +1,24 @@
 {
   "type": "pedestals:bottler",
   "inputStack": {
-    "tag": "forge:string"
+    "item": "minecraft:bucket"
   },
   "inputFluidStack": {
-    "fluid": "forge:wax",
-    "count": 250
+    "fluid": "minecraft:milk",
+    "count": 1000
   },
   "result": {
-    "item": "minecraft:candle",
-    "count": 2
+    "item": "minecraft:milk_bucket"
   },
-  "conditions": [
+  "conditions":
+  [
     {
       "type": "forge:not",
       "value": {
         "type": "forge:tag_empty",
-        "tag": "forge:wax"
+        "tag": "forge:milk"
       }
     }
   ]
+
 }

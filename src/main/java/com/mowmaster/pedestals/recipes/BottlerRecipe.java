@@ -159,7 +159,10 @@ public class BottlerRecipe implements Recipe<MowLibMultiContainer>
 
     public FluidStack getFluidNeeded()
     {
-        if(fluidIng != null)return fluidIng.getFluidStack();
+        if(fluidIng != null)
+        {
+            return fluidIng.getFluidStack();
+        }
         else return FluidStack.EMPTY;
     }
 

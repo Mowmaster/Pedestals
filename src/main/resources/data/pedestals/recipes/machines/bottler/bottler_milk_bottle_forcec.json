@@ -1,0 +1,19 @@
+{
+  "type": "pedestals:bottler",
+  "inputStack": {
+    "item": "forcecraft:force_flask"
+  },
+  "inputFluidStack": {
+    "fluid": "minecraft:milk",
+    "count": 1000
+  },
+  "result": {
+    "item": "forcecraft:milk_force_flask"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "forcecraft"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "pedestals:fluidconverter",
+  "inputFluidStack": {
+    "fluid": "cyclic:honey",
+    "count": 1000
+  },
+  "result": {
+    "item": "minecraft:honey_block"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "cyclic"
+    }
+  ]
+}

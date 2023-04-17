@@ -1,14 +1,14 @@
 {
-  "type": "pedestals:unbottler",
+  "type": "pedestals:bottler",
   "inputStack": {
-    "item": "honey_bottle"
+    "item": "minecraft:glass_bottle"
   },
   "inputFluidStack": {
     "fluid": "create:honey",
     "count": 250
   },
   "result": {
-    "item": "minecraft:glass_bottle"
+    "item": "minecraft:honey_bottle"
   },
   "conditions": [
     {
@@ -16,5 +16,4 @@
       "modid": "create"
     }
   ]
-
 }

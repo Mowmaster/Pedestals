@@ -12,8 +12,11 @@
   },
   "conditions": [
     {
-      "type": "forge:item_exists",
-      "item": "minecraft:milk"
+      "type": "forge:not",
+      "value": {
+        "type": "forge:tag_empty",
+        "tag": "forge:milk"
+      }
     }
   ]
 
