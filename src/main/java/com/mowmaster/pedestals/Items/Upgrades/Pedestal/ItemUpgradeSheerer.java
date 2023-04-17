@@ -131,7 +131,7 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
             ItemStack card = pedestal.getWorkCardInPedestal();
             if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                if(workCardBase.hasTwoPointsSelected(card))
+                if(workCardBase.hasTwoPointsSelected(card) && workCardBase.selectedAreaWithinRange(pedestal))
                 {
                     boolean canRun = true;
                     boolean damage = false;
