@@ -312,42 +312,47 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
         return null;
     }
 
-    private boolean canUseOn(BasePedestalBlockEntity pedestal, BlockState useOnState, BlockPos useOnPosition)
+    private boolean canUseOn(BasePedestalBlockEntity pedestal, BlockState useOnState, BlockPos useOnPosition, boolean bonemealUsed)
     {
         //ItemStack getItem = pedestal.getItemInPedestal();
         Block getBlockToUseOn = useOnState.getBlock();
-        if(getBlockToUseOn instanceof IPlantable || getBlockToUseOn instanceof BonemealableBlock)
+        if(bonemealUsed)
         {
-            IntegerProperty propInt = getBlockPropertyAge(useOnState);
-            if(useOnState.hasProperty(propInt))
+            if(getBlockToUseOn instanceof IPlantable || getBlockToUseOn instanceof BonemealableBlock)
             {
-                int current = useOnState.getValue(propInt);
-                //int min = Collections.min(propInt.getPossibleValues());
-                int max = Collections.max(propInt.getPossibleValues());
-                if(max>0)
+                IntegerProperty propInt = getBlockPropertyAge(useOnState);
+                if(useOnState.hasProperty(propInt))
                 {
-                    if(current == max)
+                    int current = useOnState.getValue(propInt);
+                    //int min = Collections.min(propInt.getPossibleValues());
+                    int max = Collections.max(propInt.getPossibleValues());
+                    if(max>0)
                     {
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
+                        if(current == max)
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return true;
+                        }
                     }
                 }
-            }
-            else
-            {
-                return true;
+                else
+                {
+                    return true;
+                }
             }
         }
         else if(getBlockToUseOn instanceof StemGrownBlock ||
                 getBlockToUseOn instanceof ChorusFlowerBlock ||
                 getBlockToUseOn instanceof BuddingAmethystBlock ||
-                getBlockToUseOn instanceof PointedDripstoneBlock)
+                getBlockToUseOn instanceof PointedDripstoneBlock ||
+                getBlockToUseOn instanceof IPlantable)
         {
             return true;
         }
+
 
 
         return false;
@@ -402,7 +407,7 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
                         BlockState blockAtPoint = level.getBlockState(currentPoint);
                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                         {
-                            if(canUseOn(pedestal,blockAtPoint,currentPoint))
+                            if(canUseOn(pedestal,blockAtPoint,currentPoint,false))
                             {
                                 if(passesFilter(pedestal, blockAtPoint, currentPoint))
                                 {
@@ -425,7 +430,7 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
                                                 }
                                             }
                                         }
-                                        else if(canUseOn(pedestal, blockAtPoint, currentPoint))
+                                        else if(canUseOn(pedestal, blockAtPoint, currentPoint,false))
                                         {
                                             if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                             {
@@ -457,7 +462,7 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
 
                     if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                     {
-                        if(canUseOn(pedestal,blockAtPoint,currentPoint))
+                        if(canUseOn(pedestal,blockAtPoint,currentPoint,false))
                         {
                             if(passesFilter(pedestal, blockAtPoint, currentPoint))
                             {
@@ -498,7 +503,7 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
                                         }*/
 
                                     }
-                                    else if(canUseOn(pedestal, blockAtPoint, currentPoint))
+                                    else if(canUseOn(pedestal, blockAtPoint, currentPoint,false))
                                     {
                                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                         {
