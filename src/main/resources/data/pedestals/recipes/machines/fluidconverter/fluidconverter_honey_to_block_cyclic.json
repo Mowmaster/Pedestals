@@ -4,8 +4,19 @@
     "fluid": "cyclic:honey",
     "count": 1000
   },
+  "energy": {
+    "energyValue": 0
+  },
+  "experience": {
+    "experienceValue": 0
+  },
+  "dust": {
+    "dustColor": -1,
+    "dustAmount": 0
+  },
   "result": {
-    "item": "minecraft:honey_block"
+    "item": "minecraft:honey_block",
+    "count": 1
   },
   "conditions": [
     {

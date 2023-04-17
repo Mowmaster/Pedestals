@@ -4,8 +4,19 @@
     "fluid": "industrialforegoing:pink_slime",
     "count": 250
   },
+  "energy": {
+    "energyValue": 0
+  },
+  "experience": {
+    "experienceValue": 0
+  },
+  "dust": {
+    "dustColor": -1,
+    "dustAmount": 0
+  },
   "result": {
-    "item": "industrialforegoing:pink_slime"
+    "item": "industrialforegoing:pink_slime",
+    "count": 1
   },
   "conditions": [
     {

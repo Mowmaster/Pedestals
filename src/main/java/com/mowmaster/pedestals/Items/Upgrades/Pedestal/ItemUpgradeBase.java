@@ -1865,11 +1865,13 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     public static void tryEquipItem(ItemStack stack, WeakReference<FakePlayer> pedestalPlayer, InteractionHand hand)
     {
-        if (pedestalPlayer == null) {
+        if (pedestalPlayer == null || pedestalPlayer.get() == null || stack == null) {
             return;
         }
-
-        pedestalPlayer.get().setItemInHand(hand, stack);
+        else
+        {
+            pedestalPlayer.get().setItemInHand(hand, stack);
+        }
     }
 
     public WeakReference<FakePlayer> fakeUpgradePlayer(BasePedestalBlockEntity pedestal)
@@ -1990,7 +1992,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         {
             case "upgradespeed": return canModifySpeed(upgradeItemStack);
             case "upgradedamagecapacity": return canModifyDamageCapacity(upgradeItemStack);
-            case "upgradeblockcapacity": return canModifyDamageCapacity(upgradeItemStack);
+            case "upgradeblockcapacity": return canModifyBlockCapacity(upgradeItemStack);
             case "upgradeitemcapacity": return canModifyItemCapacity(upgradeItemStack);
             case "upgradefluidcapacity": return canModifyFluidCapacity(upgradeItemStack);
             case "upgradeenergycapacity": return canModifyEnergyCapacity(upgradeItemStack);

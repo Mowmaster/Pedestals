@@ -4,8 +4,19 @@
     "fluid": "cyclic:slime",
     "count": 250
   },
+  "energy": {
+    "energyValue": 0
+  },
+  "experience": {
+    "experienceValue": 0
+  },
+  "dust": {
+    "dustColor": -1,
+    "dustAmount": 0
+  },
   "result": {
-    "item": "minecraft:slime_ball"
+    "item": "minecraft:slime_ball",
+    "count": 1
   },
   "conditions": [
     {

@@ -45,7 +45,6 @@ public class ItemUpgradeFluidConverter extends ItemUpgradeBase
         Level level = pedestal.getLevel();
         MowLibMultiContainer cont = MowLibContainerUtils.getMultiContainer(0);
         cont.setFluidStack(pedestal.getStoredFluid());
-
         if (level == null) return null;
         RecipeManager recipeManager = level.getRecipeManager();
         Optional<FluidConverterRecipe> optional = recipeManager.getRecipeFor(FluidConverterRecipe.Type.INSTANCE, cont, level);
@@ -57,7 +56,12 @@ public class ItemUpgradeFluidConverter extends ItemUpgradeBase
         return null;
     }
     protected FluidStack getFluidRequired(FluidConverterRecipe recipe) {
-        return (recipe == null)?(FluidStack.EMPTY):(recipe.getFluidRequired());
+
+        if(recipe != null)
+        {
+            return recipe.getFluidRequired();
+        }
+        return FluidStack.EMPTY;
     }
 
     protected Collection<ItemStack> getNormalResults(FluidConverterRecipe recipe) {
@@ -95,35 +99,38 @@ public class ItemUpgradeFluidConverter extends ItemUpgradeBase
             //Make sure at least one returned a value
             if(!(getReturnedEnergy<=0 && getReturnedExperience<=0 && getReturnedDust.isEmpty() && returnedStack.isEmpty()))
             {
-                if(!pedestal.removeFluid(fluidRequired, IFluidHandler.FluidAction.SIMULATE).isEmpty())
+                if(pedestal.getStoredFluid().getAmount()>= fluidRequired.getAmount())
                 {
-                    boolean allowed = true;
-                    if(!returnedStack.isEmpty())
+                    if(!pedestal.removeFluid(fluidRequired, IFluidHandler.FluidAction.SIMULATE).isEmpty())
                     {
-                        if(!pedestal.addItem(returnedStack, true))
+                        boolean allowed = true;
+                        if(!returnedStack.isEmpty())
                         {
-                            allowed = false;
+                            if(!pedestal.addItem(returnedStack, true))
+                            {
+                                allowed = false;
+                            }
                         }
-                    }
-                    if(getReturnedEnergy > 0)
-                    {
-                        if(pedestal.addEnergy(getReturnedEnergy, true) < getReturnedEnergy)allowed = false;
-                    }
-                    if(getReturnedExperience > 0)
-                    {
-                        if(pedestal.addExperience(getReturnedExperience, true)<getReturnedExperience)allowed = false;
-                    }
-                    if(!getReturnedDust.isEmpty())
-                    {
-                        if(pedestal.addDust(getReturnedDust, IDustHandler.DustAction.SIMULATE)<getReturnedDust.getDustAmount())allowed = false;
-                    }
+                        if(getReturnedEnergy > 0)
+                        {
+                            if(pedestal.addEnergy(getReturnedEnergy, true) < getReturnedEnergy)allowed = false;
+                        }
+                        if(getReturnedExperience > 0)
+                        {
+                            if(pedestal.addExperience(getReturnedExperience, true)<getReturnedExperience)allowed = false;
+                        }
+                        if(!getReturnedDust.isEmpty())
+                        {
+                            if(pedestal.addDust(getReturnedDust, IDustHandler.DustAction.SIMULATE)<getReturnedDust.getDustAmount())allowed = false;
+                        }
 
-                    if(allowed && !pedestal.removeFluid(fluidRequired, IFluidHandler.FluidAction.EXECUTE).isEmpty())
-                    {
-                        if(getReturnedEnergy > 0)pedestal.addEnergy(getReturnedEnergy, false);
-                        if(getReturnedExperience > 0)pedestal.addExperience(getReturnedExperience, false);
-                        if(!getReturnedDust.isEmpty())pedestal.addDust(getReturnedDust, IDustHandler.DustAction.EXECUTE);
-                        if(!returnedStack.isEmpty())pedestal.addItem(returnedStack, false);
+                        if(allowed && !pedestal.removeFluid(fluidRequired, IFluidHandler.FluidAction.EXECUTE).isEmpty())
+                        {
+                            if(getReturnedEnergy > 0)pedestal.addEnergy(getReturnedEnergy, false);
+                            if(getReturnedExperience > 0)pedestal.addExperience(getReturnedExperience, false);
+                            if(!getReturnedDust.isEmpty())pedestal.addDust(getReturnedDust, IDustHandler.DustAction.EXECUTE);
+                            if(!returnedStack.isEmpty())pedestal.addItem(returnedStack, false);
+                        }
                     }
                 }
             }

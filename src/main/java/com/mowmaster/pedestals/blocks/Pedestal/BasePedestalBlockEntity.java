@@ -1104,14 +1104,21 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     public boolean hasSpaceForItem(ItemStack stackToMatch)
     {
         IItemHandler h = handler.orElse(null);
-        if(h.getSlots()>1)
+        if(h.getSlots()>0)
         {
             for(int i=0;i<h.getSlots();i++)
             {
                 ItemStack stackInSlot = h.getStackInSlot(i);
-                if(((stackInSlot.getCount() < stackInSlot.getMaxStackSize()) && ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToMatch)) || stackInSlot.isEmpty())
+                if(stackInSlot.isEmpty())
                 {
                     return true;
+                }
+                else if(stackInSlot.getCount() < stackInSlot.getMaxStackSize())
+                {
+                    if(ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToMatch))
+                    {
+                        return true;
+                    }
                 }
             }
         }

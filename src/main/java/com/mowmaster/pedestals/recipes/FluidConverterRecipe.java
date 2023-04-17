@@ -90,7 +90,7 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
         //System.out.println(fluidIng == null && energy == null && experience == null && dust == null);
         if(fluidIng == null && energy == null && experience == null && dust == null && generatedItemOrBlock == null)return false;
         //System.out.println(energy.getEnergyNeeded()<=0 && experience.getExperienceRequired()<=0 && dust.getDustMagic().isEmpty() && generatedItemOrBlock.isEmpty());
-        if(energy.getEnergyNeeded()<=0 && experience.getExperienceRequired()<=0 && dust.getDustMagic().isEmpty())return false;
+        if(energy.getEnergyNeeded()<=0 && experience.getExperienceRequired()<=0 && dust.getDustMagic().isEmpty() && generatedItemOrBlock.isEmpty())return false;
 
         //System.out.println(fluidIng != null && !fluidIng.getFluidStack().isEmpty());
         if(fluidIng != null && !fluidIng.getFluidStack().isEmpty())
@@ -126,8 +126,7 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
 
     public FluidStack getFluidRequired()
     {
-        if(fluidIng != null)return fluidIng.getFluidStack();
-        else return FluidStack.EMPTY;
+        return fluidIng != null ? fluidIng.getFluidStack() : FluidStack.EMPTY;
     }
 
     public int getEnergyReturned()
@@ -173,7 +172,7 @@ public class FluidConverterRecipe implements Recipe<MowLibMultiContainer>
         return new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_FLUIDCONVERTER.get());
     }
 
-    public FluidStack getFluidStack() { return fluidIng.getFluidStack(); }
+    public FluidStack getFluidStack() { return fluidIng != null ? fluidIng.getFluidStack() : FluidStack.EMPTY; }
 
     public int getEnergy()
     {
