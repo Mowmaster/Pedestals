@@ -9,6 +9,7 @@ import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,12 +18,15 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.extensions.IForgeFluid;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -130,95 +134,84 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
+        if(level.isClientSide())return;
+
         if(pedestal.hasWorkCard())
         {
             ItemStack card = pedestal.getWorkCardInPedestal();
             if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                if(workCardBase.hasTwoPointsSelected(card))
+                if(workCardBase.hasTwoPointsSelected(card) && workCardBase.selectedAreaWithinRange(pedestal))
                 {
                     boolean canRun = true;
-
-                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
-                    {
-                        WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-                        if(getPlayer != null && getPlayer.get() != null)
-                        {
-                            AABB getArea = workCardBase.getAABBonUpgrade(card);
-                            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                            ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
-                            tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
-
-            /*if(PedestalConfig.COMMON.milker_DamageTools.get())
-            {
-                if(pedestal.hasTool())
-                {
-                    BlockPos pedestalPos = pedestal.getPos();
-                    if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                    {
-                        if(pedestal.damageInsertedTool(1,true))
-                        {
-                            damage = true;
-                        }
-                        else
-                        {
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                            canRun = false;
-                        }
-                    }
+                    Fluid getFluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation("minecraft:milk"));
+                    if(getFluid !=null && (pedestal.spaceForFluid() < FluidType.BUCKET_VOLUME)){return;}
+                    else if((getFluid == null || getFluid.defaultFluidState().isEmpty()) && pedestal.getItemInPedestal().isEmpty()){return;}
                     else
                     {
-                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                        canRun = false;
-                    }
-                }
-            }*/
-
-                            if(canRun)
+                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
+                        {
+                            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+                            if(getPlayer != null && getPlayer.get() != null)
                             {
-                                for (LivingEntity getEntity : entities)
+                                AABB getArea = workCardBase.getAABBonUpgrade(card);
+                                List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
+                                ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal().copy()):(pedestal.getToolStack());
+                                tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
+
+                                if(canRun)
                                 {
-                                    if(getEntity == null)continue;
-
-                                    BlockPos getEntityPos = getEntity.getOnPos();
-                                    if(getEntity instanceof Animal animal)
+                                    for (LivingEntity getEntity : entities)
                                     {
-                                        InteractionResult result = animal.mobInteract((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND);
-                                        if(result == InteractionResult.CONSUME)
-                                        {
-                                            NonNullList<ItemStack> getItemsInPlayer = getPlayer.get().getInventory().items;
-                                            for(int i=0;i<getItemsInPlayer.size();i++)
-                                            {
-                                                ItemStack stackInPlayer = getItemsInPlayer.get(i);
-                                                //System.out.println(stackInPlayer.getItem());
-                                                if(!stackInPlayer.isEmpty() && !toolStack.getItem().equals(stackInPlayer.getItem()))
-                                                {
-                                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
-                                                    {
-                                                        //System.out.println(stackInPlayer.getItem() instanceof BucketItem);
-                                                        if(stackInPlayer.getItem() instanceof BucketItem bucket)
-                                                        {
+                                        if(getEntity == null)continue;
 
-                                                            //System.out.println(bucket.getFluid());
-                                                            if(!bucket.getFluid().equals(Fluids.EMPTY))
+                                        BlockPos getEntityPos = getEntity.getOnPos();
+                                        if(getEntity instanceof Animal animal)
+                                        {
+                                            InteractionResult result = animal.mobInteract((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND);
+                                            if(result == InteractionResult.CONSUME)
+                                            {
+                                                NonNullList<ItemStack> getItemsInPlayer = getPlayer.get().getInventory().items;
+                                                for(int i=0;i<getItemsInPlayer.size();i++)
+                                                {
+                                                    ItemStack stackInPlayer = getItemsInPlayer.get(i);
+                                                    //System.out.println(stackInPlayer.getItem());
+                                                    if(!stackInPlayer.isEmpty() && !toolStack.getItem().equals(stackInPlayer.getItem()))
+                                                    {
+                                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
+                                                        {
+                                                            if(stackInPlayer.getItem().equals(Items.MILK_BUCKET))
                                                             {
-                                                                FluidStack getFluid = new FluidStack(bucket.getFluid(),FluidType.BUCKET_VOLUME);
-                                                                if(pedestal.addFluid(getFluid, IFluidHandler.FluidAction.SIMULATE)>0)
+                                                                if(getFluid !=null && pedestal.getItemInPedestal().isEmpty())
                                                                 {
-                                                                    pedestal.addFluid(getFluid, IFluidHandler.FluidAction.EXECUTE);
-                                                                    if(!hasAdvancedOne(coin))break;
+                                                                    FluidStack getFluidStack = new FluidStack(getFluid,FluidType.BUCKET_VOLUME);
+                                                                    if(pedestal.addFluid(getFluidStack, IFluidHandler.FluidAction.SIMULATE)>0)
+                                                                    {
+                                                                        pedestal.addFluid(getFluidStack, IFluidHandler.FluidAction.EXECUTE);
+                                                                        if(!hasAdvancedOne(coin))break;
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    if(!pedestal.removeItem(1,true).isEmpty())
+                                                                    {
+                                                                        pedestal.removeItem(1,false);
+                                                                        MowLibItemUtils.spawnItemStack(level,getEntityPos.getX(),getEntityPos.getY(),getEntityPos.getZ(),stackInPlayer);
+                                                                        if(!hasAdvancedOne(coin))break;
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                        else
-                                                        {
-
-                                                            //System.out.println(pedestal.getItemInPedestal().getItem());
-                                                            if(!pedestal.removeItem(1,true).isEmpty())
+                                                            else if(stackInPlayer.getItem() instanceof BucketItem bucket)
                                                             {
-                                                                MowLibItemUtils.spawnItemStack(level,getEntityPos.getX(),getEntityPos.getY(),getEntityPos.getZ(),stackInPlayer);
-                                                                pedestal.removeItem(1,false);
-                                                                if(!hasAdvancedOne(coin))break;
+                                                                if(!bucket.getFluid().equals(Fluids.EMPTY))
+                                                                {
+                                                                    FluidStack getFluidStack = new FluidStack(bucket.getFluid(),FluidType.BUCKET_VOLUME);
+                                                                    if(pedestal.addFluid(getFluidStack, IFluidHandler.FluidAction.SIMULATE)>0)
+                                                                    {
+                                                                        pedestal.addFluid(getFluidStack, IFluidHandler.FluidAction.EXECUTE);
+                                                                        if(!hasAdvancedOne(coin))break;
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
