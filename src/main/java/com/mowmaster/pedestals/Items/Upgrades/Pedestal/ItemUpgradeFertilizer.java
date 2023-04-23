@@ -344,12 +344,16 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
                 }
             }
         }
-        else if(getBlockToUseOn instanceof StemGrownBlock ||
+        else if(getBlockToUseOn.isRandomlyTicking(useOnState))
+        {
+            /*
+            getBlockToUseOn instanceof StemGrownBlock ||
                 getBlockToUseOn instanceof ChorusFlowerBlock ||
                 getBlockToUseOn instanceof BuddingAmethystBlock ||
                 getBlockToUseOn instanceof PointedDripstoneBlock ||
-                getBlockToUseOn instanceof IPlantable)
-        {
+                getBlockToUseOn instanceof IPlantable ||
+                getBlockToUseOn instanceof BonemealableBlock
+             */
             return true;
         }
 
