@@ -40,7 +40,7 @@ public class BaseFilter extends MowLibBaseFilter
         if(!itemFromInv.isEmpty())
         {
             FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
-            return filterRestricted.canAcceptCountItems(filterableBlockEntity,filterStack,itemStackIncoming.getMaxStackSize(),spaceAvailable,itemStackIncoming);
+            return filterRestricted.canAcceptCountItems(filterableBlockEntity,itemFromInv,itemStackIncoming.getMaxStackSize(),spaceAvailable,itemStackIncoming);
         }
 
         return Math.min(spaceAvailable, itemStackIncoming.getMaxStackSize());
@@ -61,7 +61,7 @@ public class BaseFilter extends MowLibBaseFilter
         if(!itemFromInv.isEmpty())
         {
             FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
-            return filterRestricted.canAcceptCountFluids(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable,incomingFluidStack);
+            return filterRestricted.canAcceptCountFluids(filterableBlockEntity,itemFromInv,maxSpaceSize,spaceAvailable,incomingFluidStack);
         }
 
         return Math.min(spaceAvailable, incomingFluidStack.getAmount());
@@ -82,7 +82,7 @@ public class BaseFilter extends MowLibBaseFilter
         if(!itemFromInv.isEmpty())
         {
             FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
-            return filterRestricted.canAcceptCountEnergy(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable,incomingEnergyAmount);
+            return filterRestricted.canAcceptCountEnergy(filterableBlockEntity,itemFromInv,maxSpaceSize,spaceAvailable,incomingEnergyAmount);
         }
 
         return Math.min(spaceAvailable, incomingEnergyAmount);
@@ -103,7 +103,7 @@ public class BaseFilter extends MowLibBaseFilter
         if(!itemFromInv.isEmpty())
         {
             FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
-            return filterRestricted.canAcceptCountExperience(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable,incomingExperienceAmount);
+            return filterRestricted.canAcceptCountExperience(filterableBlockEntity,itemFromInv,maxSpaceSize,spaceAvailable,incomingExperienceAmount);
         }
 
         return Math.min(spaceAvailable, incomingExperienceAmount);
@@ -124,7 +124,7 @@ public class BaseFilter extends MowLibBaseFilter
         if(!itemFromInv.isEmpty())
         {
             FilterRestricted filterRestricted = (FilterRestricted)itemFromInv.getItem();
-            return filterRestricted.canAcceptCountDust(filterableBlockEntity,filterStack,maxSpaceSize,spaceAvailable,incomingDust);
+            return filterRestricted.canAcceptCountDust(filterableBlockEntity,itemFromInv,maxSpaceSize,spaceAvailable,incomingDust);
         }
 
         return Math.min(spaceAvailable, incomingDust.getDustAmount());
