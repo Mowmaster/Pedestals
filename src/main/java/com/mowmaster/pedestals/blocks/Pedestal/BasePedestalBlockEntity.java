@@ -19,7 +19,6 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
-import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -27,7 +26,6 @@ import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.*;
 
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -35,7 +33,6 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
@@ -45,7 +42,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -66,7 +62,7 @@ import java.util.List;
 public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 {
     private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandlerPedestal);
-    private LazyOptional<IItemHandler> privateHandler = LazyOptional.of(this::createHandlerPedestalPrivate);
+    private ItemStackHandler privateItems = createPrivateItemHandler();
     private LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(this::createHandlerPedestalEnergy);
     private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(this::createHandlerPedestalFluid);
     private LazyOptional<IExperienceStorage> experienceHandler = LazyOptional.of(this::createHandlerPedestalExperience);
@@ -213,7 +209,23 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         };
     }
 
-    private IItemHandler createHandlerPedestalPrivate() {
+    private static class PrivateInventorySlot {
+        static final int COIN = 0;
+        static final int LIGHT = 1;
+        static final int FILTER = 2;
+        static final int REDSTONE = 3;
+        static final int AUGMENT_ROUNDROBIN = 4;
+        static final int AUGMENT_RENDERDIFFUSER = 5;
+        static final int AUGMENT_NOCOLLIDE = 6;
+        static final int AUGMENT_TIERED_SPEED = 7;
+        static final int AUGMENT_TIERED_CAPACITY = 8;
+        static final int AUGMENT_TIERED_STORAGE = 9;
+        static final int AUGMENT_TIERED_RANGE = 10;
+        static final int TOOL = 11;
+        static final int WORK_CARD = 12;
+    }
+
+    private ItemStackHandler createPrivateItemHandler() {
         //going from 11 to 20 slots to future proof things
         return new ItemStackHandler(20) {
 
@@ -243,21 +255,22 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                if (slot == 0 && stack.getItem() instanceof IPedestalUpgrade && !hasCoin()) return true;
-                //if (slot == 1 && stack.getItem().equals(Items.GLOWSTONE_DUST) && getLightBrightness()<15) return true;
-                if (slot == 1 && stack.getItem().equals(Items.GLOWSTONE) && !hasLight()) return true;
-                if (slot == 2 && stack.getItem() instanceof IPedestalFilter && !(stack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get())) && !hasFilter()) return true;
-                if (slot == 3 && stack.getItem().equals(Items.REDSTONE) && getRedstonePowerNeeded()<15) return true;
-                if (slot == 4 && stack.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()) && !hasRRobin()) return true;
-                if (slot == 5 && stack.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()) && !hasRenderAugment()) return true;
-                if (slot == 6 && stack.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()) && !hasNoCollide()) return true;
-                if (slot == 7 && stack.getItem() instanceof AugmentTieredSpeed && canInsertAugmentSpeed(stack)) return true;
-                if (slot == 8 && stack.getItem() instanceof AugmentTieredCapacity && canInsertAugmentCapacity(stack)) return true;
-                if (slot == 9 && stack.getItem() instanceof AugmentTieredStorage && canInsertAugmentStorage(stack)) return true;
-                if (slot == 10 && stack.getItem() instanceof AugmentTieredRange && canInsertAugmentRange(stack)) return true;
-                if (slot == 11 && canInsertTool(stack)) return true;
-                if (slot == 12 && stack.getItem() instanceof IPedestalWorkCard && !hasWorkCard()) return true;
-                return false;
+                return switch (slot) {
+                    case PrivateInventorySlot.COIN -> stack.getItem() instanceof IPedestalUpgrade && !hasCoin();
+                    case PrivateInventorySlot.LIGHT -> stack.is(Items.GLOWSTONE) && !hasLight();
+                    case PrivateInventorySlot.FILTER -> stack.getItem() instanceof IPedestalFilter && !(stack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get())) && !hasFilter();
+                    case PrivateInventorySlot.REDSTONE -> stack.is(Items.REDSTONE) && getRedstonePowerNeeded() < 15;
+                    case PrivateInventorySlot.AUGMENT_ROUNDROBIN -> stack.is(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()) && !hasRRobin();
+                    case PrivateInventorySlot.AUGMENT_RENDERDIFFUSER -> stack.is(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()) && !hasRenderAugment();
+                    case PrivateInventorySlot.AUGMENT_NOCOLLIDE -> stack.is(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()) && !hasNoCollide();
+                    case PrivateInventorySlot.AUGMENT_TIERED_SPEED -> canInsertSpeedAugment(stack);
+                    case PrivateInventorySlot.AUGMENT_TIERED_CAPACITY -> canInsertAugmentCapacity(stack);
+                    case PrivateInventorySlot.AUGMENT_TIERED_STORAGE -> canInsertAugmentStorage(stack);
+                    case PrivateInventorySlot.AUGMENT_TIERED_RANGE -> canInsertAugmentRange(stack);
+                    case PrivateInventorySlot.TOOL -> canInsertTool(stack);
+                    case PrivateInventorySlot.WORK_CARD -> stack.getItem() instanceof IPedestalWorkCard && !hasWorkCard();
+                    default -> false;
+                };
             }
         };
     }
@@ -871,15 +884,13 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public void dropInventoryItemsPrivate(Level worldIn, BlockPos pos) {
-        IItemHandler ph = privateHandler.orElse(null);
-        MowLibItemUtils.dropInventoryItems(worldIn,pos,ph);
+        MowLibItemUtils.dropInventoryItems(worldIn,pos,privateItems);
     }
 
     public List<ItemStack> dropInventoryItemsPrivateList() {
-        IItemHandler h = privateHandler.orElse(null);
         List<ItemStack> returner = new ArrayList<>();
-        for(int i = 0; i < h.getSlots(); ++i) {
-            returner.add(h.getStackInSlot(i));
+        for(int i = 0; i < privateItems.getSlots(); ++i) {
+            returner.add(privateItems.getStackInSlot(i));
         }
 
         return returner;
@@ -1767,62 +1778,30 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
 
     public boolean hasCoin()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph == null)return false;
-        if(ph.getStackInSlot(0).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.COIN).isEmpty();
     }
 
     public ItemStack getCoinOnPedestal()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph == null)return ItemStack.EMPTY;
-        if(hasCoin())
-        {
-            return ph.getStackInSlot(0);
-        }
-        else return ItemStack.EMPTY;
+        return privateItems.getStackInSlot(PrivateInventorySlot.COIN);
     }
 
     public ItemStack removeCoin() {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph == null)return ItemStack.EMPTY;
-        ItemStack stack = ph.getStackInSlot(0);
-        ph.extractItem(0,stack.getCount(),false);
-        //update();
-
-        return stack;
+        return privateItems.extractItem(PrivateInventorySlot.COIN, 1, false);
     }
 
-    public boolean addCoin(Player player, ItemStack coinFromBlock, boolean simulate)
+    public boolean attemptAddCoin(ItemStack stack)
     {
-        if(hasCoin())
-        {
+        if (privateItems.isItemValid(PrivateInventorySlot.COIN, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.COIN, stack.split(1), false);
+            // update();
+            return true;
+        } else {
             return false;
-        }
-        else
-        {
-            IItemHandler ph = privateHandler.orElse(null);
-            ItemStack coinItem = coinFromBlock.copy();
-            coinItem.setCount(1);
-            if(!hasCoin() && ph.isItemValid(0,coinItem))
-            {
-                if(!simulate)
-                {
-                    //((IPedestalUpgrade)coinFromBlock.getItem()).setPlayerOnCoin(coinFromBlock,player);
-                    ph.insertItem(0,coinItem,false);
-                }
-                return true;
-            }
-            else return false;
         }
     }
 
     public void actionOnNeighborBelowChange(BlockPos belowBlock) {
-
         if(getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
         {
             upgrade.actionOnNeighborBelowChange(getPedestal(),belowBlock);
@@ -1855,98 +1834,57 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean addSpeed(ItemStack speedAugment)
+    public boolean attemptAddSpeed(ItemStack stack)
     {
-        if(speedAugment.getItem() instanceof AugmentTieredSpeed speedStack)
-        {
-            IItemHandler ph = privateHandler.orElse(null);
-            ItemStack itemFromBlock = speedAugment.copy();
-            itemFromBlock.setCount(1);
-            if(getSpeed() < speedStack.getAllowedInsertAmount(speedAugment.getItem()))
-            {
-                ph.insertItem(7,itemFromBlock,false);
-                //update();
-                return true;
-            }
-            else return false;
+        if (privateItems.isItemValid(PrivateInventorySlot.AUGMENT_TIERED_SPEED, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.AUGMENT_TIERED_SPEED, stack.split(1), false);
+            // update();
+            return true;
+        } else {
+            return false;
         }
-        else return false;
     }
 
     public ItemStack removeSpeed(int count)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasSpeed())
-        {
-            return ph.extractItem(7,count,false);
-        }
-        else return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.AUGMENT_TIERED_SPEED, count, false);
     }
 
     public ItemStack removeAllSpeed()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasSpeed())
-        {
-            //update();
-            return ph.extractItem(7,ph.getStackInSlot(7).getCount(),false);
-        }
-        else return ItemStack.EMPTY;
+        return removeSpeed(numAugmentsSpeed());
     }
 
     public boolean hasSpeed()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(7).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return numAugmentsSpeed() > 0;
     }
 
-    public int getSpeed()
+    public int numAugmentsSpeed()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(7).getCount();
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_SPEED).getCount();
     }
 
-    public ItemStack getSpeedStack()
+    public ItemStack currentSpeedAugments()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(7);
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_SPEED);
     }
 
-    public boolean canInsertAugmentSpeed(ItemStack speedAugment)
-    {
-        if(speedAugment.getItem() instanceof AugmentTieredSpeed speedStack)
-        {
-            //Check to see if any can be insert
-            if(speedStack.getAllowedInsertAmount(speedAugment.getItem())<=0) return false;
+    public boolean canInsertSpeedAugment(ItemStack itemStack) {
+        int allowedInsertAmount = AugmentTieredSpeed.getAllowedInsertAmount(itemStack);
 
-            if(hasSpeed())
-            {
-                //Check to see if stacks to be insert match
-                if(!speedAugment.getItem().equals(getSpeedStack().getItem()))return false;
-                //Check to see if more can be insert
-                if(getSpeed() >= speedStack.getAllowedInsertAmount(speedAugment.getItem())) return false;
-
-                return true;
-            }
-            else return true;
-        }
-
-        return false;
+        return allowedInsertAmount > 0 && // is an insertable augment, and
+            (
+                // there is no existing augment, or
+                !hasSpeed() ||
+                    // this matches the existing augment and there is space left
+                    (itemStack.sameItem(currentSpeedAugments()) && numAugmentsSpeed() < allowedInsertAmount)
+            );
     }
 
     public int getTicksReduced()
     {
-        ItemStack augmentSpeed = getSpeedStack();
-        if(augmentSpeed.getItem() instanceof AugmentTieredSpeed speedStack)
-        {
-            return speedStack.getTicksReducedPerItem(augmentSpeed.getItem()) * augmentSpeed.getCount();
-        }
-
-        return 0;
+        return AugmentTieredSpeed.getTicksReduced(currentSpeedAugments()) * numAugmentsSpeed();
     }
 
     public int getCurrentSpeed()
@@ -1968,142 +1906,78 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean addCapacity(ItemStack capacityAugment)
+    public boolean attemptAddCapacity(ItemStack stack)
     {
-        if(capacityAugment.getItem() instanceof AugmentTieredCapacity capacityStack)
-        {
-            IItemHandler ph = privateHandler.orElse(null);
-            ItemStack itemFromBlock = capacityAugment.copy();
-            itemFromBlock.setCount(1);
-            if(getCapacity() < capacityStack.getAllowedInsertAmount(capacityAugment.getItem()))
-            {
-                ph.insertItem(8,itemFromBlock,false);
-                //update();
-                return true;
-            }
-            else return false;
+        if (privateItems.isItemValid(PrivateInventorySlot.AUGMENT_TIERED_CAPACITY, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.AUGMENT_TIERED_CAPACITY, stack.split(1), false);
+            // update();
+            return true;
+        } else {
+            return false;
         }
-        else return false;
     }
 
     public ItemStack removeCapacity(int count)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasCapacity())
-        {
-            return ph.extractItem(8,count,false);
-        }
-        else return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.AUGMENT_TIERED_CAPACITY, count, false);
     }
 
     public ItemStack removeAllCapacity()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasCapacity())
-        {
-            //update();
-            return ph.extractItem(8,ph.getStackInSlot(8).getCount(),false);
-        }
-        else return ItemStack.EMPTY;
+        return removeCapacity(numAugmentsCapacity());
     }
 
     public boolean hasCapacity()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(8).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return numAugmentsCapacity() > 0;
     }
 
-    public int getCapacity()
+    public int numAugmentsCapacity()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(8).getCount();
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_CAPACITY).getCount();
     }
 
-    public ItemStack getCapacityStack()
+    public ItemStack currentCapacityAugments()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(8);
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_CAPACITY);
     }
 
-    public boolean canInsertAugmentCapacity(ItemStack capacityAugment)
+    public boolean canInsertAugmentCapacity(ItemStack itemStack)
     {
-        if(capacityAugment.getItem() instanceof AugmentTieredCapacity capacityStack)
-        {
-            //Check to see if any can be insert
-            if(capacityStack.getAllowedInsertAmount(capacityAugment.getItem())<=0) return false;
+        int allowedInsertAmount = AugmentTieredCapacity.getAllowedInsertAmount(itemStack);
 
-            if(hasCapacity())
-            {
-                //Check to see if stacks to be insert match
-                if(!capacityAugment.getItem().equals(getCapacityStack().getItem()))return false;
-                //Check to see if more can be insert
-                if(getCapacity() >= capacityStack.getAllowedInsertAmount(capacityAugment.getItem())) return false;
-
-                return true;
-            }
-            else return true;
-        }
-
-        return false;
+        return allowedInsertAmount > 0 && // is an insertable augment, and
+            (
+                // there is no existing augment, or
+                !hasCapacity() ||
+                    // this matches the existing augment and there is space left
+                    (itemStack.sameItem(currentCapacityAugments()) && numAugmentsCapacity() < allowedInsertAmount)
+            );
     }
 
     public int getItemTransferRateIncreaseFromCapacity()
     {
-        ItemStack augmentCapacity = getCapacityStack();
-        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
-        {
-            return capacityStack.getAdditionalItemTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
-        }
-
-        return 0;
+        return AugmentTieredCapacity.getAdditionalItemTransferRatePerItem(currentCapacityAugments()) * numAugmentsCapacity();
     }
 
     public int getFluidTransferRateIncreaseFromCapacity()
     {
-        ItemStack augmentCapacity = getCapacityStack();
-        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
-        {
-            return capacityStack.getAdditionalFluidTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
-        }
-
-        return 0;
+        return AugmentTieredCapacity.getAdditionalFluidTransferRatePerItem(currentCapacityAugments()) * numAugmentsCapacity();
     }
 
     public int getEnergyTransferRateIncreaseFromCapacity()
     {
-        ItemStack augmentCapacity = getCapacityStack();
-        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
-        {
-            return capacityStack.getAdditionalEnergyTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
-        }
-
-        return 0;
+        return AugmentTieredCapacity.getAdditionalEnergyTransferRatePerItem(currentCapacityAugments()) * numAugmentsCapacity();
     }
 
     public int getXpTransferRateIncreaseFromCapacity()
     {
-        ItemStack augmentCapacity = getCapacityStack();
-        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
-        {
-            return capacityStack.getAdditionalXpTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
-        }
-
-        return 0;
+        return AugmentTieredCapacity.getAdditionalXpTransferRatePerItem(currentCapacityAugments()) * numAugmentsCapacity();
     }
 
     public int getDustTransferRateIncreaseFromCapacity()
     {
-        ItemStack augmentCapacity = getCapacityStack();
-        if(augmentCapacity.getItem() instanceof AugmentTieredCapacity capacityStack)
-        {
-            return capacityStack.getAdditionalDustTransferRatePerItem(augmentCapacity.getItem()) * augmentCapacity.getCount();
-        }
-
-        return 0;
+        return AugmentTieredCapacity.getAdditionalDustTransferRatePerItem(currentCapacityAugments()) * numAugmentsCapacity();
     }
 
     /*============================================================================
@@ -2119,142 +1993,78 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean addStorage(ItemStack storageAugment)
+    public boolean attemptAddStorage(ItemStack stack)
     {
-        if(storageAugment.getItem() instanceof AugmentTieredStorage storageStack)
-        {
-            IItemHandler ph = privateHandler.orElse(null);
-            ItemStack itemFromBlock = storageAugment.copy();
-            itemFromBlock.setCount(1);
-            if(getStorage() < storageStack.getAllowedInsertAmount(storageAugment.getItem()))
-            {
-                ph.insertItem(9,itemFromBlock,false);
-                //update();
-                return true;
-            }
-            else return false;
+        if (privateItems.isItemValid(PrivateInventorySlot.AUGMENT_TIERED_STORAGE, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.AUGMENT_TIERED_STORAGE, stack.split(1), false);
+            // update();
+            return true;
+        } else {
+            return false;
         }
-        else return false;
     }
 
     public ItemStack removeStorage(int count)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasStorage())
-        {
-            return ph.extractItem(9,count,false);
-        }
-        else return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.AUGMENT_TIERED_STORAGE, count, false);
     }
 
     public ItemStack removeAllStorage()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasStorage())
-        {
-            //update();
-            return ph.extractItem(9,ph.getStackInSlot(9).getCount(),false);
-        }
-        else return ItemStack.EMPTY;
+        return removeStorage(numAugmentsStorage());
     }
 
     public boolean hasStorage()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(9).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return numAugmentsStorage() > 0;
     }
 
-    public int getStorage()
+    public int numAugmentsStorage()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(9).getCount();
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_STORAGE).getCount();
     }
 
-    public ItemStack getStorageStack()
+    public ItemStack currentStorageAugments()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(9);
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_STORAGE);
     }
 
-    public boolean canInsertAugmentStorage(ItemStack storageAugment)
+    public boolean canInsertAugmentStorage(ItemStack itemStack)
     {
-        if(storageAugment.getItem() instanceof AugmentTieredStorage storageStack)
-        {
-            //Check to see if any can be insert
-            if(storageStack.getAllowedInsertAmount(storageAugment.getItem())<=0) return false;
+        int allowedInsertAmount = AugmentTieredStorage.getAllowedInsertAmount(itemStack);
 
-            if(hasStorage())
-            {
-                //Check to see if stacks to be insert match
-                if(!storageAugment.getItem().equals(getStorageStack().getItem()))return false;
-                //Check to see if more can be insert
-                if(getStorage() >= storageStack.getAllowedInsertAmount(storageAugment.getItem())) return false;
-
-                return true;
-            }
-            else return true;
-        }
-
-        return false;
+        return allowedInsertAmount > 0 && // is an insertable augment, and
+            (
+                // there is no existing augment, or
+                !hasStorage() ||
+                    // this matches the existing augment and there is space left
+                    (itemStack.sameItem(currentStorageAugments()) && numAugmentsStorage() < allowedInsertAmount)
+            );
     }
 
     public int getItemSlotIncreaseFromStorage()
     {
-        ItemStack augmentStorage = getStorageStack();
-        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
-        {
-            return storageStack.getAdditionalItemStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
-        }
-
-        return 0;
+        return AugmentTieredStorage.getAdditionalItemStoragePerItem(currentStorageAugments()) * numAugmentsStorage();
     }
 
     public int getFluidAmountIncreaseFromStorage()
     {
-        ItemStack augmentStorage = getStorageStack();
-        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
-        {
-            return storageStack.getAdditionalFluidStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
-        }
-
-        return 0;
+        return AugmentTieredStorage.getAdditionalFluidStoragePerItem(currentStorageAugments()) * numAugmentsStorage();
     }
 
     public int getEnergyAmountIncreaseFromStorage()
     {
-        ItemStack augmentStorage = getStorageStack();
-        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
-        {
-            return storageStack.getAdditionalEnergyStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
-        }
-
-        return 0;
+        return AugmentTieredStorage.getAdditionalEnergyStoragePerItem(currentStorageAugments()) * numAugmentsStorage();
     }
 
     public int getXpLevelAmountIncreaseFromStorage()
     {
-        ItemStack augmentStorage = getStorageStack();
-        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
-        {
-            return storageStack.getAdditionalXpStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
-        }
-
-        return 0;
+        return AugmentTieredStorage.getAdditionalXpStoragePerItem(currentStorageAugments()) * numAugmentsStorage();
     }
 
     public int getDustAmountIncreaseFromStorage()
     {
-        ItemStack augmentStorage = getStorageStack();
-        if(augmentStorage.getItem() instanceof AugmentTieredStorage storageStack)
-        {
-            return storageStack.getAdditionalDustStoragePerItem(augmentStorage.getItem()) * augmentStorage.getCount();
-        }
-
-        return 0;
+        return AugmentTieredStorage.getAdditionalDustStoragePerItem(currentStorageAugments()) * numAugmentsStorage();
     }
 
     /*============================================================================
@@ -2271,117 +2081,58 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean addRange(ItemStack rangeAugment)
+    public boolean attemptAddRange(ItemStack stack)
     {
-        if(rangeAugment.getItem() instanceof AugmentTieredRange rangeStack)
-        {
-            IItemHandler ph = privateHandler.orElse(null);
-            if(ph != null)
-            {
-                ItemStack itemFromBlock = rangeAugment.copy();
-                itemFromBlock.setCount(1);
-                if(getRange() < rangeStack.getAllowedInsertAmount(rangeAugment.getItem()))
-                {
-                    ph.insertItem(10,itemFromBlock,false);
-                    //update();
-                    return true;
-                }
-            }
+        if (privateItems.isItemValid(PrivateInventorySlot.AUGMENT_TIERED_RANGE, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.AUGMENT_TIERED_RANGE, stack.split(1), false);
+            // update();
+            return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public ItemStack removeRange(int count)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph != null)
-        {
-            if(hasRange())
-            {
-                return ph.extractItem(10,count,false);
-            }
-        }
-
-        return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.AUGMENT_TIERED_RANGE, count, false);
     }
 
     public ItemStack removeAllRange()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph != null)
-        {
-            if(hasRange())
-            {
-                //update();
-                return ph.extractItem(10,ph.getStackInSlot(10).getCount(),false);
-            }
-        }
-
-        return ItemStack.EMPTY;
+        return removeRange(numAugmentsRange());
     }
 
     public boolean hasRange()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph != null)
-        {
-            if(ph.getStackInSlot(10).isEmpty())
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return numAugmentsRange() > 0;
     }
 
-    public int getRange()
+    public int numAugmentsRange()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph != null)return ph.getStackInSlot(10).getCount();
-
-        return 0;
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_RANGE).getCount();
     }
 
-    public ItemStack getRangeStack()
+    public ItemStack currentRangeAugments()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph != null)return ph.getStackInSlot(10);
-
-        return ItemStack.EMPTY;
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_RANGE);
     }
 
-    public boolean canInsertAugmentRange(ItemStack rangeAugment)
+    public boolean canInsertAugmentRange(ItemStack itemStack)
     {
-        if(rangeAugment.getItem() instanceof AugmentTieredRange rangeStack)
-        {
-            //Check to see if any can be insert
-            if(rangeStack.getAllowedInsertAmount(rangeAugment.getItem())<=0) return false;
+        int allowedInsertAmount = AugmentTieredRange.getAllowedInsertAmount(itemStack);
 
-            if(hasRange())
-            {
-                //Check to see if stacks to be insert match
-                if(!rangeAugment.getItem().equals(getRangeStack().getItem()))return false;
-                //Check to see if more can be insert
-                if(getRange() >= rangeStack.getAllowedInsertAmount(rangeAugment.getItem())) return false;
-
-                return true;
-            }
-            else return true;
-        }
-
-        return false;
+        return allowedInsertAmount > 0 && // is an insertable augment, and
+            (
+                // there is no existing augment, or
+                !hasRange() ||
+                    // this matches the existing augment and there is space left
+                    (itemStack.sameItem(currentRangeAugments()) && numAugmentsRange() < allowedInsertAmount)
+            );
     }
 
     public int getRangeIncrease()
     {
-        ItemStack augmentRange = getRangeStack();
-        if(augmentRange.getItem() instanceof AugmentTieredRange rangeStack)
-        {
-            return rangeStack.getRangeIncreasePerItem(augmentRange.getItem()) * augmentRange.getCount();
-        }
-
-        return 0;
+        return AugmentTieredRange.getRangeIncreasePerItem(currentRangeAugments()) * numAugmentsRange();
     }
 
     /*============================================================================
@@ -2416,50 +2167,29 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         return false;
     }
 
-
-    public boolean addTool(ItemStack toolItem)
+    public boolean attemptAddTool(ItemStack stack)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack itemFromBlock = toolItem.copy();
-        itemFromBlock.setCount(1);
-
-        if(canInsertTool(itemFromBlock))
-        {
-            ph.insertItem(11,itemFromBlock,false);
+        if (privateItems.isItemValid(PrivateInventorySlot.TOOL, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.TOOL, stack.split(1), false);
             return true;
+        } else {
+            return false;
         }
-        else return false;
     }
 
     public ItemStack removeTool(int count)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasTool())
-        {
-            return ph.extractItem(11,count,false);
-        }
-        else return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.TOOL, count, false);
     }
 
     public ItemStack removeAllTool()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasTool())
-        {
-            //update();
-            return ph.extractItem(11,ph.getStackInSlot(11).getCount(),false);
-        }
-        else return ItemStack.EMPTY;
+        return removeTool(privateItems.getStackInSlot(PrivateInventorySlot.TOOL).getCount());
     }
 
     public boolean hasTool()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(11).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.TOOL).isEmpty();
     }
 
     public int getToolDurability()
@@ -2551,14 +2281,12 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
 
     public ItemStack getActualToolStack()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(11);
+        return privateItems.getStackInSlot(PrivateInventorySlot.TOOL);
     }
 
     public ItemStack getToolStack()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack toolInPed = ph.getStackInSlot(11);
+        ItemStack toolInPed = privateItems.getStackInSlot(PrivateInventorySlot.TOOL);
         ItemStack coinTool = ItemStack.EMPTY;
         if(hasCoin())
         {
@@ -2572,14 +2300,8 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
 
     public boolean canInsertTool(ItemStack tool)
     {
-        if(isAllowedTool(tool))
-        {
-            //Check to see if any can be insert
-            if(hasTool())return false;
-            else return true;
-        }
-
-        return false;
+        return isAllowedTool(tool) && // is an allowed tool, and
+            !hasTool(); // there is no existing tool
     }
 
     /*============================================================================
@@ -2596,45 +2318,36 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    private int slotLight = 1;
-
-    public boolean addLight()
+    public boolean attemptAddLight(ItemStack stack)
     {
-        if(hasLight())
-        {
-            return false;
-        }
-        else
-        {
-            IItemHandler ph = privateHandler.orElse(null);
+        if (privateItems.isItemValid(PrivateInventorySlot.LIGHT, stack)) {
             BlockState state = level.getBlockState(getPos());
             BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(true)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            ph.insertItem(slotLight,new ItemStack(Items.GLOWSTONE,1),false);
+            privateItems.insertItem(PrivateInventorySlot.LIGHT, stack.split(1), false);
             update();
             level.setBlock(getPos(),newstate,3);
             return true;
+        } else {
+            return false;
         }
     }
 
     public ItemStack removeLight()
     {
-        IItemHandler ph = privateHandler.orElse(null);
         if(hasLight())
         {
             BlockState state = level.getBlockState(getPos());
             BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            ph.extractItem(slotLight,1,false);
+            ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
             level.setBlock(getPos(),newstate,3);
             update();
-            return new ItemStack(Items.GLOWSTONE,1);
-
+            return retItemStack;
         }
         else return ItemStack.EMPTY;
     }
 
     /*public ItemStack removeLight()
     {
-        IItemHandler ph = privateHandler.orElse(null);
         if(hasLight())
         {
             BlockState state = level.getBlockState(getPos());
@@ -2642,15 +2355,15 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
             if(getLightBrightness()<=1)
             {
                 boolLight = true;
-                ph.extractItem(slotLight,1,false);
+                ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
                 level.setBlock(getPos(),newstate,3);
-                return new ItemStack(Items.GLOWSTONE_DUST,1);
+                return retItemStack;
             }
             else
             {
-                ph.extractItem(slotLight,1,false);
+                ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
                 state.updateNeighbourShapes(this.level,getPos(),1,3);
-                return new ItemStack(Items.GLOWSTONE_DUST,1);
+                return retItemStack;
             }
 
         }
@@ -2659,34 +2372,25 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
 
     /*public ItemStack removeAllLight()
     {
-        IItemHandler ph = privateHandler.orElse(null);
         if(hasLight())
         {
             BlockState state = level.getBlockState(getPos());
             BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            int slotCount = ph.getStackInSlot(slotLight).getCount();
-            ph.extractItem(slotLight,slotCount,false);
+            ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, privateItems.getStackInSlot(PrivateInventorySlot.LIGHT).getCount(), false);
             level.setBlock(getPos(),newstate,3);
-            return new ItemStack(Items.GLOWSTONE_DUST,slotCount);
+            return retItemStack;
         }
         else return ItemStack.EMPTY;
     }*/
 
     /*public int getLightBrightness()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(slotLight).getCount();
+        return privateItems.getStackInSlot(PrivateInventorySlot.LIGHT).getCount();
     }*/
-
 
     public boolean hasLight()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(slotLight).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.LIGHT).isEmpty();
     }
 
     /*============================================================================
@@ -2702,74 +2406,46 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ===========================     FILTER START     =============================
     ==============================================================================
     ============================================================================*/
-
-    private int slotFilter = 2;
     public boolean hasFilter()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(slotFilter).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.FILTER).isEmpty();
     }
 
     public ItemStack getFilterInPedestal()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(slotFilter);
+        return privateItems.getStackInSlot(PrivateInventorySlot.FILTER);
     }
 
     public IPedestalFilter getIPedestalFilter()
     {
         if(hasFilter())
         {
-            if(getFilterInPedestal().getItem() instanceof IPedestalFilter)
-            {
-                return ((IPedestalFilter)getFilterInPedestal().getItem());
-            }
+            return (IPedestalFilter)getFilterInPedestal().getItem();
         }
 
         return null;
     }
 
-    public ItemStack removeFilter(boolean updateBlock) {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(updateBlock)
-        {
-            BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, 0);
-            level.setBlock(getPos(),newstate,3);
-            update();
-        }
+    public ItemStack removeFilter() {
+        BlockState state = level.getBlockState(getPos());
+        BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(), MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, 0);
+        level.setBlock(getPos(), newstate, 3);
+        update();
 
-        return ph.extractItem(slotFilter,ph.getStackInSlot(slotFilter).getCount(),false);
+        return privateItems.extractItem(PrivateInventorySlot.FILTER,1,false);
     }
 
-    public boolean addFilter(ItemStack filter, boolean simulate)
+    public boolean attemptAddFilter(ItemStack stack)
     {
-        if(hasFilter())
-        {
+        if (privateItems.isItemValid(PrivateInventorySlot.FILTER, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.FILTER, stack.split(1), false);
+            BlockState state = level.getBlockState(getPos());
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) stack.getItem()).getFilterType(stack))?(2):(1));
+            level.setBlock(getPos(),newstate,3);
+            update();
+            return true;
+        } else {
             return false;
-        }
-        else
-        {
-            IItemHandler ph = privateHandler.orElse(null);
-            ItemStack itemFromBlock = filter.copy();
-            itemFromBlock.setCount(1);
-            if(!hasFilter() && ph.isItemValid(slotFilter,itemFromBlock))
-            {
-                if(!simulate)
-                {
-                    ph.insertItem(slotFilter,itemFromBlock,false);
-                    BlockState state = level.getBlockState(getPos());
-                    BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) itemFromBlock.getItem()).getFilterType(itemFromBlock))?(2):(1));
-                    level.setBlock(getPos(),newstate,3);
-                    update();
-                }
-                return true;
-            }
-            else return false;
         }
     }
 
@@ -2787,62 +2463,38 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    private int slotWorkCard = 12;
     public boolean hasWorkCard()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(slotWorkCard).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.WORK_CARD).isEmpty();
     }
 
     public ItemStack getWorkCardInPedestal()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(slotWorkCard);
+        return privateItems.getStackInSlot(PrivateInventorySlot.WORK_CARD);
     }
 
     public IPedestalWorkCard getIPedestalWorkCard()
     {
         if(hasWorkCard())
         {
-            if(getWorkCardInPedestal().getItem() instanceof IPedestalWorkCard)
-            {
-                return ((IPedestalWorkCard)getWorkCardInPedestal().getItem());
-            }
+            return (IPedestalWorkCard)getWorkCardInPedestal().getItem();
         }
 
         return null;
     }
 
     public ItemStack removeWorkCard() {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.extractItem(slotWorkCard,ph.getStackInSlot(slotWorkCard).getCount(),false);
+        return privateItems.extractItem(PrivateInventorySlot.WORK_CARD,1,false);
     }
 
-    public boolean addWorkCard(ItemStack filter, boolean simulate)
+    public boolean attemptAddWorkCard(ItemStack stack)
     {
-        if(hasWorkCard())
-        {
+        if (privateItems.isItemValid(PrivateInventorySlot.WORK_CARD, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.WORK_CARD, stack.split(1), false);
+            update();
+            return true;
+        } else {
             return false;
-        }
-        else
-        {
-            IItemHandler ph = privateHandler.orElse(null);
-            ItemStack itemFromBlock = filter.copy();
-            itemFromBlock.setCount(1);
-            if(!hasWorkCard() && ph.isItemValid(slotWorkCard,itemFromBlock))
-            {
-                if(!simulate)
-                {
-                    ph.insertItem(slotWorkCard,itemFromBlock,false);
-                    update();
-                }
-                return true;
-            }
-            else return false;
         }
     }
 
@@ -2860,25 +2512,16 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    private int torchSlot = 3;
     public boolean hasRedstone()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(torchSlot).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.REDSTONE).isEmpty();
     }
 
-    public boolean addRedstone()
+    public boolean attemptAddRedstone(ItemStack stack)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack itemFromBlock = new ItemStack(Items.REDSTONE);
-        itemFromBlock.setCount(1);
         if(!hasRedstone() || getRedstonePowerNeeded()<15)
         {
-            ph.insertItem(torchSlot,itemFromBlock,false);
+            privateItems.insertItem(PrivateInventorySlot.REDSTONE,stack.split(1),false);
             return true;
         }
         else return false;
@@ -2886,31 +2529,17 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
 
     public ItemStack removeRedstone()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasRedstone() && getRedstonePowerNeeded()>=1)
-        {
-            ph.extractItem(torchSlot,1,false);
-            return new ItemStack(Items.REDSTONE,1);
-        }
-        return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.REDSTONE,1,false);
     }
 
     public ItemStack removeAllRedstone()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasRedstone() && getRedstonePowerNeeded()>=1)
-        {
-            int slotCount = ph.getStackInSlot(torchSlot).getCount();
-            ph.extractItem(torchSlot,slotCount,false);
-            return new ItemStack(Items.REDSTONE,slotCount);
-        }
-        return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.REDSTONE,getRedstonePowerNeeded(),false);
     }
 
     public int getRedstonePowerNeeded()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        return ph.getStackInSlot(torchSlot).getCount();
+        return privateItems.getStackInSlot(PrivateInventorySlot.REDSTONE).getCount();
     }
 
     public boolean isPedestalBlockPowered(BasePedestalBlockEntity pedestal)
@@ -2951,40 +2580,25 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    private int slotRobin = 4;
-    public boolean addRRobin(ItemStack roundRobin)
+    public boolean attemptAddRRobin(ItemStack stack)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack itemFromBlock = roundRobin.copy();
-        itemFromBlock.setCount(1);
-        if(!hasRRobin())
-        {
-            ph.insertItem(slotRobin,itemFromBlock,false);
-            //update();
+        if (privateItems.isItemValid(PrivateInventorySlot.AUGMENT_ROUNDROBIN, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.AUGMENT_ROUNDROBIN, stack.split(1), false);
+            // update();
             return true;
+        } else {
+            return false;
         }
-        else return false;
     }
 
     public ItemStack removeRRobin()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasRRobin())
-        {
-            //update();
-            return ph.extractItem(slotRobin,ph.getStackInSlot(slotRobin).getCount(),false);
-        }
-        else return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.AUGMENT_ROUNDROBIN, 1, false);
     }
 
     public boolean hasRRobin()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(slotRobin).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_ROUNDROBIN).isEmpty();
     }
 
     /*============================================================================
@@ -3001,40 +2615,25 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    private int slotRenderer = 5;
-    public boolean addRenderAugment(ItemStack particle)
+    public boolean attemptAddRenderAugment(ItemStack stack)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack itemFromBlock = particle.copy();
-        itemFromBlock.setCount(1);
-        if(!hasRenderAugment())
-        {
-            //update();
-            ph.insertItem(slotRenderer,itemFromBlock,false);
+        if (privateItems.isItemValid(PrivateInventorySlot.AUGMENT_RENDERDIFFUSER, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.AUGMENT_RENDERDIFFUSER, stack.split(1), false);
+            // update();
             return true;
+        } else {
+            return false;
         }
-        else return false;
     }
 
     public ItemStack removeRenderAugment()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasRenderAugment())
-        {
-            //update();
-            return ph.extractItem(slotRenderer,ph.getStackInSlot(slotRenderer).getCount(),false);
-        }
-        else return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.AUGMENT_RENDERDIFFUSER, 1, false);
     }
 
     public boolean hasRenderAugment()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(slotRenderer).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_RENDERDIFFUSER).isEmpty();
     }
 
     public boolean canSpawnParticles()
@@ -3063,15 +2662,9 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         // 5 - No Render Item/No Render Upgrade
         // 6 - No Particles/No Render Item/No Render Upgrade
         // 7 - No Augment exists and thus all rendering is fine.
-        IItemHandler ph = privateHandler.orElse(null);
         if(hasRenderAugment())
         {
-            if(ph.getStackInSlot(slotRenderer).getItem() instanceof AugmentRenderDiffuser)
-            {
-                AugmentRenderDiffuser augment = ((AugmentRenderDiffuser)ph.getStackInSlot(slotRenderer).getItem());
-                return augment.getAugmentMode(ph.getStackInSlot(slotRenderer));
-            }
-            else  return 0;
+            return AugmentRenderDiffuser.getAugmentMode(privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_RENDERDIFFUSER));
         }
         else  return 7;
     }
@@ -3090,40 +2683,25 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    private int slotNoCollide = 6;
-    public boolean addNoCollide(ItemStack roundRobin)
+    public boolean attemptAddNoCollide(ItemStack stack)
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        ItemStack itemFromBlock = roundRobin.copy();
-        itemFromBlock.setCount(1);
-        if(!hasRRobin())
-        {
-            ph.insertItem(slotNoCollide,itemFromBlock,false);
-            //update();
+        if (privateItems.isItemValid(PrivateInventorySlot.AUGMENT_NOCOLLIDE, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.AUGMENT_NOCOLLIDE, stack.split(1), false);
+            // update();
             return true;
+        } else {
+            return false;
         }
-        else return false;
     }
 
     public ItemStack removeNoCollide()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(hasRRobin())
-        {
-            //update();
-            return ph.extractItem(slotNoCollide,ph.getStackInSlot(slotNoCollide).getCount(),false);
-        }
-        else return ItemStack.EMPTY;
+        return privateItems.extractItem(PrivateInventorySlot.AUGMENT_NOCOLLIDE, 1, false);
     }
 
     public boolean hasNoCollide()
     {
-        IItemHandler ph = privateHandler.orElse(null);
-        if(ph.getStackInSlot(slotNoCollide).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_NOCOLLIDE).isEmpty();
     }
 
     /*============================================================================
@@ -3694,7 +3272,7 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         CompoundTag invTag = p_155245_.getCompound("inv");
         handler.ifPresent(h -> ((INBTSerializable<CompoundTag>) h).deserializeNBT(invTag));
         CompoundTag invPrivateTag = p_155245_.getCompound("inv_private");
-        privateHandler.ifPresent(h -> ((INBTSerializable<CompoundTag>) h).deserializeNBT(invPrivateTag));
+        privateItems.deserializeNBT(invPrivateTag);
 
         this.storedValueForUpgrades = p_155245_.getInt("storedUpgradeValue");
         this.storedEnergy = p_155245_.getInt("storedEnergy");
@@ -3742,10 +3320,8 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
             CompoundTag compound = ((INBTSerializable<CompoundTag>) h).serializeNBT();
             p_58888_.put("inv", compound);
         });
-        privateHandler.ifPresent(h -> {
-            CompoundTag compound = ((INBTSerializable<CompoundTag>) h).serializeNBT();
-            p_58888_.put("inv_private", compound);
-        });
+        CompoundTag compound = privateItems.serializeNBT();
+        p_58888_.put("inv_private", compound);
 
         p_58888_.putInt("storedUpgradeValue",storedValueForUpgrades);
         p_58888_.putInt("storedEnergy",storedEnergy);
@@ -3839,27 +3415,13 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         this.load(tag);
     }
 
-
     @Override
     public void setRemoved() {
         super.setRemoved();
-        if(this.handler != null) {
-            this.handler.invalidate();
-        }
-        if(this.privateHandler != null) {
-            this.privateHandler.invalidate();
-        }
-        if(this.energyHandler != null) {
-            this.energyHandler.invalidate();
-        }
-        if(this.fluidHandler != null) {
-            this.fluidHandler.invalidate();
-        }
-        if(this.experienceHandler != null) {
-            this.experienceHandler.invalidate();
-        }
-        if(this.dustHandler != null) {
-            this.dustHandler.invalidate();
-        }
+        handler.invalidate();
+        energyHandler.invalidate();
+        fluidHandler.invalidate();
+        experienceHandler.invalidate();
+        dustHandler.invalidate();
     }
 }

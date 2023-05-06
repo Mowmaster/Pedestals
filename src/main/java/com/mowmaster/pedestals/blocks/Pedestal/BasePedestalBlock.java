@@ -392,27 +392,27 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 ItemStack itemInHand = p_60502_.getMainHandItem();
                 ItemStack itemInOffHand = p_60502_.getOffhandItem();
 
-                if(pedestal.hasCoin() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
+                if(pedestal.hasCoin() && itemInOffHand.is(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
                 {
                     //Method for upgrades to do things before removal
                     pedestal.actionOnRemovedFromPedestal(1);
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCoin());
                 }
-                else if(pedestal.hasTool() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
+                else if(pedestal.hasTool() && itemInOffHand.is(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
                 {
                     pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60499_, p_60501_, 1));
                     pedestal.updatePedestalPlayer(pedestal);
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
                 }
-                else if(pedestal.hasFilter() && itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_FILTERTOOL.get()))
+                else if(pedestal.hasFilter() && itemInOffHand.is(DeferredRegisterItems.TOOL_FILTERTOOL.get()))
                 {
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeFilter(true));
+                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeFilter());
                 }
-                else if(pedestal.hasLight() && itemInOffHand.getItem().equals(Items.GLOWSTONE))
+                else if(pedestal.hasLight() && itemInOffHand.is(Items.GLOWSTONE))
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeLight());
                 }
-                else if(pedestal.hasRedstone() && itemInOffHand.getItem().equals(Items.REDSTONE))
+                else if(pedestal.hasRedstone() && itemInOffHand.is(Items.REDSTONE))
                 {
                     if(p_60502_.isShiftKeyDown())
                     {
@@ -423,15 +423,15 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRedstone());
                     }
                 }
-                else if(pedestal.hasRRobin() && itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()))
+                else if(pedestal.hasRRobin() && itemInOffHand.is(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()))
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRRobin());
                 }
-                else if(pedestal.hasRenderAugment() && itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()))
+                else if(pedestal.hasRenderAugment() && itemInOffHand.is(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()))
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRenderAugment());
                 }
-                else if(pedestal.hasNoCollide() && itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()))
+                else if(pedestal.hasNoCollide() && itemInOffHand.is(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()))
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeNoCollide());
                 }
@@ -573,144 +573,94 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         return InteractionResult.FAIL;
                     }
                 }
-                else if(itemInOffHand.getItem() instanceof IPedestalUpgrade upgrade)
+                else if(itemInOffHand.getItem() instanceof IPedestalUpgrade)
                 {
-                    if(!pedestal.hasCoin() && pedestal.addCoin(p_60506_,itemInOffHand,true))
-                    {
-                        pedestal.addCoin(p_60506_,itemInOffHand,false);
-                        upgrade.actionOnAddedToPedestal(p_60506_, pedestal,pedestal.getCoinOnPedestal());
-                        p_60506_.getOffhandItem().shrink(1);
+                    if(pedestal.attemptAddCoin(itemInOffHand)) {
                         return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem() instanceof IPedestalFilter)
                 {
-                    if(!pedestal.hasFilter() && pedestal.addFilter(itemInOffHand,true))
-                    {
-                        pedestal.addFilter(itemInOffHand,false);
-                        p_60506_.getOffhandItem().shrink(1);
+                    if(pedestal.attemptAddFilter(itemInOffHand)) {
                         return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem() instanceof IPedestalWorkCard)
                 {
-                    if(!pedestal.hasWorkCard() && pedestal.addWorkCard(itemInOffHand,true))
+                    if(pedestal.attemptAddWorkCard(itemInOffHand))
                     {
-                        pedestal.addWorkCard(itemInOffHand,false);
-                        p_60506_.getOffhandItem().shrink(1);
                         return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem().equals(Items.GLOWSTONE))
                 {
-                    if(!pedestal.hasLight())
+                    if(pedestal.attemptAddLight(itemInOffHand))
                     {
-                        if(pedestal.addLight())
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem().equals(Items.REDSTONE))
                 {
-                    if(pedestal.getRedstonePowerNeeded()<15)
+                    if(pedestal.attemptAddRedstone(itemInOffHand))
                     {
-                        if(pedestal.addRedstone())
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()))
                 {
-                    if(!pedestal.hasRRobin())
-                    {
-                        if(pedestal.addRRobin(p_60506_.getOffhandItem()))
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                    if(pedestal.attemptAddRRobin(itemInOffHand)) {
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()))
                 {
-                    if(!pedestal.hasRenderAugment())
+                    if(pedestal.attemptAddRenderAugment(itemInOffHand))
                     {
-                        if(pedestal.addRenderAugment(p_60506_.getOffhandItem()))
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()))
                 {
-                    if(!pedestal.hasNoCollide())
+                    if(pedestal.attemptAddNoCollide(itemInOffHand))
                     {
-                        if(pedestal.addNoCollide(p_60506_.getOffhandItem()))
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem() instanceof AugmentTieredSpeed)
                 {
-                    if(pedestal.canInsertAugmentSpeed(itemInOffHand))
+                    if(pedestal.attemptAddSpeed(itemInOffHand))
                     {
-                        if(pedestal.addSpeed(p_60506_.getOffhandItem()))
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem() instanceof AugmentTieredCapacity)
                 {
-                    if(pedestal.canInsertAugmentCapacity(itemInOffHand))
+                    if(pedestal.attemptAddCapacity(itemInOffHand))
                     {
-                        if(pedestal.addCapacity(p_60506_.getOffhandItem()))
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem() instanceof AugmentTieredStorage)
                 {
-                    if(pedestal.canInsertAugmentStorage(itemInOffHand))
+                    if(pedestal.attemptAddStorage(itemInOffHand))
                     {
-                        if(pedestal.addStorage(p_60506_.getOffhandItem()))
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(itemInOffHand.getItem() instanceof AugmentTieredRange)
                 {
-                    if(pedestal.canInsertAugmentRange(itemInOffHand))
+                    if(pedestal.attemptAddRange(itemInOffHand))
                     {
-                        if(pedestal.addRange(p_60506_.getOffhandItem()))
-                        {
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(pedestal.isAllowedTool(itemInOffHand))
                 {
-                    if(pedestal.canInsertTool(itemInOffHand))
+                    if(pedestal.attemptAddTool(itemInOffHand))
                     {
-                        if(pedestal.addTool(p_60506_.getOffhandItem()))
-                        {
-                            pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60503_, p_60505_, 1));
-                            pedestal.updatePedestalPlayer(pedestal);
-                            p_60506_.getOffhandItem().shrink(1);
-                            return InteractionResult.SUCCESS;
-                        }
+                        pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60503_, p_60505_, 1));
+                        pedestal.updatePedestalPlayer(pedestal);
+                        return InteractionResult.SUCCESS;
                     }
                 }
                 else if(DYES.contains(itemInOffHand.getItem()))
