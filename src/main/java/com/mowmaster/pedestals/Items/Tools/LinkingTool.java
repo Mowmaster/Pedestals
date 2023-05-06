@@ -58,12 +58,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
         InteractionHand hand = p_41434_;
         ItemStack stackInHand = player.getItemInHand(hand);
 
-        String linksucess = MODID + ".tool_link_success_linkingtool";
-        String linkunsuccess = MODID + ".tool_link_unsucess";
-        String linkremoved = MODID + ".tool_link_removed";
-        String linkitsself = MODID + ".tool_link_itsself";
-        String linknetwork = MODID + ".tool_link_network";
-        String linkdistance = MODID + ".tool_link_distance";
+        String linksuccess = MODID + ".tool_link_success_linkingtool";
         String linkstart = MODID + ".tool_link_start_linkingtool";
         String linkclear = MODID + ".tool_link_cleared";
         String toolchange = MODID + ".tool_change";
@@ -77,7 +72,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
             {
                 if(player.isCrouching())
                 {
-                    if(stackInHand.getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOL.get()))
+                    if(stackInHand.is(DeferredRegisterItems.TOOL_LINKINGTOOL.get()))
                     {
                         ItemStack newTool = new ItemStack(DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get(),stackInHand.getCount(),stackInHand.getTag());
                         if(stackInHand.isEnchanted())
@@ -99,7 +94,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
                 {
                     if(getBlockState.getBlock() instanceof BasePedestalBlock)
                     {
-                        if(stackInHand.isEnchanted()==false)
+                        if(!stackInHand.isEnchanted())
                         {
                             BlockEntity tile = world.getBlockEntity(pos);
                             if(tile instanceof BasePedestalBlockEntity)
@@ -127,66 +122,24 @@ public class LinkingTool extends BaseTool implements IPedestalTool
                             if(world.getBlockState(pos).getBlock() instanceof BasePedestalBlock)
                             {
                                 //Checks Tile at location to make sure its a TilePedestal
-                                BlockEntity tileEntity = world.getBlockEntity(pos);
-                                if (tileEntity instanceof BasePedestalBlockEntity) {
-                                    BasePedestalBlockEntity tilePedestal = (BasePedestalBlockEntity) tileEntity;
+                                if (world.getBlockEntity(pos) instanceof BasePedestalBlockEntity senderPedestal) {
+                                    BlockPos receivingPos = getStoredPosition(stackInHand);
+                                    int previousStoredCount = senderPedestal.getNumberOfStoredLocations();
+                                    if (senderPedestal.attemptUpdateLink(receivingPos, player, linksuccess)) {
+                                        // successfully updated link, clean-up the tool
+                                        Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
+                                        EnchantmentHelper.setEnchantments(enchantsNone,stackInHand);
 
-                                    //checks if connecting pedestal is out of range of the senderPedestal
-                                    if(isPedestalInRange(tilePedestal,getStoredPosition(stackInHand)))
-                                    {
-                                        //Checks if pedestals to be linked are on same networks or if one is neutral
-                                        if(tilePedestal.canLinkToPedestalNetwork(getStoredPosition(stackInHand)))
-                                        {
-                                            //If stored location isnt the same as the connecting pedestal
-                                            if(!tilePedestal.isSamePedestal(getStoredPosition(stackInHand)))
-                                            {
-                                                //Checks if the conenction hasnt been made once already yet
-                                                if(!tilePedestal.isAlreadyLinked(getStoredPosition(stackInHand)))
-                                                {
-                                                    //Checks if senderPedestal has locationSlots available
-                                                    //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
-                                                    if(tilePedestal.storeNewLocation(getStoredPosition(stackInHand)))
-                                                    {
-
-                                                        //If slots are available then set wrench properties back to a default value
-                                                        this.storedPosition = defaultPos;
-                                                        this.storedPositionList = new ArrayList<>();
-                                                        writePosToNBT(stackInHand);
-                                                        writePosListToNBT(stackInHand);
-                                                        world.sendBlockUpdated(pos,world.getBlockState(pos),world.getBlockState(pos),2);
-
-                                                        if(stackInHand.getItem() instanceof LinkingTool)
-                                                        {
-                                                            if(stackInHand.isEnchanted())
-                                                            {
-                                                                Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
-                                                                EnchantmentHelper.setEnchantments(enchantsNone,stackInHand);
-                                                            }
-                                                        }
-                                                        MowLibMessageUtils.messagePopup(player,ChatFormatting.GREEN,linksucess);
-                                                    }
-                                                    else MowLibMessageUtils.messagePopup(player,ChatFormatting.RED,linkunsuccess);
-                                                }
-                                                else
-                                                {
-                                                    tilePedestal.removeLocation(getStoredPosition(stackInHand));
-
-                                                    if(stackInHand.getItem() instanceof LinkingTool)
-                                                    {
-                                                        if(stackInHand.isEnchanted())
-                                                        {
-                                                            Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
-                                                            EnchantmentHelper.setEnchantments(enchantsNone,stackInHand);
-                                                        }
-                                                    }
-                                                    MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linkremoved);
-                                                }
-                                            }
-                                            else MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linkitsself);
+                                        // TODO: this maintains existing behavior of not clearing the `storedPosition` if
+                                        // a connection was removed, which might have just been a bug?
+                                        if (senderPedestal.getNumberOfStoredLocations() > previousStoredCount) {
+                                            storedPosition = defaultPos;
+                                            storedPositionList = new ArrayList<>();
+                                            writePosToNBT(stackInHand);
+                                            writePosListToNBT(stackInHand);
+                                            world.sendBlockUpdated(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
                                         }
-                                        else MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linknetwork);
                                     }
-                                    else MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,linkdistance);
                                 }
                             }
                         }
@@ -303,26 +256,6 @@ public class LinkingTool extends BaseTool implements IPedestalTool
             }
         }
     }*/
-
-    public boolean isPedestalInRange(BasePedestalBlockEntity pedestal, BlockPos pedestalToBeLinked)
-    {
-        int range = pedestal.getLinkingRange();
-        int x = pedestalToBeLinked.getX();
-        int y = pedestalToBeLinked.getY();
-        int z = pedestalToBeLinked.getZ();
-        int x1 = pedestal.getPos().getX();
-        int y1 = pedestal.getPos().getY();
-        int z1 = pedestal.getPos().getZ();
-        int xF = Math.abs(Math.subtractExact(x,x1));
-        int yF = Math.abs(Math.subtractExact(y,y1));
-        int zF = Math.abs(Math.subtractExact(z,z1));
-
-        if(xF>range || yF>range || zF>range)
-        {
-            return false;
-        }
-        else return true;
-    }
 
     public BlockPos getStoredPosition(ItemStack getWrenchItem)
     {
