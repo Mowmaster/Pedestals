@@ -1,6 +1,6 @@
 {
-  "name": "Pedestals Guide (Very WIP)",
-  "landing_text": "Pedestals Manual",
+  "name": "pedestal.book.name",
+  "landing_text": "pedestal.book.landing.text",
   "version": 1,
   "i18n": true,
   "show_progress": false

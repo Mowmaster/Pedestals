@@ -1,5 +1,5 @@
 {
-  "name": "Work Cards",
+  "name": "pedestal.book.work.category.name",
   "icon": "pedestals:workcard_area",
-  "description": "This section shows the cards to define the operational work area of a pedestal upgrade"
+  "description": "pedestal.book.work.category.desc"
 }
