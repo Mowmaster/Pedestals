@@ -575,7 +575,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 }
                 else if(itemInOffHand.getItem() instanceof IPedestalUpgrade)
                 {
-                    if(pedestal.attemptAddCoin(itemInOffHand)) {
+                    if(pedestal.attemptAddCoin(itemInOffHand, p_60506_)) {
                         return InteractionResult.SUCCESS;
                     }
                 }

@@ -1790,10 +1790,12 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         return privateItems.extractItem(PrivateInventorySlot.COIN, 1, false);
     }
 
-    public boolean attemptAddCoin(ItemStack stack)
+    public boolean attemptAddCoin(ItemStack stack, Player player)
     {
         if (privateItems.isItemValid(PrivateInventorySlot.COIN, stack)) {
             privateItems.insertItem(PrivateInventorySlot.COIN, stack.split(1), false);
+            IPedestalUpgrade upgrade = (IPedestalUpgrade)stack.getItem();
+            upgrade.actionOnAddedToPedestal(player, this, stack);
             // update();
             return true;
         } else {
