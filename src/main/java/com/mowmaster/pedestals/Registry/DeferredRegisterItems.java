@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.pedestals.Items.Augments.*;
 import com.mowmaster.pedestals.Items.Filters.*;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.*;
+import com.mowmaster.pedestals.Items.Misc.ModifierGetterItem;
 import com.mowmaster.pedestals.Items.Misc.TagGetterItem;
 import com.mowmaster.pedestals.Items.Tools.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
@@ -81,8 +82,15 @@ public class DeferredRegisterItems
             () -> new FilterTag(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> FILTER_TAG_MACHINE = ITEMS.register("filter_tag_machine",
             () -> new FilterTagMachine(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> FILTER_ITEM_MACHINE = ITEMS.register("filter_item_machine",
+            () -> new FilterItemMachine(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> FILTER_ITEMSTACK_MACHINE = ITEMS.register("filter_itemstack_machine",
+            () -> new FilterItemStackMachine(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TAG_GETTER = ITEMS.register("tag_getter",
             () -> new TagGetterItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> MODIFIER_GETTER = ITEMS.register("modifier_getter",
+            () -> new ModifierGetterItem(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+
 
 
     public static final RegistryObject<Item> FILTER_BLOCKS_ON_CLICK_EXACT = ITEMS.register("filter_blocksonclickexact",

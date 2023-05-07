@@ -339,6 +339,14 @@
   "jei.pedestals.filter_tag.description": "§5 This Filter Filters By The Tags on an Item (Items in the filter must be renamed with tag names, like 'forge:stone'",
   "jei.pedestals.filter_tag.interaction": "§3 Offhand Filter and Right Click to switch TYPES, Crouch Right Click to switch MODES",
 
+  "item.pedestals.modifier_getter": "Modifier Getter",
+  "jei.pedestals.modifier_getter.description": "§5 This Gets Modifiers off Upgrades for use when setting up the Modifier Filter(s)",
+  "jei.pedestals.modifier_getter.interaction": "§3 Offhand the Upgrade and with this in your main hand, right click.(No item in offhand will cycle the selected tag) While the item in in you main hand, crouch right click to clear all tags.",
+  "pedestals.modifiergetter.clear": "Modifiers Cleared",
+  "pedestals.modifiergetter.created": "Modifiers Grabbed - ",
+  "pedestals.modifiergetter.changed_to": "Currently Selected: ",
+  "pedestals.modifiergetter.tooltip_header": " ===== ",
+
   "item.pedestals.tag_getter": "Tag Getter",
   "jei.pedestals.tag_getter.description": "§5 This Gets Tags off Items and Blocks for use when setting up the Tag Filter",
   "jei.pedestals.tag_getter.interaction": "§3 For Blocks: Offhand Item and Crouch Right Click to get Tags from a block in-world.(Clicking in the air will instead cycle the selected tag) For Items: Offhand the item and with this in your main hand, right click.(No item in offhand will cycle the selected tag) While the item in in you main hand, crouch right click to clear all tags.",
@@ -357,6 +365,14 @@
   "item.pedestals.filter_blocksonclickfuzzy": "Blocks Filter (Fuzzy)",
   "jei.pedestals.filter_blocksonclickfuzzy.description": "§5 This Filter Filters Similar to an Item Filter",
   "jei.pedestals.filter_blocksonclickfuzzy.interaction": "§3 Offhand Filter and Right Click in Air to switch TYPES, Crouch Right Click in Air to switch MODES, Crouch Right Clicking a block when in the offhand adds/removes it from the filter.",
+  "item.pedestals.filter_item_machine": "Item Filter (Machines)",
+  "jei.pedestals.filter_item_machine.description": "§5 This Filter Filters By Items (FUZZY)",
+  "jei.pedestals.filter_item_machine.interaction": "§3 Offhand Filter and Right Click to switch TYPES, Crouch Right Click to switch MODES",
+  "item.pedestals.filter_itemstack_machine": "Itemstack Filter (Machines)",
+  "jei.pedestals.filter_itemstack_machine.description": "§5 This Filter Filters By ItemStacks (EXACT)",
+  "jei.pedestals.filter_itemstack_machine.interaction": "§3 Offhand Filter and Right Click to switch TYPES, Crouch Right Click to switch MODES",
+
+
 
   "item.pedestals.workcard_area": "Work Area (Card)",
   "jei.pedestals.workcard_area.description": "§5 Crouch Right Click on Two points to Select a 'Work Area' Crouch Right Click in the AIR to clear selection.",

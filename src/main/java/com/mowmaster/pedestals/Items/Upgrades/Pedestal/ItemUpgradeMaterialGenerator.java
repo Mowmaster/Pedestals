@@ -325,58 +325,66 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     private boolean removeFuel(BasePedestalBlockEntity pedestal, FluidStack getFluidStackNeeded, int getEnergyNeeded, int getExperienceNeeded, DustMagic getDustNeeded,boolean toolDamage, int modifier)
     {
         boolean returner = false;
+        boolean needsFuel = needsFuel(getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded);
         FluidStack neededFluid = getFluidStackNeeded.copy();
         int neededEnergy = getEnergyNeeded;
         int neededExperience = getExperienceNeeded;
         DustMagic neededDust = getDustNeeded.copy();
 
         //Should be enough to trust that we can just check and remove
-        if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,toolDamage,modifier))
+        if(needsFuel)
         {
-            if(!neededFluid.isEmpty())
+            if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,toolDamage,modifier))
             {
-                int increase = neededFluid.getAmount()*modifier;
-                neededFluid.setAmount(increase);
-                if(pedestal.removeFluid(neededFluid, IFluidHandler.FluidAction.SIMULATE).equals(neededFluid))
+                if(!neededFluid.isEmpty())
                 {
+                    int increase = neededFluid.getAmount()*modifier;
+                    neededFluid.setAmount(increase);
+                    if(pedestal.removeFluid(neededFluid, IFluidHandler.FluidAction.SIMULATE).equals(neededFluid))
+                    {
+                        returner = true;
+                        pedestal.removeFluid(neededFluid, IFluidHandler.FluidAction.EXECUTE);
+                    }
+                }
+                if(neededEnergy>0)
+                {
+                    int increase = neededEnergy*modifier;
+                    if(pedestal.removeEnergy(increase, true)>0)
+                    {
+                        returner = true;
+                        pedestal.removeEnergy(increase, false);
+                    }
+                }
+                if(neededExperience>0)
+                {
+                    int increase = neededExperience*modifier;
+                    if(pedestal.removeExperience(increase, true)>0)
+                    {
+                        returner = true;
+                        pedestal.removeExperience(increase, false);
+                    }
+                }
+                if(!neededDust.isEmpty())
+                {
+                    int increase = neededDust.getDustAmount()*modifier;
+                    neededDust.setDustAmount(increase);
+                    if(pedestal.removeDust(neededDust, IDustHandler.DustAction.SIMULATE).equals(neededDust))
+                    {
+                        returner = true;
+                        pedestal.removeDust(neededDust, IDustHandler.DustAction.EXECUTE);
+                    }
+                }
+                if(toolDamage)
+                {
+                    int increase = modifier;
+                    pedestal.damageInsertedTool(increase,false);
                     returner = true;
-                    pedestal.removeFluid(neededFluid, IFluidHandler.FluidAction.EXECUTE);
                 }
             }
-            if(neededEnergy>0)
-            {
-                int increase = neededEnergy*modifier;
-                if(pedestal.removeEnergy(increase, true)>0)
-                {
-                    returner = true;
-                    pedestal.removeEnergy(increase, false);
-                }
-            }
-            if(neededExperience>0)
-            {
-                int increase = neededExperience*modifier;
-                if(pedestal.removeExperience(increase, true)>0)
-                {
-                    returner = true;
-                    pedestal.removeExperience(increase, false);
-                }
-            }
-            if(!neededDust.isEmpty())
-            {
-                int increase = neededDust.getDustAmount()*modifier;
-                neededDust.setDustAmount(increase);
-                if(pedestal.removeDust(neededDust, IDustHandler.DustAction.SIMULATE).equals(neededDust))
-                {
-                    returner = true;
-                    pedestal.removeDust(neededDust, IDustHandler.DustAction.EXECUTE);
-                }
-            }
-            if(toolDamage)
-            {
-                int increase = modifier;
-                pedestal.damageInsertedTool(increase,false);
-                returner = true;
-            }
+        }
+        else
+        {
+            returner = true;
         }
 
         return returner;
@@ -401,7 +409,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             int getEnergyNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_energyNeeded");
             int getExperienceNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_xpNeeded");
             DustMagic getDustNeeded = DustMagic.getDustMagicInTag(coin.getTag());
-
+            boolean needsFuel = needsFuel(getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded);
             boolean damage = false;
 
             if(PedestalConfig.COMMON.cobbleGeneratorDamageTools.get())
@@ -446,23 +454,37 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
                         ItemStack testStack = pedestal.addItemStack(stackedCopy, true);
                         if(testStack.isEmpty())
                         {
-                            if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                            if(needsFuel)
                             {
-                                if(removeFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                                if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
                                 {
-                                    pedestal.addItem(stackedCopy, false);
+                                    if(removeFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                                    {
+                                        pedestal.addItem(stackedCopy, false);
+                                    }
                                 }
+                            }
+                            else
+                            {
+                                pedestal.addItem(stackedCopy, false);
                             }
                         }
                         else if(testStack.getCount()>0)
                         {
                             stackedCopy.shrink(testStack.getCount());
-                            if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                            if(needsFuel)
                             {
-                                if(removeFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                                if(hasEnoughFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
                                 {
-                                    pedestal.addItem(stackedCopy, false);
+                                    if(removeFuel(pedestal,getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded,damage,modifier))
+                                    {
+                                        pedestal.addItem(stackedCopy, false);
+                                    }
                                 }
+                            }
+                            else
+                            {
+                                pedestal.addItem(stackedCopy, false);
                             }
                         }
                     }

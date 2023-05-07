@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pedestals:filter_itemstack_machine"
+    }
+  ],
+  "result": {
+    "item": "pedestals:filter_itemstack_machine"
+  }
+}
