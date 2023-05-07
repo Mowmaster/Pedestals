@@ -27,6 +27,7 @@ import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.*;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

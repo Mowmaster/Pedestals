@@ -32,13 +32,13 @@ logoFile="pedestals.png" #optional
 credits="Thanks to all my Patreons and Discord Community Members, Also huge thanks to Joprebond for the documentation work (patchouli guide)" #optional
 # A text field displayed in the mod UI
 authors="Mowmaster" #optional
-# The description text for the mod (multi
-#[[dependencies.pedestaline!) (#mandatory)
+# The description text for the mod (multi line!) (#mandatory)
 description='''
 A Balanced Port of 1.16 Pedestals Mod
 Most the fun Things about 1.16 Pedestals,
 But with a hint of balance and plenty of configs for pack devs :D
-'''ls]] #optional
+'''
+[[dependencies.pedestals]] #optional
 # the modid of the dependency
 modId="forge" #mandatory
 # Does this dependency have to exist - if not, ordering below must be specified
