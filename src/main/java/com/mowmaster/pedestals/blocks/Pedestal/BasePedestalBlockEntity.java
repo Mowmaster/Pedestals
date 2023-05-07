@@ -24,6 +24,7 @@ import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.*;
+import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import net.minecraft.core.BlockPos;
@@ -1031,25 +1032,36 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return  range + getRangeIncrease();
     }
 
-    public boolean isPedestalInRange(BasePedestalBlockEntity pedestalCurrent, BlockPos pedestalToBeLinked)
+    public boolean isPedestalInRange(BlockPos targetPos)
     {
-        int range = pedestalCurrent.getLinkingRange();
-        int x = pedestalToBeLinked.getX();
-        int y = pedestalToBeLinked.getY();
-        int z = pedestalToBeLinked.getZ();
-        int x1 = pedestalCurrent.getPos().getX();
-        int y1 = pedestalCurrent.getPos().getY();
-        int z1 = pedestalCurrent.getPos().getZ();
-        int xF = Math.abs(Math.subtractExact(x,x1));
-        int yF = Math.abs(Math.subtractExact(y,y1));
-        int zF = Math.abs(Math.subtractExact(z,z1));
-
-        if(xF>range || yF>range || zF>range)
-        {
-            return false;
-        }
-        else return true;
+        BlockPos distanceVector = getPos().subtract(targetPos);
+        int range = getLinkingRange();
+        return Math.abs(distanceVector.getX()) < range &&
+            Math.abs(distanceVector.getY()) < range &&
+            Math.abs(distanceVector.getZ()) < range;
     }
+
+    public boolean attemptUpdateLink(BlockPos targetPos, Player player, String successLocalizedMessage) {
+        boolean attemptSuccessful = false;
+        if (!isPedestalInRange(targetPos)) {
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_distance");
+        } else if (!canLinkToPedestalNetwork(targetPos)) {
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_network");
+        } else if (!isSamePedestal(targetPos)) {
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_itsself");
+        } else if (isAlreadyLinked(targetPos)) {
+            // this path can only occur via the linking tools, which helps because we don't need a parameter to control it
+            attemptSuccessful = true;
+            removeLocation(targetPos);
+            MowLibMessageUtils.messagePopup(player, ChatFormatting.WHITE, MODID + ".tool_link_removed");
+        } else if (storeNewLocation(targetPos)) {
+            attemptSuccessful = true;
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, successLocalizedMessage);
+        } else {
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_unsucess");
+        }
+        return attemptSuccessful;
+     }
 
     /*============================================================================
     ==============================================================================
@@ -2753,23 +2765,16 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         return false;
     }
 
-    public boolean isSamePedestal(BlockPos pedestalToBeLinked)
+    public boolean isSamePedestal(BlockPos targetPos)
     {
-        BlockPos thisPedestal = this.getPos();
-
-        if(thisPedestal.equals(pedestalToBeLinked))
-        {
-            return true;
-        }
-
-        return false;
+        return !getPos().equals(targetPos);
     }
 
     //Checks when linking pedestals if the two being linked are the same block and within range
-    public boolean canLinkToPedestalNetwork(BlockPos pedestalToBeLinked)
+    public boolean canLinkToPedestalNetwork(BlockPos targetPos)
     {
         //Check to see if pedestal to be linked is a block pedestal
-        if(level.getBlockState(pedestalToBeLinked).getBlock() instanceof BasePedestalBlock)
+        if(level.getBlockState(targetPos).getBlock() instanceof BasePedestalBlock)
         {
             //isPedestalInRange(tileCurrent,pedestalToBeLinked);
             return true;

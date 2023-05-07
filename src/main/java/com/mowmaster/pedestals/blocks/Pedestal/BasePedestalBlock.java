@@ -249,107 +249,37 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
     public void setPlacedBy(Level p_49847_, BlockPos p_49848_, BlockState p_49849_, @org.jetbrains.annotations.Nullable LivingEntity p_49850_, ItemStack p_49851_) {
         if(!p_49847_.isClientSide())
         {
-            if(p_49850_ instanceof Player)
+            if(p_49850_ instanceof Player player)
             {
-                Player player = ((Player)p_49850_);
-                String linksucess = MODID + ".tool_link_success";
-                String linkunsuccess = MODID + ".tool_link_unsucess";
-                String linkremoved = MODID + ".tool_link_removed";
-                String linkitsself = MODID + ".tool_link_itsself";
-                String linknetwork = MODID + ".tool_link_network";
-                String linkdistance = MODID + ".tool_link_distance";
-                if(player.getOffhandItem().getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOL.get()))
+                ItemStack offhandItemStack = player.getOffhandItem();
+                if(offhandItemStack.hasTag() && offhandItemStack.isEnchanted())
                 {
-                    LinkingTool tool = ((LinkingTool)player.getOffhandItem().getItem());
-                    if(player.getOffhandItem().hasTag() && player.getOffhandItem().isEnchanted())
+
+                    if(offhandItemStack.is(DeferredRegisterItems.TOOL_LINKINGTOOL.get()))
                     {
                         //Checks if clicked blocks is a Pedestal
                         if(p_49847_.getBlockState(p_49848_).getBlock() instanceof BasePedestalBlock)
                         {
-                            //Checks Tile at location to make sure its a TilePedestal
-                            BlockEntity tileEntity = p_49847_.getBlockEntity(p_49848_);
-                            if (tileEntity instanceof BasePedestalBlockEntity) {
-                                BasePedestalBlockEntity tilePedestal = (BasePedestalBlockEntity) tileEntity;
-
-                                BlockEntity tileEntitySender = p_49847_.getBlockEntity(p_49848_);
-                                if (tileEntity instanceof BasePedestalBlockEntity) {
-                                    BasePedestalBlockEntity tileSender = (BasePedestalBlockEntity) tileEntitySender;
-
-                                    //checks if connecting pedestal is out of range of the senderPedestal
-                                    if(tilePedestal.isPedestalInRange(tileSender,tool.getStoredPosition(player.getOffhandItem())))
-                                    {
-                                        //Checks if pedestals to be linked are on same networks or if one is neutral
-                                        if(tilePedestal.canLinkToPedestalNetwork(tool.getStoredPosition(player.getOffhandItem())))
-                                        {
-                                            //If stored location isnt the same as the connecting pedestal
-                                            if(!tilePedestal.isSamePedestal(tool.getStoredPosition(player.getOffhandItem())))
-                                            {
-                                                //Checks if the conenction hasnt been made once already yet
-                                                if(!tilePedestal.isAlreadyLinked(tool.getStoredPosition(player.getOffhandItem())))
-                                                {
-                                                    //Checks if senderPedestal has locationSlots available
-                                                    //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
-                                                    if(tilePedestal.storeNewLocation(tool.getStoredPosition(player.getOffhandItem())))
-                                                    {
-                                                        MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linksucess);
-                                                    }
-                                                    else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkunsuccess);
-                                                }
-                                            }
-                                            else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkitsself);
-                                        }
-                                        else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linknetwork);
-                                    }
-                                    else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkdistance);
-                                }
+                            // Checks Tile at location to make sure its a TilePedestal
+                            if (p_49847_.getBlockEntity(p_49848_) instanceof BasePedestalBlockEntity sendingPedestal) {
+                                LinkingTool tool = (LinkingTool)offhandItemStack.getItem();
+                                BlockPos receivingPos = tool.getStoredPosition(offhandItemStack);
+                                sendingPedestal.attemptUpdateLink(receivingPos, player, MODID + ".tool_link_success_linkingtool");
                             }
                         }
                     }
-                }
-                else if(player.getOffhandItem().getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get()))
-                {
-                    LinkingToolBackwards tool = ((LinkingToolBackwards)player.getOffhandItem().getItem());
-                    if(player.getOffhandItem().hasTag() && player.getOffhandItem().isEnchanted())
+                    else if(offhandItemStack.is(DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get()))
                     {
                         //Checks if clicked blocks is a Pedestal
                         if(p_49847_.getBlockState(p_49848_).getBlock() instanceof BasePedestalBlock)
                         {
+                            LinkingToolBackwards tool = (LinkingToolBackwards)offhandItemStack.getItem();
+                            BlockPos sendingPos = tool.getStoredPosition(offhandItemStack);
+
                             //Checks Tile at location to make sure its a TilePedestal
-                            BlockEntity tileEntity = p_49847_.getBlockEntity(tool.getStoredPosition(player.getOffhandItem()));
-                            if (tileEntity instanceof BasePedestalBlockEntity) {
-                                BasePedestalBlockEntity tilePedestal = (BasePedestalBlockEntity) tileEntity;
-
-                                BlockEntity tileEntitySender = p_49847_.getBlockEntity(tool.getStoredPosition(player.getOffhandItem()));
-                                if (tileEntity instanceof BasePedestalBlockEntity) {
-                                    BasePedestalBlockEntity tileSender = (BasePedestalBlockEntity) tileEntitySender;
-
-                                    //checks if connecting pedestal is out of range of the senderPedestal
-                                    if(tileSender.isPedestalInRange(tilePedestal,p_49848_))
-                                    {
-                                        //Checks if pedestals to be linked are on same networks or if one is neutral
-                                        if(tileSender.canLinkToPedestalNetwork(p_49848_))
-                                        {
-                                            //If stored location isnt the same as the connecting pedestal
-                                            if(!tileSender.isSamePedestal(p_49848_))
-                                            {
-                                                //Checks if the conenction hasnt been made once already yet
-                                                if(!tileSender.isAlreadyLinked(p_49848_))
-                                                {
-                                                    //Checks if senderPedestal has locationSlots available
-                                                    //System.out.println("Stored Locations: "+ tilePedestal.getNumberOfStoredLocations());
-                                                    if(tileSender.storeNewLocation(p_49848_))
-                                                    {
-                                                        MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linksucess);
-                                                    }
-                                                    else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkunsuccess);
-                                                }
-                                            }
-                                            else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkitsself);
-                                        }
-                                        else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linknetwork);
-                                    }
-                                    else MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE,linkdistance);
-                                }
+                            if (p_49847_.getBlockEntity(sendingPos) instanceof BasePedestalBlockEntity sendingPedestal) {
+                                BlockPos receivingPos = p_49848_;
+                                sendingPedestal.attemptUpdateLink(receivingPos, player, MODID + ".tool_link_success_backwardslinkingtool");
                             }
                         }
                     }
