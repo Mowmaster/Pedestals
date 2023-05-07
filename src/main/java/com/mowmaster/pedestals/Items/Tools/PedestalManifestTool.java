@@ -7,7 +7,6 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.References;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -164,15 +163,11 @@ public class PedestalManifestTool extends BaseTool implements IPedestalTool
                         boolean hasCollide = ped.hasNoCollide();
                         MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRoundRobin,"_hasrobin");
                         MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasCollide,"_hascollide");
-                        int getNumAugmentsSpeed = (hasSpeed)?(ped.getSpeed()):(0);
-                        int getNumAugmentsCapacity = (hasCapacity)?(ped.getCapacity()):(0);
-                        int getNumAugmentsStorage = (hasStorage)?(ped.getStorage()):(0);
-                        int getNumAugmentsRange = (hasRange)?(ped.getRange()):(0);
 
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getNumAugmentsSpeed,"_intaugmentspeed");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getNumAugmentsCapacity,"_intaugmentcapacity");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getNumAugmentsStorage,"_intaugmentstorage");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getNumAugmentsRange,"_intaugmentrange");
+                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsSpeed(),"_intaugmentspeed");
+                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsCapacity(),"_intaugmentcapacity");
+                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsStorage(),"_intaugmentstorage");
+                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsRange(),"_intaugmentrange");
 
                         MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".manifest.create");
                         MowLibPacketHandler.sendToNearby(p_41432_,player.getOnPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pos.getX(),pos.getY()+1.0D,pos.getZ(),0,0,200));
