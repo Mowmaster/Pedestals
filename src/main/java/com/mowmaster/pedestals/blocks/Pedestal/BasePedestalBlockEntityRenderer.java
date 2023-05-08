@@ -51,7 +51,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             ItemStack toolStack = p_112307_.getToolStack();
             ItemStack coin = p_112307_.getCoinOnPedestal();
             ItemStack workCard = p_112307_.getWorkCardInPedestal();
-            List<BlockPos> linkedLocations = p_112307_.getLocationList();
+            List<BlockPos> linkedLocations = p_112307_.getLinkedLocations();
             BlockPos pos = p_112307_.getPos();
             Level world = p_112307_.getLevel();
             List<String> hudMessages = p_112307_.getHudLog();

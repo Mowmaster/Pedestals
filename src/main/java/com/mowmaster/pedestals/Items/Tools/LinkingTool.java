@@ -100,7 +100,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
                             if(tile instanceof BasePedestalBlockEntity)
                             {
                                 BasePedestalBlockEntity ped = ((BasePedestalBlockEntity)tile);
-                                this.storedPositionList = ped.getLocationList();
+                                this.storedPositionList = ped.getLinkedLocations();
                             }
                             //Gets Pedestal Clicked on Pos
                             this.storedPosition = pos;
@@ -124,7 +124,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
                                 //Checks Tile at location to make sure its a TilePedestal
                                 if (world.getBlockEntity(pos) instanceof BasePedestalBlockEntity senderPedestal) {
                                     BlockPos receivingPos = getStoredPosition(stackInHand);
-                                    int previousStoredCount = senderPedestal.getNumberOfStoredLocations();
+                                    int previousLinkedCount = senderPedestal.getNumLinkedPedestals();
                                     if (senderPedestal.attemptUpdateLink(receivingPos, player, linksuccess)) {
                                         // successfully updated link, clean-up the tool
                                         Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
@@ -132,7 +132,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
 
                                         // TODO: this maintains existing behavior of not clearing the `storedPosition` if
                                         // a connection was removed, which might have just been a bug?
-                                        if (senderPedestal.getNumberOfStoredLocations() > previousStoredCount) {
+                                        if (senderPedestal.getNumLinkedPedestals() > previousLinkedCount) {
                                             storedPosition = defaultPos;
                                             storedPositionList = new ArrayList<>();
                                             writePosToNBT(stackInHand);

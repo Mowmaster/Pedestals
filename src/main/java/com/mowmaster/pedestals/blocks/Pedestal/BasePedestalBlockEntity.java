@@ -78,7 +78,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     private FluidStack storedFluid = FluidStack.EMPTY;
     private int storedExperience = 0;
     private DustMagic storedDust = DustMagic.EMPTY;
-    private final List<BlockPos> storedLocations = new ArrayList<BlockPos>();
+    private final List<BlockPos> linkedPedestals = new ArrayList<BlockPos>();
     private int storedValueForUpgrades = 0;
     private boolean showRenderRange = false;
     private boolean showRenderRangeUpgrade = false;
@@ -981,61 +981,30 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ==============================================================================
     ============================================================================*/
 
-    public int getNumberOfStoredLocations() {return storedLocations.size();}
+    public int getNumLinkedPedestals() {
+        return linkedPedestals.size();
+    }
 
-    public boolean storeNewLocation(BlockPos pos)
-    {
-        boolean returner = false;
-        if(getNumberOfStoredLocations() < 8)
-        {
-            storedLocations.add(pos);
-            returner=true;
-        }
+    private void addPedestalLink(BlockPos pos) {
+        linkedPedestals.add(pos);
         update();
-        return returner;
     }
 
-    public BlockPos getStoredPositionAt(int index)
-    {
-        BlockPos sendToPos = getPos();
-        if(index<getNumberOfStoredLocations())
-        {
-            sendToPos = storedLocations.get(index);
-        }
-
-        return sendToPos;
-    }
-
-    public boolean removeLocation(BlockPos pos)
-    {
-        boolean returner = false;
-        if(getNumberOfStoredLocations() >= 1)
-        {
-            storedLocations.remove(pos);
-            returner=true;
-        }
+    private void removePedestalLink(BlockPos pos) {
+        linkedPedestals.remove(pos);
         update();
-
-        return returner;
     }
 
-    public boolean isAlreadyLinked(BlockPos pos) {
-        return storedLocations.contains(pos);
+    public List<BlockPos> getLinkedLocations() {
+        return linkedPedestals;
     }
 
-    public List<BlockPos> getLocationList()
-    {
-        return storedLocations;
-    }
-
-    public int getLinkingRange()
-    {
+    public int getLinkingRange() {
         int range = PedestalConfig.COMMON.pedestal_baseLinkingRange.get();
         return  range + getRangeIncrease();
     }
 
-    public boolean isPedestalInRange(BlockPos targetPos)
-    {
+    public boolean isPedestalInRange(BlockPos targetPos) {
         BlockPos distanceVector = getPos().subtract(targetPos);
         int range = getLinkingRange();
         return Math.abs(distanceVector.getX()) < range &&
@@ -1043,22 +1012,35 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             Math.abs(distanceVector.getZ()) < range;
     }
 
+    public boolean isSamePedestal(BlockPos targetPos) {
+        return !getPos().equals(targetPos);
+    }
+
+    public boolean isAlreadyLinked(BlockPos pos) {
+        return linkedPedestals.contains(pos);
+    }
+
+    public boolean hasSpaceForPedestalLink() {
+        return linkedPedestals.size() < 8;
+    }
+
     public boolean attemptUpdateLink(BlockPos targetPos, Player player, String successLocalizedMessage) {
         boolean attemptSuccessful = false;
         if (!isPedestalInRange(targetPos)) {
-            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_distance");
+            MowLibMessageUtils.messagePopup(player, ChatFormatting.WHITE, MODID + ".tool_link_distance");
         } else if (!isSamePedestal(targetPos)) {
-            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_itsself");
+            MowLibMessageUtils.messagePopup(player, ChatFormatting.WHITE, MODID + ".tool_link_itsself");
         } else if (isAlreadyLinked(targetPos)) {
             // this path can only occur via the linking tools, which helps because we don't need a parameter to control it
             attemptSuccessful = true;
-            removeLocation(targetPos);
+            removePedestalLink(targetPos);
             MowLibMessageUtils.messagePopup(player, ChatFormatting.WHITE, MODID + ".tool_link_removed");
-        } else if (storeNewLocation(targetPos)) {
-            attemptSuccessful = true;
-            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, successLocalizedMessage);
+        } else if (!hasSpaceForPedestalLink()) {
+            MowLibMessageUtils.messagePopup(player, ChatFormatting.WHITE, MODID + ".tool_link_unsucess");
         } else {
-            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_unsucess");
+            attemptSuccessful = true;
+            addPedestalLink(targetPos);
+            MowLibMessageUtils.messagePopup(player, ChatFormatting.WHITE, successLocalizedMessage);
         }
         return attemptSuccessful;
      }
@@ -2753,11 +2735,6 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean isSamePedestal(BlockPos targetPos)
-    {
-        return !getPos().equals(targetPos);
-    }
-
     public boolean canSendToPedestal(BasePedestalBlockEntity pedestal)
     {
         return level != null &&
@@ -3039,26 +3016,21 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         int numScanned = 0;
         for (Iterator<BlockPos> it = view.iterator(); it.hasNext(); ++numScanned) {
             BlockPos posReceiver = it.next();
-            if(level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity pedestal)
-            {
-                if(canSendToPedestal(pedestal))
-                {
+            if(level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity pedestal) {
+                if(canSendToPedestal(pedestal)) {
                     if(sendItemsToPedestal(posReceiver,getItemStacks())) hasSent = true;
                     if(sendFluidsToPedestal(posReceiver,getStoredFluid())) hasSent = true;
                     if(sendEnergyToPedestal(posReceiver,getStoredEnergy())) hasSent = true;
                     if(sendExperienceToPedestal(posReceiver,getStoredExperience())) hasSent = true;
                     if(sendDustToPedestal(posReceiver,getStoredDust())) hasSent = true;
 
-                    if(hasSent)
-                    {
+                    if(hasSent) {
                         if (canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,posReceiver.getX(),posReceiver.getY(),posReceiver.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
                         if (hasRRobin()) setStoredValueForUpgrades(startIndex + numScanned + 1);
                         return true;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 it.remove();
                 update();
             }
@@ -3066,19 +3038,17 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         return false;
     }
 
-    public void transferAction()
-    {
-        if(!storedLocations.isEmpty())
-        {
+    public void transferAction() {
+        if(!linkedPedestals.isEmpty()) {
             int scanStart = (hasRRobin()) ? getStoredValueForUpgrades(): 0;
-            if (scanStart >= storedLocations.size()) scanStart = 0; // handle rRobin looping behavior (as well as stale data)
+            if (scanStart >= linkedPedestals.size()) scanStart = 0; // handle rRobin looping behavior (as well as stale data)
 
             // `List.subList` provides a view of the underlying collection (i.e. mutations to it impact the actual collection,
             // and it's as performant as using the actual collection). We leverage this and an *Impl function as we might have
             // to scan the whole collection but don't always start at the first element (in some cases due to the rRobin augment
             // existing).
-            if (!transferActionImpl(storedLocations.subList(scanStart, storedLocations.size()), scanStart) && scanStart > 0) {
-                transferActionImpl(storedLocations.subList(0, scanStart), 0);
+            if (!transferActionImpl(linkedPedestals.subList(scanStart, linkedPedestals.size()), scanStart) && scanStart > 0) {
+                transferActionImpl(linkedPedestals.subList(0, scanStart), 0);
             }
         }
     }
@@ -3159,7 +3129,7 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
 
                 if(!isPedestalBlockPowered(getPedestal()))
                 {
-                    if(getNumberOfStoredLocations() > 0) { transferAction(); }
+                    if(getNumLinkedPedestals() > 0) { transferAction(); }
                 }
                 //make sure we dont go over max int limit, regardless of config
                 if(pedTicker >= maxRate-1){pedTicker=0;}
@@ -3256,7 +3226,7 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         for(int i=0;i<storedIX.length;i++)
         {
             BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
-            storedLocations.add(gotPos);
+            linkedPedestals.add(gotPos);
         }
     }
 
@@ -3294,11 +3264,11 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         List<Integer> storedYS = new ArrayList<Integer>();
         List<Integer> storedZS = new ArrayList<Integer>();
         */
-        for(int i=0;i<getNumberOfStoredLocations();i++)
+        for(int i=0;i<getNumLinkedPedestals();i++)
         {
-            storedX.add(storedLocations.get(i).getX());
-            storedY.add(storedLocations.get(i).getY());
-            storedZ.add(storedLocations.get(i).getZ());
+            storedX.add(linkedPedestals.get(i).getX());
+            storedY.add(linkedPedestals.get(i).getY());
+            storedZ.add(linkedPedestals.get(i).getZ());
         }
 
 
