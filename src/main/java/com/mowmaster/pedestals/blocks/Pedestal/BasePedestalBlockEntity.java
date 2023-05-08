@@ -60,6 +60,7 @@ import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 {
@@ -1046,8 +1047,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         boolean attemptSuccessful = false;
         if (!isPedestalInRange(targetPos)) {
             MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_distance");
-        } else if (!canLinkToPedestalNetwork(targetPos)) {
-            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_network");
         } else if (!isSamePedestal(targetPos)) {
             MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.WHITE, MODID + ".tool_link_itsself");
         } else if (isAlreadyLinked(targetPos)) {
@@ -2754,63 +2753,16 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-
-
-
-
-
-    public boolean canSendItemInPedestal(BasePedestalBlockEntity pedestal)
-    {
-        if(pedestal.hasItem())return true;
-
-        return false;
-    }
-
     public boolean isSamePedestal(BlockPos targetPos)
     {
         return !getPos().equals(targetPos);
     }
 
-    //Checks when linking pedestals if the two being linked are the same block and within range
-    public boolean canLinkToPedestalNetwork(BlockPos targetPos)
-    {
-        //Check to see if pedestal to be linked is a block pedestal
-        if(level.getBlockState(targetPos).getBlock() instanceof BasePedestalBlock)
-        {
-            //isPedestalInRange(tileCurrent,pedestalToBeLinked);
-            return true;
-        }
-
-        return false;
-    }
-
-    //Needed for filtered imports
     public boolean canSendToPedestal(BasePedestalBlockEntity pedestal)
     {
-        //Method to check if we can send items FROM this pedestal???
-        //Check if Block is Loaded in World
-        if(level.isAreaLoaded(pedestal.getPos(),1))
-        {
-            //If block ISNT powered
-            if(!isPedestalBlockPowered(pedestal))
-            {
-                //Make sure its a pedestal before getting the tile
-                if(level.getBlockState(pedestal.getPos()).getBlock() instanceof BasePedestalBlock)
-                {
-                    //Make sure it is still part of the right network
-                    if(canLinkToPedestalNetwork(pedestal.getPos()))
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    removeLocation(pedestal.getPos());
-                }
-            }
-        }
-
-        return false;
+        return level != null &&
+            level.isLoaded(pedestal.getPos()) &&
+            !isPedestalBlockPowered(pedestal);
     }
 
 
@@ -3082,59 +3034,51 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         return false;
     }
 
-    public void transferAction()
-    {
-        int locations = getNumberOfStoredLocations();
-        if(locations > 0)
-        {
-            if(hasRRobin())
+    private boolean transferActionImpl(List<BlockPos> view, int startIndex) {
+        boolean hasSent = false;
+        int numScanned = 0;
+        for (Iterator<BlockPos> it = view.iterator(); it.hasNext(); ++numScanned) {
+            BlockPos posReceiver = it.next();
+            if(level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity pedestal)
             {
-                int robinCount = getStoredValueForUpgrades();
-                if(robinCount >= locations)
+                if(canSendToPedestal(pedestal))
                 {
-                    setStoredValueForUpgrades(0);
-                    robinCount=0;
-                }
-                BlockPos posReceiver = getStoredPositionAt(robinCount);
-                if(level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity pedestal)
-                {
-                    if(canSendToPedestal(pedestal))
+                    if(sendItemsToPedestal(posReceiver,getItemStacks())) hasSent = true;
+                    if(sendFluidsToPedestal(posReceiver,getStoredFluid())) hasSent = true;
+                    if(sendEnergyToPedestal(posReceiver,getStoredEnergy())) hasSent = true;
+                    if(sendExperienceToPedestal(posReceiver,getStoredExperience())) hasSent = true;
+                    if(sendDustToPedestal(posReceiver,getStoredDust())) hasSent = true;
+
+                    if(hasSent)
                     {
-                        boolean hasSent = false;
-                        if(sendItemsToPedestal(posReceiver,getItemStacks()))hasSent = true;
-                        if(sendFluidsToPedestal(posReceiver,getStoredFluid()))hasSent = true;
-                        if(sendEnergyToPedestal(posReceiver,getStoredEnergy()))hasSent = true;
-                        if(sendExperienceToPedestal(posReceiver,getStoredExperience()))hasSent = true;
-                        if(sendDustToPedestal(posReceiver,getStoredDust()))hasSent = true;
-
-                        if(hasSent && canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,posReceiver.getX(),posReceiver.getY(),posReceiver.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
-
+                        if (canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,posReceiver.getX(),posReceiver.getY(),posReceiver.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
+                        if (hasRRobin()) setStoredValueForUpgrades(startIndex + numScanned + 1);
+                        return true;
                     }
                 }
-
-                robinCount++;
-                setStoredValueForUpgrades(robinCount);
             }
             else
             {
-                for(int i=0;i<locations;i++){
-                    BlockPos posReceiver = getStoredPositionAt(i);
-                    if(level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity pedestal)
-                    {
-                        if(canSendToPedestal(pedestal))
-                        {
-                            boolean hasSent = false;
-                            if(sendItemsToPedestal(posReceiver,getItemStacks()))hasSent = true;
-                            if(sendFluidsToPedestal(posReceiver,getStoredFluid()))hasSent = true;
-                            if(sendEnergyToPedestal(posReceiver,getStoredEnergy()))hasSent = true;
-                            if(sendExperienceToPedestal(posReceiver,getStoredExperience()))hasSent = true;
-                            if(sendDustToPedestal(posReceiver,getStoredDust()))hasSent = true;
+                it.remove();
+                update();
+            }
+        }
+        return false;
+    }
 
-                            if(hasSent && canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,posReceiver.getX(),posReceiver.getY(),posReceiver.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
-                            if(hasSent)break;
-                        }
-                    }
-                }
+    public void transferAction()
+    {
+        if(!storedLocations.isEmpty())
+        {
+            int scanStart = (hasRRobin()) ? getStoredValueForUpgrades(): 0;
+            if (scanStart >= storedLocations.size()) scanStart = 0; // handle rRobin looping behavior (as well as stale data)
+
+            // `List.subList` provides a view of the underlying collection (i.e. mutations to it impact the actual collection,
+            // and it's as performant as using the actual collection). We leverage this and an *Impl function as we might have
+            // to scan the whole collection but don't always start at the first element (in some cases due to the rRobin augment
+            // existing).
+            if (!transferActionImpl(storedLocations.subList(scanStart, storedLocations.size()), scanStart) && scanStart > 0) {
+                transferActionImpl(storedLocations.subList(0, scanStart), 0);
             }
         }
     }
