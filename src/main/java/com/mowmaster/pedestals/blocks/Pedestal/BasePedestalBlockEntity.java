@@ -67,7 +67,8 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     private ItemStackHandler privateItems = createPrivateItemHandler();
     private LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(this::createHandlerPedestalEnergy);
     private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(this::createHandlerPedestalFluid);
-    private LazyOptional<IExperienceStorage> experienceHandler = LazyOptional.of(this::createHandlerPedestalExperience);
+    private IExperienceStorage experienceHandler = createExperienceHandler();
+    private LazyOptional<IExperienceStorage> experienceCapability = LazyOptional.of(() -> this.experienceHandler);
     private LazyOptional<IDustHandler> dustHandler = LazyOptional.of(this::createDustHandler);
     private List<ItemStack> stacksList = new ArrayList<>();
     private WeakReference<FakePlayer> pedestalPlayer;
@@ -564,75 +565,39 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         };
     }
 
-    public IExperienceStorage createHandlerPedestalExperience() {
+    private IExperienceStorage createExperienceHandler() {
         return new IExperienceStorage() {
 
             @Override
             public int receiveExperience(int maxReceive, boolean simulate) {
-
                 if (!canReceive())
                     return 0;
 
-                int canReceive = maxReceive;
+                int spaceAvailable = getMaxExperienceStored() - getExperienceStored();
                 IPedestalFilter filter = getIPedestalFilter();
-                int experienceReceived = Math.min(getMaxExperienceStored() - getExperienceStored(), (filter == null)?(maxReceive):((!filter.getFilterDirection().insert())?(maxReceive):(filter.canAcceptCountExperience(getPedestal(),getFilterInPedestal(),getExperienceCapacity(),spaceForExperience(),maxReceive))));
+                int maxReceivePostFilter = (filter != null && filter.getFilterDirection().insert()) ? filter.canAcceptCountExperience(getPedestal(),getFilterInPedestal(),getExperienceCapacity(),spaceForExperience(),maxReceive): maxReceive;
+                int experienceReceived = Math.min(spaceAvailable, maxReceivePostFilter);
                 if (!simulate)
                     storedExperience += experienceReceived;
                 update();
                 return experienceReceived;
-
-                /*
-                if(simulate)
-                {
-                    IPedestalFilter filter = getIPedestalFilter();
-                    int spaceAvailable = getMaxExperienceStored()-getExperienceStored();
-                    if(filter == null)return (maxReceive>spaceAvailable)?(spaceAvailable):(maxReceive);
-                    return filter.canAcceptCount(getPedestal(),ItemStack.EMPTY,3);
-                }
-                else
-                {
-                    int currentExperience = getExperienceStored();
-                    int incomingExperience = maxReceive;
-                    int spaceAvailable = getMaxExperienceStored()-currentExperience;
-                    int newExperience = currentExperience + ((maxReceive>spaceAvailable)?(spaceAvailable):(maxReceive));
-                    storedExperience = newExperience;
-                    update();
-                    return (incomingExperience>spaceAvailable)?(spaceAvailable):(incomingExperience);
-                }
-                */
             }
 
             @Override
             public int extractExperience(int maxExtract, boolean simulate) {
-
-
                 if (!canExtract())
                     return 0;
 
                 IPedestalFilter filter = getIPedestalFilter();
-                int experienceExtracted = Math.min(storedExperience, (filter == null)?(maxExtract):((!filter.getFilterDirection().extract())?(maxExtract):(filter.canAcceptCountExperience(getPedestal(),getFilterInPedestal(),getExperienceCapacity(),spaceForExperience(),maxExtract))));
+                int maxExtractPostFilter = (filter != null && filter.getFilterDirection().extract()) ? filter.canAcceptCountExperience(getPedestal(),getFilterInPedestal(),getExperienceCapacity(),spaceForExperience(),maxExtract) : maxExtract;
+                int experienceExtracted = Math.min(storedExperience, maxExtractPostFilter);
                 if (!simulate)
                     storedExperience -= experienceExtracted;
                 return experienceExtracted;
-
-                /*if(simulate)
-                {
-                    return (maxExtract>getExperienceStored())?(getExperienceStored()):(maxExtract);
-                }
-                else
-                {
-                    int currentExperience = getExperienceStored();
-                    int remaining = (maxExtract>getExperienceStored())?(0):(currentExperience-maxExtract);
-                    storedExperience = remaining;
-                    update();
-                    return (maxExtract>currentExperience)?(currentExperience):(maxExtract);
-                }*/
             }
 
             @Override
-            public int getExperienceStored() {
-                return storedExperience;
-            }
+            public int getExperienceStored() { return storedExperience; }
 
             @Override
             public int getMaxExperienceStored() {
@@ -803,7 +768,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             return fluidHandler.cast();
         }
         if ((cap == CapabilityExperience.EXPERIENCE)) {
-            return experienceHandler.cast();
+            return experienceCapability.cast();
         }
         if ((cap == CapabilityDust.DUST_HANDLER)) {
             return dustHandler.cast();
@@ -926,13 +891,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public void dropXPInWorld(Level worldIn, BlockPos pos) {
-        IExperienceStorage experience = experienceHandler.orElse(null);
-        if(experience.getExperienceStored()>0)
+        if(experienceHandler.getExperienceStored()>0)
         {
             ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_XP.get());
             if(toDrop.getItem() instanceof BaseXpBulkStorageItem droppedItemEnergy)
             {
-                droppedItemEnergy.setXp(toDrop,experience.getExperienceStored());
+                droppedItemEnergy.setXp(toDrop,experienceHandler.getExperienceStored());
                 //System.out.println("stored xp: "+ droppedItemEnergy.getXp(toDrop));
             }
             MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
@@ -1639,62 +1603,28 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean hasExperience()
-    {
-        IExperienceStorage h = experienceHandler.orElse(null);
-        if(h.getExperienceStored()>0)return true;
+    public boolean hasExperience() { return experienceHandler.getExperienceStored() > 0; }
 
-        return false;
-    }
-
-    public boolean hasSpaceForExperience()
-    {
-        return getExperienceCapacity() - getStoredExperience() > 0;
-    }
+    public boolean hasSpaceForExperience() { return spaceForExperience() > 0; }
 
     public int spaceForExperience()
     {
         return getExperienceCapacity() - getStoredExperience();
     }
 
-    public int getExperienceCapacity()
-    {
-        IExperienceStorage h = experienceHandler.orElse(null);
-        return h.getMaxExperienceStored();
-    }
+    public int getExperienceCapacity() { return experienceHandler.getMaxExperienceStored(); }
 
-    public int getStoredExperience()
-    {
-        IExperienceStorage h = experienceHandler.orElse(null);
-        return h.getExperienceStored();
-    }
+    public int getStoredExperience() { return experienceHandler.getExperienceStored(); }
 
-    public int addExperience(int amountIn, boolean simulate)
-    {
-        IExperienceStorage h = experienceHandler.orElse(null);
-        return h.receiveExperience(amountIn,simulate);
-    }
+    public int addExperience(int amountIn, boolean simulate) { return experienceHandler.receiveExperience(amountIn, simulate); }
 
-    public int removeExperience(int amountOut, boolean simulate)
-    {
-        IExperienceStorage h = experienceHandler.orElse(null);
-        return h.extractExperience(amountOut,simulate);
-    }
+    public int removeExperience(int amountOut, boolean simulate) { return experienceHandler.extractExperience(amountOut,simulate); }
 
-    public boolean canAcceptExperience()
-    {
-        IExperienceStorage h = experienceHandler.orElse(null);
-        return h.canReceive();
-    }
+    public boolean canAcceptExperience() { return experienceHandler.canReceive(); }
 
-    public boolean canSendExperience()
-    {
-        IExperienceStorage h = experienceHandler.orElse(null);
-        return h.canExtract();
-    }
+    public boolean canSendExperience() { return experienceHandler.canExtract(); }
 
-    public int getExperienceTransferRate()
-    {
+    public int getExperienceTransferRate() {
         //im assuming # = xp value???
         int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
         int experienceTransferRateConverted = MowLibXpUtils.getExpCountByLevel(baseValue);
@@ -3017,36 +2947,25 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         return false;
     }
 
-    public boolean sendExperienceToPedestal(BlockPos pedestalToSendTo, int experienceIncoming)
-    {
-        if(experienceIncoming > 0)
-        {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
-            {
-
-                LazyOptional<IExperienceStorage> cap = tilePedestalToSendTo.getCapability(CapabilityExperience.EXPERIENCE, Direction.UP);
-                if(cap.isPresent())
-                {
-                    IExperienceStorage handler = cap.orElse(null);
-                    if(handler.canReceive())
-                    {
-                        int insertedStackSimulation = handler.receiveExperience(experienceIncoming, true);
-                        if(insertedStackSimulation > 0)
-                        {
-                            int countToSend = Math.min(getExperienceTransferRate(),insertedStackSimulation);
-                            if(countToSend >=1)
-                            {
-                                //Send Experience
-                                removeExperience(handler.receiveExperience(countToSend, false),false);
-                                return true;
-                            }
+    public boolean sendExperienceToPedestal(BlockPos posReceiver, int experienceIncoming) {
+        if (experienceIncoming > 0 && level != null && level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity receiverPedestal) {
+            return receiverPedestal.getCapability(CapabilityExperience.EXPERIENCE, Direction.UP).map(receiverHandler -> {
+                if (receiverHandler.canReceive()) {
+                    int insertedStackSimulation = receiverHandler.receiveExperience(experienceIncoming, true);
+                    if (insertedStackSimulation > 0) {
+                        int countToSend = Math.min(getExperienceTransferRate(), insertedStackSimulation);
+                        if (countToSend > 0) {
+                            experienceHandler.extractExperience(countToSend, false);
+                            receiverHandler.receiveExperience(countToSend, false);
+                            return true;
                         }
                     }
                 }
-            }
+                return false;
+            }).orElse(false);
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public boolean sendDustToPedestal(BlockPos pedestalToSendTo, DustMagic dustIncoming)
@@ -3429,7 +3348,7 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         handler.invalidate();
         energyHandler.invalidate();
         fluidHandler.invalidate();
-        experienceHandler.invalidate();
+        experienceCapability.invalidate();
         dustHandler.invalidate();
     }
 }
