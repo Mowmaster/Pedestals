@@ -1787,9 +1787,12 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     public boolean attemptAddCoin(ItemStack stack, Player player)
     {
         if (privateItems.isItemValid(PrivateInventorySlot.COIN, stack)) {
-            privateItems.insertItem(PrivateInventorySlot.COIN, stack.split(1), false);
-            IPedestalUpgrade upgrade = (IPedestalUpgrade)stack.getItem();
-            upgrade.actionOnAddedToPedestal(player, this, stack);
+            // stack.split might reduce `stack` to an empty stack, so if we need to use any property of the item being
+            // insert we need to make a reference to it it prior to insertion.
+            ItemStack toInsert = stack.split(1);
+            privateItems.insertItem(PrivateInventorySlot.COIN, toInsert, false);
+            IPedestalUpgrade upgrade = (IPedestalUpgrade)toInsert.getItem();
+            upgrade.actionOnAddedToPedestal(player, this, toInsert);
             // update();
             return true;
         } else {
@@ -2434,9 +2437,12 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     public boolean attemptAddFilter(ItemStack stack)
     {
         if (privateItems.isItemValid(PrivateInventorySlot.FILTER, stack)) {
-            privateItems.insertItem(PrivateInventorySlot.FILTER, stack.split(1), false);
+            // stack.split might reduce `stack` to an empty stack, so if we need to use any property of the item being
+            // insert we need to make a reference to it it prior to insertion.
+            ItemStack toInsert = stack.split(1);
+            privateItems.insertItem(PrivateInventorySlot.FILTER, toInsert, false);
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) stack.getItem()).getFilterType(stack))?(2):(1));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) toInsert.getItem()).getFilterType(toInsert)?2:1));
             level.setBlock(getPos(),newstate,3);
             update();
             return true;
