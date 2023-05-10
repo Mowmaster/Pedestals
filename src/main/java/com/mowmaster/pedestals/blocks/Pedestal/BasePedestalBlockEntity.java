@@ -2846,37 +2846,26 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         }
     }
 
-    public boolean sendDustToPedestal(BlockPos pedestalToSendTo, DustMagic dustIncoming)
-    {
-        if(!dustIncoming.isEmpty())
-        {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
-            {
-                LazyOptional<IDustHandler> cap = tilePedestalToSendTo.getCapability(CapabilityDust.DUST_HANDLER, Direction.UP);
-                if(cap.isPresent())
-                {
-                    IDustHandler handler = cap.orElse(null);
-                    if(handler.isDustValid(0,dustIncoming))
-                    {
-                        int insertedStackSimulation = handler.fill(dustIncoming, IDustHandler.DustAction.SIMULATE);
-                        if(insertedStackSimulation > 0)
-                        {
-                            int countToSend = Math.min(getFluidTransferRate(),insertedStackSimulation);
-                            if(countToSend >=1)
-                            {
-                                DustMagic copyIncomingDust = new DustMagic(dustIncoming.getDustColor(), dustIncoming.getDustAmount());
-                                copyIncomingDust.setDustAmount(countToSend);
-                                //Send Dust
-                                removeDust(handler.fill(copyIncomingDust, IDustHandler.DustAction.EXECUTE),IDustHandler.DustAction.EXECUTE);
-                                return true;
-                            }
+    public boolean sendDustToPedestal(BlockPos posReceiver, DustMagic dustIncoming) {
+        if (!dustIncoming.isEmpty() && level != null && level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity receiverPedestal) {
+            return receiverPedestal.getCapability(CapabilityDust.DUST_HANDLER, Direction.UP).map(receiverHandler -> {
+                if (receiverHandler.isDustValid(0, dustIncoming)) {
+                    int insertedStackSimulation = receiverHandler.fill(dustIncoming, IDustHandler.DustAction.SIMULATE);
+                    if (insertedStackSimulation > 0) {
+                        int countToSend = Math.min(getFluidTransferRate(), insertedStackSimulation);
+                        if (countToSend > 0) {
+                            dustHandler.drain(countToSend, IDustHandler.DustAction.EXECUTE);
+                            receiverHandler.fill(new DustMagic(dustIncoming.getDustColor(), countToSend), IDustHandler.DustAction.EXECUTE);
+                            update();
+                            return true;
                         }
                     }
                 }
-            }
+                return false;
+            }).orElse(false);
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public void transferAction()
