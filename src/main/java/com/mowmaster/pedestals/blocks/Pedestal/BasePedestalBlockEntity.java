@@ -65,7 +65,8 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 {
     private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandlerPedestal);
     private ItemStackHandler privateItems = createPrivateItemHandler();
-    private LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(this::createHandlerPedestalEnergy);
+    private IEnergyStorage energyHandler = createEnergyHandler();
+    private LazyOptional<IEnergyStorage> energyCapability = LazyOptional.of(() -> this.energyHandler);
     private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(this::createHandlerPedestalFluid);
     private IExperienceStorage experienceHandler = createExperienceHandler();
     private LazyOptional<IExperienceStorage> experienceCapability = LazyOptional.of(() -> this.experienceHandler);
@@ -462,7 +463,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         };
     }
 
-    public IEnergyStorage createHandlerPedestalEnergy() {
+    private IEnergyStorage createEnergyHandler() {
         return new IEnergyStorage() {
 
             /*
@@ -475,13 +476,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
              */
             @Override
             public int receiveEnergy(int maxReceive, boolean simulate) {
-
                 if (!canReceive())
                     return 0;
 
-                int canReceive = maxReceive;
                 IPedestalFilter filter = getIPedestalFilter();
-                int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), (filter == null)?(maxReceive):((!filter.getFilterDirection().insert())?(maxReceive):(filter.canAcceptCountEnergy(getPedestal(),getFilterInPedestal(),getEnergyCapacity(),spaceForEnergy(),maxReceive))));
+                int maxReceivePostFilter = (filter != null && filter.getFilterDirection().insert()) ? filter.canAcceptCountEnergy(getPedestal(),getFilterInPedestal(),getEnergyCapacity(),spaceForEnergy(),maxReceive): maxReceive;
+                int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), maxReceivePostFilter);
                 if (!simulate)
                     storedEnergy += energyReceived;
                 update();
@@ -498,39 +498,24 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
              */
             @Override
             public int extractEnergy(int maxExtract, boolean simulate) {
-
                 if (!canExtract())
                     return 0;
 
                 IPedestalFilter filter = getIPedestalFilter();
-                int energyExtracted = Math.min(storedEnergy, (filter == null)?(maxExtract):((!filter.getFilterDirection().extract())?(maxExtract):(filter.canAcceptCountEnergy(getPedestal(),getFilterInPedestal(),getEnergyCapacity(),spaceForEnergy(),maxExtract))));
+                int maxExtractPostFilter = (filter != null && filter.getFilterDirection().extract()) ? filter.canAcceptCountEnergy(getPedestal(),getFilterInPedestal(),getEnergyCapacity(),spaceForEnergy(),maxExtract): maxExtract;
+                int energyExtracted = Math.min(storedEnergy, maxExtractPostFilter);
                 if (!simulate)
                     storedEnergy -= energyExtracted;
                 return energyExtracted;
-
-                /*if(simulate)
-                {
-                    return (maxExtract>getEnergyStored())?(getEnergyStored()):(maxExtract);
-                }
-                else
-                {
-                    int currentEnergy = getEnergyStored();
-                    int remaining = (maxExtract>getEnergyStored())?(0):(currentEnergy-maxExtract);
-                    storedEnergy = remaining;
-                    update();
-                    return (maxExtract>currentEnergy)?(currentEnergy):(maxExtract);
-                }*/
             }
 
             @Override
             public int getEnergyStored() {
-
                 return storedEnergy;
             }
 
             @Override
             public int getMaxEnergyStored() {
-
                 int baseStorage = PedestalConfig.COMMON.pedestal_baseEnergyStorage.get();
                 int additionalStorage = getEnergyAmountIncreaseFromStorage();
                 return baseStorage + additionalStorage;
@@ -538,7 +523,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
             @Override
             public boolean canExtract() {
-
                 if(hasEnergy())
                 {
                     IPedestalFilter filter = getIPedestalFilter();
@@ -546,9 +530,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                     return filter.canAcceptEnergy(getFilterInPedestal(),1);
                 }
                 return false;
-
-                /*if(hasEnergy())return true;
-                return false;*/
             }
 
             @Override
@@ -762,7 +743,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             return handler.cast();
         }
         if ((cap == ForgeCapabilities.ENERGY)) {
-            return energyHandler.cast();
+            return energyCapability.cast();
         }
         if ((cap == ForgeCapabilities.FLUID_HANDLER)) {
             return fluidHandler.cast();
@@ -878,13 +859,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public void removeEnergyFromBrokenPedestal(Level worldIn, BlockPos pos) {
-        IEnergyStorage energy = energyHandler.orElse(null);
-        if(energy.getEnergyStored()>0)
+        if(energyHandler.getEnergyStored()>0)
         {
             ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());
             if(toDrop.getItem() instanceof BaseEnergyBulkStorageItem droppedItemEnergy)
             {
-                droppedItemEnergy.setEnergy(toDrop,energy.getEnergyStored());
+                droppedItemEnergy.setEnergy(toDrop,energyHandler.getEnergyStored());
             }
             MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
         }
@@ -1525,60 +1505,23 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean hasEnergy()
-    {
-        IEnergyStorage h = energyHandler.orElse(null);
-        if(h.getEnergyStored()>0)return true;
+    public boolean hasEnergy() { return energyHandler.getEnergyStored() > 0; }
 
-        return false;
-    }
+    public boolean hasSpaceForEnergy() { return spaceForEnergy() > 0; }
 
-    public boolean hasSpaceForEnergy()
-    {
-        return getEnergyCapacity() - getStoredEnergy() > 0;
-    }
+    public int spaceForEnergy() { return getEnergyCapacity() - getStoredEnergy(); }
 
-    public int spaceForEnergy()
-    {
-        return getEnergyCapacity() - getStoredEnergy();
-    }
+    public int getEnergyCapacity() { return energyHandler.getMaxEnergyStored(); }
 
-    public int getEnergyCapacity()
-    {
-        IEnergyStorage h = energyHandler.orElse(null);
-        return h.getMaxEnergyStored();
-    }
+    public int getStoredEnergy() { return energyHandler.getEnergyStored(); }
 
-    public int getStoredEnergy()
-    {
-        IEnergyStorage h = energyHandler.orElse(null);
-        return h.getEnergyStored();
-    }
+    public int addEnergy(int amountIn, boolean simulate) { return energyHandler.receiveEnergy(amountIn,simulate); }
 
+    public int removeEnergy(int amountOut, boolean simulate) { return energyHandler.extractEnergy(amountOut,simulate); }
 
-    public int addEnergy(int amountIn, boolean simulate)
-    {
-        IEnergyStorage h = energyHandler.orElse(null);
-        return h.receiveEnergy(amountIn,simulate);
-    }
+    public boolean canAcceptEnergy() { return energyHandler.canReceive(); }
 
-    public int removeEnergy(int amountOut, boolean simulate)
-    {
-        IEnergyStorage h = energyHandler.orElse(null);
-        return h.extractEnergy(amountOut,simulate);
-    }
-
-    public boolean canAcceptEnergy()
-    {
-        IEnergyStorage h = energyHandler.orElse(null);
-        return h.canReceive();
-    }
-
-    public boolean canSendEnergy()
-    {
-        IEnergyStorage h = energyHandler.orElse(null);
-        return h.canExtract();
-    }
+    public boolean canSendEnergy() { return energyHandler.canExtract(); }
 
     public int getEnergyTransferRate()
     {
@@ -2916,35 +2859,26 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         return false;
     }
 
-    public boolean sendEnergyToPedestal(BlockPos pedestalToSendTo, int energyIncoming)
+    public boolean sendEnergyToPedestal(BlockPos posReceiver, int energyIncoming)
     {
-        if(energyIncoming > 0)
-        {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
-            {
-                LazyOptional<IEnergyStorage> cap = tilePedestalToSendTo.getCapability(ForgeCapabilities.ENERGY, Direction.UP);
-                if(cap.isPresent())
-                {
-                    IEnergyStorage handler = cap.orElse(null);
-                    if(handler.canReceive())
-                    {
-                        int insertedStackSimulation = handler.receiveEnergy(energyIncoming, true);
-                        if(insertedStackSimulation > 0)
-                        {
-                            int countToSend = Math.min(getEnergyTransferRate(),insertedStackSimulation);
-                            if(countToSend >=1)
-                            {
-                                //Send Energy
-                                removeEnergy(handler.receiveEnergy(countToSend, false),false);
-                                return true;
-                            }
+        if (energyIncoming > 0 && level != null && level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity receiverPedestal) {
+            return receiverPedestal.getCapability(ForgeCapabilities.ENERGY, Direction.UP).map(receiverHandler -> {
+                if(receiverHandler.canReceive()) {
+                    int insertedStackSimulation = receiverHandler.receiveEnergy(energyIncoming, true);
+                    if (insertedStackSimulation > 0) {
+                        int countToSend = Math.min(getEnergyTransferRate(), insertedStackSimulation);
+                        if(countToSend > 0) {
+                            energyHandler.extractEnergy(countToSend, false);
+                            receiverHandler.receiveEnergy(countToSend, false);
+                            return true;
                         }
                     }
                 }
-            }
+                return false;
+            }).orElse(false);
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public boolean sendExperienceToPedestal(BlockPos posReceiver, int experienceIncoming) {
@@ -3346,7 +3280,7 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     public void setRemoved() {
         super.setRemoved();
         handler.invalidate();
-        energyHandler.invalidate();
+        energyCapability.invalidate();
         fluidHandler.invalidate();
         experienceCapability.invalidate();
         dustHandler.invalidate();
