@@ -70,7 +70,9 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(this::createHandlerPedestalFluid);
     private IExperienceStorage experienceHandler = createExperienceHandler();
     private LazyOptional<IExperienceStorage> experienceCapability = LazyOptional.of(() -> this.experienceHandler);
-    private LazyOptional<IDustHandler> dustHandler = LazyOptional.of(this::createDustHandler);
+    private IDustHandler dustHandler = createDustHandler();
+
+    private LazyOptional<IDustHandler> dustCapability = LazyOptional.of(() -> this.dustHandler);
     private List<ItemStack> stacksList = new ArrayList<>();
     private WeakReference<FakePlayer> pedestalPlayer;
     private MobEffectInstance storedPotionEffect = null;
@@ -615,8 +617,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public IDustHandler createDustHandler() {
         return new IDustHandler() {
-            protected void onContentsChanged()
-            {
+            protected void onContentsChanged() {
                 update();
             }
 
@@ -632,8 +633,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             }
 
             @Override
-            public int getTankCapacity(int tank)
-            {
+            public int getTankCapacity(int tank) {
                 int baseStorage = PedestalConfig.COMMON.pedestal_baseDustStorage.get();
                 int additionalStorage = getDustAmountIncreaseFromStorage();
                 return baseStorage + additionalStorage;
@@ -648,60 +648,34 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
             @Override
             public int fill(DustMagic dust, DustAction action) {
-                if (dust.isEmpty() || !isDustValid(0,dust))
-                {
+                if (dust.isEmpty() || !isDustValid(0,dust) || !storedDust.isDustEqual(dust)) {
                     return 0;
                 }
 
                 IPedestalFilter filter = getIPedestalFilter();
-                if (action.simulate())
-                {
-                    if (storedDust.isEmpty())
-                    {
-                        return Math.min(getTankCapacity(0), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),dust),dust.getDustAmount())):(dust.getDustAmount())):(dust.getDustAmount()));
+                int dustAmountPostFilter =  (filter != null && filter.getFilterDirection().insert()) ? Math.min(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),dust), dust.getDustAmount()) : dust.getDustAmount();
+                if (storedDust.isEmpty()) {
+                    int amountFilled = Math.min(getTankCapacity(0), dustAmountPostFilter);
+                    if (!action.simulate()) {
+                        storedDust = new DustMagic(dust.getDustColor(), amountFilled);
+                        onContentsChanged();
                     }
+                    return amountFilled;
+                } else {
+                    int amountFilled = Math.min(Math.min(getTankCapacity(0) - storedDust.getDustAmount(), dustAmountPostFilter), dust.getDustAmount());
 
-                    if (!storedDust.isDustEqual(dust))
-                    {
-                        return 0;
+                    if (!action.simulate() && amountFilled > 0) {
+                        storedDust.grow(amountFilled);
+                        onContentsChanged();
                     }
-                    
-                    return Math.min(getTankCapacity(0) - storedDust.getDustAmount(), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),dust),dust.getDustAmount())):(dust.getDustAmount())):(dust.getDustAmount()));
+                    return amountFilled;
                 }
-                if (storedDust.isEmpty())
-                {
-                    storedDust = new DustMagic(dust.getDustColor(), Math.min(getTankCapacity(0), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),dust),dust.getDustAmount())):(dust.getDustAmount())):(dust.getDustAmount())));
-                    onContentsChanged();
-                    return storedDust.getDustAmount();
-                }
-                if (!storedDust.isDustEqual(dust))
-                {
-                    return 0;
-                }
-
-                int filled = Math.min(getTankCapacity(0) - storedDust.getDustAmount(), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),dust),dust.getDustAmount())):(dust.getDustAmount())):(dust.getDustAmount()));
-                //int filled = (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountDust(getPedestal(),dust),getTankCapacity(0) - storedDust.getDustAmount())):(getTankCapacity(0) - storedDust.getDustAmount())):(getTankCapacity(0) - storedDust.getDustAmount());
-
-                if (dust.getDustAmount() < filled)
-                {
-                    storedDust.grow(dust.getDustAmount());
-                    filled = dust.getDustAmount();
-                }
-                else
-                {
-                    storedDust.grow(filled);
-                    //storedDust.grow(getTankCapacity(0));
-                }
-                if (filled > 0)
-                    onContentsChanged();
-                return filled;
             }
 
             @NotNull
             @Override
             public DustMagic drain(DustMagic dust, DustAction action) {
-                if (dust.isEmpty() || !dust.isDustEqual(storedDust))
-                {
+                if (dust.isEmpty() || !dust.isDustEqual(storedDust)) {
                     return new DustMagic(-1, 0);
                 }
                 return drain(dust.getDustAmount(), action);
@@ -710,24 +684,16 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             @NotNull
             @Override
             public DustMagic drain(int maxDrain, DustAction action) {
-
                 IPedestalFilter filter = getIPedestalFilter();
-                int drained = Math.min((filter == null)?(maxDrain):((!filter.getFilterDirection().extract())?(maxDrain):(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),storedDust))), maxDrain);
-                if (storedDust.getDustAmount() < drained)
-                {
-                    drained = storedDust.getDustAmount();
-                }
-                DustMagic magic = new DustMagic(storedDust.getDustColor(), drained);
-                if (action.execute() && drained > 0)
-                {
-                    if(drained>=storedDust.getDustAmount())
-                    {
+                int maxDrainPostFilter = (filter != null && filter.getFilterDirection().extract()) ? Math.min(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),storedDust), maxDrain) : maxDrain;
+                int amountDrained = Math.min(storedDust.getDustAmount(), maxDrainPostFilter);
+                DustMagic magic = new DustMagic(storedDust.getDustColor(), amountDrained);
+                if (action.execute() && amountDrained > 0) {
+                    if (amountDrained >= storedDust.getDustAmount()) {
                         storedDust.setDustAmount(0);
                         storedDust.setDustColor(-1);
-                    }
-                    else
-                    {
-                        storedDust.shrink(drained);
+                    } else {
+                        storedDust.shrink(amountDrained);
                     }
                     onContentsChanged();
                 }
@@ -752,7 +718,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             return experienceCapability.cast();
         }
         if ((cap == CapabilityDust.DUST_HANDLER)) {
-            return dustHandler.cast();
+            return dustCapability.cast();
         }
         return super.getCapability(cap, side);
     }
@@ -884,8 +850,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public void dropDustInWorld(Level worldIn, BlockPos pos) {
-        IDustHandler dust = dustHandler.orElse(null);
-        if(!dust.getDustMagicInTank(0).isEmpty())
+        if(!dustHandler.getDustMagicInTank(0).isEmpty())
         {
             ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_DUST.get());
             DustMagic.setDustMagicInStack(toDrop,storedDust);
@@ -1589,63 +1554,42 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean hasDust()
-    {
-        IDustHandler h = dustHandler.orElse(null);
-        if(!h.getDustMagicInTank(0).isEmpty())return true;
-        return false;
+    public boolean hasDust() { return !dustHandler.getDustMagicInTank(0).isEmpty(); }
+
+    public DustMagic getStoredDust() {
+        if (hasDust()) {
+            return dustHandler.getDustMagicInTank(0);
+        } else {
+            return DustMagic.EMPTY;
+        }
     }
 
-    public DustMagic getStoredDust()
-    {
-        IDustHandler h = dustHandler.orElse(null);
-        if(!h.getDustMagicInTank(0).isEmpty())return h.getDustMagicInTank(0);
-        return DustMagic.EMPTY;
-    }
+    public int getDustCapacity() { return dustHandler.getTankCapacity(0); }
 
-    public int getDustCapacity()
-    {
-        IDustHandler h = dustHandler.orElse(null);
-        return h.getTankCapacity(0);
-    }
+    public int spaceForDust() { return getDustCapacity()  -getStoredDust().getDustAmount(); }
 
-    public int spaceForDust()
-    {
-        return getDustCapacity()-getStoredDust().getDustAmount();
-    }
+    public boolean canAcceptDust(DustMagic dustMagicIn) { return dustHandler.isDustValid(0,dustMagicIn); }
 
-    public boolean canAcceptDust(DustMagic dustMagicIn)
-    {
-        IDustHandler h = dustHandler.orElse(null);
-        return h.isDustValid(0,dustMagicIn);
-    }
-
-    public DustMagic removeDust(DustMagic dustMagicToRemove, IDustHandler.DustAction action)
-    {
-        IDustHandler h = dustHandler.orElse(null);
+    public DustMagic removeDust(DustMagic dustMagicToRemove, IDustHandler.DustAction action) {
         update();
-        return h.drain(dustMagicToRemove,action);
+        return dustHandler.drain(dustMagicToRemove,action);
     }
 
-    public DustMagic removeDust(int dustAmountToRemove, IDustHandler.DustAction action)
-    {
-        IDustHandler h = dustHandler.orElse(null);
+    public DustMagic removeDust(int dustAmountToRemove, IDustHandler.DustAction action) {
         update();
-        return h.drain(new DustMagic(getStoredDust().getDustColor(),dustAmountToRemove),action);
+        return dustHandler.drain(new DustMagic(getStoredDust().getDustColor(),dustAmountToRemove),action);
     }
 
-    public int addDust(DustMagic dustMagicIn, IDustHandler.DustAction action)
-    {
-        IDustHandler h = dustHandler.orElse(null);
+    public int addDust(DustMagic dustMagicIn, IDustHandler.DustAction action) {
         update();
-        return h.fill(dustMagicIn,action);
+        return dustHandler.fill(dustMagicIn,action);
     }
 
-    public int getDustTransferRate()
-    {
+    public int getDustTransferRate() {
         //im assuming # = rf value???
         int baseValue = PedestalConfig.COMMON.pedestal_baseDustTransferRate.get();
-        return  (getDustTransferRateIncreaseFromCapacity()>0)?(MowLibXpUtils.getExpCountByLevel(getDustTransferRateIncreaseFromCapacity()+baseValue)):(baseValue);
+        // TODO: I don't imagine this is meant to be using MowLibXpUtils for Dust actions?
+        return (getDustTransferRateIncreaseFromCapacity()>0) ? MowLibXpUtils.getExpCountByLevel(getDustTransferRateIncreaseFromCapacity() + baseValue) : baseValue;
     }
 
     /*============================================================================
@@ -3283,6 +3227,6 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         energyCapability.invalidate();
         fluidHandler.invalidate();
         experienceCapability.invalidate();
-        dustHandler.invalidate();
+        dustCapability.invalidate();
     }
 }
