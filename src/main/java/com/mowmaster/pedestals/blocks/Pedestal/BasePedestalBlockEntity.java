@@ -67,11 +67,11 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     private ItemStackHandler privateItems = createPrivateItemHandler();
     private IEnergyStorage energyHandler = createEnergyHandler();
     private LazyOptional<IEnergyStorage> energyCapability = LazyOptional.of(() -> this.energyHandler);
-    private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(this::createHandlerPedestalFluid);
+    private IFluidHandler fluidHandler = createFluidHandler();
+    private LazyOptional<IFluidHandler> fluidCapability = LazyOptional.of(() -> this.fluidHandler);
     private IExperienceStorage experienceHandler = createExperienceHandler();
     private LazyOptional<IExperienceStorage> experienceCapability = LazyOptional.of(() -> this.experienceHandler);
     private IDustHandler dustHandler = createDustHandler();
-
     private LazyOptional<IDustHandler> dustCapability = LazyOptional.of(() -> this.dustHandler);
     private List<ItemStack> stacksList = new ArrayList<>();
     private WeakReference<FakePlayer> pedestalPlayer;
@@ -281,9 +281,8 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         };
     }
 
-    public IFluidHandler createHandlerPedestalFluid() {
+    public IFluidHandler createFluidHandler() {
         return new IFluidHandler() {
-
 
             @Nonnull
             @Override
@@ -300,97 +299,29 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             @Nonnull
             @Override
             public FluidStack drain(FluidStack resource, FluidAction action) {
-
-                if (resource.isEmpty() || !resource.isFluidEqual(storedFluid))
-                {
+                if (resource.isEmpty() || !resource.isFluidEqual(storedFluid)) {
                     return FluidStack.EMPTY;
                 }
                 return drain(resource.getAmount(), action);
-
-                /*FluidStack stored = storedFluid.copy();
-                if(stored.isFluidEqual(resource))
-                {
-                    int storedAmount = stored.getAmount();
-                    int receivingAmount = resource.getAmount();
-                    if(action.simulate())
-                    {
-                        if(receivingAmount>storedAmount)
-                        {
-                            return new FluidStack(resource.getFluid(),storedAmount,resource.getTag());
-                        }
-                        return resource;
-                    }
-                    else if(action.execute())
-                    {
-                        if(receivingAmount>storedAmount)
-                        {
-                            storedFluid = FluidStack.EMPTY;
-                            update();
-                            return new FluidStack(resource.getFluid(),storedAmount,resource.getTag());
-                        }
-
-                        FluidStack newStack = storedFluid.copy();
-                        newStack.setAmount(storedAmount-receivingAmount);
-                        storedFluid = newStack;
-                        update();
-                        return resource;
-                    }
-                }
-
-                return FluidStack.EMPTY;*/
             }
 
             @Nonnull
             @Override
-            public FluidStack drain(int i, FluidAction fluidAction) {
-
+            public FluidStack drain(int maxDrain, FluidAction fluidAction) {
                 IPedestalFilter filter = getIPedestalFilter();
-                int drained = Math.min((filter == null)?(i):((!filter.getFilterDirection().extract())?(i):(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),storedFluid))), i);
-                if (storedFluid.getAmount() < drained)
-                {
-                    drained = storedFluid.getAmount();
-                }
-                FluidStack stack = new FluidStack(storedFluid, drained);
-                if (fluidAction.execute() && drained > 0)
-                {
-                    storedFluid.shrink(drained);
+                int maxDrainPostFilter = (filter != null && filter.getFilterDirection().extract()) ? Math.min(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),storedFluid), maxDrain) : maxDrain;
+                int fluidDrained = Math.min(maxDrainPostFilter, storedFluid.getAmount());
+                // `storedFluid.shrink` can reduce `storedFluid` to an empty stack, so copy it for return before shrinking.
+                FluidStack returnFluidStack = new FluidStack(storedFluid, fluidDrained);
+                if (fluidAction.execute() && fluidDrained > 0) {
+                    storedFluid.shrink(fluidDrained);
                     update();
                 }
-                return stack;
-
-                /*FluidStack stored = storedFluid.copy();
-                int storedAmount = stored.getAmount();
-                int receivingAmount = i;
-                if(fluidAction.simulate())
-                {
-                    if(receivingAmount>storedAmount)
-                    {
-                        return stored;
-                    }
-                    return new FluidStack(stored.getFluid(),receivingAmount,stored.getTag());
-                }
-                else if(fluidAction.execute())
-                {
-                    if(receivingAmount>storedAmount)
-                    {
-                        storedFluid = FluidStack.EMPTY;
-                        update();
-                        return stored;
-                    }
-
-                    FluidStack newStack = stored.copy();
-                    newStack.setAmount(storedAmount-receivingAmount);
-                    storedFluid = newStack;
-                    update();
-                    return new FluidStack(stored.getFluid(),receivingAmount,stored.getTag());
-                }
-
-                return FluidStack.EMPTY;*/
+                return returnFluidStack;
             }
 
             @Override
-            public int getTankCapacity(int i)
-            {
+            public int getTankCapacity(int i) {
                 int baseFluidStorage = PedestalConfig.COMMON.pedestal_baseFluidStorage.get();
                 int additionalFluidStorage = getFluidAmountIncreaseFromStorage();
                 return baseFluidStorage + additionalFluidStorage;
@@ -399,68 +330,31 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             @Override
             public boolean isFluidValid(int i, @Nonnull FluidStack fluidStack) {
                 IPedestalFilter filter = getIPedestalFilter();
-                if(filter == null || !filter.getFilterDirection().insert())
-                {
-                    if(storedFluid.isEmpty())return true;
-                    else return storedFluid.isFluidEqual(fluidStack);
+                if (filter == null || !filter.getFilterDirection().insert()) {
+                    return storedFluid.isEmpty() || storedFluid.isFluidEqual(fluidStack);
+                } else {
+                    return filter.canAcceptFluids(getFilterInPedestal(), fluidStack);
                 }
-                return filter.canAcceptFluids(getFilterInPedestal(),fluidStack);
             }
 
             @Override
             public int fill(FluidStack fluidStack, FluidAction fluidAction) {
-
-                if (fluidStack.isEmpty() || !isFluidValid(0,fluidStack))
-                {
+                if (fluidStack.isEmpty() || !isFluidValid(0, fluidStack) || (!storedFluid.isEmpty() && !storedFluid.isFluidEqual(fluidStack))) {
                     return 0;
                 }
 
                 IPedestalFilter filter = getIPedestalFilter();
-                if (fluidAction.simulate())
-                {
-                    if (storedFluid.isEmpty())
-                    {
-                        return Math.min(getTankCapacity(0), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount()));
-                        //return Math.min(getTankCapacity(0), (filter != null)?((!filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount()));
+                int fluidAmountPostFilter = (filter != null && filter.getFilterDirection().insert()) ? Math.min(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),fluidStack), fluidStack.getAmount()) : fluidStack.getAmount();
+                int amountFilled = Math.min(getTankCapacity(0) - storedFluid.getAmount(), fluidAmountPostFilter);
+                if (fluidAction.execute()) {
+                    if (storedFluid.isEmpty()) {
+                        storedFluid = new FluidStack(fluidStack, amountFilled);
+                    } else {
+                        storedFluid.grow(amountFilled);
                     }
-                    if (!storedFluid.isFluidEqual(fluidStack))
-                    {
-                        return 0;
-                    }
-                    //int blah = Math.min(getTankCapacity(0) - storedFluid.getAmount(), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount()));
-                    //System.out.println("BLAH: "+ blah);
-                    //return blah;
-                    return Math.min(getTankCapacity(0) - storedFluid.getAmount(), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount()));
-                }
-
-                if (storedFluid.isEmpty())
-                {
-                    storedFluid = new FluidStack(fluidStack, Math.min(getTankCapacity(0), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount())));
                     update();
-                    return storedFluid.getAmount();
                 }
-                if (!storedFluid.isFluidEqual(fluidStack))
-                {
-                    return 0;
-                }
-                int filled = Math.min(getTankCapacity(0) - storedFluid.getAmount(), (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),fluidStack),fluidStack.getAmount())):(fluidStack.getAmount())):(fluidStack.getAmount()));
-                //int filled = (filter != null)?((filter.getFilterDirection().insert())?(Math.min(filter.canAcceptCountFluids(getPedestal(),fluidStack),getTankCapacity(0) - storedFluid.getAmount())):(getTankCapacity(0) - storedFluid.getAmount())):(getTankCapacity(0) - storedFluid.getAmount());
-
-                //System.out.println("FILLED: "+ filled);
-
-                if (fluidStack.getAmount() < filled)
-                {
-                    storedFluid.grow(fluidStack.getAmount());
-                    filled = fluidStack.getAmount();
-                }
-                else
-                {
-                    storedFluid.grow(filled);
-                    //storedFluid.setAmount(getTankCapacity(0));
-                }
-                if (filled > 0)
-                    update();
-                return filled;
+                return amountFilled;
             }
         };
     }
@@ -712,7 +606,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             return energyCapability.cast();
         }
         if ((cap == ForgeCapabilities.FLUID_HANDLER)) {
-            return fluidHandler.cast();
+            return fluidCapability.cast();
         }
         if ((cap == CapabilityExperience.EXPERIENCE)) {
             return experienceCapability.cast();
@@ -811,13 +705,10 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public void dropLiquidsInWorld(Level worldIn, BlockPos pos) {
-        IFluidHandler fluids = fluidHandler.orElse(null);
-        FluidStack inTank = fluids.getFluidInTank(0);
-        if(inTank.getAmount()>0)
-        {
+        FluidStack inTank = fluidHandler.getFluidInTank(0);
+        if (inTank.getAmount()>0) {
             ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
-            if(toDrop.getItem() instanceof BaseFluidBulkStorageItem droppedItemFluid)
-            {
+            if(toDrop.getItem() instanceof BaseFluidBulkStorageItem droppedItemFluid) {
                 droppedItemFluid.setFluidStack(toDrop,inTank);
             }
             MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
@@ -1397,64 +1288,32 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     ==============================================================================
     ============================================================================*/
 
-    public boolean hasFluid()
-    {
-        IFluidHandler h = fluidHandler.orElse(null);
-        if(!h.getFluidInTank(0).isEmpty())return true;
-        return false;
-    }
+    public boolean hasFluid() { return !fluidHandler.getFluidInTank(0).isEmpty(); }
 
-    public FluidStack getStoredFluid()
-    {
-        IFluidHandler h = fluidHandler.orElse(null);
-        if(!h.getFluidInTank(0).isEmpty())return h.getFluidInTank(0);
-        return FluidStack.EMPTY;
-    }
+    public FluidStack getStoredFluid() { return fluidHandler.getFluidInTank(0); }
 
-    public int getFluidCapacity()
-    {
-        IFluidHandler h = fluidHandler.orElse(null);
-        return h.getTankCapacity(0);
-    }
+    public int getFluidCapacity() { return fluidHandler.getTankCapacity(0); }
 
     public int spaceForFluid()
     {
-        return getFluidCapacity()-getStoredFluid().getAmount();
+        return getFluidCapacity() - getStoredFluid().getAmount();
     }
 
-    public boolean canAcceptFluid(FluidStack fluidStackIn)
-    {
-        IFluidHandler h = fluidHandler.orElse(null);
-        return h.isFluidValid(0,fluidStackIn);
-    }
+    public boolean canAcceptFluid(FluidStack fluidStackIn) { return fluidHandler.isFluidValid(0,fluidStackIn); }
 
-    public FluidStack removeFluid(FluidStack fluidToRemove, IFluidHandler.FluidAction action)
-    {
-        IFluidHandler h = fluidHandler.orElse(null);
-        return h.drain(fluidToRemove,action);
-    }
+    public FluidStack removeFluid(FluidStack fluidToRemove, IFluidHandler.FluidAction action) { return fluidHandler.drain(fluidToRemove, action); }
 
-    public FluidStack removeFluid(int fluidAmountToRemove, IFluidHandler.FluidAction action)
-    {
-        IFluidHandler h = fluidHandler.orElse(null);
-        return h.drain(new FluidStack(getStoredFluid().getFluid(),fluidAmountToRemove,getStoredFluid().getTag()),action);
-    }
+    public FluidStack removeFluid(int fluidAmountToRemove, IFluidHandler.FluidAction action) { return fluidHandler.drain(new FluidStack(getStoredFluid().getFluid(),fluidAmountToRemove,getStoredFluid().getTag()),action); }
 
-    public int addFluid(FluidStack fluidStackIn, IFluidHandler.FluidAction fluidAction)
-    {
-        IFluidHandler h = fluidHandler.orElse(null);
-        return h.fill(fluidStackIn,fluidAction);
-    }
+    public int addFluid(FluidStack fluidStackIn, IFluidHandler.FluidAction fluidAction) { return fluidHandler.fill(fluidStackIn,fluidAction); }
 
 
-    public int getFluidTransferRate()
-    {
+    public int getFluidTransferRate() {
         int fluidTransferRate = PedestalConfig.COMMON.pedestal_baseFluidTransferRate.get();
         int getFluidRateIncrease = getFluidTransferRateIncreaseFromCapacity();
 
         return  fluidTransferRate + getFluidRateIncrease;
     }
-
 
     /*============================================================================
     ==============================================================================
@@ -2770,37 +2629,25 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         return false;
     }
 
-    public boolean sendFluidsToPedestal(BlockPos pedestalToSendTo, FluidStack fluidStackIncoming)
-    {
-        if(!fluidStackIncoming.isEmpty())
-        {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
-            {
-                LazyOptional<IFluidHandler> cap = tilePedestalToSendTo.getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.UP);
-                if(cap.isPresent())
-                {
-                    IFluidHandler handler = cap.orElse(null);
-                    if(handler.isFluidValid(0,fluidStackIncoming))
-                    {
-                        int insertedStackSimulation = handler.fill(fluidStackIncoming, IFluidHandler.FluidAction.SIMULATE);
-                        if(insertedStackSimulation > 0)
-                        {
-                            int countToSend = Math.min(getFluidTransferRate(),insertedStackSimulation);
-                            if(countToSend >=1)
-                            {
-                                FluidStack copyIncomingStack = fluidStackIncoming.copy();
-                                copyIncomingStack.setAmount(countToSend);
-                                //Send Fluid
-                                removeFluid(handler.fill(copyIncomingStack, IFluidHandler.FluidAction.EXECUTE),IFluidHandler.FluidAction.EXECUTE);
-                                return true;
-                            }
-                        }
+    public boolean sendFluidsToPedestal(BlockPos posReceiver, FluidStack fluidStackIncoming) {
+        if(!fluidStackIncoming.isEmpty() && level != null && level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity receiverPedestal) {
+            return receiverPedestal.getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.UP).map(receiverHandler -> {
+                if (receiverHandler.isFluidValid(0, fluidStackIncoming)) {
+                    int insertedStackSimulation = receiverHandler.fill(fluidStackIncoming, IFluidHandler.FluidAction.SIMULATE);
+                    int countToSend = Math.min(getFluidTransferRate(), insertedStackSimulation);
+                    if (countToSend > 0) {
+                        FluidStack a = new FluidStack(fluidStackIncoming, countToSend);
+                        System.out.println("sending stack: " + a.getFluid().toString() + " with amount + " + String.valueOf(a.getAmount()));
+                        receiverHandler.fill(a, IFluidHandler.FluidAction.EXECUTE);
+                        fluidHandler.drain(countToSend, IFluidHandler.FluidAction.EXECUTE);
+                        return true;
                     }
                 }
-            }
+                return false;
+            }).orElse(false);
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public boolean sendEnergyToPedestal(BlockPos posReceiver, int energyIncoming)
@@ -3214,7 +3061,7 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
         super.setRemoved();
         handler.invalidate();
         energyCapability.invalidate();
-        fluidHandler.invalidate();
+        fluidCapability.invalidate();
         experienceCapability.invalidate();
         dustCapability.invalidate();
     }
