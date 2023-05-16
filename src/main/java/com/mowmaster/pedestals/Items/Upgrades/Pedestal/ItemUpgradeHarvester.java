@@ -656,12 +656,24 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                             if(hasGentleHarvest(pedestal.getCoinOnPedestal()))
                                                             {
                                                                 IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
-                                                                int min = Collections.min(propInt.getPossibleValues());
+                                                                if(propInt !=null)
+                                                                {
+                                                                    int min = Collections.min(propInt.getPossibleValues());
+                                                                    dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                                    level.setBlockAndUpdate(currentPoint, blockAtPoint.setValue(propInt,min));
+                                                                    if(damage)pedestal.damageInsertedTool(1,false);
+                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
+                                                                }
+                                                                else
+                                                                {
+                                                                    blockAtPoint.onRemove(level,currentPoint,blockAtPoint,true);
+                                                                    dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                                    level.removeBlockEntity(currentPoint);
+                                                                    level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
+                                                                    if(damage)pedestal.damageInsertedTool(1,false);
+                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
+                                                                }
 
-                                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                                level.setBlockAndUpdate(currentPoint, blockAtPoint.setValue(propInt,min));
-                                                                if(damage)pedestal.damageInsertedTool(1,false);
-                                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
                                                             }
                                                             else
                                                             {
@@ -681,11 +693,20 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                         if(hasGentleHarvest(pedestal.getCoinOnPedestal()))
                                                         {
                                                             IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
-                                                            int min = Collections.min(propInt.getPossibleValues());
+                                                            if(propInt !=null)
+                                                            {
+                                                                int min = Collections.min(propInt.getPossibleValues());
+                                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                                level.setBlockAndUpdate(currentPoint, blockAtPoint.setValue(propInt,min));
+                                                                if(damage)pedestal.damageInsertedTool(1,false);
+                                                            }
+                                                            else
+                                                            {
+                                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                                level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
+                                                                if(damage)pedestal.damageInsertedTool(1,false);
+                                                            }
 
-                                                            dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                            level.setBlockAndUpdate(currentPoint, blockAtPoint.setValue(propInt,min));
-                                                            if(damage)pedestal.damageInsertedTool(1,false);
                                                         }
                                                         else
                                                         {
