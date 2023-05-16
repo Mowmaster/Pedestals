@@ -758,6 +758,8 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 {
                     if(pedestal.hasFluid() && itemInHand.getItem().equals(Items.BUCKET))
                     {
+                        if(p_60506_ instanceof FakePlayer){ return InteractionResult.FAIL; }
+
                         Item item = pedestal.getStoredFluid().copy().getFluid().getBucket();
                         if(item instanceof BucketItem)
                         {
