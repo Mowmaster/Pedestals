@@ -38,7 +38,7 @@ public class FilterTool extends BaseTool implements IPedestalTool
             BlockPos pos = new BlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
             if(result.getType().equals(HitResult.Type.MISS))
             {
-                if(player.isCrouching())
+                if(player.isShiftKeyDown())
                 {
                     if(stackInHand.getItem().equals(DeferredRegisterItems.TOOL_FILTERTOOL.get()))
                     {
@@ -51,7 +51,7 @@ public class FilterTool extends BaseTool implements IPedestalTool
             }
             else if(result.getType().equals(HitResult.Type.BLOCK))
             {
-                if(player.isCrouching())
+                if(player.isShiftKeyDown())
                 {
                     BlockState getBlockState = world.getBlockState(pos);
                     if(getBlockState.getBlock() instanceof BasePedestalBlock)

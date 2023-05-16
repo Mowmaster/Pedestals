@@ -40,7 +40,7 @@ public class UpgradeTool extends BaseTool implements IPedestalTool
             BlockPos pos = new BlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
             if(result.getType().equals(HitResult.Type.MISS))
             {
-                if(player.isCrouching())
+                if(player.isShiftKeyDown())
                 {
                     if(stackInHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
                     {
@@ -54,7 +54,7 @@ public class UpgradeTool extends BaseTool implements IPedestalTool
             }
             else if(result.getType().equals(HitResult.Type.BLOCK))
             {
-                if(player.isCrouching())
+                if(player.isShiftKeyDown())
                 {
                     BlockState getBlockState = world.getBlockState(pos);
                     if(getBlockState.getBlock() instanceof BasePedestalBlock)

@@ -70,7 +70,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
             BlockPos pos = new BlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
             if(result.getType().equals(HitResult.Type.MISS))
             {
-                if(player.isCrouching())
+                if(player.isShiftKeyDown())
                 {
                     if(stackInHand.is(DeferredRegisterItems.TOOL_LINKINGTOOL.get()))
                     {
@@ -90,7 +90,7 @@ public class LinkingTool extends BaseTool implements IPedestalTool
             else if(result.getType().equals(HitResult.Type.BLOCK))
             {
                 BlockState getBlockState = world.getBlockState(pos);
-                if(player.isCrouching())
+                if(player.isShiftKeyDown())
                 {
                     if(getBlockState.getBlock() instanceof BasePedestalBlock)
                     {

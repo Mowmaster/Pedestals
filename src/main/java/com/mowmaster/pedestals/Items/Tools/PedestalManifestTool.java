@@ -108,7 +108,7 @@ public class PedestalManifestTool extends BaseTool implements IPedestalTool
                     CompoundTag getTagOnItem = stackInHand.getOrCreateTag();
 
                     //Create Manifest of Augments
-                    if(player.isCrouching())
+                    if(player.isShiftKeyDown())
                     {
                         boolean hasRenderer = ped.hasRenderAugment();
                         boolean hasRedstone = ped.hasRedstone();
