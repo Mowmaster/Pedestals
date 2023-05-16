@@ -316,6 +316,8 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
     public void attack(BlockState p_60499_, Level p_60500_, BlockPos p_60501_, Player p_60502_) {
         if(!p_60500_.isClientSide())
         {
+            if(p_60502_ instanceof FakePlayer){ super.attack(p_60499_, p_60500_, p_60501_, p_60502_); }
+
             BlockEntity blockEntity = p_60500_.getBlockEntity(p_60501_);
             if(blockEntity instanceof BasePedestalBlockEntity)
             {
@@ -393,8 +395,6 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 }
                 else if(pedestal.hasItemFirst())
                 {
-                    if(p_60502_ instanceof FakePlayer){ super.attack(p_60499_, p_60500_, p_60501_, p_60502_); }
-
                     if(p_60502_.isShiftKeyDown())
                     {
                         ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(false));
@@ -865,6 +865,11 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
 
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+
+        if(player instanceof FakePlayer) {
+            return false;
+        }
+
         if (player.isCreative()) {
             if (player.getOffhandItem().getItem().equals(DeferredRegisterItems.TOOL_DEVTOOL.get()))
                 return willHarvest || super.onDestroyedByPlayer(state, world, pos, player, willHarvest, fluid);
