@@ -193,7 +193,6 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                                             item.setItem(itemStack);
                                             if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),0,0,180));                                    actionDone = true;
                                             actionDone = true;
-                                            continue;
                                         }
                                     }
                                 }
@@ -228,7 +227,6 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                                         pedestal.addEnergy(transferRate,false);
                                         handler.extractEnergy(transferRate,false);
                                         actionDone = true;
-                                        continue;
                                     }
                                 }
                             }
@@ -256,17 +254,15 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                                     item.setItem(itemStack);
                                     if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),0,180,0));
                                     actionDone = true;
-                                    continue;
                                 }
                             }
                         }
                     }
                     //Dust
-                    if(canTransferDust(coinInPedestal))
+                    /*if(canTransferDust(coinInPedestal))
                     {
                         //get custom dust items only, and maybe jars???
-                        continue;
-                    }
+                    }*/
 
                     //Handle items last so that the others can do their action first
                     //Item
@@ -294,7 +290,6 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                                     pedestal.addItem(stackToAdd,false);
                                     if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,item.getX(),item.getY(),item.getZ(),180,180,0));
                                     actionDone = true;
-                                    continue;
                                 }
                             }
                         }
