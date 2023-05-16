@@ -92,93 +92,118 @@ public class PedestalManifestTool extends BaseTool implements IPedestalTool
 
         HitResult result = player.pick(5,0,false);
         BlockPos pos = new BlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
-        if(result.getType().equals(HitResult.Type.MISS))
+        if(!level.isClientSide())
         {
-            clearManifest(stackInHand, player);
-        }
-        else if(result.getType().equals(HitResult.Type.BLOCK))
-        {
-            BlockState getBlockState = level.getBlockState(pos);
-            if(getBlockState.getBlock() instanceof BasePedestalBlock)
-            {
-                BlockEntity tile = level.getBlockEntity(pos);
-                if(tile instanceof BasePedestalBlockEntity)
-                {
-                    BasePedestalBlockEntity ped = ((BasePedestalBlockEntity)tile);
-                    CompoundTag getTagOnItem = stackInHand.getOrCreateTag();
-
-                    //Create Manifest of Augments
-                    if(player.isShiftKeyDown())
-                    {
-                        boolean hasRenderer = ped.hasRenderAugment();
-                        boolean hasRedstone = ped.hasRedstone();
-                        boolean isCurrentlyPowered = ped.isPedestalBlockPowered(ped);
-                        boolean hasGlowstone = ped.hasLight();
-                        boolean hasSpeed = ped.hasSpeed();
-                        boolean hasCapacity = ped.hasCapacity();
-                        boolean hasStorage = ped.hasStorage();
-                        boolean hasRange = ped.hasRange();
-
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRenderer,"_hasrender");
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRedstone,"_hasredstone");
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,isCurrentlyPowered,"_hassignal");
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasGlowstone,"_haslight");
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasSpeed,"_hasspeed");
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasCapacity,"_hascapacity");
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasStorage,"_hasstorage");
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRange,"_hasrange");
-
-                        int renderType = ped.getRendererType();
-                        int getRedstone = ped.getRedstonePowerNeeded();
-                        int getCurrentPower = ped.getRedstonePower();
-                        int getCurrentSpeed = ped.getCurrentSpeed();
-                        int getCapacityItem = ped.getItemTransferRate();
-                        int getCapacityFluid = ped.getFluidTransferRate();
-                        int getCapacityEnergy = ped.getEnergyTransferRate();
-                        int getCapacityExp = ped.getExperienceTransferRate();
-                        int getCapacityDust = ped.getDustTransferRate();
-                        int getStorageItem = ped.getItemSlotIncreaseFromStorage()+1;
-                        int getStorageFluid = ped.getFluidCapacity();
-                        int getStorageEnergy = ped.getEnergyCapacity();
-                        int getStorageExp = ped.getExperienceCapacity();
-                        int getStorageDust = ped.getDustCapacity();
-                        int getRangeIncrease = ped.getLinkingRange();
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,renderType,"_intpedestalrender");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getRedstone,"_intpedestalredstone");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCurrentPower,"_intpedestalsignal");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCurrentSpeed,"_intpedestalspeed");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityItem,"_intpedestalitemtransfer");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityFluid,"_intpedestalfluidtransfer");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityEnergy,"_intpedestalenergytransfer");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityExp,"_intpedestalexptransfer");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityDust,"_intpedestaldusttransfer");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageItem,"_intpedestalstorageitem");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageFluid,"_intpedestalstoragefluid");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageEnergy,"_intpedestalstorageenergy");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageExp,"_intpedestalstorageexp");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageDust,"_intpedestalstoragedust");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getRangeIncrease,"_intpedestaltotalrange");
-
-                        boolean hasRoundRobin = ped.hasRRobin();
-                        boolean hasCollide = ped.hasNoCollide();
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRoundRobin,"_hasrobin");
-                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasCollide,"_hascollide");
-
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsSpeed(),"_intaugmentspeed");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsCapacity(),"_intaugmentcapacity");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsStorage(),"_intaugmentstorage");
-                        MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsRange(),"_intaugmentrange");
-
-                        MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".manifest.create");
-                        MowLibPacketHandler.sendToNearby(p_41432_,player.getOnPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pos.getX(),pos.getY()+1.0D,pos.getZ(),0,0,200));
-                    }
-
-                    MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,true,"_hasmanifest");
-                }
-            }
-            else
+            if(result.getType().equals(HitResult.Type.MISS))
             {
                 clearManifest(stackInHand, player);
+            }
+            else if(result.getType().equals(HitResult.Type.BLOCK))
+            {
+                BlockState getBlockState = level.getBlockState(pos);
+                if(getBlockState.getBlock() instanceof BasePedestalBlock)
+                {
+                    BlockEntity tile = level.getBlockEntity(pos);
+                    if(tile instanceof BasePedestalBlockEntity ped)
+                    {
+                        CompoundTag getTagOnItem = stackInHand.getOrCreateTag();
+
+                        //Create Manifest of Augments
+                        if(player.isShiftKeyDown())
+                        {
+                            boolean hasRenderer = ped.hasRenderAugment();
+                            boolean hasRedstone = ped.hasRedstone();
+                            boolean isCurrentlyPowered = ped.isPedestalBlockPowered(ped);
+                            boolean hasGlowstone = ped.hasLight();
+                            boolean hasSpeed = ped.hasSpeed();
+                            boolean hasCapacity = ped.hasCapacity();
+                            boolean hasStorage = ped.hasStorage();
+                            boolean hasRange = ped.hasRange();
+
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRenderer,"_hasrender");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRedstone,"_hasredstone");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,isCurrentlyPowered,"_hassignal");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasGlowstone,"_haslight");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasSpeed,"_hasspeed");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasCapacity,"_hascapacity");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasStorage,"_hasstorage");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRange,"_hasrange");
+
+                            int renderType = ped.getRendererType();
+                            int getRedstone = ped.getRedstonePowerNeeded();
+                            int getCurrentPower = ped.getRedstonePower();
+                            int getCurrentSpeed = ped.getCurrentSpeed();
+                            int getCapacityItem = ped.getItemTransferRate();
+                            int getCapacityFluid = ped.getFluidTransferRate();
+                            int getCapacityEnergy = ped.getEnergyTransferRate();
+                            int getCapacityExp = ped.getExperienceTransferRate();
+                            int getCapacityDust = ped.getDustTransferRate();
+                            int getStorageItem = ped.getItemSlotIncreaseFromStorage()+1;
+                            int getStorageFluid = ped.getFluidCapacity();
+                            int getStorageEnergy = ped.getEnergyCapacity();
+                            int getStorageExp = ped.getExperienceCapacity();
+                            int getStorageDust = ped.getDustCapacity();
+                            int getRangeIncrease = ped.getLinkingRange();
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,renderType,"_intpedestalrender");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getRedstone,"_intpedestalredstone");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCurrentPower,"_intpedestalsignal");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCurrentSpeed,"_intpedestalspeed");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityItem,"_intpedestalitemtransfer");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityFluid,"_intpedestalfluidtransfer");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityEnergy,"_intpedestalenergytransfer");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityExp,"_intpedestalexptransfer");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getCapacityDust,"_intpedestaldusttransfer");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageItem,"_intpedestalstorageitem");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageFluid,"_intpedestalstoragefluid");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageEnergy,"_intpedestalstorageenergy");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageExp,"_intpedestalstorageexp");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getStorageDust,"_intpedestalstoragedust");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,getRangeIncrease,"_intpedestaltotalrange");
+
+                            boolean hasRoundRobin = ped.hasRRobin();
+                            boolean hasCollide = ped.hasNoCollide();
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRoundRobin,"_hasrobin");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasCollide,"_hascollide");
+
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsSpeed(),"_intaugmentspeed");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsCapacity(),"_intaugmentcapacity");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsStorage(),"_intaugmentstorage");
+                            MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsRange(),"_intaugmentrange");
+
+                            MowLibMessageUtils.messagePopup(player,ChatFormatting.WHITE,MODID + ".manifest.create");
+                            MowLibPacketHandler.sendToNearby(p_41432_,player.getOnPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pos.getX(),pos.getY()+1.0D,pos.getZ(),0,0,200));
+                        }
+
+                        MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,true,"_hasmanifest");
+
+
+                        // " "
+                        MutableComponent separator = Component.translatable(MODID + ".upgrade_modification.separatortwo");
+                        MutableComponent baseMessage = Component.translatable(MODID + ".manifest.description.augments.num");
+                        baseMessage.withStyle(ChatFormatting.WHITE);
+                        MutableComponent speedAugments = Component.literal(""+ped.numAugmentsSpeed()+"");
+                        speedAugments.withStyle(ChatFormatting.AQUA);
+                        baseMessage.append(speedAugments);
+                        MutableComponent capacityAugments = Component.literal(""+ped.numAugmentsCapacity()+"");
+                        capacityAugments.withStyle(ChatFormatting.GREEN);
+                        baseMessage.append(separator);
+                        baseMessage.append(capacityAugments);
+                        MutableComponent storageAugments = Component.literal(""+ped.numAugmentsStorage()+"");
+                        storageAugments.withStyle(ChatFormatting.GRAY);
+                        baseMessage.append(separator);
+                        baseMessage.append(storageAugments);
+                        MutableComponent rangeAugments = Component.literal(""+ped.numAugmentsRange()+"");
+                        rangeAugments.withStyle(ChatFormatting.GOLD);
+                        baseMessage.append(separator);
+                        baseMessage.append(rangeAugments);
+
+                        player.displayClientMessage(baseMessage, false);
+                    }
+                }
+                else
+                {
+                    clearManifest(stackInHand, player);
+                }
             }
         }
 
