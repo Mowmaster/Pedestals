@@ -70,6 +70,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -392,6 +393,8 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 }
                 else if(pedestal.hasItemFirst())
                 {
+                    if(p_60502_ instanceof FakePlayer){ super.attack(p_60499_, p_60500_, p_60501_, p_60502_); }
+
                     if(p_60502_.isShiftKeyDown())
                     {
                         ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(false));
