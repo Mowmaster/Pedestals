@@ -3,6 +3,8 @@ package com.mowmaster.pedestals.Items.Tools;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Items.Upgrades.IUpgrade;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -67,6 +69,10 @@ public class UpgradeTool extends BaseTool implements IPedestalTool
                                 ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
                                 MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,"pedestals.tool_coininpedestal");
                                 MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.WHITE,coinInPedestal.getDisplayName().getString());
+                                if(coinInPedestal.getItem() instanceof ItemUpgradeBase upgrade)
+                                {
+                                    upgrade.sendUpgradeCustomChat(player,coinInPedestal);
+                                }
                             }
                             else
                             {

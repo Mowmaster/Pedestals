@@ -210,6 +210,170 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return messages;
     }
 
+    public void sendUpgradeCustomChat(Player player, ItemStack upgrade)
+    {
+        if(canModifySpeed(upgrade))
+        {
+            if(getSpeedTicksReduced(upgrade)>0)
+            {
+                MutableComponent speedLabel = Component.translatable(MODID + ".upgrade_tooltip_speed_label");
+                speedLabel.withStyle(ChatFormatting.AQUA);
+                MutableComponent speedAmount = Component.literal(""+getSpeedTicksReduced(upgrade)+"");
+                MutableComponent separator = Component.translatable(MODID + ".upgrade_tooltip_separator_slash");
+                MutableComponent speedMax = Component.literal(""+PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get()+"");
+                speedAmount.append(separator);
+                speedAmount.append(speedMax);
+                speedAmount.withStyle(ChatFormatting.WHITE);
+
+                speedLabel.append(speedAmount);
+                player.displayClientMessage(speedLabel, false);
+            }
+        }
+
+        //Sends chat message for capacity modifications AFTER speed so its the same as the tooltip
+        if(canModifyDamageCapacity(upgrade) ||
+                canModifyBlockCapacity(upgrade) ||
+                canModifyItemCapacity(upgrade) ||
+                canModifyFluidCapacity(upgrade) ||
+                canModifyEnergyCapacity(upgrade) ||
+                canModifyXPCapacity(upgrade) ||
+                canModifyDustCapacity(upgrade))
+        {
+            MutableComponent capacityLabel = Component.translatable(MODID + ".upgrade_tooltip_capacity_label");
+            capacityLabel.withStyle(ChatFormatting.GREEN);
+            MutableComponent separator_space = Component.translatable(MODID + ".upgrade_tooltip_separator_space");
+
+            MutableComponent capacityDamageAmount = Component.literal("?");
+            MutableComponent capacityBlockAmount = Component.literal("?");
+            MutableComponent capacityItemAmount = Component.literal("?");
+            MutableComponent capacityFluidAmount = Component.literal("?");
+            MutableComponent capacityEnergyAmount = Component.literal("?");
+            MutableComponent capacityXPAmount = Component.literal("?");
+            MutableComponent capacityDustAmount = Component.literal("?");
+
+            if(getDamageCapacityIncrease(upgrade)>0) { capacityDamageAmount = Component.literal(""+getDamageCapacityIncrease(upgrade)+""); }
+            if(getBlockCapacityIncrease(upgrade)>0) { capacityBlockAmount = Component.literal(""+getBlockCapacityIncrease(upgrade)+""); }
+            if(getItemCapacityIncrease(upgrade)>0) { capacityItemAmount = Component.literal(""+getItemCapacityIncrease(upgrade)+""); }
+            if(getFluidCapacityIncrease(upgrade)>0) { capacityFluidAmount = Component.literal(""+getFluidCapacityIncrease(upgrade)+"");}
+            if(getEnergyCapacityIncrease(upgrade)>0) { capacityEnergyAmount = Component.literal(""+getEnergyCapacityIncrease(upgrade)+""); }
+            if(getItemCapacityIncrease(upgrade)>0) { capacityXPAmount = Component.literal(""+getXPCapacityIncrease(upgrade)+""); }
+            if(getItemCapacityIncrease(upgrade)>0) { capacityDustAmount = Component.literal(""+getDustCapacityIncrease(upgrade)+""); }
+
+            capacityDamageAmount.withStyle(ChatFormatting.DARK_RED);
+            capacityBlockAmount.withStyle(ChatFormatting.GRAY);
+            capacityItemAmount.withStyle(ChatFormatting.GOLD);
+            capacityFluidAmount.withStyle(ChatFormatting.BLUE);
+            capacityEnergyAmount.withStyle(ChatFormatting.RED);
+            capacityXPAmount.withStyle(ChatFormatting.GREEN);
+            capacityDustAmount.withStyle(ChatFormatting.LIGHT_PURPLE);
+
+            if(canModifyDamageCapacity(upgrade))
+            {
+                capacityLabel.append(capacityDamageAmount);
+            }
+            if(canModifyBlockCapacity(upgrade))
+            {
+                capacityLabel.append(separator_space);
+                capacityLabel.append(capacityBlockAmount);
+            }
+            if(canModifyItemCapacity(upgrade))
+            {
+                capacityLabel.append(separator_space);
+                capacityLabel.append(capacityItemAmount);
+            }
+            if(canModifyFluidCapacity(upgrade))
+            {
+                capacityLabel.append(separator_space);
+                capacityLabel.append(capacityFluidAmount);
+            }
+            if(canModifyEnergyCapacity(upgrade))
+            {
+                capacityLabel.append(separator_space);
+                capacityLabel.append(capacityEnergyAmount);
+            }
+            if(canModifyXPCapacity(upgrade))
+            {
+                capacityLabel.append(separator_space);
+                capacityLabel.append(capacityXPAmount);
+            }
+            if(canModifyDustCapacity(upgrade))
+            {
+                capacityLabel.append(separator_space);
+                capacityLabel.append(capacityDustAmount);
+            }
+
+            player.displayClientMessage(capacityLabel, false);
+        }
+
+        if(canModifyEntityContainers(upgrade))
+        {
+            if(getEntityContainer(upgrade))
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_entitycontainer_label");
+                areaLabel.withStyle(ChatFormatting.DARK_GREEN);
+                player.displayClientMessage(areaLabel, false);
+            }
+        }
+
+        if(canModifyArea(upgrade))
+        {
+            if(getAreaIncrease(upgrade)>0)
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_area_label");
+                areaLabel.withStyle(ChatFormatting.GRAY);
+                MutableComponent areaAmount = Component.literal(""+getAreaIncrease(upgrade)+"");
+                areaAmount.withStyle(ChatFormatting.WHITE);
+
+                areaLabel.append(areaAmount);
+                player.displayClientMessage(areaLabel, false);
+            }
+        }
+
+        if(canModifyRange(upgrade))
+        {
+            if(getRangeIncrease(upgrade)>0)
+            {
+                MutableComponent rangeLabel = Component.translatable(MODID + ".upgrade_tooltip_range_label");
+                rangeLabel.withStyle(ChatFormatting.GOLD);
+                MutableComponent rangeAmount = Component.literal(""+getRangeIncrease(upgrade)+"");
+                rangeAmount.withStyle(ChatFormatting.WHITE);
+
+                rangeLabel.append(rangeAmount);
+                player.displayClientMessage(rangeLabel, false);
+            }
+        }
+
+        if(canModifyMagnet(upgrade))
+        {
+            if(getMagnet(upgrade))
+            {
+                MutableComponent magnetLabel = Component.translatable(MODID + ".upgrade_tooltip_magnet_label");
+                magnetLabel.withStyle(ChatFormatting.DARK_RED);
+                player.displayClientMessage(magnetLabel, false);
+            }
+        }
+
+        if(canModifyGentleHarvest(upgrade))
+        {
+            if(getGentleHarvest(upgrade))
+            {
+                MutableComponent gentleLabel = Component.translatable(MODID + ".upgrade_tooltip_gentle_label");
+                gentleLabel.withStyle(ChatFormatting.YELLOW);
+                player.displayClientMessage(gentleLabel, false);
+            }
+        }
+
+        if(canModifySuperSpeed(upgrade))
+        {
+            if(getSuperSpeed(upgrade))
+            {
+                MutableComponent sspeedLabel = Component.translatable(MODID + ".upgrade_tooltip_superspeed_label");
+                sspeedLabel.withStyle(ChatFormatting.DARK_AQUA);
+                player.displayClientMessage(sspeedLabel, false);
+            }
+        }
+    }
+
     /*
      *
      * Methods Runs By Pedestal
