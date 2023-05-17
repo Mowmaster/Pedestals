@@ -2659,11 +2659,11 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
                 if(isPedestalInRange(posReceiver))
                 {
                     if(canSendToPedestal(pedestal)) {
-                        if(sendItemsToPedestal(posReceiver,getItemStacks())) hasSent = true;
-                        if(sendFluidsToPedestal(posReceiver,getStoredFluid())) hasSent = true;
-                        if(sendEnergyToPedestal(posReceiver,getStoredEnergy())) hasSent = true;
-                        if(sendExperienceToPedestal(posReceiver,getStoredExperience())) hasSent = true;
-                        if(sendDustToPedestal(posReceiver,getStoredDust())) hasSent = true;
+                        if(sendItemsToPedestal(posReceiver,getItemStacks())) { hasSent = true; }
+                        if(sendFluidsToPedestal(posReceiver,getStoredFluid())) { hasSent = true; }
+                        if(sendEnergyToPedestal(posReceiver,getStoredEnergy())) { hasSent = true; }
+                        if(sendExperienceToPedestal(posReceiver,getStoredExperience())) { hasSent = true; }
+                        if(sendDustToPedestal(posReceiver,getStoredDust())) { hasSent = true; }
 
                         if(hasSent) {
                             if (canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,posReceiver.getX(),posReceiver.getY(),posReceiver.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));
