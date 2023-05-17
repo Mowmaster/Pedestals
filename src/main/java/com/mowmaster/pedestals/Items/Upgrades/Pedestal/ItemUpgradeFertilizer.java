@@ -411,16 +411,15 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
                         BlockState blockAtPoint = level.getBlockState(currentPoint);
                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                         {
-                            if(canUseOn(pedestal,blockAtPoint,currentPoint,false))
+                            if(passesFilter(pedestal, blockAtPoint, currentPoint))
                             {
-                                if(passesFilter(pedestal, blockAtPoint, currentPoint))
+                                if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
                                 {
-                                    if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
+                                    if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
                                     {
-
-                                        if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
+                                        if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
                                         {
-                                            if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
+                                            if(canUseOn(pedestal,blockAtPoint,currentPoint,true))
                                             {
                                                 if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                                 {
@@ -434,14 +433,14 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
                                                 }
                                             }
                                         }
-                                        else if(canUseOn(pedestal, blockAtPoint, currentPoint,false))
+                                    }
+                                    else if(canUseOn(pedestal, blockAtPoint, currentPoint,false))
+                                    {
+                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                         {
-                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
-                                            {
-                                                blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
-                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
-                                                //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
-                                            }
+                                            blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
+                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
+                                            //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
                                         }
                                     }
                                 }
@@ -466,16 +465,16 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
 
                     if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                     {
-                        if(canUseOn(pedestal,blockAtPoint,currentPoint,false))
+                        if(passesFilter(pedestal, blockAtPoint, currentPoint))
                         {
-                            if(passesFilter(pedestal, blockAtPoint, currentPoint))
+                            if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
                             {
-                                if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() != Blocks.AIR)
-                                {
 
-                                    if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
+                                if(!pedestal.removeItem(1,true).isEmpty() && blockAtPoint.getBlock() instanceof BonemealableBlock)
+                                {
+                                    if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
                                     {
-                                        if(stackInPed.getItem() instanceof BoneMealItem bonerItem)
+                                        if(canUseOn(pedestal,blockAtPoint,currentPoint,true))
                                         {
                                             if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                             {
@@ -487,34 +486,16 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
                                                     pedestal.removeItem(1,false);
                                                 }
                                             }
-
-                                            /*BonemealEvent event = new BonemealEvent(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed);
-                                            if (!MinecraftForge.EVENT_BUS.post(event))
-                                            {
-                                                if (event.getResult() != Event.Result.DENY)
-                                                {
-
-
-                                                }
-                                            }*/
-
                                         }
-
-                                        /*if(ForgeEventFactory.onApplyBonemeal(getPlayer.get(), level,currentPoint,blockAtPoint,stackInPed)>0)
-                                        {
-                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),0,255,0));
-                                            //pedestal.removeItem(1,true);
-                                        }*/
-
                                     }
-                                    else if(canUseOn(pedestal, blockAtPoint, currentPoint,false))
+                                }
+                                else if(canUseOn(pedestal, blockAtPoint, currentPoint,false))
+                                {
+                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                     {
-                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
-                                        {
-                                            blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
-                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
-                                            //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
-                                        }
+                                        blockAtPoint.randomTick((ServerLevel) level,currentPoint, RandomSource.create());
+                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),240,240,240));
+                                        //level.markAndNotifyBlock(currentPoint, level.getChunkAt(currentPoint),blockAtPoint,blockAtPoint,2,2);
                                     }
                                 }
                             }
