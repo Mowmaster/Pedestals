@@ -71,7 +71,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 //You have to client register this too!!!
                 @SuppressWarnings("deprecation")
                 TextureAtlasSprite whiteTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/pedestal_render"));
-                AABB aabb = new AABB(pos.getX() - range, pos.getY() - range, pos.getZ() - range,pos.getX() + range, pos.getY() + range, pos.getZ() + range);
+                AABB aabb = new AABB(pos.getX() - range + 1, pos.getY() - range, pos.getZ() - range + 1,pos.getX() + range, pos.getY() + range, pos.getZ() + range);
                 p_112309_.pushPose();
                 renderBoundingBox(pos, aabb, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 1f, 0.2f, 0.2f, 1f);
                 renderFaces(whiteTextureSprite,pos,aabb,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 1f, 0.2f, 0.2f, 0.5f);
@@ -127,7 +127,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     //You have to client register this too!!!
                     @SuppressWarnings("deprecation")
                     TextureAtlasSprite whiteTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/pedestal_render"));
-                    AABB aabb = new AABB(pos.getX() - range, pos.getY() - range, pos.getZ() - range,pos.getX() + range, pos.getY() + range, pos.getZ() + range);
+                    AABB aabb = new AABB(pos.getX() - range, pos.getY() - range, pos.getZ() - range,pos.getX() + range + 1, pos.getY() + range, pos.getZ() + range + 1);
                     p_112309_.pushPose();
                     renderBoundingBox(pos, aabb, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, 0.2f, 0.2f, 1f, 1f);
                     renderFaces(whiteTextureSprite,pos,aabb,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, 0.2f, 0.2f, 1f, 0.5f);
