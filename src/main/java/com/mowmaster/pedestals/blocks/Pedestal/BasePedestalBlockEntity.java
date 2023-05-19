@@ -61,10 +61,12 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Optional;
 
 public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 {
-    private LazyOptional<IItemHandler> handler = LazyOptional.of(this::createHandlerPedestal);
+    private ItemStackHandler itemHandler = createItemHandlerPedestal();
+    private LazyOptional<IItemHandler> itemCapability = LazyOptional.of(() -> this.itemHandler);
     private ItemStackHandler privateItems = createPrivateItemHandler();
     private IEnergyStorage energyHandler = createEnergyHandler();
     private LazyOptional<IEnergyStorage> energyCapability = LazyOptional.of(() -> this.energyHandler);
@@ -109,7 +111,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     //9 slots, but only when it has the tank upgrade will we allow more then the first to be used.
-    public IItemHandler createHandlerPedestal() {
+    public ItemStackHandler createItemHandlerPedestal() {
         return new ItemStackHandler(27) {
             @Override
             protected void onLoad() {
@@ -601,7 +603,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return handler.cast();
+            return itemCapability.cast();
         }
         if ((cap == ForgeCapabilities.ENERGY)) {
             return energyCapability.cast();
@@ -678,15 +680,13 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
 
     public void dropInventoryItems(Level worldIn, BlockPos pos) {
-        IItemHandler h = handler.orElse(null);
-        MowLibItemUtils.dropInventoryItems(worldIn,pos,h);
+        MowLibItemUtils.dropInventoryItems(worldIn, pos, itemHandler);
     }
 
     public List<ItemStack> dropInventoryItemsList() {
-        IItemHandler h = handler.orElse(null);
         List<ItemStack> returner = new ArrayList<>();
-        for(int i = 0; i < h.getSlots(); ++i) {
-            returner.add(h.getStackInSlot(i));
+        for(int i = 0; i < itemHandler.getSlots(); ++i) {
+            returner.add(itemHandler.getStackInSlot(i));
         }
 
         return returner;
@@ -859,400 +859,135 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ==============================================================================
     ============================================================================*/
 
-    public boolean hasItem()
-    {
-        IItemHandler h = handler.orElse(null);
+    public boolean hasItem() {
         int firstPartialOrNonEmptySlot = 0;
-        if(h.getSlots()>1)
-        {
-            for(int i=0;i<h.getSlots();i++)
-            {
-                ItemStack stackInSlot = h.getStackInSlot(i);
-                if(stackInSlot.getCount() < stackInSlot.getMaxStackSize() || stackInSlot.isEmpty())
-                {
-                    firstPartialOrNonEmptySlot = i;
-                    break;
-                }
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+            if(stackInSlot.getCount() < stackInSlot.getMaxStackSize() || stackInSlot.isEmpty()) {
+                firstPartialOrNonEmptySlot = i;
+                break;
             }
         }
 
-        if(h.getStackInSlot(firstPartialOrNonEmptySlot).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return !itemHandler.getStackInSlot(firstPartialOrNonEmptySlot).isEmpty();
     }
 
-    public boolean hasItemFirst()
-    {
-        IItemHandler h = handler.orElse(null);
-        int firstNonEmptySlot = 0;
-        if(h.getSlots()>1)
-        {
-            for(int i=0;i<h.getSlots();i++)
-            {
-                if(!h.getStackInSlot(i).isEmpty())
-                {
-                    firstNonEmptySlot = i;
-                    break;
-                }
+    public Optional<Integer> maybeFirstNonEmptySlot() {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            if(!itemHandler.getStackInSlot(i).isEmpty()) {
+                return Optional.of(i);
             }
         }
-
-        if(h.getStackInSlot(firstNonEmptySlot).isEmpty())
-        {
-            return false;
-        }
-        else  return true;
+        return Optional.empty();
     }
 
-    public boolean hasSpaceForItem(ItemStack stackToMatch)
-    {
-        IItemHandler h = handler.orElse(null);
-        if(h.getSlots()>0)
-        {
-            for(int i=0;i<h.getSlots();i++)
-            {
-                ItemStack stackInSlot = h.getStackInSlot(i);
-                if(stackInSlot.isEmpty())
-                {
-                    return true;
-                }
-                else if(stackInSlot.getCount() < stackInSlot.getMaxStackSize())
-                {
-                    if(ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToMatch))
-                    {
-                        return true;
-                    }
-                }
+    public boolean hasItemFirst() {
+        return maybeFirstNonEmptySlot().isPresent();
+    }
+
+    public Optional<Integer> maybeLastNonEmptySlot() {
+        for (int i = itemHandler.getSlots() - 1; i >= 0; i--) {
+            if(!itemHandler.getStackInSlot(i).isEmpty()) {
+                return Optional.of(i);
             }
         }
-
-        return false;
+        return Optional.empty();
     }
 
-    public ItemStack getItemInPedestal()
-    {
-        IItemHandler h = handler.orElse(null);
-        if(hasItemFirst())
-        {
-            int firstNonEmptySlot = 0;
-            if(h.getSlots()>1)
-            {
-                for(int i=0;i<h.getSlots();i++)
-                {
-                    ItemStack stackInSlot = h.getStackInSlot(i);
-                    if(!stackInSlot.isEmpty())
-                    {
-                        firstNonEmptySlot = i;
-                        break;
-                    }
-                }
+    public Optional<Integer> maybeFirstSlotWithSpaceForMatchingItem(ItemStack stackToMatch) {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+            if (stackInSlot.isEmpty() || (stackInSlot.getCount() < stackInSlot.getMaxStackSize() && ItemHandlerHelper.canItemStacksStack(stackInSlot, stackToMatch))) {
+                return Optional.of(i);
             }
-            return h.getStackInSlot(firstNonEmptySlot);
         }
-        else return ItemStack.EMPTY;
+        return Optional.empty();
     }
 
-    public ItemStack getItemInPedestalOrEmptySlot()
-    {
-        IItemHandler h = handler.orElse(null);
-        if(hasItemFirst())
-        {
-            int firstNonEmptySlot = 0;
-            if(h.getSlots()>1)
-            {
-                for(int i=0;i<h.getSlots();i++)
-                {
-                    ItemStack stackInSlot = h.getStackInSlot(i);
-                    if((stackInSlot.getMaxStackSize() > stackInSlot.getCount()) || stackInSlot.isEmpty())
-                    {
-                        firstNonEmptySlot = i;
-                        break;
-                    }
-                }
-            }
-            return h.getStackInSlot(firstNonEmptySlot);
-        }
-        else return ItemStack.EMPTY;
+    public boolean hasSpaceForItem(ItemStack stackToMatch) {
+        return maybeFirstSlotWithSpaceForMatchingItem(stackToMatch).isPresent();
     }
 
-    public ItemStack getMatchingItemInPedestalOrEmptySlot(ItemStack stackToMatch)
-    {
-        IItemHandler h = handler.orElse(null);
-        if(hasItemFirst())
-        {
-            int firstNonEmptySlot = 0;
-            if(h.getSlots()>1)
-            {
-                for(int i=0;i<h.getSlots();i++)
-                {
-                    ItemStack stackInSlot = h.getStackInSlot(i);
-                    if(((stackInSlot.getMaxStackSize() > stackInSlot.getCount())  && ItemHandlerHelper.canItemStacksStack(stackInSlot,stackToMatch))  || stackInSlot.isEmpty())
-                    {
-                        firstNonEmptySlot = i;
-                        break;
-                    }
-                }
-            }
-            return h.getStackInSlot(firstNonEmptySlot);
-        }
-        else return ItemStack.EMPTY;
+    public ItemStack getItemInPedestal() {
+        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
     }
 
-    public ItemStack getItemInPedestalFirst()
-    {
-        IItemHandler h = handler.orElse(null);
-        if(hasItemFirst())
-        {
-            int firstNonEmptySlot = 0;
-            if(h.getSlots()>1)
-            {
-                for(int i=0;i<h.getSlots();i++)
-                {
-                    if(!h.getStackInSlot(i).isEmpty())
-                    {
-                        firstNonEmptySlot = i;
-                        break;
-                    }
-                }
-            }
-            return h.getStackInSlot(firstNonEmptySlot);
-        }
-        else return ItemStack.EMPTY;
+    public ItemStack getMatchingItemInPedestalOrEmptySlot(ItemStack stackToMatch) {
+        return maybeFirstSlotWithSpaceForMatchingItem(stackToMatch).map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
+
     }
 
-    public int getPedestalSlots()
-    {
-        IItemHandler h = handler.orElse(null);
-        if(h !=null)return h.getSlots();
+    public ItemStack getItemInPedestalFirst() {
+        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
 
-        return 1;
     }
 
-    public List<ItemStack> getItemStacks()
-    {
-        IItemHandler h = handler.orElse(null);
+    public int getPedestalSlots() { return itemHandler.getSlots(); }
+
+    public List<ItemStack> getItemStacks() {
         List<ItemStack> listed = new ArrayList<>();
-        if(h.getSlots()>1)
-        {
-            for(int i=0;i<h.getSlots();i++)
-            {
-                if(!h.getStackInSlot(i).isEmpty())
-                {
-                    listed.add(h.getStackInSlot(i));
-                }
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            if (!itemHandler.getStackInSlot(i).isEmpty()) {
+                listed.add(itemHandler.getStackInSlot(i));
             }
         }
-        else
-        {
-            listed.add(h.getStackInSlot(0));
-        }
-
         return listed;
     }
 
-    public ItemStack getItemInPedestal(int slot)
-    {
-        IItemHandler h = handler.orElse(null);
-        if(hasItem())
-        {
-            int firstNonEmptySlot = 0;
-            if(h.getSlots()>1)
-            {
-                firstNonEmptySlot = slot;
-            }
-            return h.getStackInSlot(firstNonEmptySlot);
+    public ItemStack getItemInPedestal(int slot) {
+        if (itemHandler.getSlots() > slot) {
+            return itemHandler.getStackInSlot(slot);
+        } else {
+            return ItemStack.EMPTY;
         }
-        else return ItemStack.EMPTY;
-    }
-
-    public int countAllowedForInsert(ItemStack stackIn) {
-        if(hasItem())
-        {
-            if(stackIn.getItem().equals(getItemInPedestal().getItem()))
-            {
-                int allowedInsertCount = stackIn.getMaxStackSize() - getItemInPedestal().getCount();
-                return allowedInsertCount;
-            }
-            else return 0;
-        }
-        else return stackIn.getMaxStackSize();
-
     }
 
     public ItemStack removeItem(int numToRemove, boolean simulate) {
-        IItemHandler h = handler.orElse(null);
-        int firstNonEmptySlot = 0;
-        if(h.getSlots()>1)
-        {
-            int endFirst = h.getSlots()-1;
-            for(int i=endFirst;i>=0;i--)
-            {
-                if(!h.getStackInSlot(i).isEmpty())
-                {
-                    firstNonEmptySlot = i;
-                    break;
-                }
-            }
-        }
-        /*
-Extracts an ItemStack from the given slot.
-The returned value must be empty if nothing is extracted, otherwise its stack size must be less than or equal to amount and ItemStack.getMaxStackSize().
-Params:
-slot – Slot to extract from.
-amount – Amount to extract (may be greater than the current stack's max limit)
-simulate – If true, the extraction is only simulated
-Returns:
-ItemStack extracted from the slot, must be empty if nothing can be extracted. The returned ItemStack can be safely modified after, so item handlers should return a new or copied stack.
-         */
-        ItemStack stack = h.extractItem(firstNonEmptySlot,numToRemove,simulate);
-        //update();
-
-        return stack;
+        return maybeLastNonEmptySlot().map(slot -> itemHandler.extractItem(slot, numToRemove, simulate)).orElse(ItemStack.EMPTY);
     }
 
     public ItemStack removeItemStack(ItemStack stackToRemove, boolean simulate) {
-        IItemHandler h = handler.orElse(null);
         int matchingSlotNumber = 0;
-        if(h.getSlots()>1)
-        {
-            for(int i=0;i<h.getSlots();i++)
-            {
-                if(ItemHandlerHelper.canItemStacksStack(h.getStackInSlot(i),stackToRemove))
-                {
-                    matchingSlotNumber = i;
-                    break;
-                }
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            if(ItemHandlerHelper.canItemStacksStack(itemHandler.getStackInSlot(i), stackToRemove)) {
+                matchingSlotNumber = i;
+                break;
             }
         }
-        ItemStack stack = h.extractItem(matchingSlotNumber,stackToRemove.getCount(),simulate);
-
-        return stack;
-    }
-
-    public ItemStack removeItemStack(int slot, boolean simulate) {
-        IItemHandler h = handler.orElse(null);
-        ItemStack stack = h.extractItem(slot,h.getStackInSlot(slot).getCount(),simulate);
-
-        return stack;
+        return itemHandler.extractItem(matchingSlotNumber, stackToRemove.getCount(), simulate);
     }
 
     public ItemStack removeItem(boolean simulate) {
-        IItemHandler h = handler.orElse(null);
-        int firstNonEmptySlot = 0;
-        if(h.getSlots()>1)
-        {
-            int endFirst = h.getSlots()-1;
-            for(int i=endFirst;i>=0;i--)
-            {
-                if(!h.getStackInSlot(i).isEmpty())
-                {
-                    firstNonEmptySlot = i;
-                    break;
-                }
-            }
-        }
-        ItemStack stack = h.extractItem(firstNonEmptySlot,h.getStackInSlot(firstNonEmptySlot).getCount(),simulate);
-        //update();
-
-        return stack;
+        return maybeLastNonEmptySlot().map(slot -> {
+            ItemStack stack = itemHandler.extractItem(slot, itemHandler.getStackInSlot(slot).getCount(), simulate);
+            //update();
+            return stack;
+        }).orElse(ItemStack.EMPTY);
     }
 
     //If resulting insert stack is empty it means the full stack was inserted
-    public boolean addItem(ItemStack itemFromBlock, boolean simulate)
-    {
+    public boolean addItem(ItemStack itemFromBlock, boolean simulate) {
         return addItemStack(itemFromBlock, simulate).isEmpty();
     }
 
     //Return result not inserted, if all inserted return empty stack
-    public ItemStack addItemStack(ItemStack itemFromBlock, boolean simulate)
-    {
-        IItemHandler h = handler.orElse(null);
-        int firstEmptyorMatchingSlot = 0;
-        if(h.getSlots()>1)
-        {
-            for(int i=0;i<h.getSlots();i++)
-            {
-                ItemStack stackInSlot = h.getStackInSlot(i);
-                if(stackInSlot.getCount() < stackInSlot.getMaxStackSize() && ItemHandlerHelper.canItemStacksStack(stackInSlot,itemFromBlock))
-                {
-                    firstEmptyorMatchingSlot = i;
-                    break;
-                }
-                else if(h.getStackInSlot(i).isEmpty())
-                {
-                    firstEmptyorMatchingSlot = i;
-                    break;
-                }
-            }
-        }
-
-        /*
-        Inserts an ItemStack into the given slot and return the remainder. The ItemStack should not be modified in this function!
-Note: This behaviour is subtly different from IFluidHandler.fill(FluidStack, IFluidHandler.FluidAction)
-Params:
-slot – Slot to insert into.
-stack – ItemStack to insert. This must not be modified by the item handler.
-simulate – If true, the insertion is only simulated
-Returns:
-The remaining ItemStack that was not inserted (if the entire stack is accepted, then return an empty ItemStack). May be the same as the input ItemStack if unchanged, otherwise a new ItemStack. The returned ItemStack can be safely modified after.
-         */
-
-        if(h.isItemValid(firstEmptyorMatchingSlot,itemFromBlock))
-        {
-            if(hasSpaceForItem(itemFromBlock) && ItemHandlerHelper.canItemStacksStack(h.getStackInSlot(firstEmptyorMatchingSlot),itemFromBlock))
-            {
-                ItemStack returner = h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), simulate);
-                if(!simulate)update();
+    public ItemStack addItemStack(ItemStack itemFromBlock, boolean simulate) {
+        return maybeFirstSlotWithSpaceForMatchingItem(itemFromBlock).map(slot -> {
+            if (itemHandler.isItemValid(slot, itemFromBlock)) {
+                ItemStack returner = itemHandler.insertItem(slot, itemFromBlock.copy(), simulate);
+                if (!simulate) update();
                 return returner;
             }
-            else
-            {
-                ItemStack returner = h.insertItem(firstEmptyorMatchingSlot, itemFromBlock.copy(), simulate);
-                if(!simulate)update();
-                return returner;
-            }
-        }
-
-        return itemFromBlock;
+            return itemFromBlock;
+        }).orElse(itemFromBlock);
     }
 
-    public int getItemTransferRate()
-    {
-        int itemRate = PedestalConfig.COMMON.pedestal_baseItemTransferRate.get();
-        int getRateIncrease = getItemTransferRateIncreaseFromCapacity();
-
-        return  itemRate + getRateIncrease;
+    public int getItemTransferRate() {
+        return  PedestalConfig.COMMON.pedestal_baseItemTransferRate.get() + getItemTransferRateIncreaseFromCapacity();
     }
 
-    public int getSlotSizeLimit()
-    {
-        IItemHandler h = handler.orElse(null);
-        int firstNonEmptySlot = 0;
-        if(h.getSlots()>1)
-        {
-            for(int i=0;i<h.getSlots();i++)
-            {
-                if(!h.getStackInSlot(i).isEmpty())
-                {
-                    firstNonEmptySlot = i;
-                    break;
-                }
-            }
-        }
-        return (h != null)?(h.getSlotLimit(firstNonEmptySlot)):(0);
-    }
-
-    public int getSlotSizeLimit(int slot)
-    {
-        IItemHandler h = handler.orElse(null);
-        int firstNonEmptySlot = 0;
-        if(h.getSlots()>1)
-        {
-            firstNonEmptySlot = slot;
-        }
-        return (h != null)?(h.getSlotLimit(firstNonEmptySlot)):(0);
+    public int getSlotSizeLimit() {
+        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getSlotLimit(slot)).orElse(itemHandler.getSlotLimit(0));
     }
 
     /*============================================================================
@@ -2511,57 +2246,25 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
 
 
     //The actual transfer methods for items
-    public boolean sendItemsToPedestal(BlockPos pedestalToSendTo, List<ItemStack> itemStacksIncoming)
-    {
-        if(itemStacksIncoming.size()>0)
-        {
-            if(level.getBlockEntity(pedestalToSendTo) instanceof BasePedestalBlockEntity tilePedestalToSendTo)
-            {
-                LazyOptional<IItemHandler> cap = tilePedestalToSendTo.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP);
-                if(cap.isPresent())
-                {
-                    IItemHandler handler = cap.orElse(null);
-                    int difference = 0;
-                    ItemStack stackToRemove = ItemStack.EMPTY;
-                    for (ItemStack stack: itemStacksIncoming)
-                    {
-                        ItemStack notInsertedStackSimulation = tilePedestalToSendTo.addItemStack(stack,true);
-                        //System.out.println("notInsertedStackSimulation: "+ notInsertedStackSimulation);
-                        //this means some items were inserted OR the full stack was inserted
-                        difference = (notInsertedStackSimulation.isEmpty())?(stack.getCount()):(stack.getCount() - notInsertedStackSimulation.getCount());
-                        //Our Item Handler doesnt require a slot value for isValid so default == 0
-                        if(difference>0 && handler.isItemValid(0,stack))
-                        {
-                            stackToRemove=stack.copy();
-                            break;
-                        }
-                    }
-
-                    if(difference > 0)
-                    {
-
-                        int countToSend = Math.min(getItemTransferRate(),difference);
-                        if(countToSend >=1)
-                        {
-                            ItemStack copyIncomingStack = stackToRemove.copy();
-                            copyIncomingStack.setCount(countToSend);
-                            //Send items
-                            if(tilePedestalToSendTo.addItem(copyIncomingStack,true))
-                            {
-                                ItemStack removed = removeItemStack(copyIncomingStack,false);
-                                ItemStack added = tilePedestalToSendTo.addItemStack(copyIncomingStack,false);
-                                //System.out.println("Removed: "+ removed);
-                                //System.out.println("Added: "+ added);
-                                if(!removed.isEmpty() && added.getCount() != copyIncomingStack.getCount())return true;
-
-                            }
-                        }
+    public boolean sendItemsToPedestal(BlockPos posReceiver, List<ItemStack> itemStacksIncoming) {
+        if (itemStacksIncoming.size() > 0 && level != null && level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity receiverPedestal) {
+            return receiverPedestal.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP).map(receiverHandler -> {
+                for (ItemStack stack: itemStacksIncoming) {
+                    ItemStack insertedStackSimulation = receiverPedestal.addItemStack(stack, true);
+                    int countToSend = Math.min(getItemTransferRate(), stack.getCount() - insertedStackSimulation.getCount());
+                    if (countToSend > 0 && receiverHandler.isItemValid(0, stack)) {
+                        ItemStack stackToRemove = stack.copy();
+                        stackToRemove.setCount(countToSend);
+                        receiverPedestal.addItemStack(stackToRemove, false);
+                        removeItemStack(stackToRemove, false);
+                        return true;
                     }
                 }
-            }
+                return false;
+            }).orElse(false);
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public boolean sendFluidsToPedestal(BlockPos posReceiver, FluidStack fluidStackIncoming) {
@@ -2572,7 +2275,6 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
                     int countToSend = Math.min(getFluidTransferRate(), insertedStackSimulation);
                     if (countToSend > 0) {
                         FluidStack a = new FluidStack(fluidStackIncoming, countToSend);
-                        System.out.println("sending stack: " + a.getFluid().toString() + " with amount + " + String.valueOf(a.getAmount()));
                         receiverHandler.fill(a, IFluidHandler.FluidAction.EXECUTE);
                         fluidHandler.drain(countToSend, IFluidHandler.FluidAction.EXECUTE);
                         return true;
@@ -2834,7 +2536,7 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     public void load(CompoundTag p_155245_) {
         super.load(p_155245_);
         CompoundTag invTag = p_155245_.getCompound("inv");
-        handler.ifPresent(h -> ((INBTSerializable<CompoundTag>) h).deserializeNBT(invTag));
+        itemHandler.deserializeNBT(invTag);
         CompoundTag invPrivateTag = p_155245_.getCompound("inv_private");
         privateItems.deserializeNBT(invPrivateTag);
 
@@ -2880,12 +2582,8 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
 
     public CompoundTag save(CompoundTag p_58888_) {
         //System.out.println("SAVE");
-        handler.ifPresent(h -> {
-            CompoundTag compound = ((INBTSerializable<CompoundTag>) h).serializeNBT();
-            p_58888_.put("inv", compound);
-        });
-        CompoundTag compound = privateItems.serializeNBT();
-        p_58888_.put("inv_private", compound);
+        p_58888_.put("inv", itemHandler.serializeNBT());
+        p_58888_.put("inv_private", privateItems.serializeNBT());
 
         p_58888_.putInt("storedUpgradeValue",storedValueForUpgrades);
         p_58888_.putInt("storedEnergy",storedEnergy);
@@ -2982,7 +2680,7 @@ The remaining ItemStack that was not inserted (if the entire stack is accepted, 
     @Override
     public void setRemoved() {
         super.setRemoved();
-        handler.invalidate();
+        itemCapability.invalidate();
         energyCapability.invalidate();
         fluidCapability.invalidate();
         experienceCapability.invalidate();

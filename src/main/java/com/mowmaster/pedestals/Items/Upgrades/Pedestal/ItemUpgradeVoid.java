@@ -74,19 +74,10 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
     {
         //Items
-        if(canTransferItems(coin))
-        {
-            if(pedestal.hasItem())
-            {
-                for(int i=0;i<pedestal.getItemStacks().size();i++)
-                {
-                    if(passesFilter(pedestal,pedestal.getItemInPedestal(i),null,null,0,0, IItemMode.ItemTransferMode.ITEMS))
-                    {
-                        if(!pedestal.removeItemStack(i,true).isEmpty())
-                        {
-                            pedestal.removeItemStack(i,false);
-                        }
-                    }
+        if(canTransferItems(coin)) {
+            for (ItemStack itemStack: pedestal.getItemStacks()) {
+                if (passesFilter(pedestal, itemStack, null, null, 0, 0, IItemMode.ItemTransferMode.ITEMS)) {
+                    pedestal.removeItemStack(itemStack, false);
                 }
             }
         }
