@@ -673,6 +673,9 @@
   "pedestal.book.augm.category.name": "Augments",
   "pedestal.book.augm.category.desc": "This section shows augment how the pedestals work",
 
+  "pedestal.book.upgrades.name.materialgen": "Material Generator",
+  "pedestal.book.upgrades.desc.materialgen": "Placing a block under the pedestal, and feeding it input fluid/energy/xp when necessary, you can generate blocks.",
+
   "pedestal.book.augm.name.capacity": "Capacity Augments",
   "pedestal.book.augm.desc.t1capacity": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 4$(li)Fluid: 2000mb$(li)Energy: 5000 Fe/t$(li)Experience - 1 level$(li)Dust Rate: 10$(li)Maximum Upgrades: 4",
   "pedestal.book.augm.desc.t2capacity": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 16$(li)Fluid: 4000mb$(li)Energy: 10000 Fe/t$(li)Experience - 5 levels$(li)Dust Rate: 10$(li)Maximum Upgrades: 8",

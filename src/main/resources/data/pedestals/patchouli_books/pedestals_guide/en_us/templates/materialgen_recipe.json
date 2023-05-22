@@ -1,0 +1,63 @@
+{
+  "processor": "com.mowmaster.pedestals.Compat.Patchouli.MaterialGenProcessor",
+  "components": [
+    {
+      "type": "patchouli:header",
+      "text": "item.pedestals.upgrade_pedestal_cobblegen",
+      "x": -1,
+      "y": -1
+    },
+    {
+      "type": "patchouli:item",
+      "item": "pedestals:block_pedestal",
+      "framed": false,
+      "x": 49,
+      "y": 23
+    },
+    {
+      "type": "patchouli:item",
+      "item": "minecraft:stone_pickaxe",
+      "framed": false,
+      "x": 49,
+      "y": 3
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#block_below",
+      "framed": true,
+      "x": 49,
+      "y": 53
+    },
+    {
+      "type": "patchouli:text",
+      "text": "#input_energy",
+      "x": -1,
+      "y": 100
+    },
+    {
+      "type": "patchouli:text",
+      "text": "#input_exp",
+      "x": -1,
+      "y": 120
+    },
+    {
+      "type": "patchouli:text",
+      "text": "#input_dust",
+      "x": -1,
+      "y": 140
+    },
+    {
+      "type": "patchouli:header",
+      "text": "#result_description",
+      "x": -1,
+      "y": 170
+    },{
+      "type": "patchouli:item",
+      "item": "#result_block",
+      "link_recipe": true,
+      "framed": true,
+      "x": 49,
+      "y": 116
+    }
+  ]
+}
