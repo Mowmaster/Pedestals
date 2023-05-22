@@ -316,13 +316,11 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
         return true;
     }
 
-    private boolean canPlace(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack getPlaceItem = pedestal.getItemInPedestal();
-        Block possibleBlock = Block.byItem(getPlaceItem.getItem());
+    private boolean canPlace(ItemStack itemToPlace) {
+        Block possibleBlock = Block.byItem(itemToPlace.getItem());
         if(possibleBlock != Blocks.AIR)
         {
-            if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_place"))).stream().toList().contains(getPlaceItem))
+            if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_place"))).stream().toList().contains(itemToPlace))
             {
                 if(possibleBlock instanceof IPlantable && (
                         possibleBlock instanceof BushBlock ||
@@ -355,38 +353,32 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
                 BlockPos currentPoint = listed.get(currentPosition);
                 BlockState blockAtPoint = level.getBlockState(currentPoint);
                 boolean fuelRemoved = true;
-                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
-                {
-                    if(!pedestal.removeItem(1,true).isEmpty())
-                    {
-                        if(canPlace(pedestal) && passesFilter(pedestal, blockAtPoint, currentPoint))
-                        {
-                            if(!currentPoint.equals(pedestal.getPos()) && level.getBlockState(currentPoint).getBlock() == Blocks.AIR)
-                            {
-                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
-                                {
-                                    UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                    if (result == InteractionResult.CONSUME) {
-                                        pedestal.removeItem(1,false);
-                                    }
-                                }
-                                else {
-                                    fuelRemoved = false;
-                                }
+                if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), currentPoint), true)) {
+                    ItemStack itemToPlace = pedestal.getItemInPedestal().copy();
+                    if(
+                        !pedestal.removeItemStack(itemToPlace, true).isEmpty() &&
+                            canPlace(itemToPlace) &&
+                            passesFilter(pedestal, blockAtPoint, currentPoint) &&
+                            !currentPoint.equals(pedestal.getPos()) &&
+                            level.getBlockState(currentPoint).getBlock() == Blocks.AIR
+                    ) {
+                        if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false)) {
+                            ItemStack itemToRemove = itemToPlace.copy(); // UseOnContext modifies the passed in item stack when returning an InteractionResult.CONSUME, so we need a copy of it for removal.
+                            UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, itemToPlace, new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
+                            InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                            if (result == InteractionResult.CONSUME) {
+                                itemToRemove.setCount(1); // only remove 1 item
+                                pedestal.removeItemStack(itemToRemove, false);
                             }
+                        } else {
+                            fuelRemoved = false;
                         }
                     }
 
-                    if((currentPosition+1)>=listed.size())
-                    {
+                    if( (currentPosition+1) >= listed.size()) {
                         setCurrentPosition(pedestal,0);
-                    }
-                    else
-                    {
-                        if(fuelRemoved){
-                            iterateCurrentPosition(pedestal);
-                        }
+                    } else if (fuelRemoved) {
+                        iterateCurrentPosition(pedestal);
                     }
                 }
 

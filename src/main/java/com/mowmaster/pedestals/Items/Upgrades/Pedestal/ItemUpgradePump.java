@@ -479,13 +479,11 @@ public class ItemUpgradePump extends ItemUpgradeBase
         if(xpdrop>0)blockAtPoint.getBlock().popExperience((ServerLevel)level,currentPoint,xpdrop);
     }
 
-    private boolean canPlace(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack getPlaceItem = pedestal.getItemInPedestal();
-        Block possibleBlock = Block.byItem(getPlaceItem.getItem());
+    private boolean canPlace(ItemStack itemToPlace) {
+        Block possibleBlock = Block.byItem(itemToPlace.getItem());
         if(possibleBlock != Blocks.AIR)
         {
-            if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_place"))).stream().toList().contains(getPlaceItem))
+            if(!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_place"))).stream().toList().contains(itemToPlace))
             {
                 if(possibleBlock instanceof IPlantable && (
                         possibleBlock instanceof BushBlock ||
@@ -569,93 +567,52 @@ public class ItemUpgradePump extends ItemUpgradeBase
                                     BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
                                     BlockState blockAtPoint = level.getBlockState(adjustedPoint);
 
-                                    if(!adjustedPoint.equals(pedestal.getPos()))
-                                    {
-                                        //System.out.println("Can Mine: "+ canMine(pedestal, blockAtPoint, adjustedPoint));
-                                        if(canMine(pedestal, blockAtPoint, adjustedPoint))
-                                        {
-                                            //System.out.println("Passes Filter: "+ passesFilter(pedestal, blockAtPoint, adjustedPoint));
-                                            if(passesFilter(pedestal, blockAtPoint, adjustedPoint))
-                                            {
-                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true))
-                                                {
-                                                    FluidState fluidState = pedestal.getLevel().getFluidState(adjustedPoint);
-                                                    //System.out.println("source or cauldron: "+ (fluidState.isSource() || blockAtPoint.getBlock() instanceof AbstractCauldronBlock));
-                                                    if(fluidState.isSource() || blockAtPoint.getBlock() instanceof AbstractCauldronBlock)
-                                                    {
-                                                        FluidStack fluidStack = new FluidStack(fluidState.getType(), FluidType.BUCKET_VOLUME);
-                                                        if(blockAtPoint.getBlock() instanceof AbstractCauldronBlock)
-                                                        {
-                                                            if(blockAtPoint.getBlock().equals(Blocks.WATER_CAULDRON))
-                                                            {
-                                                                fluidStack = new FluidStack(Fluids.WATER, FluidType.BUCKET_VOLUME);
-                                                            }
-                                                            else if(blockAtPoint.getBlock().equals(Blocks.LAVA_CAULDRON))
-                                                            {
-                                                                fluidStack = new FluidStack(Fluids.LAVA, FluidType.BUCKET_VOLUME);
-                                                            }
-                                                        }
-                                                        //System.out.println("can accept: "+ pedestal.canAcceptFluid(fluidStack));
-                                                        if(pedestal.canAcceptFluid(fluidStack))
-                                                        {
-                                                            if(pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME)
-                                                            {
-                                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
-                                                                {
-                                                                    //Store Fluid
-                                                                    pedestal.addFluid(fluidStack, IFluidHandler.FluidAction.EXECUTE);
+                                    //System.out.println("Can Mine: "+ canMine(pedestal, blockAtPoint, adjustedPoint));
+                                    //System.out.println("Passes Filter: "+ passesFilter(pedestal, blockAtPoint, adjustedPoint));
+                                    if(!adjustedPoint.equals(pedestal.getPos()) && canMine(pedestal, blockAtPoint, adjustedPoint) && passesFilter(pedestal, blockAtPoint, adjustedPoint)) {
+                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true)) {
+                                            FluidState fluidState = pedestal.getLevel().getFluidState(adjustedPoint);
+                                            //System.out.println("source or cauldron: "+ (fluidState.isSource() || blockAtPoint.getBlock() instanceof AbstractCauldronBlock));
+                                            if(fluidState.isSource() || blockAtPoint.getBlock() instanceof AbstractCauldronBlock) {
+                                                FluidStack fluidStack = new FluidStack(fluidState.getType(), FluidType.BUCKET_VOLUME);
+                                                if(blockAtPoint.getBlock() instanceof AbstractCauldronBlock) {
+                                                    if(blockAtPoint.getBlock().equals(Blocks.WATER_CAULDRON)) {
+                                                        fluidStack = new FluidStack(Fluids.WATER, FluidType.BUCKET_VOLUME);
+                                                    } else if(blockAtPoint.getBlock().equals(Blocks.LAVA_CAULDRON)) {
+                                                        fluidStack = new FluidStack(Fluids.LAVA, FluidType.BUCKET_VOLUME);
+                                                    }
+                                                }
+                                                //System.out.println("can accept: "+ pedestal.canAcceptFluid(fluidStack));
+                                                if (pedestal.canAcceptFluid(fluidStack) && pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME) {
+                                                    if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), false)) {
+                                                        pedestal.addFluid(fluidStack, IFluidHandler.FluidAction.EXECUTE);
 
-                                                                    if(blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED))
-                                                                    {
-                                                                        if(removeWaterFromLoggedBlocks())level.setBlockAndUpdate(adjustedPoint,blockAtPoint.setValue(BlockStateProperties.WATERLOGGED,false));
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        if(!pedestal.removeItem(1,true).isEmpty())
-                                                                        {
-                                                                            if(blockAtPoint.getBlock() instanceof AbstractCauldronBlock)
-                                                                            {
-                                                                                level.setBlockAndUpdate(adjustedPoint,Blocks.CAULDRON.defaultBlockState());
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                level.setBlockAndUpdate(adjustedPoint,Blocks.AIR.defaultBlockState());
-                                                                            }
-
-                                                                            if(canPlace(pedestal) && passesFilterItems(pedestal, level.getBlockState(adjustedPoint), adjustedPoint))
-                                                                            {
-                                                                                if(!adjustedPoint.equals(pedestal.getPos()))
-                                                                                {
-                                                                                    UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, pedestal.getItemInPedestal().copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
-                                                                                    InteractionResult resultPlace = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                                                                    if (resultPlace == InteractionResult.CONSUME) {
-                                                                                        pedestal.removeItem(1,false);
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            if(blockAtPoint.getBlock() instanceof AbstractCauldronBlock)
-                                                                            {
-                                                                                level.setBlockAndUpdate(adjustedPoint,Blocks.CAULDRON.defaultBlockState());
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                level.setBlockAndUpdate(adjustedPoint,Blocks.AIR.defaultBlockState());
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    fuelRemoved = false;
+                                                        if (blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                                                            if (removeWaterFromLoggedBlocks()) {
+                                                                level.setBlockAndUpdate(adjustedPoint, blockAtPoint.setValue(BlockStateProperties.WATERLOGGED, false));
+                                                            }
+                                                        } else if (blockAtPoint.getBlock() instanceof AbstractCauldronBlock) {
+                                                            level.setBlockAndUpdate(adjustedPoint, Blocks.CAULDRON.defaultBlockState());
+                                                        } else {
+                                                            level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
+                                                            ItemStack itemToPlace = pedestal.getItemInPedestal().copy();
+                                                            if(!pedestal.removeItemStack(itemToPlace, true).isEmpty() && canPlace(itemToPlace) && passesFilterItems(pedestal, level.getBlockState(adjustedPoint), adjustedPoint) && !adjustedPoint.equals(pedestal.getPos())) {
+                                                                ItemStack itemToRemove = itemToPlace.copy(); // UseOnContext modifies the passed in item stack when returning an InteractionResult.CONSUME, so we need a copy of it for removal.
+                                                                UseOnContext blockContext = new UseOnContext(level,(getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND, itemToPlace, new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
+                                                                InteractionResult resultPlace = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                                                if (resultPlace == InteractionResult.CONSUME) {
+                                                                    itemToRemove.setCount(1); // only remove 1 item
+                                                                    pedestal.removeItemStack(itemToRemove,false);
                                                                 }
                                                             }
                                                         }
+                                                    } else {
+                                                        fuelRemoved = false;
                                                     }
                                                 }
                                             }
                                         }
+
                                     }
                                 }
                             }
