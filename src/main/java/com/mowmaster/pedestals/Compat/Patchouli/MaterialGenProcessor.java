@@ -33,14 +33,18 @@ public class MaterialGenProcessor implements IComponentProcessor {
         }
         if (key.equals("block_below"))
             return IVariable.from(recipe.getIngredients().get(0));
-        if (key.equals("input_fluid"))
-            return IVariable.from(recipe.getResultFluidNeeded());
+        if (key.equals("input_fluid_name"))
+            return IVariable.wrap(recipe.getResultFluidNeeded().getDisplayName().getString());
+        if (key.equals("input_fluid_amount"))
+            return IVariable.wrap(recipe.getResultFluidNeeded().getAmount());
         if (key.equals("input_energy"))
             return IVariable.wrap(recipe.getResultEnergyNeeded());
         if (key.equals("input_exp"))
             return IVariable.wrap(recipe.getResultExperienceNeeded());
-        /*if (key.equals("input_dust"))
-            return IVariable.from(recipe.getResultDustNeeded());*/
+        if (key.equals("input_dust_color"))
+            return IVariable.wrap(recipe.getResultDustNeeded().getDustColor());
+        if (key.equals("input_dust_amount"))
+            return IVariable.wrap(recipe.getResultDustNeeded().getDustAmount());
         if (key.equals("result_block")) {
             return IVariable.from(recipe.getResultItem());
         }

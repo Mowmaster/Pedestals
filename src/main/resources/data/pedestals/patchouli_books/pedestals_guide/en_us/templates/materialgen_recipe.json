@@ -30,6 +30,18 @@
     },
     {
       "type": "patchouli:text",
+      "text": "#input_fluid_name",
+      "x": -1,
+      "y": 90
+    },
+    {
+      "type": "patchouli:text",
+      "text": "#input_fluid_amount",
+      "x": -1,
+      "y": 80
+    },
+    {
+      "type": "patchouli:text",
       "text": "#input_energy",
       "x": -1,
       "y": 100
@@ -42,9 +54,15 @@
     },
     {
       "type": "patchouli:text",
-      "text": "#input_dust",
+      "text": "#input_dust_color",
       "x": -1,
       "y": 140
+    },
+    {
+      "type": "patchouli:text",
+      "text": "#input_dust_amount",
+      "x": -1,
+      "y": 150
     },
     {
       "type": "patchouli:header",

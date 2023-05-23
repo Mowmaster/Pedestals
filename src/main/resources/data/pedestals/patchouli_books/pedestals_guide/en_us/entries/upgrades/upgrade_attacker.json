@@ -11,6 +11,10 @@
       "type": "crafting",
       "text": "pedestal.book.upgrades.name.attacker",
       "recipe": "pedestals:upgrades/upgrade_attacker"
+    },
+    {
+      "type": "pedestals:modification_recipe",
+      "recipe": "pedestals:machines/upgrademodification/attacker/attacker_damage_tier_one"
     }
   ]
 }

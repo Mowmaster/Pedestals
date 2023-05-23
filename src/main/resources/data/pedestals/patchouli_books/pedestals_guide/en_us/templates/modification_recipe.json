@@ -1,0 +1,113 @@
+{
+  "processor": "com.mowmaster.pedestals.Compat.Patchouli.ModificationInfusionProcessor",
+  "components": [
+    {
+      "type": "patchouli:header",
+      "text": "item.pedestals.upgrade_pedestal_modifications",
+      "x": -1,
+      "y": -1
+    },
+    {
+      "type": "patchouli:item",
+      "item": "pedestals:block_pedestal",
+      "framed": false,
+      "x": 50,
+      "y": 90
+    },
+    {
+      "type": "patchouli:item",
+      "item": "minecraft:chest",
+      "framed": false,
+      "x": 50,
+      "y": 100
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_upgrade",
+      "framed": true,
+      "x": 30,
+      "y": 100
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_1",
+      "framed": true,
+      "x": 20,
+      "y": 30
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_2",
+      "framed": true,
+      "x": 40,
+      "y": 30
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_3",
+      "framed": true,
+      "x": 60,
+      "y": 30
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_4",
+      "framed": true,
+      "x": 20,
+      "y": 50
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_5",
+      "framed": true,
+      "x": 40,
+      "y": 50
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_6",
+      "framed": true,
+      "x": 60,
+      "y": 50
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_7",
+      "framed": true,
+      "x": 20,
+      "y": 70
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_8",
+      "framed": true,
+      "x": 40,
+      "y": 70
+    },
+    {
+      "type": "patchouli:item",
+      "item": "#input_9",
+      "framed": true,
+      "x": 60,
+      "y": 70
+    },
+    {
+      "type": "patchouli:text",
+      "text": "#result_modification",
+      "x": 45,
+      "y": 130
+    },
+    {
+      "type": "patchouli:text",
+      "text": "#modification_min",
+      "x": 40,
+      "y": 150
+    },
+    {
+      "type": "patchouli:text",
+      "text": "#modification_max",
+      "x": 50,
+      "y": 150
+    }
+  ]
+}

@@ -12,7 +12,7 @@
     },
     {
       "type": "pedestals:materialgen_recipe",
-      "recipe": "pedestals:machines/cobblegen/generate_clay"
+      "recipe": "pedestals:machines/cobblegen/generate_obsidian"
     }
   ]
 }
