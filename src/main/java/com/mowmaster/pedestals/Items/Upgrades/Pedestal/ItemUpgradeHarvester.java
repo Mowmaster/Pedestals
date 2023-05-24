@@ -418,9 +418,16 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
         boolean returner = false;
         IntegerProperty propInt = getBlockPropertyAge(canMineBlock);
 
-        if (canMineBlock.getBlock() instanceof KelpBlock)
+        //KelpBlock == GrowingPlantBlock
+        if (canMineBlock.getBlock() instanceof GrowingPlantBlock
+                || canMineBlock.getBlock() instanceof BambooBlock
+                || canMineBlock.getBlock() instanceof SugarCaneBlock
+                || canMineBlock.getBlock() instanceof CactusBlock)
         {
-            returner = true;
+            if(pedestal.getLevel().getBlockState(canMinePos.below()).getBlock().equals(canMineBlock.getBlock()))
+            {
+                returner = true;
+            }
         }
         else if (canMineBlock.getBlock() instanceof StemGrownBlock)
         {
@@ -436,12 +443,15 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
         }
         else
         {
-            int current = canMineBlock.getValue(propInt);
-            //int min = Collections.min(propInt.getPossibleValues());
-            int max = Collections.max(propInt.getPossibleValues());
-            if(current == max)
+            if(propInt != null)
             {
-                returner = true;
+                int current = canMineBlock.getValue(propInt);
+                //int min = Collections.min(propInt.getPossibleValues());
+                int max = Collections.max(propInt.getPossibleValues());
+                if(current == max)
+                {
+                    returner = true;
+                }
             }
         }
 
@@ -455,6 +465,25 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
         int xpdrop = blockAtPoint.getBlock().getExpDrop(blockAtPoint,level, level.random,currentPoint,fortune,silky);
         if(xpdrop>0)blockAtPoint.getBlock().popExperience((ServerLevel)level,currentPoint,xpdrop);
     }
+    
+    private void updateHarvestedBlock(Level level, BasePedestalBlockEntity pedestal, BlockState blockAtPoint, BlockPos currentPoint, boolean hasGentle)
+    {
+        IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
+        int min = (propInt == null)?(0):(Collections.min(propInt.getPossibleValues()));
+
+        //KelpBlock == GrowingPlantBlock
+        if (blockAtPoint.getBlock() instanceof GrowingPlantBlock
+                || blockAtPoint.getBlock() instanceof BambooBlock
+                || blockAtPoint.getBlock() instanceof SugarCaneBlock
+                || blockAtPoint.getBlock() instanceof CactusBlock)
+        {
+            level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
+        }
+        else
+        {
+            level.setBlockAndUpdate(currentPoint, (propInt != null && hasGentleHarvest(pedestal.getCoinOnPedestal()))?(blockAtPoint.setValue(propInt,min)):(Blocks.AIR.defaultBlockState()));
+        }
+    }
 
     public void harvesterAction(Level level, BasePedestalBlockEntity pedestal)
     {
@@ -463,6 +492,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
             WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
             if(getPlayer != null && getPlayer.get() != null)
             {
+                boolean hasGentle = hasGentleHarvest(pedestal.getCoinOnPedestal());
                 if(hasSuperSpeed(pedestal.getCoinOnPedestal()))
                 {
                     List<BlockPos> listed = getValidList(pedestal);
@@ -512,51 +542,25 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                     {
                                                         boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
                                                         List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint, currentPoint);
-                                                        if(level.getBlockEntity(currentPoint) !=null){
-                                                            if(canRemoveBlockEntities)
+                                                        if(canRemoveBlockEntities){
+                                                            if(level.getBlockEntity(currentPoint) !=null)
                                                             {
-                                                                if(hasGentleHarvest(pedestal.getCoinOnPedestal()))
-                                                                {
-                                                                    IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
-                                                                    int min = Collections.min(propInt.getPossibleValues());
-
-                                                                    dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                                    level.setBlockAndUpdate(currentPoint, blockAtPoint.setValue(propInt,min));
-                                                                    if(damage)pedestal.damageInsertedTool(1,false);
-                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
-                                                                }
-                                                                else
-                                                                {
-                                                                    blockAtPoint.onRemove(level,currentPoint,blockAtPoint,true);
-                                                                    dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                                    level.removeBlockEntity(currentPoint);
-                                                                    //level.removeBlock(adjustedPoint, true);
-                                                                    level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
-                                                                    //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                                    if(damage)pedestal.damageInsertedTool(1,false);
-                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
-                                                                }
+                                                                IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
+                                                                int min = (propInt == null)?(0):(Collections.min(propInt.getPossibleValues()));
+                                                                updateHarvestedBlock(level, pedestal, blockAtPoint, currentPoint, hasGentle);
+                                                                //level.setBlockAndUpdate(currentPoint, (propInt != null && hasGentleHarvest(pedestal.getCoinOnPedestal()))?(blockAtPoint.setValue(propInt,min)):(Blocks.AIR.defaultBlockState()));
+                                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                                if(damage)pedestal.damageInsertedTool(1,false);
+                                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                             }
                                                         }
                                                         else
                                                         {
-                                                            if(hasGentleHarvest(pedestal.getCoinOnPedestal()))
-                                                            {
-                                                                IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
-                                                                int min = Collections.min(propInt.getPossibleValues());
-
-                                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                                level.setBlockAndUpdate(currentPoint, blockAtPoint.setValue(propInt,min));
-                                                                if(damage)pedestal.damageInsertedTool(1,false);
-                                                            }
-                                                            else
-                                                            {
-                                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                                level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
-                                                                //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                                if(damage)pedestal.damageInsertedTool(1,false);
-                                                                //if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
-                                                            }
+                                                            IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
+                                                            int min = (propInt == null)?(0):(Collections.min(propInt.getPossibleValues()));
+                                                            updateHarvestedBlock(level, pedestal, blockAtPoint, currentPoint, hasGentle);                                                            dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                            if(damage)pedestal.damageInsertedTool(1,false);
+                                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                         }
 
                                                         if(drops.size()>0)
@@ -653,6 +657,14 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                     if(level.getBlockEntity(currentPoint) !=null){
                                                         if(canRemoveBlockEntities)
                                                         {
+                                                            //Making sure not to delete the old code until i know for a fact its working
+                                                            IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
+                                                            int min = (propInt == null)?(0):(Collections.min(propInt.getPossibleValues()));
+                                                            updateHarvestedBlock(level, pedestal, blockAtPoint, currentPoint, hasGentle);                                                            dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                            if(damage)pedestal.damageInsertedTool(1,false);
+                                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
+
+                                                            /*
                                                             if(hasGentleHarvest(pedestal.getCoinOnPedestal()))
                                                             {
                                                                 IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
@@ -662,7 +674,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                                     dropXP(level, pedestal, blockAtPoint, currentPoint);
                                                                     level.setBlockAndUpdate(currentPoint, blockAtPoint.setValue(propInt,min));
                                                                     if(damage)pedestal.damageInsertedTool(1,false);
-                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
+                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                                 }
                                                                 else
                                                                 {
@@ -671,7 +683,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                                     level.removeBlockEntity(currentPoint);
                                                                     level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                                     if(damage)pedestal.damageInsertedTool(1,false);
-                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
+                                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                                 }
 
                                                             }
@@ -684,38 +696,18 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                                 level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                                 //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                                 if(damage)pedestal.damageInsertedTool(1,false);
-                                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
+                                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                             }
+                                                            */
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        if(hasGentleHarvest(pedestal.getCoinOnPedestal()))
-                                                        {
-                                                            IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
-                                                            if(propInt !=null)
-                                                            {
-                                                                int min = Collections.min(propInt.getPossibleValues());
-                                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                                level.setBlockAndUpdate(currentPoint, blockAtPoint.setValue(propInt,min));
-                                                                if(damage)pedestal.damageInsertedTool(1,false);
-                                                            }
-                                                            else
-                                                            {
-                                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                                level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
-                                                                if(damage)pedestal.damageInsertedTool(1,false);
-                                                            }
-
-                                                        }
-                                                        else
-                                                        {
-                                                            dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                            level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
-                                                            //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                            if(damage)pedestal.damageInsertedTool(1,false);
-                                                            //if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX()+0.5D,currentPoint.getY()+1.0f,currentPoint.getZ()+0.5D,255,246,0));
-                                                        }
+                                                        IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
+                                                        int min = (propInt == null)?(0):(Collections.min(propInt.getPossibleValues()));
+                                                        updateHarvestedBlock(level, pedestal, blockAtPoint, currentPoint, hasGentle);                                                        dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                        if(damage)pedestal.damageInsertedTool(1,false);
+                                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                     }
 
                                                     if(drops.size()>0)
