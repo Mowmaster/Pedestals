@@ -949,7 +949,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean isSelectionInRange(BasePedestalBlockEntity pedestalCurrent, BlockPos currentSelectedPoint)
     {
 
-        int range = PedestalConfig.COMMON.upgrades_baseSelectionRange.get() + getUpgradeWorkRange(pedestalCurrent.getCoinOnPedestal());
+        int range = PedestalConfig.COMMON.upgrades_baseSelectionRange.get() + getRangeIncrease(pedestalCurrent.getCoinOnPedestal());
+
         int x = currentSelectedPoint.getX();
         int y = currentSelectedPoint.getY();
         int z = currentSelectedPoint.getZ();
