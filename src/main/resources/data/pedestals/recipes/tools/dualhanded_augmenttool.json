@@ -1,0 +1,15 @@
+{
+  "type": "mowlib:dualhandedcrafting",
+  "blockTarget": {
+    "item": "minecraft:bookshelf"
+  },
+  "mainhandTool": {
+    "tag": "forge:rods"
+  },
+  "offhandTool": {
+    "item": "minecraft:obsidian"
+  },
+  "result": {
+    "item": "pedestals:tool_augments_speed"
+  }
+}

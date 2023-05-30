@@ -12,8 +12,8 @@ import com.mowmaster.pedestals.Items.Augments.AugmentTieredRange;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredSpeed;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredStorage;
 import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
-import com.mowmaster.pedestals.Items.Tools.LinkingTool;
-import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
+import com.mowmaster.pedestals.Items.Tools.Linking.LinkingTool;
+import com.mowmaster.pedestals.Items.Tools.Linking.LinkingToolBackwards;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
@@ -64,7 +64,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -356,39 +355,39 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRedstone());
                     }
                 }
-                else if(pedestal.hasRRobin() && itemInOffHand.is(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()))
+                else if(pedestal.hasRRobin() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_ROUNDROBIN.get()))
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRRobin());
                 }
-                else if(pedestal.hasRenderAugment() && itemInOffHand.is(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()))
+                else if(pedestal.hasRenderAugment() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_DIFFUSER.get()))
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRenderAugment());
                 }
-                else if(pedestal.hasNoCollide() && itemInOffHand.is(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()))
+                else if(pedestal.hasNoCollide() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_COLLIDE.get()))
                 {
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeNoCollide());
                 }
-                else if(pedestal.hasSpeed() && itemInOffHand.getItem() instanceof AugmentTieredSpeed)
+                else if(pedestal.hasSpeed() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_SPEED.get()))
                 {
                     if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllSpeed());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeSpeed(1));
                 }
-                else if(pedestal.hasCapacity() && itemInOffHand.getItem() instanceof AugmentTieredCapacity)
+                else if(pedestal.hasCapacity() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_CAPACITY.get()))
                 {
                     if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllCapacity());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCapacity(1));
                 }
-                else if(pedestal.hasStorage() && itemInOffHand.getItem() instanceof AugmentTieredStorage)
+                else if(pedestal.hasStorage() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_STORAGE.get()))
                 {
                     if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllStorage());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeStorage(1));
                 }
-                else if(pedestal.hasRange() && itemInOffHand.getItem() instanceof AugmentTieredRange)
+                else if(pedestal.hasRange() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_RANGE.get()))
                 {
                     if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRange());}
                     else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRange(1));
                 }
-                else if(pedestal.hasWorkCard() && (itemInOffHand.getItem() instanceof WorkCardBase || itemInOffHand.getItem().equals(DeferredRegisterItems.TOOL_WORKTOOL.get())))
+                else if(pedestal.hasWorkCard() && itemInOffHand.is(DeferredRegisterItems.TOOL_WORKTOOL.get()))
                 {
                     pedestal.actionOnRemovedFromPedestal(1);
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeWorkCard());

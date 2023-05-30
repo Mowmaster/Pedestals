@@ -89,6 +89,14 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_TAGTOOL.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_DEVTOOL.get());
 
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_SPEED.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_CAPACITY.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_STORAGE.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_RANGE.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_DIFFUSER.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_ROUNDROBIN.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_COLLIDE.get());
+
         this.registerIngredientDescription(registration, DeferredRegisterItems.TOOL_MANIFEST.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_MANIFEST.get());
 

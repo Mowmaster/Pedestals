@@ -1,6 +1,40 @@
 {
   "itemGroup.tab_pedestaltab": "Pedestals",
 
+  "pedestals.text.separator.colon": ":",
+  "pedestals.text.separator.colon_space": ": ",
+  "pedestals.text.separator.space_colon": " :",
+  "pedestals.text.separator.space_colon_space": " : ",
+  "pedestals.text.separator.comma": ",",
+  "pedestals.text.separator.comma_space": ", ",
+  "pedestals.text.separator.space_comma": " ,",
+  "pedestals.text.separator.space_comma_space": " , ",
+  "pedestals.text.separator.slash": "/",
+  "pedestals.text.separator.slash_space": "/ ",
+  "pedestals.text.separator.space_slash": " /",
+  "pedestals.text.separator.space_slash_space": " / ",
+  "pedestals.text.separator.dash": "-",
+  "pedestals.text.separator.dash_space": "- ",
+  "pedestals.text.separator.space_dash": " -",
+  "pedestals.text.separator.space_dash_space": " - ",
+  "pedestals.text.separator.plus": "+",
+  "pedestals.text.separator.plus_space": "+ ",
+  "pedestals.text.separator.plus_slash": " +",
+  "pedestals.text.separator.space_plus_space": " + ",
+  "pedestals.text.separator.space": " ",
+  "pedestals.text.separator.space_2": "  ",
+  "pedestals.text.separator.space_3": "   ",
+  "pedestals.text.separator.space_4": "    ",
+  "pedestals.text.separator.x": "x ",
+  "pedestals.text.separator.y": "y ",
+  "pedestals.text.separator.z": "z",
+  "pedestals.text.separator.horizontal_rule_large.equals": "====================",
+  "pedestals.text.separator.horizontal_rule_medium.equals": "==========",
+  "pedestals.text.separator.horizontal_rule_small.equals": "=====",
+  "pedestals.text.separator.horizontal_rule_large.dash": "--------------------",
+  "pedestals.text.separator.horizontal_rule_medium.dash": "----------",
+  "pedestals.text.separator.horizontal_rule_small.dash": "-----",
+
   "pedestals.jei.cobble_gen": "Material Generator",
   "pedestals.cobble_gen.warning": "§cThe Pedestal Simulates Breaking the Result Block, the Broken remains are what is Actually Generated",
   "pedestals.cobble_gen.tool": "§cThe Default tool used is this, but Offhand inserting one can vastly change up what is produced (enchants factor in as well)",
@@ -235,6 +269,26 @@
 
 
 
+  "pedestals.tool.augment.inserted": "Inserted: ",
+  "pedestals.tool.augment.speed": "Current Transfer Speed: ",
+  "pedestals.tool.augment.speed_not": "No Speed Augments Inserted",
+
+  "pedestals.tool.augment.capacity_not": "No Capacity Augments Inserted",
+
+  "pedestals.tool.augment.storage_not": "No Storage Augments Inserted",
+
+  "pedestals.tool.augment.range": "Current Linking Range: ",
+  "pedestals.tool.augment.range_not": "No Range Augments Inserted",
+
+  "pedestals.tool.augment.collide": "Has Collision Augment",
+  "pedestals.tool.augment.collide_not": "Does not have Collision Augment",
+  "pedestals.tool.augment.diffuser": "Has Particle Diffuser Augment",
+  "pedestals.tool.augment.diffuser_not": "Does not have Particle Diffuser Augment",
+  "pedestals.tool.augment.roundrobin": "Has Round Robin Augment",
+  "pedestals.tool.augment.roundrobin_not": "Does not have Round Robin Augment",
+
+
+
   "pedestals.linkingtool.pedestal_render_on": "Linking Range Visualizer: ON",
   "pedestals.linkingtool.pedestal_render_off": "Linking Range Visualizer: OFF",
 
@@ -287,6 +341,21 @@
   "item.pedestals.tool_manifesttool": "Pedestal Manifest",
   "jei.pedestals.tool_manifesttool.description": "§5 Gets the Current Details about the pedestal. Can be used to see what Augments a pedestal has.",
   "jei.pedestals.tool_manifesttool.interaction": "§3 Crouch Right Click on Pedestal to Get Details, Right click to clear",
+
+  "item.pedestals.tool_augments_speed": "Speed Augment Tool",
+  "jei.pedestals.tool_augments_speed.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_augments_capacity": "Capacity Augment Tool",
+  "jei.pedestals.tool_augments_capacity.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_augments_storage": "Storage Augment Tool",
+  "jei.pedestals.tool_augments_storage.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_augments_range": "Range Augment Tool",
+  "jei.pedestals.tool_augments_range.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_augments_collide": "Collision Augment Tool",
+  "jei.pedestals.tool_augments_collide.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_augments_diffuser": "Particle Diffuser Augment Tool",
+  "jei.pedestals.tool_augments_diffuser.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_augments_roundrobin": "Round Robin Augment Tool",
+  "jei.pedestals.tool_augments_roundrobin.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
 
 
   "pedestals.filter_type": "Filter Type: ",
@@ -613,6 +682,10 @@
   "death.attack.pedestal11.item": "%1$s has kicked the bucket.",
   "death.attack.pedestal12.item": "%1$s, we told you not to play around with sharp things!",
   "death.attack.pedestal13.item": "%1$s, became Holey, then they Ascended!",
+
+  "enchantment.level.0": "",
+
+
 
   "pedestal.book.name": "Pedestals Guide (Very WIP)",
   "pedestal.book.landing.text": "Pedestals Manual",

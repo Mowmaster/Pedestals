@@ -1,8 +1,8 @@
 package com.mowmaster.pedestals.EventHandlers;
 
 
-import com.mowmaster.pedestals.Items.Tools.LinkingTool;
-import com.mowmaster.pedestals.Items.Tools.LinkingToolBackwards;
+import com.mowmaster.pedestals.Items.Tools.Linking.LinkingTool;
+import com.mowmaster.pedestals.Items.Tools.Linking.LinkingToolBackwards;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
