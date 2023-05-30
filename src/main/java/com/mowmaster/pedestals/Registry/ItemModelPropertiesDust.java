@@ -3,16 +3,13 @@ package com.mowmaster.pedestals.Registry;
 
 import com.mowmaster.pedestals.Items.Augments.AugmentRenderDiffuser;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
-import com.mowmaster.pedestals.Items.Filters.FilterItem;
-import com.mowmaster.pedestals.Items.Tools.PedestalManifestTool;
+import com.mowmaster.pedestals.Items.Tools.Augment.PedestalManifestTool;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeExport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeImport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeMagnet;
-import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 

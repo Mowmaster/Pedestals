@@ -6,10 +6,13 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.*;
 import com.mowmaster.pedestals.Items.Misc.ModifierGetterItem;
 import com.mowmaster.pedestals.Items.Misc.TagGetterItem;
 import com.mowmaster.pedestals.Items.Tools.*;
+import com.mowmaster.pedestals.Items.Tools.Augment.*;
+import com.mowmaster.pedestals.Items.Tools.Linking.LinkingTool;
+import com.mowmaster.pedestals.Items.Tools.Linking.LinkingToolBackwards;
+import com.mowmaster.pedestals.Items.Tools.Upgrade.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBlockBreaker;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardLocations;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardPedestals;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
@@ -44,6 +47,21 @@ public class DeferredRegisterItems
             () -> new ToolSwapper(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_DEVTOOL = ITEMS.register("tool_devtool",
             () -> new DevTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+
+    public static final RegistryObject<Item> TOOL_AUGMENTS_SPEED = ITEMS.register("tool_augments_speed",
+            () -> new AugmentTool_Speed(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_AUGMENTS_CAPACITY = ITEMS.register("tool_augments_capacity",
+            () -> new AugmentTool_Capacity(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_AUGMENTS_STORAGE = ITEMS.register("tool_augments_storage",
+            () -> new AugmentTool_Storage(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_AUGMENTS_RANGE = ITEMS.register("tool_augments_range",
+            () -> new AugmentTool_Range(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_AUGMENTS_DIFFUSER = ITEMS.register("tool_augments_diffuser",
+            () -> new AugmentTool_Diffuser(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_AUGMENTS_ROUNDROBIN = ITEMS.register("tool_augments_roundrobin",
+            () -> new AugmentTool_Robin(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_AUGMENTS_COLLIDE = ITEMS.register("tool_augments_collide",
+            () -> new AugmentTool_Collide(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
 
     public static final RegistryObject<Item> TOOL_MANIFEST = ITEMS.register("tool_manifesttool",
             () -> new PedestalManifestTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
