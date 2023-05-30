@@ -9,7 +9,10 @@ import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardLocations;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardPedestals;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -397,7 +400,38 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return -1;
     }
 
+    public void resetCachedValidWorkCardPositions(ItemStack upgrade) {
+        removeBlockListCustomNBTTags(upgrade, "_validlist");
+    }
 
+    public List<BlockPos> getValidWorkCardPositions(BasePedestalBlockEntity pedestal) {
+        ItemStack upgrade = pedestal.getCoinOnPedestal();
+        List<BlockPos> cached = readBlockPosListCustomFromNBT(upgrade, "_validlist");
+        if (cached.size() == 0) {
+            // Optimization to construct the validlist only once. The NBT tag should be reset when the WorkCard/Upgrade
+            // is removed (as that is the only way to invalidate the cached list) by calling `resetCachedValidWorkCardPositions`.
+            if (!hasBlockListCustomNBTTags(upgrade, "_validlist") && pedestal.hasWorkCard()) {
+                ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
+                if (workCardItemStack.getItem() instanceof WorkCardBase baseCard) {
+                    int supportedWorkCardTypesForThisUpgrade = getWorkCardType();
+                    int insertedWorkCardType = baseCard.getWorkCardType();
+                    if (
+                        insertedWorkCardType == supportedWorkCardTypesForThisUpgrade || // exact match
+                        (supportedWorkCardTypesForThisUpgrade == 0 && (insertedWorkCardType == 1 || insertedWorkCardType == 2)) // match for the "either" area or locations type
+                    ) {
+                        cached = switch (baseCard.getWorkCardType()) {
+                            case 1 -> WorkCardArea.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal);
+                            case 2 -> WorkCardLocations.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal);
+                            case 3 -> WorkCardPedestals.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal);
+                            default -> List.of();
+                        };
+                    }
+                }
+                saveBlockPosListCustomToNBT(upgrade, "_validlist", cached);
+            }
+        }
+        return cached;
+    }
 
     public int getUpgradeExperienceTransferRate(ItemStack upgradeStack)
     {

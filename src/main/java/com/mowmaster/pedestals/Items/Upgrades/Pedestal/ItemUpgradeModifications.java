@@ -54,70 +54,18 @@ public class ItemUpgradeModifications extends ItemUpgradeBase
     @Override
     public int getWorkCardType() { return 3; }
 
-    private void buildValidBlockList(BasePedestalBlockEntity pedestal)
-    {
-        Level level = pedestal.getLevel();
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        List<BlockPos> valid = new ArrayList<>();
-
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                List<BlockPos> listed = workCardBase.readBlockPosListFromNBT(card);
-                for (BlockPos pos:listed) {
-                    if(selectedPointWithinRange(pedestal, pos))
-                    {
-                        if(level.getBlockState(pos).getBlock() instanceof BasePedestalBlock)
-                        {
-                            valid.add(pos);
-                        }
-                    }
-                }
-            }
-        }
-
-        saveBlockPosListCustomToNBT(coin,"_validlist",valid);
-    }
-
-    private List<BlockPos> getValidList(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBlockPosListCustomFromNBT(coin,"_validlist");
-    }
-
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
+        resetCachedValidWorkCardPositions(coinInPedestal);
     }
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        if (allPositions.isEmpty()) return;
 
-
-        List<BlockPos> listed = getValidList(pedestal);
-
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                List<BlockPos> getList = workCardBase.readBlockPosListFromNBT(card);
-                if(listed.size()>0)
-                {
-                    modifierAction(level,pedestal);
-                }
-                else if(getList.size()>0)
-                {
-                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        buildValidBlockList(pedestal);
-                    }
-                }
-            }
-        }
+        modifierAction(level, pedestal, allPositions);
     }
 
     @Nullable
@@ -168,12 +116,10 @@ public class ItemUpgradeModifications extends ItemUpgradeBase
 
 
 
-    public void modifierAction(Level level, BasePedestalBlockEntity pedestal)
-    {
+    public void modifierAction(Level level, BasePedestalBlockEntity pedestal, List<BlockPos> listed) {
         if(!level.isClientSide())
         {
             boolean fullstop = false;
-            List<BlockPos> listed = getValidList(pedestal);
             List<ItemStack> ingredientList = new ArrayList<>();
             for(int i=0; i<listed.size(); i++)
             {

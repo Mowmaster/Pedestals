@@ -7,7 +7,9 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardLocations;
+import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,7 +22,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
@@ -29,7 +30,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
@@ -129,79 +129,17 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
         return messages;
     }
 
-    private void buildValidBlockListFromWorkCardLocations(ItemStack workCardItemStack, BasePedestalBlockEntity pedestal) {
-        List<BlockPos> valid = WorkCardBase.readBlockPosListFromNBT(workCardItemStack).stream()
-            .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-            .toList();
-
-        saveBlockPosListCustomToNBT(pedestal.getCoinOnPedestal(), "_validlist", valid);
-    }
-
-    private void buildValidBlockListFromWorkCardArea(ItemStack workCardItemStack, WorkCardBase workCardBase, BasePedestalBlockEntity pedestal) {
-        List<BlockPos> valid = new ArrayList<>();
-        if (workCardBase.selectedAreaWithinRange(pedestal)) {
-            AABB area = new AABB(WorkCardBase.readBlockPosFromNBT(workCardItemStack, 1), WorkCardBase.readBlockPosFromNBT(workCardItemStack, 2));
-
-            int minX = (int) area.minX;
-            int minY = (int) area.minY;
-            int minZ = (int) area.minZ;
-
-            int maxX = (int) area.maxX;
-            int maxY = (int) area.maxY;
-            int maxZ = (int) area.maxZ;
-
-            if(minY < pedestal.getPos().getY()) {
-                for (int i = maxX; i >= minX; i--) {
-                    for (int j = maxZ; j >= minZ; j--) {
-                        for (int k = maxY; k >= minY; k--) {
-                            valid.add(new BlockPos(i, k, j));
-                        }
-                    }
-                }
-            } else {
-                for (int i = minX; i <= maxX; i++) {
-                    for (int j = minZ; j <= maxZ; j++) {
-                        for (int k = minY; k <= maxY; k++) {
-                            valid.add(new BlockPos(i, k, j));
-                        }
-                    }
-                }
-            }
-        }
-
-        saveBlockPosListCustomToNBT(pedestal.getCoinOnPedestal(), "_validlist", valid);
-    }
-
-    private List<BlockPos> getValidList(BasePedestalBlockEntity pedestal) {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBlockPosListCustomFromNBT(coin,"_validlist");
-    }
-
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
+        resetCachedValidWorkCardPositions(coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
     }
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        List<BlockPos> allPositions = getValidList(pedestal);
-        if (allPositions.size() == 0) {
-            // Optimization to construct the validlist only once. The NBT tag is reset when the WorkCard or Upgrade is
-            // removed (which are the only ways to change the supported range / selected area).
-            if (!hasBlockListCustomNBTTags(coin, "_validlist") && pedestal.hasWorkCard()) {
-                ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
-                if (workCardItemStack.getItem() instanceof WorkCardBase workCardBase) {
-                    if (workCardBase.hasTwoPointsSelected(workCardItemStack)) {
-                        buildValidBlockListFromWorkCardArea(workCardItemStack, workCardBase, pedestal);
-                    } else {
-                        buildValidBlockListFromWorkCardLocations(workCardItemStack, pedestal);
-                    }
-                }
-            }
-            return;
-        }
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        if (allPositions.isEmpty()) return;
 
         if (hasSuperSpeed(pedestal.getCoinOnPedestal())) {
             for (BlockPos plantAtPos: allPositions) {

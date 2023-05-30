@@ -2,12 +2,9 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
-import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -16,13 +13,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -44,60 +37,15 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase
     }
 
     @Override
-    public boolean selectedPointWithinRange(BasePedestalBlockEntity pedestal, BlockPos posPoint)
-    {
-        if(isSelectionInRange(pedestal, posPoint))
-        {
-            Level level = pedestal.getLevel();
-            if(level.getBlockState(posPoint).getBlock() instanceof BasePedestalBlock)return true;
-        }
-
-        return false;
-    }
-
-    @Override
     public boolean needsWorkCard() { return true; }
 
     @Override
     public int getWorkCardType() { return 3; }
 
-    private void buildValidBlockList(BasePedestalBlockEntity pedestal)
-    {
-        Level level = pedestal.getLevel();
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        List<BlockPos> valid = new ArrayList<>();
-
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                List<BlockPos> listed = workCardBase.readBlockPosListFromNBT(card);
-                for (BlockPos pos:listed) {
-                    if(selectedPointWithinRange(pedestal, pos))
-                    {
-                        if(level.getBlockState(pos).getBlock() instanceof BasePedestalBlock)
-                        {
-                            valid.add(pos);
-                        }
-                    }
-                }
-            }
-        }
-
-        saveBlockPosListCustomToNBT(coin,"_validlist",valid);
-    }
-
-    private List<BlockPos> getValidList(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBlockPosListCustomFromNBT(coin,"_validlist");
-    }
-
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
+        resetCachedValidWorkCardPositions(coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coinInPedestal.getOrCreateTag(),"input");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coinInPedestal.getOrCreateTag(),"output");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID,coinInPedestal.getOrCreateTag(),"hasrecipe");
@@ -105,29 +53,10 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        if (allPositions.isEmpty()) return;
 
-
-        List<BlockPos> listed = getValidList(pedestal);
-
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                List<BlockPos> getList = workCardBase.readBlockPosListFromNBT(card);
-                if(listed.size()>0)
-                {
-                    modifierAction(level,pedestal);
-                }
-                else if(getList.size()>0)
-                {
-                    if(!hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        buildValidBlockList(pedestal);
-                    }
-                }
-            }
-        }
+        modifierAction(level, pedestal, allPositions);
     }
 
     @Nullable
@@ -235,13 +164,12 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase
 
 
 
-    public void modifierAction(Level level, BasePedestalBlockEntity pedestal)
+    public void modifierAction(Level level, BasePedestalBlockEntity pedestal, List<BlockPos> listed)
     {
         if(!level.isClientSide())
         {
             boolean fullstop = false;
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-            List<BlockPos> listed = getValidList(pedestal);
             List<ItemStack> ingredientList = new ArrayList<>();
             for(int i=0; i<listed.size(); i++)
             {
