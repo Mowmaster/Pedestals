@@ -260,17 +260,12 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
         return !readBlockPosFromNBT(stack,1).equals(BlockPos.ZERO) && !readBlockPosFromNBT(stack,2).equals(BlockPos.ZERO);
     }
 
-    public AABB getAABBonUpgrade(ItemStack stack)
-    {
-        if(stack.getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()) && hasTwoPointsSelected(stack))
-        {
-            BlockPos posOne = readBlockPosFromNBT(stack,1);
-            BlockPos posTwo = readBlockPosFromNBT(stack,2);
-
-            return new AABB(Math.min(posOne.getX(), posTwo.getX()),Math.min(posOne.getY(), posTwo.getY()),Math.min(posOne.getZ(), posTwo.getZ()),
-                    Math.max(posOne.getX(), posTwo.getX()),Math.max(posOne.getY(), posTwo.getY()),Math.max(posOne.getZ(), posTwo.getZ())).expandTowards(1D,1D,1D);
+    public AABB getAABBonUpgrade(ItemStack stack) {
+        if (stack.is(DeferredRegisterItems.WORKCARD_AREA.get()) && hasTwoPointsSelected(stack)) {
+            return new AABB(readBlockPosFromNBT(stack, 1), readBlockPosFromNBT(stack, 2)).expandTowards(1D, 1D, 1D);
+        } else {
+            return new AABB(BlockPos.ZERO);
         }
-        return new AABB(BlockPos.ZERO);
     }
 
     //ToDo: Add to mowlib and remove from here

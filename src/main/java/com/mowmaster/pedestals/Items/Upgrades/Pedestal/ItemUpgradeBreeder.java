@@ -3,7 +3,6 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -19,8 +18,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class ItemUpgradeBreeder extends ItemUpgradeBase
-{
+public class ItemUpgradeBreeder extends ItemUpgradeBase {
     public ItemUpgradeBreeder(Properties p_41383_) {
         super(new Properties());
     }
@@ -73,37 +71,28 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase
     @Override
     public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_breeder_selectedMultiplier.get(); }
 
-
     public boolean hasBreederLimit() { return PedestalConfig.COMMON.upgrade_breeder_entityBreedingLimit.get(); }
     public int getBreederLimitCount() { return PedestalConfig.COMMON.upgrade_breeder_entityLimitBreedingCount.get(); }
 
     @Override
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
-
         List<String> messages = super.getUpgradeHUD(pedestal);
 
-        if(messages.size()<=0)
-        {
-            if(baseEnergyCostPerDistance()>0)
-            {
-                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
-                {
+        if (messages.size() == 0) {
+            if (baseEnergyCostPerDistance() > 0) {
+                if (pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
                     messages.add(ChatFormatting.RED + "Needs Energy");
                     messages.add(ChatFormatting.RED + "To Operate");
                 }
             }
-            if(baseXpCostPerDistance()>0)
-            {
-                if(pedestal.getStoredExperience()<baseXpCostPerDistance())
-                {
+            if (baseXpCostPerDistance() > 0) {
+                if (pedestal.getStoredExperience() < baseXpCostPerDistance()) {
                     messages.add(ChatFormatting.GREEN + "Needs Experience");
                     messages.add(ChatFormatting.GREEN + "To Operate");
                 }
             }
-            if(baseDustCostPerDistance().getDustAmount()>0)
-            {
-                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
-                {
+            if (baseDustCostPerDistance().getDustAmount() > 0) {
+                if (pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
                     messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
                     messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
                 }
@@ -114,88 +103,42 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase
     }
 
     @Override
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
-    {
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                if(workCardBase.hasTwoPointsSelected(card))
-                {
-                    boolean canRun = true;
-                    //boolean damage = false;
-
-                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
-                    {
-                        WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-                        if(getPlayer != null && getPlayer.get() != null)
-                        {
-                            AABB getArea = workCardBase.getAABBonUpgrade(card);
-                            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                            ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
-                            tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
-
-                            if(hasBreederLimit())
-                            {
-                                if(entities.size()>=getBreederLimitCount())
-                                {
-                                    canRun = false;
-                                }
-                            }
-
-                            /*if(PedestalConfig.COMMON.breeder_DamageTools.get())
-            {
-                if(pedestal.hasTool())
-                {
-                    BlockPos pedestalPos = pedestal.getPos();
-                    if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                    {
-                        if(pedestal.damageInsertedTool(1,true))
-                        {
-                            damage = true;
-                        }
-                        else
-                        {
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                            canRun = false;
-                        }
-                    }
-                    else
-                    {
-                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                        canRun = false;
-                    }
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
+        if (fakePlayerReference != null && fakePlayerReference.get() != null) {
+            FakePlayer fakePlayer = fakePlayerReference.get();
+            ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
+            if(
+                !workCardItemStack.isEmpty() &&
+                workCardItemStack.getItem() instanceof WorkCardBase workCardBase &&
+                workCardBase.hasTwoPointsSelected(workCardItemStack)
+            ) {
+                AABB area = workCardBase.getAABBonUpgrade(workCardItemStack);
+                List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, area);
+                if (hasBreederLimit() && entities.size() >= getBreederLimitCount()) {
+                    return;
                 }
-            }*/
 
-                            if(canRun)
-                            {
-                                for (LivingEntity getEntity : entities)
-                                {
-                                    if(getEntity == null)continue;
+                for (LivingEntity entity : entities) {
+                    ItemStack stackInPedestal = pedestal.hasItem() ? pedestal.getItemInPedestal() : pedestal.getToolStack();
+                    if (stackInPedestal.isEmpty()) {
+                        return;
+                    }
 
-                                    BlockPos getEntityPos = getEntity.getOnPos();
-                                    if(getEntity instanceof Animal animal)
-                                    {
-                                        if(animal.isFood(toolStack))
-                                        {
-                                            if(animal.getAge() == 0 && animal.canFallInLove())
-                                            {
-                                                InteractionResult result = animal.mobInteract((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), InteractionHand.MAIN_HAND);
-                                                //System.out.println(result.toString());
-                                                if(result == InteractionResult.SUCCESS)
-                                                {
-                                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),getEntityPos), false))
-                                                    {
-                                                        pedestal.removeItem(1,false);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                    if (
+                        entity instanceof Animal animal &&
+                        animal.isFood(stackInPedestal) &&
+                        animal.getAge() == 0 &&
+                        animal.canFallInLove() &&
+                        removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), animal.getOnPos()), true)
+                    ) {
+                        ItemStack toFeed = stackInPedestal.copy();
+                        toFeed.setCount(1);
+                        fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, toFeed.copy());
+                        InteractionResult result = animal.mobInteract(fakePlayer, InteractionHand.MAIN_HAND);
+                        if (result == InteractionResult.SUCCESS) {
+                            removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), animal.getOnPos()), false);
+                            pedestal.removeItemStack(toFeed, false);
                         }
                     }
                 }
