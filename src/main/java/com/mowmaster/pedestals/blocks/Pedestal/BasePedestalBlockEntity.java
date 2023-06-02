@@ -807,9 +807,9 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     public boolean isPedestalInRange(BlockPos targetPos) {
         BlockPos distanceVector = getPos().subtract(targetPos);
         int range = getLinkingRange();
-        return Math.abs(distanceVector.getX()) < range &&
-            Math.abs(distanceVector.getY()) < range &&
-            Math.abs(distanceVector.getZ()) < range;
+        return Math.abs(distanceVector.getX()) <= range &&
+            Math.abs(distanceVector.getY()) <= range &&
+            Math.abs(distanceVector.getZ()) <= range;
     }
 
     public boolean isSamePedestal(BlockPos targetPos) {
