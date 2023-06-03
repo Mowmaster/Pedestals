@@ -1,22 +1,11 @@
 package com.mowmaster.pedestals.Items.WorkCards;
 
-import com.mowmaster.mowlib.MowLibUtils.MowLibTooltipUtils;
-import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.Augments.AugmentBase;
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.Item;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 public class WorkCardPedestals extends WorkCardBase implements ISelectablePoints {
 
@@ -33,6 +22,17 @@ public class WorkCardPedestals extends WorkCardBase implements ISelectablePoints
         return 3;
     }
 
-
-
+    // This returns all the stored locations regardless of whether they are currently pedestals. As typical uses of this
+    // list is to cache it once for all future uses, doing so would be not only unnecessary but give an incorrect sense
+    // that upgrades don't have to verify the list every time it is used (as the blocks at those positions could change
+    // at any point after this is cached).
+    public static List<BlockPos> getPositionsInRangeOfUpgrade(ItemStack workCardStack, BasePedestalBlockEntity pedestal) {
+        if (workCardStack.getItem() instanceof WorkCardPedestals workCard) {
+            return WorkCardBase.readBlockPosListFromNBT(workCardStack).stream()
+                    .filter(blockPos -> workCard.selectedPointWithinRange(pedestal, blockPos))
+                    .toList();
+        } else {
+            return List.of();
+        }
+    }
 }

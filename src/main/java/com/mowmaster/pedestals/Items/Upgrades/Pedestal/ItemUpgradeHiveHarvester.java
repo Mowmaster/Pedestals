@@ -142,146 +142,19 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
         return new ItemStack(Items.SHEARS);
     }
 
-    private void buildValidBlockList(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                List<BlockPos> listed = workCardBase.readBlockPosListFromNBT(card);
-                List<BlockPos> valid = new ArrayList<>();
-                for (BlockPos pos:listed) {
-                    if(workCardBase.selectedPointWithinRange(pedestal, pos))
-                    {
-                        valid.add(pos);
-                    }
-                }
-
-                saveBlockPosListCustomToNBT(coin,"_validlist",valid);
-            }
-        }
-    }
-
-    private void buildValidBlockListArea(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        List<BlockPos> valid = new ArrayList<>();
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                AABB area = new AABB(workCardBase.readBlockPosFromNBT(card,1),workCardBase.readBlockPosFromNBT(card,2));
-
-                int maxX = (int)area.maxX;
-                int maxY = (int)area.maxY;
-                int maxZ = (int)area.maxZ;
-
-                int minX = (int)area.minX;
-                int minY = (int)area.minY;
-                int minZ = (int)area.minZ;
-
-                BlockPos pedestalPos = pedestal.getPos();
-                if(minY < pedestalPos.getY())
-                {
-                    for(int i=maxX;i>=minX;i--)
-                    {
-                        for(int j=maxZ;j>=minZ;j--)
-                        {
-                            for(int k=maxY;k>=minY;k--)
-                            {
-                                BlockPos newPoint = new BlockPos(i,k,j);
-                                if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
-                                {
-                                    valid.add(newPoint);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    for(int i= minX;i<=maxX;i++)
-                    {
-                        for(int j= minZ;j<=maxZ;j++)
-                        {
-                            for(int k= minY;k<=maxY;k++)
-                            {
-                                BlockPos newPoint = new BlockPos(i,k,j);
-                                if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
-                                {
-                                    valid.add(newPoint);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        saveBlockPosListCustomToNBT(coin,"_validlist",valid);
-    }
-
-    private List<BlockPos> getValidList(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBlockPosListCustomFromNBT(coin,"_validlist");
-    }
-
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
+        resetCachedValidWorkCardPositions(coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
     }
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                boolean override = workCardBase.hasTwoPointsSelected(card);
-                List<BlockPos> listed = getValidList(pedestal);
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        if (allPositions.isEmpty()) return;
 
-                if(override)
-                {
-                    if(listed.size()>0)
-                    {
-                        harvesterAction(level,pedestal);
-                    }
-                    else if(workCardBase.selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        buildValidBlockListArea(pedestal);
-                    }
-                }
-                else
-                {
-                    List<BlockPos> getList = workCardBase.readBlockPosListFromNBT(card);
-                    if(!override && listed.size()>0)
-                    {
-                        harvesterAction(level,pedestal);
-                    }
-                    else if(getList.size()>0)
-                    {
-                        if(!hasBlockListCustomNBTTags(coin,"_validlist"))
-                        {
-                            BlockPos hasValidPos = IntStream.range(0,getList.size())//Int Range
-                                    .mapToObj((getList)::get)
-                                    .filter(blockPos -> selectedPointWithinRange(pedestal, blockPos))
-                                    .findFirst().orElse(BlockPos.ZERO);
-                            if(!hasValidPos.equals(BlockPos.ZERO))
-                            {
-                                buildValidBlockList(pedestal);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        harvesterAction(level, pedestal, allPositions);
     }
 
     private int getCurrentPosition(BasePedestalBlockEntity pedestal)
@@ -396,14 +269,12 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
         return false;
     }
 
-    public void harvesterAction(Level level, BasePedestalBlockEntity pedestal)
-    {
+    public void harvesterAction(Level level, BasePedestalBlockEntity pedestal, List<BlockPos> listed) {
         if(!level.isClientSide())
         {
             WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
             if(getPlayer != null && getPlayer.get() != null)
             {
-                List<BlockPos> listed = getValidList(pedestal);
                 int currentPosition = getCurrentPosition(pedestal);
                 BlockPos currentPoint = listed.get(currentPosition);
                 BlockState blockAtPoint = level.getBlockState(currentPoint);
