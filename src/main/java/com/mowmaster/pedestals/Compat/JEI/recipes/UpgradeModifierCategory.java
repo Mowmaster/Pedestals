@@ -121,25 +121,30 @@ public class UpgradeModifierCategory implements IRecipeCategory<UpgradeModificat
 
 
         //+2 - Max 10
-        MutableComponent separator1 = Component.translatable(References.MODID + ".upgrade_modification.separatorone");
 
-        MutableComponent separator2 = Component.translatable(References.MODID + ".upgrade_modification.separatortwo");
+        //+
+        MutableComponent separator1 = Component.translatable(References.MODID + ".text.separator.plus");
+        //" "
+        MutableComponent spaceText = Component.translatable(References.MODID + ".text.separator.space");
+        //"Min: "
+        MutableComponent minText = Component.translatable(References.MODID + ".text.separator.min");
+        //"Max: "
+        MutableComponent maxText = Component.translatable(References.MODID + ".text.separator.max");
 
         MutableComponent increaseAmount = Component.literal(""+ recipe.getResultModificationAmount() +"");
-
-        MutableComponent separator3 = Component.translatable(References.MODID + ".upgrade_modification.separatorthree");
-
+        MutableComponent minAmount = Component.literal(""+ recipe.getResultModificationMinAmount() +"");
         MutableComponent maxAmount = Component.literal(""+ recipe.getResultModificationMaxAmount() +"");
 
-        separator1.withStyle(ChatFormatting.BLACK);
-        increaseAmount.withStyle(ChatFormatting.BLACK);
+
         separator1.append(increaseAmount);
-        separator2.withStyle(ChatFormatting.BLACK);
-        separator1.append(separator2);
-        separator3.withStyle(ChatFormatting.BLACK);
-        separator1.append(separator3);
-        maxAmount.withStyle(ChatFormatting.BLACK);
+        separator1.append(spaceText);
+        separator1.append(minText);
+        separator1.append(minAmount);
+        separator1.append(spaceText);
+        separator1.append(maxText);
         separator1.append(maxAmount);
+        separator1.withStyle(ChatFormatting.BLACK);
+
         int width = fontRenderer.width(separator1.getString());
         fontRenderer.draw(stack,separator1,64-Math.floorDiv(width,2),73,0xffffffff);
     }

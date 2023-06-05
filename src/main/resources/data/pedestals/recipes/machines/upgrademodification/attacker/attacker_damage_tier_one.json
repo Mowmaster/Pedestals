@@ -14,5 +14,6 @@
   ],
   "resultModificationName": "upgradedamagecapacity",
   "resultModificationValue": 1,
+  "resultModificationMinValue": 0,
   "resultModificationMaxValue": 3
 }

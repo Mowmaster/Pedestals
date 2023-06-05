@@ -34,6 +34,8 @@
   "pedestals.text.separator.horizontal_rule_large.dash": "--------------------",
   "pedestals.text.separator.horizontal_rule_medium.dash": "----------",
   "pedestals.text.separator.horizontal_rule_small.dash": "-----",
+  "pedestals.text.separator.min": "Min: ",
+  "pedestals.text.separator.max": "Max: ",
 
   "pedestals.jei.cobble_gen": "Material Generator",
   "pedestals.cobble_gen.warning": "§cThe Pedestal Simulates Breaking the Result Block, the Broken remains are what is Actually Generated",

@@ -36,19 +36,21 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
     private final NonNullList<Ingredient> inputIngredients;
     private final String resultModificationName;
     private final int resultModificationValue;
+    private final int resultModificationMinValue;
     private final int resultModificationMaxValue;
 
 
 
     //Someday add in a bool value to set as something fake players could do too or not???
 
-    public UpgradeModificationGlobalRecipe(ResourceLocation id, String group, NonNullList<Ingredient> inputIngredients, String resultModificationName, int resultModificationValue, int resultModificationMaxValue)
+    public UpgradeModificationGlobalRecipe(ResourceLocation id, String group, NonNullList<Ingredient> inputIngredients, String resultModificationName, int resultModificationValue, int resultModificationMinValue, int resultModificationMaxValue)
     {
         this.group = group;
         this.id = id;
         this.inputIngredients = inputIngredients;
         this.resultModificationName = resultModificationName;
         this.resultModificationValue = resultModificationValue;
+        this.resultModificationMinValue = resultModificationMinValue;
         this.resultModificationMaxValue = resultModificationMaxValue;
     }
 
@@ -146,6 +148,10 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
     {
         return resultModificationValue;
     }
+    public int getResultModificationMinAmount()
+    {
+        return resultModificationMinValue;
+    }
     public int getResultModificationMaxAmount()
     {
         return resultModificationMaxValue;
@@ -160,10 +166,9 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
             {
 
                 int value = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,inputUpgradeStack.getOrCreateTag(),getResultModificationName());
-                if(value>=getResultModificationMaxAmount())
-                {
-                    return false;
-                }
+                if(value>=getResultModificationMaxAmount()) { return false; }
+                if(value<getResultModificationMinAmount()) { return false; }
+
                 int newValue = value + getResultModificationAmount();
                 if(newValue > getResultModificationMaxAmount())
                 {
@@ -171,8 +176,10 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
                 }
                 /*System.out.println("recipe v2R: "+getResultModificationAmount());
                 System.out.println("recipe v2: "+value);
-                System.out.println("recipe v3R: "+getResultModificationMaxAmount());
-                System.out.println("recipe v3: "+newValue);*/
+                System.out.println("recipe v3R: "+getResultModificationMinAmount());
+                System.out.println("recipe v3: "+newValue);
+                System.out.println("recipe v4R: "+getResultModificationMaxAmount());
+                System.out.println("recipe v4: "+newValue);*/
 
                 if(!simulate)MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID,inputUpgradeStack.getOrCreateTag(),newValue,getResultModificationName());
                 return true;
@@ -215,9 +222,9 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
         public static final ResourceLocation ID =
                 new ResourceLocation(MODID,"upgrademodification_global");
 
-        protected UpgradeModificationGlobalRecipe createRecipe(ResourceLocation recipeId, String group, NonNullList<Ingredient> inputIngredients, String resultModificationName, int resultModificationValue, int resultModificationMaxValue)
+        protected UpgradeModificationGlobalRecipe createRecipe(ResourceLocation recipeId, String group, NonNullList<Ingredient> inputIngredients, String resultModificationName, int resultModificationValue, int resultModificationMinValue, int resultModificationMaxValue)
         {
-            return new UpgradeModificationGlobalRecipe(recipeId, group, inputIngredients, resultModificationName, resultModificationValue, resultModificationMaxValue);
+            return new UpgradeModificationGlobalRecipe(recipeId, group, inputIngredients, resultModificationName, resultModificationValue, resultModificationMinValue, resultModificationMaxValue);
         }
 
         @Override
@@ -235,8 +242,9 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
 
             String resultModificationName = GsonHelper.getAsString(json, "resultModificationName", "");
             int resultModificationValue = json.has("resultModificationValue") ? GsonHelper.getAsInt(json,"resultModificationValue") : (0);
+            int resultModificationMinValue = json.has("resultModificationMinValue") ? GsonHelper.getAsInt(json,"resultModificationMinValue") : (0);
             int resultModificationMaxValue = json.has("resultModificationMaxValue") ? GsonHelper.getAsInt(json,"resultModificationMaxValue") : (0);
-            return createRecipe(recipeId, group, inputIngredients, resultModificationName, resultModificationValue, resultModificationMaxValue);
+            return createRecipe(recipeId, group, inputIngredients, resultModificationName, resultModificationValue, resultModificationMinValue, resultModificationMaxValue);
         }
 
         @Override
@@ -252,8 +260,9 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
 
             String resultModificationName = buffer.readUtf(32767);
             int resultModificationValue = buffer.readInt();
+            int resultModificationMinValue = buffer.readInt();
             int resultModificationMaxValue = buffer.readInt();
-            return createRecipe(recipeId, group, inputIngredients, resultModificationName, resultModificationValue, resultModificationMaxValue);
+            return createRecipe(recipeId, group, inputIngredients, resultModificationName, resultModificationValue, resultModificationMinValue, resultModificationMaxValue);
         }
 
         @Override
@@ -268,6 +277,7 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
 
             buffer.writeUtf(recipe.resultModificationName);
             buffer.writeInt(recipe.resultModificationValue);
+            buffer.writeInt(recipe.resultModificationMinValue);
             buffer.writeInt(recipe.resultModificationMaxValue);
         }
 
