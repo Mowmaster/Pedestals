@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.Items.WorkCards;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.IPedestalAugment;
@@ -450,10 +451,15 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
 
         if(itemInHand.getItem() instanceof WorkCardBase)
         {
-            if(hand.equals(InteractionHand.MAIN_HAND) && !player.isShiftKeyDown() && itemInHand.getItem() instanceof WorkCardBase && itemInHand.getItem() instanceof ISelectablePoints)
+            if(hand.equals(InteractionHand.MAIN_HAND) && !player.isShiftKeyDown() && itemInHand.getItem() instanceof WorkCardBase baseCard && itemInHand.getItem() instanceof ISelectablePoints)
             {
                 if(result.getType().equals(HitResult.Type.BLOCK))
                 {
+                    if(baseCard.getWorkCardType() == 3)
+                    {
+                        if(!(level.getBlockState(atLocation).getBlock() instanceof BasePedestalBlock))
+                            return InteractionResultHolder.fail(p_41433_.getItemInHand(p_41434_));
+                    }
                     boolean added = addBlockPosToList(itemInHand,atLocation);
                     player.setItemInHand(hand,itemInHand);
                     MowLibMessageUtils.messagePopup(player,(added)?(ChatFormatting.WHITE):(ChatFormatting.BLACK),(added)?(MODID + ".upgrade_blockpos_added"):(MODID + ".upgrade_blockpos_removed"));
