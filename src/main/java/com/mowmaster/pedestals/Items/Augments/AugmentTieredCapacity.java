@@ -11,9 +11,11 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import static com.mowmaster.pedestals.PedestalUtils.References.isDustLoaded;
 
 import net.minecraft.world.item.Item.Properties;
 
@@ -76,38 +78,40 @@ public class AugmentTieredCapacity extends AugmentBase{
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
 
-        List<String> listed = new ArrayList<>();
-        List<ChatFormatting> colors = new ArrayList<>();
+        List<String>listed = new ArrayList<String>(
+                Arrays.asList(
+                        MODID + ".augments_capacity_itemrate"
+                        ,String.valueOf(AugmentTieredCapacity.getAdditionalItemTransferRatePerItem(p_41421_))
+                        ,MODID + ".augments_capacity_fluidrate"
+                        ,String.valueOf(AugmentTieredCapacity.getAdditionalFluidTransferRatePerItem(p_41421_))
+                        ,MODID + ".augments_capacity_energyrate"
+                        ,String.valueOf(AugmentTieredCapacity.getAdditionalEnergyTransferRatePerItem(p_41421_))
+                        ,MODID + ".augments_capacity_xprate"
+                        ,String.valueOf(AugmentTieredCapacity.getAdditionalXpTransferRatePerItem(p_41421_))
+                        ,MODID + ".augments_insertable"
+                        ,String.valueOf(AugmentTieredCapacity.getAllowedInsertAmount(p_41421_))
+                ));
 
-        colors.add(ChatFormatting.YELLOW);
-        listed.add(MODID + ".augments_capacity_itemrate");
-        colors.add(ChatFormatting.WHITE);
-        listed.add(String.valueOf(AugmentTieredCapacity.getAdditionalItemTransferRatePerItem(p_41421_)));
+        List<ChatFormatting>colors = new ArrayList<ChatFormatting>(
+                Arrays.asList(
+                        ChatFormatting.YELLOW
+                        ,ChatFormatting.WHITE
+                        ,ChatFormatting.AQUA
+                        ,ChatFormatting.WHITE
+                        ,ChatFormatting.RED
+                        ,ChatFormatting.WHITE
+                        ,ChatFormatting.GREEN
+                        ,ChatFormatting.WHITE
+                        ,ChatFormatting.GOLD
+                        ,ChatFormatting.GOLD
+                ));
 
-        colors.add(ChatFormatting.AQUA);
-        listed.add(MODID + ".augments_capacity_fluidrate");
-        colors.add(ChatFormatting.WHITE);
-        listed.add(String.valueOf(AugmentTieredCapacity.getAdditionalFluidTransferRatePerItem(p_41421_)));
+        if(isDustLoaded())
+        {
+            listed = new ArrayList<String>(Arrays.asList(MODID + ".augments_capacity_itemrate",String.valueOf(AugmentTieredCapacity.getAdditionalItemTransferRatePerItem(p_41421_)),MODID + ".augments_capacity_fluidrate",String.valueOf(AugmentTieredCapacity.getAdditionalFluidTransferRatePerItem(p_41421_)),MODID + ".augments_capacity_energyrate",String.valueOf(AugmentTieredCapacity.getAdditionalEnergyTransferRatePerItem(p_41421_)),MODID + ".augments_capacity_xprate",String.valueOf(AugmentTieredCapacity.getAdditionalXpTransferRatePerItem(p_41421_)),MODID + ".augments_capacity_dustrate",String.valueOf(AugmentTieredCapacity.getAdditionalDustTransferRatePerItem(p_41421_)),MODID + ".augments_insertable",String.valueOf(AugmentTieredCapacity.getAllowedInsertAmount(p_41421_))));
+            colors = new ArrayList<ChatFormatting>(Arrays.asList(ChatFormatting.YELLOW,ChatFormatting.WHITE,ChatFormatting.AQUA,ChatFormatting.WHITE,ChatFormatting.RED,ChatFormatting.WHITE,ChatFormatting.GREEN,ChatFormatting.WHITE,ChatFormatting.LIGHT_PURPLE,ChatFormatting.WHITE,ChatFormatting.GOLD,ChatFormatting.GOLD));
+        }
 
-        colors.add(ChatFormatting.RED);
-        listed.add(MODID + ".augments_capacity_energyrate");
-        colors.add(ChatFormatting.WHITE);
-        listed.add(String.valueOf(AugmentTieredCapacity.getAdditionalEnergyTransferRatePerItem(p_41421_)));
-
-        colors.add(ChatFormatting.GREEN);
-        listed.add(MODID + ".augments_capacity_xprate");
-        colors.add(ChatFormatting.WHITE);
-        listed.add(String.valueOf(AugmentTieredCapacity.getAdditionalXpTransferRatePerItem(p_41421_)));
-
-        colors.add(ChatFormatting.LIGHT_PURPLE);
-        listed.add(MODID + ".augments_capacity_dustrate");
-        colors.add(ChatFormatting.WHITE);
-        listed.add(String.valueOf(AugmentTieredCapacity.getAdditionalDustTransferRatePerItem(p_41421_)));
-
-        colors.add(ChatFormatting.GOLD);
-        listed.add(MODID + ".augments_insertable");
-        colors.add(ChatFormatting.GOLD);
-        listed.add(String.valueOf(AugmentTieredCapacity.getAllowedInsertAmount(p_41421_)));
 
         MowLibTooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID+".augments",p_41423_,listed,colors);
     }

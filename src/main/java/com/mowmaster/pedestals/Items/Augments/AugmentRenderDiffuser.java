@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Augments;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import com.mowmaster.pedestals.PedestalUtils.MoveToMowLibUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,6 +15,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -89,21 +92,27 @@ public class AugmentRenderDiffuser extends AugmentBase
                         saveModeToNBT(itemInOffhand,setNewMode);
                         player.setItemInHand(p_41434_,itemInOffhand);
 
-                        ChatFormatting colorChange = ChatFormatting.BLACK;
-                        String typeString = "";
-                        switch(setNewMode)
-                        {
-                            case 0: typeString = ".mode_augment_particle"; colorChange = ChatFormatting.LIGHT_PURPLE; break;
-                            case 1: typeString = ".mode_augment_item"; colorChange = ChatFormatting.AQUA; break;
-                            case 2: typeString = ".mode_augment_upgrade"; colorChange = ChatFormatting.GOLD; break;
-                            case 3: typeString = ".mode_augment_pi"; colorChange = ChatFormatting.WHITE; break;
-                            case 4: typeString = ".mode_augment_pu"; colorChange = ChatFormatting.LIGHT_PURPLE; break;
-                            case 5: typeString = ".mode_augment_iu"; colorChange = ChatFormatting.AQUA; break;
-                            case 6: typeString = ".mode_augment_piu"; colorChange = ChatFormatting.GOLD; break;
-                            default: typeString = ".error"; colorChange = ChatFormatting.DARK_RED; break;
-                        }
+                        List<String>typeStringList = new ArrayList<String>(
+                                Arrays.asList(
+                                        ".mode_augment_particle",
+                                        ".mode_augment_item",
+                                        ".mode_augment_upgrade",
+                                        ".mode_augment_pi",
+                                        ".mode_augment_pu",
+                                        ".mode_augment_iu",
+                                        ".mode_augment_piu"));
 
-                        MowLibMessageUtils.messagePopup(player,colorChange,MODID + typeString);
+                        List<ChatFormatting>chatColorList = new ArrayList<ChatFormatting>(
+                                Arrays.asList(
+                                        ChatFormatting.LIGHT_PURPLE,
+                                        ChatFormatting.AQUA,
+                                        ChatFormatting.GOLD,
+                                        ChatFormatting.WHITE,
+                                        ChatFormatting.LIGHT_PURPLE,
+                                        ChatFormatting.AQUA,
+                                        ChatFormatting.GOLD));
+
+                        MoveToMowLibUtils.modeBasedTextOutputPopup(player, setNewMode, true, MODID, typeStringList, chatColorList);
                     }
                 }
             }
@@ -112,27 +121,22 @@ public class AugmentRenderDiffuser extends AugmentBase
         return super.use(p_41432_, p_41433_, p_41434_);
     }
 
+
+
+
     @Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
 
-        int augmentMode = getAugmentMode(p_41421_);
-
-        String typeString = "";
-        switch(augmentMode)
-        {
-            case 0: typeString = ".mode_augment_particle";break;
-            case 1: typeString = ".mode_augment_item"; break;
-            case 2: typeString = ".mode_augment_upgrade"; break;
-            case 3: typeString = ".mode_augment_pi"; break;
-            case 4: typeString = ".mode_augment_pu"; break;
-            case 5: typeString = ".mode_augment_iu"; break;
-            case 6: typeString = ".mode_augment_piu"; break;
-            default: typeString = ".error"; break;
-        }
-
-        MutableComponent type = Component.translatable(MODID + typeString);
-        type.withStyle(ChatFormatting.GOLD);
-        p_41423_.add(type);
+        List<String>typeStringList = new ArrayList<String>(
+                Arrays.asList(
+                        ".mode_augment_particle",
+                        ".mode_augment_item",
+                        ".mode_augment_upgrade",
+                        ".mode_augment_pi",
+                        ".mode_augment_pu",
+                        ".mode_augment_iu",
+                        ".mode_augment_piu"));
+        MoveToMowLibUtils.modeBasedTextOutputTooltip(getAugmentMode(p_41421_), true, MODID, typeStringList, ChatFormatting.GOLD, p_41423_);
 
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
     }

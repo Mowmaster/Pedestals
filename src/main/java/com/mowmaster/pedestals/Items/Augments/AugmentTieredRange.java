@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
@@ -45,17 +46,21 @@ public class AugmentTieredRange extends AugmentBase{
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
 
-        List<String> listed = new ArrayList<>();
-        List<ChatFormatting> colors = new ArrayList<>();
+        List<String>listed = new ArrayList<String>(
+                Arrays.asList(
+                        MODID + ".augments_range_increase"
+                        ,String.valueOf(AugmentTieredRange.getRangeIncreasePerItem(p_41421_))
+                        ,MODID + ".augments_insertable"
+                        ,String.valueOf(AugmentTieredRange.getAllowedInsertAmount(p_41421_))
+                ));
 
-        colors.add(ChatFormatting.YELLOW);
-        listed.add(MODID + ".augments_range_increase");
-        colors.add(ChatFormatting.WHITE);
-        listed.add(String.valueOf(AugmentTieredRange.getRangeIncreasePerItem(p_41421_)));
-        colors.add(ChatFormatting.LIGHT_PURPLE);
-        listed.add(MODID + ".augments_insertable");
-        colors.add(ChatFormatting.GOLD);
-        listed.add(String.valueOf(AugmentTieredRange.getAllowedInsertAmount(p_41421_)));
+        List<ChatFormatting>colors = new ArrayList<ChatFormatting>(
+                Arrays.asList(
+                        ChatFormatting.YELLOW
+                        ,ChatFormatting.WHITE
+                        ,ChatFormatting.LIGHT_PURPLE
+                        ,ChatFormatting.GOLD
+                ));
 
         MowLibTooltipUtils.addTooltipShiftMessageMultiWithStyle(MODID,p_41423_,listed,colors);
     }
