@@ -6,17 +6,13 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMultiContainer;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Recipes.BottlerRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -83,65 +79,45 @@ public class ItemUpgradeBottler extends ItemUpgradeBase
     }
 
     @Override
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
-    {
-        BlockPos posInventory = getPosOfBlockBelow(level,pedestalPos,1);
-        ItemStack itemFromInv = ItemStack.EMPTY;
-        LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
-        if(!isInventoryEmpty(cap)) {
-            if (cap.isPresent()) {
-                IItemHandler handler = cap.orElse(null);
-                BlockEntity invToPullFrom = level.getBlockEntity(posInventory);
-                if(invToPullFrom instanceof BasePedestalBlockEntity) {
-                    itemFromInv = ItemStack.EMPTY;
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        BlockPos inventoryPos = getPosOfBlockBelow(level, pedestalPos,1);
+        if (level.getBlockEntity(inventoryPos) instanceof BasePedestalBlockEntity) {
+            return;
+        }
 
-                }
-                else {
-                    if (handler != null) {
-                        //Items
-                        //Handle last, just incase any items match the other options
-                        int i = getNextSlotWithItemsCapFilteredMachine(pedestal,cap);
-                        if(i>=0)
-                        {
-                            itemFromInv = handler.getStackInSlot(i);
-                            ItemStack copyIncoming = itemFromInv.copy();
-                            copyIncoming.setCount(1);
-                            if(itemFromInv != null && !itemFromInv.isEmpty())
-                            {
-                                BottlerRecipe recipe = getNormalRecipe(pedestal, copyIncoming);
-                                ItemStack returnedStack = getNormalResults(recipe).stream().findFirst().orElse(ItemStack.EMPTY);
-                                if(!returnedStack.isEmpty())
-                                {
-                                    boolean fluid = true;
-                                    FluidStack getRequiredFluid = getFluidNeeded(recipe);
-                                    boolean energy = true;
-                                    int getRequiredEnergy = getEnergyNeeded(recipe);
-                                    boolean exp = true;
-                                    int getRequiredExperience = getExperienceNeeded(recipe);
-                                    boolean dust = true;
-                                    DustMagic getRequiredDust = getDustNeeded(recipe);
+        MowLibItemUtils.findItemHandlerAtPos(level, inventoryPos, getPedestalFacing(level, pedestalPos), true).ifPresent(handler ->
+            getFirstSlotWithNonMachineFilteredItems(pedestal, handler).ifPresent(slot -> {
+                ItemStack itemFromInv = handler.getStackInSlot(slot);
+                ItemStack copyIncoming = itemFromInv.copy();
+                copyIncoming.setCount(1);
+                BottlerRecipe recipe = getNormalRecipe(pedestal, copyIncoming);
+                ItemStack returnedStack = getNormalResults(recipe).stream().findFirst().orElse(ItemStack.EMPTY);
+                if(!returnedStack.isEmpty()) {
+                    boolean fluid = true;
+                    FluidStack getRequiredFluid = getFluidNeeded(recipe);
+                    boolean energy = true;
+                    int getRequiredEnergy = getEnergyNeeded(recipe);
+                    boolean exp = true;
+                    int getRequiredExperience = getExperienceNeeded(recipe);
+                    boolean dust = true;
+                    DustMagic getRequiredDust = getDustNeeded(recipe);
 
-                                    if(!getRequiredFluid.isEmpty() && pedestal.removeFluid(getRequiredFluid, IFluidHandler.FluidAction.SIMULATE).isEmpty())fluid = false;
-                                    if(getRequiredEnergy > 0 && pedestal.removeEnergy(getRequiredEnergy, true)<=0)energy = false;
-                                    if(getRequiredExperience > 0 && pedestal.removeExperience(getRequiredExperience, true)<=0)exp = false;
-                                    if(!getRequiredDust.isEmpty() && pedestal.removeDust(getRequiredDust, IDustHandler.DustAction.SIMULATE).isEmpty())dust = false;
-                                    boolean hasRequiredStuff = fluid && energy && exp && dust;
+                    if(!getRequiredFluid.isEmpty() && pedestal.removeFluid(getRequiredFluid, IFluidHandler.FluidAction.SIMULATE).isEmpty())fluid = false;
+                    if(getRequiredEnergy > 0 && pedestal.removeEnergy(getRequiredEnergy, true)<=0)energy = false;
+                    if(getRequiredExperience > 0 && pedestal.removeExperience(getRequiredExperience, true)<=0)exp = false;
+                    if(!getRequiredDust.isEmpty() && pedestal.removeDust(getRequiredDust, IDustHandler.DustAction.SIMULATE).isEmpty())dust = false;
+                    boolean hasRequiredStuff = fluid && energy && exp && dust;
 
-                                    if(!handler.extractItem(i,1 ,true ).isEmpty() && pedestal.addItem(returnedStack, true) && hasRequiredStuff)
-                                    {
-                                        handler.extractItem(i,1 ,false );
-                                        if(!getRequiredFluid.isEmpty())pedestal.removeFluid(getRequiredFluid, IFluidHandler.FluidAction.EXECUTE);
-                                        if(getRequiredEnergy > 0)pedestal.removeEnergy(getRequiredEnergy, false);
-                                        if(getRequiredExperience > 0)pedestal.removeExperience(getRequiredExperience, false);
-                                        if(!getRequiredDust.isEmpty())pedestal.removeDust(getRequiredDust, IDustHandler.DustAction.EXECUTE);
-                                        pedestal.addItem(returnedStack, false);
-                                    }
-                                }
-                            }
-                        }
+                    if(!handler.extractItem(slot,1 ,true ).isEmpty() && pedestal.addItem(returnedStack, true) && hasRequiredStuff) {
+                        handler.extractItem(slot,1 ,false );
+                        if(!getRequiredFluid.isEmpty())pedestal.removeFluid(getRequiredFluid, IFluidHandler.FluidAction.EXECUTE);
+                        if(getRequiredEnergy > 0)pedestal.removeEnergy(getRequiredEnergy, false);
+                        if(getRequiredExperience > 0)pedestal.removeExperience(getRequiredExperience, false);
+                        if(!getRequiredDust.isEmpty())pedestal.removeDust(getRequiredDust, IDustHandler.DustAction.EXECUTE);
+                        pedestal.addItem(returnedStack, false);
                     }
                 }
-            }
-        }
+            })
+        );
     }
 }

@@ -59,6 +59,7 @@ import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -1312,36 +1313,18 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return ItemHandlerHelper.canItemStacksStack(stackPedestal,itemStackIn);
     }
 
-    public int getNextSlotWithItemsCapFilteredMachine(BasePedestalBlockEntity pedestal, LazyOptional<IItemHandler> cap)
-    {
-        AtomicInteger slot = new AtomicInteger(-1);
-        if(cap.isPresent()) {
-
-            cap.ifPresent(itemHandler -> {
-                int range = itemHandler.getSlots();
-                for(int i=0;i<range;i++)
-                {
-                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
-                    //find a slot with items
-                    if(!stackInSlot.isEmpty())
-                    {
-                        //check if it could pull the item out or not
-                        if(!itemHandler.extractItem(i,1 ,true ).equals(ItemStack.EMPTY))
-                        {
-                            //If pedestal is empty accept any items
-                            if(passesMachineFilter(pedestal,stackInSlot))
-                            {
-                                slot.set(i);
-                                break;
-                            }
-                        }
-                    }
-                }});
-
-
+    public static Optional<Integer> getFirstSlotWithNonMachineFilteredItems(BasePedestalBlockEntity pedestal, IItemHandler itemHandler) {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+            if(
+                !stackInSlot.isEmpty() &&
+                !itemHandler.extractItem(i, 1, true).equals(ItemStack.EMPTY) &&
+                passesMachineFilter(pedestal, stackInSlot)
+            ) {
+                return Optional.of(i);
+            }
         }
-
-        return slot.get();
+        return Optional.empty();
     }
 
     public int getNextSlotWithItemsCapFiltered(BasePedestalBlockEntity pedestal, LazyOptional<IItemHandler> cap)
@@ -1426,23 +1409,14 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return slot.get();
     }
 
-    public boolean passesMachineFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn)
-    {
-        boolean returner = true;
-        if(pedestal.hasFilter())
-        {
+    public static boolean passesMachineFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn) {
+        if (pedestal.hasFilter()) {
             ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
-            {
-                if(filter.getFilterDirection().equals(IPedestalFilter.FilterDirection.NEUTRAL))
-                {
-                    returner = filter.canAcceptItems(filterInPedestal,stackIn);
-                }
+            if (filterInPedestal.getItem() instanceof IPedestalFilter filter && filter.getFilterDirection().equals(IPedestalFilter.FilterDirection.NEUTRAL)) {
+                return filter.canAcceptItems(filterInPedestal, stackIn);
             }
-
         }
-
-        return returner;
+        return true;
     }
 
     public boolean passesItemFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn)
