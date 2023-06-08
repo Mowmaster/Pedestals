@@ -4,7 +4,6 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
-import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.PedestalUtils.MoveToMowLibUtils;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.ChatFormatting;
@@ -17,7 +16,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.*;
 
-public class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRecipe> extends ItemUpgradeBase {
+public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRecipe> extends ItemUpgradeBase {
     private final RecipeType<T> recipeType;
 
     public ItemUpgradeAbstractCookingBase(Properties p_41383_, RecipeType<T> rType) {
@@ -31,7 +30,7 @@ public class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRecipe> ext
     @Override
     public int baseEnergyCostPerDistance() { return baseEnergyCost(); }
 
-    public int baseEnergyCost() { return PedestalConfig.COMMON.upgrade_blast_baseEnergyCost.get(); }
+    abstract public int baseEnergyCost();
 
     @Override
     public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
