@@ -4,6 +4,7 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.MoveToMowLibUtils;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.ChatFormatting;
@@ -36,7 +37,7 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
     public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
 
     @Override
-    public List<String> getUpgradeHUD(com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity pedestal) {
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
         List<String> messages = new ArrayList<>();
 
         if (pedestal.getItemInPedestal().isEmpty()) {
@@ -52,7 +53,7 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
     }
 
     @Override
-    public void actionOnRemovedFromPedestal(com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
+    public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
         MoveToMowLibUtils.resetCachedAbstractCooking(References.MODID, coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getOrCreateTag(), "hasitem");
@@ -65,7 +66,7 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getOrCreateTag(), "_numdelay");
     }
 
-    private void updateHasItemNBT(com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity pedestal, boolean state) {
+    private void updateHasItemNBT(BasePedestalBlockEntity pedestal, boolean state) {
         CompoundTag tag = pedestal.getCoinOnPedestal().getOrCreateTag();
         if (MowLibCompoundTagUtils.readBooleanFromNBT(References.MODID, tag, "hasitem") != state) {
             MowLibCompoundTagUtils.writeBooleanToNBT(References.MODID, tag, state, "hasitem");
@@ -74,10 +75,10 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
     }
 
     @Override
-    public void updateAction(Level level, com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity pedestal) {
+    public void updateAction(Level level, BasePedestalBlockEntity pedestal) {
         BlockPos pedestalPos = pedestal.getPos();
         BlockPos inventoryPos = getPosOfBlockBelow(level, pedestalPos,1);
-        if (level.getBlockEntity(inventoryPos) instanceof com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity) {
+        if (level.getBlockEntity(inventoryPos) instanceof BasePedestalBlockEntity) {
             updateHasItemNBT(pedestal, false);
             return;
         }
