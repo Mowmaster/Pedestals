@@ -5,6 +5,7 @@ import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.PedestalUtils.BaseUseInteractionItem;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -31,7 +32,7 @@ import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.phys.HitResult;
 
-public class BaseTool extends Item
+public class BaseTool extends BaseUseInteractionItem
 {
 
     public BaseTool(Properties p_41383_) {
@@ -43,13 +44,9 @@ public class BaseTool extends Item
 
     public InteractionResultHolder interactCrouchingTargetAir(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result)
     { return interactSwapTool(level,player,hand,itemStackInHand, result, getMainTool().getItem(), getSwappedTool().getItem()); }
-    public InteractionResultHolder interactTargetAir(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result)
-    { return  InteractionResultHolder.pass(player.getItemInHand(hand)); }
 
     public InteractionResultHolder interactCrouchingTargetBlock(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result)
     { return interactGetPedestalDetail(level, player, hand, itemStackInHand, result); }
-    public InteractionResultHolder interactTargetBlock(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result)
-    { return  InteractionResultHolder.pass(player.getItemInHand(hand)); }
 
 
     //Default method of interactCrouchingTargetAir
@@ -85,45 +82,6 @@ public class BaseTool extends Item
 
     //Default method of interactGetPedestalDetail which is in interactCrouchingTargetBlock
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {}
-
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level p_41432_, Player p_41433_, InteractionHand p_41434_) {
-
-        Level level = p_41432_;
-        if(!level.isClientSide())
-        {
-            Player player = p_41433_;
-            InteractionHand hand = p_41434_;
-            ItemStack itemStackInHand = player.getItemInHand(hand);
-            HitResult result = player.pick(5,0,false);
-            BlockPos pos = new BlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
-            if(result.getType().equals(HitResult.Type.MISS))
-            {
-                if(player.isShiftKeyDown())
-                {
-                    //Defaults to interactSwapTool method, but can be overwritten.
-                    interactCrouchingTargetAir(level, player, hand, itemStackInHand, result);
-                }
-                else
-                {
-                    interactTargetAir(level, player, hand, itemStackInHand, result);
-                }
-            }
-            else if(result.getType().equals(HitResult.Type.BLOCK))
-            {
-                if(player.isShiftKeyDown())
-                {
-                    interactCrouchingTargetBlock(level, player, hand, itemStackInHand, result);
-                }
-                else
-                {
-                    interactTargetBlock(level, player, hand, itemStackInHand, result);
-                }
-            }
-        }
-
-        return super.use(p_41432_, p_41433_, p_41434_);
-    }
 
     @Override
     public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
@@ -198,8 +156,5 @@ public class BaseTool extends Item
     @Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
-        /*TooltipUtils.addTooltipShiftMessageWithStyle(p_41423_,getDescriptionId() + ".description",ChatFormatting.LIGHT_PURPLE);
-        TooltipUtils.addTooltipAltMessageWithStyle(p_41423_,getDescriptionId() + ".description_use",ChatFormatting.AQUA);
-*/
     }
 }
