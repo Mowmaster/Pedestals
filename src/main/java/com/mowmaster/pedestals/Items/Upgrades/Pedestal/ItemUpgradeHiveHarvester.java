@@ -8,15 +8,9 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
-import com.mowmaster.pedestals.Items.ISelectableArea;
-import com.mowmaster.pedestals.Items.ISelectablePoints;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockSourceImpl;
-import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.*;
@@ -24,31 +18,21 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 import static net.minecraft.world.level.block.BeehiveBlock.HONEY_LEVEL;
 
-public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
-{
+public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
     public ItemUpgradeHiveHarvester(Properties p_41383_) {
         super(new Properties());
     }
@@ -64,9 +48,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
     }
 
     @Override
-    public boolean canModifyArea(ItemStack upgradeItemStack) {
-        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
-    }
+    public boolean canModifyArea(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get(); }
 
     @Override
     public boolean needsWorkCard() { return true; }
@@ -76,77 +58,59 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
 
     //Requires energy
     @Override
-    public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_hiveharvester_baseEnergyCost.get(); }
+    public int baseEnergyCostPerDistance() { return PedestalConfig.COMMON.upgrade_hiveharvester_baseEnergyCost.get(); }
     @Override
-    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_hiveharvester_energy_distance_multiplier.get();}
+    public boolean energyDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_hiveharvester_energy_distance_multiplier.get(); }
     @Override
-    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_hiveharvester_energyMultiplier.get(); }
+    public double energyCostMultiplier() { return PedestalConfig.COMMON.upgrade_hiveharvester_energyMultiplier.get(); }
 
     @Override
-    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_hiveharvester_baseXpCost.get(); }
+    public int baseXpCostPerDistance() { return PedestalConfig.COMMON.upgrade_hiveharvester_baseXpCost.get(); }
     @Override
-    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_hiveharvester_xp_distance_multiplier.get();}
+    public boolean xpDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_hiveharvester_xp_distance_multiplier.get(); }
     @Override
-    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_hiveharvester_xpMultiplier.get(); }
+    public double xpCostMultiplier() { return PedestalConfig.COMMON.upgrade_hiveharvester_xpMultiplier.get(); }
 
     @Override
-    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_hiveharvester_dustColor.get(),PedestalConfig.COMMON.upgrade_hiveharvester_baseDustAmount.get()); }
+    public DustMagic baseDustCostPerDistance() { return new DustMagic(PedestalConfig.COMMON.upgrade_hiveharvester_dustColor.get(),PedestalConfig.COMMON.upgrade_hiveharvester_baseDustAmount.get()); }
     @Override
-    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_hiveharvester_dust_distance_multiplier.get();}
+    public boolean dustDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_hiveharvester_dust_distance_multiplier.get(); }
     @Override
-    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_hiveharvester_dustMultiplier.get(); }
+    public double dustCostMultiplier() { return PedestalConfig.COMMON.upgrade_hiveharvester_dustMultiplier.get(); }
 
     @Override
     public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_hiveharvester_selectedAllowed.get(); }
     @Override
-    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_hiveharvester_selectedMultiplier.get(); }
+    public double selectedAreaCostMultiplier() { return PedestalConfig.COMMON.upgrade_hiveharvester_selectedMultiplier.get(); }
 
     @Override
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
-
         List<String> messages = super.getUpgradeHUD(pedestal);
-
-        if(messages.size()<=0)
-        {
-            if(baseEnergyCostPerDistance()>0)
-            {
-                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
-                {
-                    messages.add(ChatFormatting.RED + "Needs Energy");
-                    messages.add(ChatFormatting.RED + "To Operate");
-                }
+        if (messages.isEmpty()) {
+            if (baseEnergyCostPerDistance() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
+                messages.add(ChatFormatting.RED + "Needs Energy");
+                messages.add(ChatFormatting.RED + "To Operate");
             }
-            if(baseXpCostPerDistance()>0)
-            {
-                if(pedestal.getStoredExperience()<baseXpCostPerDistance())
-                {
-                    messages.add(ChatFormatting.GREEN + "Needs Experience");
-                    messages.add(ChatFormatting.GREEN + "To Operate");
-                }
+            if (baseXpCostPerDistance() > 0 && pedestal.getStoredExperience() < baseXpCostPerDistance()) {
+                messages.add(ChatFormatting.GREEN + "Needs Experience");
+                messages.add(ChatFormatting.GREEN + "To Operate");
             }
-            if(baseDustCostPerDistance().getDustAmount()>0)
-            {
-                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
-                {
-                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
-                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
-                }
+            if (baseDustCostPerDistance().getDustAmount() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
+                messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
             }
         }
-
         return messages;
     }
 
     @Override
-    public ItemStack getUpgradeDefaultTool() {
-        return new ItemStack(Items.SHEARS);
-    }
+    public ItemStack getUpgradeDefaultTool() { return new ItemStack(Items.SHEARS); }
 
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
         resetCachedValidWorkCardPositions(coinInPedestal);
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getOrCreateTag(), "_numposition");
     }
 
     @Override
@@ -154,224 +118,95 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase
         List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
         if (allPositions.isEmpty()) return;
 
-        harvesterAction(level, pedestal, allPositions);
+        int currentPosition = getCurrentPosition(coin);
+        BlockPos targetPos = allPositions.get(currentPosition);
+        harvesterAction(level, pedestal, targetPos);
+        if (currentPosition + 1 >= allPositions.size()) {
+            setCurrentPosition(pedestal, 0);
+        } else {
+            setCurrentPosition(pedestal, currentPosition + 1);
+        }
     }
 
-    private int getCurrentPosition(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getOrCreateTag(), "_numposition");
+    private int getCurrentPosition(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, upgrade.getOrCreateTag(), "_numposition");
     }
 
-    private void setCurrentPosition(BasePedestalBlockEntity pedestal, int num)
-    {
+    private void setCurrentPosition(BasePedestalBlockEntity pedestal, int num) {
         ItemStack coin = pedestal.getCoinOnPedestal();
         MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numposition");
     }
 
-    private void iterateCurrentPosition(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        int current = getCurrentPosition(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numposition");
-    }
-
-    private boolean isToolHighEnoughLevelForBlock(ItemStack toolIn, BlockState getBlock)
-    {
-        if(toolIn.getItem() instanceof TieredItem tieredItem)
-        {
-            Tier toolTier = tieredItem.getTier();
-            return TierSortingRegistry.isCorrectTierForDrops(toolTier,getBlock);
-        }
-
-        return false;
-    }
-
-    private List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockState blockTarget, BlockPos posTarget)
-    {
-        ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(new ItemStack(Items.STONE_PICKAXE)):(pedestal.getToolStack());
-        Level level = pedestal.getLevel();
-        if(blockTarget.getBlock() != Blocks.AIR)
-        {
-            LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                    .withRandom(level.random)
-                    .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                    .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-            return blockTarget.getBlock().getDrops(blockTarget,builder);
-        }
-
-        /*if(blockTarget.requiresCorrectToolForDrops())
-        {
-            if(isToolHighEnoughLevelForBlock(getToolFromPedestal, blockTarget))
-            {
-            }
-        }
-        else
-        {
-            //Level level = pedestal.getLevel();
-            if(blockTarget.getBlock() != Blocks.AIR)
-            {
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-                return blockTarget.getBlock().getDrops(blockTarget,builder);
-            }
-        }*/
-
-        return new ArrayList<>();
-    }
-
-    private boolean passesFilter(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)
-    {
-        if(pedestal.hasFilter())
-        {
+    private boolean passesFilter(BasePedestalBlockEntity pedestal, Block targetBlock) {
+        if (pedestal.hasFilter()) {
             ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if(filterInPedestal.getItem() instanceof BaseFilter filter)
-            {
-                if(filter.getFilterDirection().neutral())
-                {
-                    ItemStack blockToCheck = ItemStack.EMPTY;
-                    if(canMineBlock.getBlock() instanceof Block)
-                    {
-                        blockToCheck = canMineBlock.getBlock().getCloneItemStack(pedestal.getLevel(),canMinePos,canMineBlock);
-                    }
+            if (filterInPedestal.getItem() instanceof BaseFilter filter && filter.getFilterDirection().neutral()) {
+                ItemStack blockToCheck = new ItemStack(targetBlock);
 
-                    return filter.canAcceptItems(filterInPedestal,blockToCheck);
-                }
+                return filter.canAcceptItems(filterInPedestal, blockToCheck);
             }
         }
 
         return true;
     }
 
-    public static IntegerProperty getBlockPropertyAge(BlockState blockState) {
-        for (Property<?> prop : blockState.getProperties()) {
-            if (prop != null && prop.getName() != null && prop instanceof IntegerProperty && prop.getName().equalsIgnoreCase("age")) {
-                return (IntegerProperty) prop;
-            }
-        }
-        return null;
+    private boolean canHarvest(Level level, BlockPos targetPos, BlockState targetBlockState, Block targetBlock) {
+        List<Block> cannotBreakBlocks = ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList();
+
+        return !cannotBreakBlocks.contains(targetBlock) &&
+            targetBlockState.getDestroySpeed(level, targetPos) >= 0 &&
+            targetBlockState.hasProperty(HONEY_LEVEL) &&
+            targetBlockState.getValue(HONEY_LEVEL) >= 5;
     }
 
-    private boolean canMine(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)
-    {
-        if (canMineBlock.is(BlockTags.BEEHIVES, (p_202454_) -> {
-            return p_202454_.hasProperty(HONEY_LEVEL) && p_202454_.getBlock() instanceof BeehiveBlock;
-        })) {
-            int i = canMineBlock.getValue(HONEY_LEVEL);
-            if (i >= 5) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void harvesterAction(Level level, BasePedestalBlockEntity pedestal, List<BlockPos> listed) {
-        if(!level.isClientSide())
-        {
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-            if(getPlayer != null && getPlayer.get() != null)
-            {
-                int currentPosition = getCurrentPosition(pedestal);
-                BlockPos currentPoint = listed.get(currentPosition);
-                BlockState blockAtPoint = level.getBlockState(currentPoint);
-                boolean fuelRemoved = true;
-
-                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
-                {
-                    if(!blockAtPoint.getBlock().equals(Blocks.AIR) && blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
-                    {
-                        if(passesFilter(pedestal, blockAtPoint, currentPoint) && (!ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_cannot_break"))).stream().toList().contains(blockAtPoint.getBlock())))
-                        {
-                            if(canMine(pedestal,blockAtPoint,currentPoint))
-                            {
-                                if(ForgeEventFactory.doPlayerHarvestCheck((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), blockAtPoint, true)) {
-                                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, currentPoint, blockAtPoint, (getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()));
-                                    if (!MinecraftForge.EVENT_BUS.post(e)) {
-                                        boolean damage = false;
-                                        if(!currentPoint.equals(pedestal.getPos()))
-                                        {
-                                            if(PedestalConfig.COMMON.blockBreakerDamageTools.get())
-                                            {
-                                                if(pedestal.hasTool())
-                                                {
-                                                    BlockPos pedestalPos = pedestal.getPos();
-                                                    if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                                                    {
-                                                        if(pedestal.damageInsertedTool(1,true))
-                                                        {
-                                                            damage = true;
-                                                        }
-                                                        else
-                                                        {
-                                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                                            return;
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                                        return;
-                                                    }
-                                                }
-                                            }
-
-                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
-                                            {
-                                                BlockSourceImpl p_123444_ = new BlockSourceImpl((ServerLevel)level, currentPoint);
-                                                if (blockAtPoint.is(BlockTags.BEEHIVES, (p_123442_) -> {
-                                                    return p_123442_.hasProperty(HONEY_LEVEL) && p_123442_.getBlock() instanceof BeehiveBlock;
-                                                }) && blockAtPoint.getValue(HONEY_LEVEL) >= 5) {
-                                                    ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
-                                                    getPlayer.get().setItemInHand(InteractionHand.MAIN_HAND,toolStack);
-                                                    UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, toolStack.copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
-                                                    BlockHitResult resulted = new BlockHitResult(blockContext.getClickLocation(),blockContext.getClickedFace(),blockContext.getClickedPos(),blockContext.isInside());
-                                                    if(resulted.getType() == HitResult.Type.BLOCK)
-                                                    {
-                                                        ((BeehiveBlock)blockAtPoint.getBlock()).use(blockAtPoint,level,currentPoint, getPlayer.get(), InteractionHand.MAIN_HAND,resulted);
-                                                        NonNullList<ItemStack> getItemsInPlayer = getPlayer.get().getInventory().items;
-                                                        for(int i=0;i<getItemsInPlayer.size();i++)
-                                                        {
-                                                            ItemStack stackInPlayer = getItemsInPlayer.get(i);
-                                                            if(!stackInPlayer.isEmpty() && !toolStack.getItem().equals(stackInPlayer.getItem()))
-                                                            {
-                                                                MowLibItemUtils.spawnItemStack(level,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),stackInPlayer);
-                                                                if(toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize()<=1)
-                                                                {
-                                                                    if(damage)pedestal.damageTool(toolStack,1,false);
-                                                                }
-                                                                else
-                                                                {
-                                                                    pedestal.removeItem(1,false);
-                                                                }
-                                                            }
-                                                        }
-                                                        if(damage)pedestal.damageInsertedTool(1,false);
-                                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
-                                                    }
-                                                }
-                                            }
-                                            else {
-                                                fuelRemoved = false;
-                                            }
-                                        }
-                                    }
-                                }
+    public void harvesterAction(Level level, BasePedestalBlockEntity pedestal, BlockPos targetPos) {
+        if(!level.isClientSide()) {
+            WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
+            if (fakePlayerReference != null && fakePlayerReference.get() != null) {
+                FakePlayer fakePlayer = fakePlayerReference.get();
+                BlockPos pedestalPos = pedestal.getPos();
+                BlockState targetBlockState = level.getBlockState(targetPos);
+                Block targetBlock = targetBlockState.getBlock();
+                if (
+                    removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestalPos, targetPos), true) &&
+                        targetBlock instanceof BeehiveBlock beehiveBlock &&
+                        canHarvest(level, targetPos, targetBlockState, targetBlock) &&
+                        passesFilter(pedestal, targetBlock)
+                ) {
+                    BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, targetPos, targetBlockState, fakePlayer);
+                    if (!MinecraftForge.EVENT_BUS.post(e)) {
+                        ItemStack toolStack = pedestal.hasItem() ? pedestal.getItemInPedestal() : pedestal.getToolStack();
+                        if(PedestalConfig.COMMON.hiveharvester_DamageTools.get()) {
+                            if(!pedestal.damageTool(toolStack, 1, true)) {
+                                if (pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 255, 255, 255));
+                                return; // tool does not have sufficient durability
                             }
                         }
-                    }
 
-                    if((currentPosition+1)>=listed.size())
-                    {
-                        setCurrentPosition(pedestal,0);
-                    }
-                    else
-                    {
-                        if(fuelRemoved){
-                            iterateCurrentPosition(pedestal);
+                        if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestalPos, targetPos), false)) {
+                            fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, toolStack);
+                            UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toolStack.copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level, pedestalPos), targetPos, false));
+                            BlockHitResult result = new BlockHitResult(blockContext.getClickLocation(), blockContext.getClickedFace(), blockContext.getClickedPos(), blockContext.isInside());
+                            if (result.getType() == HitResult.Type.BLOCK) {
+                                beehiveBlock.use(targetBlockState, level, targetPos, fakePlayer, InteractionHand.MAIN_HAND, result);
+                                for (ItemStack stackInPlayer : fakePlayer.getInventory().items) {
+                                    if (!stackInPlayer.isEmpty() && !stackInPlayer.is(toolStack.getItem())) {
+                                        MowLibItemUtils.spawnItemStack(level, targetPos.getX(), targetPos.getY(), targetPos.getZ(), stackInPlayer);
+                                    }
+                                }
+                                if (PedestalConfig.COMMON.hiveharvester_DamageTools.get()) {
+                                    if (toolStack.getMaxStackSize() <= 1) {
+                                        pedestal.damageTool(toolStack, 1, false);
+                                    } else {
+                                        ItemStack toRemove = toolStack.copy();
+                                        toRemove.setCount(1);
+                                        pedestal.removeItemStack(toRemove, false);
+                                    }
+                                }
+                                if (pedestal.canSpawnParticles()) {
+                                    MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, targetPos.getX(), targetPos.getY()+1.0f, targetPos.getZ(), 255, 246, 0));
+                                }
+                            }
                         }
                     }
                 }
