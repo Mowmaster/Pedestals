@@ -163,24 +163,6 @@ public class BaseFilter extends MowLibBaseFilter
                     MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GRAY,filterStack.getDisplayName().getString() + " |--->  ", enchantList);
                 }
             }
-            /*for(int i=0; i < ItemTransferMode.values().length; i++)
-            {
-                List<ItemStack> filterQueue = readFilterQueueFromNBT(filterStack,get);
-                if(filterQueue.size()>0)
-                {
-                    MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,MODID + ".filters.tooltip_filterlist");
-
-                    List<String> enchantList = new ArrayList<>();
-                    for(int j=0;j<filterQueue.size();j++) {
-
-                        if(!filterQueue.get(j).isEmpty())
-                        {
-                            enchantList.add(filterQueue.get(j).getDisplayName().getString() + ", ");
-                        }
-                    }
-                    MowLibMessageUtils.messagePlayerChatWithAppend(MODID, player,ChatFormatting.GRAY,filterStack.getDisplayName().getString(), enchantList);
-                }
-            }*/
         }
         else
         {

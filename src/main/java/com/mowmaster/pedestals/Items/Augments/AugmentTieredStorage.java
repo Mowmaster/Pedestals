@@ -79,37 +79,8 @@ public class AugmentTieredStorage extends AugmentBase{
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_) {
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
 
-        List<String>listed = new ArrayList<String>(
-                Arrays.asList(
-                        MODID + ".augments_storage_itemrate"
-                        ,String.valueOf(AugmentTieredStorage.getAdditionalItemStoragePerItem(p_41421_))
-                        ,MODID + ".augments_storage_fluidrate"
-                        ,String.valueOf(AugmentTieredStorage.getAdditionalFluidStoragePerItem(p_41421_))
-                        ,MODID + ".augments_storage_energyrate"
-                        ,String.valueOf(AugmentTieredStorage.getAdditionalEnergyStoragePerItem(p_41421_))
-                        ,MODID + ".augments_storage_xprate"
-                        ,String.valueOf(AugmentTieredStorage.getAdditionalXpStoragePerItem(p_41421_))
-                        ,MODID + ".augments_storage_dustrate"
-                        ,String.valueOf(AugmentTieredStorage.getAdditionalDustStoragePerItem(p_41421_))
-                        ,MODID + ".augments_insertable"
-                        ,String.valueOf(AugmentTieredStorage.getAllowedInsertAmount(p_41421_))
-                ));
-
-        List<ChatFormatting>colors = new ArrayList<ChatFormatting>(
-                Arrays.asList(
-                        ChatFormatting.YELLOW
-                        ,ChatFormatting.WHITE
-                        ,ChatFormatting.AQUA
-                        ,ChatFormatting.WHITE
-                        ,ChatFormatting.RED
-                        ,ChatFormatting.WHITE
-                        ,ChatFormatting.GREEN
-                        ,ChatFormatting.WHITE
-                        ,ChatFormatting.LIGHT_PURPLE
-                        ,ChatFormatting.WHITE
-                        ,ChatFormatting.GOLD
-                        ,ChatFormatting.WHITE
-                ));
+        List<String>listed = new ArrayList<String>(Arrays.asList(MODID + ".augments_storage_itemrate",String.valueOf(AugmentTieredStorage.getAdditionalItemStoragePerItem(p_41421_)),MODID + ".augments_storage_fluidrate",String.valueOf(AugmentTieredStorage.getAdditionalFluidStoragePerItem(p_41421_)),MODID + ".augments_storage_energyrate",String.valueOf(AugmentTieredStorage.getAdditionalEnergyStoragePerItem(p_41421_)),MODID + ".augments_storage_xprate",String.valueOf(AugmentTieredStorage.getAdditionalXpStoragePerItem(p_41421_)),MODID + ".augments_storage_dustrate",String.valueOf(AugmentTieredStorage.getAdditionalDustStoragePerItem(p_41421_)),MODID + ".augments_insertable",String.valueOf(AugmentTieredStorage.getAllowedInsertAmount(p_41421_))));
+        List<ChatFormatting>colors = new ArrayList<ChatFormatting>(Arrays.asList(ChatFormatting.YELLOW,ChatFormatting.WHITE,ChatFormatting.AQUA,ChatFormatting.WHITE,ChatFormatting.RED,ChatFormatting.WHITE,ChatFormatting.GREEN,ChatFormatting.WHITE,ChatFormatting.LIGHT_PURPLE,ChatFormatting.WHITE,ChatFormatting.GOLD,ChatFormatting.WHITE));
 
         if(isDustLoaded())
         {
