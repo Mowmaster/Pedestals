@@ -176,15 +176,16 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
                     BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, targetPos, targetBlockState, fakePlayer);
                     if (!MinecraftForge.EVENT_BUS.post(e)) {
                         ItemStack toolStack = pedestal.hasItem() ? pedestal.getItemInPedestal() : pedestal.getToolStack();
-                        if(PedestalConfig.COMMON.hiveharvester_DamageTools.get()) {
-                            if(!pedestal.damageTool(toolStack, 1, true)) {
+                        boolean toolStackIsDamageable = toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize() <= 1;
+                        if (PedestalConfig.COMMON.hiveharvester_DamageTools.get()) {
+                            if (toolStackIsDamageable && !pedestal.damageTool(toolStack, 1, true)) {
                                 if (pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 255, 255, 255));
                                 return; // tool does not have sufficient durability
                             }
                         }
 
                         if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestalPos, targetPos), false)) {
-                            fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, toolStack);
+                            fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, toolStack.copy());
                             UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toolStack.copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level, pedestalPos), targetPos, false));
                             BlockHitResult result = new BlockHitResult(blockContext.getClickLocation(), blockContext.getClickedFace(), blockContext.getClickedPos(), blockContext.isInside());
                             if (result.getType() == HitResult.Type.BLOCK) {
@@ -192,16 +193,15 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
                                 for (ItemStack stackInPlayer : fakePlayer.getInventory().items) {
                                     if (!stackInPlayer.isEmpty() && !stackInPlayer.is(toolStack.getItem())) {
                                         MowLibItemUtils.spawnItemStack(level, targetPos.getX(), targetPos.getY(), targetPos.getZ(), stackInPlayer);
+                                        if (!toolStackIsDamageable) {
+                                            ItemStack toRemove = toolStack.copy();
+                                            toRemove.setCount(1);
+                                            pedestal.removeItemStack(toRemove, false);
+                                        }
                                     }
                                 }
-                                if (PedestalConfig.COMMON.hiveharvester_DamageTools.get()) {
-                                    if (toolStack.getMaxStackSize() <= 1) {
-                                        pedestal.damageTool(toolStack, 1, false);
-                                    } else {
-                                        ItemStack toRemove = toolStack.copy();
-                                        toRemove.setCount(1);
-                                        pedestal.removeItemStack(toRemove, false);
-                                    }
+                                if (toolStackIsDamageable && PedestalConfig.COMMON.hiveharvester_DamageTools.get()) {
+                                    pedestal.damageTool(toolStack, 1, false);
                                 }
                                 if (pedestal.canSpawnParticles()) {
                                     MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, targetPos.getX(), targetPos.getY()+1.0f, targetPos.getZ(), 255, 246, 0));
