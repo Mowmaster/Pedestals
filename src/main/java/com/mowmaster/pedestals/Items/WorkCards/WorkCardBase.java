@@ -11,6 +11,7 @@ import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IHasModeTypes;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.PedestalUtils.MoveToMowLibUtils;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -271,28 +272,12 @@ public class WorkCardBase extends Item implements IPedestalWorkCard
 
     //ToDo: Add to mowlib and remove from here
 
-    public boolean isSelectionInRange(BasePedestalBlockEntity pedestalCurrent, BlockPos currentSelectedPoint)
-    {
+    public boolean isSelectionInRange(BasePedestalBlockEntity pedestal, BlockPos pos) {
         int range = PedestalConfig.COMMON.upgrades_baseSelectionRange.get();
-        if(pedestalCurrent.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
-        {
-            range += upgrade.getRangeIncrease(pedestalCurrent.getCoinOnPedestal());
+        if(pedestal.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade) {
+            range += upgrade.getRangeIncrease(pedestal.getCoinOnPedestal());
         }
-        int x = currentSelectedPoint.getX();
-        int y = currentSelectedPoint.getY();
-        int z = currentSelectedPoint.getZ();
-        int x1 = pedestalCurrent.getPos().getX();
-        int y1 = pedestalCurrent.getPos().getY();
-        int z1 = pedestalCurrent.getPos().getZ();
-        int xF = Math.abs(Math.subtractExact(x,x1));
-        int yF = Math.abs(Math.subtractExact(y,y1));
-        int zF = Math.abs(Math.subtractExact(z,z1));
-
-        if(xF>range || yF>range || zF>range)
-        {
-            return false;
-        }
-        else return true;
+        return MoveToMowLibUtils.arePositionsInRange(pos, pedestal.getPos(), range);
     }
 
     public boolean selectedAreaWithinRange(BasePedestalBlockEntity pedestal)

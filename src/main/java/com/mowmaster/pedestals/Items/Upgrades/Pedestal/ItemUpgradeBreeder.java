@@ -3,7 +3,7 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -12,7 +12,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.util.FakePlayer;
 
 import java.lang.ref.WeakReference;
@@ -34,9 +33,7 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase {
     }
 
     @Override
-    public boolean canModifyArea(ItemStack upgradeItemStack) {
-        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
-    }
+    public boolean canModifyArea(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get(); }
 
     @Override
     public boolean needsWorkCard() { return true; }
@@ -46,30 +43,30 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase {
 
     //Requires energy
     @Override
-    public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_breeder_baseEnergyCost.get(); }
+    public int baseEnergyCostPerDistance() { return PedestalConfig.COMMON.upgrade_breeder_baseEnergyCost.get(); }
     @Override
-    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_breeder_energy_distance_multiplier.get();}
+    public boolean energyDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_breeder_energy_distance_multiplier.get(); }
     @Override
-    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_breeder_energyMultiplier.get(); }
+    public double energyCostMultiplier() { return PedestalConfig.COMMON.upgrade_breeder_energyMultiplier.get(); }
 
     @Override
-    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_breeder_baseXpCost.get(); }
+    public int baseXpCostPerDistance() { return PedestalConfig.COMMON.upgrade_breeder_baseXpCost.get(); }
     @Override
-    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_breeder_xp_distance_multiplier.get();}
+    public boolean xpDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_breeder_xp_distance_multiplier.get(); }
     @Override
-    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_breeder_xpMultiplier.get(); }
+    public double xpCostMultiplier() { return PedestalConfig.COMMON.upgrade_breeder_xpMultiplier.get(); }
 
     @Override
-    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_breeder_dustColor.get(),PedestalConfig.COMMON.upgrade_breeder_baseDustAmount.get()); }
+    public DustMagic baseDustCostPerDistance() { return new DustMagic(PedestalConfig.COMMON.upgrade_breeder_dustColor.get(),PedestalConfig.COMMON.upgrade_breeder_baseDustAmount.get()); }
     @Override
-    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_breeder_dust_distance_multiplier.get();}
+    public boolean dustDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_breeder_dust_distance_multiplier.get(); }
     @Override
-    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_breeder_dustMultiplier.get(); }
+    public double dustCostMultiplier() { return PedestalConfig.COMMON.upgrade_breeder_dustMultiplier.get(); }
 
     @Override
     public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_breeder_selectedAllowed.get(); }
     @Override
-    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_breeder_selectedMultiplier.get(); }
+    public double selectedAreaCostMultiplier() { return PedestalConfig.COMMON.upgrade_breeder_selectedMultiplier.get(); }
 
     public boolean hasBreederLimit() { return PedestalConfig.COMMON.upgrade_breeder_entityBreedingLimit.get(); }
     public int getBreederLimitCount() { return PedestalConfig.COMMON.upgrade_breeder_entityLimitBreedingCount.get(); }
@@ -108,25 +105,19 @@ public class ItemUpgradeBreeder extends ItemUpgradeBase {
         if (fakePlayerReference != null && fakePlayerReference.get() != null) {
             FakePlayer fakePlayer = fakePlayerReference.get();
             ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
-            if(
-                !workCardItemStack.isEmpty() &&
-                workCardItemStack.getItem() instanceof WorkCardBase workCardBase &&
-                workCardBase.hasTwoPointsSelected(workCardItemStack)
-            ) {
-                AABB area = workCardBase.getAABBonUpgrade(workCardItemStack);
-                List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, area);
-                if (hasBreederLimit() && entities.size() >= getBreederLimitCount()) {
+            if (workCardItemStack.getItem() instanceof WorkCardArea) {
+                List<Animal> animals = WorkCardArea.getEntitiesInRangeOfUpgrade(level, Animal.class, workCardItemStack, pedestal);
+                if (hasBreederLimit() && animals.size() >= getBreederLimitCount()) {
                     return;
                 }
 
-                for (LivingEntity entity : entities) {
+                for (Animal animal : animals) {
                     ItemStack stackInPedestal = pedestal.hasItem() ? pedestal.getItemInPedestal() : pedestal.getToolStack();
                     if (stackInPedestal.isEmpty()) {
                         return;
                     }
 
                     if (
-                        entity instanceof Animal animal &&
                         animal.isFood(stackInPedestal) &&
                         animal.getAge() == 0 &&
                         animal.canFallInLove() &&

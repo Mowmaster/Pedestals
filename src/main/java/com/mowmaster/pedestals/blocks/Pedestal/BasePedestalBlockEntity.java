@@ -19,6 +19,7 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
+import com.mowmaster.pedestals.PedestalUtils.MoveToMowLibUtils;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -805,11 +806,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public boolean isPedestalInRange(BlockPos targetPos) {
-        BlockPos distanceVector = getPos().subtract(targetPos);
-        int range = getLinkingRange();
-        return Math.abs(distanceVector.getX()) <= range &&
-            Math.abs(distanceVector.getY()) <= range &&
-            Math.abs(distanceVector.getZ()) <= range;
+        return MoveToMowLibUtils.arePositionsInRange(getPos(), targetPos, getLinkingRange());
     }
 
     public boolean isSamePedestal(BlockPos targetPos) {

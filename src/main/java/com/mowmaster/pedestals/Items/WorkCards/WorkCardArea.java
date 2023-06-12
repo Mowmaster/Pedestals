@@ -3,28 +3,44 @@ package com.mowmaster.pedestals.Items.WorkCards;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class WorkCardArea extends WorkCardBase implements ISelectableArea {
-
     public WorkCardArea(Properties p_41383_) {
         super(p_41383_);
     }
 
-    public int getWorkCardType()
-    {
+    public int getWorkCardType() {
         return 1;
     }
 
+    // NOTE: The returned AABB is sufficient for cases that are dealing directly with the points covered by the area,
+    // but needs to be modified by `.expandTowards(1.0D, 1.0D, 1.0D)` for any code that is using it as a bounding-box.
+    private static Optional<AABB> getAABBIfDefinedAndInRange(ItemStack workCardStack, BasePedestalBlockEntity pedestal) {
+        BlockPos posOne = readBlockPosFromNBT(workCardStack, 1);
+        BlockPos posTwo = readBlockPosFromNBT(workCardStack, 2);
+        if (
+            workCardStack.getItem() instanceof WorkCardArea workCard &&
+            !posOne.equals(BlockPos.ZERO) && !posTwo.equals(BlockPos.ZERO) &&
+            workCard.isSelectionInRange(pedestal, posOne) && workCard.isSelectionInRange(pedestal, posTwo)
+        ) {
+            return Optional.of(new AABB(posOne, posTwo));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public static List<BlockPos> getPositionsInRangeOfUpgrade(ItemStack workCardStack, BasePedestalBlockEntity pedestal) {
-        if (workCardStack.getItem() instanceof WorkCardArea workCard) {
-            List<BlockPos> locations = new ArrayList<>();
-            if (workCard.selectedAreaWithinRange(pedestal)) {
-                AABB area = new AABB(WorkCardBase.readBlockPosFromNBT(workCardStack, 1), WorkCardBase.readBlockPosFromNBT(workCardStack, 2));
+        return getAABBIfDefinedAndInRange(workCardStack, pedestal)
+            .map(area -> {
+                List<BlockPos> locations = new ArrayList<>();
 
                 int minX = (int) area.minX;
                 int minY = (int) area.minY;
@@ -51,10 +67,13 @@ public class WorkCardArea extends WorkCardBase implements ISelectableArea {
                         }
                     }
                 }
-            }
-            return locations;
-        } else {
-            return List.of();
-        }
+                return locations;
+            }).orElse(List.of());
+    }
+
+    public static <T extends Entity> List<T> getEntitiesInRangeOfUpgrade(Level level, Class<T> entityType, ItemStack workCardStack, BasePedestalBlockEntity pedestal) {
+        return getAABBIfDefinedAndInRange(workCardStack, pedestal)
+            .map(area -> level.getEntitiesOfClass(entityType, area.expandTowards(1.0D, 1.0D, 1.0D)))
+            .orElse(List.of());
     }
 }

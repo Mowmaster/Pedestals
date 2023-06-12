@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.PedestalUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.Container;
@@ -111,4 +112,12 @@ public class MoveToMowLibUtils
     /*
      * End RecipeUtils
      */
+
+    // TODO: is already in a PR to MowLib
+    public static boolean arePositionsInRange(BlockPos posOne, BlockPos posTwo, int range) {
+        BlockPos distanceVector = posOne.subtract(posTwo);
+        return Math.abs(distanceVector.getX()) <= range &&
+            Math.abs(distanceVector.getY()) <= range &&
+            Math.abs(distanceVector.getZ()) <= range;
+    }
 }
