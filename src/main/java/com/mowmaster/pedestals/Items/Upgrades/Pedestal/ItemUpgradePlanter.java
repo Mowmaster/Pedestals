@@ -7,9 +7,6 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Filters.BaseFilter;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardLocations;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -50,9 +47,7 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
     }
 
     @Override
-    public boolean canModifyArea(ItemStack upgradeItemStack) {
-        return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get();
-    }
+    public boolean canModifyArea(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get(); }
 
     @Override
     public boolean canModifySuperSpeed(ItemStack upgradeItemStack) {
@@ -66,63 +61,47 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
     public int getWorkCardType() { return 0; }
 
     //Requires energy
-
     @Override
     public int baseEnergyCostPerDistance(){ return PedestalConfig.COMMON.upgrade_planter_baseEnergyCost.get(); }
     @Override
-    public boolean energyDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_energy_distance_multiplier.get();}
+    public boolean energyDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_planter_energy_distance_multiplier.get(); }
     @Override
-    public double energyCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_energyMultiplier.get(); }
+    public double energyCostMultiplier() { return PedestalConfig.COMMON.upgrade_planter_energyMultiplier.get(); }
 
     @Override
-    public int baseXpCostPerDistance(){ return PedestalConfig.COMMON.upgrade_planter_baseXpCost.get(); }
+    public int baseXpCostPerDistance() { return PedestalConfig.COMMON.upgrade_planter_baseXpCost.get(); }
     @Override
-    public boolean xpDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_xp_distance_multiplier.get();}
+    public boolean xpDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_planter_xp_distance_multiplier.get(); }
     @Override
-    public double xpCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_xpMultiplier.get(); }
+    public double xpCostMultiplier() { return PedestalConfig.COMMON.upgrade_planter_xpMultiplier.get(); }
 
     @Override
-    public DustMagic baseDustCostPerDistance(){ return new DustMagic(PedestalConfig.COMMON.upgrade_planter_dustColor.get(),PedestalConfig.COMMON.upgrade_planter_baseDustAmount.get()); }
+    public DustMagic baseDustCostPerDistance() { return new DustMagic(PedestalConfig.COMMON.upgrade_planter_dustColor.get(),PedestalConfig.COMMON.upgrade_planter_baseDustAmount.get()); }
     @Override
-    public boolean dustDistanceAsModifier() {return PedestalConfig.COMMON.upgrade_planter_dust_distance_multiplier.get();}
+    public boolean dustDistanceAsModifier() { return PedestalConfig.COMMON.upgrade_planter_dust_distance_multiplier.get(); }
     @Override
-    public double dustCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_dustMultiplier.get(); }
+    public double dustCostMultiplier() { return PedestalConfig.COMMON.upgrade_planter_dustMultiplier.get(); }
 
     @Override
     public boolean hasSelectedAreaModifier() { return PedestalConfig.COMMON.upgrade_planter_selectedAllowed.get(); }
     @Override
-    public double selectedAreaCostMultiplier(){ return PedestalConfig.COMMON.upgrade_planter_selectedMultiplier.get(); }
+    public double selectedAreaCostMultiplier() { return PedestalConfig.COMMON.upgrade_planter_selectedMultiplier.get(); }
 
     @Override
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
-
         List<String> messages = super.getUpgradeHUD(pedestal);
-
-        if(messages.size()<=0)
-        {
-            if(baseEnergyCostPerDistance()>0)
-            {
-                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
-                {
-                    messages.add(ChatFormatting.RED + "Needs Energy");
-                    messages.add(ChatFormatting.RED + "To Operate");
-                }
+        if (messages.isEmpty()) {
+            if (baseEnergyCostPerDistance() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
+                messages.add(ChatFormatting.RED + "Needs Energy");
+                messages.add(ChatFormatting.RED + "To Operate");
             }
-            if(baseXpCostPerDistance()>0)
-            {
-                if(pedestal.getStoredExperience()<baseXpCostPerDistance())
-                {
-                    messages.add(ChatFormatting.GREEN + "Needs Experience");
-                    messages.add(ChatFormatting.GREEN + "To Operate");
-                }
+            if (baseXpCostPerDistance() > 0 && pedestal.getStoredExperience() < baseXpCostPerDistance()) {
+                messages.add(ChatFormatting.GREEN + "Needs Experience");
+                messages.add(ChatFormatting.GREEN + "To Operate");
             }
-            if(baseDustCostPerDistance().getDustAmount()>0)
-            {
-                if(pedestal.getStoredEnergy()<baseEnergyCostPerDistance())
-                {
-                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
-                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
-                }
+            if (baseDustCostPerDistance().getDustAmount() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
+                messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
             }
         }
 
@@ -138,6 +117,8 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        if (level.isClientSide()) return;
+
         List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
         if (allPositions.isEmpty()) return;
 
@@ -147,11 +128,12 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
             }
         } else {
             int currentPosition = getCurrentPosition(pedestal);
-            planterAction(level, pedestal, allPositions.get(currentPosition));
-            if (currentPosition + 1 >= allPositions.size()) {
-                setCurrentPosition(pedestal, 0);
-            } else {
-                setCurrentPosition(pedestal, currentPosition + 1);
+            if (planterAction(level, pedestal, allPositions.get(currentPosition))) {
+                if (currentPosition + 1 == allPositions.size()) {
+                    setCurrentPosition(pedestal, 0);
+                } else {
+                    setCurrentPosition(pedestal, currentPosition + 1);
+                }
             }
         }
     }
@@ -211,34 +193,34 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
         };
     }
 
-    public void planterAction(Level level, BasePedestalBlockEntity pedestal, BlockPos targetPos) {
-        if (!level.isClientSide()) {
-            WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
-            if (fakePlayerReference != null && fakePlayerReference.get() != null) {
-                FakePlayer fakePlayer = fakePlayerReference.get();
-                Direction pedestalFacing = getPedestalFacing(level, pedestal.getPos());
-                ItemStack stackInPedestal = pedestal.getItemInPedestal();
-                ItemStack toPlant = stackInPedestal.copy();
-                toPlant.setCount(1);
+    public boolean planterAction(Level level, BasePedestalBlockEntity pedestal, BlockPos targetPos) {
+        WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
+        if (fakePlayerReference != null && fakePlayerReference.get() != null) {
+            FakePlayer fakePlayer = fakePlayerReference.get();
+            Direction pedestalFacing = getPedestalFacing(level, pedestal.getPos());
+            ItemStack toPlant = pedestal.getItemInPedestal().copy();
+            toPlant.setCount(1);
 
-                if (
-                    removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), targetPos), true) &&
-                        !pedestal.removeItemStack(toPlant, true).isEmpty() &&
-                        !targetPos.equals(pedestal.getPos()) &&
-                        canPlace(level, pedestalFacing, targetPos, toPlant) &&
-                        passesFilter(pedestal, toPlant)
-                ) {
-                    UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toPlant.copy(), new BlockHitResult(Vec3.ZERO, pedestalFacing, targetPos, false));
-                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                    if (result == InteractionResult.CONSUME) {
-                        removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), targetPos), false);
-                        pedestal.removeItemStack(toPlant, false);
-                        if (pedestal.canSpawnParticles()) {
-                            MowLibPacketHandler.sendToNearby(pedestal.getLevel(), pedestal.getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, targetPos.getX() + 0.5D, targetPos.getY() + 0.5D, targetPos.getZ() + 0.5D, 100, 255, 100));
-                        }
+            if (
+                removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), targetPos), true) &&
+                    !pedestal.removeItemStack(toPlant, true).isEmpty() &&
+                    !targetPos.equals(pedestal.getPos()) &&
+                    canPlace(level, pedestalFacing, targetPos, toPlant) &&
+                    passesFilter(pedestal, toPlant)
+            ) {
+                UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toPlant.copy(), new BlockHitResult(Vec3.ZERO, pedestalFacing, targetPos, false));
+                InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                if (result == InteractionResult.CONSUME) {
+                    removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), targetPos), false);
+                    pedestal.removeItemStack(toPlant, false);
+                    if (pedestal.canSpawnParticles()) {
+                        MowLibPacketHandler.sendToNearby(pedestal.getLevel(), pedestal.getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, targetPos.getX() + 0.5D, targetPos.getY() + 0.5D, targetPos.getZ() + 0.5D, 100, 255, 100));
                     }
                 }
+                return true;
             }
         }
+
+        return false;
     }
 }
