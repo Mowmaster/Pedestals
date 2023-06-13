@@ -110,6 +110,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
         if (level.isClientSide()) return;
+        if (!pedestal.hasItem()) return;
 
         List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
         if (allPositions.isEmpty()) return;
@@ -134,13 +135,12 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
         MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numposition");
     }
 
-    private boolean passesFilter(BasePedestalBlockEntity pedestal) {
+    private boolean passesFilter(BasePedestalBlockEntity pedestal, ItemStack toPlace) {
         if (pedestal.hasFilter()) {
             ItemStack filterInPedestal = pedestal.getFilterInPedestal();
             if (filterInPedestal.getItem() instanceof BaseFilter filter && filter.getFilterDirection().neutral()) {
-                ItemStack blockToCheck = pedestal.getItemInPedestal();
-                if (Block.byItem(blockToCheck.getItem()) != Blocks.AIR) {
-                    return filter.canAcceptItems(filterInPedestal,blockToCheck);
+                if (Block.byItem(toPlace.getItem()) != Blocks.AIR) {
+                    return filter.canAcceptItems(filterInPedestal, toPlace);
                 }
             }
         }
@@ -173,7 +173,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
                     !pedestal.removeItemStack(toPlace, true).isEmpty() &&
                     !targetPos.equals(pedestal.getPos()) &&
                     canPlace(toPlace) &&
-                    passesFilter(pedestal)
+                    passesFilter(pedestal, toPlace)
             ) {
                 if (level.getBlockState(targetPos).getBlock() != Blocks.AIR) return true; // skip over already-placed blocks
 
