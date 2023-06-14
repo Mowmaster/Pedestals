@@ -8,8 +8,7 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.mowlib.Recipes.BaseBlockEntityFilter;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.ISelectableArea;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -32,7 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 
@@ -417,80 +415,62 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                if(workCardBase.hasTwoPointsSelected(card))
-                {
-                    attackerAction(level, pedestal, pedestalPos, coin);
-                }
-            }
-        }
+        attackerAction(level, pedestal, pedestalPos, coin);
     }
 
-    public void attackerAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
-    {
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                if(workCardBase.hasTwoPointsSelected(card))
+    public void attackerAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
+        if (fakePlayerReference != null && fakePlayerReference.get() != null) {
+            FakePlayer fakePlayer = fakePlayerReference.get();
+            ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
+            if (workCardItemStack.getItem() instanceof WorkCardArea) {
+                List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal);
+
+                boolean canRun = true;
+                boolean damage = false;
+
+                if(removeFuelForAction(pedestal, 0, true))
                 {
-                    boolean canRun = true;
-                    boolean damage = false;
+                    ItemStack toolStack = pedestal.getToolStack().copy();
+                    fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, toolStack);
 
-                    if(removeFuelForAction(pedestal, workCardBase.getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
+                    if(PedestalConfig.COMMON.attacker_DamageTools.get())
                     {
-                        WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-                        if(getPlayer != null && getPlayer.get() != null)
+                        if(pedestal.hasTool())
                         {
-                            AABB getArea = workCardBase.getAABBonUpgrade(card);
-                            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                            ItemStack toolStack = pedestal.getToolStack().copy();
-                            tryEquipItem(toolStack,getPlayer,InteractionHand.MAIN_HAND);
-
-                            if(PedestalConfig.COMMON.attacker_DamageTools.get())
+                            if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
                             {
-                                if(pedestal.hasTool())
+                                if(pedestal.damageInsertedTool(1,true))
                                 {
-                                    if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                                    {
-                                        if(pedestal.damageInsertedTool(1,true))
-                                        {
-                                            damage = true;
-                                        }
-                                        else
-                                        {
-                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                            canRun = false;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                        canRun = false;
-                                    }
+                                    damage = true;
+                                }
+                                else
+                                {
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                    canRun = false;
                                 }
                             }
-
-                            if(canRun)
+                            else
                             {
-                                for (LivingEntity getEntity : entities)
-                                {
-                                    if(getEntity == null)continue;
-                                    //BlockPos getEntityPos = getEntity.getOnPos();
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                canRun = false;
+                            }
+                        }
+                    }
 
-                                    if(allowEntity(coin,getEntity))
-                                    {
-                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), false))
-                                        {
-                                            doAttack(pedestal, getPlayer.get(),getEntity);
-                                            if(damage)pedestal.damageInsertedTool(1,false);
-                                        }
-                                    }
+                    if(canRun)
+                    {
+                        for (LivingEntity getEntity : entities)
+                        {
+                            if(getEntity == null)continue;
+                            //BlockPos getEntityPos = getEntity.getOnPos();
+
+                            if(allowEntity(coin,getEntity))
+                            {
+                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), false))
+                                {
+                                    doAttack(pedestal, fakePlayer, getEntity);
+                                    if(damage)pedestal.damageInsertedTool(1,false);
                                 }
                             }
                         }

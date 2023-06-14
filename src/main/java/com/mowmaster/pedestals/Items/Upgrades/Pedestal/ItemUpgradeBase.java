@@ -2036,17 +2036,6 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     ==============================================================================
     ============================================================================*/
 
-    public static void tryEquipItem(ItemStack stack, WeakReference<FakePlayer> pedestalPlayer, InteractionHand hand)
-    {
-        if (pedestalPlayer == null || pedestalPlayer.get() == null || stack == null) {
-            return;
-        }
-        else
-        {
-            pedestalPlayer.get().setItemInHand(hand, stack);
-        }
-    }
-
     public WeakReference<FakePlayer> fakeUpgradePlayer(BasePedestalBlockEntity pedestal)
     {
         Level world = pedestal.getLevel();

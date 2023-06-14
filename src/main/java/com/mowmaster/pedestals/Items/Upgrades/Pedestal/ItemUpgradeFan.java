@@ -6,8 +6,7 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.Recipes.BaseBlockEntityFilter;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.ISelectableArea;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -251,46 +249,25 @@ public class ItemUpgradeFan extends ItemUpgradeBase
         if(level.getGameTime()%speed == 0 )
         {
         }*/
-        if(pedestal.hasWorkCard())
+        if(level.getGameTime()%2 == 0)
         {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                if(level.getGameTime()%2 == 0)
-                {
-                    if(workCardBase.hasTwoPointsSelected(card))
-                    {
-                        fanAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
-                    }
-                }
-            }
+                fanAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
         }
     }
 
-    public void fanAction(BasePedestalBlockEntity pedestal, Level level, BlockPos posOfPedestal, ItemStack coinInPedestal)
-    {
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posOfPedestal), true))
-                {
-                    AABB getArea = workCardBase.getAABBonUpgrade(card);
-                    List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
+    public void fanAction(BasePedestalBlockEntity pedestal, Level level, BlockPos posOfPedestal, ItemStack coinInPedestal) {
+        ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
+        if (workCardItemStack.getItem() instanceof WorkCardArea) {
+            List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal);
 
-                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posOfPedestal), false))
-                    {
-                        for (LivingEntity getEntity : entities)
-                        {
-                            if(getEntity == null)continue;
-                            if(!allowEntity(coinInPedestal,getEntity))continue;
-                            if(getEntity instanceof Player player && player.isCrouching())continue;
+            if (removeFuelForAction(pedestal, 0, false)) {
+                Direction facing = getPedestalFacing(level,posOfPedestal);
+                for (LivingEntity entity : entities) {
+                    if (entity == null) continue;
+                    if (!allowEntity(coinInPedestal, entity)) continue;
+                    if (entity instanceof Player player && player.isCrouching()) continue;
 
-                            Direction facing = getPedestalFacing(level,posOfPedestal);
-                            addMotion((((facing == Direction.UP)?(0.2D):(0.1D)) + (double)(((getSpeedTicksReduced(coinInPedestal)==0)?(1):(getSpeedTicksReduced(coinInPedestal)))/PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get())), facing,getEntity);
-                        }
-                    }
+                    addMotion((((facing == Direction.UP)?(0.2D):(0.1D)) + (double)(((getSpeedTicksReduced(coinInPedestal)==0)?(1):(getSpeedTicksReduced(coinInPedestal)))/PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get())), facing, entity);
                 }
             }
         }

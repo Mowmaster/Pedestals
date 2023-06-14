@@ -6,8 +6,7 @@ import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.ISelectableArea;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,7 +15,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.IForgeShearable;
 import net.minecraftforge.common.util.FakePlayer;
 
@@ -124,82 +122,73 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
     }
 
     @Override
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
-    {
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                if(workCardBase.hasTwoPointsSelected(card) && workCardBase.selectedAreaWithinRange(pedestal))
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
+        if (fakePlayerReference != null && fakePlayerReference.get() != null) {
+            FakePlayer fakePlayer = fakePlayerReference.get();
+            ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
+            if (workCardItemStack.getItem() instanceof WorkCardArea) {
+                List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal);
+                boolean canRun = true;
+                boolean damage = false;
+
+                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
                 {
-                    boolean canRun = true;
-                    boolean damage = false;
+                    ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
 
-                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
+                    if(PedestalConfig.COMMON.sheerer_DamageTools.get())
                     {
-                        WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-                        if(getPlayer != null && getPlayer.get() != null)
+                        if(pedestal.hasTool())
                         {
-                            AABB getArea = workCardBase.getAABBonUpgrade(card);
-                            List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, getArea);
-                            ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
-
-                            if(PedestalConfig.COMMON.sheerer_DamageTools.get())
+                            if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
                             {
-                                if(pedestal.hasTool())
+                                if(pedestal.damageInsertedTool(1,true))
                                 {
-                                    if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                                    {
-                                        if(pedestal.damageInsertedTool(1,true))
-                                        {
-                                            damage = true;
-                                        }
-                                        else
-                                        {
-                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                            canRun = false;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                        canRun = false;
-                                    }
+                                    damage = true;
+                                }
+                                else
+                                {
+                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                    canRun = false;
                                 }
                             }
-
-                            if(canRun)
+                            else
                             {
-                                for (LivingEntity getEntity : entities)
+                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                                canRun = false;
+                            }
+                        }
+                    }
+
+                    if(canRun)
+                    {
+                        for (LivingEntity getEntity : entities)
+                        {
+                            if(getEntity == null)continue;
+
+                            if(getEntity instanceof IForgeShearable shearMe)
+                            {
+                                BlockPos posSheerMe = getEntity.getOnPos();
+                                if(shearMe.isShearable(toolStack.copy(),level,posSheerMe))
                                 {
-                                    if(getEntity == null)continue;
-
-                                    if(getEntity instanceof IForgeShearable shearMe)
+                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posSheerMe), false))
                                     {
-                                        BlockPos posSheerMe = getEntity.getOnPos();
-                                        if(shearMe.isShearable(toolStack.copy(),level,posSheerMe))
-                                        {
-                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),posSheerMe), false))
-                                            {
-                                                int fortune = (EnchantmentHelper.getEnchantments(toolStack).containsKey(Enchantments.BLOCK_FORTUNE))?(EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE,toolStack)):(0);
-                                                List<ItemStack> getReturns = shearMe.onSheared((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()),toolStack,level,posSheerMe,fortune);
+                                        int fortune = (EnchantmentHelper.getEnchantments(toolStack).containsKey(Enchantments.BLOCK_FORTUNE))?(EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE,toolStack)):(0);
+                                        List<ItemStack> getReturns = shearMe.onSheared(fakePlayer,toolStack,level,posSheerMe,fortune);
 
-                                                if(getReturns.size()>0)
+                                        if(getReturns.size()>0)
+                                        {
+                                            for (ItemStack itemstack : getReturns) {
+                                                if(!itemstack.isEmpty()) MowLibItemUtils.spawnItemStack(level,posSheerMe.getX(),posSheerMe.getY(),posSheerMe.getZ(),itemstack);
+                                            }
+                                            if(damage)
+                                            {
+                                                if(toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize()<=1)
                                                 {
-                                                    for (ItemStack itemstack : getReturns) {
-                                                        if(!itemstack.isEmpty()) MowLibItemUtils.spawnItemStack(level,posSheerMe.getX(),posSheerMe.getY(),posSheerMe.getZ(),itemstack);
-                                                    }
-                                                    if(damage)
-                                                    {
-                                                        if(toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize()<=1)
-                                                        {
-                                                            pedestal.damageTool(toolStack,1,false);
-                                                        }
-                                                    }
-                                                    if(!hasAdvancedOne(coin))break;
+                                                    pedestal.damageTool(toolStack,1,false);
                                                 }
                                             }
+                                            if(!hasAdvancedOne(coin))break;
                                         }
                                     }
                                 }
