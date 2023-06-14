@@ -153,10 +153,11 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
         ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
         if (workCardItemStack.getItem() instanceof WorkCardArea) {
             WorkCardArea.getAABBIfDefinedAndInRange(workCardItemStack, pedestal).ifPresent(aabb -> {
+                AABB expandedAABB = aabb.expandTowards(1.0D, 1.0D, 1.0D);
                 boolean needsEnergy = requiresFuelForUpgradeAction();
                 boolean actionDone = false;
 
-                List<ItemEntity> list = world.getEntitiesOfClass(ItemEntity.class, aabb);
+                List<ItemEntity> list = world.getEntitiesOfClass(ItemEntity.class, expandedAABB);
                 for (ItemEntity item : list)
                 {
                     if(needsEnergy) { if(!removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,item.getOnPos()),true))break; }
@@ -294,7 +295,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                     if(!hasAdvancedOne(coinInPedestal) && actionDone)break;
                 }
 
-                List<ExperienceOrb> listXP = world.getEntitiesOfClass(ExperienceOrb.class, aabb);
+                List<ExperienceOrb> listXP = world.getEntitiesOfClass(ExperienceOrb.class, expandedAABB);
                 for (ExperienceOrb orb : listXP)
                 {
                     if(needsEnergy) { if(!removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,orb.getOnPos()),true))break; }
