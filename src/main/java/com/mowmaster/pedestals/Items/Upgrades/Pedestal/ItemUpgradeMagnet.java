@@ -1,14 +1,13 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
-import com.mowmaster.mowlib.MowLibUtils.MowLibEnergyUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.ISelectableArea;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -150,16 +149,12 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
         }
     }
 
-    public void magnetAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal)
-    {
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
+    public void magnetAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal) {
+        ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
+        if (workCardItemStack.getItem() instanceof WorkCardArea) {
+            WorkCardArea.getAABBIfDefinedAndInRange(workCardItemStack, pedestal).ifPresent(aabb -> {
                 boolean needsEnergy = requiresFuelForUpgradeAction();
                 boolean actionDone = false;
-                AABB aabb = workCardBase.getAABBonUpgrade(card);
 
                 List<ItemEntity> list = world.getEntitiesOfClass(ItemEntity.class, aabb);
                 for (ItemEntity item : list)
@@ -327,11 +322,9 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                         }
                     }
                 }
-            }
+            });
         }
     }
-
-
 
     @Override
     public void onCollideAction(BasePedestalBlockEntity pedestal) {
