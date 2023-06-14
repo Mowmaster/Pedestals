@@ -8,6 +8,7 @@ import com.mojang.math.Vector3f;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardBase;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.client.Minecraft;
@@ -134,27 +135,18 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     p_112309_.popPose();
 
 
-                    if(workCard.getItem() instanceof ISelectableArea)
-                    {
-                        if(workCard.getItem() instanceof WorkCardBase cardBase)
-                        {
-                            if(cardBase.hasTwoPointsSelected(workCard))
-                            {
-                                p_112309_.pushPose();
-                                AABB aabbCoin = cardBase.getAABBonUpgrade(workCard);
-                                if(aabbCoin != new AABB(BlockPos.ZERO))
-                                {
-                                    Boolean inSelectedInRange = cardBase.selectedAreaWithinRange(p_112307_);
-                                    //You have to client register this too!!!
-                                    @SuppressWarnings("deprecation")
-                                    TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
-                                    renderBoundingBox(pos, aabbCoin, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 1f);
-                                    renderFaces(upgradeTextureSprite,pos,aabbCoin,p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
-
-                                }
-                                p_112309_.popPose();
-                            }
-                        }
+                    if (workCard.getItem() instanceof WorkCardArea workCardArea) {
+                        p_112309_.pushPose();
+                        WorkCardArea.getAABBIfDefined(workCard).ifPresent(workCardAABB -> {
+                            AABB expandedWorkCardAABB = workCardAABB.expandTowards(1.0D, 1.0D, 1.0D); // rendering requires expansion over the actual points.
+                            boolean inSelectedInRange = workCardArea.selectedAreaWithinRange(p_112307_);
+                            //You have to client register this too!!!
+                            @SuppressWarnings("deprecation")
+                            TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
+                            renderBoundingBox(pos, expandedWorkCardAABB, p_112309_, p_112310_.getBuffer(RenderType.lines()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 1f);
+                            renderFaces(upgradeTextureSprite,pos, expandedWorkCardAABB, p_112309_, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), p_112307_, (inSelectedInRange)?(0.0f):(1f), (inSelectedInRange)?(1f):(0.0f), 0.0f, 0.5f);
+                        });
+                        p_112309_.popPose();
                     }
 
                     if(workCard.getItem() instanceof ISelectablePoints)

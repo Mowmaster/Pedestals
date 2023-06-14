@@ -23,7 +23,22 @@ public class WorkCardArea extends WorkCardBase implements ISelectableArea {
 
     // NOTE: The returned AABB is sufficient for cases that are dealing directly with the points covered by the area,
     // but needs to be modified by `.expandTowards(1.0D, 1.0D, 1.0D)` for any code that is using it as a bounding-box.
-    private static Optional<AABB> getAABBIfDefinedAndInRange(ItemStack workCardStack, BasePedestalBlockEntity pedestal) {
+    public static Optional<AABB> getAABBIfDefined(ItemStack workCardStack) {
+        BlockPos posOne = readBlockPosFromNBT(workCardStack, 1);
+        BlockPos posTwo = readBlockPosFromNBT(workCardStack, 2);
+        if (
+            workCardStack.getItem() instanceof WorkCardArea workCard &&
+            !posOne.equals(BlockPos.ZERO) && !posTwo.equals(BlockPos.ZERO)
+        ) {
+            return Optional.of(new AABB(posOne, posTwo));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    // NOTE: The returned AABB is sufficient for cases that are dealing directly with the points covered by the area,
+    // but needs to be modified by `.expandTowards(1.0D, 1.0D, 1.0D)` for any code that is using it as a bounding-box.
+    public static Optional<AABB> getAABBIfDefinedAndInRange(ItemStack workCardStack, BasePedestalBlockEntity pedestal) {
         BlockPos posOne = readBlockPosFromNBT(workCardStack, 1);
         BlockPos posTwo = readBlockPosFromNBT(workCardStack, 2);
         if (
