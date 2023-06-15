@@ -201,10 +201,21 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         return hasItem;
     }*/
 
+    public void resetCachedRecipe(ItemStack upgrade) {
+        CompoundTag tag = upgrade.getOrCreateTag();
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_stackList");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_fluidStack");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_energyNeeded");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_xpNeeded");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MowLibReferences.MODID, tag, "_dustMagicColor");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MowLibReferences.MODID, tag, "_dustMagicAmount");
+    }
+
     //To save a recipe and verify if it hasnt changed so we dont have to keep pulling it every time
     //https://github.com/oierbravo/createsifter/blob/mc1.19/dev/src/main/java/com/oierbravo/createsifter/content/contraptions/components/sifter/SifterTileEntity.java
     @Override
     public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
+        resetCachedRecipe(pedestal.getCoinOnPedestal());
 
         CobbleGenRecipe recipe = getRecipe(pedestal.getLevel(),new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem()));
         ItemStack getOutput = getItemStackToGenerate(pedestal,recipe);
@@ -214,27 +225,20 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         int getExperienceNeeded = getExperienceRequiredForGeneration(recipe);
         FluidStack getFluidStackNeeded = getFluidRequiredForGeneration(recipe);
         DustMagic getDustNeeded = getDustRequiredForGeneration(recipe);
-        CompoundTag tagCoin = new CompoundTag();
         ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        if(coinInPedestal.hasTag()) { tagCoin = coinInPedestal.getTag(); }
-        tagCoin = MowLibCompoundTagUtils.writeItemStackListToNBT(References.MODID, tagCoin, getStackList,"_stackList");
-        tagCoin = MowLibCompoundTagUtils.writeFluidStackToNBT(References.MODID, tagCoin, getFluidStackNeeded,"_fluidStack");
-        tagCoin = MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tagCoin,getEnergyNeeded, "_energyNeeded");
-        tagCoin = MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tagCoin,getExperienceNeeded, "_xpNeeded");
-        DustMagic.setDustMagicInTag(coinInPedestal.getTag(),getDustNeeded);
+        CompoundTag tag = coinInPedestal.getOrCreateTag();
+        MowLibCompoundTagUtils.writeItemStackListToNBT(References.MODID, tag, getStackList,"_stackList");
+        MowLibCompoundTagUtils.writeFluidStackToNBT(References.MODID, tag, getFluidStackNeeded,"_fluidStack");
+        MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tag,getEnergyNeeded, "_energyNeeded");
+        MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tag,getExperienceNeeded, "_xpNeeded");
+        DustMagic.setDustMagicInTag(tag, getDustNeeded);
 
-        coinInPedestal.setTag(tagCoin);
+        coinInPedestal.setTag(tag);
     }
 
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
-        //remove NBT saved on upgrade here
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(),"_stackList");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(),"_fluidStack");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_energyNeeded");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_xpNeeded");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(MowLibReferences.MODID, coinInPedestal.getTag(), "_dustMagicColor");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(MowLibReferences.MODID, coinInPedestal.getTag(), "_dustMagicAmount");
+        resetCachedRecipe(coinInPedestal);
     }
 
     private boolean needsFuel(FluidStack getFluidStackNeeded, int getEnergyNeeded, int getExperienceNeeded, DustMagic getDustNeeded)
