@@ -3,7 +3,6 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibReferences;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
@@ -15,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -26,7 +26,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -55,87 +54,6 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         return new ItemStack(Items.STONE_PICKAXE);
     }
 
-    public int getCobbleGenSpawnRate(ItemStack upgradeStack) {
-        return Math.max(getItemCapacityIncrease(upgradeStack), 1);
-    }
-
-    @Nullable
-    public CobbleGenRecipe getRecipe(Level level, ItemStack stackIn) {
-        Container cont = MowLibContainerUtils.getContainer(1);
-        cont.setItem(-1,stackIn);
-        List<CobbleGenRecipe> recipes = level.getRecipeManager().getRecipesFor(CobbleGenRecipe.Type.INSTANCE,cont,level);
-        return recipes.size() > 0 ? level.getRecipeManager().getRecipesFor(CobbleGenRecipe.Type.INSTANCE,cont,level).get(0) : null;
-    }
-
-    protected Collection<ItemStack> getGeneratedItem(CobbleGenRecipe recipe) {
-        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResultItem()));
-    }
-
-    protected int getEnergyRequiredForGeneration(CobbleGenRecipe recipe) {
-        return (recipe == null)?(0):(recipe.getResultEnergyNeeded());
-    }
-
-    protected int getExperienceRequiredForGeneration(CobbleGenRecipe recipe) {
-        return (recipe == null)?(0):(recipe.getResultExperienceNeeded());
-    }
-
-    protected FluidStack getFluidRequiredForGeneration(CobbleGenRecipe recipe) {
-        return (recipe == null)?(FluidStack.EMPTY):(recipe.getResultFluidNeeded());
-    }
-
-    protected DustMagic getDustRequiredForGeneration(CobbleGenRecipe recipe) {
-        return (recipe == null)?(DustMagic.EMPTY):(recipe.getResultDustNeeded());
-    }
-
-    public List<ItemStack> getItemToGenerate(BasePedestalBlockEntity pedestal, CobbleGenRecipe recipe)
-    {
-        ItemStack getInitialGeneratedItem = ItemStack.EMPTY;
-        Level level = pedestal.getLevel();
-        //ItemStack itemBlockBelow = new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem());
-        if(recipe == null)return new ArrayList<>();
-        getInitialGeneratedItem = getGeneratedItem(recipe).stream().findFirst().get();
-
-        Block generatedBlock = Block.byItem(getInitialGeneratedItem.getItem());
-        if(generatedBlock != Blocks.AIR)
-        {
-            ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(getUpgradeDefaultTool()):(pedestal.getToolStack());
-
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-            if(getPlayer != null && getPlayer.get() != null)
-            {
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                return generatedBlock.defaultBlockState().getBlock().getDrops(generatedBlock.defaultBlockState(),builder);
-            }
-            else
-            {
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                return generatedBlock.defaultBlockState().getBlock().getDrops(generatedBlock.defaultBlockState(),builder);
-            }
-        }
-
-        return new ArrayList<>();
-    }
-
-    public ItemStack getItemStackToGenerate(BasePedestalBlockEntity pedestal, CobbleGenRecipe recipe)
-    {
-        ItemStack getInitialGeneratedItem = ItemStack.EMPTY;
-        Level level = pedestal.getLevel();
-        //ItemStack itemBlockBelow = new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem());
-        if(recipe == null)return ItemStack.EMPTY;
-        getInitialGeneratedItem = getGeneratedItem(recipe).stream().findFirst().get();
-
-        return getInitialGeneratedItem;
-    }
-
     public List<ItemStack> getItemsToGenerate(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack blockToBreak) {
         Block generatedBlock = Block.byItem(blockToBreak.getItem());
         if(generatedBlock != Blocks.AIR) {
@@ -149,91 +67,45 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
             if (fakePlayerReference != null && fakePlayerReference.get() != null) {
                 builder.withOptionalParameter(LootContextParams.THIS_ENTITY, fakePlayerReference.get());
-
             }
             return generatedBlock.defaultBlockState().getDrops(builder);
-
         }
 
         return new ArrayList<>();
     }
 
-    /*@Override
-    public int getComparatorRedstoneLevel(Level worldIn, BlockPos pos) {
-        int hasItem=0;
-        BlockEntity blockEntity = worldIn.getBlockEntity(pos);
-        if(blockEntity instanceof BasePedestalBlockEntity pedestal) {
-            List<ItemStack> itemstacks = pedestal.getItemStacks();
-            if(itemstacks.size()>0)
-            {
-                int maxStackSizeDefault = 64;
-                if(pedestal.hasFilter())
-                {
-                    IPedestalFilter filter =pedestal.getIPedestalFilter();
-                    if(filter != null && filter.getFilterDirection().insert())
-                    {
-                        maxStackSizeDefault = Math.max(1,filter.canAcceptCountItems(pedestal,pedestal.getFilterInPedestal(), new ItemStack(Items.STONE,64).getMaxStackSize(), pedestal.getSlotSizeLimit(), new ItemStack(Items.STONE,64)));
-                    }
-                }
-                int counter = 0;
-                int maxStorageCount = Math.max(1,(pedestal.getPedestalSlots()-1)) * maxStackSizeDefault;
-                for (ItemStack stack : itemstacks)
-                {
-                    //adjust max storage possible based on itemstacks present
-                    if(stack.getMaxStackSize()<maxStackSizeDefault)
-                    {
-                        maxStorageCount-=maxStackSizeDefault;
-                        maxStorageCount+=stack.getMaxStackSize();
-                    }
-
-                    counter+=stack.getCount();
-                }
-                float f = (float)counter/(float)maxStorageCount;
-                hasItem = (int)Math.floor(f*15.0F);
-            }
-            else
-            {
-                float f = (float) pedestal.getItemInPedestal().getCount() / (float) pedestal.getItemInPedestal().getMaxStackSize();
-                return (int) Math.floor(f * 15.0F);
-            }
-        }
-
-        return hasItem;
-    }*/
-
     public void resetCachedRecipe(ItemStack upgrade) {
         CompoundTag tag = upgrade.getOrCreateTag();
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_stackList");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_cobblegen_result");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_fluidStack");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_energyNeeded");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_xpNeeded");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MowLibReferences.MODID, tag, "_dustMagicColor");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MowLibReferences.MODID, tag, "_dustMagicAmount");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_cobblegen_cached");
+        // TODO [1.20]: get rid of these lines as they remove the previous NBT tags used.
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_stackList");
     }
 
-    //To save a recipe and verify if it hasnt changed so we dont have to keep pulling it every time
-    //https://github.com/oierbravo/createsifter/blob/mc1.19/dev/src/main/java/com/oierbravo/createsifter/content/contraptions/components/sifter/SifterTileEntity.java
+    public void lookupAndCacheCobbleGenResult(Level level, ItemStack input, ItemStack upgrade) {
+        Container container = new SimpleContainer(input);
+        Optional<CobbleGenRecipe> result = level.getRecipeManager().getRecipeFor(CobbleGenRecipe.Type.INSTANCE, container, level);
+        CompoundTag tag = upgrade.getOrCreateTag();
+        if (result.isPresent()) {
+            CobbleGenRecipe recipe = result.get();
+            MowLibCompoundTagUtils.writeItemStackToNBT(References.MODID, tag, recipe.getResultItem(),"_cobblegen_result");
+            MowLibCompoundTagUtils.writeFluidStackToNBT(References.MODID, tag, recipe.getResultFluidNeeded(),"_fluidStack");
+            MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tag, recipe.getResultEnergyNeeded(), "_energyNeeded");
+            MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tag, recipe.getResultExperienceNeeded(), "_xpNeeded");
+            DustMagic.setDustMagicInTag(tag, recipe.getResultDustNeeded());
+        }
+        // even if there was no recipe, denote we've done the lookup since we already reset this when the block below changes
+        MowLibCompoundTagUtils.writeBooleanToNBT(References.MODID, tag, true, "_cobblegen_cached");
+    }
+
     @Override
     public void actionOnNeighborBelowChange(BasePedestalBlockEntity pedestal, BlockPos belowBlock) {
         resetCachedRecipe(pedestal.getCoinOnPedestal());
-
-        CobbleGenRecipe recipe = getRecipe(pedestal.getLevel(),new ItemStack(pedestal.getLevel().getBlockState(belowBlock).getBlock().asItem()));
-        ItemStack getOutput = getItemStackToGenerate(pedestal,recipe);
-        List<ItemStack> getStackList = new ArrayList<>();
-        getStackList.add(getOutput);
-        int getEnergyNeeded = getEnergyRequiredForGeneration(recipe);
-        int getExperienceNeeded = getExperienceRequiredForGeneration(recipe);
-        FluidStack getFluidStackNeeded = getFluidRequiredForGeneration(recipe);
-        DustMagic getDustNeeded = getDustRequiredForGeneration(recipe);
-        ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-        CompoundTag tag = coinInPedestal.getOrCreateTag();
-        MowLibCompoundTagUtils.writeItemStackListToNBT(References.MODID, tag, getStackList,"_stackList");
-        MowLibCompoundTagUtils.writeFluidStackToNBT(References.MODID, tag, getFluidStackNeeded,"_fluidStack");
-        MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tag,getEnergyNeeded, "_energyNeeded");
-        MowLibCompoundTagUtils.writeIntegerToNBT(References.MODID, tag,getExperienceNeeded, "_xpNeeded");
-        DustMagic.setDustMagicInTag(tag, getDustNeeded);
-
-        coinInPedestal.setTag(tag);
     }
 
     @Override
@@ -370,13 +242,12 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     }
 
     private ItemStack getGeneratorRecipeResult(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack upgrade) {
-        BlockPos posBelow = getPosOfBlockBelow(level, pedestalPos, 1);
-        List<ItemStack> recipeOutput = MowLibCompoundTagUtils.readItemStackListFromNBT(References.MODID, upgrade.getTag(), "_stackList");
-        if (recipeOutput == null) { // cache the result using the neighbor below change code (which we rely on for future updates)
-            actionOnNeighborBelowChange(pedestal, posBelow);
-            recipeOutput = MowLibCompoundTagUtils.readItemStackListFromNBT(References.MODID, upgrade.getTag(), "_stackList");
+        CompoundTag tag = upgrade.getOrCreateTag();
+        if (!MowLibCompoundTagUtils.readBooleanFromNBT(References.MODID, tag, "_cobblegen_cached")) {
+            BlockPos posBelow = getPosOfBlockBelow(level, pedestalPos, 1);
+            lookupAndCacheCobbleGenResult(level, new ItemStack(level.getBlockState(posBelow).getBlock().asItem()), upgrade);
         }
-        return recipeOutput.get(0); // TODO: stop storing this as a List<ItemStack>.
+        return MowLibCompoundTagUtils.readItemStackFromNBT(References.MODID, tag, "_cobblegen_result");
     }
 
     @Override
@@ -400,7 +271,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         DustMagic getDustNeeded = DustMagic.getDustMagicInTag(coin.getTag());
         boolean needsFuel = needsFuel(getFluidStackNeeded,getEnergyNeeded,getExperienceNeeded,getDustNeeded);
         boolean damage = false;
-        int modifier = getCobbleGenSpawnRate(coin);
+        int modifier = Math.max(getItemCapacityIncrease(coin), 1);
 
         if(PedestalConfig.COMMON.cobbleGeneratorDamageTools.get())
         {
