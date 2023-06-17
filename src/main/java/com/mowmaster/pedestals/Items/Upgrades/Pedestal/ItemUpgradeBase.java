@@ -1327,6 +1327,20 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return Optional.empty();
     }
 
+    public static Optional<Integer> getFirstSlotWithNonFilteredItems(BasePedestalBlockEntity pedestal, IItemHandler itemHandler) {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+            if(
+                !stackInSlot.isEmpty() &&
+                !itemHandler.extractItem(i, 1, true).equals(ItemStack.EMPTY) &&
+                passesItemFilter(pedestal, stackInSlot)
+            ) {
+                return Optional.of(i);
+            }
+        }
+        return Optional.empty();
+    }
+
     public int getNextSlotWithItemsCapFiltered(BasePedestalBlockEntity pedestal, LazyOptional<IItemHandler> cap)
     {
         AtomicInteger slot = new AtomicInteger(-1);
@@ -1419,20 +1433,14 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return true;
     }
 
-    public boolean passesItemFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn)
-    {
-        boolean returner = true;
-        if(pedestal.hasFilter())
-        {
+    public static boolean passesItemFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn) {
+        if (pedestal.hasFilter()) {
             ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
-            {
-                returner = filter.canAcceptItems(filterInPedestal,stackIn);
+            if(filterInPedestal.getItem() instanceof IPedestalFilter filter) {
+                return filter.canAcceptItems(filterInPedestal,stackIn);
             }
-
         }
-
-        return returner;
+        return true;
     }
 
     public FluidStack getFluidStackFromItemStack(ItemStack stackIn)
