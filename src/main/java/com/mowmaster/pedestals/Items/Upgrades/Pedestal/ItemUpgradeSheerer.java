@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
@@ -127,7 +128,7 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
             FakePlayer fakePlayer = fakePlayerReference.get();
             ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
             if (workCardItemStack.getItem() instanceof WorkCardArea) {
-                List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal);
+                List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal, getUpgradeWorkRange(coin));
                 boolean canRun = true;
                 boolean damage = false;
 

@@ -2,7 +2,8 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
-import com.mowmaster.mowlib.Items.Filters.IItemMode;
+import com.mowmaster.mowlib.Items.Filters.BaseFilter;
+import com.mowmaster.mowlib.api.TransportAndStorage.ITransferMode;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -28,20 +29,20 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
         return true;
     }
 
-    private boolean passesFilter(BasePedestalBlockEntity pedestal, @Nullable ItemStack stackIn, @Nullable FluidStack fluidIn, @Nullable DustMagic magicIn, int energy, int exp, IItemMode.ItemTransferMode mode)
+    private boolean passesFilter(BasePedestalBlockEntity pedestal, @Nullable ItemStack stackIn, @Nullable FluidStack fluidIn, @Nullable DustMagic magicIn, int energy, int exp, ITransferMode.ItemTransferMode mode)
     {
         if(pedestal.hasFilter())
         {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
             if(filterInPedestal.getItem() instanceof BaseFilter filter)
             {
                 if(filter.getFilterDirection().neutral())
                 {
-                    if(mode == IItemMode.ItemTransferMode.ITEMS) return filter.canAcceptItems(filterInPedestal,stackIn);
-                    if(mode == IItemMode.ItemTransferMode.FLUIDS) return filter.canAcceptFluids(filterInPedestal,fluidIn);
-                    if(mode == IItemMode.ItemTransferMode.ENERGY) return filter.canAcceptEnergy(filterInPedestal,energy);
-                    if(mode == IItemMode.ItemTransferMode.EXPERIENCE) return filter.canAcceptExperience(filterInPedestal,exp);
-                    if(mode == IItemMode.ItemTransferMode.DUST) return filter.canAcceptDust(filterInPedestal,magicIn);
+                    if(mode == ITransferMode.ItemTransferMode.ITEMS) return filter.canAcceptItems(filterInPedestal,stackIn);
+                    if(mode == ITransferMode.ItemTransferMode.FLUIDS) return filter.canAcceptFluids(filterInPedestal,fluidIn);
+                    if(mode == ITransferMode.ItemTransferMode.ENERGY) return filter.canAcceptEnergy(filterInPedestal,energy);
+                    if(mode == ITransferMode.ItemTransferMode.EXPERIENCE) return filter.canAcceptExperience(filterInPedestal,exp);
+                    if(mode == ITransferMode.ItemTransferMode.DUST) return filter.canAcceptDust(filterInPedestal,magicIn);
                 }
             }
         }
@@ -58,7 +59,7 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
         //Items
         if(canTransferItems(coin)) {
             for (ItemStack itemStack: pedestal.getItemStacks()) {
-                if (passesFilter(pedestal, itemStack, null, null, 0, 0, IItemMode.ItemTransferMode.ITEMS)) {
+                if (passesFilter(pedestal, itemStack, null, null, 0, 0, ITransferMode.ItemTransferMode.ITEMS)) {
                     pedestal.removeItemStack(itemStack, false);
                 }
             }
@@ -66,22 +67,22 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
         //Fluids
         if(canTransferFluids(coin))
         {
-            if(pedestal.hasFluid() && passesFilter(pedestal,null,pedestal.getStoredFluid(),null,0,0, IItemMode.ItemTransferMode.FLUIDS))pedestal.removeFluid(pedestal.getStoredFluid(), IFluidHandler.FluidAction.EXECUTE);
+            if(pedestal.hasFluid() && passesFilter(pedestal,null,pedestal.getStoredFluid(),null,0,0, ITransferMode.ItemTransferMode.FLUIDS))pedestal.removeFluid(pedestal.getStoredFluid(), IFluidHandler.FluidAction.EXECUTE);
         }
         //Energy
         if(canTransferEnergy(coin))
         {
-            if(pedestal.hasEnergy() && passesFilter(pedestal,null,null,null,pedestal.getStoredEnergy(),0, IItemMode.ItemTransferMode.ENERGY))pedestal.removeEnergy(pedestal.getStoredEnergy(),false);
+            if(pedestal.hasEnergy() && passesFilter(pedestal,null,null,null,pedestal.getStoredEnergy(),0, ITransferMode.ItemTransferMode.ENERGY))pedestal.removeEnergy(pedestal.getStoredEnergy(),false);
         }
         //XP
         if(canTransferXP(coin))
         {
-            if(pedestal.hasExperience() && passesFilter(pedestal,null,null,null,0,pedestal.getStoredExperience(), IItemMode.ItemTransferMode.EXPERIENCE))pedestal.removeExperience(pedestal.getStoredExperience(),false);
+            if(pedestal.hasExperience() && passesFilter(pedestal,null,null,null,0,pedestal.getStoredExperience(), ITransferMode.ItemTransferMode.EXPERIENCE))pedestal.removeExperience(pedestal.getStoredExperience(),false);
         }
         //Dust
         if(canTransferDust(coin))
         {
-            if(pedestal.hasDust() && passesFilter(pedestal,null,null,pedestal.getStoredDust(),0,0, IItemMode.ItemTransferMode.DUST))pedestal.removeDust(pedestal.getStoredDust(), IDustHandler.DustAction.EXECUTE);
+            if(pedestal.hasDust() && passesFilter(pedestal,null,null,pedestal.getStoredDust(),0,0, ITransferMode.ItemTransferMode.DUST))pedestal.removeDust(pedestal.getStoredDust(), IDustHandler.DustAction.EXECUTE);
         }
     }
 
@@ -94,7 +95,7 @@ public class ItemUpgradeVoid extends ItemUpgradeBase implements IHasModeTypes
         {
             if(getEntity instanceof ItemEntity itemEntity)
             {
-                if(passesFilter(pedestal,itemEntity.getItem(),null,null,0,0, IItemMode.ItemTransferMode.ITEMS))
+                if(passesFilter(pedestal,itemEntity.getItem(),null,null,0,0, ITransferMode.ItemTransferMode.ITEMS))
                 {
                     itemEntity.remove(Entity.RemovalReason.DISCARDED);
                 }

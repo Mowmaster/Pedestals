@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.Filters.BaseFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -251,7 +252,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
     {
         if(pedestal.hasFilter())
         {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
             if(filterInPedestal.getItem() instanceof BaseFilter filter)
             {
                 if(filter.getFilterDirection().neutral())
@@ -286,7 +287,8 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
 
         //KelpBlock == GrowingPlantBlock
         if (canMineBlock.getBlock() instanceof GrowingPlantBlock
-                || canMineBlock.getBlock() instanceof BambooBlock
+                || canMineBlock.getBlock() instanceof BambooStalkBlock
+                || canMineBlock.getBlock() instanceof BambooSaplingBlock
                 || canMineBlock.getBlock() instanceof SugarCaneBlock
                 || canMineBlock.getBlock() instanceof CactusBlock)
         {
@@ -339,7 +341,8 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
 
         //KelpBlock == GrowingPlantBlock
         if (blockAtPoint.getBlock() instanceof GrowingPlantBlock
-                || blockAtPoint.getBlock() instanceof BambooBlock
+                || blockAtPoint.getBlock() instanceof BambooStalkBlock
+                || blockAtPoint.getBlock() instanceof BambooSaplingBlock
                 || blockAtPoint.getBlock() instanceof SugarCaneBlock
                 || blockAtPoint.getBlock() instanceof CactusBlock)
         {

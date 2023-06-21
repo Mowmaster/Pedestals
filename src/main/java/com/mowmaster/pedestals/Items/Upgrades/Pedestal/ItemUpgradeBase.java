@@ -1,15 +1,18 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardBE;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardBase;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardLocations;
 import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import com.mowmaster.mowlib.api.DefineLocations.ISelectableArea;
+import com.mowmaster.mowlib.api.DefineLocations.ISelectablePoints;
+import com.mowmaster.mowlib.api.TransportAndStorage.IFilterItem;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
-import com.mowmaster.pedestals.Items.ISelectableArea;
-import com.mowmaster.pedestals.Items.ISelectablePoints;
-import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
@@ -61,7 +64,7 @@ import java.util.stream.IntStream;
 public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 {
     public ItemUpgradeBase(Properties p_41383_) {
-        super(new Properties().tab(PedestalsTab.TAB_ITEMS));
+        super(new Properties());
     }
 
     /*
@@ -162,7 +165,9 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         {
             if(pedestal.getWorkCardInPedestal().getItem() instanceof WorkCardBase workCardBase)
             {
-                Boolean inSelectedInRange = workCardBase.selectedAreaWithinRange(pedestal);
+
+                //TODO: Update MowLib to fix this static class issue
+                Boolean inSelectedInRange = MowLibBlockPosUtils.selectedAreaWithinRange(pedestal,getUpgradeWorkRange(pedestal.getCoinOnPedestal()));
                 boolean addmessages = false;
                 if(getWorkCardType()!=workCardBase.getWorkCardType())
                 {
@@ -198,7 +203,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                         }
                     }
                 }
-                else if(!inSelectedInRange && pedestal.getWorkCardInPedestal().getItem().equals(DeferredRegisterItems.WORKCARD_AREA.get()))
+                else if(!inSelectedInRange && pedestal.getWorkCardInPedestal().is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.WORKCARD_AREA.get()))
                 {
                     messages.add(ChatFormatting.RED + "Work Selection");
                     messages.add(ChatFormatting.RED + "Is Invalid");
@@ -416,9 +421,9 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                         (supportedWorkCardTypesForThisUpgrade == 0 && (insertedWorkCardType == 1 || insertedWorkCardType == 2)) // match for the "either" area or locations type
                     ) {
                         cached = switch (baseCard.getWorkCardType()) {
-                            case 1 -> WorkCardArea.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal);
-                            case 2 -> WorkCardLocations.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal);
-                            case 3 -> WorkCardPedestals.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal);
+                            case 1 -> WorkCardArea.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal, getUpgradeWorkRange(pedestal.getCoinOnPedestal()));
+                            case 2 -> WorkCardLocations.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal, getUpgradeWorkRange(pedestal.getCoinOnPedestal()));
+                            case 3 -> WorkCardBE.getPositionsInRangeOfUpgrade(workCardItemStack, pedestal, getUpgradeWorkRange(pedestal.getCoinOnPedestal()));
                             default -> List.of();
                         };
                     }
@@ -1420,8 +1425,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     public static boolean passesMachineFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn) {
         if (pedestal.hasFilter()) {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if (filterInPedestal.getItem() instanceof IPedestalFilter filter && filter.getFilterDirection().equals(IPedestalFilter.FilterDirection.NEUTRAL)) {
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
+            if (filterInPedestal.getItem() instanceof IFilterItem filter && filter.getFilterDirection().equals(IFilterItem.FilterDirection.NEUTRAL)) {
                 return filter.canAcceptItems(filterInPedestal, stackIn);
             }
         }
@@ -1430,8 +1435,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     public static boolean passesItemFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn) {
         if (pedestal.hasFilter()) {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if(filterInPedestal.getItem() instanceof IPedestalFilter filter) {
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
+            if(filterInPedestal.getItem() instanceof IFilterItem filter) {
                 return filter.canAcceptItems(filterInPedestal,stackIn);
             }
         }
@@ -1455,8 +1460,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
         if(pedestal.hasFilter())
         {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
+            if(filterInPedestal.getItem() instanceof IFilterItem filter)
             {
                 returner = filter.canAcceptFluids(filterInPedestal, incomingFluidStack);
             }
@@ -1476,8 +1481,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
         if(pedestal.hasFilter())
         {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
+            if(filterInPedestal.getItem() instanceof IFilterItem filter)
             {
                 returner = filter.canAcceptDust(filterInPedestal, incomingDust);
             }
@@ -1495,8 +1500,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     {
         if(pedestal.hasFilter())
         {
-            ItemStack filterStackInPedestal = pedestal.getFilterInPedestal();
-            if(filterStackInPedestal.getItem() instanceof IPedestalFilter filter)
+            ItemStack filterStackInPedestal = pedestal.getFilterInBlockEntity();
+            if(filterStackInPedestal.getItem() instanceof IFilterItem filter)
             {
                 return filter.canAcceptCountItems(pedestal,filterStackInPedestal,stackIn.getMaxStackSize(),pedestal.getSlotSizeLimit(),stackIn);
             }

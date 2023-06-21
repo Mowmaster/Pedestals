@@ -1,6 +1,9 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardBase;
+import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -138,7 +141,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
             {
                 if(workCardBase.hasTwoPointsSelected(card))
                 {
-                    if(workCardBase.selectedAreaWithinRange(pedestal))
+                    if(MowLibBlockPosUtils.selectedAreaWithinRange(pedestal,getUpgradeWorkRange(coin)))
                     {
                         magnetAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
                     }
@@ -150,7 +153,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
     public void magnetAction(BasePedestalBlockEntity pedestal, Level world, BlockPos posOfPedestal, ItemStack coinInPedestal) {
         ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
         if (workCardItemStack.getItem() instanceof WorkCardArea) {
-            WorkCardArea.getAABBIfDefinedAndInRange(workCardItemStack, pedestal).ifPresent(aabb -> {
+            WorkCardArea.getAABBIfDefinedAndInRange(workCardItemStack, pedestal, getUpgradeWorkRange(coinInPedestal)).ifPresent(aabb -> {
                 AABB expandedAABB = aabb.expandTowards(1.0D, 1.0D, 1.0D);
                 boolean needsEnergy = requiresFuelForUpgradeAction();
                 boolean actionDone = false;

@@ -1,3 +1,4 @@
+/*
 package com.mowmaster.pedestals.Compat.Patchouli;
 
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
@@ -62,3 +63,4 @@ public class ModificationInfusionProcessor implements IComponentProcessor {
         return null;
     }
 }
+*/

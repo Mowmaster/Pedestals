@@ -1,13 +1,8 @@
 package com.mowmaster.pedestals.Items.Tools.Upgrade;
 
 
-import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.Items.Tools.BaseTool;
-import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
-import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.item.Item.Properties;
@@ -21,7 +16,7 @@ public class ToolSwapper extends BaseTool {
     public ItemStack getMainTool() { return DeferredRegisterItems.TOOL_TOOLSWAPPER.get().getDefaultInstance(); }
 
     @Override
-    public ItemStack getSwappedTool() { return DeferredRegisterItems.TOOL_FILTERTOOL.get().getDefaultInstance(); }
+    public ItemStack getSwappedTool() { return DeferredRegisterItems.TOOL_LINKINGTOOL.get().getDefaultInstance(); }
 
     /*@Override
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {

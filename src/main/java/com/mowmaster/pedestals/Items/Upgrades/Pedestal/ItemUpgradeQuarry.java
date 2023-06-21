@@ -1,6 +1,9 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.Filters.BaseFilter;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardBase;
+import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -144,10 +147,10 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
             ItemStack card = pedestal.getWorkCardInPedestal();
             if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                List<BlockPos> listed = workCardBase.readBlockPosListFromNBT(card);
+                List<BlockPos> listed = MowLibBlockPosUtils.readBlockPosListFromNBT(card);
                 List<BlockPos> valid = new ArrayList<>();
                 for (BlockPos pos:listed) {
-                    if(workCardBase.selectedPointWithinRange(pedestal, pos))
+                    if(MowLibBlockPosUtils.selectedPointWithinRange(pedestal, pos, getUpgradeWorkRange(coin)))
                     {
                         valid.add(pos);
                     }
@@ -167,7 +170,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
             ItemStack card = pedestal.getWorkCardInPedestal();
             if(card.getItem() instanceof WorkCardBase workCardBase)
             {
-                AABB area = new AABB(workCardBase.readBlockPosFromNBT(card,1),workCardBase.readBlockPosFromNBT(card,2));
+                AABB area = new AABB(MowLibBlockPosUtils.readBlockPosFromNBT(card,1),MowLibBlockPosUtils.readBlockPosFromNBT(card,2));
 
                 int maxX = (int)area.maxX;
                 int maxY = (int)area.maxY;
@@ -185,7 +188,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                     for(int j=maxZ;j>=minZ;j--)
                     {
                         BlockPos newPoint = new BlockPos(i,pedestalPos.getY(),j);
-                        if(workCardBase.selectedPointWithinRange(pedestal, newPoint))
+                        if(MowLibBlockPosUtils.selectedPointWithinRange(pedestal, newPoint, getUpgradeWorkRange(coin)))
                         {
                             valid.add(newPoint);
                         }
@@ -229,7 +232,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                     {
                         quarryAction(level,pedestal);
                     }
-                    else if(workCardBase.selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
+                    else if(MowLibBlockPosUtils.selectedAreaWithinRange(pedestal, getUpgradeWorkRange(coin)) && !hasBlockListCustomNBTTags(coin,"_validlist"))
                     {
                         buildValidBlockListArea(pedestal);
                     }
@@ -388,7 +391,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
     {
         if(pedestal.hasFilter())
         {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
             if(filterInPedestal.getItem() instanceof BaseFilter filter)
             {
                 if(filter.getFilterDirection().neutral())
@@ -430,7 +433,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                         List<BlockPos> listed = getValidList(pedestal);
                         int currentPosition = getCurrentPosition(pedestal);
                         BlockPos currentPoint = listed.get(currentPosition);
-                        AABB area = new AABB(workCardBase.readBlockPosFromNBT(card,1),workCardBase.readBlockPosFromNBT(card,2));
+                        AABB area = new AABB(MowLibBlockPosUtils.readBlockPosFromNBT(card,1),MowLibBlockPosUtils.readBlockPosFromNBT(card,2));
                         int maxY = (int)area.maxY;
                         int minY = (int)area.minY;
                         int ySpread = maxY - minY;

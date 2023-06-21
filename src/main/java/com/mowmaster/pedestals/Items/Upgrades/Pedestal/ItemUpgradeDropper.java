@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.Items.Filters.BaseFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
@@ -108,7 +109,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
     {
         if(pedestal.hasFilter())
         {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
             if(filterInPedestal.getItem() instanceof BaseFilter filter)
             {
                 if(filter.getFilterDirection().neutral())

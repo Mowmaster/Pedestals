@@ -1,7 +1,6 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.mowlib.Items.Filters.IItemMode;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
@@ -119,8 +118,8 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase implements IHasModeType
         return optional1.orElse(null);
     }
 
-    protected Collection<ItemStack> getNormalResults(AbstractCookingRecipe recipe) {
-        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResultItem()));
+    protected Collection<ItemStack> getNormalResults(Level level, AbstractCookingRecipe recipe) {
+        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResultItem(level.registryAccess())));
     }
 
     protected float getNormalResultsExp(AbstractCookingRecipe recipe) {
@@ -237,7 +236,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase implements IHasModeType
                                 {
                                     AbstractCookingRecipe recipe = getNormalRecipe(pedestal.getLevel(), copyIncoming);
                                     float getEXP = getNormalResultsExp(recipe);
-                                    ItemStack returnedStack = getNormalResults(recipe).stream().findFirst().orElse(ItemStack.EMPTY);
+                                    ItemStack returnedStack = getNormalResults(level,recipe).stream().findFirst().orElse(ItemStack.EMPTY);
                                     if(!returnedStack.isEmpty())
                                     {
                                         if(!handler.extractItem(i,1 ,true ).isEmpty() && pedestal.addItem(returnedStack, true))

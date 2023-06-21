@@ -24,35 +24,6 @@ public class ClientRegistry
     public static void registerItemColor(RegisterColorHandlersEvent.Item event) {
 
         event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ITEM.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ITEMSTACK.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_DURABILITY.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ENCHANTED.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ENCHANTED_COUNT.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ENCHANTED_EXACT.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_ENCHANTED_FUZZY.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_FOOD.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_MOD.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return FilterRestricted.getColor(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_RESTRICTED.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_TAG.get());
-
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_EXACT.get());
-        event.register((stack, color) ->
-        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
-
-
-        event.register((stack, color) ->
         {if (color == 1) {return BaseItemBulkStorageItem.getItemColor();} else {return -1;}}, DeferredRegisterItems.MECHANICAL_STORAGE_ITEM.get());
         event.register((stack, color) ->
         {if (color == 1) {return BaseFluidBulkStorageItem.getItemColor();} else {return -1;}}, DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
@@ -74,22 +45,6 @@ public class ClientRegistry
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_VOID.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_DROPPER.get());
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.PEDESTAL_UPGRADE_RECYCLER.get());
-
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ITEM.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ITEMSTACK.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_DURABILITY.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ENCHANTED.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ENCHANTED_COUNT.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ENCHANTED_EXACT.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_ENCHANTED_FUZZY.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_FOOD.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_MOD.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_RESTRICTED.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_TAG.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_TAG_MACHINE.get());
-
-        //ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_EXACT.get());
-        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get());
 
@@ -119,7 +74,7 @@ public class ClientRegistry
 
     @SubscribeEvent
     @SuppressWarnings("deprecation")
-    public static void textureStitchPreEvent(TextureStitchEvent.Pre event)
+    public static void textureStitchPreEvent(TextureStitchEvent event)
     {
 
         ResourceLocation location = event.getAtlas().location();
@@ -127,22 +82,22 @@ public class ClientRegistry
         if(location.equals(TextureAtlas.LOCATION_BLOCKS))
         {
 
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_1"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_2"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_3"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_4"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_5"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_6"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_7"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_8"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_9"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_10"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_11"));
-            event.addSprite(new ResourceLocation(MODID, "util/pedestal_render_12"));
-            event.addSprite(new ResourceLocation(MODID, "util/upgrade_render"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_1"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_2"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_3"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_4"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_5"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_6"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_7"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_8"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_9"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_10"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_11"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_12"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/upgrade_render"));
 
-            event.addSprite(new ResourceLocation(MODID, "util/crystal_dust"));
+            event.getAtlas().getSprite(new ResourceLocation(MODID, "util/crystal_dust"));
         }
 
     }

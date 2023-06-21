@@ -3,8 +3,8 @@ package com.mowmaster.pedestals.Items.Tools.Linking;
 import com.google.common.collect.Maps;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
-import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -38,11 +38,11 @@ public class LinkingToolBackwards extends BaseLinkingTool
     public ItemStack getMainTool() { return DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get().getDefaultInstance(); }
 
     @Override
-    public ItemStack getSwappedTool() { return DeferredRegisterItems.TOOL_LINKINGTOOL.get().getDefaultInstance(); }
+    public ItemStack getSwappedTool() { return DeferredRegisterItems.TOOL_UPGRADETOOL.get().getDefaultInstance(); }
 
     @Override
     public InteractionResultHolder interactCrouchingTargetBlock(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result) {
-        BlockPos pos = new BlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
+        BlockPos pos = new BlockPos((int)result.getLocation().x,(int)result.getLocation().y,(int)result.getLocation().z);
         BlockState getBlockState = level.getBlockState(pos);
         String linksuccess = MODID + ".tool_link_success_backwardslinkingtool";
         String linkstart = MODID + ".tool_link_start_backwardslinkingtool";

@@ -1,6 +1,9 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.Filters.BaseFilter;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardBase;
+import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
@@ -198,7 +201,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase {
 
     private boolean passesFilter(BasePedestalBlockEntity pedestal, ItemStack toPlace) {
         if (pedestal.hasFilter()) {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
             if (filterInPedestal.getItem() instanceof BaseFilter filter && filter.getFilterDirection().neutral()) {
                 if(Block.byItem(toPlace.getItem()) != Blocks.AIR) {
                     return filter.canAcceptItems(filterInPedestal, toPlace);
@@ -232,7 +235,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase {
                 if (card.getItem() instanceof WorkCardBase workCardBase) {
                     int currentPosition = getCurrentPosition(pedestal);
                     BlockPos currentPoint = listed.get(currentPosition);
-                    AABB area = new AABB(workCardBase.readBlockPosFromNBT(card, 1), workCardBase.readBlockPosFromNBT(card, 2));
+                    AABB area = new AABB(MowLibBlockPosUtils.readBlockPosFromNBT(card, 1), MowLibBlockPosUtils.readBlockPosFromNBT(card, 2));
                     int maxY = (int) area.maxY;
                     int minY = (int) area.minY;
                     int ySpread = maxY - minY;

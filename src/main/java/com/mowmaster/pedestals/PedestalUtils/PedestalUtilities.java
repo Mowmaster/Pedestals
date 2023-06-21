@@ -1,6 +1,6 @@
 package com.mowmaster.pedestals.PedestalUtils;
 
-import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
+import com.mowmaster.mowlib.api.TransportAndStorage.IFilterItem;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import net.minecraft.core.BlockPos;
@@ -78,10 +78,10 @@ public class PedestalUtilities
                 int maxStackSizeDefault = 64;
                 if(pedestal.hasFilter())
                 {
-                    IPedestalFilter filter =pedestal.getIPedestalFilter();
+                    IFilterItem filter = pedestal.getIFilterItem();
                     if(filter != null && filter.getFilterDirection().insert())
                     {
-                        maxStackSizeDefault = Math.max(1,filter.canAcceptCountItems(pedestal,pedestal.getFilterInPedestal(), new ItemStack(Items.STONE,64).getMaxStackSize(), pedestal.getSlotSizeLimit(), new ItemStack(Items.STONE,64)));
+                        maxStackSizeDefault = Math.max(1,filter.canAcceptCountItems(pedestal,pedestal.getFilterInBlockEntity(), new ItemStack(Items.STONE,64).getMaxStackSize(), pedestal.getSlotSizeLimit(), new ItemStack(Items.STONE,64)));
                     }
                 }
                 int counter = 0;

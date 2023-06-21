@@ -3,12 +3,14 @@ package com.mowmaster.pedestals.Recipes;
 import com.google.gson.JsonObject;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMultiContainer;
-import com.mowmaster.pedestals.Recipes.Ingredients.DustIngredient;
-import com.mowmaster.pedestals.Recipes.Ingredients.EnergyIngredient;
-import com.mowmaster.pedestals.Recipes.Ingredients.ExperienceIngredient;
-import com.mowmaster.pedestals.Recipes.Ingredients.FluidTagIngredient;
+import com.mowmaster.mowlib.MowLibUtils.MowLibRecipeUtils;
+import com.mowmaster.mowlib.Recipes.Ingredients.DustIngredient;
+import com.mowmaster.mowlib.Recipes.Ingredients.EnergyIngredient;
+import com.mowmaster.mowlib.Recipes.Ingredients.ExperienceIngredient;
+import com.mowmaster.mowlib.Recipes.Ingredients.FluidTagIngredient;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -146,13 +148,16 @@ public class BottlerRecipe implements Recipe<MowLibMultiContainer>
     }
 
     @Override
-    public ItemStack assemble(MowLibMultiContainer p_44001_) {
+    public ItemStack assemble(MowLibMultiContainer p_44001_, RegistryAccess p_267165_) {
         return getResultItem().copy();
     }
 
     @Override
-    public ItemStack getResultItem()
-    {
+    public ItemStack getResultItem(RegistryAccess p_267052_) {
+        return generatedItemOrBlock;
+    }
+
+    public ItemStack getResultItem() {
         return generatedItemOrBlock;
     }
 
@@ -244,8 +249,8 @@ public class BottlerRecipe implements Recipe<MowLibMultiContainer>
         public BottlerRecipe fromJson(ResourceLocation recipeId, JsonObject json)
         {
             String group = GsonHelper.getAsString(json, "group", "");
-            Ingredient inputStack = json.has("inputStack") ? CraftingHelper.getIngredient(json.get("inputStack")) : null;
-            FluidTagIngredient fluidTagIngredient = json.has("inputFluidStack") ? RecipeUtil.parseFluid(json,"inputFluidStack") : null;
+            Ingredient inputStack = json.has("inputStack") ? CraftingHelper.getIngredient(json.get("inputStack"),false) : null;
+            FluidTagIngredient fluidTagIngredient = json.has("inputFluidStack") ? MowLibRecipeUtils.parseFluid(json,"inputFluidStack") : null;
             EnergyIngredient energyIngredient = new EnergyIngredient(json);
             ExperienceIngredient experienceIngredient = new ExperienceIngredient(json);
             DustIngredient dustIngredient = DustIngredient.parseData(json);

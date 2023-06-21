@@ -58,6 +58,8 @@ public class pedestals
         DeferredBlockEntityTypes.BLOCK_ENTITIES.register(eventBus);
 
         DeferredRecipeSerializers.register(eventBus);
+
+        DeferredCreativeTabRegistry.DEF_REG.register(eventBus);
     }
 
     private void setup(final FMLCommonSetupEvent event)

@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Items.Tools.Augment;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.mowlib.Items.Tools.BaseTool;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -11,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class AugmentTool_Collide extends BaseTool {
+public class AugmentTool_Collide extends PedestalBaseTool {
     public AugmentTool_Collide(Properties p_41383_) {
         super(p_41383_.stacksTo(1));
     }

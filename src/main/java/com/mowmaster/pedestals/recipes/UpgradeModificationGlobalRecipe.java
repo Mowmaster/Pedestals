@@ -7,6 +7,7 @@ import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -129,14 +130,16 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
     }
 
     @Override
-    public ItemStack assemble(Container inv)
-    {
+    public ItemStack assemble(Container p_44001_, RegistryAccess p_267165_) {
         return getResultItem().copy();
     }
 
     @Override
-    public ItemStack getResultItem()
-    {
+    public ItemStack getResultItem(RegistryAccess p_267052_) {
+        return new ItemStack(Items.BARRIER);
+    }
+
+    public ItemStack getResultItem() {
         return new ItemStack(Items.BARRIER);
     }
 

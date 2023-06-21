@@ -1,10 +1,6 @@
 package com.mowmaster.pedestals.Items.MechanicalOnlyStorage;
 
-import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
-import com.mowmaster.mowlib.Items.BaseDustDropItem;
 import com.mowmaster.mowlib.Items.BaseEnergyDropItem;
-import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
-import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibTooltipUtils;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
@@ -23,9 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

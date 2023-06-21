@@ -9,6 +9,7 @@ import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -116,14 +117,16 @@ public class UpgradeModificationRecipe implements Recipe<Container>
     }
 
     @Override
-    public ItemStack assemble(Container inv)
-    {
+    public ItemStack assemble(Container p_44001_, RegistryAccess p_267165_) {
         return getResultItem().copy();
     }
 
     @Override
-    public ItemStack getResultItem()
-    {
+    public ItemStack getResultItem(RegistryAccess p_267052_) {
+        return new ItemStack(Items.BARRIER);
+    }
+
+    public ItemStack getResultItem() {
         return new ItemStack(Items.BARRIER);
     }
 
@@ -205,8 +208,8 @@ public class UpgradeModificationRecipe implements Recipe<Container>
         public UpgradeModificationRecipe fromJson(ResourceLocation recipeId, JsonObject json)
         {
             String group = GsonHelper.getAsString(json, "group", "");
-            Ingredient upgradeInput = json.has("upgradeInput") ? CraftingHelper.getIngredient(json.get("upgradeInput")) : null;
-            Ingredient infusionInputIngredients = json.has("ingredients") ? CraftingHelper.getIngredient(json.get("ingredients")) : null;
+            Ingredient upgradeInput = json.has("upgradeInput") ? CraftingHelper.getIngredient(json.get("upgradeInput"), false) : null;
+            Ingredient infusionInputIngredients = json.has("ingredients") ? CraftingHelper.getIngredient(json.get("ingredients"), false) : null;
             String resultModificationName = GsonHelper.getAsString(json, "resultModificationName", "");
             int resultModificationValue = json.has("resultModificationValue") ? GsonHelper.getAsInt(json,"resultModificationValue") : (0);
             int resultModificationMaxValue = json.has("resultModificationMaxValue") ? GsonHelper.getAsInt(json,"resultModificationMaxValue") : (0);

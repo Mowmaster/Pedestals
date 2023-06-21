@@ -1,13 +1,10 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.google.common.collect.Maps;
-import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlock;
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
 import com.mowmaster.mowlib.BlockEntities.MowLibBaseFilterableBlock;
-import com.mowmaster.mowlib.Items.ColorApplicator;
-import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
-import com.mowmaster.mowlib.Items.WorkCards.WorkCardBE;
+import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
-import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibReferences;
 import com.mowmaster.mowlib.api.Tools.IMowLibTool;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredCapacity;
@@ -27,19 +24,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -48,7 +37,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -59,12 +47,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -249,6 +235,7 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
                 if(offhandItemStack.hasTag() && offhandItemStack.isEnchanted())
                 {
 
+
                     if(offhandItemStack.is(DeferredRegisterItems.TOOL_LINKINGTOOL.get()))
                     {
                         //Checks if clicked blocks is a Pedestal
@@ -256,7 +243,7 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
                         {
                             // Checks Tile at location to make sure its a TilePedestal
                             if (p_49847_.getBlockEntity(p_49848_) instanceof BasePedestalBlockEntity sendingPedestal) {
-                                LinkingTool tool = (LinkingTool)offhandItemStack.getItem();
+                                LinkingTool tool = (LinkingTool) offhandItemStack.getItem();
                                 BlockPos receivingPos = tool.getStoredPosition(offhandItemStack);
                                 sendingPedestal.attemptUpdateLink(receivingPos, player, MODID + ".tool_link_success_linkingtool");
                             }
@@ -328,7 +315,7 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
                 }
                 else if(pedestal.hasTool() && itemInOffHand.is(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
                 {
-                    pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60499_, p_60501_, 1));
+                    pedestal.actionOnNeighborBelowChange(MowLibBlockPosUtils.getPosBelowBlockEntity(p_60499_, p_60501_, 1));
                     pedestal.updatePedestalPlayer(pedestal);
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
                 }
@@ -511,7 +498,7 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
             {
                 if(pedestal.attemptAddTool(itemInOffHand))
                 {
-                    pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60503_, p_60505_, 1));
+                    pedestal.actionOnNeighborBelowChange(MowLibBlockPosUtils.getPosBelowBlockEntity(p_60503_, p_60505_, 1));
                     pedestal.updatePedestalPlayer(pedestal);
                     return InteractionResult.SUCCESS;
                 }
@@ -807,23 +794,20 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
     }
 
 
-
-    /*@Override
+    @Override
     public void neighborChanged(BlockState p_60509_, Level p_60510_, BlockPos p_60511_, Block p_60512_, BlockPos p_60513_, boolean p_60514_) {
-
         if(!p_60510_.isClientSide())
         {
-            if(p_60513_.equals(getPosOfBlockBelow(p_60509_, p_60511_, 1)))
+            if(p_60513_.equals(MowLibBlockPosUtils.getPosBelowBlockEntity(p_60510_,p_60511_,1)))
             {
-                if(p_60510_.getBlockEntity(p_60511_) instanceof BasePedestalBlockEntity pedestal)
+                if(p_60510_.getBlockEntity(p_60511_) instanceof MowLibBaseBlockEntity baseBlockEntity)
                 {
-                    pedestal.actionOnNeighborBelowChange(getPosOfBlockBelow(p_60509_, p_60511_, 1));
+                    baseBlockEntity.actionOnNeighborBelowChange(MowLibBlockPosUtils.getPosBelowBlockEntity(p_60510_,p_60511_,1));
                 }
             }
         }
         super.neighborChanged(p_60509_, p_60510_, p_60511_, p_60512_, p_60513_, p_60514_);
-    }*/
-
+    }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

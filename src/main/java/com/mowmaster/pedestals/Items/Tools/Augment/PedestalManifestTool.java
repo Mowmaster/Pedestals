@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Items.Tools.Augment;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import com.mowmaster.mowlib.Items.Tools.BaseTool;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
@@ -28,7 +29,7 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class PedestalManifestTool extends BaseTool {
+public class PedestalManifestTool extends PedestalBaseTool {
     public PedestalManifestTool(Properties p_41383_) {
         super(p_41383_);
     }
@@ -90,7 +91,7 @@ public class PedestalManifestTool extends BaseTool {
         ItemStack stackInHand = player.getItemInHand(hand);
 
         HitResult result = player.pick(5,0,false);
-        BlockPos pos = new BlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
+        BlockPos pos = new BlockPos((int)result.getLocation().x,(int)result.getLocation().y,(int)result.getLocation().z);
         if(!level.isClientSide())
         {
             if(result.getType().equals(HitResult.Type.MISS))

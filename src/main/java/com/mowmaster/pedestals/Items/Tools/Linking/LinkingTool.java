@@ -4,8 +4,8 @@ package com.mowmaster.pedestals.Items.Tools.Linking;
 import com.google.common.collect.Maps;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
-import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -39,7 +39,7 @@ public class LinkingTool extends BaseLinkingTool
 
     @Override
     public InteractionResultHolder interactCrouchingTargetBlock(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result) {
-        BlockPos pos = new BlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
+        BlockPos pos = new BlockPos((int)result.getLocation().x,(int)result.getLocation().y,(int)result.getLocation().z);
         BlockState getBlockState = level.getBlockState(pos);
         String linksuccess = MODID + ".tool_link_success_linkingtool";
         String linkstart = MODID + ".tool_link_start_linkingtool";

@@ -1,10 +1,10 @@
 package com.mowmaster.pedestals.Registry;
 
 
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraftforge.registries.RegistryObject;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;

@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Items.Tools.Augment;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.mowlib.Items.Tools.BaseTool;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredSpeed;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
@@ -13,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class AugmentTool_Speed extends BaseTool {
+public class AugmentTool_Speed extends PedestalBaseTool {
     public AugmentTool_Speed(Properties p_41383_) {
         super(p_41383_.stacksTo(1));
     }

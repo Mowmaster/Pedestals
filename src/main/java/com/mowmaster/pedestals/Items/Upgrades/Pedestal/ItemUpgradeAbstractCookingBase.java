@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibRecipeUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
@@ -54,7 +55,7 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        MoveToMowLibUtils.resetCachedAbstractCooking(References.MODID, coinInPedestal);
+        MowLibRecipeUtils.resetCachedAbstractCooking(References.MODID, coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getOrCreateTag(), "hasitem");
 
         // TODO [1.20]: get rid of these lines as they remove the previous NBT tags used.
@@ -87,11 +88,11 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
                 ItemStack upgrade = pedestal.getCoinOnPedestal();
                 ItemStack inputItem = handler.getStackInSlot(slot);
 
-                ItemStack cookResult = MoveToMowLibUtils.getAbstractCookingResult(References.MODID, level, upgrade, inputItem, recipeType);
+                ItemStack cookResult = MowLibRecipeUtils.getAbstractCookingResult(References.MODID, level, upgrade, inputItem, recipeType);
                 if (!cookResult.isEmpty()) {
-                    int startingElapsedCookTime = MoveToMowLibUtils.getCookTimeElapsed(References.MODID, upgrade);
+                    int startingElapsedCookTime = MowLibRecipeUtils.getCookTimeElapsed(References.MODID, upgrade);
                     int newElapsedCookTime = startingElapsedCookTime;
-                    int requiredCookTime = MoveToMowLibUtils.getCookTimeRequired(References.MODID, upgrade);
+                    int requiredCookTime = MowLibRecipeUtils.getCookTimeRequired(References.MODID, upgrade);
                     boolean spawnParticles = false;
                     int particleRed = 0, particleGreen = 0, particleBlue = 0;
 
@@ -120,7 +121,7 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
                         ItemStack leftover = pedestal.addItemStack(cookResult, false);
                         int amountAdded = amountToAdd - leftover.getCount();
                         handler.extractItem(slot, amountAdded, false);
-                        pedestal.addExperience(MoveToMowLibUtils.getXpGainFromCachedRecipe(References.MODID, upgrade) * amountAdded, false); // excess experience is currently lost
+                        pedestal.addExperience(MowLibRecipeUtils.getXpGainFromCachedRecipe(References.MODID, upgrade) * amountAdded, false); // excess experience is currently lost
                         newElapsedCookTime -= requiredCookTime * amountAdded;
 
                         if (amountAdded > 0) {
@@ -131,7 +132,7 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
 
                     // 3: Update Necessary State
                     if (newElapsedCookTime != startingElapsedCookTime) {
-                        MoveToMowLibUtils.setCookTimeElapsed(References.MODID, upgrade, newElapsedCookTime);
+                        MowLibRecipeUtils.setCookTimeElapsed(References.MODID, upgrade, newElapsedCookTime);
                     }
 
                     // 4: Spawn Particles

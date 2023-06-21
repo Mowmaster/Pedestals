@@ -1,4 +1,4 @@
-package com.mowmaster.pedestals.blocks.Pedestal;
+package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.mowmaster.mowlib.BlockEntities.MowLibBaseOmniStorageBlockEntity;
 import com.mowmaster.mowlib.Capabilities.Dust.CapabilityDust;
@@ -672,7 +672,7 @@ public class BasePedestalBlockEntity extends MowLibBaseOmniStorageBlockEntity
             ItemStack toInsert = stack.split(1);
             privateItems.insertItem(PrivateInventorySlot.COIN, toInsert, false);
             IPedestalUpgrade upgrade = (IPedestalUpgrade)toInsert.getItem();
-            upgrade.actionOnAddedToPedestal(player, this, toInsert);
+            upgrade.actionOnAddedToPedestal(player, getPedestal(), toInsert);
             // update();
             return true;
         } else {

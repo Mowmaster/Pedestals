@@ -23,11 +23,6 @@ public class ItemModelPropertiesDust
         ItemProperties.register(item, new ResourceLocation(MODID + ":upgrade_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
             return ItemUpgradeMagnet.getUpgradeModeForRender(p_174625_);});
 
-        ItemProperties.register(item, new ResourceLocation(MODID + ":filter_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
-            return BaseFilter.getFilterModeForRender(p_174625_);});
-        ItemProperties.register(item, new ResourceLocation(MODID + ":filter_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
-            return BaseFilter.getFilterModeForRender(p_174625_);});
-
         ItemProperties.register(item, new ResourceLocation(MODID + ":augment_mode"),(p_174625_, p_174626_, p_174627_, p_174628_) -> {
             return AugmentRenderDiffuser.getAugmentMode(p_174625_);});
 

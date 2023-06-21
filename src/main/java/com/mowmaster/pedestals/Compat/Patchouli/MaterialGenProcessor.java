@@ -1,3 +1,4 @@
+/*
 package com.mowmaster.pedestals.Compat.Patchouli;
 
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
@@ -55,3 +56,4 @@ public class MaterialGenProcessor implements IComponentProcessor {
         return null;
     }
 }
+*/

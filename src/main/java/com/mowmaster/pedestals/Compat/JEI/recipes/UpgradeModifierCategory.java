@@ -24,6 +24,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -105,7 +106,7 @@ public class UpgradeModifierCategory implements IRecipeCategory<UpgradeModificat
     }
 
     @Override
-    public void draw(UpgradeModificationGlobalRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(UpgradeModificationGlobalRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         RenderSystem.enableBlend();
         Font fontRenderer = Minecraft.getInstance().font;
 
@@ -116,7 +117,7 @@ public class UpgradeModifierCategory implements IRecipeCategory<UpgradeModificat
         modType.withStyle(ChatFormatting.BLACK);
         //modTypeLabel.append(modType);
         int width1 = fontRenderer.width(modType.getString());
-        fontRenderer.draw(stack,modType,64-Math.floorDiv(width1,2),4,0xffffffff);
+        guiGraphics.drawString(fontRenderer,modType,64-Math.floorDiv(width1,2),4,0xffffffff);
         //fontRenderer.draw(stack,modType,34,4,0xffffffff);
 
 
@@ -146,6 +147,6 @@ public class UpgradeModifierCategory implements IRecipeCategory<UpgradeModificat
         separator1.withStyle(ChatFormatting.BLACK);
 
         int width = fontRenderer.width(separator1.getString());
-        fontRenderer.draw(stack,separator1,64-Math.floorDiv(width,2),73,0xffffffff);
+        guiGraphics.drawString(fontRenderer,separator1,64-Math.floorDiv(width,2),73,0xffffffff);
     }
 }

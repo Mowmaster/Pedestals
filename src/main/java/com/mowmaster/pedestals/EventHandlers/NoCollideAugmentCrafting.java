@@ -53,7 +53,7 @@ public class NoCollideAugmentCrafting
                 if ((player.getItemInHand(hand) != null)) {
                     if (player.getItemInHand(hand).getItem() instanceof LinkingTool || player.getItemInHand(hand).getItem() instanceof LinkingToolBackwards) {
                         //List<EntityItem> item = player.level.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(posX-1, posY-1, posZ-1, posX+1, posY+1, posZ+1));
-                        List<ItemEntity> items = player.level.getEntitiesOfClass(ItemEntity.class, new AABB(posX - 3, posY - 3, posZ - 3, posX + 3, posY + 3, posZ + 3));
+                        List<ItemEntity> items = player.level().getEntitiesOfClass(ItemEntity.class, new AABB(posX - 3, posY - 3, posZ - 3, posX + 3, posY + 3, posZ + 3));
                         BlockPos getPos = event.getPos();
                         for (ItemEntity item : items) {
                             ItemStack stack = item.getItem();
@@ -74,7 +74,7 @@ public class NoCollideAugmentCrafting
 
                         if(paper > 0)
                         {
-                            worldIn.explode(new ItemEntity(worldIn, posX, posY, posZ,new ItemStack(Items.PAPER)),(DamageSource)null,new EntityBasedExplosionDamageCalculator(player), posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Explosion.BlockInteraction.NONE);
+                            worldIn.explode(new ItemEntity(worldIn, posX, posY, posZ,new ItemStack(Items.PAPER)),(DamageSource)null,new EntityBasedExplosionDamageCalculator(player), posX + 0.5, posY + 2.0, posZ + 0.25, 0.0F,false, Level.ExplosionInteraction.NONE);
                             if(paper>0)
                             {
                                 //NEED TO ADD ANOTHER TAG TO ITEM TO MAKE IT NOT USEABLE IN COMBINING AGAIN!!!

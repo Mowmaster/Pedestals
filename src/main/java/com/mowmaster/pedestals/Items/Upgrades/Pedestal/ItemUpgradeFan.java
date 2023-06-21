@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.Recipes.BaseBlockEntityFilter;
@@ -257,7 +258,7 @@ public class ItemUpgradeFan extends ItemUpgradeBase
     public void fanAction(BasePedestalBlockEntity pedestal, Level level, BlockPos posOfPedestal, ItemStack coinInPedestal) {
         ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
         if (workCardItemStack.getItem() instanceof WorkCardArea) {
-            List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal);
+            List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal, getUpgradeWorkRange(coinInPedestal));
 
             if (removeFuelForAction(pedestal, 0, false)) {
                 Direction facing = getPedestalFacing(level,posOfPedestal);

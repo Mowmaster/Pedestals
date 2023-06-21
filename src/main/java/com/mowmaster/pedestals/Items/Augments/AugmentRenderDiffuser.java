@@ -1,5 +1,8 @@
 package com.mowmaster.pedestals.Items.Augments;
 
+import com.mowmaster.mowlib.MowLibUtils.MowLibComponentUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import com.mowmaster.mowlib.MowLibUtils.MowLibTooltipUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -106,7 +109,7 @@ public class AugmentRenderDiffuser extends AugmentBase
                                         ChatFormatting.AQUA,
                                         ChatFormatting.GOLD));
 
-                        MoveToMowLibUtils.modeBasedTextOutputPopup(player, setNewMode, true, MODID, typeStringList, chatColorList);
+                        MowLibMessageUtils.modeBasedTextOutputPopup(player, setNewMode, true, MODID, typeStringList, chatColorList);
                     }
                 }
             }
@@ -130,7 +133,7 @@ public class AugmentRenderDiffuser extends AugmentBase
                         ".mode_augment_pu",
                         ".mode_augment_iu",
                         ".mode_augment_piu"));
-        MoveToMowLibUtils.modeBasedTextOutputTooltip(getAugmentMode(p_41421_), true, MODID, typeStringList, ChatFormatting.GOLD, p_41423_);
+        MowLibTooltipUtils.modeBasedTextOutputTooltip(getAugmentMode(p_41421_), true, MODID, typeStringList, ChatFormatting.GOLD, p_41423_);
 
         super.appendHoverText(p_41421_, p_41422_, p_41423_, p_41424_);
     }

@@ -1,5 +1,7 @@
 package com.mowmaster.pedestals.Items.Tools.Augment;
 
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseFilterableBlockEntity;
+import com.mowmaster.mowlib.Items.Tools.BaseTool;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredCapacity;
@@ -12,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class AugmentTool_Capacity extends BaseTool {
+public class AugmentTool_Capacity extends PedestalBaseTool {
     public AugmentTool_Capacity(Properties p_41383_) {
         super(p_41383_.stacksTo(1));
     }
@@ -25,7 +27,6 @@ public class AugmentTool_Capacity extends BaseTool {
 
     @Override
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {
-
         MutableComponent separator2 = Component.translatable(MODID + ".text.separator.space");
         MutableComponent separator3 = Component.translatable(MODID + ".text.separator.slash");
 

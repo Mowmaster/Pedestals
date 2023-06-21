@@ -1,6 +1,8 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mojang.datafixers.util.Either;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -10,18 +12,23 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderOwner;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -37,7 +44,10 @@ import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
@@ -279,12 +289,12 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                     float i = (float)player.getAttributeValue(Attributes.ATTACK_KNOCKBACK); // Forge: Initialize player value to the attack knockback attribute of the player, which is by default 0
                     i += EnchantmentHelper.getKnockbackBonus(player);
                     if (player.isSprinting() && flag) {
-                        player.level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, player.getSoundSource(), 1.0F, 1.0F);
+                        player.level().playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, player.getSoundSource(), 1.0F, 1.0F);
                         ++i;
                         flag1 = true;
                     }
 
-                    boolean flag2 = flag && player.fallDistance > 0.0F && !player.isOnGround() && !player.onClimbable() && !player.isInWater() && !player.hasEffect(MobEffects.BLINDNESS) && !player.isPassenger() && toAttack instanceof LivingEntity;
+                    boolean flag2 = flag && player.fallDistance > 0.0F && !player.onGround() && !player.onClimbable() && !player.isInWater() && !player.hasEffect(MobEffects.BLINDNESS) && !player.isPassenger() && toAttack instanceof LivingEntity;
                     flag2 = flag2 && !player.isSprinting();
                     net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(player, toAttack, flag2, flag2 ? 1.5F : 1.0F);
                     flag2 = hitResult != null;
@@ -295,7 +305,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                     damageFloat += f1;
                     boolean flag3 = false;
                     double d0 = (double)(player.walkDist - player.walkDistO);
-                    if (flag && !flag2 && !flag1 && player.isOnGround() && d0 < (double)player.getSpeed()) {
+                    if (flag && !flag2 && !flag1 && player.onGround() && d0 < (double)player.getSpeed()) {
                         ItemStack itemstack = player.getItemInHand(InteractionHand.MAIN_HAND);
                         flag3 = itemstack.canPerformAction(net.minecraftforge.common.ToolActions.SWORD_SWEEP);
                     }
@@ -314,7 +324,66 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                     Vec3 vec3 = toAttack.getDeltaMovement();
                     List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10", "pedestal11", "pedestal12");
                     Random rn = new Random();
-                    DamageSource source = new EntityDamageSource(list.get(rn.nextInt(list.size())), player);
+                    Holder<DamageType> type = new Holder<DamageType>() {
+                        @Override
+                        public DamageType value() {
+                            return new DamageType(list.get(rn.nextInt(list.size())),0.5F);
+                        }
+
+                        @Override
+                        public boolean isBound() {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean is(ResourceLocation p_205713_) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean is(ResourceKey<DamageType> p_205712_) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean is(Predicate<ResourceKey<DamageType>> p_205711_) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean is(TagKey<DamageType> p_205705_) {
+                            return false;
+                        }
+
+                        @Override
+                        public Stream<TagKey<DamageType>> tags() {
+                            return null;
+                        }
+
+                        @Override
+                        public Either<ResourceKey<DamageType>, DamageType> unwrap() {
+                            return null;
+                        }
+
+                        @Override
+                        public Optional<ResourceKey<DamageType>> unwrapKey() {
+                            return Optional.empty();
+                        }
+
+                        @Override
+                        public Kind kind() {
+                            return null;
+                        }
+
+                        @Override
+                        public boolean canSerializeIn(HolderOwner<DamageType> p_255833_) {
+                            return false;
+                        }
+                    };
+
+                    DamageSource source = new DamageSource(type,player);
+
+                    //DamageSource source = new EntityDamageSource(list.get(rn.nextInt(list.size())), player);
                     boolean flag5 = toAttack.hurt(source, damageFloat+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 1.0F));
                     if (flag5) {
                         if (i > 0) {
@@ -331,14 +400,14 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                         if (flag3) {
                             float f3 = 1.0F + EnchantmentHelper.getSweepingDamageRatio(player) * damageFloat;
 
-                            for(LivingEntity livingentity : player.level.getEntitiesOfClass(LivingEntity.class, player.getItemInHand(InteractionHand.MAIN_HAND).getSweepHitBox(player, toAttack))) {
-                                if (livingentity != player && livingentity != toAttack && !player.isAlliedTo(livingentity) && (!(livingentity instanceof ArmorStand) || !((ArmorStand)livingentity).isMarker()) && player.canHit(livingentity, 0)) { // Original check was dist < 3, range is 3, so vanilla used padding=0
+                            for(LivingEntity livingentity : player.level().getEntitiesOfClass(LivingEntity.class, player.getItemInHand(InteractionHand.MAIN_HAND).getSweepHitBox(player, toAttack))) {
+                                if (livingentity != player && livingentity != toAttack && !player.isAlliedTo(livingentity) && (!(livingentity instanceof ArmorStand) || !((ArmorStand)livingentity).isMarker()) && player.canAttack(livingentity)) { // Original check was dist < 3, range is 3, so vanilla used padding=0
                                     livingentity.knockback((double)0.4F, (double)Mth.sin(player.getYRot() * ((float)Math.PI / 180F)), (double)(-Mth.cos(player.getYRot() * ((float)Math.PI / 180F))));
-                                    livingentity.hurt(DamageSource.playerAttack(player), f3+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 0.5F));
+                                    livingentity.hurt(source, f3+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 0.5F));
                                 }
                             }
 
-                            player.level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, player.getSoundSource(), 1.0F, 1.0F);
+                            player.level().playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, player.getSoundSource(), 1.0F, 1.0F);
                             player.sweepAttack();
                         }
 
@@ -349,15 +418,15 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                         }
 
                         if (flag2) {
-                            player.level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
+                            player.level().playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
                             player.crit(toAttack);
                         }
 
                         if (!flag2 && !flag3) {
                             if (flag) {
-                                player.level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, player.getSoundSource(), 1.0F, 1.0F);
+                                player.level().playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, player.getSoundSource(), 1.0F, 1.0F);
                             } else {
-                                player.level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_WEAK, player.getSoundSource(), 1.0F, 1.0F);
+                                player.level().playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_WEAK, player.getSoundSource(), 1.0F, 1.0F);
                             }
                         }
 
@@ -377,7 +446,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                             entity = ((net.minecraftforge.entity.PartEntity<?>) toAttack).getParent();
                         }
 
-                        if (!player.level.isClientSide && !itemstack1.isEmpty() && entity instanceof LivingEntity) {
+                        if (!player.level().isClientSide && !itemstack1.isEmpty() && entity instanceof LivingEntity) {
                             ItemStack copy = itemstack1.copy();
                             itemstack1.hurtEnemy((LivingEntity)entity, player);
                             if (itemstack1.isEmpty()) {
@@ -393,15 +462,15 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                                 toAttack.setSecondsOnFire(j * 4);
                             }
 
-                            if (player.level instanceof ServerLevel && f5 > 2.0F) {
+                            if (player.level() instanceof ServerLevel && f5 > 2.0F) {
                                 int k = (int)((double)f5 * 0.5D);
-                                ((ServerLevel)player.level).sendParticles(ParticleTypes.DAMAGE_INDICATOR, toAttack.getX(), toAttack.getY(0.5D), toAttack.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
+                                ((ServerLevel)player.level()).sendParticles(ParticleTypes.DAMAGE_INDICATOR, toAttack.getX(), toAttack.getY(0.5D), toAttack.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
                             }
                         }
 
                         player.causeFoodExhaustion(0.1F);
                     } else {
-                        player.level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, player.getSoundSource(), 1.0F, 1.0F);
+                        player.level().playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, player.getSoundSource(), 1.0F, 1.0F);
                         if (flag4) {
                             toAttack.clearFire();
                         }
@@ -423,7 +492,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
             FakePlayer fakePlayer = fakePlayerReference.get();
             ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
             if (workCardItemStack.getItem() instanceof WorkCardArea) {
-                List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal);
+                List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal, getUpgradeWorkRange(coin));
 
                 boolean canRun = true;
                 boolean damage = false;

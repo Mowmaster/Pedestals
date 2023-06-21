@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.Filters.BaseFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
@@ -149,8 +150,8 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
 
     private boolean passesFilter(BasePedestalBlockEntity pedestal, ItemStack toPlant) {
         if (pedestal.hasFilter()) {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if (pedestal.getFilterInPedestal().getItem() instanceof BaseFilter filter) {
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
+            if (pedestal.getFilterInBlockEntity().getItem() instanceof BaseFilter filter) {
                 if (filter.getFilterDirection().neutral()) {
                     return filter.canAcceptItems(filterInPedestal, toPlant);
                 }

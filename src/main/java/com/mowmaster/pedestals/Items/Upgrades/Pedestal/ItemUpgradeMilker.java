@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
@@ -123,7 +124,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase {
             FakePlayer fakePlayer = fakePlayerReference.get();
             ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
             if (workCardItemStack.getItem() instanceof WorkCardArea) {
-                List<Animal> animals = WorkCardArea.getEntitiesInRangeOfUpgrade(level, Animal.class, workCardItemStack, pedestal);
+                List<Animal> animals = WorkCardArea.getEntitiesInRangeOfUpgrade(level, Animal.class, workCardItemStack, pedestal, getUpgradeWorkRange(coin));
                 fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, toolStack.copy());
                 for (Animal animal : animals) {
                     BlockPos animalPos = animal.getOnPos();

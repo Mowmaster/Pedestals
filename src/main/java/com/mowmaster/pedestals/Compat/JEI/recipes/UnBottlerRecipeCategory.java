@@ -23,6 +23,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +40,7 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
 
     public UnBottlerRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createDrawable(
-                new ResourceLocation(References.MODID, "textures/gui/jei/unbottler.png"), 0, 0, 128, 120);
+                new ResourceLocation(References.MODID, (References.isDustLoaded())?("textures/gui/jei/unbottler.png"):("textures/gui/jei/unbottler_nodust.png")), 0, 0, 128, 120);
         this.localizedName = Component.translatable(References.MODID + ".jei.unbottler");
         //this.overlay =
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, this.renderStack);
@@ -91,33 +92,36 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
     }
 
     @Override
-    public void draw(UnBottlerRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(UnBottlerRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         RenderSystem.enableBlend();
         Font fontRenderer = Minecraft.getInstance().font;
 
         MutableComponent energy = Component.translatable(References.MODID + ".unbottler.energy");
         energy.append(Component.literal("" + recipe.getEnergyReturned() + ""));
         energy.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,energy,10,64,0xffffffff);
+        guiGraphics.drawString(fontRenderer,energy,10,64,0xffffffff);
 
         MutableComponent exp = Component.translatable(References.MODID + ".unbottler.xp");
         exp.append(Component.literal("" + recipe.getExperienceReturned() + ""));
         exp.withStyle(ChatFormatting.BLACK);
-        fontRenderer.draw(stack,exp,10,82,0xffffffff);
+        guiGraphics.drawString(fontRenderer,exp,10,82,0xffffffff);
 
-        DustMagic dustNeeded = recipe.getDustReturned();
-        MutableComponent dust = Component.translatable(References.MODID + ".unbottler.dust");
-        if(dustNeeded.getDustColor() > 0)
+        if(References.isDustLoaded())
         {
-            dust = Component.translatable(MowLibReferences.MODID + "." + MowLibColorReference.getColorName(dustNeeded.getDustColor()));
-            dust.append(Component.literal(": " + dustNeeded.getDustAmount() + ""));
-        }
-        else
-        {
-            dust.append(Component.literal(dustNeeded.getDustAmount() + ""));
-        }
-        dust.withStyle(ChatFormatting.BLACK);
+            DustMagic dustNeeded = recipe.getDustReturned();
+            MutableComponent dust = Component.translatable(References.MODID + ".unbottler.dust");
+            if(dustNeeded.getDustColor() > 0)
+            {
+                dust = Component.translatable(MowLibReferences.MODID + "." + MowLibColorReference.getColorName(dustNeeded.getDustColor()));
+                dust.append(Component.literal(": " + dustNeeded.getDustAmount() + ""));
+            }
+            else
+            {
+                dust.append(Component.literal(dustNeeded.getDustAmount() + ""));
+            }
+            dust.withStyle(ChatFormatting.BLACK);
 
-        fontRenderer.draw(stack,dust,10,100,0xffffffff);
+            guiGraphics.drawString(fontRenderer,dust,10,100,0xffffffff);
+        }
     }
 }

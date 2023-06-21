@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.Filters.BaseFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -23,6 +24,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -191,11 +193,19 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
             WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
             if(getPlayer != null && getPlayer.get() != null)
             {
+                LootContext.Builder builder = new LootContext.Builder()
+                        .withRandom(level.random)
+                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
+                        .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+
+                /*
                 LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
                         .withRandom(level.random)
                         .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
                         .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
                         .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+                 */
 
                 return blockTarget.getDrops(builder);
                 //return blockTarget.getBlock().getDrops(blockTarget,builder);
@@ -220,7 +230,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
     {
         if(pedestal.hasFilter())
         {
-            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
             if(filterInPedestal.getItem() instanceof BaseFilter filter)
             {
                 if(filter.getFilterDirection().neutral())
