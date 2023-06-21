@@ -137,7 +137,6 @@ public class ItemUpgradeMilker extends ItemUpgradeBase {
                                         ItemStack toRemove = toolStack.copy();
                                         toRemove.setCount(1);
                                         if (!pedestal.removeItemStack(toRemove, false).isEmpty()) {
-                                            System.out.println("removed");
                                             MowLibItemUtils.spawnItemStack(level, animalPos.getX(), animalPos.getY(), animalPos.getZ(), stackInPlayer);
                                             if (!hasSuperSpeed(coin)) return;
                                         }
