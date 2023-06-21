@@ -1,11 +1,8 @@
 package com.mowmaster.pedestals.Items.Augments;
 
-import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
-import com.mowmaster.pedestals.PedestalUtils.MoveToMowLibUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -21,9 +18,6 @@ import java.util.List;
 
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
-
-
-import net.minecraft.world.item.Item.Properties;
 
 public class AugmentRenderDiffuser extends AugmentBase
 {

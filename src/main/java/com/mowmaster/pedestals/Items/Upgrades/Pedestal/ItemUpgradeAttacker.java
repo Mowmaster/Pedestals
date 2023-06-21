@@ -8,7 +8,6 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.mowlib.Recipes.BaseBlockEntityFilter;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;

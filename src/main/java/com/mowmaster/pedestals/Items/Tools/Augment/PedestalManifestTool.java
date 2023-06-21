@@ -6,8 +6,6 @@ import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Items.Tools.BaseTool;
-import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -30,8 +28,7 @@ import java.util.List;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class PedestalManifestTool extends BaseTool implements IPedestalTool
-{
+public class PedestalManifestTool extends BaseTool {
     public PedestalManifestTool(Properties p_41383_) {
         super(p_41383_);
     }

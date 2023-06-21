@@ -4,8 +4,6 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredSpeed;
-import com.mowmaster.pedestals.Items.Tools.BaseTool;
-import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -15,8 +13,7 @@ import net.minecraft.world.item.ItemStack;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class AugmentTool_Speed extends BaseTool implements IPedestalTool
-{
+public class AugmentTool_Speed extends BaseTool {
     public AugmentTool_Speed(Properties p_41383_) {
         super(p_41383_.stacksTo(1));
     }

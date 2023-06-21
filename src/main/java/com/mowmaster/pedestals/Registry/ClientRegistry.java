@@ -3,7 +3,6 @@ package com.mowmaster.pedestals.Registry;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntityRenderer;
-import com.mowmaster.pedestals.Items.Filters.FilterRestricted;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.texture.TextureAtlas;

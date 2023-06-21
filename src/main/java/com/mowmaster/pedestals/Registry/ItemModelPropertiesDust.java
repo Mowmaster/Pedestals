@@ -2,7 +2,6 @@ package com.mowmaster.pedestals.Registry;
 
 
 import com.mowmaster.pedestals.Items.Augments.AugmentRenderDiffuser;
-import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.Tools.Augment.PedestalManifestTool;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeExport;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeImport;

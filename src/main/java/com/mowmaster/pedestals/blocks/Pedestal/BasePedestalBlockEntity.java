@@ -1,13 +1,11 @@
-package com.mowmaster.pedestals.Blocks.Pedestal;
+package com.mowmaster.pedestals.blocks.Pedestal;
 
-
-import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseOmniStorageBlockEntity;
 import com.mowmaster.mowlib.Capabilities.Dust.CapabilityDust;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Capabilities.Dust.IDustHandler;
 import com.mowmaster.mowlib.Capabilities.Experience.CapabilityExperience;
 import com.mowmaster.mowlib.Capabilities.Experience.IExperienceStorage;
-import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.*;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
@@ -18,78 +16,46 @@ import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseFluidBulkStorageI
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.BaseXpBulkStorageItem;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.IPedestalUpgrade;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
-import com.mowmaster.pedestals.Items.WorkCards.IPedestalWorkCard;
-import com.mowmaster.pedestals.PedestalUtils.MoveToMowLibUtils;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
-import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.*;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-import com.mowmaster.pedestals.Registry.DeferredRegisterTileBlocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
-import java.util.Optional;
 
-public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
+public class BasePedestalBlockEntity extends MowLibBaseOmniStorageBlockEntity
 {
-    private ItemStackHandler itemHandler = createItemHandlerPedestal();
-    private LazyOptional<IItemHandler> itemCapability = LazyOptional.of(() -> this.itemHandler);
     private ItemStackHandler privateItems = createPrivateItemHandler();
-    private IEnergyStorage energyHandler = createEnergyHandler();
-    private LazyOptional<IEnergyStorage> energyCapability = LazyOptional.of(() -> this.energyHandler);
-    private IFluidHandler fluidHandler = createFluidHandler();
-    private LazyOptional<IFluidHandler> fluidCapability = LazyOptional.of(() -> this.fluidHandler);
-    private IExperienceStorage experienceHandler = createExperienceHandler();
-    private LazyOptional<IExperienceStorage> experienceCapability = LazyOptional.of(() -> this.experienceHandler);
-    private IDustHandler dustHandler = createDustHandler();
-    private LazyOptional<IDustHandler> dustCapability = LazyOptional.of(() -> this.dustHandler);
     private List<ItemStack> stacksList = new ArrayList<>();
     private WeakReference<FakePlayer> pedestalPlayer;
-    private MobEffectInstance storedPotionEffect = null;
-    private int storedPotionEffectDuration = 0;
-    private int storedEnergy = 0;
-    private FluidStack storedFluid = FluidStack.EMPTY;
-    private int storedExperience = 0;
-    private DustMagic storedDust = DustMagic.EMPTY;
     private final List<BlockPos> linkedPedestals = new ArrayList<BlockPos>();
     private int storedValueForUpgrades = 0;
     private boolean showRenderRange = false;
     private boolean showRenderRangeUpgrade = false;
-    public BlockPos getPos() { return this.worldPosition; }
     private BasePedestalBlockEntity getPedestal() { return this; }
     private int maxRate = Integer.MAX_VALUE;
 
@@ -104,135 +70,42 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         super(DeferredBlockEntityTypes.PEDESTAL.get(), p_155229_, p_155230_);
     }
 
-    public void update()
-    {
+    @Override
+    public void update() {
         BlockState state = level.getBlockState(getPos());
         this.level.sendBlockUpdated(getPos(), state, state, 3);
         this.setChanged();
     }
 
-    //9 slots, but only when it has the tank upgrade will we allow more then the first to be used.
+    @Override
     public ItemStackHandler createItemHandlerPedestal() {
-        return new ItemStackHandler(27) {
-            @Override
-            protected void onLoad() {
-                super.onLoad();
-            }
-
+        super.createItemHandlerPedestal();
+        return new ItemStackHandler()
+        {
             @Override
             protected void onContentsChanged(int slot) {
                 update();
             }
 
             @Override
-            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                //Run filter checks here(slot==0)?(true):(false)
-                IPedestalFilter filter = getIPedestalFilter();
-                if(filter == null || !filter.getFilterDirection().insert())return true;
-                return filter.canAcceptItems(getFilterInPedestal(),stack);
-            }
-
-            @Override
             public int getSlots() {
-                //maybe return less if there is no tank upgrade???
                 int baseSlots = PedestalConfig.COMMON.pedestal_baseItemStacks.get();
                 int additionalSlots = getItemSlotIncreaseFromStorage();
                 return baseSlots + additionalSlots;
-            }
-
-            @Override
-            protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
-                //Run filter checks here
-                IPedestalFilter filter = getIPedestalFilter();
-                if(filter == null || !filter.getFilterDirection().insert())return super.getStackLimit(slot, stack);
-                return filter.canAcceptCountItems(getPedestal(), getFilterInPedestal(),  stack.getMaxStackSize(), getSlotSizeLimit(),stack);
-                //return super.getStackLimit(slot, stack);
-            }
-
-            @Override
-            public int getSlotLimit(int slot) {
-
-                //Hopefully never mess with this again
-                //Amount of items allowed in the slot --- may use for bibliomania???
-                return super.getSlotLimit(slot);
-            }
-
-            @Nonnull
-            @Override
-            public ItemStack getStackInSlot(int slot) {
-
-                return super.getStackInSlot((slot>getSlots())?(0):(slot));
-            }
-
-            /*
-                Inserts an ItemStack into the given slot and return the remainder. The ItemStack should not be modified in this function!
-                Note: This behaviour is subtly different from IFluidHandler.fill(FluidStack, IFluidHandler.FluidAction)
-                Params:
-                    slot – Slot to insert into.
-                    stack – ItemStack to insert. This must not be modified by the item handler.
-                    simulate – If true, the insertion is only simulated
-                Returns:
-                    The remaining ItemStack that was not inserted (if the entire stack is accepted, then return an empty ItemStack).
-                    May be the same as the input ItemStack if unchanged, otherwise a new ItemStack.
-                    The returned ItemStack can be safely modified after.
-            */
-            @Nonnull
-            @Override
-            public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-                /*IPedestalFilter filter = getIPedestalFilter();
-                if(filter != null)
-                {
-                    if(filter.getFilterDirection().insert())
-                    {
-                        int countAllowed = filter.canAcceptCountItems(getPedestal(),stack);
-                        ItemStack modifiedStack = stack.copy();
-                        super.insertItem((slot>getSlots())?(0):(slot), modifiedStack, simulate);
-                        ItemStack returnedStack = modifiedStack.copy();
-                        returnedStack.setCount(stack.getCount() - countAllowed);
-                        return returnedStack;
-                    }
-                }*/
-
-                return super.insertItem((slot>getSlots())?(0):(slot), stack, simulate);
-            }
-
-            /*
-                Extracts an ItemStack from the given slot.
-                The returned value must be empty if nothing is extracted,
-                otherwise its stack size must be less than or equal to amount and ItemStack.getMaxStackSize().
-                Params:
-                    slot – Slot to extract from.
-                    amount – Amount to extract (may be greater than the current stack's max limit)
-                    simulate – If true, the extraction is only simulated
-                Returns:
-                    ItemStack extracted from the slot, must be empty if nothing can be extracted.
-                    The returned ItemStack can be safely modified after, so item handlers should return a new or copied stack.
-             */
-            @Nonnull
-            @Override
-            public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                
-                IPedestalFilter filter = getIPedestalFilter();
-                if(filter == null || !filter.getFilterDirection().extract())return super.extractItem((slot>getSlots())?(0):(slot), amount, simulate);
-                return super.extractItem((slot>getSlots())?(0):(slot), Math.min(amount, (filter == null)?(amount):((!filter.getFilterDirection().extract())?(amount):(filter.canAcceptCountItems(getPedestal(),getFilterInPedestal(),  getStackInSlot((slot>getSlots())?(0):(slot)).getMaxStackSize(), getSlotSizeLimit(),getStackInSlot((slot>getSlots())?(0):(slot)))))), simulate);
             }
         };
     }
 
     private static class PrivateInventorySlot {
         static final int COIN = 0;
-        static final int LIGHT = 1;
-        static final int FILTER = 2;
-        static final int REDSTONE = 3;
-        static final int AUGMENT_ROUNDROBIN = 4;
-        static final int AUGMENT_RENDERDIFFUSER = 5;
-        static final int AUGMENT_NOCOLLIDE = 6;
-        static final int AUGMENT_TIERED_SPEED = 7;
-        static final int AUGMENT_TIERED_CAPACITY = 8;
-        static final int AUGMENT_TIERED_STORAGE = 9;
-        static final int AUGMENT_TIERED_RANGE = 10;
-        static final int TOOL = 11;
-        static final int WORK_CARD = 12;
+        static final int AUGMENT_ROUNDROBIN = 1;
+        static final int AUGMENT_RENDERDIFFUSER = 2;
+        static final int AUGMENT_NOCOLLIDE = 3;
+        static final int AUGMENT_TIERED_SPEED = 4;
+        static final int AUGMENT_TIERED_CAPACITY = 5;
+        static final int AUGMENT_TIERED_STORAGE = 6;
+        static final int AUGMENT_TIERED_RANGE = 7;
+        static final int TOOL = 8;
     }
 
     private ItemStackHandler createPrivateItemHandler() {
@@ -267,9 +140,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
                 return switch (slot) {
                     case PrivateInventorySlot.COIN -> stack.getItem() instanceof IPedestalUpgrade && !hasCoin();
-                    case PrivateInventorySlot.LIGHT -> stack.is(Items.GLOWSTONE) && !hasLight();
-                    case PrivateInventorySlot.FILTER -> stack.getItem() instanceof IPedestalFilter && !(stack.getItem().equals(DeferredRegisterItems.FILTER_BASE.get())) && !hasFilter();
-                    case PrivateInventorySlot.REDSTONE -> stack.is(Items.REDSTONE) && getRedstonePowerNeeded() < 15;
                     case PrivateInventorySlot.AUGMENT_ROUNDROBIN -> stack.is(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()) && !hasRRobin();
                     case PrivateInventorySlot.AUGMENT_RENDERDIFFUSER -> stack.is(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()) && !hasRenderAugment();
                     case PrivateInventorySlot.AUGMENT_NOCOLLIDE -> stack.is(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()) && !hasNoCollide();
@@ -278,140 +148,72 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                     case PrivateInventorySlot.AUGMENT_TIERED_STORAGE -> canInsertAugmentStorage(stack);
                     case PrivateInventorySlot.AUGMENT_TIERED_RANGE -> canInsertAugmentRange(stack);
                     case PrivateInventorySlot.TOOL -> canInsertTool(stack);
-                    case PrivateInventorySlot.WORK_CARD -> stack.getItem() instanceof IPedestalWorkCard && !hasWorkCard();
                     default -> false;
                 };
             }
         };
     }
 
+    @Override
     public IFluidHandler createFluidHandler() {
+        IFluidHandler handler = super.createFluidHandler();
         return new IFluidHandler() {
-
-            @Nonnull
-            @Override
-            public FluidStack getFluidInTank(int i) {
-                return storedFluid;
-            }
-
             @Override
             public int getTanks() {
-                //Technically we dont use the tanks thing, but we'll pretend and hope it doesnt break...
-                return 1;
-            }
-
-            @Nonnull
-            @Override
-            public FluidStack drain(FluidStack resource, FluidAction action) {
-                if (resource.isEmpty() || !resource.isFluidEqual(storedFluid)) {
-                    return FluidStack.EMPTY;
-                }
-                return drain(resource.getAmount(), action);
-            }
-
-            @Nonnull
-            @Override
-            public FluidStack drain(int maxDrain, FluidAction fluidAction) {
-                IPedestalFilter filter = getIPedestalFilter();
-                int maxDrainPostFilter = (filter != null && filter.getFilterDirection().extract()) ? Math.min(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),storedFluid), maxDrain) : maxDrain;
-                int fluidDrained = Math.min(maxDrainPostFilter, storedFluid.getAmount());
-                // `storedFluid.shrink` can reduce `storedFluid` to an empty stack, so copy it for return before shrinking.
-                FluidStack returnFluidStack = new FluidStack(storedFluid, fluidDrained);
-                if (fluidAction.execute() && fluidDrained > 0) {
-                    storedFluid.shrink(fluidDrained);
-                    update();
-                }
-                return returnFluidStack;
+                return handler.getTanks();
             }
 
             @Override
-            public int getTankCapacity(int i) {
+            public @NotNull FluidStack getFluidInTank(int tank) {
+                return handler.getFluidInTank(tank);
+            }
+
+            @Override
+            public int getTankCapacity(int tank) {
                 int baseFluidStorage = PedestalConfig.COMMON.pedestal_baseFluidStorage.get();
                 int additionalFluidStorage = getFluidAmountIncreaseFromStorage();
                 return baseFluidStorage + additionalFluidStorage;
             }
 
             @Override
-            public boolean isFluidValid(int i, @Nonnull FluidStack fluidStack) {
-                IPedestalFilter filter = getIPedestalFilter();
-                if (filter == null || !filter.getFilterDirection().insert()) {
-                    return storedFluid.isEmpty() || storedFluid.isFluidEqual(fluidStack);
-                } else {
-                    return filter.canAcceptFluids(getFilterInPedestal(), fluidStack);
-                }
+            public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
+                return handler.isFluidValid(tank,stack);
             }
 
             @Override
-            public int fill(FluidStack fluidStack, FluidAction fluidAction) {
-                if (fluidStack.isEmpty() || !isFluidValid(0, fluidStack) || (!storedFluid.isEmpty() && !storedFluid.isFluidEqual(fluidStack))) {
-                    return 0;
-                }
+            public int fill(FluidStack resource, FluidAction action) {
+                return handler.fill(resource,action);
+            }
 
-                IPedestalFilter filter = getIPedestalFilter();
-                int fluidAmountPostFilter = (filter != null && filter.getFilterDirection().insert()) ? Math.min(filter.canAcceptCountFluids(getPedestal(),getFilterInPedestal(),getFluidCapacity(),spaceForFluid(),fluidStack), fluidStack.getAmount()) : fluidStack.getAmount();
-                int amountFilled = Math.min(getTankCapacity(0) - storedFluid.getAmount(), fluidAmountPostFilter);
-                if (fluidAction.execute()) {
-                    if (storedFluid.isEmpty()) {
-                        storedFluid = new FluidStack(fluidStack, amountFilled);
-                    } else {
-                        storedFluid.grow(amountFilled);
-                    }
-                    update();
-                }
-                return amountFilled;
+            @Override
+            public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
+                return handler.drain(resource,action);
+            }
+
+            @Override
+            public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+                return handler.drain(maxDrain,action);
             }
         };
     }
 
-    private IEnergyStorage createEnergyHandler() {
+    @Override
+    public IEnergyStorage createEnergyHandler() {
+        IEnergyStorage handler = super.createEnergyHandler();
         return new IEnergyStorage() {
-
-            /*
-            Adds energy to the storage. Returns quantity of energy that was accepted.
-            Params:
-                maxReceive – Maximum amount of energy to be inserted.
-                simulate – If TRUE, the insertion will only be simulated.
-            Returns:
-                Amount of energy that was (or would have been, if simulated) accepted by the storage.
-             */
             @Override
             public int receiveEnergy(int maxReceive, boolean simulate) {
-                if (!canReceive())
-                    return 0;
-
-                IPedestalFilter filter = getIPedestalFilter();
-                int maxReceivePostFilter = (filter != null && filter.getFilterDirection().insert()) ? filter.canAcceptCountEnergy(getPedestal(),getFilterInPedestal(),getEnergyCapacity(),spaceForEnergy(),maxReceive): maxReceive;
-                int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), maxReceivePostFilter);
-                if (!simulate)
-                    storedEnergy += energyReceived;
-                update();
-                return energyReceived;
+                return handler.receiveEnergy(maxReceive,simulate);
             }
 
-            /*
-            Removes energy from the storage. Returns quantity of energy that was removed.
-            Params:
-                maxExtract – Maximum amount of energy to be extracted.
-                simulate – If TRUE, the extraction will only be simulated.
-            Returns:
-                Amount of energy that was (or would have been, if simulated) extracted from the storage.
-             */
             @Override
             public int extractEnergy(int maxExtract, boolean simulate) {
-                if (!canExtract())
-                    return 0;
-
-                IPedestalFilter filter = getIPedestalFilter();
-                int maxExtractPostFilter = (filter != null && filter.getFilterDirection().extract()) ? filter.canAcceptCountEnergy(getPedestal(),getFilterInPedestal(),getEnergyCapacity(),spaceForEnergy(),maxExtract): maxExtract;
-                int energyExtracted = Math.min(storedEnergy, maxExtractPostFilter);
-                if (!simulate)
-                    storedEnergy -= energyExtracted;
-                return energyExtracted;
+                return handler.extractEnergy(maxExtract,simulate);
             }
 
             @Override
             public int getEnergyStored() {
-                return storedEnergy;
+                return handler.getEnergyStored();
             }
 
             @Override
@@ -423,202 +225,100 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
             @Override
             public boolean canExtract() {
-                if(hasEnergy())
-                {
-                    IPedestalFilter filter = getIPedestalFilter();
-                    if(filter == null || !filter.getFilterDirection().extract())return true;
-                    return filter.canAcceptEnergy(getFilterInPedestal(),1);
-                }
-                return false;
+                return handler.canExtract();
             }
 
             @Override
             public boolean canReceive() {
-                if(hasSpaceForEnergy())
-                {
-                    IPedestalFilter filter = getIPedestalFilter();
-                    if(filter == null || !filter.getFilterDirection().insert())return true;
-                    return filter.canAcceptEnergy(getFilterInPedestal(),1);
-                }
-
-                return false;
+                return handler.canReceive();
             }
         };
     }
 
-    private IExperienceStorage createExperienceHandler() {
+
+    @Override
+    public IExperienceStorage createExperienceHandler() {
+        IExperienceStorage handler = super.createExperienceHandler();
         return new IExperienceStorage() {
-
             @Override
-            public int receiveExperience(int maxReceive, boolean simulate) {
-                if (!canReceive())
-                    return 0;
-
-                int spaceAvailable = getMaxExperienceStored() - getExperienceStored();
-                IPedestalFilter filter = getIPedestalFilter();
-                int maxReceivePostFilter = (filter != null && filter.getFilterDirection().insert()) ? filter.canAcceptCountExperience(getPedestal(),getFilterInPedestal(),getExperienceCapacity(),spaceForExperience(),maxReceive): maxReceive;
-                int experienceReceived = Math.min(spaceAvailable, maxReceivePostFilter);
-                if (!simulate)
-                    storedExperience += experienceReceived;
-                update();
-                return experienceReceived;
+            public int receiveExperience(int i, boolean b) {
+                return handler.receiveExperience(i,b);
             }
 
             @Override
-            public int extractExperience(int maxExtract, boolean simulate) {
-                if (!canExtract())
-                    return 0;
-
-                IPedestalFilter filter = getIPedestalFilter();
-                int maxExtractPostFilter = (filter != null && filter.getFilterDirection().extract()) ? filter.canAcceptCountExperience(getPedestal(),getFilterInPedestal(),getExperienceCapacity(),spaceForExperience(),maxExtract) : maxExtract;
-                int experienceExtracted = Math.min(storedExperience, maxExtractPostFilter);
-                if (!simulate)
-                    storedExperience -= experienceExtracted;
-                return experienceExtracted;
+            public int extractExperience(int i, boolean b) {
+                return handler.extractExperience(i,b);
             }
 
             @Override
-            public int getExperienceStored() { return storedExperience; }
+            public int getExperienceStored() {
+                return handler.getExperienceStored();
+            }
 
             @Override
             public int getMaxExperienceStored() {
                 int convertLevelsToXp = MowLibXpUtils.getExpCountByLevel(PedestalConfig.COMMON.pedestal_baseXpStorage.get());
                 //Conditioning out running the xp converter when theres not need to.
                 int convertLevelsToXpAdditional = (getXpLevelAmountIncreaseFromStorage()>0)?(MowLibXpUtils.getExpCountByLevel(getXpLevelAmountIncreaseFromStorage())):(0);
-                return convertLevelsToXp + convertLevelsToXpAdditional;//30 levels is default
+                return convertLevelsToXp + convertLevelsToXpAdditional;
             }
 
             @Override
             public boolean canExtract() {
-                if(hasExperience())
-                {
-                    IPedestalFilter filter = getIPedestalFilter();
-                    if(filter == null || !filter.getFilterDirection().extract())return true;
-                    return filter.canAcceptExperience(getFilterInPedestal(),1);
-                }
-                return false;
+                return handler.canExtract();
             }
 
             @Override
             public boolean canReceive() {
-                if(hasSpaceForExperience())
-                {
-                    IPedestalFilter filter = getIPedestalFilter();
-                    if(filter == null || !filter.getFilterDirection().insert())return true;
-                    return filter.canAcceptExperience(getFilterInPedestal(),1);
-                }
-
-                return false;
+                return handler.canReceive();
             }
         };
     }
 
+    @Override
     public IDustHandler createDustHandler() {
+        IDustHandler handler = super.createDustHandler();
         return new IDustHandler() {
-            protected void onContentsChanged() {
-                update();
-            }
-
             @Override
             public int getTanks() {
-                return 1;
+                return handler.getTanks();
             }
 
             @NotNull
             @Override
-            public DustMagic getDustMagicInTank(int tank) {
-                return storedDust;
+            public DustMagic getDustMagicInTank(int i) {
+                return handler.getDustMagicInTank(i);
             }
 
             @Override
-            public int getTankCapacity(int tank) {
+            public int getTankCapacity(int i) {
                 int baseStorage = PedestalConfig.COMMON.pedestal_baseDustStorage.get();
                 int additionalStorage = getDustAmountIncreaseFromStorage();
                 return baseStorage + additionalStorage;
             }
 
             @Override
-            public boolean isDustValid(int tank, @NotNull DustMagic dustIn) {
-                IPedestalFilter filter = getIPedestalFilter();
-                if(filter == null || !filter.getFilterDirection().insert())return storedDust.isDustEqualOrEmpty(dustIn);
-                return filter.canAcceptDust(getFilterInPedestal(),dustIn);
+            public boolean isDustValid(int i, @NotNull DustMagic dustMagic) {
+                return handler.isDustValid(i,dustMagic);
             }
 
             @Override
-            public int fill(DustMagic dust, DustAction action) {
-                if (dust.isEmpty() || !isDustValid(0,dust) || !storedDust.isDustEqual(dust)) {
-                    return 0;
-                }
-
-                IPedestalFilter filter = getIPedestalFilter();
-                int dustAmountPostFilter =  (filter != null && filter.getFilterDirection().insert()) ? Math.min(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),dust), dust.getDustAmount()) : dust.getDustAmount();
-                if (storedDust.isEmpty()) {
-                    int amountFilled = Math.min(getTankCapacity(0), dustAmountPostFilter);
-                    if (!action.simulate()) {
-                        storedDust = new DustMagic(dust.getDustColor(), amountFilled);
-                        onContentsChanged();
-                    }
-                    return amountFilled;
-                } else {
-                    int amountFilled = Math.min(Math.min(getTankCapacity(0) - storedDust.getDustAmount(), dustAmountPostFilter), dust.getDustAmount());
-
-                    if (!action.simulate() && amountFilled > 0) {
-                        storedDust.grow(amountFilled);
-                        onContentsChanged();
-                    }
-                    return amountFilled;
-                }
+            public int fill(DustMagic dustMagic, DustAction dustAction) {
+                return handler.fill(dustMagic,dustAction);
             }
 
             @NotNull
             @Override
-            public DustMagic drain(DustMagic dust, DustAction action) {
-                if (dust.isEmpty() || !dust.isDustEqual(storedDust)) {
-                    return new DustMagic(-1, 0);
-                }
-                return drain(dust.getDustAmount(), action);
+            public DustMagic drain(DustMagic dustMagic, DustAction dustAction) {
+                return handler.drain(dustMagic,dustAction);
             }
 
             @NotNull
             @Override
-            public DustMagic drain(int maxDrain, DustAction action) {
-                IPedestalFilter filter = getIPedestalFilter();
-                int maxDrainPostFilter = (filter != null && filter.getFilterDirection().extract()) ? Math.min(filter.canAcceptCountDust(getPedestal(),getFilterInPedestal(),getDustCapacity(),spaceForDust(),storedDust), maxDrain) : maxDrain;
-                int amountDrained = Math.min(storedDust.getDustAmount(), maxDrainPostFilter);
-                DustMagic magic = new DustMagic(storedDust.getDustColor(), amountDrained);
-                if (action.execute() && amountDrained > 0) {
-                    if (amountDrained >= storedDust.getDustAmount()) {
-                        storedDust.setDustAmount(0);
-                        storedDust.setDustColor(-1);
-                    } else {
-                        storedDust.shrink(amountDrained);
-                    }
-                    onContentsChanged();
-                }
-                return magic;
+            public DustMagic drain(int i, DustAction dustAction) {
+                return handler.drain(i,dustAction);
             }
         };
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return itemCapability.cast();
-        }
-        if ((cap == ForgeCapabilities.ENERGY)) {
-            return energyCapability.cast();
-        }
-        if ((cap == ForgeCapabilities.FLUID_HANDLER)) {
-            return fluidCapability.cast();
-        }
-        if ((cap == CapabilityExperience.EXPERIENCE)) {
-            return experienceCapability.cast();
-        }
-        if ((cap == CapabilityDust.DUST_HANDLER)) {
-            return dustCapability.cast();
-        }
-        return super.getCapability(cap, side);
     }
 
     /*==========================================================
@@ -678,21 +378,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ==========================================================*/
 
 
-
-
-    public void dropInventoryItems(Level worldIn, BlockPos pos) {
-        MowLibItemUtils.dropInventoryItems(worldIn, pos, itemHandler);
-    }
-
-    public List<ItemStack> dropInventoryItemsList() {
-        List<ItemStack> returner = new ArrayList<>();
-        for(int i = 0; i < itemHandler.getSlots(); ++i) {
-            returner.add(itemHandler.getStackInSlot(i));
-        }
-
-        return returner;
-    }
-
     public void dropInventoryItemsPrivate(Level worldIn, BlockPos pos) {
         MowLibItemUtils.dropInventoryItems(worldIn,pos,privateItems);
     }
@@ -706,8 +391,9 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return returner;
     }
 
+    @Override
     public void dropLiquidsInWorld(Level worldIn, BlockPos pos) {
-        FluidStack inTank = fluidHandler.getFluidInTank(0);
+        FluidStack inTank = getStoredFluid();
         if (inTank.getAmount()>0) {
             ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_FLUID.get());
             if(toDrop.getItem() instanceof BaseFluidBulkStorageItem droppedItemFluid) {
@@ -717,36 +403,39 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         }
     }
 
+    @Override
     public void removeEnergyFromBrokenPedestal(Level worldIn, BlockPos pos) {
-        if(energyHandler.getEnergyStored()>0)
+        if(getStoredEnergy()>0)
         {
             ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_ENERGY.get());
             if(toDrop.getItem() instanceof BaseEnergyBulkStorageItem droppedItemEnergy)
             {
-                droppedItemEnergy.setEnergy(toDrop,energyHandler.getEnergyStored());
+                droppedItemEnergy.setEnergy(toDrop,getStoredEnergy());
             }
             MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
         }
     }
 
+    @Override
     public void dropXPInWorld(Level worldIn, BlockPos pos) {
-        if(experienceHandler.getExperienceStored()>0)
+        if(getStoredExperience()>0)
         {
             ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_XP.get());
             if(toDrop.getItem() instanceof BaseXpBulkStorageItem droppedItemEnergy)
             {
-                droppedItemEnergy.setXp(toDrop,experienceHandler.getExperienceStored());
+                droppedItemEnergy.setXp(toDrop,getStoredExperience());
                 //System.out.println("stored xp: "+ droppedItemEnergy.getXp(toDrop));
             }
             MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
         }
     }
 
+    @Override
     public void dropDustInWorld(Level worldIn, BlockPos pos) {
-        if(!dustHandler.getDustMagicInTank(0).isEmpty())
+        if(!getStoredDust().isEmpty())
         {
             ItemStack toDrop = new ItemStack(DeferredRegisterItems.MECHANICAL_STORAGE_DUST.get());
-            DustMagic.setDustMagicInStack(toDrop,storedDust);
+            DustMagic.setDustMagicInStack(toDrop,getStoredDust());
             MowLibItemUtils.spawnItemStack(worldIn,pos.getX(),pos.getY(),pos.getZ(),toDrop);
         }
     }
@@ -806,7 +495,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public boolean isPedestalInRange(BlockPos targetPos) {
-        return MoveToMowLibUtils.arePositionsInRange(getPos(), targetPos, getLinkingRange());
+        return MowLibBlockPosUtils.arePositionsInRange(getPos(), targetPos, getLinkingRange());
     }
 
     public boolean isSamePedestal(BlockPos targetPos) {
@@ -856,135 +545,8 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ==============================================================================
     ============================================================================*/
 
-    public boolean hasItem() {
-        int firstPartialOrNonEmptySlot = 0;
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
-            if(stackInSlot.getCount() < stackInSlot.getMaxStackSize() || stackInSlot.isEmpty()) {
-                firstPartialOrNonEmptySlot = i;
-                break;
-            }
-        }
-
-        return !itemHandler.getStackInSlot(firstPartialOrNonEmptySlot).isEmpty();
-    }
-
-    public Optional<Integer> maybeFirstNonEmptySlot() {
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            if(!itemHandler.getStackInSlot(i).isEmpty()) {
-                return Optional.of(i);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public boolean hasItemFirst() {
-        return maybeFirstNonEmptySlot().isPresent();
-    }
-
-    public Optional<Integer> maybeLastNonEmptySlot() {
-        for (int i = itemHandler.getSlots() - 1; i >= 0; i--) {
-            if(!itemHandler.getStackInSlot(i).isEmpty()) {
-                return Optional.of(i);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public Optional<Integer> maybeFirstSlotWithSpaceForMatchingItem(ItemStack stackToMatch) {
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
-            if (stackInSlot.isEmpty() || (stackInSlot.getCount() < stackInSlot.getMaxStackSize() && ItemHandlerHelper.canItemStacksStack(stackInSlot, stackToMatch))) {
-                return Optional.of(i);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public boolean hasSpaceForItem(ItemStack stackToMatch) {
-        return maybeFirstSlotWithSpaceForMatchingItem(stackToMatch).isPresent();
-    }
-
-    public ItemStack getItemInPedestal() {
-        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
-    }
-
-    public ItemStack getMatchingItemInPedestalOrEmptySlot(ItemStack stackToMatch) {
-        return maybeFirstSlotWithSpaceForMatchingItem(stackToMatch).map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
-
-    }
-
-    public ItemStack getItemInPedestalFirst() {
-        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
-
-    }
-
-    public int getPedestalSlots() { return itemHandler.getSlots(); }
-
-    public List<ItemStack> getItemStacks() {
-        List<ItemStack> listed = new ArrayList<>();
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            if (!itemHandler.getStackInSlot(i).isEmpty()) {
-                listed.add(itemHandler.getStackInSlot(i));
-            }
-        }
-        return listed;
-    }
-
-    public ItemStack getItemInPedestal(int slot) {
-        if (itemHandler.getSlots() > slot) {
-            return itemHandler.getStackInSlot(slot);
-        } else {
-            return ItemStack.EMPTY;
-        }
-    }
-
-    public ItemStack removeItem(int numToRemove, boolean simulate) {
-        return maybeLastNonEmptySlot().map(slot -> itemHandler.extractItem(slot, numToRemove, simulate)).orElse(ItemStack.EMPTY);
-    }
-
-    public ItemStack removeItemStack(ItemStack stackToRemove, boolean simulate) {
-        int matchingSlotNumber = 0;
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            if(ItemHandlerHelper.canItemStacksStack(itemHandler.getStackInSlot(i), stackToRemove)) {
-                matchingSlotNumber = i;
-                break;
-            }
-        }
-        return itemHandler.extractItem(matchingSlotNumber, stackToRemove.getCount(), simulate);
-    }
-
-    public ItemStack removeItem(boolean simulate) {
-        return maybeLastNonEmptySlot().map(slot -> {
-            ItemStack stack = itemHandler.extractItem(slot, itemHandler.getStackInSlot(slot).getCount(), simulate);
-            //update();
-            return stack;
-        }).orElse(ItemStack.EMPTY);
-    }
-
-    //If resulting insert stack is empty it means the full stack was inserted
-    public boolean addItem(ItemStack itemFromBlock, boolean simulate) {
-        return addItemStack(itemFromBlock, simulate).isEmpty();
-    }
-
-    //Return result not inserted, if all inserted return empty stack
-    public ItemStack addItemStack(ItemStack itemFromBlock, boolean simulate) {
-        return maybeFirstSlotWithSpaceForMatchingItem(itemFromBlock).map(slot -> {
-            if (itemHandler.isItemValid(slot, itemFromBlock)) {
-                ItemStack returner = itemHandler.insertItem(slot, itemFromBlock.copy(), simulate);
-                if (!simulate) update();
-                return returner;
-            }
-            return itemFromBlock;
-        }).orElse(itemFromBlock);
-    }
-
     public int getItemTransferRate() {
         return  PedestalConfig.COMMON.pedestal_baseItemTransferRate.get() + getItemTransferRateIncreaseFromCapacity();
-    }
-
-    public int getSlotSizeLimit() {
-        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getSlotLimit(slot)).orElse(itemHandler.getSlotLimit(0));
     }
 
     /*============================================================================
@@ -1000,26 +562,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ===========================    FLUID  START      =============================
     ==============================================================================
     ============================================================================*/
-
-    public boolean hasFluid() { return !fluidHandler.getFluidInTank(0).isEmpty(); }
-
-    public FluidStack getStoredFluid() { return fluidHandler.getFluidInTank(0); }
-
-    public int getFluidCapacity() { return fluidHandler.getTankCapacity(0); }
-
-    public int spaceForFluid()
-    {
-        return getFluidCapacity() - getStoredFluid().getAmount();
-    }
-
-    public boolean canAcceptFluid(FluidStack fluidStackIn) { return fluidHandler.isFluidValid(0,fluidStackIn); }
-
-    public FluidStack removeFluid(FluidStack fluidToRemove, IFluidHandler.FluidAction action) { return fluidHandler.drain(fluidToRemove, action); }
-
-    public FluidStack removeFluid(int fluidAmountToRemove, IFluidHandler.FluidAction action) { return fluidHandler.drain(new FluidStack(getStoredFluid().getFluid(),fluidAmountToRemove,getStoredFluid().getTag()),action); }
-
-    public int addFluid(FluidStack fluidStackIn, IFluidHandler.FluidAction fluidAction) { return fluidHandler.fill(fluidStackIn,fluidAction); }
-
 
     public int getFluidTransferRate() {
         int fluidTransferRate = PedestalConfig.COMMON.pedestal_baseFluidTransferRate.get();
@@ -1041,24 +583,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ===========================    ENERGY START      =============================
     ==============================================================================
     ============================================================================*/
-
-    public boolean hasEnergy() { return energyHandler.getEnergyStored() > 0; }
-
-    public boolean hasSpaceForEnergy() { return spaceForEnergy() > 0; }
-
-    public int spaceForEnergy() { return getEnergyCapacity() - getStoredEnergy(); }
-
-    public int getEnergyCapacity() { return energyHandler.getMaxEnergyStored(); }
-
-    public int getStoredEnergy() { return energyHandler.getEnergyStored(); }
-
-    public int addEnergy(int amountIn, boolean simulate) { return energyHandler.receiveEnergy(amountIn,simulate); }
-
-    public int removeEnergy(int amountOut, boolean simulate) { return energyHandler.extractEnergy(amountOut,simulate); }
-
-    public boolean canAcceptEnergy() { return energyHandler.canReceive(); }
-
-    public boolean canSendEnergy() { return energyHandler.canExtract(); }
 
     public int getEnergyTransferRate()
     {
@@ -1083,27 +607,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ==============================================================================
     ============================================================================*/
 
-    public boolean hasExperience() { return experienceHandler.getExperienceStored() > 0; }
-
-    public boolean hasSpaceForExperience() { return spaceForExperience() > 0; }
-
-    public int spaceForExperience()
-    {
-        return getExperienceCapacity() - getStoredExperience();
-    }
-
-    public int getExperienceCapacity() { return experienceHandler.getMaxExperienceStored(); }
-
-    public int getStoredExperience() { return experienceHandler.getExperienceStored(); }
-
-    public int addExperience(int amountIn, boolean simulate) { return experienceHandler.receiveExperience(amountIn, simulate); }
-
-    public int removeExperience(int amountOut, boolean simulate) { return experienceHandler.extractExperience(amountOut,simulate); }
-
-    public boolean canAcceptExperience() { return experienceHandler.canReceive(); }
-
-    public boolean canSendExperience() { return experienceHandler.canExtract(); }
-
     public int getExperienceTransferRate() {
         //im assuming # = xp value???
         int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
@@ -1125,37 +628,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ===========================    DUST   START      =============================
     ==============================================================================
     ============================================================================*/
-
-    public boolean hasDust() { return !dustHandler.getDustMagicInTank(0).isEmpty(); }
-
-    public DustMagic getStoredDust() {
-        if (hasDust()) {
-            return dustHandler.getDustMagicInTank(0);
-        } else {
-            return DustMagic.EMPTY;
-        }
-    }
-
-    public int getDustCapacity() { return dustHandler.getTankCapacity(0); }
-
-    public int spaceForDust() { return getDustCapacity()  -getStoredDust().getDustAmount(); }
-
-    public boolean canAcceptDust(DustMagic dustMagicIn) { return dustHandler.isDustValid(0,dustMagicIn); }
-
-    public DustMagic removeDust(DustMagic dustMagicToRemove, IDustHandler.DustAction action) {
-        update();
-        return dustHandler.drain(dustMagicToRemove,action);
-    }
-
-    public DustMagic removeDust(int dustAmountToRemove, IDustHandler.DustAction action) {
-        update();
-        return dustHandler.drain(new DustMagic(getStoredDust().getDustColor(),dustAmountToRemove),action);
-    }
-
-    public int addDust(DustMagic dustMagicIn, IDustHandler.DustAction action) {
-        update();
-        return dustHandler.fill(dustMagicIn,action);
-    }
 
     public int getDustTransferRate() {
         //im assuming # = rf value???
@@ -1277,6 +749,10 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TIERED_SPEED);
     }
 
+    public boolean sameItem(ItemStack stackCompareTo, ItemStack stackIn) {
+        return !stackIn.isEmpty() && stackCompareTo.is(stackIn.getItem());
+    }
+
     public boolean canInsertSpeedAugment(ItemStack itemStack) {
         int allowedInsertAmount = AugmentTieredSpeed.getAllowedInsertAmount(itemStack);
 
@@ -1285,7 +761,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 // there is no existing augment, or
                 !hasSpeed() ||
                     // this matches the existing augment and there is space left
-                    (itemStack.sameItem(currentSpeedAugments()) && numAugmentsSpeed() < allowedInsertAmount)
+                    (sameItem(itemStack,currentSpeedAugments()) && numAugmentsSpeed() < allowedInsertAmount)
             );
     }
 
@@ -1358,7 +834,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 // there is no existing augment, or
                 !hasCapacity() ||
                     // this matches the existing augment and there is space left
-                    (itemStack.sameItem(currentCapacityAugments()) && numAugmentsCapacity() < allowedInsertAmount)
+                    (sameItem(itemStack,currentCapacityAugments()) && numAugmentsCapacity() < allowedInsertAmount)
             );
     }
 
@@ -1445,7 +921,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 // there is no existing augment, or
                 !hasStorage() ||
                     // this matches the existing augment and there is space left
-                    (itemStack.sameItem(currentStorageAugments()) && numAugmentsStorage() < allowedInsertAmount)
+                    (sameItem(itemStack,currentStorageAugments()) && numAugmentsStorage() < allowedInsertAmount)
             );
     }
 
@@ -1533,7 +1009,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 // there is no existing augment, or
                 !hasRange() ||
                     // this matches the existing augment and there is space left
-                    (itemStack.sameItem(currentRangeAugments()) && numAugmentsRange() < allowedInsertAmount)
+                    (sameItem(itemStack,currentRangeAugments()) && numAugmentsRange() < allowedInsertAmount)
             );
     }
 
@@ -1721,271 +1197,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     /*============================================================================
     ==============================================================================
-    ===========================      LIGHT START     =============================
-    ==============================================================================
-    ============================================================================*/
-
-    public boolean attemptAddLight(ItemStack stack)
-    {
-        if (privateItems.isItemValid(PrivateInventorySlot.LIGHT, stack)) {
-            BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(true)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            privateItems.insertItem(PrivateInventorySlot.LIGHT, stack.split(1), false);
-            update();
-            level.setBlock(getPos(),newstate,3);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public ItemStack removeLight()
-    {
-        if(hasLight())
-        {
-            BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
-            level.setBlock(getPos(),newstate,3);
-            update();
-            return retItemStack;
-        }
-        else return ItemStack.EMPTY;
-    }
-
-    /*public ItemStack removeLight()
-    {
-        if(hasLight())
-        {
-            BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            if(getLightBrightness()<=1)
-            {
-                boolLight = true;
-                ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
-                level.setBlock(getPos(),newstate,3);
-                return retItemStack;
-            }
-            else
-            {
-                ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
-                state.updateNeighbourShapes(this.level,getPos(),1,3);
-                return retItemStack;
-            }
-
-        }
-        else return ItemStack.EMPTY;
-    }*/
-
-    /*public ItemStack removeAllLight()
-    {
-        if(hasLight())
-        {
-            BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, privateItems.getStackInSlot(PrivateInventorySlot.LIGHT).getCount(), false);
-            level.setBlock(getPos(),newstate,3);
-            return retItemStack;
-        }
-        else return ItemStack.EMPTY;
-    }*/
-
-    /*public int getLightBrightness()
-    {
-        return privateItems.getStackInSlot(PrivateInventorySlot.LIGHT).getCount();
-    }*/
-
-    public boolean hasLight()
-    {
-        return !privateItems.getStackInSlot(PrivateInventorySlot.LIGHT).isEmpty();
-    }
-
-    /*============================================================================
-    ==============================================================================
-    ===========================       LIGHT END      =============================
-    ==============================================================================
-    ============================================================================*/
-
-
-
-    /*============================================================================
-    ==============================================================================
-    ===========================     FILTER START     =============================
-    ==============================================================================
-    ============================================================================*/
-    public boolean hasFilter()
-    {
-        return !privateItems.getStackInSlot(PrivateInventorySlot.FILTER).isEmpty();
-    }
-
-    public ItemStack getFilterInPedestal()
-    {
-        return privateItems.getStackInSlot(PrivateInventorySlot.FILTER);
-    }
-
-    public IPedestalFilter getIPedestalFilter()
-    {
-        if(hasFilter())
-        {
-            return (IPedestalFilter)getFilterInPedestal().getItem();
-        }
-
-        return null;
-    }
-
-    public ItemStack removeFilter() {
-        BlockState state = level.getBlockState(getPos());
-        BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(), MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, 0);
-        level.setBlock(getPos(), newstate, 3);
-        update();
-
-        return privateItems.extractItem(PrivateInventorySlot.FILTER,1,false);
-    }
-
-    public boolean attemptAddFilter(ItemStack stack)
-    {
-        if (privateItems.isItemValid(PrivateInventorySlot.FILTER, stack)) {
-            // stack.split might reduce `stack` to an empty stack, so if we need to use any property of the item being
-            // insert we need to make a reference to it it prior to insertion.
-            ItemStack toInsert = stack.split(1);
-            privateItems.insertItem(PrivateInventorySlot.FILTER, toInsert, false);
-            BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) toInsert.getItem()).getFilterType(toInsert)?2:1));
-            level.setBlock(getPos(),newstate,3);
-            update();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /*============================================================================
-    ==============================================================================
-    ===========================      FILTER END      =============================
-    ==============================================================================
-    ============================================================================*/
-
-
-
-    /*============================================================================
-    ==============================================================================
-    ===========================    WORKCARD START    =============================
-    ==============================================================================
-    ============================================================================*/
-
-    public boolean hasWorkCard()
-    {
-        return !privateItems.getStackInSlot(PrivateInventorySlot.WORK_CARD).isEmpty();
-    }
-
-    public ItemStack getWorkCardInPedestal()
-    {
-        return privateItems.getStackInSlot(PrivateInventorySlot.WORK_CARD);
-    }
-
-    public IPedestalWorkCard getIPedestalWorkCard()
-    {
-        if(hasWorkCard())
-        {
-            return (IPedestalWorkCard)getWorkCardInPedestal().getItem();
-        }
-
-        return null;
-    }
-
-    public ItemStack removeWorkCard() {
-        return privateItems.extractItem(PrivateInventorySlot.WORK_CARD,1,false);
-    }
-
-    public boolean attemptAddWorkCard(ItemStack stack)
-    {
-        if (privateItems.isItemValid(PrivateInventorySlot.WORK_CARD, stack)) {
-            privateItems.insertItem(PrivateInventorySlot.WORK_CARD, stack.split(1), false);
-            update();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /*============================================================================
-    ==============================================================================
-    ===========================    WORKCARD  END     =============================
-    ==============================================================================
-    ============================================================================*/
-
-
-
-    /*============================================================================
-    ==============================================================================
-    ===========================    REDSTONE START    =============================
-    ==============================================================================
-    ============================================================================*/
-
-    public boolean hasRedstone()
-    {
-        return !privateItems.getStackInSlot(PrivateInventorySlot.REDSTONE).isEmpty();
-    }
-
-    public boolean attemptAddRedstone(ItemStack stack)
-    {
-        if(!hasRedstone() || getRedstonePowerNeeded()<15)
-        {
-            privateItems.insertItem(PrivateInventorySlot.REDSTONE,stack.split(1),false);
-            return true;
-        }
-        else return false;
-    }
-
-    public ItemStack removeRedstone()
-    {
-        return privateItems.extractItem(PrivateInventorySlot.REDSTONE,1,false);
-    }
-
-    public ItemStack removeAllRedstone()
-    {
-        return privateItems.extractItem(PrivateInventorySlot.REDSTONE,getRedstonePowerNeeded(),false);
-    }
-
-    public int getRedstonePowerNeeded()
-    {
-        return privateItems.getStackInSlot(PrivateInventorySlot.REDSTONE).getCount();
-    }
-
-    public boolean isPedestalBlockPowered(BasePedestalBlockEntity pedestal)
-    {
-        if(pedestal.hasRedstone())
-        {
-            //hasRedstone should mean if theres a signal, its off (reverse of normal)
-            return (this.getLevel().hasNeighborSignal(pedestal.getBlockPos()))?((pedestal.getRedstonePower()>=pedestal.getRedstonePowerNeeded())?(false):(true)):(true);
-        }
-
-        return pedestal.getRedstonePower() > 0;
-    }
-
-    public int getRedstonePower() {
-        /*System.out.println(this.getLevel().getSignal(this.getBlockPos(), Direction.NORTH));
-        System.out.println(this.getLevel().getDirectSignal(this.getBlockPos(), Direction.NORTH));
-
-        //Redstone Dust Linked to it ONLY
-        System.out.println(this.getLevel().getDirectSignalTo(this.getBlockPos()));
-
-        //Any Redstone Signal (Lever, torch, dust, whatever
-        System.out.println(this.getLevel().getBestNeighborSignal(this.getBlockPos()));*/
-
-        return this.getLevel().getBestNeighborSignal(this.getBlockPos());
-    }
-
-    /*============================================================================
-    ==============================================================================
-    ===========================    REDSTONE END      =============================
-    ==============================================================================
-    ============================================================================*/
-
-
-
-    /*============================================================================
-    ==============================================================================
     ===========================     Robin START     ==============================
     ==============================================================================
     ============================================================================*/
@@ -2166,82 +1377,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //The actual transfer methods for items
     public boolean sendItemsToPedestal(BlockPos posReceiver, List<ItemStack> itemStacksIncoming) {
         if (itemStacksIncoming.size() > 0 && level != null && level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity receiverPedestal) {
@@ -2273,7 +1408,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                     if (countToSend > 0) {
                         FluidStack a = new FluidStack(fluidStackIncoming, countToSend);
                         receiverHandler.fill(a, IFluidHandler.FluidAction.EXECUTE);
-                        fluidHandler.drain(countToSend, IFluidHandler.FluidAction.EXECUTE);
+                        removeFluid(countToSend, IFluidHandler.FluidAction.EXECUTE);
                         return true;
                     }
                 }
@@ -2293,7 +1428,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                     if (insertedStackSimulation > 0) {
                         int countToSend = Math.min(getEnergyTransferRate(), insertedStackSimulation);
                         if(countToSend > 0) {
-                            energyHandler.extractEnergy(countToSend, false);
+                            removeEnergy(countToSend, false);
                             receiverHandler.receiveEnergy(countToSend, false);
                             return true;
                         }
@@ -2314,7 +1449,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                     if (insertedStackSimulation > 0) {
                         int countToSend = Math.min(getExperienceTransferRate(), insertedStackSimulation);
                         if (countToSend > 0) {
-                            experienceHandler.extractExperience(countToSend, false);
+                            removeExperience(countToSend, false);
                             receiverHandler.receiveExperience(countToSend, false);
                             return true;
                         }
@@ -2335,7 +1470,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                     if (insertedStackSimulation > 0) {
                         int countToSend = Math.min(getFluidTransferRate(), insertedStackSimulation);
                         if (countToSend > 0) {
-                            dustHandler.drain(countToSend, IDustHandler.DustAction.EXECUTE);
+                            removeDust(countToSend, IDustHandler.DustAction.EXECUTE);
                             receiverHandler.fill(new DustMagic(dustIncoming.getDustColor(), countToSend), IDustHandler.DustAction.EXECUTE);
                             update();
                             return true;
@@ -2394,69 +1529,11 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         }
     }
 
-    public BlockPos offsetBasedOnDirection(Direction enumfacing, BlockPos posOfPedestal, double x, double y, double z)
-    {
-        BlockPos blockBelow = posOfPedestal;
-        switch (enumfacing)
-        {
-            case UP:
-                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + y, blockBelow.getZ() + z);
-            case DOWN:
-                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + y + 1D, blockBelow.getZ() + z);
-            case NORTH:
-                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + z, blockBelow.getZ() + y);
-            case SOUTH:
-                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + z, blockBelow.getZ() + y);
-            case EAST:
-                return new BlockPos(blockBelow.getX() + y, blockBelow.getY() + x, blockBelow.getZ() + z);
-            case WEST:
-                return new BlockPos(blockBelow.getX() + y, blockBelow.getY() + x, blockBelow.getZ() + z);
-            default:
-                return blockBelow;
-        }
-    }
-
-
-    public BlockPos getPosOfBlockBelowPedestal(Level world, int numBelow)
-    {
-        BlockState state = world.getBlockState(getPos());
-
-        Direction enumfacing = (state.hasProperty(FACING))?(state.getValue(FACING)):(Direction.UP);
-        BlockPos blockBelow = getPos();
-        switch (enumfacing)
-        {
-            case UP:
-                return blockBelow.offset(0,-numBelow,0);
-            case DOWN:
-                return blockBelow.offset(0,numBelow,0);
-            case NORTH:
-                return blockBelow.offset(0,0,numBelow);
-            case SOUTH:
-                return blockBelow.offset(0,0,-numBelow);
-            case EAST:
-                return blockBelow.offset(-numBelow,0,0);
-            case WEST:
-                return blockBelow.offset(numBelow,0,0);
-            default:
-                return blockBelow;
-        }
-    }
-
-
-
-    public static void serverTick(Level level, BlockPos blockPos, BlockState blockState, BasePedestalBlockEntity e) {
-        e.tick();
-    }
-
-    public static <E extends BlockEntity> void clientTick(Level level, BlockPos blockPos, BlockState blockState, BasePedestalBlockEntity e) {
-        e.tickClient();
-    }
-
-    int partTicker = 0;
-    int impTicker = 0;
     int pedTicker = 0;
 
+    @Override
     public void tick() {
+        super.tick();
         if(!level.isClientSide() &&level.isAreaLoaded(getPos(),1))
         {
             pedTicker++;
@@ -2492,7 +1569,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
             if(canSpawnParticles())
             {
-                BlockPos posOrientated = getPosOfBlockBelowPedestal(level,0);
+                BlockPos posOrientated = MowLibBlockPosUtils.getPosBelowBlockEntity(level,getPos(),0);
                 if(getRenderRange() && pedTicker%10 == 0){
                     MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,getPos().getX(),getPos().getY()+1.0D,getPos().getZ(),0,0,0));
                 }
@@ -2513,38 +1590,13 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         }
     }
 
-    public void tickClient()
-    {
-        /*if(hasCoin())
-        {
-            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
-            {
-                upgrade.runClientStuff(this);
-            }
-        }*/
-
-
-        /*
-
-         */
-    }
-
     @Override
     public void load(CompoundTag p_155245_) {
         super.load(p_155245_);
-        CompoundTag invTag = p_155245_.getCompound("inv");
-        itemHandler.deserializeNBT(invTag);
         CompoundTag invPrivateTag = p_155245_.getCompound("inv_private");
         privateItems.deserializeNBT(invPrivateTag);
 
         this.storedValueForUpgrades = p_155245_.getInt("storedUpgradeValue");
-        this.storedEnergy = p_155245_.getInt("storedEnergy");
-        this.storedFluid = FluidStack.loadFluidStackFromNBT(p_155245_.getCompound("storedFluid"));
-        this.storedExperience = p_155245_.getInt("storedExperience");
-        this.storedDust = DustMagic.getDustMagicInTag(p_155245_);
-        //this.setFluid(FluidStack.loadFluidStackFromNBT(p_155245_.getCompound("storedFluid")),0);
-        this.storedPotionEffect = (MobEffectInstance.load(p_155245_)!=null)?(MobEffectInstance.load(p_155245_)):(null);
-        this.storedPotionEffectDuration = p_155245_.getInt("storedEffectDuration");
         this.showRenderRange = p_155245_.getBoolean("showRenderRange");
 
         //new value added in 0.2.30
@@ -2558,12 +1610,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         int[] storedIY = p_155245_.getIntArray("intArrayYPos");
         int[] storedIZ = p_155245_.getIntArray("intArrayZPos");
 
-        /*
-        int[] storedIXS = p_155245_.getIntArray("intArrayXSPos");
-        int[] storedIYS = p_155245_.getIntArray("intArrayYSPos");
-        int[] storedIZS = p_155245_.getIntArray("intArrayZSPos");
-        */
-
         for(int i=0;i<storedIX.length;i++)
         {
             BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
@@ -2571,24 +1617,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         }
     }
 
-    @Override
-    protected void saveAdditional(CompoundTag p_187471_) {
-        super.saveAdditional(p_187471_);
-        save(p_187471_);
-    }
 
+    @Override
     public CompoundTag save(CompoundTag p_58888_) {
-        //System.out.println("SAVE");
-        p_58888_.put("inv", itemHandler.serializeNBT());
         p_58888_.put("inv_private", privateItems.serializeNBT());
 
         p_58888_.putInt("storedUpgradeValue",storedValueForUpgrades);
-        p_58888_.putInt("storedEnergy",storedEnergy);
-        p_58888_.put("storedFluid",storedFluid.writeToNBT(new CompoundTag()));
-        p_58888_.putInt("storedExperience",storedExperience);
-
-        if(storedPotionEffect!=null)storedPotionEffect.save(p_58888_);
-        p_58888_.putInt("storedEffectDuration",storedPotionEffectDuration);
         p_58888_.putBoolean("showRenderRange",showRenderRange);
         p_58888_.putBoolean("showRenderRangeUpgrade",showRenderRangeUpgrade);
 
@@ -2596,11 +1630,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         List<Integer> storedY = new ArrayList<Integer>();
         List<Integer> storedZ = new ArrayList<Integer>();
 
-        /*
-        List<Integer> storedXS = new ArrayList<Integer>();
-        List<Integer> storedYS = new ArrayList<Integer>();
-        List<Integer> storedZS = new ArrayList<Integer>();
-        */
         for(int i=0;i<getNumLinkedPedestals();i++)
         {
             storedX.add(linkedPedestals.get(i).getX());
@@ -2608,21 +1637,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             storedZ.add(linkedPedestals.get(i).getZ());
         }
 
-
-
         p_58888_.putIntArray("intArrayXPos",storedX);
         p_58888_.putIntArray("intArrayYPos",storedY);
         p_58888_.putIntArray("intArrayZPos",storedZ);
 
-        /*
-        p_58888_.putIntArray("intArrayXSPos",storedXS);
-        p_58888_.putIntArray("intArrayYSPos",storedYS);
-        p_58888_.putIntArray("intArrayZSPos",storedZS);
-        */
-
-        return DustMagic.setDustMagicInTag(p_58888_,this.storedDust);
+        return super.save(p_58888_);
     }
-
 
     //This is needed so that the render boxes show up when the player is just out of normal render range of the pedestal
     @Override
@@ -2640,47 +1660,5 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
         AABB aabb = new AABB(getPos().getX() - range, getPos().getY() - range, getPos().getZ() - range,getPos().getX() + range, getPos().getY() + range, getPos().getZ() + range);
         return aabb;
-    }
-
-    @Nullable
-    @Override
-    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        /*CompoundTag nbtTagCompound = new CompoundTag();
-        save(nbtTagCompound);*/
-        //super.getUpdatePacket();
-        //return new ClientboundBlockEntityDataPacket(getPos(),42,nbtTagCompound);
-        //System.out.println("ClientBound");
-        return ClientboundBlockEntityDataPacket.create(this.getPedestal());
-    }
-
-    @Override
-    public CompoundTag getUpdateTag() {
-        //System.out.println("getUpdateTag");
-        return save(new CompoundTag());
-    }
-
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        //System.out.println("onDataPacket");
-        super.onDataPacket(net,pkt);
-        BlockState state = this.level.getBlockState(getPos());
-        this.handleUpdateTag(pkt.getTag());
-        this.level.sendBlockUpdated(getPos(), state, state, 3);
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        //System.out.println("handleUpdateTag");
-        this.load(tag);
-    }
-
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
-        itemCapability.invalidate();
-        energyCapability.invalidate();
-        fluidCapability.invalidate();
-        experienceCapability.invalidate();
-        dustCapability.invalidate();
     }
 }

@@ -3,7 +3,6 @@ package com.mowmaster.pedestals.Recipes;
 import com.google.gson.JsonObject;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMultiContainer;
-import com.mowmaster.pedestals.PedestalUtils.RecipeUtil;
 import com.mowmaster.pedestals.Recipes.Ingredients.DustIngredient;
 import com.mowmaster.pedestals.Recipes.Ingredients.EnergyIngredient;
 import com.mowmaster.pedestals.Recipes.Ingredients.ExperienceIngredient;
