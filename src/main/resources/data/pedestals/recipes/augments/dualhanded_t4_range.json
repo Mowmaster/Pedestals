@@ -1,7 +1,7 @@
 {
   "type": "mowlib:dualhandedcrafting",
   "blockTarget": {
-    "item": "minecraft:obsidian"
+    "item": "minecraft:crying_obsidian"
   },
   "mainhandTool": {
     "item": "pedestals:augment_pedestal_t3_range"
@@ -10,6 +10,7 @@
     "item": "minecraft:nether_star"
   },
   "result": {
-    "item": "pedestals:augment_pedestal_t4_range"
+    "item": "pedestals:augment_pedestal_t4_range",
+    "count": 2
   }
 }

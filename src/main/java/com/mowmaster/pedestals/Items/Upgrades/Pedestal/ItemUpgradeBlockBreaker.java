@@ -6,6 +6,7 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import net.minecraft.ChatFormatting;
@@ -23,10 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.common.util.FakePlayer;
@@ -182,48 +179,6 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
         }
 
         return false;
-    }
-
-    private List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockState blockTarget, BlockPos posTarget)
-    {
-        ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(new ItemStack(Items.STONE_PICKAXE)):(pedestal.getToolStack());
-        Level level = pedestal.getLevel();
-        if(blockTarget.getBlock() != Blocks.AIR)
-        {
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-            if(getPlayer != null && getPlayer.get() != null)
-            {
-                LootContext.Builder builder = new LootContext.Builder()
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                /*
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-                 */
-
-                return blockTarget.getDrops(builder);
-                //return blockTarget.getBlock().getDrops(blockTarget,builder);
-            }
-            else
-            {
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                return blockTarget.getDrops(builder);
-                //return blockTarget.getBlock().getDrops(blockTarget,builder);
-            }
-
-        }
-
-        return new ArrayList<>();
     }
 
     private boolean passesFilter(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)

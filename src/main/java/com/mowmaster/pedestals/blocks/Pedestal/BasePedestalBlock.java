@@ -1,12 +1,19 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.google.common.collect.Maps;
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlock;
 import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
 import com.mowmaster.mowlib.BlockEntities.MowLibBaseFilterableBlock;
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseFilterableBlockEntity;
+import com.mowmaster.mowlib.Items.ColorApplicator;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardBE;
 import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibReferences;
+import com.mowmaster.mowlib.api.DefineLocations.IWorkCard;
 import com.mowmaster.mowlib.api.Tools.IMowLibTool;
+import com.mowmaster.mowlib.api.TransportAndStorage.IFilterItem;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredCapacity;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredRange;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredSpeed;
@@ -37,6 +44,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -47,6 +55,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
@@ -64,11 +73,16 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
+import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.getPosBelowBlockEntity;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 
-public class BasePedestalBlock extends MowLibBaseFilterableBlock implements SimpleWaterloggedBlock, EntityBlock
+public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterloggedBlock, EntityBlock
 {
+    public static final IntegerProperty FILTER_STATUS = IntegerProperty.create("filter_status", 0, 2);
+    public static final BooleanProperty WORKCARD_STATUS = BooleanProperty.create("workcard_status");
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final IntegerProperty REDSTONE_STATUS = IntegerProperty.create("redstone_status", 0, 15);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     protected final VoxelShape CUP;
@@ -307,7 +321,35 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
                 ItemStack itemInHand = p_60502_.getMainHandItem();
                 ItemStack itemInOffHand = p_60502_.getOffhandItem();
 
-                if(pedestal.hasCoin() && itemInOffHand.is(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
+                if(pedestal.hasFilter() && itemInOffHand.is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.TOOL_FILTERTOOL.get()))
+                {
+                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeFilter(null));
+                    pedestal.actionOnFilterRemovedFromBlockEntity(1);
+                }
+                else if(pedestal.hasLight() && itemInOffHand.is(Items.GLOWSTONE))
+                {
+                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeLight(null));
+                    pedestal.actionOnLightRemovedFromBlockEntity(1);
+                }
+                else if(pedestal.hasRedstone() && itemInOffHand.is(Items.REDSTONE))
+                {
+                    if(p_60502_.isShiftKeyDown())
+                    {
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRedstone(null));
+                    }
+                    else
+                    {
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRedstone(null));
+                    }
+
+                    pedestal.actionOnRedstoneRemovedFromBlockEntity(1);
+                }
+                else if(pedestal.hasWorkCard() && itemInOffHand.is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.TOOL_WORKTOOL.get()))
+                {
+                    pedestal.actionOnWorkCardRemovedFromBlockEntity(1);
+                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeWorkCard(null));
+                }
+                else if(pedestal.hasCoin() && itemInOffHand.is(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
                 {
                     //Method for upgrades to do things before removal
                     pedestal.actionOnRemovedFromPedestal(1);
@@ -315,7 +357,7 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
                 }
                 else if(pedestal.hasTool() && itemInOffHand.is(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
                 {
-                    pedestal.actionOnNeighborBelowChange(MowLibBlockPosUtils.getPosBelowBlockEntity(p_60499_, p_60501_, 1));
+                    pedestal.actionOnNeighborBelowChange(getPosBelowBlockEntity(p_60499_, p_60501_, 1));
                     pedestal.updatePedestalPlayer(pedestal);
                     ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
                 }
@@ -373,318 +415,390 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
 
         super.use(p_60503_, p_60504_, p_60505_, p_60506_, p_60507_, p_60508_);
 
-        BlockEntity blockEntity = p_60504_.getBlockEntity(p_60505_);
-        if(blockEntity instanceof BasePedestalBlockEntity pedestal)
+        ItemStack itemInHand = p_60506_.getMainHandItem();
+        if(p_60504_.isClientSide())
         {
-            ItemStack itemInHand = p_60506_.getMainHandItem();
-            ItemStack itemInOffHand = p_60506_.getOffhandItem();
-
-            int getColor;
-            int currentColor;
-            Component sameColor;
-            BlockState newState;
-            List<Item> DYES = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes"))).stream().toList();
-
-            if(itemInHand.getItem() instanceof IMowLibTool)
+            if(itemInHand.getItem() instanceof WorkCardBE)
             {
-
-                if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOL.get()) || itemInHand.getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get())){
-                    boolean getCurrentRender = pedestal.getRenderRange();
-                    pedestal.setRenderRange(!getCurrentRender);
-
-                    MutableComponent render_on = Component.translatable(MODID + ".linkingtool.pedestal_render_on");
-                    MutableComponent render_off = Component.translatable(MODID + ".linkingtool.pedestal_render_off");
-                    MutableComponent render = (!getCurrentRender)?(render_on):(render_off);
-                    ChatFormatting color = (!getCurrentRender)?(ChatFormatting.RED):(ChatFormatting.DARK_RED);
-                    render.withStyle(color);
-
-                    p_60506_.displayClientMessage(render, true);
-                }
-                if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get())){
-                    if(pedestal.hasCoin())
-                    {
-                        if(pedestal.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
-                        {
-                            int value = upgrade.getUpgradeWorkRange(pedestal.getCoinOnPedestal());
-                            if(value>0)
-                            {
-                                boolean getCurrentRenderUpgrade = pedestal.getRenderRangeUpgrade();
-                                pedestal.setRenderRangeUpgrade(!getCurrentRenderUpgrade);
-
-                                MutableComponent render_on = Component.translatable(MODID + ".upgradetool.pedestal_render_on");
-                                MutableComponent render_off = Component.translatable(MODID + ".upgradetool.pedestal_render_off");
-                                MutableComponent render = (!getCurrentRenderUpgrade)?(render_on):(render_off);
-                                ChatFormatting color = (!getCurrentRenderUpgrade)?(ChatFormatting.BLUE):(ChatFormatting.DARK_BLUE);
-                                render.withStyle(color);
-
-                                p_60506_.displayClientMessage(render, true);
-                            }
-                            else
-                            {
-                                MutableComponent render_none = Component.translatable(MODID + ".upgradetool.pedestal_render_none");
-                                render_none.withStyle(ChatFormatting.WHITE);
-                                p_60506_.displayClientMessage(render_none, true);
-                            }
-                        }
-                    }
-                }
-                else if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_MANIFEST.get())){
-
-                    MutableComponent manifest = Component.translatable(MODID + ".manifest.color");
-                    MutableComponent color = Component.translatable(MowLibReferences.MODID + "." +MowLibColorReference.getColorName(MowLibColorReference.getColorFromStateInt(p_60503_)));
-                    manifest.withStyle(ChatFormatting.GOLD);
-                    color.withStyle(ChatFormatting.WHITE);
-                    manifest.append(color);
-
-                    p_60506_.displayClientMessage(manifest, true);
-                }
                 return InteractionResult.FAIL;
             }
-            else if(itemInOffHand.getItem() instanceof IPedestalUpgrade)
+        }
+        else
+        {
+            BlockEntity blockEntity = p_60504_.getBlockEntity(p_60505_);
+            if(blockEntity instanceof BasePedestalBlockEntity pedestal)
             {
-                if(pedestal.attemptAddCoin(itemInOffHand, p_60506_)) {
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()))
-            {
-                if(pedestal.attemptAddRRobin(itemInOffHand)) {
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()))
-            {
-                if(pedestal.attemptAddRenderAugment(itemInOffHand))
-                {
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()))
-            {
-                if(pedestal.attemptAddNoCollide(itemInOffHand))
-                {
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(itemInOffHand.getItem() instanceof AugmentTieredSpeed)
-            {
-                if(pedestal.attemptAddSpeed(itemInOffHand))
-                {
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(itemInOffHand.getItem() instanceof AugmentTieredCapacity)
-            {
-                if(pedestal.attemptAddCapacity(itemInOffHand))
-                {
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(itemInOffHand.getItem() instanceof AugmentTieredStorage)
-            {
-                if(pedestal.attemptAddStorage(itemInOffHand))
-                {
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(itemInOffHand.getItem() instanceof AugmentTieredRange)
-            {
-                if(pedestal.attemptAddRange(itemInOffHand))
-                {
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(pedestal.isAllowedTool(itemInOffHand))
-            {
-                if(pedestal.attemptAddTool(itemInOffHand))
-                {
-                    pedestal.actionOnNeighborBelowChange(MowLibBlockPosUtils.getPosBelowBlockEntity(p_60503_, p_60505_, 1));
-                    pedestal.updatePedestalPlayer(pedestal);
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            else if(itemInHand.isEmpty())
-            {
-                if(p_60506_.isShiftKeyDown())
-                {
-                    boolean displayOther = false;
-                    MutableComponent displayOtherComponent = Component.literal("");
-                    if(pedestal.hasRedstone())
-                    {
-                        MutableComponent redstoneCountInPedestal = Component.translatable(MODID + ".pedestal.message_redstone_disable");
-                        redstoneCountInPedestal.append(""+pedestal.getRedstonePowerNeeded()+"");
-                        redstoneCountInPedestal.withStyle(ChatFormatting.BLACK);
-                        if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
-                        displayOtherComponent.append(redstoneCountInPedestal);
-                        displayOther = true;
-                    }
+                //ItemStack itemInHand = p_60506_.getMainHandItem();
+                ItemStack itemInOffHand = p_60506_.getOffhandItem();
 
-                    if(pedestal.hasFluid())
-                    {
-                        MutableComponent pedestalFluid = pedestal.getStoredFluid().getDisplayName().copy();
-                        pedestalFluid.append(Component.translatable(MODID + ".pedestal.message_separator1"));
-                        pedestalFluid.append(""+ pedestal.getStoredFluid().getAmount() + "");
-                        pedestalFluid.append(Component.translatable(MODID + ".pedestal.message_separator2"));
-                        pedestalFluid.append(""+ pedestal.getFluidCapacity() + "");
-                        pedestalFluid.withStyle(ChatFormatting.BLUE);
-                        if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
-                        displayOtherComponent.append(pedestalFluid);
-                        displayOther = true;
-                    }
+                int getColor;
+                int currentColor;
+                Component sameColor;
+                BlockState newState;
+                List<Item> DYES = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes"))).stream().toList();
 
-                    if(pedestal.hasEnergy())
-                    {
-                        MutableComponent pedestalEnergy = Component.translatable(MODID + ".pedestal.message_energy");
-                        pedestalEnergy.append(Component.translatable(MODID + ".pedestal.message_separator1"));
-                        pedestalEnergy.append(""+ pedestal.getStoredEnergy() + "");
-                        pedestalEnergy.append(Component.translatable(MODID + ".pedestal.message_separator2"));
-                        pedestalEnergy.append(""+ pedestal.getEnergyCapacity() + "");
-                        pedestalEnergy.withStyle(ChatFormatting.RED);
-                        if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
-                        displayOtherComponent.append(pedestalEnergy);
-                        displayOther = true;
-                    }
+                if(itemInHand.getItem() instanceof IMowLibTool)
+                {
+                    if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOL.get()) || itemInHand.getItem().equals(DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get())){
+                        boolean getCurrentRender = pedestal.getRenderRange();
+                        pedestal.setRenderRange(!getCurrentRender);
 
-                    if(pedestal.hasExperience())
-                    {
-                        MutableComponent pedestalExperience = Component.translatable(MODID + ".pedestal.message_experience");
-                        pedestalExperience.append(Component.translatable(MODID + ".pedestal.message_separator1"));
-                        pedestalExperience.append(""+ pedestal.getStoredExperience() + "");
-                        pedestalExperience.append(Component.translatable(MODID + ".pedestal.message_separator2"));
-                        pedestalExperience.append(""+ pedestal.getExperienceCapacity() + "");
-                        pedestalExperience.withStyle(ChatFormatting.GREEN);
-                        if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
-                        displayOtherComponent.append(pedestalExperience);
-                        displayOther = true;
-                    }
+                        MutableComponent render_on = Component.translatable(MODID + ".linkingtool.pedestal_render_on");
+                        MutableComponent render_off = Component.translatable(MODID + ".linkingtool.pedestal_render_off");
+                        MutableComponent render = (!getCurrentRender)?(render_on):(render_off);
+                        ChatFormatting color = (!getCurrentRender)?(ChatFormatting.RED):(ChatFormatting.DARK_RED);
+                        render.withStyle(color);
 
-                    if(pedestal.hasDust())
-                    {
-                        MutableComponent dustInPedestal = Component.translatable(MODID + ".pedestal.message_dust");
-                        dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator1"));
-                        dustInPedestal.append(Component.translatable(MowLibReferences.MODID + "." + MowLibColorReference.getColorName(pedestal.getStoredDust().getDustColor())));
-                        dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator4"));
-                        dustInPedestal.append(""+ pedestal.getStoredDust().getDustAmount() + "");
-                        dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator2"));
-                        dustInPedestal.append(""+ pedestal.getDustCapacity() + "");
-                        dustInPedestal.withStyle(ChatFormatting.LIGHT_PURPLE);
-                        if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
-                        displayOtherComponent.append(dustInPedestal);
-                        displayOther = true;
+                        p_60506_.displayClientMessage(render, true);
                     }
-
-                    if((displayOtherComponent.getSiblings().size() > 3))
-                    {
-                        for(int i=0;i<displayOtherComponent.getSiblings().size();i++)
+                    if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_UPGRADETOOL.get())){
+                        if(pedestal.hasCoin())
                         {
-                            if(displayOtherComponent.getSiblings().get(i).getString().contains(Component.translatable(MODID + ".pedestal.message_separator3").getString()))continue;
-
-                            p_60506_.displayClientMessage(displayOtherComponent.getSiblings().get(i),false);
-                        }
-                    }
-                    else
-                    {
-                        p_60506_.displayClientMessage(displayOtherComponent,true);
-                    }
-
-
-                }
-                else
-                {
-                    if(pedestal.hasItem())
-                    {
-                        if(pedestal.getItemStacks().size()>1)
-                        {
-                            List<ItemStack> stacks = pedestal.getItemStacks();
-                            Map<Item,Integer> getMapped =  Maps.<Item,Integer>newLinkedHashMap();
-                            for(int i=0;i<stacks.size();i++)
+                            if(pedestal.getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
                             {
-                                if(stacks.get(i).isEmpty())continue;
-
-                                if(getMapped.containsKey(stacks.get(i).getItem()))
+                                int value = upgrade.getUpgradeWorkRange(pedestal.getCoinOnPedestal());
+                                if(value>0)
                                 {
-                                    int currentValue = getMapped.getOrDefault(stacks.get(i).getItem(),0);
-                                    getMapped.replace(stacks.get(i).getItem(),currentValue, currentValue + stacks.get(i).getCount());
+                                    boolean getCurrentRenderUpgrade = pedestal.getRenderRangeUpgrade();
+                                    pedestal.setRenderRangeUpgrade(!getCurrentRenderUpgrade);
+
+                                    MutableComponent render_on = Component.translatable(MODID + ".upgradetool.pedestal_render_on");
+                                    MutableComponent render_off = Component.translatable(MODID + ".upgradetool.pedestal_render_off");
+                                    MutableComponent render = (!getCurrentRenderUpgrade)?(render_on):(render_off);
+                                    ChatFormatting color = (!getCurrentRenderUpgrade)?(ChatFormatting.BLUE):(ChatFormatting.DARK_BLUE);
+                                    render.withStyle(color);
+
+                                    p_60506_.displayClientMessage(render, true);
                                 }
                                 else
                                 {
-                                    getMapped.put(stacks.get(i).getItem(),stacks.get(i).getCount());
+                                    MutableComponent render_none = Component.translatable(MODID + ".upgradetool.pedestal_render_none");
+                                    render_none.withStyle(ChatFormatting.WHITE);
+                                    p_60506_.displayClientMessage(render_none, true);
                                 }
                             }
+                        }
+                    }
+                    else if(itemInHand.getItem().equals(DeferredRegisterItems.TOOL_MANIFEST.get())){
 
-                            if(getMapped.size()>0)
+                        MutableComponent manifest = Component.translatable(MODID + ".manifest.color");
+                        MutableComponent color = Component.translatable(MowLibReferences.MODID + "." +MowLibColorReference.getColorName(MowLibColorReference.getColorFromStateInt(p_60503_)));
+                        manifest.withStyle(ChatFormatting.GOLD);
+                        color.withStyle(ChatFormatting.WHITE);
+                        manifest.append(color);
+
+                        p_60506_.displayClientMessage(manifest, true);
+                    }
+                    return InteractionResult.FAIL;
+                }
+                else if (p_60506_.getItemInHand(p_60507_).getItem() instanceof ColorApplicator) {
+
+
+                    getColor = MowLibColorReference.getColorFromItemStackInt(p_60506_.getItemInHand(p_60507_));
+                    currentColor = MowLibColorReference.getColorFromStateInt(p_60503_);
+                    if (currentColor != getColor) {
+                        newState = MowLibColorReference.addColorToBlockState(p_60503_, getColor);
+                        p_60504_.setBlock(p_60505_, newState, 3);
+                        return InteractionResult.SUCCESS;
+                    }
+                    else {
+                        MowLibMessageUtils.messagePlayerChat(p_60506_, ChatFormatting.RED,"mowlib.recolor.message_sameColor");
+                        return InteractionResult.FAIL;
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof IPedestalUpgrade)
+                {
+                    if(pedestal.attemptAddCoin(itemInOffHand, p_60506_)) {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof IFilterItem)
+                {
+                    if(pedestal.attemptAddFilter(itemInOffHand,null)) {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof IWorkCard)
+                {
+                    if(pedestal.attemptAddWorkCard(itemInOffHand,null))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem().equals(Items.GLOWSTONE))
+                {
+                    if(pedestal.attemptAddLight(itemInOffHand,null))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem().equals(Items.REDSTONE))
+                {
+                    if(pedestal.attemptAddRedstone(itemInOffHand,null))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_ROUNDROBIN.get()))
+                {
+                    if(pedestal.attemptAddRRobin(itemInOffHand)) {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get()))
+                {
+                    if(pedestal.attemptAddRenderAugment(itemInOffHand))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()))
+                {
+                    if(pedestal.attemptAddNoCollide(itemInOffHand))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof AugmentTieredSpeed)
+                {
+                    if(pedestal.attemptAddSpeed(itemInOffHand))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof AugmentTieredCapacity)
+                {
+                    if(pedestal.attemptAddCapacity(itemInOffHand))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof AugmentTieredStorage)
+                {
+                    if(pedestal.attemptAddStorage(itemInOffHand))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem() instanceof AugmentTieredRange)
+                {
+                    if(pedestal.attemptAddRange(itemInOffHand))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(pedestal.isAllowedTool(itemInOffHand))
+                {
+                    if(pedestal.attemptAddTool(itemInOffHand))
+                    {
+                        pedestal.actionOnNeighborBelowChange(getPosBelowBlockEntity(p_60503_, p_60505_, 1));
+                        pedestal.updatePedestalPlayer(pedestal);
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(DYES.contains(itemInOffHand.getItem()))
+                {
+                    getColor = MowLibColorReference.getColorFromDyeInt(itemInOffHand);
+                    currentColor = MowLibColorReference.getColorFromStateInt(p_60503_);
+                    if (currentColor != getColor) {
+                        newState = MowLibColorReference.addColorToBlockState(p_60503_, getColor);
+                        p_60504_.setBlock(p_60505_, newState, 3);
+                        return InteractionResult.SUCCESS;
+                    } else {
+                        MowLibMessageUtils.messagePlayerChat(p_60506_, ChatFormatting.RED,"mowlib.recolor.message_sameColor");
+                        return InteractionResult.FAIL;
+                    }
+
+                }
+                else if(itemInHand.isEmpty())
+                {
+                    if(p_60506_.isShiftKeyDown())
+                    {
+                        boolean displayOther = false;
+                        MutableComponent displayOtherComponent = Component.literal("");
+                        if(pedestal.hasRedstone())
+                        {
+                            MutableComponent redstoneCountInPedestal = Component.translatable(MODID + ".pedestal.message_redstone_disable");
+                            redstoneCountInPedestal.append(""+pedestal.getRedstonePowerNeeded()+"");
+                            redstoneCountInPedestal.withStyle(ChatFormatting.BLACK);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(redstoneCountInPedestal);
+                            displayOther = true;
+                        }
+
+                        if(pedestal.hasFluid())
+                        {
+                            MutableComponent pedestalFluid = pedestal.getStoredFluid().getDisplayName().copy();
+                            pedestalFluid.append(Component.translatable(MODID + ".pedestal.message_separator1"));
+                            pedestalFluid.append(""+ pedestal.getStoredFluid().getAmount() + "");
+                            pedestalFluid.append(Component.translatable(MODID + ".pedestal.message_separator2"));
+                            pedestalFluid.append(""+ pedestal.getFluidCapacity() + "");
+                            pedestalFluid.withStyle(ChatFormatting.BLUE);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(pedestalFluid);
+                            displayOther = true;
+                        }
+
+                        if(pedestal.hasEnergy())
+                        {
+                            MutableComponent pedestalEnergy = Component.translatable(MODID + ".pedestal.message_energy");
+                            pedestalEnergy.append(Component.translatable(MODID + ".pedestal.message_separator1"));
+                            pedestalEnergy.append(""+ pedestal.getStoredEnergy() + "");
+                            pedestalEnergy.append(Component.translatable(MODID + ".pedestal.message_separator2"));
+                            pedestalEnergy.append(""+ pedestal.getEnergyCapacity() + "");
+                            pedestalEnergy.withStyle(ChatFormatting.RED);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(pedestalEnergy);
+                            displayOther = true;
+                        }
+
+                        if(pedestal.hasExperience())
+                        {
+                            MutableComponent pedestalExperience = Component.translatable(MODID + ".pedestal.message_experience");
+                            pedestalExperience.append(Component.translatable(MODID + ".pedestal.message_separator1"));
+                            pedestalExperience.append(""+ pedestal.getStoredExperience() + "");
+                            pedestalExperience.append(Component.translatable(MODID + ".pedestal.message_separator2"));
+                            pedestalExperience.append(""+ pedestal.getExperienceCapacity() + "");
+                            pedestalExperience.withStyle(ChatFormatting.GREEN);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(pedestalExperience);
+                            displayOther = true;
+                        }
+
+                        if(pedestal.hasDust())
+                        {
+                            MutableComponent dustInPedestal = Component.translatable(MODID + ".pedestal.message_dust");
+                            dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator1"));
+                            dustInPedestal.append(Component.translatable(MowLibReferences.MODID + "." + MowLibColorReference.getColorName(pedestal.getStoredDust().getDustColor())));
+                            dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator4"));
+                            dustInPedestal.append(""+ pedestal.getStoredDust().getDustAmount() + "");
+                            dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator2"));
+                            dustInPedestal.append(""+ pedestal.getDustCapacity() + "");
+                            dustInPedestal.withStyle(ChatFormatting.LIGHT_PURPLE);
+                            if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                            displayOtherComponent.append(dustInPedestal);
+                            displayOther = true;
+                        }
+
+                        if((displayOtherComponent.getSiblings().size() > 3))
+                        {
+                            for(int i=0;i<displayOtherComponent.getSiblings().size();i++)
                             {
-                                MutableComponent itemCountInPedestal = Component.literal("");
-                                for (Item item : getMapped.keySet())
-                                {
-                                    itemCountInPedestal.append(Component.translatable(item.getDefaultInstance().getDisplayName().getString() + " " + getMapped.get(item)));
-                                    if(getMapped.size()>1)itemCountInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator3"));
-                                }
+                                if(displayOtherComponent.getSiblings().get(i).getString().contains(Component.translatable(MODID + ".pedestal.message_separator3").getString()))continue;
 
-                                itemCountInPedestal.withStyle(ChatFormatting.GOLD);
-
-                                if((itemCountInPedestal.getSiblings().size() > 5))
-                                {
-                                    for(int i=0;i<itemCountInPedestal.getSiblings().size();i++)
-                                    {
-                                        if(itemCountInPedestal.getSiblings().get(i).getString().contains(Component.translatable(MODID + ".pedestal.message_separator3").getString()))continue;
-
-                                        p_60506_.displayClientMessage(itemCountInPedestal.getSiblings().get(i),false);
-                                    }
-                                }
-                                else
-                                {
-                                    p_60506_.displayClientMessage(itemCountInPedestal,true);
-                                }
+                                p_60506_.displayClientMessage(displayOtherComponent.getSiblings().get(i),false);
                             }
                         }
                         else
                         {
-                            MutableComponent itemCountInPedestal = Component.translatable(pedestal.getItemInPedestal().getDisplayName().getString() + " " + pedestal.getItemInPedestal().getCount());
-                            itemCountInPedestal.withStyle(ChatFormatting.GOLD);
-                            p_60506_.displayClientMessage(itemCountInPedestal,true);
+                            p_60506_.displayClientMessage(displayOtherComponent,true);
                         }
-                    }
-                }
-            }
-            else
-            {
-                if(pedestal.hasFluid() && itemInHand.getItem().equals(Items.BUCKET))
-                {
-                    if(p_60506_ instanceof FakePlayer){ return InteractionResult.FAIL; }
 
-                    Item item = pedestal.getStoredFluid().copy().getFluid().getBucket();
-                    if(item instanceof BucketItem)
+
+                    }
+                    else
                     {
-                        BucketItem bucketItem = (BucketItem) item;
-                        String fluid = pedestal.getStoredFluid().getDisplayName().getString();
-                        if(!pedestal.removeFluid(1000, IFluidHandler.FluidAction.EXECUTE).isEmpty())
+                        if(pedestal.hasItem())
                         {
-                            if(!p_60506_.isCreative())itemInHand.shrink(1);
-                            if(!p_60506_.isCreative())ItemHandlerHelper.giveItemToPlayer(p_60506_,new ItemStack(bucketItem));
+                            if(pedestal.getItemStacks().size()>1)
+                            {
+                                List<ItemStack> stacks = pedestal.getItemStacks();
+                                Map<Item,Integer> getMapped =  Maps.<Item,Integer>newLinkedHashMap();
+                                for(int i=0;i<stacks.size();i++)
+                                {
+                                    if(stacks.get(i).isEmpty())continue;
 
-                            String fluidRemoved = fluid +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
-                            MutableComponent pedestalFluid = Component.translatable(fluidRemoved);
-                            pedestalFluid.withStyle(ChatFormatting.WHITE);
-                            p_60506_.displayClientMessage(pedestalFluid,true);
+                                    if(getMapped.containsKey(stacks.get(i).getItem()))
+                                    {
+                                        int currentValue = getMapped.getOrDefault(stacks.get(i).getItem(),0);
+                                        getMapped.replace(stacks.get(i).getItem(),currentValue, currentValue + stacks.get(i).getCount());
+                                    }
+                                    else
+                                    {
+                                        getMapped.put(stacks.get(i).getItem(),stacks.get(i).getCount());
+                                    }
+                                }
 
-                            return InteractionResult.SUCCESS;
+                                if(getMapped.size()>0)
+                                {
+                                    MutableComponent itemCountInPedestal = Component.literal("");
+                                    for (Item item : getMapped.keySet())
+                                    {
+                                        itemCountInPedestal.append(Component.translatable(item.getDefaultInstance().getDisplayName().getString() + " " + getMapped.get(item)));
+                                        if(getMapped.size()>1)itemCountInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator3"));
+                                    }
+
+                                    itemCountInPedestal.withStyle(ChatFormatting.GOLD);
+
+                                    if((itemCountInPedestal.getSiblings().size() > 5))
+                                    {
+                                        for(int i=0;i<itemCountInPedestal.getSiblings().size();i++)
+                                        {
+                                            if(itemCountInPedestal.getSiblings().get(i).getString().contains(Component.translatable(MODID + ".pedestal.message_separator3").getString()))continue;
+
+                                            p_60506_.displayClientMessage(itemCountInPedestal.getSiblings().get(i),false);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        p_60506_.displayClientMessage(itemCountInPedestal,true);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                MutableComponent itemCountInPedestal = Component.translatable(pedestal.getItemInPedestal().getDisplayName().getString() + " " + pedestal.getItemInPedestal().getCount());
+                                itemCountInPedestal.withStyle(ChatFormatting.GOLD);
+                                p_60506_.displayClientMessage(itemCountInPedestal,true);
+                            }
                         }
                     }
                 }
-
-                if(!itemInHand.isEmpty())
+                else
                 {
-                    ItemStack stackNotInsert = pedestal.addItemStack(itemInHand,true);
-                    if(itemInHand.getCount() > stackNotInsert.getCount())
+                    if(pedestal.hasFluid() && itemInHand.getItem().equals(Items.BUCKET))
                     {
-                        int shrinkAmount = itemInHand.getCount() - pedestal.addItemStack(itemInHand,false).getCount();
-                        itemInHand.shrink(shrinkAmount);
-                        return InteractionResult.SUCCESS;
+                        if(p_60506_ instanceof FakePlayer){ return InteractionResult.FAIL; }
+
+                        Item item = pedestal.getStoredFluid().copy().getFluid().getBucket();
+                        if(item instanceof BucketItem)
+                        {
+                            BucketItem bucketItem = (BucketItem) item;
+                            String fluid = pedestal.getStoredFluid().getDisplayName().getString();
+                            if(!pedestal.removeFluid(1000, IFluidHandler.FluidAction.EXECUTE).isEmpty())
+                            {
+                                if(!p_60506_.isCreative())itemInHand.shrink(1);
+                                if(!p_60506_.isCreative())ItemHandlerHelper.giveItemToPlayer(p_60506_,new ItemStack(bucketItem));
+
+                                String fluidRemoved = fluid +": " +pedestal.getStoredFluid().getAmount() +"/"+pedestal.getFluidCapacity();
+                                MutableComponent pedestalFluid = Component.translatable(fluidRemoved);
+                                pedestalFluid.withStyle(ChatFormatting.WHITE);
+                                p_60506_.displayClientMessage(pedestalFluid,true);
+
+                                return InteractionResult.SUCCESS;
+                            }
+                        }
+                    }
+
+                    if(!itemInHand.isEmpty())
+                    {
+                        if(itemInHand.getItem() instanceof WorkCardBE)
+                        {
+                            return InteractionResult.FAIL;
+                        }
+                        else
+                        {
+                            ItemStack stackNotInsert = pedestal.addItemStack(itemInHand,true);
+                            if(itemInHand.getCount() > stackNotInsert.getCount())
+                            {
+                                int shrinkAmount = itemInHand.getCount() - pedestal.addItemStack(itemInHand,false).getCount();
+                                itemInHand.shrink(shrinkAmount);
+                                return InteractionResult.SUCCESS;
+                            }
+                            else return InteractionResult.FAIL;
+                        }
                     }
                     else return InteractionResult.FAIL;
-                }
-                else return InteractionResult.FAIL;
 
                     /*
                     int allowedInsert = pedestal.countAllowedForInsert(itemInHand);
@@ -705,12 +819,41 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
                     }
                     return InteractionResult.SUCCESS;
                     */
+                }
             }
-
         }
+
 
         return InteractionResult.SUCCESS;
     }
+    @Override
+    public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
+        return (state.getValue(LIT))?(15):(0);
+    }
+
+    @Override
+    public boolean shouldCheckWeakPower(BlockState state, SignalGetter level, BlockPos pos, Direction side) {
+        return true;
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState p_60457_) {
+        //super.hasAnalogOutputSignal(p_60457_);
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState p_60487_, Level p_60488_, BlockPos p_60489_) {
+        //super.getAnalogOutputSignal(p_60487_, p_60488_, p_60489_);
+        return PedestalUtilities.getRedstoneLevelPedestal(p_60488_,p_60489_);
+    }
+
+    @Override
+    public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @javax.annotation.Nullable Direction direction) {
+        return true;
+    }
+
+
 
     @Override
     public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos pos, Player player) {
@@ -745,7 +888,7 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
         }
 
         if (player.isCreative()) {
-            if (player.getOffhandItem().getItem().equals(DeferredRegisterItems.TOOL_DEVTOOL.get()))
+            if (player.getOffhandItem().getItem().equals(com.mowmaster.mowlib.Registry.DeferredRegisterItems.TOOL_DEVTOOL.get()))
                 return willHarvest || super.onDestroyedByPlayer(state, world, pos, player, willHarvest, fluid);
             else
                 attack(state, world, pos, player);
@@ -766,27 +909,17 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
                 //Method for upgrades to do things before removal
                 pedestal.actionOnRemovedFromPedestal(0);
                 pedestal.dropInventoryItemsPrivate(p_60516_,p_60517_);
+
                 //Fixed to drop an item and not spill out
                 pedestal.dropLiquidsInWorld(p_60516_,p_60517_);
                 pedestal.removeEnergyFromBrokenPedestal(p_60516_,p_60517_);
                 pedestal.dropXPInWorld(p_60516_,p_60517_);
                 pedestal.dropDustInWorld(p_60516_,p_60517_);
-
                 p_60516_.updateNeighbourForOutputSignal(p_60517_,p_60518_.getBlock());
             }
             p_60516_.removeBlock(p_60517_,false);
             super.onRemove(p_60515_, p_60516_, p_60517_, p_60518_, p_60519_);
         }
-    }
-
-
-
-
-
-    @Override
-    public int getAnalogOutputSignal(BlockState p_60487_, Level p_60488_, BlockPos p_60489_) {
-        //super.getAnalogOutputSignal(p_60487_, p_60488_, p_60489_);
-        return PedestalUtilities.getRedstoneLevelPedestal(p_60488_,p_60489_);
     }
 
     public RenderShape getRenderShape(BlockState p_50950_) {
@@ -798,11 +931,11 @@ public class BasePedestalBlock extends MowLibBaseFilterableBlock implements Simp
     public void neighborChanged(BlockState p_60509_, Level p_60510_, BlockPos p_60511_, Block p_60512_, BlockPos p_60513_, boolean p_60514_) {
         if(!p_60510_.isClientSide())
         {
-            if(p_60513_.equals(MowLibBlockPosUtils.getPosBelowBlockEntity(p_60510_,p_60511_,1)))
+            if(p_60513_.equals(getPosBelowBlockEntity(p_60510_,p_60511_,1)))
             {
                 if(p_60510_.getBlockEntity(p_60511_) instanceof MowLibBaseBlockEntity baseBlockEntity)
                 {
-                    baseBlockEntity.actionOnNeighborBelowChange(MowLibBlockPosUtils.getPosBelowBlockEntity(p_60510_,p_60511_,1));
+                    baseBlockEntity.actionOnNeighborBelowChange(getPosBelowBlockEntity(p_60510_,p_60511_,1));
                 }
             }
         }

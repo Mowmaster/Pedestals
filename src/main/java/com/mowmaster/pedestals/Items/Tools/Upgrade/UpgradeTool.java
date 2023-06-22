@@ -1,10 +1,15 @@
 package com.mowmaster.pedestals.Items.Tools.Upgrade;
 
-import com.mowmaster.mowlib.Items.Tools.BaseTool;
+import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Items.Tools.PedestalBaseTool;
+import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class UpgradeTool extends BaseTool {
+public class UpgradeTool extends PedestalBaseTool {
     public UpgradeTool(Properties p_41383_) {
         super(p_41383_.stacksTo(1));
     }
@@ -15,12 +20,12 @@ public class UpgradeTool extends BaseTool {
     @Override
     public ItemStack getSwappedTool() { return DeferredRegisterItems.TOOL_TOOLSWAPPER.get().getDefaultInstance(); }
 
-    /*@Override
+    @Override
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {
         if(pedestal.hasCoin())
         {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-            MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,"pedestals.tool_coininpedestal");
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE,"pedestals.tool_coininpedestal");
             MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.WHITE,coinInPedestal.getDisplayName().getString());
             if(coinInPedestal.getItem() instanceof ItemUpgradeBase upgrade)
             {
@@ -31,5 +36,5 @@ public class UpgradeTool extends BaseTool {
         {
             MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,"pedestals.tool_coininpedestal_not");
         }
-    }*/
+    }
 }

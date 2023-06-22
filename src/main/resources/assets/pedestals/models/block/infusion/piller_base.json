@@ -2,9 +2,9 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/cube_all",
 	"textures": {
-		"1": "pedestals:blocks/block_crystal_stone",
-		"2": "pedestals:blocks/block_crystal_smooth_test",
-		"particle": "pedestals:blocks/block_crystal_smooth_test"
+		"1": "pedestals:block/block_crystal_stone",
+		"2": "pedestals:block/block_crystal_smooth_test",
+		"particle": "pedestals:block/block_crystal_smooth_test"
 	},
 	"elements": [
 		{

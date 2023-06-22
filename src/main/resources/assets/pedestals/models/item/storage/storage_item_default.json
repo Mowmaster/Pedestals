@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "pedestals:blocks/block_crystal_stone",
-		"1": "pedestals:blocks/crystal_dust",
-		"particle": "pedestals:blocks/block_crystal_stone"
+		"0": "pedestals:block/block_crystal_stone",
+		"1": "pedestals:block/crystal_dust",
+		"particle": "pedestals:block/block_crystal_stone"
 	},
 	"elements": [
 		{

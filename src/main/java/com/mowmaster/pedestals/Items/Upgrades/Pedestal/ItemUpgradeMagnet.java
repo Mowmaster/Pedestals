@@ -1,13 +1,14 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
 import com.mowmaster.mowlib.Items.WorkCards.WorkCardBase;
-import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibXpUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import net.minecraft.ChatFormatting;
@@ -131,20 +132,19 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
         return messages;
     }
 
+
+
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
 
         if(pedestal.hasWorkCard())
         {
             ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
+            if(hasTwoPointsSelected(card))
             {
-                if(workCardBase.hasTwoPointsSelected(card))
+                if(selectedAreaWithinRange(pedestal,getUpgradeWorkRange(coin)))
                 {
-                    if(MowLibBlockPosUtils.selectedAreaWithinRange(pedestal,getUpgradeWorkRange(coin)))
-                    {
-                        magnetAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
-                    }
+                    magnetAction(pedestal, level,pedestal.getPos(),pedestal.getCoinOnPedestal());
                 }
             }
         }

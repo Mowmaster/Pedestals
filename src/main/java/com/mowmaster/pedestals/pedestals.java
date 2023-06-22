@@ -4,6 +4,7 @@ package com.mowmaster.pedestals;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Registry.*;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,6 +34,8 @@ public class pedestals
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
+        //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupTextureStitchClient);
+
         //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClientTooltips);
         // Register the enqueueIMC method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
@@ -60,6 +63,8 @@ public class pedestals
         DeferredRecipeSerializers.register(eventBus);
 
         DeferredCreativeTabRegistry.DEF_REG.register(eventBus);
+
+
     }
 
     private void setup(final FMLCommonSetupEvent event)
@@ -72,7 +77,7 @@ public class pedestals
         PLOGGER.info("Initialize "+MODNAME+" Block Entity Renders");
         ClientRegistry.registerBlockEntityRenderers();
 
-        PLOGGER.info("Initialize "+MODNAME+" Tooltip Renders");
+        //PLOGGER.info("Initialize "+MODNAME+" Tooltip Renders");
         //MinecraftForgeClient.registerTooltipComponentFactory(ItemTooltipComponent.class, ClientItemTooltipComponent::new);
     }
 
@@ -82,9 +87,9 @@ public class pedestals
         event.register(ItemTooltipComponent.class, ClientItemTooltipComponent::new);
     }*/
 
-    /*private void setupPreClient(final TextureStitchEvent.Pre event)
+    /*private void setupTextureStitchClient(final TextureStitchEvent event)
     {
-        LOGGER.info("Initialize "+MODNAME+" Texture Sprites/Atlas");
+        PLOGGER.info("Initialize "+MODNAME+" Texture Sprites/Atlas");
         ClientRegistry.textureStitchPreEvent(event);
     }*/
 

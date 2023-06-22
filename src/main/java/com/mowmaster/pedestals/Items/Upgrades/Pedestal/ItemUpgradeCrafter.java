@@ -4,6 +4,7 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.core.BlockPos;
@@ -75,7 +76,9 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase {
     private ItemStack getAndCacheCraftingResult(String modID, Level level, ItemStack stackToStoreNBT, List<ItemStack> ingredients) {
         int numIngredients = ingredients.size();
         int dimension = (int)Math.ceil(Math.sqrt(numIngredients));
-        CraftingContainer craftingContainer = new CraftingContainer(MowLibContainerUtils.getAbstractContainerMenu(40), dimension, dimension); // CraftingContainer initializes all slots with ItemStack.EMPTY
+        //new CraftingContainer(MowLibContainerUtils.getAbstractContainerMenu(40), dimension, dimension);
+        CraftingContainer craftingContainer = MowLibContainerUtils.getContainerCrafting(dimension,dimension);
+        // CraftingContainer initializes all slots with ItemStack.EMPTY
         for (int i = 0; i < numIngredients; i++) {
             craftingContainer.setItem(i, ingredients.get(i));
         }
@@ -86,9 +89,9 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase {
             CraftingRecipe recipe = result.get();
             ItemStack resultItem;
             if (recipe instanceof RepairItemRecipe) {
-                resultItem = recipe.assemble(craftingContainer);
+                resultItem = recipe.assemble(craftingContainer,level.registryAccess());
             } else {
-                resultItem = recipe.getResultItem();
+                resultItem = recipe.getResultItem(level.registryAccess());
             }
             CompoundTag tag = stackToStoreNBT.getOrCreateTag();
             MowLibCompoundTagUtils.writeItemStackListToNBT(modID, tag, ingredients, "craft_ingredients");

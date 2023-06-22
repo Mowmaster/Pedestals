@@ -1,7 +1,7 @@
 {
   "parent": "pedestals:block/pedestal/base_pedestal_models/pedestal_block",
   "textures": {
-    "type": "pedestals:blocks/block_crystal_stone",
-    "typepart":"pedestals:blocks/block_crystal_stone"
+    "type": "pedestals:block/block_crystal_stone",
+    "typepart":"pedestals:block/block_crystal_stone"
   }
 }

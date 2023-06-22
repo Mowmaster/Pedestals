@@ -1,9 +1,9 @@
 {
 "parent": "pedestals:item/upgrades/pedestal_upgrade",
 "textures": {
-"coin": "pedestals:items/models/upgrades/pedestal_upgrade",
-"letter": "pedestals:items/models/upgrades/pedestal_upgrade_unpackager",
-"part": "pedestals:items/models/upgrades/pedestal_upgrade"
+"coin": "pedestals:item/models/upgrades/pedestal_upgrade",
+"letter": "pedestals:item/models/upgrades/pedestal_upgrade_unpackager",
+"part": "pedestals:item/models/upgrades/pedestal_upgrade"
 },
   "overrides": [
     { "predicate": { "pedestals:upgrade_mode": 0}, "model": "pedestals:item/upgrades/unpackager/pedestal_upgrade_it"},

@@ -1,4 +1,4 @@
-package com.mowmaster.pedestals.Items.Tools.Augment;
+package com.mowmaster.pedestals.Items.Tools;
 
 import com.mowmaster.mowlib.BlockEntities.MowLibBaseFilterableBlockEntity;
 import com.mowmaster.mowlib.Items.Tools.BaseTool;
@@ -10,14 +10,7 @@ public class PedestalBaseTool extends BaseTool {
         super(p_41383_);
     }
 
-    @Override
-    public void getBlockEntityDetail(MowLibBaseFilterableBlockEntity baseFilterableBlockEntity, Player player) {
-        super.getBlockEntityDetail(baseFilterableBlockEntity, player);
-    }
-
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {
-        super.getBlockEntityDetail(pedestal, player);
+        getBlockEntityDetailBase(pedestal,player);
     }
-
-
 }

@@ -1,9 +1,9 @@
 {
 	"parent": "pedestals:item/manifest_tool/manifest_tool_model",
 	"textures": {
-		"board": "pedestals:items/scroll/sticks",
-		"paper": "pedestals:items/scroll/scroll_1",
-		"metal": "pedestals:items/models/upgrades/pedestal_upgrade"
+		"board": "pedestals:item/scroll/sticks",
+		"paper": "pedestals:item/scroll/scroll_1",
+		"metal": "pedestals:item/models/upgrades/pedestal_upgrade"
 	},
 	"overrides": [
 		{ "predicate": { "pedestals:manifest_mode": 0}, "model": "pedestals:item/manifest_tool/manifest_blank"},

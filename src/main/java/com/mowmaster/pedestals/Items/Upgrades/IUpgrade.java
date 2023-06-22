@@ -1,8 +1,8 @@
 package com.mowmaster.pedestals.Items.Upgrades;
 
-import com.mowmaster.mowlib.Items.Filters.IItemMode;
+import com.mowmaster.mowlib.api.TransportAndStorage.ITransferMode;
 
-public interface IUpgrade extends IItemMode
+public interface IUpgrade extends ITransferMode
 {
 
 }

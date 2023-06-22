@@ -2,8 +2,8 @@ package com.mowmaster.pedestals.Items.Tools.Augment;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.mowlib.Items.Tools.BaseTool;
 import com.mowmaster.pedestals.Items.Augments.AugmentTieredStorage;
+import com.mowmaster.pedestals.Items.Tools.PedestalBaseTool;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

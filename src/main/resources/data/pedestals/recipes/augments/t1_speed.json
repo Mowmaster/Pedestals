@@ -1,24 +1,17 @@
 {
-
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "MOM",
-    "OTO",
-    "MOM"
-  ],
-  "key": {
-    "M": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "tag": "forge:gems/diamond"
     },
-    "O": {
+    {
       "item": "minecraft:obsidian"
     },
-    "T": {
+    {
       "item": "pedestals:tool_augments_speed"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:augment_pedestal_t1_speed"
   }
-
 }

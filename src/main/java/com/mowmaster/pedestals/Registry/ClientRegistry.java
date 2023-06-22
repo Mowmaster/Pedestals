@@ -4,6 +4,7 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntityRenderer;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.*;
+import com.mowmaster.pedestals.pedestals;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import static com.mowmaster.pedestals.PedestalUtils.References.MODNAME;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "pedestals", bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientRegistry
@@ -73,15 +75,12 @@ public class ClientRegistry
     }
 
     @SubscribeEvent
-    @SuppressWarnings("deprecation")
     public static void textureStitchPreEvent(TextureStitchEvent event)
     {
-
         ResourceLocation location = event.getAtlas().location();
 
         if(location.equals(TextureAtlas.LOCATION_BLOCKS))
         {
-
             event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render"));
             event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_1"));
             event.getAtlas().getSprite(new ResourceLocation(MODID, "util/pedestal_render_2"));

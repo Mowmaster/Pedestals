@@ -1,8 +1,8 @@
 {
 	"parent": "pedestals:item/tool_manifesttool",
 	"textures": {
-		"board": "pedestals:items/scroll/sticks",
-		"paper": "pedestals:items/scroll/scroll_1",
-		"metal": "pedestals:items/models/upgrades/pedestal_upgrade"
+		"board": "pedestals:item/scroll/sticks",
+		"paper": "pedestals:item/scroll/scroll_1",
+		"metal": "pedestals:item/models/upgrades/pedestal_upgrade"
 	}
 }

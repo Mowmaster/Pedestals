@@ -1,8 +1,8 @@
 {
 "parent": "pedestals:item/upgrades/pedestal_upgrade",
 "textures": {
-"coin": "pedestals:items/models/upgrades/pedestal_upgrade",
-"letter": "pedestals:items/models/upgrades/pedestal_upgrade_fluidconverter",
-"part": "pedestals:items/models/upgrades/pedestal_upgrade"
+"coin": "pedestals:item/models/upgrades/pedestal_upgrade",
+"letter": "pedestals:item/models/upgrades/pedestal_upgrade_fluidconverter",
+"part": "pedestals:item/models/upgrades/pedestal_upgrade"
 }
 }

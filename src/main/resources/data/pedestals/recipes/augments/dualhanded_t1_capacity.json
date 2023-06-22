@@ -1,7 +1,7 @@
 {
   "type": "mowlib:dualhandedcrafting",
   "blockTarget": {
-    "item": "minecraft:obsidian"
+    "item": "minecraft:crying_obsidian"
   },
   "mainhandTool": {
     "item": "pedestals:tool_augments_capacity"
@@ -12,6 +12,7 @@
   },
   "consumeOffhandItem": true,
   "result": {
-    "item": "pedestals:augment_pedestal_t1_capacity"
+    "item": "pedestals:augment_pedestal_t1_capacity",
+    "count": 2
   }
 }

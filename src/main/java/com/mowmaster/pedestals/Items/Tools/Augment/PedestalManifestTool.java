@@ -2,11 +2,11 @@ package com.mowmaster.pedestals.Items.Tools.Augment;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
-import com.mowmaster.mowlib.Items.Tools.BaseTool;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Items.Tools.PedestalBaseTool;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -91,7 +91,7 @@ public class PedestalManifestTool extends PedestalBaseTool {
         ItemStack stackInHand = player.getItemInHand(hand);
 
         HitResult result = player.pick(5,0,false);
-        BlockPos pos = new BlockPos((int)result.getLocation().x,(int)result.getLocation().y,(int)result.getLocation().z);
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
         if(!level.isClientSide())
         {
             if(result.getType().equals(HitResult.Type.MISS))

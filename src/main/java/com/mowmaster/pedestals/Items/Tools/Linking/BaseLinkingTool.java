@@ -4,6 +4,7 @@ package com.mowmaster.pedestals.Items.Tools.Linking;
 import com.google.common.collect.Maps;
 import com.mowmaster.mowlib.Items.Tools.BaseTool;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
+import com.mowmaster.pedestals.Items.Tools.PedestalBaseTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -27,7 +28,7 @@ import java.util.Map;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class BaseLinkingTool extends BaseTool {
+public class BaseLinkingTool extends PedestalBaseTool {
     public static final BlockPos defaultPos = new BlockPos(0,-2000,0);
     public BlockPos storedPosition = defaultPos;
     public List<BlockPos> storedPositionList = new ArrayList<>();
@@ -40,7 +41,7 @@ public class BaseLinkingTool extends BaseTool {
     public InteractionResultHolder interactSwapTool(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result, Item mainTool, Item swapTool) {
         String toolchange = MODID + ".tool_change";
         String linkclear = MODID + ".tool_link_cleared";
-        BlockPos pos = new BlockPos((int)result.getLocation().x,(int)result.getLocation().y,(int)result.getLocation().z);
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
 
         if(itemStackInHand.is(getMainTool().getItem()))
         {

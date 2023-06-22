@@ -1,13 +1,13 @@
 package com.mowmaster.pedestals.Items.Tools.Upgrade;
 
 
-import com.mowmaster.mowlib.Items.Tools.BaseTool;
+import com.mowmaster.pedestals.Items.Tools.PedestalBaseTool;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.item.Item.Properties;
 
-public class ToolSwapper extends BaseTool {
+public class ToolSwapper extends PedestalBaseTool {
     public ToolSwapper(Properties p_41383_) {
         super(p_41383_.stacksTo(1));
     }

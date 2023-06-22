@@ -6,28 +6,21 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibReferences;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
@@ -48,7 +41,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     @Override
     public ItemStack getUpgradeDefaultTool() { return new ItemStack(Items.STONE_PICKAXE); }
 
-    public List<ItemStack> getItemsToGenerate(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack blockToBreak) {
+    /*public List<ItemStack> getItemsToGenerate(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, Item blockToBreak) {
         Block generatedBlock = Block.byItem(blockToBreak.getItem());
         if(generatedBlock != Blocks.AIR) {
             ItemStack toolStack = pedestal.getToolStack();
@@ -66,7 +59,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
         }
 
         return new ArrayList<>();
-    }
+    }*/
 
     public void resetCachedRecipe(ItemStack upgrade) {
         CompoundTag tag = upgrade.getOrCreateTag();
@@ -178,7 +171,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             return;
         }
 
-        List<ItemStack> getCobbleGenOutputs = getItemsToGenerate(level, pedestal, pedestalPos, recipeResult);
+        List<ItemStack> getCobbleGenOutputs = getBlockDrops(pedestal, pedestalPos, recipeResult.getItem());
         if (getCobbleGenOutputs.isEmpty()) {
             return;
         }

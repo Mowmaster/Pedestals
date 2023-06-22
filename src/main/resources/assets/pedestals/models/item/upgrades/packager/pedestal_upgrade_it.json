@@ -1,8 +1,8 @@
 {
   "parent": "pedestals:item/upgrade_pedestal_export",
 "textures": {
-"coin": "pedestals:items/models/upgrades/pedestal_upgrade_i",
-"letter": "pedestals:items/models/upgrades/pedestal_upgrade_packager",
-"part": "pedestals:items/models/upgrades/pedestal_upgrade_i"
+"coin": "pedestals:item/models/upgrades/pedestal_upgrade_i",
+"letter": "pedestals:item/models/upgrades/pedestal_upgrade_packager",
+"part": "pedestals:item/models/upgrades/pedestal_upgrade_i"
 }
 }

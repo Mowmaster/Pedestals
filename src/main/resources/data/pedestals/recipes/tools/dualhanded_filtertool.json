@@ -7,10 +7,10 @@
     "tag": "forge:rods"
   },
   "offhandTool": {
-    "tag": "forge:ingots/gold"
+    "item": "mowlib:filter_base"
   },
   "result": {
-    "item": "pedestals:tool_upgradetool",
+    "item": "mowlib:tool_filter",
     "conditions": [
       {
         "type": "forge:not",

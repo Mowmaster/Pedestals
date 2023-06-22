@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "pedestals:items/tool_augments_range"
+    "layer0": "pedestals:item/tool_augments_range"
   }
 }

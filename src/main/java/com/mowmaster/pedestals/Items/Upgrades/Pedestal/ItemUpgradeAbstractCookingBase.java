@@ -17,6 +17,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.*;
 
+import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
+
 public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRecipe> extends ItemUpgradeBase {
     private final RecipeType<T> recipeType;
 

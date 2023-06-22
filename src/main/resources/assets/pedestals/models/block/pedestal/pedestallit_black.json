@@ -1,9 +1,9 @@
 {
   "parent": "pedestals:block/pedestal/base_pedestal_models/pedestal_blocklit_filter",
   "textures": {
-    "filter": "pedestals:blocks/pedestal/filter_black",
-    "glow":"pedestals:blocks/pedestal/ancientglowstone",
-    "type": "pedestals:blocks/block_crystal_stone",
-    "typepart":"pedestals:blocks/block_crystal_stone"
+    "filter": "pedestals:block/pedestal/filter_black",
+    "glow":"pedestals:block/pedestal/ancientglowstone",
+    "type": "pedestals:block/block_crystal_stone",
+    "typepart":"pedestals:block/block_crystal_stone"
   }
 }

@@ -1,6 +1,6 @@
 {
   "parent": "pedestals:item/augment_pedestal_renderdiffuser",
   "textures": {
-    "layer0": "pedestals:items/augments/augment_renderdiffuser_i"
+    "layer0": "pedestals:item/augments/augment_renderdiffuser_i"
   }
 }

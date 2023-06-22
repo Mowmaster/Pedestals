@@ -84,10 +84,6 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_LINKINGTOOLBACKWARDS.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_UPGRADETOOL.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_TOOLSWAPPER.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_FILTERTOOL.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_WORKTOOL.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_TAGTOOL.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_DEVTOOL.get());
 
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_SPEED.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_CAPACITY.get());
@@ -99,51 +95,6 @@ public class JeiPedestalsPlugin implements IModPlugin
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.TOOL_MANIFEST.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_MANIFEST.get());
-
-        this.registerIngredientDescription(registration, DeferredRegisterItems.WORKCARD_AREA.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.WORKCARD_LOCATIONS.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.WORKCARD_PEDESTALS.get());
-
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_BASE.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_BASE.get());
-        this.registerIngredientBase(registration, DeferredRegisterItems.FILTER_BASE.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_ITEM.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_ITEM.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_ITEMSTACK.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_ITEMSTACK.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_DURABILITY.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_DURABILITY.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_ENCHANTED.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_ENCHANTED.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_ENCHANTED_COUNT.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_ENCHANTED_COUNT.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_ENCHANTED_FUZZY.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_ENCHANTED_FUZZY.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_ENCHANTED_EXACT.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_ENCHANTED_EXACT.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_FOOD.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_FOOD.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_MOD.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_MOD.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_RESTRICTED.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_RESTRICTED.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_TAG.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_TAG.get());
-
-        this.registerIngredientDescription(registration, DeferredRegisterItems.TAG_GETTER.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.TAG_GETTER.get());
-
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_TAG_MACHINE.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_TAG_MACHINE.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_EXACT.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_EXACT.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_ITEM_MACHINE.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_ITEM_MACHINE.get());
-        this.registerIngredientDescription(registration, DeferredRegisterItems.FILTER_ITEMSTACK_MACHINE.get());
-        this.registerIngredientInteraction(registration, DeferredRegisterItems.FILTER_ITEMSTACK_MACHINE.get());
-
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get());
         this.registerIngredientCrafting(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get());

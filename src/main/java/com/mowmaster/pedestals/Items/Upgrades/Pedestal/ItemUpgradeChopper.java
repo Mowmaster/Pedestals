@@ -8,6 +8,7 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
+import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import net.minecraft.ChatFormatting;
@@ -169,7 +170,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                     }
                 }
 
-                saveBlockPosListCustomToNBT(coin,"_validlist",valid);
+                saveBlockPosListCustomToNBT(MODID,"_validlist",coin,valid);
             }
         }
     }
@@ -211,19 +212,19 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
 
 
         //System.out.println("validList: "+ valid);
-        saveBlockPosListCustomToNBT(coin,"_validlist",valid);
+        saveBlockPosListCustomToNBT(MODID,"_validlist",coin,valid);
     }
 
     private List<BlockPos> getValidList(BasePedestalBlockEntity pedestal)
     {
         ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBlockPosListCustomFromNBT(coin,"_validlist");
+        return readBlockPosListCustomFromNBT(MODID,"_validlist",coin);
     }
 
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        removeBlockListCustomNBTTags(coinInPedestal, "_validlist");
+        removeBlockListCustomNBTTags(MODID,"_validlist",coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_boolstop");
@@ -234,21 +235,18 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         if(pedestal.hasWorkCard())
         {
             ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                boolean override = workCardBase.hasTwoPointsSelected(card);
-                List<BlockPos> listed = getValidList(pedestal);
+            boolean override = hasTwoPointsSelected(card);
+            List<BlockPos> listed = getValidList(pedestal);
 
-                if(override)
+            if(override)
+            {
+                if(listed.size()>0)
                 {
-                    if(listed.size()>0)
-                    {
-                        chopperAction(level,pedestal);
-                    }
-                    else if(MowLibBlockPosUtils.selectedAreaWithinRange(pedestal,getUpgradeWorkRange(coin)) && !hasBlockListCustomNBTTags(coin,"_validlist"))
-                    {
-                        buildValidBlockListArea(pedestal);
-                    }
+                    chopperAction(level,pedestal);
+                }
+                else if(MowLibBlockPosUtils.selectedAreaWithinRange(pedestal,getUpgradeWorkRange(coin)) && !hasBlockListCustomNBTTags(MODID,"_validlist",coin))
+                {
+                    buildValidBlockListArea(pedestal);
                 }
             }
         }
@@ -301,70 +299,6 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         }
 
         return false;
-    }
-
-    private List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockState blockTarget, BlockPos posTarget)
-    {
-        ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(getUpgradeDefaultTool()):(pedestal.getToolStack());
-
-        Level level = pedestal.getLevel();
-        if(blockTarget.getBlock() != Blocks.AIR)
-        {
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-            if(getPlayer != null && getPlayer.get() != null)
-            {
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                return blockTarget.getDrops(builder);
-                //return blockTarget.getBlock().getDrops(blockTarget,builder);
-            }
-            else
-            {
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                return blockTarget.getDrops(builder);
-                //return blockTarget.getBlock().getDrops(blockTarget,builder);
-            }
-        }
-
-        /*if(blockTarget.requiresCorrectToolForDrops())
-        {
-            if(isToolHighEnoughLevelForBlock(getToolFromPedestal, blockTarget))
-            {
-                Level level = pedestal.getLevel();
-                if(blockTarget.getBlock() != Blocks.AIR)
-                {
-                    LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                            .withRandom(level.random)
-                            .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                            .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                    return blockTarget.getBlock().getDrops(blockTarget,builder);
-                }
-            }
-        }
-        else
-        {
-            Level level = pedestal.getLevel();
-            if(blockTarget.getBlock() != Blocks.AIR)
-            {
-                LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, new Vec3(pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ()))
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                return blockTarget.getBlock().getDrops(blockTarget,builder);
-            }
-        }*/
-
-        return new ArrayList<>();
     }
 
     private boolean passesFilter(BasePedestalBlockEntity pedestal, BlockState canMineBlock, BlockPos canMinePos)

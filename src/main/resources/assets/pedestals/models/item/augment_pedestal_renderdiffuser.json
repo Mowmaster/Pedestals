@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "pedestals:items/augments/renderaugment"
+    "layer0": "pedestals:item/augments/renderaugment"
   },
   "overrides": [
     { "predicate": { "pedestals:augment_mode": 0}, "model": "pedestals:item/augments/augment_p"},

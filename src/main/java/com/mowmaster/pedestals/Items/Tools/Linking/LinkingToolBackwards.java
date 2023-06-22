@@ -42,7 +42,7 @@ public class LinkingToolBackwards extends BaseLinkingTool
 
     @Override
     public InteractionResultHolder interactCrouchingTargetBlock(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result) {
-        BlockPos pos = new BlockPos((int)result.getLocation().x,(int)result.getLocation().y,(int)result.getLocation().z);
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(result.getLocation().x,result.getLocation().y,result.getLocation().z);
         BlockState getBlockState = level.getBlockState(pos);
         String linksuccess = MODID + ".tool_link_success_backwardslinkingtool";
         String linkstart = MODID + ".tool_link_start_backwardslinkingtool";

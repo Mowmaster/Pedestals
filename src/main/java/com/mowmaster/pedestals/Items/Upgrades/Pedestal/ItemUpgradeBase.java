@@ -16,6 +16,7 @@ import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 
+import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
@@ -39,11 +40,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
@@ -385,6 +391,70 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
      *
      */
 
+    public List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockState blockTarget, BlockPos posTarget)
+    {
+        ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(getUpgradeDefaultTool()):(pedestal.getToolStack());
+        Level level = pedestal.getLevel();
+        if(blockTarget.getBlock() != Blocks.AIR)
+        {
+            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+            if(getPlayer != null && getPlayer.get() != null)
+            {
+                //https://github.com/JackyyTV/Exchangers/blob/dev-1.20/src/main/java/jackyy/exchangers/handler/ExchangerHandler.java#LL329C29-L331C82
+                LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
+                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
+                        .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+
+                return blockTarget.getDrops(builder);
+            }
+            else
+            {
+                LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
+                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
+                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+
+                return blockTarget.getDrops(builder);
+            }
+
+        }
+
+        return new ArrayList<>();
+    }
+
+    public List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockPos posTarget, Item itemBlockTarget)
+    {
+        Block blockTarget = Block.byItem(itemBlockTarget);
+        if(blockTarget != Blocks.AIR) {
+            ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(getUpgradeDefaultTool()):(pedestal.getToolStack());
+            Level level = pedestal.getLevel();
+            if(blockTarget != Blocks.AIR)
+            {
+                WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
+                if(getPlayer != null && getPlayer.get() != null)
+                {
+                    //https://github.com/JackyyTV/Exchangers/blob/dev-1.20/src/main/java/jackyy/exchangers/handler/ExchangerHandler.java#LL329C29-L331C82
+                    LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
+                            .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
+                            .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
+                            .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+
+                    return blockTarget.defaultBlockState().getDrops(builder);
+                }
+                else
+                {
+                    LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
+                            .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
+                            .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+
+                    return blockTarget.defaultBlockState().getDrops(builder);
+                }
+
+            }
+        }
+        return new ArrayList<>();
+    }
+
 
     public boolean needsWorkCard()
     {
@@ -402,16 +472,16 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     public void resetCachedValidWorkCardPositions(ItemStack upgrade) {
-        removeBlockListCustomNBTTags(upgrade, "_validlist");
+        removeBlockListCustomNBTTags(MODID, "_validlist",upgrade);
     }
 
     public List<BlockPos> getValidWorkCardPositions(BasePedestalBlockEntity pedestal) {
         ItemStack upgrade = pedestal.getCoinOnPedestal();
-        List<BlockPos> cached = readBlockPosListCustomFromNBT(upgrade, "_validlist");
+        List<BlockPos> cached = readBlockPosListCustomFromNBT(MODID, "_validlist",upgrade);
         if (cached.size() == 0) {
             // Optimization to construct the validlist only once. The NBT tag should be reset when the WorkCard/Upgrade
             // is removed (as that is the only way to invalidate the cached list) by calling `resetCachedValidWorkCardPositions`.
-            if (!hasBlockListCustomNBTTags(upgrade, "_validlist") && pedestal.hasWorkCard()) {
+            if (!hasBlockListCustomNBTTags(MODID, "_validlist",upgrade) && pedestal.hasWorkCard()) {
                 ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
                 if (workCardItemStack.getItem() instanceof WorkCardBase baseCard) {
                     int supportedWorkCardTypesForThisUpgrade = getWorkCardType();
@@ -428,7 +498,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                         };
                     }
                 }
-                saveBlockPosListCustomToNBT(upgrade, "_validlist", cached);
+                saveBlockPosListCustomToNBT(MODID, "_validlist",upgrade, cached);
             }
         }
         return cached;
@@ -567,20 +637,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return true;
     }
 
-    public int getDistanceBetweenPoints(BlockPos pointOne, BlockPos posToCompare)
-    {
-        int x = pointOne.getX();
-        int y = pointOne.getY();
-        int z = pointOne.getZ();
-        int x1 = posToCompare.getX();
-        int y1 = posToCompare.getY();
-        int z1 = posToCompare.getZ();
-        int xF = Math.abs(Math.subtractExact(x,x1));
-        int yF = Math.abs(Math.subtractExact(y,y1));
-        int zF = Math.abs(Math.subtractExact(z,z1));
 
-        return Math.max(Math.max(xF,yF),zF);
-    }
 
 
 
@@ -748,198 +805,16 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
 
-    //ToDo: Add to mowlib and remove from here
-    public static void saveStringToNBT(ItemStack upgrade, String nbtTag, String string)
-    {
-        CompoundTag compound = new CompoundTag();
-        if(upgrade.hasTag())
-        {
-            compound = upgrade.getTag();
-        }
-        compound.putString(MODID+nbtTag, string);
-        upgrade.setTag(compound);
-    }
 
-    //ToDo: Add to mowlib and remove from here
-    //returns true for an add, false for a remove.
-    public static boolean addBlockPosToList(ItemStack upgrade, BlockPos posOfBlock)
-    {
-        List<BlockPos> currentList = readBlockPosListFromNBT(upgrade);
-        if(currentList.contains(posOfBlock))
-        {
-            currentList.remove(posOfBlock);
-            saveBlockPosListToNBT(upgrade,currentList);
-            return false;
-        }
-        else
-        {
-            currentList.add(posOfBlock);
-            saveBlockPosListToNBT(upgrade,currentList);
-            return true;
-        }
-    }
 
-    //ToDo: Add to mowlib and remove from here
-    public static void saveBlockPosListToNBT(ItemStack upgrade, List<BlockPos> posListToSave)
-    {
-        CompoundTag compound = new CompoundTag();
-        if(upgrade.hasTag())
-        {
-            compound = upgrade.getTag();
-        }
-        List<Integer> storedX = new ArrayList<Integer>();
-        List<Integer> storedY = new ArrayList<Integer>();
-        List<Integer> storedZ = new ArrayList<Integer>();
 
-        for(int i=0;i<posListToSave.size();i++)
-        {
-            storedX.add(posListToSave.get(i).getX());
-            storedY.add(posListToSave.get(i).getY());
-            storedZ.add(posListToSave.get(i).getZ());
-        }
 
-        compound.putIntArray(MODID+"_intArrayXPos",storedX);
-        compound.putIntArray(MODID+"_intArrayYPos",storedY);
-        compound.putIntArray(MODID+"_intArrayZPos",storedZ);
-        upgrade.setTag(compound);
-    }
 
-    //ToDo: Add to mowlib and remove from here
-    public static List<BlockPos> readBlockPosListFromNBT(ItemStack upgrade) {
-        List<BlockPos> posList = new ArrayList<>();
-        if(upgrade.hasTag())
-        {
-            String tagX = MODID+"_intArrayXPos";
-            String tagY = MODID+"_intArrayYPos";
-            String tagZ = MODID+"_intArrayZPos";
-            CompoundTag getCompound = upgrade.getTag();
-            if(upgrade.getTag().contains(tagX) && upgrade.getTag().contains(tagY) && upgrade.getTag().contains(tagZ))
-            {
-                int[] storedIX = getCompound.getIntArray(tagX);
-                int[] storedIY = getCompound.getIntArray(tagY);
-                int[] storedIZ = getCompound.getIntArray(tagZ);
 
-                for(int i=0;i<storedIX.length;i++)
-                {
-                    BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
-                    posList.add(gotPos);
-                }
-            }
-        }
-        return posList;
-    }
 
-    public static void saveBlockPosListCustomToNBT(ItemStack upgrade, String tagGenericName, List<BlockPos> posListToSave)
-    {
-        CompoundTag compound = new CompoundTag();
-        if(upgrade.hasTag())
-        {
-            compound = upgrade.getTag();
-        }
-        List<Integer> storedX = new ArrayList<Integer>();
-        List<Integer> storedY = new ArrayList<Integer>();
-        List<Integer> storedZ = new ArrayList<Integer>();
 
-        for(int i=0;i<posListToSave.size();i++)
-        {
-            storedX.add(posListToSave.get(i).getX());
-            storedY.add(posListToSave.get(i).getY());
-            storedZ.add(posListToSave.get(i).getZ());
-        }
 
-        compound.putIntArray(MODID+tagGenericName+"_X",storedX);
-        compound.putIntArray(MODID+tagGenericName+"_Y",storedY);
-        compound.putIntArray(MODID+tagGenericName+"_Z",storedZ);
-        upgrade.setTag(compound);
-    }
 
-    public static List<BlockPos> readBlockPosListCustomFromNBT(ItemStack upgrade, String tagGenericName) {
-        List<BlockPos> posList = new ArrayList<>();
-        if(upgrade.hasTag())
-        {
-            String tagX = MODID+tagGenericName+"_X";
-            String tagY = MODID+tagGenericName+"_Y";
-            String tagZ = MODID+tagGenericName+"_Z";
-            CompoundTag getCompound = upgrade.getTag();
-            if(upgrade.getTag().contains(tagX) && upgrade.getTag().contains(tagY) && upgrade.getTag().contains(tagZ))
-            {
-                int[] storedIX = getCompound.getIntArray(tagX);
-                int[] storedIY = getCompound.getIntArray(tagY);
-                int[] storedIZ = getCompound.getIntArray(tagZ);
-
-                for(int i=0;i<storedIX.length;i++)
-                {
-                    BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
-                    posList.add(gotPos);
-                }
-            }
-        }
-        return posList;
-    }
-
-    public void removeBlockListCustomNBTTags(ItemStack upgrade, String tagGenericName)
-    {
-        String tagX = MODID+tagGenericName+"_X";
-        String tagY = MODID+tagGenericName+"_Y";
-        String tagZ = MODID+tagGenericName+"_Z";
-        CompoundTag getTags = upgrade.getTag();
-        if(getTags.contains(tagX))getTags.remove(tagX);
-        if(getTags.contains(tagY))getTags.remove(tagY);
-        if(getTags.contains(tagZ))getTags.remove(tagZ);
-        upgrade.setTag(getTags);
-    }
-
-    public boolean hasBlockListCustomNBTTags(ItemStack upgrade, String tagGenericName)
-    {
-        String tagX = MODID+tagGenericName+"_X";
-        String tagY = MODID+tagGenericName+"_Y";
-        String tagZ = MODID+tagGenericName+"_Z";
-        CompoundTag getTags = upgrade.getTag();
-
-        return getTags.contains(tagX) && getTags.contains(tagY) && getTags.contains(tagZ);
-    }
-
-    //ToDo: Add to mowlib and remove from here
-    public static void saveBlockPosToNBT(ItemStack upgrade, int num, BlockPos posToSave)
-    {
-        CompoundTag compound = new CompoundTag();
-        if(upgrade.hasTag())
-        {
-            compound = upgrade.getTag();
-        }
-        List<Integer> listed = new ArrayList<>();
-        listed.add(posToSave.getX());
-        listed.add(posToSave.getY());
-        listed.add(posToSave.getZ());
-        compound.putIntArray(MODID+"_upgrade_blockpos_"+num, listed);
-        upgrade.setTag(compound);
-    }
-
-    //ToDo: Add to mowlib and remove from here
-    public static BlockPos readBlockPosFromNBT(ItemStack upgrade, int num) {
-        if(upgrade.hasTag())
-        {
-            String tag = MODID+"_upgrade_blockpos_"+num;
-            CompoundTag getCompound = upgrade.getTag();
-            if(upgrade.getTag().contains(tag))
-            {
-                int[] listed = getCompound.getIntArray(tag);
-                if(listed.length>=3)return new BlockPos(listed[0],listed[1],listed[2]);
-            }
-        }
-        return BlockPos.ZERO;
-    }
-
-    //ToDo: Add to mowlib and remove from here
-    public static BlockPos getBlockPosOnUpgrade(ItemStack stack, int num) {
-
-        return readBlockPosFromNBT(stack,num);
-    }
-
-    //ToDo: Add to mowlib and remove from here
-    public boolean hasOneBlockPos(ItemStack stack) {
-        return !readBlockPosFromNBT(stack,1).equals(BlockPos.ZERO) || !readBlockPosFromNBT(stack,2).equals(BlockPos.ZERO);
-    }
 
 
     public static BlockPos getExistingSingleBlockPos(ItemStack stack) {
@@ -980,135 +855,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return PedestalConfig.COMMON.upgrades_baseSelectionRange.get() + getRangeIncrease(coinUpgrade);
     }
 
-    //ToDo: Add to mowlib and remove from here
-    public boolean isSelectionInRange(BasePedestalBlockEntity pedestalCurrent, BlockPos currentSelectedPoint)
-    {
 
-        int range = PedestalConfig.COMMON.upgrades_baseSelectionRange.get() + getRangeIncrease(pedestalCurrent.getCoinOnPedestal());
-
-        int x = currentSelectedPoint.getX();
-        int y = currentSelectedPoint.getY();
-        int z = currentSelectedPoint.getZ();
-        int x1 = pedestalCurrent.getPos().getX();
-        int y1 = pedestalCurrent.getPos().getY();
-        int z1 = pedestalCurrent.getPos().getZ();
-        int xF = Math.abs(Math.subtractExact(x,x1));
-        int yF = Math.abs(Math.subtractExact(y,y1));
-        int zF = Math.abs(Math.subtractExact(z,z1));
-
-        if(xF>range || yF>range || zF>range)
-        {
-            return false;
-        }
-        else return true;
-    }
-
-    public boolean selectedAreaWithinRange(BasePedestalBlockEntity pedestal)
-    {
-        if(isSelectionInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),1)) && isSelectionInRange(pedestal, readBlockPosFromNBT(pedestal.getCoinOnPedestal(),2)))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    //ToDo: Add to mowlib and remove from here
-    public boolean selectedPointWithinRange(BasePedestalBlockEntity pedestal, BlockPos posPoint)
-    {
-        if(isSelectionInRange(pedestal, posPoint))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    public BlockPos getHigherByFacing(BlockPos atLocation, Direction facing)
-    {
-        //west north down +XYZ
-        //east +YZ
-        //south +XY
-        //up +XZ
-        BlockPos higherPos = atLocation;
-        switch(facing)
-        {
-            case NORTH:
-            default:
-                higherPos = atLocation.offset(1,1,1);
-                break;
-            case EAST:
-                higherPos = atLocation.offset(0,1,1);
-                break;
-            case SOUTH:
-                higherPos = atLocation.offset(1,1,0);
-                break;
-            case UP:
-                higherPos = atLocation.offset(1,0,1);
-                break;
-        }
-
-        return higherPos;
-    }
-
-    public BlockPos getLowerByFacing(BlockPos atLocation, Direction facing)
-    {
-        //west north down +-0
-        //east -x
-        //south -z
-        //up -y
-        BlockPos lowerPos = atLocation;
-        switch(facing)
-        {
-            case NORTH:
-            default:
-                break;
-            case EAST:
-                lowerPos = atLocation.offset(-1,0,0);
-                break;
-            case SOUTH:
-                lowerPos = atLocation.offset(0,0,-1);
-                break;
-            case UP:
-                lowerPos = atLocation.offset(0,-1,0);
-                break;
-        }
-
-        return lowerPos;
-    }
-
-    /*
-    INTERACTIONS
-
-    MODE CHANGE:
-    - (Offhand)Crouch Right Click = Mode change
-    TYPE CHANGE:
-    - (Offhand)Right Click = Type Change
-
-
-
-    GET BLOCK POS FOR AREA:
-    main hand crouch right click to start it and right click to end it???
-     */
-    public Direction getLastClickedDirectionFromUpgrade(ItemStack stack)
-    {
-        Direction dir = Direction.UP;
-        if(stack.hasTag())
-        {
-            if(stack.getTag().contains(MODID + "_string_last_clicked_direction"))
-            {
-                String direction = stack.getTag().getString(MODID + "_string_last_clicked_direction");
-                if(direction == "down")return Direction.DOWN;
-                else if(direction == "up")return Direction.UP;
-                else if(direction == "north")return Direction.NORTH;
-                else if(direction == "south")return Direction.SOUTH;
-                else if(direction == "west")return Direction.WEST;
-                else if(direction == "east")return Direction.EAST;
-            }
-        }
-
-        return dir;
-    }
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
@@ -1246,30 +993,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return getTransportModeFromNBT(upgrade, 4);
     }
 
-    public BlockPos getPosOfBlockBelow(Level world, BlockPos posOfPedestal, int numBelow)
-    {
-        BlockState state = world.getBlockState(posOfPedestal);
 
-        Direction enumfacing = (state.hasProperty(FACING))?(state.getValue(FACING)):(Direction.UP);
-        BlockPos blockBelow = posOfPedestal;
-        switch (enumfacing)
-        {
-            case UP:
-                return blockBelow.offset(0,-numBelow,0);
-            case DOWN:
-                return blockBelow.offset(0,numBelow,0);
-            case NORTH:
-                return blockBelow.offset(0,0,numBelow);
-            case SOUTH:
-                return blockBelow.offset(0,0,-numBelow);
-            case EAST:
-                return blockBelow.offset(-numBelow,0,0);
-            case WEST:
-                return blockBelow.offset(numBelow,0,0);
-            default:
-                return blockBelow;
-        }
-    }
 
     public Direction getPedestalFacing(Level world, BlockPos posOfPedestal)
     {
