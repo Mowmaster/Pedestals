@@ -104,7 +104,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        resetCachedValidWorkCardPositions(coinInPedestal);
+        resetCachedValidWorkCardPositions(MODID, coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getOrCreateTag(), "_numposition");
     }
 
@@ -113,7 +113,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
         if (level.isClientSide()) return;
         if (!pedestal.hasItem()) return;
 
-        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal, coin, getWorkCardType(),MODID);
         if (allPositions.isEmpty()) return;
 
         int currentPosition = getCurrentPosition(pedestal);

@@ -5,6 +5,8 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
+import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.core.BlockPos;
@@ -48,20 +50,20 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase {
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        resetCachedValidWorkCardPositions(coinInPedestal);
-        resetCachedRecipe(References.MODID, coinInPedestal);
+        resetCachedValidWorkCardPositions(MODID, coinInPedestal);
+        resetCachedRecipe(MODID, coinInPedestal);
 
         // TODO [1.20]: get rid of these lines as they removes the previous NBT tags used. All 3 were switched off of to ensure
         // nothing was broken by moving off of `output` (we had to ignore that a cached recipe existed and used that old NBT)
         CompoundTag tag = coinInPedestal.getOrCreateTag();
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "input");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "output");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "hasrecipe");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, tag, "input");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, tag, "output");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, tag, "hasrecipe");
     }
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal, coin, getWorkCardType(),MODID);
         if (allPositions.isEmpty()) return;
 
         crafterAction(level, pedestal, allPositions);
@@ -156,7 +158,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase {
 
             List<ItemStack> ingredientList = ingredientPedestals.stream()
                 .map(BasePedestalBlockEntity::getItemInPedestal).toList();
-            ItemStack craftingResult = getCraftingResult(References.MODID, level, crafterPedestal.getCoinOnPedestal(), ingredientList);
+            ItemStack craftingResult = getCraftingResult(MODID, level, crafterPedestal.getCoinOnPedestal(), ingredientList);
             if (!craftingResult.isEmpty()) {
                 if (crafterPedestal.addItem(craftingResult, true)) {
                     for (BasePedestalBlockEntity ingredientPedestal: ingredientPedestals) {

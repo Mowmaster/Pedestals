@@ -111,7 +111,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase {
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        resetCachedValidWorkCardPositions(coinInPedestal);
+        resetCachedValidWorkCardPositions(MODID, coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numposition");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numdelay");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(),"_numheight");
@@ -123,7 +123,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase {
         if (level.isClientSide()) return;
         if (!pedestal.hasItem()) return;
 
-        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal, coin, getWorkCardType(),MODID);
         if (allPositions.isEmpty()) return;
 
         fillerAction(level, pedestal, allPositions);

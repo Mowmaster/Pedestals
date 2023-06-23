@@ -110,7 +110,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        resetCachedValidWorkCardPositions(coinInPedestal);
+        resetCachedValidWorkCardPositions(MODID, coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getOrCreateTag(), "_numposition");
     }
 
@@ -118,7 +118,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
         if(level.isClientSide()) return;
 
-        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal, coin, getWorkCardType(),MODID);
         if (allPositions.isEmpty()) return;
 
         int currentPosition = getCurrentPosition(coin);

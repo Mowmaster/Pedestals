@@ -4,6 +4,8 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
+import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Recipes.UpgradeModificationGlobalRecipe;
 import net.minecraft.core.BlockPos;
@@ -40,14 +42,14 @@ public class ItemUpgradeModifications extends ItemUpgradeBase {
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
-        resetCachedValidWorkCardPositions(coinInPedestal);
+        resetCachedValidWorkCardPositions(MODID, coinInPedestal);
     }
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
         if (level.isClientSide()) return;
 
-        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal, coin, getWorkCardType(),MODID);
         if (allPositions.isEmpty()) return;
 
         modifierAction(level, pedestal, allPositions);
