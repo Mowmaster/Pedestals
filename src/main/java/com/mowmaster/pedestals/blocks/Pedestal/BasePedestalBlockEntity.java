@@ -1203,7 +1203,7 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
         {
             if(getCoinOnPedestal().getItem() instanceof IPedestalUpgrade upgrade)
             {
-                //upgrade.actionOnRemovedFromPedestal(getPedestal(), getCoinOnPedestal());
+                upgrade.actionOnRemovedFromPedestal(getPedestal(), getCoinOnPedestal());
             }
         }
     }
