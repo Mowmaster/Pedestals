@@ -125,7 +125,10 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
 
             @Override
             public int getSlots() {
-                return super.getSlots();
+                //maybe return less if there is no tank upgrade???
+                int baseSlots = PedestalConfig.COMMON.pedestal_baseItemStacks.get();
+                int additionalSlots = getItemSlotIncreaseFromStorage();
+                return baseSlots + additionalSlots;
             }
 
             @Override
@@ -275,13 +278,6 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
             }
 
             @Override
-            public int getTankCapacity(int i) {
-                int baseFluidStorage = PedestalConfig.COMMON.pedestal_baseFluidStorage.get();
-                int additionalFluidStorage = getFluidAmountIncreaseFromStorage();
-                return baseFluidStorage + additionalFluidStorage;
-            }
-
-            @Override
             public int getTanks() {
                 //Technically we dont use the tanks thing, but we'll pretend and hope it doesnt break...
                 return 1;
@@ -309,6 +305,13 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
                     update();
                 }
                 return returnFluidStack;
+            }
+
+            @Override
+            public int getTankCapacity(int i) {
+                int baseFluidStorage = PedestalConfig.COMMON.pedestal_baseFluidStorage.get();
+                int additionalFluidStorage = getFluidAmountIncreaseFromStorage();
+                return baseFluidStorage + additionalFluidStorage;
             }
 
             @Override
