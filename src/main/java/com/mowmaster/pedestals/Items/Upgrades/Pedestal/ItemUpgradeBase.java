@@ -69,6 +69,7 @@ import java.util.stream.IntStream;
 
 public class ItemUpgradeBase extends Item implements IPedestalUpgrade
 {
+
     public ItemUpgradeBase(Properties p_41383_) {
         super(new Properties());
     }
@@ -471,20 +472,20 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return -1;
     }
 
-    public void resetCachedValidWorkCardPositions(ItemStack upgrade) {
-        removeBlockListCustomNBTTags(MODID, "_validlist",upgrade);
+    public void resetCachedValidWorkCardPositions(String modid, ItemStack upgrade) {
+        removeBlockListCustomNBTTags(modid, "_validlist",upgrade);
     }
 
-    public List<BlockPos> getValidWorkCardPositions(BasePedestalBlockEntity pedestal) {
-        ItemStack upgrade = pedestal.getCoinOnPedestal();
-        List<BlockPos> cached = readBlockPosListCustomFromNBT(MODID, "_validlist",upgrade);
+    public List<BlockPos> getValidWorkCardPositions(BasePedestalBlockEntity pedestal, ItemStack upgrade, int workCardType, String modid) {
+        //ItemStack upgrade = pedestal.getCoinOnPedestal();
+        List<BlockPos> cached = readBlockPosListCustomFromNBT(modid, "_validlist",upgrade);
         if (cached.size() == 0) {
             // Optimization to construct the validlist only once. The NBT tag should be reset when the WorkCard/Upgrade
             // is removed (as that is the only way to invalidate the cached list) by calling `resetCachedValidWorkCardPositions`.
-            if (!hasBlockListCustomNBTTags(MODID, "_validlist",upgrade) && pedestal.hasWorkCard()) {
+            if (!hasBlockListCustomNBTTags(modid, "_validlist",upgrade) && pedestal.hasWorkCard()) {
                 ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
                 if (workCardItemStack.getItem() instanceof WorkCardBase baseCard) {
-                    int supportedWorkCardTypesForThisUpgrade = getWorkCardType();
+                    int supportedWorkCardTypesForThisUpgrade = workCardType;
                     int insertedWorkCardType = baseCard.getWorkCardType();
                     if (
                         insertedWorkCardType == supportedWorkCardTypesForThisUpgrade || // exact match
@@ -498,7 +499,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                         };
                     }
                 }
-                saveBlockPosListCustomToNBT(MODID, "_validlist",upgrade, cached);
+                saveBlockPosListCustomToNBT(modid, "_validlist",upgrade, cached);
             }
         }
         return cached;

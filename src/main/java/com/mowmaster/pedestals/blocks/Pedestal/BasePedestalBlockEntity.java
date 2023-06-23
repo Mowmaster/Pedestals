@@ -103,6 +103,19 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
         this.setChanged();
     }
 
+    //TODO: Fix this
+    @Override
+    public void actionOnWorkCardRemovedFromBlockEntity(int type) {
+        super.actionOnWorkCardRemovedFromBlockEntity(type);
+        if (hasCoin()) {
+            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase base)
+            {
+                base.resetCachedValidWorkCardPositions(MODID,getCoinOnPedestal());
+            }
+            //MowLibWorkCardUtil.resetCachedValidWorkCardPositions(MODID, getCoinOnPedestal());
+        }
+    }
+
     public ItemStackHandler createItemHandlerPedestal() {
         return new ItemStackHandler(64) {
             @Override
@@ -1148,7 +1161,6 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
     ===========================     DUST   END       =============================
     ==============================================================================
     ============================================================================*/
-
 
 
     /*============================================================================
