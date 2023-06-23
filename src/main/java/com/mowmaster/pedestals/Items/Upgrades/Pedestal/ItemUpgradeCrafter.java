@@ -6,11 +6,16 @@ import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.PedestalUtils.PedestalCraftingUtil;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.RecipeBookMenu;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -76,9 +81,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase {
     private ItemStack getAndCacheCraftingResult(String modID, Level level, ItemStack stackToStoreNBT, List<ItemStack> ingredients) {
         int numIngredients = ingredients.size();
         int dimension = (int)Math.ceil(Math.sqrt(numIngredients));
-        //new CraftingContainer(MowLibContainerUtils.getAbstractContainerMenu(40), dimension, dimension);
-        CraftingContainer craftingContainer = MowLibContainerUtils.getContainerCrafting(dimension,dimension);
-        // CraftingContainer initializes all slots with ItemStack.EMPTY
+        CraftingContainer craftingContainer = new TransientCraftingContainer(MowLibContainerUtils.getAbstractContainerMenu(40), dimension, dimension);
         for (int i = 0; i < numIngredients; i++) {
             craftingContainer.setItem(i, ingredients.get(i));
         }
