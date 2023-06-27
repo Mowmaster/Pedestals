@@ -31,6 +31,9 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
     public boolean canModifySpeed(ItemStack upgradeItemStack) { return true; }
 
     @Override
+    public int getMaxSpeed(ItemStack upgradeItemStack) { return 200; }
+
+    @Override
     public int baseEnergyCostPerDistance() { return baseEnergyCost(); }
 
     abstract public int baseEnergyCost();

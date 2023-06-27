@@ -231,7 +231,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 speedLabel.withStyle(ChatFormatting.AQUA);
                 MutableComponent speedAmount = Component.literal(""+getSpeedTicksReduced(upgrade)+"");
                 MutableComponent separator = Component.translatable(MODID + ".upgrade_tooltip_separator_slash");
-                MutableComponent speedMax = Component.literal(""+PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get()+"");
+                MutableComponent speedMax = Component.literal(""+getMaxSpeed(upgrade)+"");
                 speedAmount.append(separator);
                 speedAmount.append(speedMax);
                 speedAmount.withStyle(ChatFormatting.WHITE);
@@ -1371,7 +1371,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 speedLabel.withStyle(ChatFormatting.AQUA);
                 MutableComponent speedAmount = Component.literal(""+getSpeedTicksReduced(p_41421_)+"");
                 MutableComponent separator = Component.translatable(MODID + ".upgrade_tooltip_separator_slash");
-                MutableComponent speedMax = Component.literal(""+PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get()+"");
+                MutableComponent speedMax = Component.literal(""+getMaxSpeed(p_41421_)+"");
                 speedAmount.append(separator);
                 speedAmount.append(speedMax);
                 speedAmount.withStyle(ChatFormatting.WHITE);
@@ -1904,6 +1904,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     public int getSpeedTicksReduced(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradespeed"); }
+    public int getMaxSpeed(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get(); }
 
     public int getDamageCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradedamagecapacity"); }
     public int getBlockCapacityIncrease(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeblockcapacity"); }
