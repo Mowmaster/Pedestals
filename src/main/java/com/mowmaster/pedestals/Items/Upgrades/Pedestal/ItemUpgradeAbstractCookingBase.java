@@ -5,6 +5,7 @@ import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.PedestalUtils.MoveToMowLibUtils;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import net.minecraft.ChatFormatting;
@@ -27,6 +28,9 @@ public abstract class ItemUpgradeAbstractCookingBase<T extends AbstractCookingRe
 
     @Override
     public boolean canModifySpeed(ItemStack upgradeItemStack) { return true; }
+
+    @Override
+    public int getMaxSpeed(ItemStack upgradeItemStack) { return 200; }
 
     @Override
     public int baseEnergyCostPerDistance() { return baseEnergyCost(); }
