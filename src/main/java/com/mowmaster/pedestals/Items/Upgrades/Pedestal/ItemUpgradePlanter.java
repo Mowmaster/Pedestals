@@ -206,18 +206,21 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
                 removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), targetPos), true) &&
                     !pedestal.removeItemStack(toPlant, true).isEmpty() &&
                     !targetPos.equals(pedestal.getPos()) &&
-                    canPlace(level, pedestalFacing, targetPos, toPlant) &&
                     passesFilter(pedestal, toPlant)
             ) {
-                UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toPlant.copy(), new BlockHitResult(Vec3.ZERO, pedestalFacing, targetPos, false));
-                InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                if (result == InteractionResult.CONSUME) {
-                    removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), targetPos), false);
-                    pedestal.removeItemStack(toPlant, false);
-                    if (pedestal.canSpawnParticles()) {
-                        MowLibPacketHandler.sendToNearby(pedestal.getLevel(), pedestal.getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, targetPos.getX() + 0.5D, targetPos.getY() + 0.5D, targetPos.getZ() + 0.5D, 100, 255, 100));
+                if (canPlace(level, pedestalFacing, targetPos, toPlant)) {
+                    UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toPlant.copy(), new BlockHitResult(Vec3.ZERO, pedestalFacing, targetPos, false));
+                    InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                    if (result == InteractionResult.CONSUME) {
+                        removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), targetPos), false);
+                        pedestal.removeItemStack(toPlant, false);
+                        if (pedestal.canSpawnParticles()) {
+                            MowLibPacketHandler.sendToNearby(pedestal.getLevel(), pedestal.getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, targetPos.getX() + 0.5D, targetPos.getY() + 0.5D, targetPos.getZ() + 0.5D, 100, 255, 100));
+                        }
+                        return true;
                     }
-                    return true;
+                } else {
+                    return true; // iterate over spots that can't be planted on (needed for the water in the center of most crop farms)
                 }
             }
         }
