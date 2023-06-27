@@ -176,7 +176,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
                     canPlace(toPlace) &&
                     passesFilter(pedestal, toPlace)
             ) {
-                if (level.getBlockState(targetPos).getBlock() != Blocks.AIR) return true; // skip over already-placed blocks
+                if (level.getBlockState(targetPos).getBlock() != Blocks.AIR) return false; // don't skip over already-placed blocks
 
                 UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toPlace.copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level, pedestal.getPos()), targetPos, false));
                 InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);

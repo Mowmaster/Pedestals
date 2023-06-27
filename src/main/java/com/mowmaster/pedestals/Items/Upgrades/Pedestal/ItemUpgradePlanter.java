@@ -217,8 +217,8 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
                     if (pedestal.canSpawnParticles()) {
                         MowLibPacketHandler.sendToNearby(pedestal.getLevel(), pedestal.getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, targetPos.getX() + 0.5D, targetPos.getY() + 0.5D, targetPos.getZ() + 0.5D, 100, 255, 100));
                     }
+                    return true;
                 }
-                return true;
             }
         }
 
