@@ -308,105 +308,107 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
     //Left Click Action
     @Override
     public void attack(BlockState p_60499_, Level p_60500_, BlockPos p_60501_, Player p_60502_) {
-        super.attack(p_60499_, p_60500_, p_60501_, p_60502_);
 
         if(!p_60500_.isClientSide())
         {
-            if(p_60502_ instanceof FakePlayer){ super.attack(p_60499_, p_60500_, p_60501_, p_60502_); }
-
-            BlockEntity blockEntity = p_60500_.getBlockEntity(p_60501_);
-            if(blockEntity instanceof BasePedestalBlockEntity)
+            if(!(p_60502_ instanceof FakePlayer))
             {
-                BasePedestalBlockEntity pedestal = ((BasePedestalBlockEntity)blockEntity);
-                ItemStack itemInHand = p_60502_.getMainHandItem();
-                ItemStack itemInOffHand = p_60502_.getOffhandItem();
+                BlockEntity blockEntity = p_60500_.getBlockEntity(p_60501_);
+                if(blockEntity instanceof BasePedestalBlockEntity)
+                {
+                    BasePedestalBlockEntity pedestal = ((BasePedestalBlockEntity)blockEntity);
+                    ItemStack itemInHand = p_60502_.getMainHandItem();
+                    ItemStack itemInOffHand = p_60502_.getOffhandItem();
 
-                if(pedestal.hasFilter() && itemInOffHand.is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.TOOL_FILTERTOOL.get()))
-                {
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeFilter(null));
-                    pedestal.actionOnFilterRemovedFromBlockEntity(1);
-                }
-                else if(pedestal.hasLight() && itemInOffHand.is(Items.GLOWSTONE))
-                {
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeLight(null));
-                    pedestal.actionOnLightRemovedFromBlockEntity(1);
-                }
-                else if(pedestal.hasRedstone() && itemInOffHand.is(Items.REDSTONE))
-                {
-                    if(p_60502_.isShiftKeyDown())
+                    if(pedestal.hasFilter() && itemInOffHand.is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.TOOL_FILTERTOOL.get()))
                     {
-                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRedstone(null));
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeFilter(null));
+                        pedestal.actionOnFilterRemovedFromBlockEntity(1);
                     }
-                    else
+                    else if(pedestal.hasLight() && itemInOffHand.is(Items.GLOWSTONE))
                     {
-                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRedstone(null));
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeLight(null));
+                        pedestal.actionOnLightRemovedFromBlockEntity(1);
+                    }
+                    else if(pedestal.hasRedstone() && itemInOffHand.is(Items.REDSTONE))
+                    {
+                        if(p_60502_.isShiftKeyDown())
+                        {
+                            ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRedstone(null));
+                        }
+                        else
+                        {
+                            ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRedstone(null));
+                        }
+
+                        pedestal.actionOnRedstoneRemovedFromBlockEntity(1);
+                    }
+                    else if(pedestal.hasWorkCard() && itemInOffHand.is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.TOOL_WORKTOOL.get()))
+                    {
+                        pedestal.actionOnWorkCardRemovedFromBlockEntity(1);
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeWorkCard(null));
+                    }
+                    else if(pedestal.hasCoin() && itemInOffHand.is(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
+                    {
+                        //Method for upgrades to do things before removal
+                        pedestal.actionOnRemovedFromPedestal(1);
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCoin());
+                    }
+                    else if(pedestal.hasTool() && itemInOffHand.is(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
+                    {
+                        pedestal.actionOnNeighborBelowChange(getPosBelowBlockEntity(p_60499_, p_60501_, 1));
+                        pedestal.updatePedestalPlayer(pedestal);
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
                     }
 
-                    pedestal.actionOnRedstoneRemovedFromBlockEntity(1);
-                }
-                else if(pedestal.hasWorkCard() && itemInOffHand.is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.TOOL_WORKTOOL.get()))
-                {
-                    pedestal.actionOnWorkCardRemovedFromBlockEntity(1);
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeWorkCard(null));
-                }
-                else if(pedestal.hasCoin() && itemInOffHand.is(DeferredRegisterItems.TOOL_UPGRADETOOL.get()))
-                {
-                    //Method for upgrades to do things before removal
-                    pedestal.actionOnRemovedFromPedestal(1);
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCoin());
-                }
-                else if(pedestal.hasTool() && itemInOffHand.is(DeferredRegisterItems.TOOL_TOOLSWAPPER.get()))
-                {
-                    pedestal.actionOnNeighborBelowChange(getPosBelowBlockEntity(p_60499_, p_60501_, 1));
-                    pedestal.updatePedestalPlayer(pedestal);
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllTool());
-                }
-
-                else if(pedestal.hasRRobin() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_ROUNDROBIN.get()))
-                {
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRRobin());
-                }
-                else if(pedestal.hasRenderAugment() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_DIFFUSER.get()))
-                {
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRenderAugment());
-                }
-                else if(pedestal.hasNoCollide() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_COLLIDE.get()))
-                {
-                    ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeNoCollide());
-                }
-                else if(pedestal.hasSpeed() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_SPEED.get()))
-                {
-                    if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllSpeed());}
-                    else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeSpeed(1));
-                }
-                else if(pedestal.hasCapacity() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_CAPACITY.get()))
-                {
-                    if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllCapacity());}
-                    else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCapacity(1));
-                }
-                else if(pedestal.hasStorage() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_STORAGE.get()))
-                {
-                    if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllStorage());}
-                    else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeStorage(1));
-                }
-                else if(pedestal.hasRange() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_RANGE.get()))
-                {
-                    if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRange());}
-                    else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRange(1));
-                }
-                else if(pedestal.hasItemFirst())
-                {
-                    if(p_60502_.isShiftKeyDown())
+                    else if(pedestal.hasRRobin() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_ROUNDROBIN.get()))
                     {
-                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(false));
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRRobin());
                     }
-                    else
+                    else if(pedestal.hasRenderAugment() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_DIFFUSER.get()))
                     {
-                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(1,false));
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRenderAugment());
+                    }
+                    else if(pedestal.hasNoCollide() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_COLLIDE.get()))
+                    {
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeNoCollide());
+                    }
+                    else if(pedestal.hasSpeed() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_SPEED.get()))
+                    {
+                        if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllSpeed());}
+                        else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeSpeed(1));
+                    }
+                    else if(pedestal.hasCapacity() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_CAPACITY.get()))
+                    {
+                        if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllCapacity());}
+                        else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeCapacity(1));
+                    }
+                    else if(pedestal.hasStorage() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_STORAGE.get()))
+                    {
+                        if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllStorage());}
+                        else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeStorage(1));
+                    }
+                    else if(pedestal.hasRange() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_RANGE.get()))
+                    {
+                        if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllRange());}
+                        else ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeRange(1));
+                    }
+                    else if(pedestal.hasItemFirst())
+                    {
+                        if(p_60502_.isShiftKeyDown())
+                        {
+                            ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(false));
+                        }
+                        else
+                        {
+                            ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeItem(1,false));
+                        }
                     }
                 }
             }
         }
+        
+        super.attack(p_60499_, p_60500_, p_60501_, p_60502_);
     }
 
 
