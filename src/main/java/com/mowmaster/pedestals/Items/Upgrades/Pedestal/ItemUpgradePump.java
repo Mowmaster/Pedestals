@@ -448,7 +448,7 @@ public class ItemUpgradePump extends ItemUpgradeBase
                         boolean runsOnce = true;
                         boolean stop = getStopped(pedestal);
 
-                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                        if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint),getHeightIteratorValue(pedestal), true))
                         {
                             if(!stop)
                             {
@@ -460,7 +460,7 @@ public class ItemUpgradePump extends ItemUpgradeBase
                                     //System.out.println("Can Mine: "+ canMine(pedestal, blockAtPoint, adjustedPoint));
                                     //System.out.println("Passes Filter: "+ passesFilter(pedestal, blockAtPoint, adjustedPoint));
                                     if(!adjustedPoint.equals(pedestal.getPos()) && canMine(pedestal, blockAtPoint, adjustedPoint) && passesFilter(pedestal, blockAtPoint, adjustedPoint)) {
-                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true)) {
+                                        if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint),getHeightIteratorValue(pedestal), true)) {
                                             FluidState fluidState = pedestal.getLevel().getFluidState(adjustedPoint);
                                             //System.out.println("source or cauldron: "+ (fluidState.isSource() || blockAtPoint.getBlock() instanceof AbstractCauldronBlock));
                                             if(fluidState.isSource() || blockAtPoint.getBlock() instanceof AbstractCauldronBlock) {
@@ -474,7 +474,7 @@ public class ItemUpgradePump extends ItemUpgradeBase
                                                 }
                                                 //System.out.println("can accept: "+ pedestal.canAcceptFluid(fluidStack));
                                                 if (pedestal.canAcceptFluid(fluidStack) && pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME) {
-                                                    if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), false)) {
+                                                    if (removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), getHeightIteratorValue(pedestal), false)) {
                                                         pedestal.addFluid(fluidStack, IFluidHandler.FluidAction.EXECUTE);
 
                                                         if (blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED)) {

@@ -567,6 +567,42 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return true;
     }
 
+    public boolean removeFuelForActionMultiple(BasePedestalBlockEntity pedestal, int distance, int multiplyBy, boolean simulate)
+    {
+        if(requiresFuelForUpgradeAction())
+        {
+            boolean energy = true;
+            boolean xp = true;
+            boolean dust = true;
+
+            if(requiresEnergy())
+            {
+                int energyCost = (int)Math.round(((double)baseEnergyCostPerDistance() + ((hasSelectedAreaModifier())?((double)(((energyDistanceAsModifier())?(distance):(1)) * selectedAreaCostMultiplier())):(0.0D))) * energyCostMultiplier());
+                energyCost *= multiplyBy;
+                energy = pedestal.removeEnergy(energyCost,simulate)>=energyCost;
+            }
+
+            if(requiresXp())
+            {
+                int xpCost = (int)Math.round(((double)baseXpCostPerDistance() + ((hasSelectedAreaModifier())?((double)(((xpDistanceAsModifier())?(distance):(1)) * selectedAreaCostMultiplier())):(0.0D))) * xpCostMultiplier());
+                xpCost *= multiplyBy;
+                xp = pedestal.removeExperience(xpCost,simulate)>=xpCost;
+            }
+
+            //Need to add dust stuff to pedestal yet...
+            if(requiresDust())
+            {
+                int dustAmountNeeded = (int)Math.round(((double)baseDustCostPerDistance().getDustAmount() + ((hasSelectedAreaModifier())?((double)(((dustDistanceAsModifier())?(distance):(1)) * selectedAreaCostMultiplier())):(0.0D))) * dustCostMultiplier());
+                //dustAmountNeeded  *= multiplyBy;
+                //dust = pedestal.removeDust(dustAmountNeeded,simulate).getDustAmount()>=dustAmountNeeded;
+            }
+
+            return (energy && xp && dust);
+        }
+
+        return true;
+    }
+
     public int getDistanceBetweenPoints(BlockPos pointOne, BlockPos posToCompare)
     {
         int x = pointOne.getX();
