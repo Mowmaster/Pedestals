@@ -172,7 +172,10 @@ dependencies {
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${mc_version}-${patchouli_version}")
 
     implementation fg.deobf("curse.maven:mowlib-631455:4027223")
-    runtimeOnly fg.deobf("curse.maven:mows-crystal-blocks-508570:4027238")
+
+
+    //runtimeOnly fg.deobf("curse.maven:mows-crystal-blocks-508570:4027238")
+    //runtimeOnly fg.deobf("curse.maven:cyclic-239286:4577457")
 
     //compileOnly fg.deobf("curse.maven:mowlib-631455:4412146")
     //runtimeOnly fg.deobf("curse.maven:mowlib-631455:4412146")
