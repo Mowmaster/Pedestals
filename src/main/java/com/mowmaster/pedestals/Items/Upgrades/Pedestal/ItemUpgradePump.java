@@ -176,7 +176,6 @@ public class ItemUpgradePump extends ItemUpgradeBase
 
     private int getHeightIteratorValue(BasePedestalBlockEntity pedestal)
     {
-        //TODO: make a modifier for this
         return PedestalConfig.COMMON.upgrade_pump_baseBlocksPumped.get() + getBlockCapacityIncrease(pedestal.getCoinOnPedestal());
     }
 

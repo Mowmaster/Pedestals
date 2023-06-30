@@ -31,6 +31,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 
@@ -400,7 +401,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                             }
                         }
 
-                        player.causeFoodExhaustion(0.1F);
+                        //player.causeFoodExhaustion(0.1F);
                     } else {
                         player.level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, player.getSoundSource(), 1.0F, 1.0F);
                         if (flag4) {
