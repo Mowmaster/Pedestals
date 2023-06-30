@@ -45,7 +45,7 @@ public class AugmentTool_Capacity extends PedestalBaseTool {
             MutableComponent tierLabel = getCurrentAugments.getDisplayName().copy();
             MutableComponent insertedText = Component.translatable(MODID + ".tool.augment.inserted");
             tierLabel.append(separator2);
-            insertedText.withStyle(ChatFormatting.AQUA);
+            insertedText.withStyle(ChatFormatting.GREEN);
             tierLabel.append(insertedText);
             //"##/##"
             MutableComponent speedAmount = Component.literal(""+currentInsertAmount+"");
