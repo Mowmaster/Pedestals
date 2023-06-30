@@ -266,15 +266,15 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                     {
                         // if(canTransferDust(coinInPedestal)) then dont pick up dust items???
 
-                        ItemStack stackInPedestal = pedestal.getItemInPedestal();
-                        boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
+                        //boolean stacksMatch = doItemsMatch(stackInPedestal,itemStack);
                         if((pedestal.addItem(itemStack,true)) && passesItemFilter(pedestal,itemStack))
                         {
-                            int spaceInPed = stackInPedestal.getMaxStackSize()-stackInPedestal.getCount();
-                            int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
-                            int actualSpaceInPed = (filterAllowedSpace>spaceInPed)?(spaceInPed):(filterAllowedSpace);
-                            if(actualSpaceInPed>0)
+                            if(pedestal.hasSpaceForItem(itemStack))
                             {
+                                int spaceInPed = itemStack.getMaxStackSize() - pedestal.addItemStack(itemStack,true).getCount();
+                                int filterAllowedSpace = getCountItemFilter(pedestal,itemStack);
+                                int actualSpaceInPed = (filterAllowedSpace>spaceInPed)?(spaceInPed):(filterAllowedSpace);
+
                                 int itemInCount = itemStack.getCount();
                                 int countToAdd = ( itemInCount<= actualSpaceInPed)?(itemInCount):(actualSpaceInPed);
                                 ItemStack stackToAdd = itemStack.copy();
