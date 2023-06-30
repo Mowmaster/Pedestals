@@ -103,16 +103,14 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
         this.setChanged();
     }
 
-    //TODO: Fix this
     @Override
     public void actionOnWorkCardRemovedFromBlockEntity(int type) {
         super.actionOnWorkCardRemovedFromBlockEntity(type);
         if (hasCoin()) {
-            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase base)
-            {
-                base.resetCachedValidWorkCardPositions(MODID,getCoinOnPedestal());
+            ItemStack coin = getCoinOnPedestal();
+            if(coin.getItem() instanceof ItemUpgradeBase base) {
+                base.actionOnRemovedFromPedestal(getPedestal(), coin);
             }
-            //MowLibWorkCardUtil.resetCachedValidWorkCardPositions(MODID, getCoinOnPedestal());
         }
     }
 
