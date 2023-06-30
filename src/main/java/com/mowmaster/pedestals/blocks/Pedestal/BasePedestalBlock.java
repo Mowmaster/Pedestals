@@ -407,7 +407,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 }
             }
         }
-        
+
         super.attack(p_60499_, p_60500_, p_60501_, p_60502_);
     }
 

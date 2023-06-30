@@ -256,7 +256,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase {
                     boolean runsOnce = true;
                     boolean stop = getStopped(pedestal);
 
-                    if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), currentPoint), true)) {
+                    if (removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(), currentPoint),getHeightIteratorValue(pedestal), true)) {
                         if (!stop) {
                             for (int y = min; y <= max; y++) {
                                 ItemStack toPlace = pedestal.getItemInPedestal().copy();
@@ -264,7 +264,7 @@ public class ItemUpgradeFiller extends ItemUpgradeBase {
                                 BlockPos adjustedPoint = new BlockPos(currentPoint.getX(), y, currentPoint.getZ());
                                 BlockState blockAtPoint = level.getBlockState(adjustedPoint);
                                 if (!pedestal.removeItemStack(toPlace, true).isEmpty()) {
-                                    if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), false)) {
+                                    if (removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint),getHeightIteratorValue(pedestal), false)) {
                                         if (canPlace(toPlace) && passesFilter(pedestal, toPlace)) {
                                             if (!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR) {
                                                 UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toPlace.copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level, pedestal.getPos()), adjustedPoint, false));

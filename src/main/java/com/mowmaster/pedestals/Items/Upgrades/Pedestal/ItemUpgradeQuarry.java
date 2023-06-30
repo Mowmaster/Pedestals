@@ -386,7 +386,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                         //ToDo: make this a modifier for later
                         boolean runsOnce = true;
                         boolean stop = getStopped(pedestal);
-                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                        if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint),getHeightIteratorValue(pedestal), true))
                         {
                             if(!stop)
                             {
@@ -414,7 +414,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
 
                                                         if(!adjustedPoint.equals(pedestal.getPos()))
                                                         {
-                                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true))
+                                                            if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint),getHeightIteratorValue(pedestal), true))
                                                             {
                                                                 if(PedestalConfig.COMMON.quarryDamageTools.get())
                                                                 {
@@ -441,7 +441,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase
                                                                     }
                                                                 }
 
-                                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
+                                                                if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint),getHeightIteratorValue(pedestal), false))
                                                                 {
                                                                     boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
                                                                     List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint, adjustedPoint);
