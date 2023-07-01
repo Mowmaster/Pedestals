@@ -1,0 +1,9 @@
+{
+  "type": "mowlib:toolswapcrafting",
+  "mainhandTool": {
+    "item": "pedestals:tool_tagtool"
+  },
+  "result": {
+    "item": "pedestals:tool_upgradetool"
+  }
+}
