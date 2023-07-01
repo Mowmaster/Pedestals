@@ -156,7 +156,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
                                 {
                                     //If pedestal is empty, if not then set max possible stack size for pedestal itemstack(64)
                                     if(itemFromPedestal.isEmpty() || itemFromPedestal.equals(ItemStack.EMPTY))
-                                    {maxStackSizeAllowedInPedestal = 64;}
+                                    {maxStackSizeAllowedInPedestal = copyIncoming.getMaxStackSize();}
                                     else
                                     {maxStackSizeAllowedInPedestal = itemFromPedestal.getMaxStackSize();}
 
