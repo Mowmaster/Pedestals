@@ -10,7 +10,7 @@
     "tag": "forge:ingots/gold"
   },
   "result": {
-    "item": "mowlib:tool_filter",
+    "item": "pedestals:tool_upgradetool",
     "conditions": [
       {
         "type": "forge:mod_loaded",
