@@ -38,7 +38,7 @@ public class BaseLinkingTool extends BaseTool implements IPedestalTool
         super(p_41383_.stacksTo(1));
     }
 
-    @Override
+    /*@Override
     public InteractionResultHolder interactSwapTool(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result, Item mainTool, Item swapTool) {
         String toolchange = MODID + ".tool_change";
         String linkclear = MODID + ".tool_link_cleared";
@@ -46,7 +46,7 @@ public class BaseLinkingTool extends BaseTool implements IPedestalTool
 
         if(itemStackInHand.is(getMainTool().getItem()))
         {
-            /*ItemStack newTool = new ItemStack(getSwappedTool().getItem(),itemStackInHand.getCount(),itemStackInHand.getTag());
+            *//*ItemStack newTool = new ItemStack(getSwappedTool().getItem(),itemStackInHand.getCount(),itemStackInHand.getTag());
             player.setItemInHand(hand, newTool);
             if(itemStackInHand.isEnchanted())
             {
@@ -55,7 +55,7 @@ public class BaseLinkingTool extends BaseTool implements IPedestalTool
             }
 
             MowLibMessageUtils.messagePopup(player,ChatFormatting.GREEN,toolchange);
-            return InteractionResultHolder.success(itemStackInHand);*/
+            return InteractionResultHolder.success(itemStackInHand);*//*
 
 
             if(itemStackInHand.isEnchanted())
@@ -86,7 +86,7 @@ public class BaseLinkingTool extends BaseTool implements IPedestalTool
         }
 
         return InteractionResultHolder.fail(itemStackInHand);
-    }
+    }*/
 
     public BlockPos getStoredPosition(ItemStack getWrenchItem)
     {

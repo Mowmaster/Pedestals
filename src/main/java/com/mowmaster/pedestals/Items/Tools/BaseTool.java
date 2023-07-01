@@ -1,25 +1,22 @@
 package com.mowmaster.pedestals.Items.Tools;
 
+import com.mowmaster.mowlib.Items.BaseUseInteractionItem;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
 import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.PedestalUtils.BaseUseInteractionItem;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,15 +39,15 @@ public class BaseTool extends BaseUseInteractionItem
     public ItemStack getMainTool(){return Items.STICK.getDefaultInstance();}
     public ItemStack getSwappedTool(){return Items.BLAZE_ROD.getDefaultInstance();}
 
-    public InteractionResultHolder interactCrouchingTargetAir(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result)
+    /*public InteractionResultHolder interactCrouchingTargetAir(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result)
     { return interactSwapTool(level,player,hand,itemStackInHand, result, getMainTool().getItem(), getSwappedTool().getItem()); }
-
+*/
     public InteractionResultHolder interactCrouchingTargetBlock(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result)
     { return interactGetPedestalDetail(level, player, hand, itemStackInHand, result); }
 
 
     //Default method of interactCrouchingTargetAir
-    public InteractionResultHolder interactSwapTool(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result, Item mainTool, Item swapTool)
+   /* public InteractionResultHolder interactSwapTool(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result, Item mainTool, Item swapTool)
     {
         if(itemStackInHand.getItem().equals(mainTool))
         {
@@ -62,7 +59,7 @@ public class BaseTool extends BaseUseInteractionItem
         }
 
         return  InteractionResultHolder.pass(player.getItemInHand(hand));
-    }
+    }*/
 
     //Default method of interactCrouchingTargetBlock
     public InteractionResultHolder interactGetPedestalDetail(Level level, Player player, InteractionHand hand, ItemStack itemStackInHand, HitResult result)
