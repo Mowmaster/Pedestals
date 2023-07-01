@@ -100,7 +100,7 @@ public class ItemUpgradeGenerator_FurnaceFuels extends ItemUpgradeBase {
             if (burnTime > 0 && !pedestal.removeItemStack(toBurn,true).isEmpty()) {
                 if (toBurn.hasCraftingRemainingItem())
                 {
-                    if(pedestal.addItem(toBurn.getCraftingRemainingItem(),true))
+                    if(pedestal.itemPassesFilter(toBurn.getCraftingRemainingItem()))
                     {
                         setBurnTime(pedestal, burnTime);
                         pedestal.removeItemStack(toBurn, false);
