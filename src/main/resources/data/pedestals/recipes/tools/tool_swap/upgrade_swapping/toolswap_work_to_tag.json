@@ -1,0 +1,9 @@
+{
+  "type": "mowlib:toolswapcrafting",
+  "mainhandTool": {
+    "item": "mowlib:tool_work"
+  },
+  "result": {
+    "item": "mowlib:tool_tag"
+  }
+}

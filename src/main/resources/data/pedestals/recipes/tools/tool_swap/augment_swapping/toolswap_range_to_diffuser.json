@@ -1,0 +1,9 @@
+{
+  "type": "mowlib:toolswapcrafting",
+  "mainhandTool": {
+    "item": "pedestals:tool_augments_range"
+  },
+  "result": {
+    "item": "pedestals:tool_augments_diffuser"
+  }
+}

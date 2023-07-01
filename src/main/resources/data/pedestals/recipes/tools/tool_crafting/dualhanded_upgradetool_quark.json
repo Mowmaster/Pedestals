@@ -1,23 +1,20 @@
 {
   "type": "mowlib:dualhandedcrafting",
   "blockTarget": {
-    "item": "minecraft:bookshelf"
+    "tag": "forge:bookshelves"
   },
   "mainhandTool": {
     "tag": "forge:rods"
   },
   "offhandTool": {
-    "item": "mowlib:filter_base"
+    "tag": "forge:ingots/gold"
   },
   "result": {
     "item": "mowlib:tool_filter",
     "conditions": [
       {
-        "type": "forge:not",
-        "value": {
-          "type": "forge:mod_loaded",
-          "modid": "quark"
-        }
+        "type": "forge:mod_loaded",
+        "modid": "quark"
       }
     ]
   }
