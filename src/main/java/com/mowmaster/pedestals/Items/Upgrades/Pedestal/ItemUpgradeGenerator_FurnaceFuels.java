@@ -80,6 +80,7 @@ public class ItemUpgradeGenerator_FurnaceFuels extends ItemUpgradeBase {
     @Override
     public void updateAction(Level level, BasePedestalBlockEntity pedestal) {
         ItemStack stackInPedestal = pedestal.getItemInPedestal();
+        BlockPos pedestalPos = pedestal.getPos();
         int simulatedBurnTime = incrementBurnTime(pedestal, true);
 
         if (simulatedBurnTime > 0) {
@@ -88,8 +89,7 @@ public class ItemUpgradeGenerator_FurnaceFuels extends ItemUpgradeBase {
                 incrementBurnTime(pedestal, false);
                 pedestal.addEnergy(calcRF, false);
                 if (pedestal.canSpawnParticles()) {
-                    BlockPos pedestalPos = pedestal.getPos();
-                    MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+0.75D,pedestalPos.getZ(),255,0,0));
+                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+0.75D,pedestalPos.getZ(),255,0,0));
                 }
             }
         } else if(!stackInPedestal.isEmpty()) {
@@ -98,9 +98,24 @@ public class ItemUpgradeGenerator_FurnaceFuels extends ItemUpgradeBase {
             int burnTime = ForgeHooks.getBurnTime(toBurn, RecipeType.SMELTING);
 
             if (burnTime > 0 && !pedestal.removeItemStack(toBurn,true).isEmpty()) {
-                setBurnTime(pedestal, burnTime);
-                pedestal.removeItemStack(toBurn, false);
-                if (toBurn.hasCraftingRemainingItem()) pedestal.addItem(toBurn.getCraftingRemainingItem(),false);
+                if (toBurn.hasCraftingRemainingItem())
+                {
+                    if(pedestal.addItem(toBurn.getCraftingRemainingItem(),true))
+                    {
+                        setBurnTime(pedestal, burnTime);
+                        pedestal.removeItemStack(toBurn, false);
+                        pedestal.addItem(toBurn.getCraftingRemainingItem(),false);
+                    }
+                    else
+                    {
+                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+0.75D,pedestalPos.getZ(),128,128,128));
+                    }
+                }
+                else
+                {
+                    setBurnTime(pedestal, burnTime);
+                    pedestal.removeItemStack(toBurn, false);
+                }
             }
         }
     }
