@@ -111,6 +111,11 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         this.setChanged();
     }
 
+    public boolean itemPassesFilter(ItemStack stackInput)
+    {
+        return itemHandler.isItemValid(0,stackInput);
+    }
+
     //9 slots, but only when it has the tank upgrade will we allow more then the first to be used.
     public ItemStackHandler createItemHandlerPedestal() {
         return new ItemStackHandler(27) {
