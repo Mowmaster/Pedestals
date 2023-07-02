@@ -6,7 +6,6 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.PedestalUtils.References;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -61,22 +60,6 @@ public class ItemUpgradeGenerator_FurnaceFuels extends ItemUpgradeBase {
         return 0;
     }
 
-    /*@Override
-    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
-        List<String> messages = new ArrayList<>();
-
-        if(baseEnergyCost()>0)
-        {
-            boolean hasItem = MowLibCompoundTagUtils.readBooleanFromNBT(MODID,pedestal.getCoinOnPedestal().getOrCreateTag(),"hasitem");
-            if(pedestal.getStoredEnergy()<baseEnergyCost() && hasItem)
-            {
-                messages.add(ChatFormatting.RED + "Needs Energy");
-            }
-        }
-
-        return messages;
-    }*/
-
     @Override
     public void updateAction(Level level, BasePedestalBlockEntity pedestal) {
         ItemStack stackInPedestal = pedestal.getItemInPedestal();
@@ -100,7 +83,7 @@ public class ItemUpgradeGenerator_FurnaceFuels extends ItemUpgradeBase {
             if (burnTime > 0 && !pedestal.removeItemStack(toBurn,true).isEmpty()) {
                 if (toBurn.hasCraftingRemainingItem())
                 {
-                    if(pedestal.itemPassesFilter(toBurn.getCraftingRemainingItem()))
+                    if(passesItemFilter(pedestal, toBurn.getCraftingRemainingItem()))
                     {
                         setBurnTime(pedestal, burnTime);
                         pedestal.removeItemStack(toBurn, false);

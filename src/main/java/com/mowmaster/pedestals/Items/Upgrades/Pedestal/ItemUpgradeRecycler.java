@@ -1,8 +1,6 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
-import com.google.common.collect.Maps;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibContainerUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
@@ -10,270 +8,173 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class ItemUpgradeRecycler extends ItemUpgradeBase implements IHasModeTypes
-{
-    public ItemUpgradeRecycler(Properties p_41383_) {
-        super(new Properties());
-    }
+public class ItemUpgradeRecycler extends ItemUpgradeBase implements IHasModeTypes {
+    public ItemUpgradeRecycler(Properties p_41383_) { super(p_41383_); }
 
     @Override
-    public boolean canModifySpeed(ItemStack upgradeItemStack) {
-        return true;
-    }
+    public boolean canModifySpeed(ItemStack upgradeItemStack) { return true; }
 
     @Override
     public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
 
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
-        //remove NBT saved on upgrade here
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_storedExpUnderOne");
     }
 
-    private boolean canProcess(ItemStack stackIn)
-    {
-        if(!stackIn.isEmpty())
-        {
-            boolean tagged = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("pedestals","pedestals_cannot_recycle"))).stream().toList().contains(stackIn);
-            if(!tagged && (stackIn.getItem() instanceof ArmorItem || stackIn.getItem() instanceof TieredItem))
-            {
-                return true;
-            }
-        }
-        else
-        {
-            return false;
-        }
-
-        return false;
+    private boolean canProcess(ItemStack toProcess) {
+        List<Item> cannotProcessItems = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation(MODID, "pedestals_cannot_recycle"))).stream().toList();
+        Item toProcessItem = toProcess.getItem();
+        return !toProcess.isEmpty() &&
+            !cannotProcessItems.contains(toProcessItem) &&
+            (
+                toProcess.isEnchanted() ||
+                toProcessItem instanceof EnchantedBookItem ||
+                toProcessItem instanceof ArmorItem ||
+                toProcessItem instanceof TieredItem
+            );
     }
 
-    public int getNextSlotWithItemsCapFilteredAndPasses(BasePedestalBlockEntity pedestal, LazyOptional<IItemHandler> cap)
-    {
-        AtomicInteger slot = new AtomicInteger(-1);
-        if(cap.isPresent()) {
-
-            cap.ifPresent(itemHandler -> {
-                int range = itemHandler.getSlots();
-                for(int i=0;i<range;i++)
-                {
-                    ItemStack stackInSlot = itemHandler.getStackInSlot(i);
-                    //find a slot with items
-                    if(!stackInSlot.isEmpty())
-                    {
-                        //check if it could pull the item out or not
-                        if(!itemHandler.extractItem(i,1 ,true ).equals(ItemStack.EMPTY))
-                        {
-                            //If pedestal is empty accept any items
-                            if(passesItemFilter(pedestal,stackInSlot) && canProcess(stackInSlot))
-                            {
-                                ItemStack itemFromPedestal = pedestal.getMatchingItemInPedestalOrEmptySlot(stackInSlot);
-                                if(itemFromPedestal.isEmpty())
-                                {
-                                    slot.set(i);
-                                    break;
-                                }
-                                //if stack in pedestal matches items in slot
-                                else if(doItemsMatch(itemFromPedestal,stackInSlot))
-                                {
-                                    slot.set(i);
-                                    break;
-                                }
-                            }
-                        }
+    public Optional<Integer> getFirstSlotWithItemThatCanBeProcessed(BasePedestalBlockEntity pedestal, IItemHandler itemHandler) {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+            if (canProcess(stackInSlot)) {
+                if (!itemHandler.extractItem(i,1 ,true).equals(ItemStack.EMPTY)) {
+                    if (passesItemFilter(pedestal, stackInSlot) && canProcess(stackInSlot)) {
+                        return Optional.of(i);
                     }
                 }
-            });
+            }
         }
-
-        return slot.get();
+        return Optional.empty();
     }
 
-    @javax.annotation.Nullable
-    protected AbstractCookingRecipe getNormalRecipe(Level level, ItemStack stackIn) {
-        Container cont = MowLibContainerUtils.getContainer(1);
-        cont.setItem(-1,stackIn);
-
-        if (level == null) return null;
+    protected Optional<? extends AbstractCookingRecipe> getNormalRecipe(Level level, ItemStack input) {
+        Container container = new SimpleContainer(input);
 
         RecipeManager recipeManager = level.getRecipeManager();
-        Optional<BlastingRecipe> optional = recipeManager.getRecipeFor(RecipeType.BLASTING, cont, level);
-        if (optional.isPresent()) return optional.get();
-
-        Optional<SmeltingRecipe> optional1 = recipeManager.getRecipeFor(RecipeType.SMELTING, cont, level);
-        return optional1.orElse(null);
+        Optional<? extends AbstractCookingRecipe> blastingRecipeMaybe = recipeManager.getRecipeFor(RecipeType.BLASTING, container, level);
+        if (blastingRecipeMaybe.isPresent()) {
+            return blastingRecipeMaybe;
+        } else {
+            return recipeManager.getRecipeFor(RecipeType.SMELTING, container, level);
+        }
     }
 
-    protected Collection<ItemStack> getNormalResults(Level level, AbstractCookingRecipe recipe) {
-        return (recipe == null)?(Arrays.asList(ItemStack.EMPTY)):(Collections.singleton(recipe.getResultItem(level.registryAccess())));
-    }
-
-    protected float getNormalResultsExp(AbstractCookingRecipe recipe) {
-        return (recipe == null)?(0.0F):(recipe.getExperience());
-    }
-
-    private boolean canAddExperienceFromProcessing(BasePedestalBlockEntity pedestal, float experience)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        int getExperienceStored = MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getTag(), "_storedExpUnderOne");
+    private void addExperienceFromProcessing(BasePedestalBlockEntity pedestal, ItemStack upgrade, float experience) {
+        int getExperienceStored = MowLibCompoundTagUtils.readIntegerFromNBT(MODID, upgrade.getOrCreateTag(), "_storedExpUnderOne");
         int convertFloatDecimal = (int)(experience * 100);
         int sum = getExperienceStored + convertFloatDecimal;
-        int expToAdd = 0;
-        int remainingXP = 0;
-        boolean returner = false;
-        if(sum>=100)
-        {
-            while(sum>=100)
-            {
-                expToAdd++;
-                sum -=100;
-            }
+        int expToAdd = sum / 100; // integer division floors
+        int remainingExp = sum % 100;
+        pedestal.addExperience(expToAdd,false);
 
-            if(pedestal.addExperience(expToAdd,true)>0)
-            {
-                pedestal.addExperience(expToAdd,false);
-                remainingXP = sum;
-                returner = true;
-            }
-        }
-        else {
-            remainingXP = sum;
-        }
-
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getTag(), remainingXP, "_storedExpUnderOne");
-
-        return returner;
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, upgrade.getTag(), remainingExp, "_storedExpUnderOne");
     }
 
     @Override
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin)
-    {
-        BlockPos posInventory = getPosOfBlockBelow(level,pedestalPos,1);
-        ItemStack itemFromInv = ItemStack.EMPTY;
-        LazyOptional<IItemHandler> cap = MowLibItemUtils.findItemHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
-        if(!isInventoryEmpty(cap)) {
-            if (cap.isPresent()) {
-                IItemHandler handler = cap.orElse(null);
-                BlockEntity invToPullFrom = level.getBlockEntity(posInventory);
-                if(invToPullFrom instanceof BasePedestalBlockEntity) {
-                    itemFromInv = ItemStack.EMPTY;
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        BlockPos inventoryPos = getPosOfBlockBelow(level,pedestal.getPos(),1);
+        BlockEntity invToPullFrom = level.getBlockEntity(inventoryPos);
+        if (invToPullFrom instanceof BasePedestalBlockEntity) {
+            return;
+        }
 
-                }
-                else {
-                    if (handler != null) {
-                        //XP
-                        //Grindstone stuff basically
-                        if(canTransferXP(coin))
-                        {
-                            int i = getNextSlotWithItemsCapFiltered(pedestal,cap);
-                            if(i>=0)
-                            {
-                                itemFromInv = handler.getStackInSlot(i);
-                                ItemStack copyIncoming = itemFromInv.copy();
-                                if(itemFromInv != null && !itemFromInv.isEmpty())
-                                {
-                                    if(copyIncoming.isEnchanted() || copyIncoming.getItem() instanceof EnchantedBookItem)
-                                    {
-                                        int getXPSpace = pedestal.spaceForExperience();
-                                        int getGrindedXpCount = getItemsExpDisenchantAmount(copyIncoming);
-                                        if(getXPSpace >= getGrindedXpCount)
-                                        {
-                                            Map<Enchantment, Integer> enchantsNone = Maps.<Enchantment, Integer>newLinkedHashMap();
-                                            ItemStack stackToReturn = (copyIncoming.getItem() instanceof EnchantedBookItem)?(new ItemStack(Items.BOOK,1)):(copyIncoming);
-                                            EnchantmentHelper.setEnchantments(enchantsNone,stackToReturn);
-
-                                            if(!stackToReturn.isEmpty())
-                                            {
-                                                if(canTransferItems(coin))
-                                                {
-                                                    if(pedestal.addExperience(getGrindedXpCount,true)>0)
-                                                    {
-                                                        EnchantmentHelper.setEnchantments(enchantsNone,itemFromInv);
-                                                        pedestal.addExperience(getGrindedXpCount,false);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    if(!handler.extractItem(i,1 ,true ).isEmpty() && pedestal.addItem(stackToReturn, true) && pedestal.addExperience(getGrindedXpCount,true)>0)
-                                                    {
-                                                        handler.extractItem(i,1 ,false );
-                                                        pedestal.addExperience(getGrindedXpCount,false);
-                                                        pedestal.addItem(stackToReturn, false);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+        MowLibItemUtils.findItemHandlerAtPos(level, inventoryPos, getPedestalFacing(level, pedestalPos), true).ifPresent(handler -> {
+            // Handle enchants.
+            Optional<Integer> slotToHandle = getFirstSlotWithItemThatCanBeProcessed(pedestal, handler);
+            if (canTransferXP(coin)) {
+                boolean shouldStop = slotToHandle.map(i -> {
+                    ItemStack itemFromInv = handler.getStackInSlot(i);
+                    if (itemFromInv.getItem() instanceof EnchantedBookItem) {
+                        int grindedExpAmount = getItemsExpDisenchantAmount(itemFromInv);
+                        if (grindedExpAmount <= pedestal.spaceForExperience()) {
+                            ItemStack stackToReturn = new ItemStack(Items.BOOK, itemFromInv.getCount());
+                            if (!handler.extractItem(i, 1, true).isEmpty() && pedestal.addItem(stackToReturn, true) && pedestal.addExperience(grindedExpAmount, true) > 0) {
+                                handler.extractItem(i, 1, false);
+                                pedestal.addExperience(grindedExpAmount, false);
+                                pedestal.addItem(stackToReturn, false);
+                                return true;
                             }
                         }
-
-                        //Items
-                        //Handle last, just incase any items match the other options
-                        if(canTransferItems(coin))
-                        {
-                            int i = getNextSlotWithItemsCapFilteredAndPasses(pedestal,cap);
-                            if(i>=0)
-                            {
-                                itemFromInv = handler.getStackInSlot(i);
-                                ItemStack copyIncoming = itemFromInv.copy();
-                                copyIncoming.setCount(1);
-                                if(itemFromInv != null && !itemFromInv.isEmpty())
-                                {
-                                    AbstractCookingRecipe recipe = getNormalRecipe(pedestal.getLevel(), copyIncoming);
-                                    float getEXP = getNormalResultsExp(recipe);
-                                    ItemStack returnedStack = getNormalResults(level,recipe).stream().findFirst().orElse(ItemStack.EMPTY);
-                                    if(!returnedStack.isEmpty())
-                                    {
-                                        if(!handler.extractItem(i,1 ,true ).isEmpty() && pedestal.addItem(returnedStack, true))
-                                        {
-                                            handler.extractItem(i,1 ,false );
-                                            if(getEXP > 0.0F){canAddExperienceFromProcessing(pedestal,getEXP);}
-                                            pedestal.addItem(returnedStack, false);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if(!handler.extractItem(i,1 ,true ).isEmpty() && pedestal.addItem(copyIncoming, true))
-                                        {
-                                            handler.extractItem(i,1 ,false );
-                                            pedestal.addItem(copyIncoming, false);
-                                        }
-                                    }
+                    } else if (itemFromInv.isEnchanted()) {
+                        int grindedExpAmount = getItemsExpDisenchantAmount(itemFromInv);
+                        if (grindedExpAmount <= pedestal.spaceForExperience()) {
+                            if (canTransferItems(coin)) {
+                                if (pedestal.addExperience(grindedExpAmount,true) > 0) {
+                                    EnchantmentHelper.setEnchantments(Map.of(), itemFromInv);
+                                    pedestal.addExperience(grindedExpAmount,false);
+                                }
+                            } else {
+                                ItemStack stackToReturn = itemFromInv.copy();
+                                EnchantmentHelper.setEnchantments(Map.of(), stackToReturn);
+                                if (!handler.extractItem(i,1 ,true).isEmpty() && pedestal.addItem(stackToReturn, true) && pedestal.addExperience(grindedExpAmount,true) > 0) {
+                                    handler.extractItem(i,1 ,false);
+                                    pedestal.addExperience(grindedExpAmount,false);
+                                    pedestal.addItem(stackToReturn, false);
+                                    return true;
                                 }
                             }
                         }
                     }
+                    return false;
+                }).orElse(false);
+                if (shouldStop) {
+                    slotToHandle = Optional.empty();
                 }
             }
-        }
+
+            // Handle recycling metal tools etc.
+            if (canTransferItems(coin)) {
+                slotToHandle.ifPresent(i -> {
+                    ItemStack itemFromInv = handler.getStackInSlot(i);
+                    if (!itemFromInv.isEmpty()) {
+                        Optional<? extends AbstractCookingRecipe> recipeMaybe = getNormalRecipe(level, itemFromInv);
+                        ItemStack returnedStack = recipeMaybe.map(recipe -> recipe.getResultItem(level.registryAccess())).orElse(ItemStack.EMPTY);
+                        if (!returnedStack.isEmpty()) {
+                            if (!handler.extractItem(i,1 ,true).isEmpty() && pedestal.addItem(returnedStack, true)) {
+                                float expAmount = recipeMaybe.map(AbstractCookingRecipe::getExperience).orElse(0.0F);
+                                if (expAmount > 0.0F) { addExperienceFromProcessing(pedestal, coin, expAmount); }
+                                handler.extractItem(i,1 ,false);
+                                pedestal.addItem(returnedStack, false);
+                            }
+                        } else {
+                            ItemStack toAdd = itemFromInv.copy();
+                            toAdd.setCount(1);
+                            if (!handler.extractItem(i,1 ,true).isEmpty() && pedestal.addItem(toAdd, true)) {
+                                handler.extractItem(i,1 ,false);
+                                pedestal.addItem(toAdd, false);
+                            }
+                        }
+                    }
+                });
+            }
+        });
     }
 
-    public int getItemsExpDisenchantAmount(ItemStack stack)
-    {
+    public int getItemsExpDisenchantAmount(ItemStack stack) {
         int exp = 0;
         Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
         for(Map.Entry<Enchantment, Integer> entry : map.entrySet()) {
             Enchantment enchantment = entry.getKey();
             Integer integer = entry.getValue();
 
-            exp += enchantment.getMinCost(integer.intValue());
+            exp += enchantment.getMinCost(integer);
         }
-        return exp*stack.getCount();
+        return exp * stack.getCount();
     }
 }

@@ -114,12 +114,6 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
         }
     }
 
-    //TODO: Add to mowlib 1.20
-    public boolean itemPassesFilter(ItemStack stackInput)
-    {
-        return itemHandler.isItemValid(0,stackInput);
-    }
-
     public ItemStackHandler createItemHandlerPedestal() {
         return new ItemStackHandler(64) {
             @Override
