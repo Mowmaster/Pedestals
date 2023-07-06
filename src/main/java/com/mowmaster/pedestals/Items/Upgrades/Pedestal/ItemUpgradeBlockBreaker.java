@@ -265,7 +265,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                                         if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                         {
                                             boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
-                                            List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint, currentPoint);
+                                            List<ItemStack> drops = getBlockDrops(level, pedestal, getPlayer.get(), blockAtPoint);
                                             if(level.getBlockEntity(currentPoint) !=null){
                                                 if(canRemoveBlockEntities)
                                                 {

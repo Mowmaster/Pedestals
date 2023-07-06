@@ -353,7 +353,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
 
                                                     if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), getHeightIteratorValue(pedestal), false)) {
                                                         boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
-                                                        List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint, adjustedPoint);
+                                                        List<ItemStack> drops = getBlockDrops(level, pedestal, fakePlayer, blockAtPoint);
                                                         if (level.getBlockEntity(adjustedPoint) != null) {
                                                             if(canRemoveBlockEntities) {
 

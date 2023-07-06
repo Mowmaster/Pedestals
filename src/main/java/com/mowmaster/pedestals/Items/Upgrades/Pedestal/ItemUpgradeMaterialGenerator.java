@@ -41,26 +41,6 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     @Override
     public ItemStack getUpgradeDefaultTool() { return new ItemStack(Items.STONE_PICKAXE); }
 
-    /*public List<ItemStack> getItemsToGenerate(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, Item blockToBreak) {
-        Block generatedBlock = Block.byItem(blockToBreak.getItem());
-        if(generatedBlock != Blocks.AIR) {
-            ItemStack toolStack = pedestal.getToolStack();
-
-            LootContext.Builder builder = new LootContext.Builder((ServerLevel) level)
-                    .withRandom(level.random)
-                    .withParameter(LootContextParams.ORIGIN, new Vec3(pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ()))
-                    .withParameter(LootContextParams.TOOL, toolStack);
-
-            WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
-            if (fakePlayerReference != null && fakePlayerReference.get() != null) {
-                builder.withOptionalParameter(LootContextParams.THIS_ENTITY, fakePlayerReference.get());
-            }
-            return generatedBlock.defaultBlockState().getDrops(builder);
-        }
-
-        return new ArrayList<>();
-    }*/
-
     public void resetCachedRecipe(ItemStack upgrade) {
         CompoundTag tag = upgrade.getOrCreateTag();
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, tag, "_cobblegen_result");
@@ -171,7 +151,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             return;
         }
 
-        List<ItemStack> getCobbleGenOutputs = getBlockDrops(pedestal, pedestalPos, recipeResult.getItem());
+        List<ItemStack> getCobbleGenOutputs = getBlockDrops(level, pedestal, recipeResult.getItem());
         if (getCobbleGenOutputs.isEmpty()) {
             return;
         }

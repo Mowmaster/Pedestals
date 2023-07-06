@@ -411,7 +411,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                                                                     if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                                                                     {
                                                                         boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
-                                                                        List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint, adjustedPoint);
+                                                                        List<ItemStack> drops = getBlockDrops(level, pedestal, getPlayer.get(), blockAtPoint);
                                                                         if(level.getBlockEntity(adjustedPoint) !=null){
                                                                             if(canRemoveBlockEntities)
                                                                             {
@@ -528,7 +528,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                                                                     if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
                                                                     {
                                                                         boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
-                                                                        List<ItemStack> drops = getBlockDrops(pedestal, blockAtPoint, adjustedPoint);
+                                                                        List<ItemStack> drops = getBlockDrops(level, pedestal, getPlayer.get(), blockAtPoint);
                                                                         if(level.getBlockEntity(adjustedPoint) !=null){
                                                                             if(canRemoveBlockEntities)
                                                                             {

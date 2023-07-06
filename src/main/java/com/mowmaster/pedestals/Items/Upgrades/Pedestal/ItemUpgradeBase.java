@@ -392,68 +392,36 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
      *
      */
 
-    public List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockState blockTarget, BlockPos posTarget)
-    {
-        ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(getUpgradeDefaultTool()):(pedestal.getToolStack());
-        Level level = pedestal.getLevel();
-        if(blockTarget.getBlock() != Blocks.AIR)
-        {
-            WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-            if(getPlayer != null && getPlayer.get() != null)
-            {
-                //https://github.com/JackyyTV/Exchangers/blob/dev-1.20/src/main/java/jackyy/exchangers/handler/ExchangerHandler.java#LL329C29-L331C82
-                LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
-                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
-                        .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+    public List<ItemStack> getBlockDrops(Level level, BasePedestalBlockEntity pedestal, FakePlayer fakePlayer, BlockState targetBlockState) {
+        if (targetBlockState.getBlock() != Blocks.AIR) {
+            //https://github.com/JackyyTV/Exchangers/blob/dev-1.20/src/main/java/jackyy/exchangers/handler/ExchangerHandler.java#LL329C29-L331C82
+            LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
+                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
+                .withOptionalParameter(LootContextParams.THIS_ENTITY, fakePlayer)
+                .withParameter(LootContextParams.TOOL, pedestal.getToolStack());
 
-                return blockTarget.getDrops(builder);
-            }
-            else
-            {
-                LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
-                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
-                        .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                return blockTarget.getDrops(builder);
-            }
-
+            return targetBlockState.getDrops(builder);
+        } else {
+            return List.of();
         }
-
-        return new ArrayList<>();
     }
 
-    public List<ItemStack> getBlockDrops(BasePedestalBlockEntity pedestal, BlockPos posTarget, Item itemBlockTarget)
-    {
-        Block blockTarget = Block.byItem(itemBlockTarget);
-        if(blockTarget != Blocks.AIR) {
-            ItemStack getToolFromPedestal = (pedestal.getToolStack().isEmpty())?(getUpgradeDefaultTool()):(pedestal.getToolStack());
-            Level level = pedestal.getLevel();
-            if(blockTarget != Blocks.AIR)
-            {
-                WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);
-                if(getPlayer != null && getPlayer.get() != null)
-                {
-                    //https://github.com/JackyyTV/Exchangers/blob/dev-1.20/src/main/java/jackyy/exchangers/handler/ExchangerHandler.java#LL329C29-L331C82
-                    LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
-                            .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
-                            .withOptionalParameter(LootContextParams.THIS_ENTITY, getPlayer.get())
-                            .withParameter(LootContextParams.TOOL, getToolFromPedestal);
+    public List<ItemStack> getBlockDrops(Level level, BasePedestalBlockEntity pedestal, Item targetItem) {
+        Block targetBlock = Block.byItem(targetItem);
+        if (targetBlock != Blocks.AIR) {
+            //https://github.com/JackyyTV/Exchangers/blob/dev-1.20/src/main/java/jackyy/exchangers/handler/ExchangerHandler.java#LL329C29-L331C82
+            LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
+                    .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
+                    .withParameter(LootContextParams.TOOL, pedestal.getToolStack());
 
-                    return blockTarget.defaultBlockState().getDrops(builder);
-                }
-                else
-                {
-                    LootParams.Builder builder = new LootParams.Builder((ServerLevel) level)
-                            .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pedestal.getPos()))
-                            .withParameter(LootContextParams.TOOL, getToolFromPedestal);
-
-                    return blockTarget.defaultBlockState().getDrops(builder);
-                }
-
+            WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
+            if (fakePlayerReference != null && fakePlayerReference.get() != null) {
+                builder.withOptionalParameter(LootContextParams.THIS_ENTITY, fakePlayerReference.get());
             }
+            return targetBlock.defaultBlockState().getDrops(builder);
+        } else {
+            return List.of();
         }
-        return new ArrayList<>();
     }
 
 
