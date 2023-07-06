@@ -1689,18 +1689,15 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
         return privateItems.getStackInSlot(PrivateInventorySlot.TOOL);
     }
 
-    public ItemStack getToolStack()
-    {
+    public ItemStack getToolStack() {
         ItemStack toolInPed = privateItems.getStackInSlot(PrivateInventorySlot.TOOL);
-        ItemStack coinTool = ItemStack.EMPTY;
-        if(hasCoin())
-        {
-            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
-            {
-                coinTool = upgrade.getUpgradeDefaultTool();
-            }
+        if (!toolInPed.isEmpty()) {
+            return toolInPed;
+        } else if (hasCoin() && getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade) {
+            return upgrade.getUpgradeDefaultTool();
+        } else {
+            return ItemStack.EMPTY;
         }
-        return (!toolInPed.isEmpty())?(toolInPed):(coinTool);
     }
 
     public boolean canInsertTool(ItemStack tool)

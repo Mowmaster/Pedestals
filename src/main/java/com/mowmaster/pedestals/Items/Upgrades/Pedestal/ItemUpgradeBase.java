@@ -1080,7 +1080,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             if(
                 !stackInSlot.isEmpty() &&
                 !itemHandler.extractItem(i, 1, true).equals(ItemStack.EMPTY) &&
-                passesMachineFilter(pedestal, stackInSlot)
+                passesMachineFilterItems(pedestal, stackInSlot)
             ) {
                 return Optional.of(i);
             }
@@ -1184,13 +1184,24 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return slot.get();
     }
 
-    public static boolean passesMachineFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn) {
+    public static boolean passesMachineFilterItems(BasePedestalBlockEntity pedestal, ItemStack itemStack) {
         if (pedestal.hasFilter()) {
             ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
             if (filterInPedestal.getItem() instanceof IFilterItem filter && filter.getFilterDirection().equals(IFilterItem.FilterDirection.NEUTRAL)) {
-                return filter.canAcceptItems(filterInPedestal, stackIn);
+                return filter.canAcceptItems(filterInPedestal, itemStack);
             }
         }
+        return true;
+    }
+
+    public static boolean passesMachineFilterFluids(BasePedestalBlockEntity pedestal, FluidStack fluidStack) {
+        if (pedestal.hasFilter()) {
+            ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
+            if (filterInPedestal.getItem() instanceof IFilterItem filter && filter.getFilterDirection().equals(IFilterItem.FilterDirection.NEUTRAL)) {
+                return filter.canAcceptFluids(filterInPedestal, fluidStack);
+            }
+        }
+
         return true;
     }
 
