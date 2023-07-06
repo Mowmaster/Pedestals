@@ -7,6 +7,7 @@ import com.mowmaster.mowlib.Networking.MowLibPacketParticles;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
+import com.mowmaster.pedestals.Items.Filters.BaseFilter;
 import com.mowmaster.pedestals.Items.ISelectableArea;
 import com.mowmaster.pedestals.Items.ISelectablePoints;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardArea;
@@ -1355,7 +1356,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             if(
                 !stackInSlot.isEmpty() &&
                 !itemHandler.extractItem(i, 1, true).equals(ItemStack.EMPTY) &&
-                passesMachineFilter(pedestal, stackInSlot)
+                passesMachineFilterItems(pedestal, stackInSlot)
             ) {
                 return Optional.of(i);
             }
@@ -1459,13 +1460,26 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return slot.get();
     }
 
-    public static boolean passesMachineFilter(BasePedestalBlockEntity pedestal, ItemStack stackIn) {
+    public static boolean passesMachineFilterItems(BasePedestalBlockEntity pedestal, ItemStack itemStack) {
         if (pedestal.hasFilter()) {
             ItemStack filterInPedestal = pedestal.getFilterInPedestal();
             if (filterInPedestal.getItem() instanceof IPedestalFilter filter && filter.getFilterDirection().equals(IPedestalFilter.FilterDirection.NEUTRAL)) {
-                return filter.canAcceptItems(filterInPedestal, stackIn);
+                return filter.canAcceptItems(filterInPedestal, itemStack);
             }
         }
+        return true;
+    }
+
+    public static boolean passesMachineFilterFluids(BasePedestalBlockEntity pedestal, FluidStack fluidStack) {
+        if (pedestal.hasFilter()) {
+            ItemStack filterInPedestal = pedestal.getFilterInPedestal();
+            if (filterInPedestal.getItem() instanceof BaseFilter filter) {
+                if (filter.getFilterDirection().neutral()) {
+                    return filter.canAcceptFluids(filterInPedestal, fluidStack);
+                }
+            }
+        }
+
         return true;
     }
 
