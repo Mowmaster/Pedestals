@@ -32,6 +32,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
@@ -254,15 +255,16 @@ public class ItemUpgradeFiller extends ItemUpgradeBase {
                     boolean runsOnce = true;
                     boolean stop = getStopped(pedestal);
 
-                    if (removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(), currentPoint), getHeightIteratorValue(pedestal), true)) {
+                    List<BlockPos> adjustedPoints = IntStream.range(min, max).mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
+                    List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestal.getPos(), point)).toList();
+                    if (removeFuelForActionMultiple(pedestal, distances, true)) {
                         if (!stop) {
-                            for (int y = min; y <= max; y++) {
+                            for (BlockPos adjustedPoint : adjustedPoints) {
                                 ItemStack toPlace = pedestal.getItemInPedestal().copy();
                                 toPlace.setCount(1);
-                                BlockPos adjustedPoint = new BlockPos(currentPoint.getX(), y, currentPoint.getZ());
                                 BlockState blockAtPoint = level.getBlockState(adjustedPoint);
                                 if (!pedestal.removeItemStack(toPlace, true).isEmpty()) {
-                                    if (removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), getHeightIteratorValue(pedestal), false)) {
+                                    if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), false)) {
                                         if (canPlace(toPlace) && passesFilter(pedestal, toPlace)) {
                                             if (!adjustedPoint.equals(pedestal.getPos()) && blockAtPoint.getBlock() == Blocks.AIR) {
                                                 UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toPlace.copy(), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level, pedestal.getPos()), adjustedPoint, false));

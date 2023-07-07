@@ -282,7 +282,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
 
                 if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.SIMULATE).getAmount() == FluidType.BUCKET_VOLUME)
                 {
-                    if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), getHeightIteratorValue(pedestal), true))
+                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                     {
                         if(canPlace(pedestal,blockAtPoint,currentPoint) && passesFilter(pedestal, blockAtPoint, currentPoint))
                         {
@@ -292,7 +292,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
                                 UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, FluidUtil.getFilledBucket(stackInPedestal), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
                                 InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                                 if (result == InteractionResult.PASS) {
-                                    if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), getHeightIteratorValue(pedestal), false))
+                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                     {
                                         if(blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED))
                                         {
@@ -359,15 +359,14 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
             boolean runsOnce = true;
             boolean stop = getStopped(pedestal);
 
-            if(!stop)
-            {
-                for(int y=min;y<=max;y++)
-                {
-                    BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
-                    BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                    if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.SIMULATE).getAmount() == FluidType.BUCKET_VOLUME)
+            List<BlockPos> adjustedPoints = IntStream.range(min, max).mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
+            List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
+            if (removeFuelForActionMultiple(pedestal, distances, true)) {
+                if(!stop) {
+                    for (BlockPos adjustedPoint : adjustedPoints)
                     {
-                        if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), true))
+                        BlockState blockAtPoint = level.getBlockState(adjustedPoint);
+                        if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.SIMULATE).getAmount() == FluidType.BUCKET_VOLUME)
                         {
                             if(canPlace(pedestal,blockAtPoint,adjustedPoint) && passesFilter(pedestal, blockAtPoint, adjustedPoint))
                             {
@@ -378,7 +377,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
                                     InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                                     if (result == InteractionResult.PASS) {
                                         System.out.println(blockAtPoint.getBlock());
-                                        if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false))
+                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), false))
                                         {
                                             if(blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED))
                                             {
@@ -404,9 +403,9 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
                                     }
                                 }
                             }
-                        }
-                        else {
-                            fuelRemoved = false;
+                            else {
+                                fuelRemoved = false;
+                            }
                         }
                     }
                 }

@@ -33,6 +33,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
@@ -118,16 +119,6 @@ public class ItemUpgradePump extends ItemUpgradeBase {
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numheight");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_boolstop");
-    }
-
-    @Override
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        if (level.isClientSide()) return;
-
-        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
-        if (allPositions.isEmpty()) return;
-
-        if (pedestal.spaceForFluid()>=1000) pumpAction(level, pedestal, pedestalPos, allPositions);
     }
 
     private boolean getStopped(BasePedestalBlockEntity pedestal)
@@ -238,6 +229,16 @@ public class ItemUpgradePump extends ItemUpgradeBase {
             );
     }
 
+    @Override
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        if (level.isClientSide()) return;
+
+        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
+        if (allPositions.isEmpty()) return;
+
+        if (pedestal.spaceForFluid()>=1000) pumpAction(level, pedestal, pedestalPos, allPositions);
+    }
+
     public void pumpAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, List<BlockPos> listed) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if(fakePlayerReference != null && fakePlayerReference.get() != null) {
@@ -265,10 +266,11 @@ public class ItemUpgradePump extends ItemUpgradeBase {
                     boolean runsOnce = true;
                     boolean stop = getStopped(pedestal);
 
-                    if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint),getHeightIteratorValue(pedestal), true)) {
+                    List<BlockPos> adjustedPoints = IntStream.range(min, max).mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
+                    List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
+                    if (removeFuelForActionMultiple(pedestal, distances, true)) {
                         if(!stop) {
-                            for(int y = min; y <= max; y++) {
-                                BlockPos adjustedPoint = new BlockPos(currentPoint.getX(),y,currentPoint.getZ());
+                            for (BlockPos adjustedPoint : adjustedPoints) {
                                 if (adjustedPoint.equals(pedestalPos)) {
                                     continue;
                                 }
@@ -277,33 +279,31 @@ public class ItemUpgradePump extends ItemUpgradeBase {
                                 FluidStack targetFluidStack = getFluidStackForTarget(targetBlock, level.getFluidState(adjustedPoint));
 
                                 if (canPump(pedestal, targetBlock, targetFluidStack) && passesMachineFilterFluids(pedestal, targetFluidStack)) {
-                                    if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint),getHeightIteratorValue(pedestal), true)) {
-                                        if (pedestal.canAcceptFluid(targetFluidStack) && pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME) {
-                                            if (removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), getHeightIteratorValue(pedestal), false)) {
-                                                pedestal.addFluid(targetFluidStack, IFluidHandler.FluidAction.EXECUTE);
+                                    if (pedestal.canAcceptFluid(targetFluidStack) && pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME) {
+                                        if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), false)) {
+                                            pedestal.addFluid(targetFluidStack, IFluidHandler.FluidAction.EXECUTE);
 
-                                                if (targetBlockState.hasProperty(BlockStateProperties.WATERLOGGED)) {
-                                                    if (removeWaterFromLoggedBlocks()) {
-                                                        level.setBlockAndUpdate(adjustedPoint, targetBlockState.setValue(BlockStateProperties.WATERLOGGED, false));
-                                                    }
-                                                } else if (targetBlock instanceof AbstractCauldronBlock) {
-                                                    level.setBlockAndUpdate(adjustedPoint, Blocks.CAULDRON.defaultBlockState());
-                                                } else {
-                                                    level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
-                                                    ItemStack itemToPlace = pedestal.getItemInPedestal().copy();
-                                                    if(!pedestal.removeItemStack(itemToPlace, true).isEmpty() && canPlace(itemToPlace) && passesMachineFilterItems(pedestal, itemToPlace)) {
-                                                        ItemStack itemToRemove = itemToPlace.copy(); // UseOnContext modifies the passed in item stack when returning an InteractionResult.CONSUME, so we need a copy of it for removal.
-                                                        UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, itemToPlace, new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
-                                                        InteractionResult resultPlace = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                                        if (resultPlace == InteractionResult.CONSUME) {
-                                                            itemToRemove.setCount(1); // only remove 1 item
-                                                            pedestal.removeItemStack(itemToRemove,false);
-                                                        }
+                                            if (targetBlockState.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                                                if (removeWaterFromLoggedBlocks()) {
+                                                    level.setBlockAndUpdate(adjustedPoint, targetBlockState.setValue(BlockStateProperties.WATERLOGGED, false));
+                                                }
+                                            } else if (targetBlock instanceof AbstractCauldronBlock) {
+                                                level.setBlockAndUpdate(adjustedPoint, Blocks.CAULDRON.defaultBlockState());
+                                            } else {
+                                                level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
+                                                ItemStack itemToPlace = pedestal.getItemInPedestal().copy();
+                                                if(!pedestal.removeItemStack(itemToPlace, true).isEmpty() && canPlace(itemToPlace) && passesMachineFilterItems(pedestal, itemToPlace)) {
+                                                    ItemStack itemToRemove = itemToPlace.copy(); // UseOnContext modifies the passed in item stack when returning an InteractionResult.CONSUME, so we need a copy of it for removal.
+                                                    UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, itemToPlace, new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
+                                                    InteractionResult resultPlace = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                                    if (resultPlace == InteractionResult.CONSUME) {
+                                                        itemToRemove.setCount(1); // only remove 1 item
+                                                        pedestal.removeItemStack(itemToRemove,false);
                                                     }
                                                 }
-                                            } else {
-                                                fuelRemoved = false;
                                             }
+                                        } else {
+                                            fuelRemoved = false;
                                         }
                                     }
                                 }
