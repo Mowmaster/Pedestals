@@ -277,7 +277,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
 
                 if(pedestal.removeFluid(FluidType.BUCKET_VOLUME, IFluidHandler.FluidAction.SIMULATE).getAmount() == FluidType.BUCKET_VOLUME)
                 {
-                    if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint),getHeightIteratorValue(pedestal), true))
+                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                     {
                         if(canPlace(pedestal,blockAtPoint,currentPoint) && passesFilter(pedestal, blockAtPoint, currentPoint))
                         {
@@ -287,7 +287,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
                                 UseOnContext blockContext = new UseOnContext(level,getPlayer.get(), InteractionHand.MAIN_HAND, FluidUtil.getFilledBucket(stackInPedestal), new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), currentPoint, false));
                                 InteractionResult result = ForgeHooks.onPlaceItemIntoWorld(blockContext);
                                 if (result == InteractionResult.PASS) {
-                                    if(removeFuelForActionMultiple(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint),getHeightIteratorValue(pedestal), false))
+                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                     {
                                         if(blockAtPoint.hasProperty(BlockStateProperties.WATERLOGGED))
                                         {
