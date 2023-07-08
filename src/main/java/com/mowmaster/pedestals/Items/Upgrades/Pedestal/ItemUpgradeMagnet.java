@@ -290,7 +290,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                     }
 
                     if(needsEnergy && actionDone)removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,item.getOnPos()),false);
-                    if(!hasAdvancedOne(coinInPedestal) && actionDone)break;
+                    if(!hasSuperSpeed(coinInPedestal) && actionDone)break;
                 }
 
                 List<ExperienceOrb> listXP = world.getEntitiesOfClass(ExperienceOrb.class, expandedAABB);
@@ -316,7 +316,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase implements IHasModeTypes
                                 if(value<=added)orb.remove(Entity.RemovalReason.DISCARDED);
                                 if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(pedestal.getLevel(),pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,pedestal.getPos().getX(),pedestal.getPos().getY(),pedestal.getPos().getZ(),0,255,0));
                                 if(needsEnergy && !actionDone)removeFuelForAction(pedestal,getDistanceBetweenPoints(posOfPedestal,orb.getOnPos()),false);
-                                if(!hasAdvancedOne(coinInPedestal))break;
+                                if(!hasSuperSpeed(coinInPedestal))break;
                             }
                         }
                     }

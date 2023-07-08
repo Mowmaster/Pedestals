@@ -188,7 +188,7 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
                                                     pedestal.damageTool(toolStack,1,false);
                                                 }
                                             }
-                                            if(!hasAdvancedOne(coin))break;
+                                            if(!hasSuperSpeed(coin))break;
                                         }
                                     }
                                 }

@@ -378,6 +378,16 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 player.displayClientMessage(sspeedLabel, false);
             }
         }
+
+        if(canModifyOperateToBedrock(upgrade))
+        {
+            if(getOperateToBedrock(upgrade))
+            {
+                MutableComponent operateToBedrockLabel = Component.translatable(MODID + ".upgrade_tooltip_operatetobedrock_label");
+                operateToBedrockLabel.withStyle(ChatFormatting.GRAY);
+                player.displayClientMessage(operateToBedrockLabel, false);
+            }
+        }
     }
 
     /*
@@ -445,51 +455,40 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return  (upgradeIncrease>0)?(MowLibXpUtils.getExpCountByLevel(upgradeIncrease+baseValue)):(experienceTransferRateConverted);
     }
 
-    public ItemStack getUpgradeDefaultTool()
-    {
+    public ItemStack getUpgradeDefaultTool() {
         return ItemStack.EMPTY;
     }
 
-    //This is for things that have for loops, normally they break after each working loop,
-    // but this would remove that break and allow it to process all in the for loop
-    public boolean hasAdvancedOne(ItemStack upgradeStack)
-    {
-        if(canModifySuperSpeed(upgradeStack))
-        {
+    public boolean hasSuperSpeed(ItemStack upgradeStack) {
+        if (canModifySuperSpeed(upgradeStack)) {
             return getSuperSpeed(upgradeStack);
+        } else {
+            return false;
         }
-
-        return false;
     }
 
-    public boolean hasSuperSpeed(ItemStack upgradeStack)
-    {
-        if(canModifySuperSpeed(upgradeStack))
-        {
-            return getSuperSpeed(upgradeStack);
-        }
-
-        return false;
-    }
-
-    public boolean hasGentleHarvest(ItemStack upgradeStack)
-    {
-        if(canModifyGentleHarvest(upgradeStack))
-        {
+    public boolean hasGentleHarvest(ItemStack upgradeStack) {
+        if (canModifyGentleHarvest(upgradeStack)) {
             return getGentleHarvest(upgradeStack);
+        } else {
+            return false;
         }
-
-        return false;
     }
 
-    public boolean hasEntityContainer(ItemStack upgradeStack)
-    {
-        if(canModifyEntityContainers(upgradeStack))
-        {
+    public boolean hasEntityContainer(ItemStack upgradeStack) {
+        if (canModifyEntityContainers(upgradeStack)) {
             return getEntityContainer(upgradeStack);
+        } else {
+            return false;
         }
+    }
 
-        return false;
+    public boolean hasOperateToBedrock(ItemStack upgradeStack) {
+        if (canModifyOperateToBedrock(upgradeStack)) {
+            return getOperateToBedrock(upgradeStack);
+        } else {
+            return false;
+        }
     }
 
     public void runClientStuff(BasePedestalBlockEntity pedestal)
@@ -1970,6 +1969,19 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
         }
 
+        if(canModifyOperateToBedrock(p_41421_))
+        {
+            if(getOperateToBedrock(p_41421_))
+            {
+                MutableComponent operateToBedrockLabel = Component.translatable(MODID + ".upgrade_tooltip_operatetobedrock_label");
+                operateToBedrockLabel.withStyle(ChatFormatting.GRAY);
+                p_41423_.add(operateToBedrockLabel);
+            }
+            else {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_operatetobedrock_allowed",ChatFormatting.DARK_AQUA);
+            }
+        }
+
         /*=====================================
         =======================================
         =====================================*/
@@ -2191,27 +2203,27 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean canModifyGentleHarvest(ItemStack upgradeItemStack) { return false; }
     public boolean canModifySuperSpeed(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyEntityContainers(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyOperateToBedrock(ItemStack upgradeItemStack) { return false; }
 
-    public boolean canAddModifierToUpgrade(ItemStack upgradeItemStack, String nbtTagString)
-    {
-        switch(nbtTagString)
-        {
-            case "upgradespeed": return canModifySpeed(upgradeItemStack);
-            case "upgradedamagecapacity": return canModifyDamageCapacity(upgradeItemStack);
-            case "upgradeblockcapacity": return canModifyBlockCapacity(upgradeItemStack);
-            case "upgradeitemcapacity": return canModifyItemCapacity(upgradeItemStack);
-            case "upgradefluidcapacity": return canModifyFluidCapacity(upgradeItemStack);
-            case "upgradeenergycapacity": return canModifyEnergyCapacity(upgradeItemStack);
-            case "upgradexpcapacity": return canModifyXPCapacity(upgradeItemStack);
-            case "upgradedustcapacity": return canModifyDustCapacity(upgradeItemStack);
-            case "upgradearea": return canModifyArea(upgradeItemStack);
-            case "upgraderange": return canModifyRange(upgradeItemStack);
-            case "upgrademagnet": return canModifyMagnet(upgradeItemStack);
-            case "upgradegentle": return canModifyGentleHarvest(upgradeItemStack);
-            case "upgradesuperspeed": return canModifySuperSpeed(upgradeItemStack);
-            case "upgradeentitystorage": return canModifyEntityContainers(upgradeItemStack);
-            default: return false;
-        }
+    public boolean canAddModifierToUpgrade(ItemStack upgradeItemStack, String nbtTagString) {
+        return switch (nbtTagString) {
+            case "upgradespeed" -> canModifySpeed(upgradeItemStack);
+            case "upgradedamagecapacity" -> canModifyDamageCapacity(upgradeItemStack);
+            case "upgradeblockcapacity" -> canModifyBlockCapacity(upgradeItemStack);
+            case "upgradeitemcapacity" -> canModifyItemCapacity(upgradeItemStack);
+            case "upgradefluidcapacity" -> canModifyFluidCapacity(upgradeItemStack);
+            case "upgradeenergycapacity" -> canModifyEnergyCapacity(upgradeItemStack);
+            case "upgradexpcapacity" -> canModifyXPCapacity(upgradeItemStack);
+            case "upgradedustcapacity" -> canModifyDustCapacity(upgradeItemStack);
+            case "upgradearea" -> canModifyArea(upgradeItemStack);
+            case "upgraderange" -> canModifyRange(upgradeItemStack);
+            case "upgrademagnet" -> canModifyMagnet(upgradeItemStack);
+            case "upgradegentle" -> canModifyGentleHarvest(upgradeItemStack);
+            case "upgradesuperspeed" -> canModifySuperSpeed(upgradeItemStack);
+            case "upgradeentitystorage" -> canModifyEntityContainers(upgradeItemStack);
+            case "upgradeoperatetobedrock" -> canModifyOperateToBedrock(upgradeItemStack);
+            default -> false;
+        };
     }
 
     public int getSpeedTicksReduced(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradespeed"); }
@@ -2232,6 +2244,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean getGentleHarvest(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradegentle")>=1; }
     public boolean getSuperSpeed(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradesuperspeed")>=1; }
     public boolean getEntityContainer(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeentitystorage")>=1; }
+    public boolean getOperateToBedrock(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeoperatetobedrock")>=1; }
 
     /*============================================================================
     ==============================================================================
