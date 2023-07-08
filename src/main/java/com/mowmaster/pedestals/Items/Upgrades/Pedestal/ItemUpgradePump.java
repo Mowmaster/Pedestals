@@ -239,7 +239,7 @@ public class ItemUpgradePump extends ItemUpgradeBase {
         List<BlockPos> allPositions = getValidWorkCardPositions(pedestal, coin, getWorkCardType(), MODID);
         if (allPositions.isEmpty()) return;
 
-        if (pedestal.spaceForFluid()>=1000) pumpAction(level, pedestal, pedestalPos, allPositions);
+        if (pedestal.spaceForFluid() >= 1000) pumpAction(level, pedestal, pedestalPos, allPositions);
     }
 
     public void pumpAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, List<BlockPos> listed) {
