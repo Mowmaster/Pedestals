@@ -141,80 +141,64 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         MowLibCompoundTagUtils.removeCustomTagFromNBT(References.MODID, coinInPedestal.getTag(), "_string_last_clicked_direction");
     }
 
-    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal)
-    {
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
         List<String> messages = new ArrayList<>();
-        if(getWorkCardType()<0)return messages;
+        int supportedWorkCardType = getWorkCardType();
+        if (supportedWorkCardType < 0) return messages;
 
-        if(needsWorkCard() && !pedestal.hasWorkCard())
-        {
-            messages.add(ChatFormatting.WHITE + "Needs");
-            messages.add(ChatFormatting.WHITE + "----------------");
-            if(getWorkCardType() == 0)
-            {
-                messages.add(ChatFormatting.RED + "Work Area");
-                messages.add(ChatFormatting.WHITE + "OR");
-                messages.add(ChatFormatting.RED + "Work Locations");
-            }
-            if(getWorkCardType() == 1)
-            {
-                messages.add(ChatFormatting.RED + "Work Area");
-            }
-            if(getWorkCardType() == 2)
-            {
-                messages.add(ChatFormatting.RED + "Work Locations");
-            }
-            if(getWorkCardType() == 3)
-            {
-                messages.add(ChatFormatting.RED + "Pedestal Locations");
-            }
-        }
-        else if(pedestal.hasWorkCard())
-        {
-            if(pedestal.getWorkCardInPedestal().getItem() instanceof WorkCardBase workCardBase)
-            {
-
-                //TODO: Update MowLib to fix this static class issue
-                Boolean inSelectedInRange = MowLibBlockPosUtils.selectedAreaWithinRange(pedestal,getUpgradeWorkRange(pedestal.getCoinOnPedestal()));
-                boolean addmessages = false;
-                if(getWorkCardType()!=workCardBase.getWorkCardType())
-                {
-                    addmessages=true;
-                    if(getWorkCardType()==0 && (workCardBase.getWorkCardType()==1 || workCardBase.getWorkCardType()==2))
-                    {
-                        addmessages=false;
-                    }
-
-                    if(addmessages)
-                    {
-                        messages.add(ChatFormatting.RED + "Incorrect Card");
-                        messages.add(ChatFormatting.WHITE + "Needs:");
-                        if(getWorkCardType() != 0){messages.add(ChatFormatting.WHITE + "----------------");}
-
-                        if(getWorkCardType() == 0)
-                        {
-                            messages.add(ChatFormatting.BLUE + "Work Area");
-                            messages.add(ChatFormatting.WHITE + "OR");
-                            messages.add(ChatFormatting.BLUE + "Work Locations");
-                        }
-                        if(getWorkCardType() == 1 )
-                        {
-                            messages.add(ChatFormatting.BLUE + "Work Area");
-                        }
-                        if(getWorkCardType() == 2)
-                        {
-                            messages.add(ChatFormatting.BLUE + "Work Locations");
-                        }
-                        if(getWorkCardType() == 3)
-                        {
-                            messages.add(ChatFormatting.BLUE + "Pedestal Locations");
-                        }
-                    }
+        if (needsWorkCard() && !pedestal.hasWorkCard()) {
+            messages.add(ChatFormatting.RED + "Missing WorkCard");
+            messages.add(ChatFormatting.WHITE + "------------------");
+            messages.add(ChatFormatting.WHITE + "Upgrade Supports:");
+            switch (supportedWorkCardType) {
+                case 0 -> {
+                    messages.add(ChatFormatting.WHITE + "(Area), OR");
+                    messages.add(ChatFormatting.WHITE + "(Location)");
                 }
-                else if(!inSelectedInRange && pedestal.getWorkCardInPedestal().is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.WORKCARD_AREA.get()))
-                {
-                    messages.add(ChatFormatting.RED + "Work Selection");
-                    messages.add(ChatFormatting.RED + "Is Invalid");
+                case 1 -> messages.add(ChatFormatting.WHITE + "(Area)");
+                case 2 -> messages.add(ChatFormatting.WHITE + "(Location)");
+                case 3 -> messages.add(ChatFormatting.WHITE + "(Machines)");
+            }
+        } else if (pedestal.hasWorkCard() && pedestal.getWorkCardInPedestal().getItem() instanceof WorkCardBase workCardBase) {
+            int insertedWorkCardType = workCardBase.getWorkCardType();
+            if (
+                insertedWorkCardType != supportedWorkCardType && // not an exact match
+                !(supportedWorkCardType == 0 && (insertedWorkCardType == 1 || insertedWorkCardType == 2)) // not a match for the "either" area or locations type
+            ) {
+                messages.add(ChatFormatting.RED + "Wrong WorkCard");
+                messages.add(ChatFormatting.WHITE + "------------------");
+                messages.add(ChatFormatting.WHITE + "Upgrade Supports:");
+                switch (supportedWorkCardType) {
+                    case 0 -> {
+                        messages.add(ChatFormatting.WHITE + "(Area), OR");
+                        messages.add(ChatFormatting.WHITE + "(Location)");
+                    }
+                    case 1 -> messages.add(ChatFormatting.WHITE + "(Area)");
+                    case 2 -> messages.add(ChatFormatting.WHITE + "(Location)");
+                    case 3 -> messages.add(ChatFormatting.WHITE + "(Machines)");
+                }
+            } else {
+                if (insertedWorkCardType == 1) {
+                    List<String> errorReason = List.of(); // supports up to 3 lines
+                    if (!MowLibBlockPosUtils.selectedAreaWithinRange(pedestal, getUpgradeWorkRange(pedestal.getCoinOnPedestal()))) {
+                        errorReason = List.of(
+                            ChatFormatting.WHITE + "Area Not Within",
+                            ChatFormatting.WHITE + "Upgrade Range"
+                        );
+                    } else if (
+                        hasOperateToBedrock(pedestal.getCoinOnPedestal()) &&
+                        readBlockPosFromNBT(pedestal.getWorkCardInPedestal(), 1).getY() != readBlockPosFromNBT(pedestal.getWorkCardInPedestal(), 2).getY()
+                    ) {
+                        errorReason = List.of(
+                            ChatFormatting.WHITE + "Operate to Bedrock",
+                            ChatFormatting.WHITE + "Limits Height to 1"
+                        );
+                    }
+                    if (!errorReason.isEmpty()) {
+                        messages.add(ChatFormatting.RED + "Invalid Work Area");
+                        messages.add(ChatFormatting.WHITE + "------------------");
+                        messages.addAll(errorReason);
+                    }
                 }
             }
         }
