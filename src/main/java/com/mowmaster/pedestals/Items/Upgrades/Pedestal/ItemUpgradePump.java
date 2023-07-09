@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
 import com.mowmaster.mowlib.Items.WorkCards.WorkCardBase;
 import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
@@ -23,7 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
@@ -34,6 +34,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -55,6 +56,9 @@ public class ItemUpgradePump extends ItemUpgradeBase {
 
     @Override
     public boolean canModifyArea(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get(); }
+
+    @Override
+    public boolean canModifyOperateToBedrock(ItemStack upgradeItemStack) { return true; }
 
     @Override
     public boolean needsWorkCard() { return true; }
@@ -96,20 +100,25 @@ public class ItemUpgradePump extends ItemUpgradeBase {
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
         List<String> messages = super.getUpgradeHUD(pedestal);
         if (messages.isEmpty()) {
-            if(baseEnergyCostPerDistance() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
-                messages.add(ChatFormatting.RED + "Needs Energy");
-                messages.add(ChatFormatting.RED + "To Operate");
-            }
-            if(baseXpCostPerDistance() > 0 && pedestal.getStoredExperience() < baseXpCostPerDistance()) {
-                messages.add(ChatFormatting.GREEN + "Needs Experience");
-                messages.add(ChatFormatting.GREEN + "To Operate");
-            }
-            if(baseDustCostPerDistance().getDustAmount() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
-                messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
-                messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
+            if (hasInvalidWorkCard(pedestal.getCoinOnPedestal())) {
+                messages.add(ChatFormatting.RED + "Work Selection");
+                messages.add(ChatFormatting.RED + "Is Invalid");
+                messages.add(ChatFormatting.WHITE + "Max height is 1");
+            } else {
+                if (baseEnergyCostPerDistance() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
+                    messages.add(ChatFormatting.RED + "Needs Energy");
+                    messages.add(ChatFormatting.RED + "To Operate");
+                }
+                if (baseXpCostPerDistance() > 0 && pedestal.getStoredExperience() < baseXpCostPerDistance()) {
+                    messages.add(ChatFormatting.GREEN + "Needs Experience");
+                    messages.add(ChatFormatting.GREEN + "To Operate");
+                }
+                if (baseDustCostPerDistance().getDustAmount() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
+                }
             }
         }
-
         return messages;
     }
 
@@ -118,84 +127,56 @@ public class ItemUpgradePump extends ItemUpgradeBase {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
         resetCachedValidWorkCardPositions(MODID, coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numheight");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_boolstop");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_invalidworkcard");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_miny");
+        // TODO: remove at some point? (it's fine if the stale NBT sticks around)
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
     }
 
-    private boolean getStopped(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
+    private boolean hasInvalidWorkCard(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, upgrade.getOrCreateTag(), "_invalidworkcard");
     }
 
-    private void setStopped(BasePedestalBlockEntity pedestal, boolean value)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
+    private void setInvalidWorkCard(ItemStack upgrade) {
+        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, upgrade.getOrCreateTag(), true, "_invalidworkcard");
     }
 
-    private int getHeightIteratorValue(BasePedestalBlockEntity pedestal)
-    {
-        //TODO: make a modifier for this
-        return PedestalConfig.COMMON.upgrade_pump_baseBlocksPumped.get() + getBlockCapacityIncrease(pedestal.getCoinOnPedestal());
+    private boolean getStopped(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, upgrade.getOrCreateTag(), "_boolstop");
     }
 
-    private int getCurrentHeight(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return (coin.getOrCreateTag().contains(MODID + "_numheight"))?(MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getOrCreateTag(), "_numheight")):(pedestal.getLevel().getMinBuildHeight());
+    private void setStopped(ItemStack upgrade) {
+        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, upgrade.getOrCreateTag(), true, "_boolstop");
     }
 
-    private void setCurrentHeight(BasePedestalBlockEntity pedestal, int num)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numheight");
+    private int getNumBlocksPerOperation(ItemStack upgrade) {
+        return PedestalConfig.COMMON.upgrade_pump_baseBlocksPumped.get() + getBlockCapacityIncrease(upgrade);
     }
 
-    private void iterateCurrentHeight(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        int current = getCurrentHeight(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+getHeightIteratorValue(pedestal)), "_numheight");
+    private int getCurrentHeight(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, upgrade.getOrCreateTag(), "_numheight");
     }
 
-    private int getCurrentDelay(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getOrCreateTag(), "_numdelay");
+    private void setCurrentHeight(ItemStack upgrade, int num) {
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, upgrade.getOrCreateTag(), num, "_numheight");
     }
 
-    private void setCurrentDelay(BasePedestalBlockEntity pedestal, int num)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numdelay");
+    private int getMinY(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, upgrade.getOrCreateTag(), "_miny");
     }
 
-    private void iterateCurrentDelay(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        int current = getCurrentDelay(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1+getSpeedTicksReduced(pedestal.getCoinOnPedestal())), "_numdelay");
+    private void setMinY(ItemStack upgrade, int minY) {
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, upgrade.getOrCreateTag(), minY, "_miny");
     }
 
-    private int getCurrentPosition(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getOrCreateTag(), "_numposition");
+    private int getCurrentPosition(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, upgrade.getOrCreateTag(), "_numposition");
     }
 
-    private void setCurrentPosition(BasePedestalBlockEntity pedestal, int num)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numposition");
-    }
-
-    private void iterateCurrentPosition(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        int current = getCurrentPosition(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numposition");
+    private void setCurrentPosition(ItemStack upgrade, int num) {
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, upgrade.getOrCreateTag(), num, "_numposition");
     }
 
     private boolean canPump(BasePedestalBlockEntity pedestal, Block targetBlock, FluidStack targetFluidStack) {
@@ -232,128 +213,133 @@ public class ItemUpgradePump extends ItemUpgradeBase {
             );
     }
 
+    public List<BlockPos> getValidWorkCardPositionsPump(Level level, BasePedestalBlockEntity pedestal, ItemStack upgrade) {
+        List<BlockPos> cached = readBlockPosListCustomFromNBT(MODID, "_validlist", upgrade);
+        if (cached.size() == 0) {
+            // Optimization to construct the validlist only once. The NBT tag should be reset when the WorkCard/Upgrade
+            // is removed (as that is the only way to invalidate the cached list) by calling `resetCachedValidWorkCardPositions`.
+            if (!hasBlockListCustomNBTTags(MODID, "_validlist", upgrade) && pedestal.hasWorkCard()) {
+                ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
+                if (workCardItemStack.getItem() instanceof WorkCardArea) {
+                    cached = WorkCardArea.getAABBIfDefinedAndInRange(workCardItemStack, pedestal, getUpgradeWorkRange(upgrade))
+                        .map(area -> {
+                            List<BlockPos> locations = new ArrayList<>();
+                            int minY = (int)area.minY;
+                            int maxY = (int)area.maxY;
+                            if (hasOperateToBedrock(upgrade)) {
+                                if (minY != maxY) {
+                                    setInvalidWorkCard(upgrade);
+                                    pedestal.update(); // forces a rendering of the HUD due to this error message.
+                                    return locations;
+                                }
+                                setCurrentHeight(upgrade, maxY);
+                                setMinY(upgrade, level.getMinBuildHeight());
+                            } else {
+                                setMinY(upgrade, minY);
+                            }
+                            for (int x = (int)area.maxX; x >= (int)area.minX; x--) {
+                                for (int z = (int)area.maxZ; z >= (int)area.minZ; z--) {
+                                    for (int y = maxY; y >= minY; y -= getNumBlocksPerOperation(upgrade)) {
+                                        locations.add(new BlockPos(x, y, z));
+                                    }
+                                }
+                            }
+                            return locations;
+                        }).orElse(List.of());
+                }
+                saveBlockPosListCustomToNBT(MODID, "_validlist", upgrade, cached);
+            }
+        }
+        return cached;
+    }
+
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
         if (level.isClientSide()) return;
+        if (getStopped(coin)) {
+            if (pedestal.canSpawnParticles()) {
+                MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 255, 55, 55));
+            }
+            return;
+        }
 
-        List<BlockPos> allPositions = getValidWorkCardPositions(pedestal, coin, getWorkCardType(), MODID);
+        List<BlockPos> allPositions = getValidWorkCardPositionsPump(level, pedestal, coin);
         if (allPositions.isEmpty()) return;
 
-        if (pedestal.spaceForFluid() >= 1000) pumpAction(level, pedestal, pedestalPos, allPositions);
+        int currentPosition = getCurrentPosition(coin);
+        BlockPos currentPoint = allPositions.get(currentPosition);
+        int currentY = hasOperateToBedrock(coin) ? getCurrentHeight(coin) : currentPoint.getY();
+        int currentMinY = Math.max(currentY - getNumBlocksPerOperation(coin) + 1, getMinY(coin));
+        List<BlockPos> adjustedPoints = IntStream.rangeClosed(currentMinY, currentY)
+            .mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
+        if (pedestal.spaceForFluid() >= (FluidType.BUCKET_VOLUME * adjustedPoints.size()) && pumpAction(level, pedestal, pedestalPos, adjustedPoints)) {
+            if (currentPosition + 1 >= allPositions.size()) {
+                setCurrentPosition(coin, 0);
+                if (hasOperateToBedrock(coin)) {
+                    setCurrentHeight(coin, currentMinY - 1);
+                    if (currentMinY <= getMinY(coin)) {
+                        setStopped(coin);
+                    }
+                }
+            } else {
+                setCurrentPosition(coin, currentPosition + 1);
+            }
+        }
     }
 
-    public void pumpAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, List<BlockPos> listed) {
+    public boolean pumpAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, List<BlockPos> adjustedPoints) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if(fakePlayerReference != null && fakePlayerReference.get() != null) {
             FakePlayer fakePlayer = fakePlayerReference.get();
 
-            if(pedestal.hasWorkCard()) {
-                ItemStack card = pedestal.getWorkCardInPedestal();
-                if (card.getItem() instanceof WorkCardBase) {
-                    int currentPosition = getCurrentPosition(pedestal);
-                    BlockPos currentPoint = listed.get(currentPosition);
-                    AABB area = new AABB(MowLibBlockPosUtils.readBlockPosFromNBT(card,1), MowLibBlockPosUtils.readBlockPosFromNBT(card,2));
-                    int maxY = (int)area.maxY;
-                    int minY = (int)area.minY;
-                    int ySpread = maxY - minY;
-                    boolean minMaxHeight = (maxY - minY > 0) || listed.size()<=4;
-                    if(ySpread>getHeightIteratorValue(pedestal))setCurrentHeight(pedestal,minY);
-                    int currentYMin = getCurrentHeight(pedestal);
-                    int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue(pedestal));
-                    int min = (minMaxHeight)?(minY):(currentYMin);
-                    int max = (minMaxHeight)?((ySpread>getHeightIteratorValue(pedestal))?(minY+getHeightIteratorValue(pedestal)):(maxY)):(currentYMax);
-                    int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
+            List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
+            if (removeFuelForActionMultiple(pedestal, distances, true)) {
+                for (BlockPos adjustedPoint : adjustedPoints) {
+                    if (adjustedPoint.equals(pedestalPos)) {
+                        continue;
+                    }
+                    BlockState targetBlockState = level.getBlockState(adjustedPoint);
+                    Block targetBlock = targetBlockState.getBlock();
+                    FluidStack targetFluidStack = getFluidStackForTarget(targetBlock, level.getFluidState(adjustedPoint));
 
-                    boolean fuelRemoved = true;
-                    //ToDo: make this a modifier for later
-                    boolean runsOnce = true;
-                    boolean stop = getStopped(pedestal);
+                    if (canPump(pedestal, targetBlock, targetFluidStack) && passesMachineFilterFluids(pedestal, targetFluidStack)) {
+                        if (pedestal.canAcceptFluid(targetFluidStack) && pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME) {
+                            if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestalPos, adjustedPoint), false)) {
+                                pedestal.addFluid(targetFluidStack, IFluidHandler.FluidAction.EXECUTE);
 
-                    List<BlockPos> adjustedPoints = IntStream.range(min, max).mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
-                    List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
-                    if (removeFuelForActionMultiple(pedestal, distances, true)) {
-                        if(!stop) {
-                            for (BlockPos adjustedPoint : adjustedPoints) {
-                                if (adjustedPoint.equals(pedestalPos)) {
-                                    continue;
-                                }
-                                BlockState targetBlockState = level.getBlockState(adjustedPoint);
-                                Block targetBlock = targetBlockState.getBlock();
-                                FluidStack targetFluidStack = getFluidStackForTarget(targetBlock, level.getFluidState(adjustedPoint));
-
-                                if (canPump(pedestal, targetBlock, targetFluidStack) && passesMachineFilterFluids(pedestal, targetFluidStack)) {
-                                    if (pedestal.canAcceptFluid(targetFluidStack) && pedestal.spaceForFluid() >= FluidType.BUCKET_VOLUME) {
-                                        if (removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), adjustedPoint), false)) {
-                                            pedestal.addFluid(targetFluidStack, IFluidHandler.FluidAction.EXECUTE);
-
-                                            if (targetBlockState.hasProperty(BlockStateProperties.WATERLOGGED)) {
-                                                if (removeWaterFromLoggedBlocks()) {
-                                                    level.setBlockAndUpdate(adjustedPoint, targetBlockState.setValue(BlockStateProperties.WATERLOGGED, false));
-                                                }
-                                            } else if (targetBlock instanceof AbstractCauldronBlock) {
-                                                level.setBlockAndUpdate(adjustedPoint, Blocks.CAULDRON.defaultBlockState());
-                                            } else {
-                                                level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
-                                                ItemStack itemToPlace = pedestal.getItemInPedestal().copy();
-                                                if(!pedestal.removeItemStack(itemToPlace, true).isEmpty() && canPlace(itemToPlace) && passesMachineFilterItems(pedestal, itemToPlace)) {
-                                                    ItemStack itemToRemove = itemToPlace.copy(); // UseOnContext modifies the passed in item stack when returning an InteractionResult.CONSUME, so we need a copy of it for removal.
-                                                    UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, itemToPlace, new BlockHitResult(Vec3.ZERO, getPedestalFacing(level,pedestal.getPos()), adjustedPoint, false));
-                                                    InteractionResult resultPlace = ForgeHooks.onPlaceItemIntoWorld(blockContext);
-                                                    if (resultPlace == InteractionResult.CONSUME) {
-                                                        itemToRemove.setCount(1); // only remove 1 item
-                                                        pedestal.removeItemStack(itemToRemove,false);
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            fuelRemoved = false;
+                                if (targetBlockState.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                                    if (removeWaterFromLoggedBlocks()) {
+                                        level.setBlockAndUpdate(adjustedPoint, targetBlockState.setValue(BlockStateProperties.WATERLOGGED, false));
+                                    }
+                                } else if (targetBlock instanceof AbstractCauldronBlock) {
+                                    level.setBlockAndUpdate(adjustedPoint, Blocks.CAULDRON.defaultBlockState());
+                                } else {
+                                    level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
+                                    ItemStack toPlace = pedestal.getItemInPedestal().copy();
+                                    if (!pedestal.removeItemStack(toPlace, true).isEmpty() && canPlace(toPlace) && passesMachineFilterItems(pedestal, toPlace)) {
+                                        ItemStack toRemove = toPlace.copy(); // UseOnContext modifies the passed in item stack when returning an InteractionResult.CONSUME, so we need a copy of it for removal.
+                                        UseOnContext blockContext = new UseOnContext(level, fakePlayer, InteractionHand.MAIN_HAND, toPlace, new BlockHitResult(Vec3.ZERO, getPedestalFacing(level, pedestalPos), adjustedPoint, false));
+                                        InteractionResult resultPlace = ForgeHooks.onPlaceItemIntoWorld(blockContext);
+                                        if (resultPlace == InteractionResult.CONSUME) {
+                                            toRemove.setCount(1); // only remove 1 item
+                                            pedestal.removeItemStack(toRemove,false);
                                         }
                                     }
                                 }
-                            }
-                        }
-                        else
-                        {
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestal.getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestal.getPos().getX(),pedestal.getPos().getY()+1.0f,pedestal.getPos().getZ(),55,55,55));
-                        }
-
-                        if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
-                        {
-                            if(runsOnce)
-                            {
-                                //ToDo: Make this 1200 value a config
-                                int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
-                                if(getCurrentDelay(pedestal)>=delay)
-                                {
-                                    setCurrentPosition(pedestal,0);
-                                    setStopped(pedestal,false);
-                                    setCurrentDelay(pedestal,0);
-                                }
-                                else
-                                {
-                                    iterateCurrentDelay(pedestal);
-                                    setStopped(pedestal,true);
-                                }
-                            }
-                            else
-                            {
-                                setCurrentPosition(pedestal,0);
-                            }
-                        }
-                        else if((currentPosition+1)>=listed.size())
-                        {
-                            setCurrentPosition(pedestal,0);
-                            iterateCurrentHeight(pedestal);
-                        }
-                        else
-                        {
-                            if(fuelRemoved){
-                                iterateCurrentPosition(pedestal);
+                            } else {
+                                return false; // should be impossible
                             }
                         }
                     }
                 }
+            } else {
+                if (pedestal.canSpawnParticles()) {
+                    MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 55, 55, 55));
+                }
             }
+
+            return true;
         }
+        return false;
     }
 }
