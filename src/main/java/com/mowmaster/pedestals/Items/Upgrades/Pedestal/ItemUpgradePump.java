@@ -97,23 +97,17 @@ public class ItemUpgradePump extends ItemUpgradeBase {
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
         List<String> messages = super.getUpgradeHUD(pedestal);
         if (messages.isEmpty()) {
-            if (hasInvalidWorkCard(pedestal.getCoinOnPedestal())) {
-                messages.add(ChatFormatting.RED + "Work Selection");
-                messages.add(ChatFormatting.RED + "Is Invalid");
-                messages.add(ChatFormatting.WHITE + "Max height is 1");
-            } else {
-                if (baseEnergyCostPerDistance() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
-                    messages.add(ChatFormatting.RED + "Needs Energy");
-                    messages.add(ChatFormatting.RED + "To Operate");
-                }
-                if (baseXpCostPerDistance() > 0 && pedestal.getStoredExperience() < baseXpCostPerDistance()) {
-                    messages.add(ChatFormatting.GREEN + "Needs Experience");
-                    messages.add(ChatFormatting.GREEN + "To Operate");
-                }
-                if (baseDustCostPerDistance().getDustAmount() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
-                    messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
-                    messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
-                }
+            if (baseEnergyCostPerDistance() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
+                messages.add(ChatFormatting.RED + "Needs Energy");
+                messages.add(ChatFormatting.RED + "To Operate");
+            }
+            if (baseXpCostPerDistance() > 0 && pedestal.getStoredExperience() < baseXpCostPerDistance()) {
+                messages.add(ChatFormatting.GREEN + "Needs Experience");
+                messages.add(ChatFormatting.GREEN + "To Operate");
+            }
+            if (baseDustCostPerDistance().getDustAmount() > 0 && pedestal.getStoredEnergy() < baseEnergyCostPerDistance()) {
+                messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
+                messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
             }
         }
         return messages;
@@ -126,18 +120,9 @@ public class ItemUpgradePump extends ItemUpgradeBase {
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numheight");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_boolstop");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_invalidworkcard");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_miny");
         // TODO: remove at some point? (it's fine if the stale NBT sticks around)
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
-    }
-
-    private boolean hasInvalidWorkCard(ItemStack upgrade) {
-        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, upgrade.getOrCreateTag(), "_invalidworkcard");
-    }
-
-    private void setInvalidWorkCard(ItemStack upgrade) {
-        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, upgrade.getOrCreateTag(), true, "_invalidworkcard");
     }
 
     private boolean getStopped(ItemStack upgrade) {
@@ -224,9 +209,7 @@ public class ItemUpgradePump extends ItemUpgradeBase {
                             int minY = (int)area.minY;
                             int maxY = (int)area.maxY;
                             if (hasOperateToBedrock(upgrade)) {
-                                if (minY != maxY) {
-                                    setInvalidWorkCard(upgrade);
-                                    pedestal.update(); // forces a rendering of the HUD due to this error message.
+                                if (minY != maxY) { // invalid selection
                                     return locations;
                                 }
                                 setCurrentHeight(upgrade, maxY);
