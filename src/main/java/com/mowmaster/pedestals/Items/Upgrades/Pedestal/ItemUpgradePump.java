@@ -312,13 +312,13 @@ public class ItemUpgradePump extends ItemUpgradeBase {
                         }
                     }
                 }
+                return true;
             } else {
                 if (pedestal.canSpawnParticles()) {
                     MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 55, 55, 55));
                 }
+                return false;
             }
-
-            return true;
         }
         return false;
     }
