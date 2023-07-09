@@ -1,0 +1,18 @@
+{
+  "type": "pedestals:upgrademodification_global",
+
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_pump"
+    },
+    {
+      "item": "pedestals:workcard_area"
+    },
+    {
+      "item": "minecraft:stone_button"
+    }
+  ],
+  "resultModificationName": "upgradeoperatetobedrock",
+  "resultModificationValue": 1,
+  "resultModificationMaxValue": 1
+}
