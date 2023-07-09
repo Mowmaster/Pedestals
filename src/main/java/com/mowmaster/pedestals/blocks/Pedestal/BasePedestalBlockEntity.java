@@ -1597,7 +1597,7 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
         return !privateItems.getStackInSlot(PrivateInventorySlot.TOOL).isEmpty();
     }
 
-    public int getToolDurability()
+    public int getToolDamageValue()
     {
         if(hasTool())
         {
@@ -1625,41 +1625,30 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
         return 0;
     }
 
-    public int getDurabilityRemainingOnInsertedTool()
-    {
-        return getToolMaxDurability() - getToolDurability();
+    public int getDurabilityRemainingOnInsertedTool() {
+        return getToolMaxDurability() - getToolDamageValue();
     }
 
-    public boolean repairInsertedTool(int repairAmount, boolean simulate)
-    {
-        if(getDurabilityRemainingOnInsertedTool()<getToolMaxDurability())
-        {
-            if(!simulate)
-            {
-                int newDamageAmount = getToolDurability() - repairAmount;
-                getToolStack().setDamageValue(newDamageAmount);
-                return true;
+    public boolean repairInsertedTool(int repairAmount, boolean simulate) {
+        if (getDurabilityRemainingOnInsertedTool() < getToolMaxDurability()) {
+            if(!simulate) {
+                getToolStack().setDamageValue(getToolDamageValue() - repairAmount);
             }
             return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
-    public boolean damageInsertedTool(int damageAmount, boolean simulate)
-    {
-        if(getDurabilityRemainingOnInsertedTool()>damageAmount)
-        {
-            if(!simulate)
-            {
-                int newDamageAmount = getToolDurability() + damageAmount;
-                getToolStack().setDamageValue(newDamageAmount);
-                return true;
+    public boolean damageInsertedTool(int damageAmount, boolean simulate) {
+        if (getDurabilityRemainingOnInsertedTool() > damageAmount) {
+            if (!simulate) {
+                getToolStack().setDamageValue(getToolDamageValue() + damageAmount);
             }
             return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public boolean damageTool(ItemStack stackTool, int damageAmount, boolean simulate)

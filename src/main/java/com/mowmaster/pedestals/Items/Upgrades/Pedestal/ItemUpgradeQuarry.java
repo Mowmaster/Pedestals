@@ -1,9 +1,7 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
-import com.mowmaster.mowlib.Items.Filters.BaseFilter;
-import com.mowmaster.mowlib.Items.WorkCards.WorkCardBase;
-import com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils;
+import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
 import com.mowmaster.mowlib.MowLibUtils.MowLibItemUtils;
 import com.mowmaster.mowlib.Networking.MowLibPacketHandler;
@@ -23,7 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -53,6 +50,9 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
 
     @Override
     public boolean canModifyArea(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get(); }
+
+    @Override
+    public boolean canModifyOperateToBedrock(ItemStack upgradeItemStack) { return true; }
 
     @Override
     public boolean needsWorkCard() { return true; }
@@ -113,158 +113,52 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
         return new ItemStack(Items.IRON_PICKAXE);
     }
 
-    private void buildValidBlockListArea(BasePedestalBlockEntity pedestal) {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        List<BlockPos> valid = new ArrayList<>();
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            if(card.getItem() instanceof WorkCardBase workCardBase)
-            {
-                AABB area = new AABB(MowLibBlockPosUtils.readBlockPosFromNBT(card,1), MowLibBlockPosUtils.readBlockPosFromNBT(card,2));
-
-                int maxX = (int)area.maxX;
-                int maxY = (int)area.maxY;
-                int maxZ = (int)area.maxZ;
-
-
-                int minX = (int)area.minX;
-                int minY = (int)area.minY;
-                int minZ = (int)area.minZ;
-
-
-                BlockPos pedestalPos = pedestal.getPos();
-                for(int i=maxX;i>=minX;i--)
-                {
-                    for(int j=maxZ;j>=minZ;j--)
-                    {
-                        BlockPos newPoint = new BlockPos(i,pedestalPos.getY(),j);
-                        if(MowLibBlockPosUtils.selectedPointWithinRange(pedestal, newPoint, getUpgradeWorkRange(coin)))
-                        {
-                            valid.add(newPoint);
-                        }
-                    }
-                }
-
-                saveBlockPosListCustomToNBT(MODID,"_validlist",coin,valid);
-            }
-        }
-    }
-
-    private List<BlockPos> getValidList(BasePedestalBlockEntity pedestal) {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return readBlockPosListCustomFromNBT(MODID,"_validlist",coin);
-    }
-
     @Override
     public void actionOnRemovedFromPedestal(BasePedestalBlockEntity pedestal, ItemStack coinInPedestal) {
         super.actionOnRemovedFromPedestal(pedestal, coinInPedestal);
         removeBlockListCustomNBTTags(MODID,"_validlist",coinInPedestal);
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numposition");
-        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numheight");
         MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_boolstop");
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_miny");
+        // TODO: remove at some point? (it's fine if the stale NBT sticks around)
+        MowLibCompoundTagUtils.removeCustomTagFromNBT(MODID, coinInPedestal.getTag(), "_numdelay");
     }
 
-    @Override
-    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        if (level.isClientSide()) return;
-
-        if(pedestal.hasWorkCard())
-        {
-            ItemStack card = pedestal.getWorkCardInPedestal();
-            boolean override = hasTwoPointsSelected(card);
-            List<BlockPos> listed = getValidList(pedestal);
-
-            if(override)
-            {
-                if(listed.size()>0)
-                {
-                    quarryAction(level, pedestal, pedestalPos);
-                }
-                else if(MowLibBlockPosUtils.selectedAreaWithinRange(pedestal, getUpgradeWorkRange(coin)) && !hasBlockListCustomNBTTags(MODID,"_validlist",coin))
-                {
-                    buildValidBlockListArea(pedestal);
-                }
-            }
-        }
+    private boolean getStopped(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, upgrade.getOrCreateTag(), "_boolstop");
     }
 
-
-
-    private boolean getStopped(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return MowLibCompoundTagUtils.readBooleanFromNBT(MODID, coin.getOrCreateTag(), "_boolstop");
+    private void setStopped(ItemStack upgrade) {
+        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, upgrade.getOrCreateTag(), true, "_boolstop");
     }
 
-    private void setStopped(BasePedestalBlockEntity pedestal, boolean value)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        MowLibCompoundTagUtils.writeBooleanToNBT(MODID, coin.getOrCreateTag(),value, "_boolstop");
+    private int getNumBlocksPerOperation(ItemStack upgrade) {
+        return PedestalConfig.COMMON.upgrade_pump_baseBlocksPumped.get() + getBlockCapacityIncrease(upgrade);
     }
 
-    private int getHeightIteratorValue(BasePedestalBlockEntity pedestal)
-    {
-        //TODO: make a modifier for this
-        return PedestalConfig.COMMON.upgrade_quarry_baseBlocksMined.get() + getBlockCapacityIncrease(pedestal.getCoinOnPedestal());
+    private int getCurrentHeight(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, upgrade.getOrCreateTag(), "_numheight");
     }
 
-    private int getCurrentHeight(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return (coin.getOrCreateTag().contains(MODID + "_numheight"))?(MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getOrCreateTag(), "_numheight")):(pedestal.getLevel().getMinBuildHeight());
+    private void setCurrentHeight(ItemStack upgrade, int num) {
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, upgrade.getOrCreateTag(), num, "_numheight");
     }
 
-    private void setCurrentHeight(BasePedestalBlockEntity pedestal, int num)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numheight");
+    private int getMinY(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, upgrade.getOrCreateTag(), "_miny");
     }
 
-    private void iterateCurrentHeight(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        int current = getCurrentHeight(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+getHeightIteratorValue(pedestal)), "_numheight");
+    private void setMinY(ItemStack upgrade, int minY) {
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, upgrade.getOrCreateTag(), minY, "_miny");
     }
 
-    private int getCurrentDelay(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getOrCreateTag(), "_numdelay");
+    private int getCurrentPosition(ItemStack upgrade) {
+        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, upgrade.getOrCreateTag(), "_numposition");
     }
 
-    private void setCurrentDelay(BasePedestalBlockEntity pedestal, int num)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numdelay");
-    }
-
-    private void iterateCurrentDelay(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        int current = getCurrentDelay(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1+getSpeedTicksReduced(pedestal.getCoinOnPedestal())), "_numdelay");
-    }
-
-    private int getCurrentPosition(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        return MowLibCompoundTagUtils.readIntegerFromNBT(MODID, coin.getOrCreateTag(), "_numposition");
-    }
-
-    private void setCurrentPosition(BasePedestalBlockEntity pedestal, int num)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), num, "_numposition");
-    }
-
-    private void iterateCurrentPosition(BasePedestalBlockEntity pedestal)
-    {
-        ItemStack coin = pedestal.getCoinOnPedestal();
-        int current = getCurrentPosition(pedestal);
-        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, coin.getOrCreateTag(), (current+1), "_numposition");
+    private void setCurrentPosition(ItemStack upgrade, int num) {
+        MowLibCompoundTagUtils.writeIntegerToNBT(MODID, upgrade.getOrCreateTag(), num, "_numposition");
     }
     private boolean canMine(Block targetBlock) {
         List<Block> canChopCannotQuarryBlocks = ForgeRegistries.BLOCKS.tags().getTag(BlockTags.create(new ResourceLocation(MODID, "pedestals_can_chop_cant_quarry"))).stream().toList();
@@ -282,149 +176,139 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
         if(xpdrop>0)blockAtPoint.getBlock().popExperience((ServerLevel)level,currentPoint,xpdrop);
     }
 
-    public void quarryAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos) {
+    public List<BlockPos> getValidWorkCardPositionsQuarry(Level level, BasePedestalBlockEntity pedestal, ItemStack upgrade) {
+        List<BlockPos> cached = readBlockPosListCustomFromNBT(MODID, "_validlist", upgrade);
+        if (cached.size() == 0) {
+            // Optimization to construct the validlist only once. The NBT tag should be reset when the WorkCard/Upgrade
+            // is removed (as that is the only way to invalidate the cached list) by calling `resetCachedValidWorkCardPositions`.
+            if (!hasBlockListCustomNBTTags(MODID, "_validlist", upgrade) && pedestal.hasWorkCard()) {
+                ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
+                if (workCardItemStack.getItem() instanceof WorkCardArea) {
+                    cached = WorkCardArea.getAABBIfDefinedAndInRange(workCardItemStack, pedestal, getUpgradeWorkRange(upgrade))
+                            .map(area -> {
+                                List<BlockPos> locations = new ArrayList<>();
+                                int minY = (int)area.minY;
+                                int maxY = (int)area.maxY;
+                                if (hasOperateToBedrock(upgrade)) {
+                                    if (minY != maxY) { // invalid selection
+                                        return locations;
+                                    }
+                                    setCurrentHeight(upgrade, maxY);
+                                    setMinY(upgrade, level.getMinBuildHeight());
+                                } else {
+                                    setMinY(upgrade, minY);
+                                }
+                                for (int x = (int)area.maxX; x >= (int)area.minX; x--) {
+                                    for (int z = (int)area.maxZ; z >= (int)area.minZ; z--) {
+                                        for (int y = maxY; y >= minY; y -= getNumBlocksPerOperation(upgrade)) {
+                                            locations.add(new BlockPos(x, y, z));
+                                        }
+                                    }
+                                }
+                                return locations;
+                            }).orElse(List.of());
+                }
+                saveBlockPosListCustomToNBT(MODID, "_validlist", upgrade, cached);
+            }
+        }
+        return cached;
+    }
+
+    @Override
+    public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        if (level.isClientSide()) return;
+        if (getStopped(coin)) {
+            if (pedestal.canSpawnParticles()) {
+                MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 255, 55, 55));
+            }
+            return;
+        }
+        List<BlockPos> allPositions = getValidWorkCardPositionsQuarry(level, pedestal, coin);
+        if (allPositions.isEmpty()) return;
+
+        int currentPosition = getCurrentPosition(coin);
+        BlockPos currentPoint = allPositions.get(currentPosition);
+        int currentY = hasOperateToBedrock(coin) ? getCurrentHeight(coin) : currentPoint.getY();
+        int currentMinY = Math.max(currentY - getNumBlocksPerOperation(coin) + 1, getMinY(coin));
+        List<BlockPos> adjustedPoints = IntStream.rangeClosed(currentMinY, currentY)
+            .mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
+        if (quarryAction(level, pedestal, pedestalPos, adjustedPoints)) {
+            if (currentPosition + 1 >= allPositions.size()) {
+                setCurrentPosition(coin, 0);
+                if (hasOperateToBedrock(coin)) {
+                    setCurrentHeight(coin, currentMinY - 1);
+                    if (currentMinY <= getMinY(coin)) {
+                        setStopped(coin);
+                    }
+                }
+            } else {
+                setCurrentPosition(coin, currentPosition + 1);
+            }
+        }
+    }
+
+    public boolean quarryAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, List<BlockPos> adjustedPoints) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if(fakePlayerReference != null && fakePlayerReference.get() != null) {
             FakePlayer fakePlayer = fakePlayerReference.get();
-            if(pedestal.hasWorkCard())
-            {
-                ItemStack card = pedestal.getWorkCardInPedestal();
-                if(card.getItem() instanceof WorkCardBase)
-                {
-                    List<BlockPos> listed = getValidList(pedestal);
-                    int currentPosition = getCurrentPosition(pedestal);
-                    BlockPos currentPoint = listed.get(currentPosition);
-                    AABB area = new AABB(MowLibBlockPosUtils.readBlockPosFromNBT(card,1), MowLibBlockPosUtils.readBlockPosFromNBT(card,2));
-                    int maxY = (int)area.maxY;
-                    int minY = (int)area.minY;
-                    int ySpread = maxY - minY;
-                    boolean minMaxHeight = ySpread > 0;
-                    if(ySpread>getHeightIteratorValue(pedestal))setCurrentHeight(pedestal,minY);
 
-                    int currentYMin = getCurrentHeight(pedestal);
-                    int currentYMax = (minMaxHeight)?(0):(currentYMin+getHeightIteratorValue(pedestal));
+            List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
+            boolean damageToolsEnabled = PedestalConfig.COMMON.quarryDamageTools.get();
+            if (removeFuelForActionMultiple(pedestal, distances, true)) {
+                if (!damageToolsEnabled || (pedestal.hasTool() && pedestal.damageInsertedTool(adjustedPoints.size(), true))) {
+                    for (BlockPos adjustedPoint : adjustedPoints) {
+                        if (adjustedPoint.equals(pedestalPos)) {
+                            continue;
+                        }
+                        BlockState targetBlockState = level.getBlockState(adjustedPoint);
+                        Block targetBlock = targetBlockState.getBlock();
+                        //targetBlockState.requiresCorrectToolForDrops();
 
-                    int min = (minMaxHeight)?(minY):(currentYMin);
-                    int max = (minMaxHeight)?((ySpread>getHeightIteratorValue(pedestal))?(minY+getHeightIteratorValue(pedestal)):(maxY)):(currentYMax);
-                    int absoluteMax = (minMaxHeight)?(maxY):(level.getMaxBuildHeight());
-
-                    boolean fuelRemoved = true;
-                    //ToDo: make this a modifier for later
-                    boolean runsOnce = true;
-                    boolean stop = getStopped(pedestal);
-
-                    List<BlockPos> adjustedPoints = IntStream.range(min, max).mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
-                    List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
-                    if (removeFuelForActionMultiple(pedestal, distances, true)) {
-                        if(!stop) {
-                            for (BlockPos adjustedPoint : adjustedPoints) {
-                                if (adjustedPoint.equals(pedestalPos)) {
-                                    continue;
-                                }
-                                BlockState blockAtPoint = level.getBlockState(adjustedPoint);
-                                Block targetBlock = blockAtPoint.getBlock();
-                                //blockAtPoint.requiresCorrectToolForDrops();
-
-                                if(blockAtPoint.getDestroySpeed(level,currentPoint)>=0)
-                                {
-                                    if(ForgeEventFactory.doPlayerHarvestCheck(fakePlayer, blockAtPoint, true))
-                                    {
-                                        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, adjustedPoint, blockAtPoint, fakePlayer);
-                                        if(!MinecraftForge.EVENT_BUS.post(e))
-                                        {
-                                            if(canMine(targetBlock) && passesMachineFilterItems(pedestal, blockAtPoint.getBlock().getCloneItemStack(level, adjustedPoint, blockAtPoint))) {
-                                                //ToDo: config option
-                                                boolean damage = false;
-
-                                                if(PedestalConfig.COMMON.quarryDamageTools.get()) {
-                                                    if(pedestal.hasTool()) {
-                                                        if(pedestal.getDurabilityRemainingOnInsertedTool() > 0) {
-                                                            if(pedestal.damageInsertedTool(1,true)) {
-                                                                damage = true;
-                                                            }
-                                                        }
-                                                        if (!damage) {
-                                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                                            return;
-                                                        }
-                                                    }
+                        if (targetBlockState.getDestroySpeed(level, adjustedPoint) >= 0) {
+                            if (ForgeEventFactory.doPlayerHarvestCheck(fakePlayer, targetBlockState, true)) {
+                                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, adjustedPoint, targetBlockState, fakePlayer);
+                                if (!MinecraftForge.EVENT_BUS.post(e)) {
+                                    if (canMine(targetBlock) && passesMachineFilterItems(pedestal, targetBlock.getCloneItemStack(level, adjustedPoint, targetBlockState))) {
+                                        if (
+                                            removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestalPos, adjustedPoint), false) &&
+                                            (!damageToolsEnabled || pedestal.damageInsertedTool(1, false))
+                                        ) {
+                                            boolean targetIsBlockEntity = level.getBlockEntity(adjustedPoint) != null;
+                                            if (targetIsBlockEntity) {
+                                                if (!PedestalConfig.COMMON.blockBreakerBreakEntities.get()) {
+                                                    continue; // we can't break block entities, so skip this
                                                 }
-
-                                                if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),adjustedPoint), false)) {
-                                                    boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
-                                                    List<ItemStack> drops = getBlockDrops(level, pedestal, fakePlayer, blockAtPoint);
-                                                    if (level.getBlockEntity(adjustedPoint) != null) {
-                                                        if(canRemoveBlockEntities) {
-                                                            blockAtPoint.onRemove(level, adjustedPoint, blockAtPoint,true);
-                                                            level.removeBlockEntity(adjustedPoint);
-                                                            dropXP(level, pedestal, blockAtPoint, adjustedPoint);
-                                                            level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
-                                                            if (damage) pedestal.damageInsertedTool(1, false);
-
-                                                            for (ItemStack drop: drops) {
-//                                                                    MowLibItemUtils.spawnItemStack(level, adjustedPoint.getX(), adjustedPoint.getY(), adjustedPoint.getZ(), drop);
-                                                                MowLibItemUtils.spawnItemStack(level, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), drop);
-                                                            }
-                                                        }
-                                                    } else {
-                                                        dropXP(level, pedestal, blockAtPoint, adjustedPoint);
-                                                        level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
-                                                        if (damage) pedestal.damageInsertedTool(1, false);
-
-                                                        for (ItemStack drop: drops) {
-//                                                                MowLibItemUtils.spawnItemStack(level, adjustedPoint.getX(), adjustedPoint.getY(), adjustedPoint.getZ(), drop);
-                                                            MowLibItemUtils.spawnItemStack(level, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), drop);
-                                                        }
-                                                    }
-                                                } else {
-                                                    fuelRemoved = false;
-                                                }
+                                                targetBlockState.onRemove(level, adjustedPoint, targetBlockState, true);
+                                                level.removeBlockEntity(adjustedPoint);
                                             }
+                                            dropXP(level, pedestal, targetBlockState, pedestalPos);
+                                            level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
+                                            List<ItemStack> drops = getBlockDrops(level, pedestal, fakePlayer, targetBlockState);
+                                            for (ItemStack drop : drops) {
+                                                MowLibItemUtils.spawnItemStack(level, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ(), drop);
+                                            }
+                                        } else {
+                                            return false; // should be impossible
                                         }
                                     }
                                 }
                             }
-                        } else {
-                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY()+1.0f, pedestalPos.getZ(),55,55,55));
-                        }
-
-                        if((currentPosition+1)>=listed.size() && currentYMax >= absoluteMax)
-                        {
-                            if(runsOnce)
-                            {
-                                //ToDo: Make this 1200 value a config
-                                int delay = listed.size() * Math.abs((((minMaxHeight)?(maxY):(level.getMaxBuildHeight()))-((minMaxHeight)?(maxY):(level.getMinBuildHeight()))));
-                                if(getCurrentDelay(pedestal)>=delay)
-                                {
-                                    setCurrentPosition(pedestal,0);
-                                    setStopped(pedestal,false);
-                                    setCurrentDelay(pedestal,0);
-                                }
-                                else
-                                {
-                                    iterateCurrentDelay(pedestal);
-                                    setStopped(pedestal,true);
-                                }
-                            }
-                            else
-                            {
-                                setCurrentPosition(pedestal,0);
-                            }
-                        }
-                        else if((currentPosition+1)>=listed.size())
-                        {
-                            setCurrentPosition(pedestal,0);
-                            iterateCurrentHeight(pedestal);
-                        }
-                        else
-                        {
-                            if(fuelRemoved){
-                                iterateCurrentPosition(pedestal);
-                            }
                         }
                     }
+                    return true;
+                } else {
+                    if (pedestal.canSpawnParticles()) {
+                        MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 255, 255, 255));
+                    }
+                    return false;
                 }
+            } else {
+                if (pedestal.canSpawnParticles()) {
+                    MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 55, 55, 55));
+                }
+                return false;
             }
         }
+        return false;
     }
 }
