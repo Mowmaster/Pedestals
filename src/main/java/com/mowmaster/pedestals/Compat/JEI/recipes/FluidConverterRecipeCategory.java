@@ -89,12 +89,12 @@ public class FluidConverterRecipeCategory implements IRecipeCategory<FluidConver
 
         MutableComponent energy = Component.translatable(References.MODID + ".fluidconverter.energy");
         energy.append(Component.literal("" + recipe.getEnergyReturned() + ""));
-        energy.withStyle(ChatFormatting.BLACK);
+        energy.withStyle(ChatFormatting.WHITE);
         guiGraphics.drawString(fontRenderer,energy,10,44,0xffffffff);
 
         MutableComponent exp = Component.translatable(References.MODID + ".fluidconverter.xp");
         exp.append(Component.literal("" + recipe.getExperienceReturned() + ""));
-        exp.withStyle(ChatFormatting.BLACK);
+        exp.withStyle(ChatFormatting.WHITE);
         guiGraphics.drawString(fontRenderer,exp,10,62,0xffffffff);
 
         if(References.isDustLoaded())
@@ -110,7 +110,7 @@ public class FluidConverterRecipeCategory implements IRecipeCategory<FluidConver
             {
                 dust.append(Component.literal(dustNeeded.getDustAmount() + ""));
             }
-            dust.withStyle(ChatFormatting.BLACK);
+            dust.withStyle(ChatFormatting.WHITE);
 
             guiGraphics.drawString(fontRenderer,dust,10,80,0xffffffff);
         }

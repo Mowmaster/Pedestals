@@ -114,7 +114,7 @@ public class UpgradeModifierCategory implements IRecipeCategory<UpgradeModificat
         //MutableComponent modTypeLabel = Component.translatable(References.MODID + ".upgrade_modification.type");
         MutableComponent modType = Component.translatable(References.MODID + ".upgrade_modification." + recipe.getResultModificationName());
         //modTypeLabel.withStyle(ChatFormatting.BLACK);
-        modType.withStyle(ChatFormatting.BLACK);
+        modType.withStyle(ChatFormatting.WHITE);
         //modTypeLabel.append(modType);
         int width1 = fontRenderer.width(modType.getString());
         guiGraphics.drawString(fontRenderer,modType,64-Math.floorDiv(width1,2),4,0xffffffff);
@@ -144,7 +144,7 @@ public class UpgradeModifierCategory implements IRecipeCategory<UpgradeModificat
         separator1.append(spaceText);
         separator1.append(maxText);
         separator1.append(maxAmount);
-        separator1.withStyle(ChatFormatting.BLACK);
+        separator1.withStyle(ChatFormatting.WHITE);
 
         int width = fontRenderer.width(separator1.getString());
         guiGraphics.drawString(fontRenderer,separator1,64-Math.floorDiv(width,2),73,0xffffffff);

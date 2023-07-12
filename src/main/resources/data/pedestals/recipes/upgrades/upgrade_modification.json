@@ -5,19 +5,22 @@
       "item": "pedestals:upgrade_pedestal_base"
     },
     {
-      "item": "pedestals:augment_pedestal_t1_capacity"
+      "tag": "forge:gems/emerald"
     },
     {
-      "item": "pedestals:augment_pedestal_t1_storage"
+      "tag": "forge:gems/lapis"
     },
     {
-      "item": "pedestals:augment_pedestal_t1_speed"
+      "tag": "forge:gems/diamond"
     },
     {
-      "item": "pedestals:augment_pedestal_t1_range"
+      "tag": "forge:gems/quartz"
     },
     {
-      "item": "pedestals:augment_pedestal_nocollide"
+      "tag": "forge:gems/amethyst"
+    },
+    {
+      "tag": "forge:gems/prismarine"
     }
   ],
   "result": {

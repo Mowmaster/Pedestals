@@ -98,12 +98,12 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
 
         MutableComponent energy = Component.translatable(References.MODID + ".unbottler.energy");
         energy.append(Component.literal("" + recipe.getEnergyReturned() + ""));
-        energy.withStyle(ChatFormatting.BLACK);
+        energy.withStyle(ChatFormatting.WHITE);
         guiGraphics.drawString(fontRenderer,energy,10,64,0xffffffff);
 
         MutableComponent exp = Component.translatable(References.MODID + ".unbottler.xp");
         exp.append(Component.literal("" + recipe.getExperienceReturned() + ""));
-        exp.withStyle(ChatFormatting.BLACK);
+        exp.withStyle(ChatFormatting.WHITE);
         guiGraphics.drawString(fontRenderer,exp,10,82,0xffffffff);
 
         if(References.isDustLoaded())
@@ -119,7 +119,7 @@ public class UnBottlerRecipeCategory implements IRecipeCategory<UnBottlerRecipe>
             {
                 dust.append(Component.literal(dustNeeded.getDustAmount() + ""));
             }
-            dust.withStyle(ChatFormatting.BLACK);
+            dust.withStyle(ChatFormatting.WHITE);
 
             guiGraphics.drawString(fontRenderer,dust,10,100,0xffffffff);
         }

@@ -100,12 +100,12 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
 
         MutableComponent energy = Component.translatable(References.MODID + ".cobble_gen.energy");
         energy.append(Component.literal("" + recipe.getResultEnergyNeeded() + ""));
-        energy.withStyle(ChatFormatting.BLACK);
+        energy.withStyle(ChatFormatting.WHITE);
         guiGraphics.drawString(fontRenderer,energy,10,66,0xffffffff);
 
         MutableComponent exp = Component.translatable(References.MODID + ".cobble_gen.xp");
         exp.append(Component.literal("" + recipe.getResultExperienceNeeded() + ""));
-        exp.withStyle(ChatFormatting.BLACK);
+        exp.withStyle(ChatFormatting.WHITE);
         guiGraphics.drawString(fontRenderer,exp,10,84,0xffffffff);
 
         if(References.isDustLoaded())
@@ -121,7 +121,7 @@ public class CobbleGenRecipeCategory implements IRecipeCategory<CobbleGenRecipe>
             {
                 dust.append(Component.literal(dustNeeded.getDustAmount() + ""));
             }
-            dust.withStyle(ChatFormatting.BLACK);
+            dust.withStyle(ChatFormatting.WHITE);
 
             guiGraphics.drawString(fontRenderer,dust,10,102,0xffffffff);
         }
