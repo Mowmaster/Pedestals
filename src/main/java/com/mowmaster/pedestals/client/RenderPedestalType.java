@@ -1,4 +1,4 @@
-package com.mowmaster.pedestals.Client;
+package com.mowmaster.pedestals.client;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;

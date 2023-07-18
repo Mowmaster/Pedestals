@@ -1,4 +1,4 @@
-package com.mowmaster.pedestals.Client;
+package com.mowmaster.pedestals.client;
 
 public class PedestalParticles
 {

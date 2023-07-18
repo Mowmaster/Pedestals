@@ -1,13 +1,10 @@
-package com.mowmaster.pedestals.Recipes;
+package com.mowmaster.pedestals.recipes;
 
 import com.google.gson.JsonObject;
-import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
-import com.mowmaster.mowlib.MowLibUtils.MowLibMultiContainer;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
-import com.mowmaster.pedestals.PedestalUtils.PedestalUtilities;
-import com.mowmaster.pedestals.PedestalUtils.References;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
+import com.mowmaster.pedestals.items.upgrades.pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.pedestalutils.References;
+import com.mowmaster.pedestals.registry.DeferredRegisterItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -22,11 +19,12 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ObjectHolder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import static com.mowmaster.pedestals.pedestalutils.References.MODID;
 
 public class UpgradeModificationRecipe implements Recipe<Container>
 {
@@ -67,7 +65,7 @@ public class UpgradeModificationRecipe implements Recipe<Container>
     }
 
     @Override
-    public String getGroup()
+    public @NotNull String getGroup()
     {
         return group;
     }
@@ -79,7 +77,7 @@ public class UpgradeModificationRecipe implements Recipe<Container>
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients()
+    public @NotNull NonNullList<Ingredient> getIngredients()
     {
         NonNullList<Ingredient> allIngredients = NonNullList.create();
         allIngredients.add(upgradeInput != null ? upgradeInput : Ingredient.EMPTY);
@@ -88,9 +86,9 @@ public class UpgradeModificationRecipe implements Recipe<Container>
     }
 
     @Override
-    public boolean matches(Container inv, Level worldIn)
+    public boolean matches(Container inv, @NotNull Level worldIn)
     {
-        ItemStack stacks[] = infusionInputIngredients.getItems();
+        ItemStack[] stacks = infusionInputIngredients.getItems();
         //Immediate fail if input container is less then recipe size needed.
         if(inv.getContainerSize()<stacks.length)return false;
         int matchCounter = 0;
@@ -116,13 +114,13 @@ public class UpgradeModificationRecipe implements Recipe<Container>
     }
 
     @Override
-    public ItemStack assemble(Container inv)
+    public @NotNull ItemStack assemble(@NotNull Container inv)
     {
         return getResultItem().copy();
     }
 
     @Override
-    public ItemStack getResultItem()
+    public @NotNull ItemStack getResultItem()
     {
         return new ItemStack(Items.BARRIER);
     }
@@ -159,18 +157,18 @@ public class UpgradeModificationRecipe implements Recipe<Container>
     }
 
     @Override
-    public ResourceLocation getId()
+    public @NotNull ResourceLocation getId()
     {
         return id;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<?> getSerializer() {
         return UpgradeModificationRecipe.Serializer.INSTANCE;
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public @NotNull RecipeType<?> getType() {
         return UpgradeModificationRecipe.Type.INSTANCE;
     }
 
@@ -181,7 +179,7 @@ public class UpgradeModificationRecipe implements Recipe<Container>
     }
 
     @Override
-    public ItemStack getToastSymbol()
+    public @NotNull ItemStack getToastSymbol()
     {
         return new ItemStack(DeferredRegisterItems.PEDESTAL_UPGRADE_MODIFICATIONS.get());
     }
@@ -202,7 +200,7 @@ public class UpgradeModificationRecipe implements Recipe<Container>
         }
 
         @Override
-        public UpgradeModificationRecipe fromJson(ResourceLocation recipeId, JsonObject json)
+        public @NotNull UpgradeModificationRecipe fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json)
         {
             String group = GsonHelper.getAsString(json, "group", "");
             Ingredient upgradeInput = json.has("upgradeInput") ? CraftingHelper.getIngredient(json.get("upgradeInput")) : null;
@@ -214,7 +212,7 @@ public class UpgradeModificationRecipe implements Recipe<Container>
         }
 
         @Override
-        public UpgradeModificationRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer)
+        public UpgradeModificationRecipe fromNetwork(@NotNull ResourceLocation recipeId, FriendlyByteBuf buffer)
         {
             String group = buffer.readUtf(32767);
             boolean hasUpgradeInput = buffer.readBoolean();

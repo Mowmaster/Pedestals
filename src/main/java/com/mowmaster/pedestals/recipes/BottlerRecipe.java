@@ -1,14 +1,14 @@
-package com.mowmaster.pedestals.Recipes;
+package com.mowmaster.pedestals.recipes;
 
 import com.google.gson.JsonObject;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMultiContainer;
-import com.mowmaster.pedestals.PedestalUtils.RecipeUtil;
-import com.mowmaster.pedestals.Recipes.Ingredients.DustIngredient;
-import com.mowmaster.pedestals.Recipes.Ingredients.EnergyIngredient;
-import com.mowmaster.pedestals.Recipes.Ingredients.ExperienceIngredient;
-import com.mowmaster.pedestals.Recipes.Ingredients.FluidTagIngredient;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
+import com.mowmaster.pedestals.pedestalutils.RecipeUtil;
+import com.mowmaster.pedestals.recipes.ingredients.DustIngredient;
+import com.mowmaster.pedestals.recipes.ingredients.EnergyIngredient;
+import com.mowmaster.pedestals.recipes.ingredients.ExperienceIngredient;
+import com.mowmaster.pedestals.recipes.ingredients.FluidTagIngredient;
+import com.mowmaster.pedestals.registry.DeferredRegisterItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import static com.mowmaster.pedestals.pedestalutils.References.MODID;
 
 public class BottlerRecipe implements Recipe<MowLibMultiContainer>
 {

@@ -1,11 +1,11 @@
-package com.mowmaster.pedestals.Recipes;
+package com.mowmaster.pedestals.recipes;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mowmaster.mowlib.MowLibUtils.MowLibCompoundTagUtils;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
-import com.mowmaster.pedestals.PedestalUtils.References;
-import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
+import com.mowmaster.pedestals.items.upgrades.pedestal.ItemUpgradeBase;
+import com.mowmaster.pedestals.pedestalutils.References;
+import com.mowmaster.pedestals.registry.DeferredRegisterItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -18,14 +18,12 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ObjectHolder;
 import org.jetbrains.annotations.Nullable;
 
-import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import static com.mowmaster.pedestals.pedestalutils.References.MODID;
 
 import java.util.Collection;
-
 
 public class UpgradeModificationGlobalRecipe implements Recipe<Container>
 {
@@ -122,8 +120,8 @@ public class UpgradeModificationGlobalRecipe implements Recipe<Container>
                 }
             }
         }
-        //System.out.println("Ingredients > Container: "+ (inputIngredients.size() >= inv.getContainerSize()));
-        //System.out.println("Has Upgrade: "+ hasUpgrade);
+        //System.out.println("ingredients > Container: "+ (inputIngredients.size() >= inv.getContainerSize()));
+        //System.out.println("Has upgrade: "+ hasUpgrade);
         //System.out.println("Unmatching: "+ unmatching);
         return inputIngredients.size() >= inv.getContainerSize() && canAddModifier && unmatching<=0;
     }

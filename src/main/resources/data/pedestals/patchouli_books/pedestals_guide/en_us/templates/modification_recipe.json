@@ -1,5 +1,5 @@
 {
-  "processor": "com.mowmaster.pedestals.Compat.Patchouli.ModificationInfusionProcessor",
+  "processor": "com.mowmaster.pedestals.compat.patchouli.ModificationInfusionProcessor",
   "components": [
     {
       "type": "patchouli:header",
