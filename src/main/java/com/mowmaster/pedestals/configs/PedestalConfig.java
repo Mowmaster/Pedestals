@@ -1,10 +1,16 @@
 package com.mowmaster.pedestals.configs;
 
 import com.mowmaster.pedestals.Pedestals;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.DyeColor;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.awt.*;
 
 public class PedestalConfig
 {
@@ -1422,14 +1428,57 @@ public class PedestalConfig
 
         public final ForgeConfigSpec.BooleanValue pedestalRotateItems;
         public final ForgeConfigSpec.BooleanValue pedestalRenderItems;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderParticles;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderHUD;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderUpgrades;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderToolSlot;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderUpgradeInToolSlot;
+        public final ForgeConfigSpec.IntValue pedestalRenderDistance;
         Client(ForgeConfigSpec.Builder builder) {
-            builder.comment("Pedestal rendering options").push("pedestal");
+            builder.comment("Pedestal rendering options").push("Pedestal");
             pedestalRotateItems = builder
                     .comment("Should items on pedestal rotate")
-                    .define("pedestalRotateItems", true);
+                    .comment("§a§lLOW§f resource usage when §a§lTRUE")
+                    .comment("§2§lLOWEST§f resource usage when §c§lFALSE")
+                    .define("Rotate Items", true);
             pedestalRenderItems = builder
                     .comment("Should items be rendered on pedestal")
-                    .define("pedestalRenderItems", true);
+                    .comment("§6§lMEDIUM§f resource usage when §a§lTRUE")
+                    .comment("§2§lLOWEST§f resource usage when §c§lFALSE")
+                    .define("Render Items", true);
+            pedestalRenderParticles = builder
+                    .comment("Should pedestals render particles")
+                    .comment("§a§lLOW§f resource usage when §a§lTRUE")
+                    .comment("§2§lLOWEST§f resource usage when §c§lFALSE")
+                    .define("Render Particles", true);
+            pedestalRenderHUD = builder
+                    .comment("Should pedestals render HUD elements?")
+                    .comment("§a§lLOW§f resource usage when §a§lTRUE")
+                    .comment("§2§lLOWEST§f resource usage when §c§lFALSE")
+                    .define("Render HUD", true);
+            pedestalRenderUpgrades = builder
+                    .comment("Should pedestals render upgrades?")
+                    .comment("This will prevent upgrades from being rendered")
+                    .comment("Set to false if you're experiencing client-side lag from Pedestals")
+                    .comment("§4§lHIGHEST§f resource usage when §a§lTRUE")
+                    .comment("§2§lLOWEST§f resource usage when §c§lFALSE")
+                    .define("Render Upgrades", true);
+            pedestalRenderToolSlot = builder
+                    .comment("Should pedestals render their Tool Slot which is located at the TOP?")
+                    .comment("§a§lLOW§f resource usage when §a§lTRUE")
+                    .comment("§2§lLOWEST§f resource usage when §c§lFALSE")
+                    .define("Render Tool Slot", true);
+            pedestalRenderUpgradeInToolSlot = builder
+                    .comment("Should the pedestal upgrades be rendered on TOP instead?")
+                    .comment("This will prevent the 'Tool Slot' from being rendered")
+                    .comment("§a§lLOW§f resource usage when §c§lFALSE")
+                    .comment("§2§lLOWEST§f resource usage when §a§lTRUE")
+                    .define("Render Upgrades in Tool Slot", false);
+            pedestalRenderDistance = builder
+                    .comment("Distance (blocks) away before Pedestal renders")
+                    .comment("§6§lMEDIUM§f resource usage on §c§l64")
+                    .comment("§2§lLOWEST§f resource usage on §a§l1")
+                    .defineInRange("Render Distance", 8, 1, 64);
             builder.pop();
         }
     }

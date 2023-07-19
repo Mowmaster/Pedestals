@@ -28,6 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -43,20 +44,20 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
     private static final TextureAtlasSprite UPGRADE_TEXTURE_SPRITE = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/upgrade_render"));
 
     @Override
-    public void render(BasePedestalBlockEntity p_112307_, float p_112308_, @NotNull PoseStack poseStack, @NotNull MultiBufferSource p_112310_, int p_112311_, int p_112312_) {
-        if (p_112307_.isRemoved()) {
+    public void render(BasePedestalBlockEntity pedestalBlockEntity, float p_112308_, @NotNull PoseStack poseStack, @NotNull MultiBufferSource multiBufferSource, int p_112311_, int p_112312_) {
+        if (pedestalBlockEntity.isRemoved()) {
             return;
         }
 
-        Direction facing = p_112307_.getBlockState().getValue(FACING);
-        List<ItemStack> listed = p_112307_.getItemStacks();
-        ItemStack toolStack = p_112307_.getToolStack();
-        ItemStack coin = p_112307_.getCoinOnPedestal();
-        ItemStack workCard = p_112307_.getWorkCardInPedestal();
-        List<BlockPos> linkedLocations = p_112307_.getLinkedLocations();
-        BlockPos pos = p_112307_.getPos();
-        Level world = p_112307_.getLevel();
-        List<String> hudMessages = p_112307_.getHudLog();
+        Direction facing = pedestalBlockEntity.getBlockState().getValue(FACING);
+        List<ItemStack> listed = pedestalBlockEntity.getItemStacks();
+        ItemStack toolStack = pedestalBlockEntity.getToolStack();
+        ItemStack coin = pedestalBlockEntity.getCoinOnPedestal();
+        ItemStack workCard = pedestalBlockEntity.getWorkCardInPedestal();
+        List<BlockPos> linkedLocations = pedestalBlockEntity.getLinkedLocations();
+        BlockPos pos = pedestalBlockEntity.getPos();
+        Level world = pedestalBlockEntity.getLevel();
+        List<String> hudMessages = pedestalBlockEntity.getHudLog();
             // 0 - No Particles
             // 1 - No Render Item
             // 2 - No Render upgrade
@@ -65,13 +66,13 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             // 5 - No Render Item/No Render upgrade
             // 6 - No Particles/No Render Item/No Render upgrade
             // 7 - No augment exists and thus all rendering is fine.
-            int renderAugmentType = p_112307_.getRendererType();
-        if (p_112307_.getRenderRange()) {
-            int range = p_112307_.getLinkingRange();
+            int renderAugmentType = pedestalBlockEntity.getRendererType();
+        if (pedestalBlockEntity.getRenderRange()) {
+            int range = pedestalBlockEntity.getLinkingRange();
             AABB aabb = new AABB(pos.offset(-range, -range, -range), pos.offset(range + 1, range + 1, range + 1));
             poseStack.pushPose();
-            renderBoundingBox(pos, aabb, poseStack, p_112310_.getBuffer(RenderType.lines()), 1f, 0.2f, 0.2f, 1f);
-            renderFaces(WHITE_TEXTURE_SPRITE, pos, aabb, poseStack, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), 1f, 0.2f, 0.2f, 0.5f);
+            renderBoundingBox(pos, aabb, poseStack, multiBufferSource.getBuffer(RenderType.lines()), 1f, 0.2f, 0.2f, 1f);
+            renderFaces(WHITE_TEXTURE_SPRITE, pos, aabb, poseStack, multiBufferSource.getBuffer(Sheets.translucentCullBlockSheet()), 1f, 0.2f, 0.2f, 0.5f);
             poseStack.popPose();
 
             if (!linkedLocations.isEmpty()) {
@@ -80,8 +81,8 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     AABB aabbCoin = new AABB(posPoints);
                     if (!aabbCoin.equals(new AABB(BlockPos.ZERO))) {
                         TextureAtlasSprite upgradeTextureSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(new ResourceLocation(MODID, "util/pedestal_render_" + (linkedLocations.indexOf(posPoints) + 1)));
-                        renderBoundingBox(pos, aabbCoin, poseStack, p_112310_.getBuffer(RenderType.lines()), 0.0f, 0.0f, 1f, 1f);
-                        renderFaces(upgradeTextureSprite, pos, aabbCoin, poseStack, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), 0.0f, 0.0f, 1f, 0.5f);
+                        renderBoundingBox(pos, aabbCoin, poseStack, multiBufferSource.getBuffer(RenderType.lines()), 0.0f, 0.0f, 1f, 1f);
+                        renderFaces(upgradeTextureSprite, pos, aabbCoin, poseStack, multiBufferSource.getBuffer(Sheets.translucentCullBlockSheet()), 0.0f, 0.0f, 1f, 0.5f);
                     }
                 }
                 poseStack.popPose();
@@ -90,7 +91,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             linkedLocations.clear();
         }
 
-        if (p_112307_.getRenderRangeUpgrade() && !coin.isEmpty()) {
+        if (pedestalBlockEntity.getRenderRangeUpgrade() && !coin.isEmpty()) {
             int range = 0;
             if (coin.getItem() instanceof ItemUpgradeBase upgrade) {
                 range = upgrade.getUpgradeWorkRange(coin);
@@ -99,17 +100,17 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             if (range > 0) {
                 AABB aabb = new AABB(pos.offset(-range, -range, -range), pos.offset(range + 1, range + 1, range + 1));
                 poseStack.pushPose();
-                renderBoundingBox(pos, aabb, poseStack, p_112310_.getBuffer(RenderType.lines()), 0.2f, 0.2f, 1f, 1f);
-                renderFaces(WHITE_TEXTURE_SPRITE, pos, aabb, poseStack, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), 0.2f, 0.2f, 1f, 0.5f);
+                renderBoundingBox(pos, aabb, poseStack, multiBufferSource.getBuffer(RenderType.lines()), 0.2f, 0.2f, 1f, 1f);
+                renderFaces(WHITE_TEXTURE_SPRITE, pos, aabb, poseStack, multiBufferSource.getBuffer(Sheets.translucentCullBlockSheet()), 0.2f, 0.2f, 1f, 0.5f);
                 poseStack.popPose();
 
                 if (workCard.getItem() instanceof WorkCardArea workCardArea) {
                     poseStack.pushPose();
                     WorkCardArea.getAABBIfDefined(workCard).ifPresent(workCardAABB -> {
                         AABB expandedWorkCardAABB = workCardAABB.expandTowards(1.0D, 1.0D, 1.0D);
-                        boolean inSelectedInRange = workCardArea.selectedAreaWithinRange(p_112307_);
-                        renderBoundingBox(pos, expandedWorkCardAABB, poseStack, p_112310_.getBuffer(RenderType.lines()), inSelectedInRange ? 0.0f : 1f, inSelectedInRange ? 1f : 0.0f, 0.0f, 1f);
-                        renderFaces(UPGRADE_TEXTURE_SPRITE, pos, expandedWorkCardAABB, poseStack, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), inSelectedInRange ? 0.0f : 1f, inSelectedInRange ? 1f : 0.0f, 0.0f, 0.5f);
+                        boolean inSelectedInRange = workCardArea.selectedAreaWithinRange(pedestalBlockEntity);
+                        renderBoundingBox(pos, expandedWorkCardAABB, poseStack, multiBufferSource.getBuffer(RenderType.lines()), inSelectedInRange ? 0.0f : 1f, inSelectedInRange ? 1f : 0.0f, 0.0f, 1f);
+                        renderFaces(UPGRADE_TEXTURE_SPRITE, pos, expandedWorkCardAABB, poseStack, multiBufferSource.getBuffer(Sheets.translucentCullBlockSheet()), inSelectedInRange ? 0.0f : 1f, inSelectedInRange ? 1f : 0.0f, 0.0f, 0.5f);
                     });
                     poseStack.popPose();
                 }
@@ -123,9 +124,9 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                                 for (BlockPos posPoints : locations) {
                                     AABB aabbCoin = new AABB(posPoints);
                                     if (!aabbCoin.equals(new AABB(BlockPos.ZERO))) {
-                                        boolean inSelectedInRange = cardBase.selectedPointWithinRange(p_112307_, posPoints);
-                                        renderBoundingBox(pos, aabbCoin, poseStack, p_112310_.getBuffer(RenderType.lines()), inSelectedInRange ? 0.0f : 1f, inSelectedInRange ? 1f : 0.0f, 0.0f, 1f);
-                                        renderFaces(UPGRADE_TEXTURE_SPRITE, pos, aabbCoin, poseStack, p_112310_.getBuffer(Sheets.translucentCullBlockSheet()), inSelectedInRange ? 0.0f : 1f, inSelectedInRange ? 1f : 0.0f, 0.0f, 0.5f);
+                                        boolean inSelectedInRange = cardBase.selectedPointWithinRange(pedestalBlockEntity, posPoints);
+                                        renderBoundingBox(pos, aabbCoin, poseStack, multiBufferSource.getBuffer(RenderType.lines()), inSelectedInRange ? 0.0f : 1f, inSelectedInRange ? 1f : 0.0f, 0.0f, 1f);
+                                        renderFaces(UPGRADE_TEXTURE_SPRITE, pos, aabbCoin, poseStack, multiBufferSource.getBuffer(Sheets.translucentCullBlockSheet()), inSelectedInRange ? 0.0f : 1f, inSelectedInRange ? 1f : 0.0f, 0.0f, 0.5f);
                                     }
                                 }
                             }
@@ -163,82 +164,56 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                     poseStack.translate(0, -1, 0);
                     break;
             }
-            renderTileItems(world, poseStack, p_112310_, listed, coin, toolStack, p_112311_, p_112312_, renderAugmentType, hudMessages);
+            renderTileItems(world, poseStack, multiBufferSource, listed, coin, toolStack, p_112311_, p_112312_, renderAugmentType, hudMessages);
             poseStack.popPose();
         }
     }
 
-    public static void renderTileItems(Level worldIn, PoseStack poseStack, MultiBufferSource p_112310_, List<ItemStack> item, ItemStack coin, ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType, List<String> messages) {
-        renderCoin(worldIn, coin, poseStack, p_112310_, 0.5f, 0.475f, 0.3125f, 0, p_112311_, p_112312_);
-        renderCoin(worldIn, coin, poseStack, p_112310_, 0.3125f, 0.475f, 0.5f, 90, p_112311_, p_112312_);
-        renderCoin(worldIn, coin, poseStack, p_112310_, 0.5f, 0.475f, 0.6875f, 180, p_112311_, p_112312_);
-        renderCoin(worldIn, coin, poseStack, p_112310_, 0.6875f, 0.475f, 0.5f, 270, p_112311_, p_112312_);
-        renderTool(worldIn, toolStack, poseStack, p_112310_, p_112311_, p_112312_);
+    public static void renderTileItems(Level worldIn, PoseStack poseStack, MultiBufferSource multiBufferSource, List<ItemStack> item, ItemStack coin, ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType, List<String> messages) {
+        boolean renderUpgrades = PedestalConfig.CLIENT.pedestalRenderUpgrades.get();
+        boolean renderUpgradesInToolSlot = PedestalConfig.CLIENT.pedestalRenderUpgradeInToolSlot.get();
+        if(renderUpgradesInToolSlot) {
+            if (renderUpgrades) {
+                renderTool(worldIn, coin, poseStack, multiBufferSource, p_112311_, p_112312_);
+            }
+        } else {
+            if (renderUpgrades) {
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.5f, 0.475f, 0.3125f,0, p_112311_,p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.3125f, 0.475f, 0.5f,90, p_112311_,p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.5f, 0.475f, 0.6875f,180, p_112311_,p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.6875f, 0.475f, 0.5f,270, p_112311_,p_112312_);
+            }
+            boolean renderUpgradeExtras = PedestalConfig.CLIENT.pedestalRenderToolSlot.get();
+            if (renderUpgradeExtras) {
+                renderTool(worldIn, toolStack, poseStack, multiBufferSource, p_112311_, p_112312_);
+            }
+        }
 
-        if (messages.size() > 0) {
-            renderPedestalsHUD(poseStack, p_112310_, messages, -0.75F, 0);
-            renderPedestalsHUD(poseStack, p_112310_, messages, 1.5F, 180);
+        boolean renderHUD = PedestalConfig.CLIENT.pedestalRenderHUD.get();
+        if (renderHUD) {
+            if (messages.size() > 0) {
+                renderPedestalsHUD(poseStack, multiBufferSource, messages, -0.75F, 0);
+                renderPedestalsHUD(poseStack, multiBufferSource, messages, 1.5F, 180);
+            }
         }
 
         boolean renderItems = PedestalConfig.CLIENT.pedestalRenderItems.get();
-        if(renderItems) {
-            if ((!(renderAugmentType == 5 || renderAugmentType == 6))) {
-                renderItemsRotating(worldIn, poseStack, p_112310_, item, p_112311_, p_112312_);
+        if (renderItems) {
+            if (!(renderAugmentType == 5 || renderAugmentType == 6)) {
+                renderItemsRotating(worldIn, poseStack, multiBufferSource, item, p_112311_, p_112312_);
             }
         }
     }
 
     public static void renderItemsRotating(Level worldIn, PoseStack posStack, MultiBufferSource buffers, List<ItemStack> listed, int light, int overlay) {
         //https://github.com/VazkiiMods/Botania/blob/1.18.x/Xplat/src/main/java/vazkii/botania/client/render/tile/RenderTileRuneAltar.java#L49
-        int stacks = listed.size();
-        boolean rotateEnabled = PedestalConfig.CLIENT.pedestalRotateItems.get();
-        if (stacks > 1) {
-            posStack.pushPose();
-
-            float anglePer = 360F / stacks;
-
-            double time = worldIn.getGameTime();
-
-            float sized = 1.25F;
-            float sizedd = 0.25F;
-            if (stacks <= 4) {
-                sized = 0.25F;
-                sizedd = 0.05F;
-            } else if (stacks <= 8) {
-                sized = 0.5F;
-                sizedd = 0.10F;
-            } else if (stacks <= 12) {
-                sized = 0.75F;
-                sizedd = 0.15F;
-            } else if (stacks <= 16) {
-                sized = 1.0F;
-                sizedd = 0.20F;
-            }
-
-            for (int i = 0; i < stacks; i++) {
-                posStack.pushPose();
-                posStack.translate(0.5F, 0.75F, 0.5F);
-                if(rotateEnabled) {
-                    posStack.mulPose(Vector3f.YP.rotationDegrees(anglePer * i + (float) time));
-                }
-                posStack.translate(sized, 0F, sizedd);
-                if(rotateEnabled) {
-                    posStack.mulPose(Vector3f.YP.rotationDegrees(90F));
-                }
-                posStack.translate(0D, 0.075 * Math.sin((time + i * 10) / 5D), 0F);
-                ItemStack stack = listed.get(i);
-                Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemTransforms.TransformType.GROUND,
-                        light, overlay, posStack, buffers, 0);
-                posStack.popPose();
-            }
-
-            posStack.popPose();
-        } else if (stacks == 1) {
+        if(listed != null && !listed.isEmpty()) {
             posStack.pushPose();
             posStack.translate(0.5, 1.0, 0.5);
             posStack.scale(0.75F, 0.75F, 0.75F);
             long time = System.currentTimeMillis();
             float angle = time / 25 % 360;
+            boolean rotateEnabled = PedestalConfig.CLIENT.pedestalRotateItems.get();
             if(rotateEnabled) {
                 posStack.mulPose(Vector3f.YP.rotationDegrees(angle));
             }
@@ -260,16 +235,57 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             poseStack.scale(0.1875f, 0.1875f, 0.1875f);
             poseStack.mulPose(Vector3f.YP.rotationDegrees(angle));
 
+            // Check if the coin model is already cached
             if (cachedModel == null || cachedModel != itemRenderer.getModel(itemCoin, worldIn, null, 0)) {
                 cachedModel = itemRenderer.getModel(itemCoin, worldIn, null, 0);
             }
 
+            // Render the coin using the current pose stack
             itemRenderer.render(itemCoin, ItemTransforms.TransformType.FIXED, true, poseStack, bufferSource, overlay, light, cachedModel);
 
             poseStack.popPose();
         }
     }
 
+    /*
+    private static boolean isVisibleToPlayer(Level level, BlockPos pos) {
+        Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            Vec3 eyePos = player.getEyePosition(1.0F);
+            Vec3 blockPos = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+
+            Vec3 lookDir = player.getLookAngle().normalize();
+            Vec3 playerToBlock = blockPos.subtract(eyePos).normalize();
+
+            double dotProduct = lookDir.dot(playerToBlock);
+
+            // Adjust the threshold to change the visibility angle
+            double visibilityAngleThreshold = Math.cos(Math.toRadians(-90)); // 60 degrees
+
+            // Check if the angle between the player's look direction and the vector to the block is within the visibility angle threshold
+            return dotProduct >= visibilityAngleThreshold;
+        }
+        return false;
+    }
+*/
+
+    /*
+    private static boolean isVisibleToPlayer(BlockPos pos) {
+        Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            Vec3 eyePos = player.getEyePosition(1.0F);
+            Vec3 lookDir = player.getLookAngle().normalize();
+            Vec3 blockPos = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+
+            // Calculate the vector from the player's eye position to the block position
+            Vec3 vecToBlock = blockPos.subtract(eyePos);
+
+            // Check if the angle between the player's look direction and the vector to the block is less than 90 degrees
+            return lookDir.dot(vecToBlock) >= 0;
+        }
+        return false;
+    }
+*/
     public static void renderTool(Level worldIn, ItemStack itemTool, PoseStack poseStack, MultiBufferSource bufferSource, int overlay, int light) {
         if (!itemTool.isEmpty()) {
             poseStack.pushPose();
@@ -438,8 +454,15 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
 
     //This allows the pedestal render boxes to render when the pedestal isnt within normal render range
     @Override
-    public boolean shouldRenderOffScreen(BasePedestalBlockEntity pedestal) {
-        return pedestal.getRenderRange() || pedestal.getRenderRangeUpgrade();
+    public boolean shouldRenderOffScreen(BasePedestalBlockEntity blockEntity) {
+        return blockEntity.getRenderRange() || blockEntity.getRenderRangeUpgrade();
+    }
+
+    @Override
+    public boolean shouldRender(BasePedestalBlockEntity blockEntity, @NotNull Vec3 playerPos) {
+        Vec3 blockPos = Vec3.atCenterOf(blockEntity.getBlockPos());
+        int renderDistance = PedestalConfig.CLIENT.pedestalRenderDistance.get();
+        return blockPos.closerThan(playerPos, renderDistance); //Only render pedestals in x blocks radius
     }
 
 }

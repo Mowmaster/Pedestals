@@ -1,6 +1,5 @@
 package com.mowmaster.pedestals.blocks.pedestal;
 
-
 import com.mowmaster.mowlib.BlockEntities.MowLibBaseBlockEntity;
 import com.mowmaster.mowlib.Capabilities.Dust.CapabilityDust;
 import com.mowmaster.mowlib.Capabilities.Dust.DustMagic;
@@ -886,11 +885,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public ItemStack getMatchingItemInPedestalOrEmptySlot(ItemStack stackToMatch) {
         return maybeFirstSlotWithSpaceForMatchingItem(stackToMatch).map(itemHandler::getStackInSlot).orElse(ItemStack.EMPTY);
-
-    }
-
-    public ItemStack getItemInPedestalFirst() {
-        return maybeFirstNonEmptySlot().map(itemHandler::getStackInSlot).orElse(ItemStack.EMPTY);
 
     }
 
@@ -1979,10 +1973,14 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public boolean canSpawnParticles()
     {
-        return switch (getRendererType()) {
-            case 0, 3, 4, 6 -> false;
-            default -> true;
-        };
+        boolean particlesEnabled = PedestalConfig.CLIENT.pedestalRenderParticles.get();
+        if(particlesEnabled) {
+            return switch (getRendererType()) {
+                case 0, 3, 4, 6 -> false;
+                default -> true;
+            };
+        }
+        return false;
     }
 
     public int  getRendererType()
@@ -2249,218 +2247,172 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
 
-    public static void clientTick(BasePedestalBlockEntity e) {
-        e.tickClient();
-    }
-
     int pedTicker = 0;
 
     public void tick() {
-        if(!Objects.requireNonNull(level).isClientSide() &&level.isAreaLoaded(getPos(),1))
-        {
+        if (!Objects.requireNonNull(level).isClientSide() && level.isAreaLoaded(getPos(), 1)) {
             pedTicker++;
-            //if (pedTicker%getOperationSpeed() == 0) {
-            int speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-            if(hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getTicksReduced();
-            //Make sure speed has at least a value of 1
-            if(speed<=0)speed = 1;
-            if (pedTicker%speed == 0) {
-
-                if(!isPedestalBlockPowered(getPedestal()))
-                {
-                    if(getNumLinkedPedestals() > 0) { transferAction(); }
+            int maxTicksToTransfer = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
+            int speed = maxTicksToTransfer - getTicksReduced();
+            if (speed <= 0) {
+                speed = 1;
+            }
+            if (pedTicker % speed == 0) {
+                if (!isPedestalBlockPowered(getPedestal())) {
+                    if (getNumLinkedPedestals() > 0) {
+                        transferAction();
+                    }
                 }
-                //make sure we dont go over max int limit, regardless of config
-                int maxRate = Integer.MAX_VALUE;
-                if(pedTicker >= maxRate -1){pedTicker=0;}
+                if (pedTicker >= Integer.MAX_VALUE - 1) {
+                    pedTicker = 0;
+                }
             }
 
-            if(hasCoin())
-            {
-                Item coinInPed = getCoinOnPedestal().getItem();
-                if(coinInPed instanceof IPedestalUpgrade upgrade) {
-                    upgrade.updateAction(level,this);
-
-                    if(hasNoCollide())
-                    {
+            if (hasCoin()) {
+                Item coinItem = getCoinOnPedestal().getItem();
+                if (coinItem instanceof IPedestalUpgrade upgrade) {
+                    upgrade.updateAction(level, this);
+                    if (hasNoCollide()) {
                         upgrade.actionOnCollideWithBlock(this);
                     }
                 }
-
             }
 
-            if(canSpawnParticles())
-            {
-                BlockPos posOrientated = getPosOfBlockBelowPedestal(level,0);
-                if(getRenderRange() && pedTicker%10 == 0){
-                    MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,getPos().getX(),getPos().getY()+1.0D,getPos().getZ(),0,0,0));
+            if (canSpawnParticles()) {
+                BlockPos posOrientated = getPosOfBlockBelowPedestal(level, 0);
+                if (getRenderRange() && pedTicker % 10 == 0) {
+                    MowLibPacketHandler.sendToNearby(level, getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, getPos().getX(), getPos().getY() + 1.0D, getPos().getZ(), 0, 0, 0));
                 }
-
-                if(getRenderRangeUpgrade() && pedTicker%10 == 0){
-                    MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,getPos().getX(),getPos().getY()+1.0D,getPos().getZ(),50,50,50));
+                if (getRenderRangeUpgrade() && pedTicker % 10 == 0) {
+                    MowLibPacketHandler.sendToNearby(level, getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, getPos().getX(), getPos().getY() + 1.0D, getPos().getZ(), 50, 50, 50));
                 }
-
-                if(pedTicker%40 == 0){if(this.hasEnergy()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.25D,posOrientated.getY(),posOrientated.getZ()+0.25D,255,0,0));}}
-                if(pedTicker%40 == 0){if(this.hasExperience()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.75D,posOrientated.getY(),posOrientated.getZ()+0.75D,0,255,0));}}
-                if(pedTicker%40 == 0){if(this.hasFluid()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.75D,posOrientated.getY(),posOrientated.getZ()+0.25D,0,0,255));}}
-                if(References.isDustLoaded())
-                {
-                    if(pedTicker%40 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasDust()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.25D,posOrientated.getY(),posOrientated.getZ()+0.75D,178,0,255));}}
+                if (pedTicker % 40 == 0) {
+                    if (this.hasEnergy()) {
+                        MowLibPacketHandler.sendToNearby(level, posOrientated, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, posOrientated.getX() + 0.25D, posOrientated.getY(), posOrientated.getZ() + 0.25D, 255, 0, 0));
+                    }
+                    if (pedTicker % 40 == 0) {
+                        if (this.hasExperience()) {
+                            MowLibPacketHandler.sendToNearby(level, posOrientated, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, posOrientated.getX() + 0.75D, posOrientated.getY(), posOrientated.getZ() + 0.75D, 0, 255, 0));
+                        }
+                        if (pedTicker % 40 == 0) {
+                            if (this.hasFluid()) {
+                                MowLibPacketHandler.sendToNearby(level, posOrientated, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, posOrientated.getX() + 0.75D, posOrientated.getY(), posOrientated.getZ() + 0.25D, 0, 0, 255));
+                            }
+                            if (References.isDustLoaded()) {
+                                if (pedTicker % 40 == 0 && !isPedestalBlockPowered(getPedestal())) {
+                                    if (this.hasDust()) {
+                                        MowLibPacketHandler.sendToNearby(level, posOrientated, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, posOrientated.getX() + 0.25D, posOrientated.getY(), posOrientated.getZ() + 0.75D, 178, 0, 255));
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
-
         }
-    }
-
-    public void tickClient()
-    {
-        /*if(hasCoin())
-        {
-            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
-            {
-                upgrade.runClientStuff(this);
-            }
-        }*/
-
-
-        /*
-
-         */
     }
 
     @Override
-    public void load(CompoundTag p_155245_) {
-        super.load(p_155245_);
-        CompoundTag invTag = p_155245_.getCompound("inv");
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        CompoundTag invTag = tag.getCompound("inv");
         itemHandler.deserializeNBT(invTag);
-        CompoundTag invPrivateTag = p_155245_.getCompound("inv_private");
+        CompoundTag invPrivateTag = tag.getCompound("inv_private");
         privateItems.deserializeNBT(invPrivateTag);
 
-        this.storedValueForUpgrades = p_155245_.getInt("storedUpgradeValue");
-        this.storedEnergy = p_155245_.getInt("storedEnergy");
-        this.storedFluid = FluidStack.loadFluidStackFromNBT(p_155245_.getCompound("storedFluid"));
-        this.storedExperience = p_155245_.getInt("storedExperience");
-        this.storedDust = DustMagic.getDustMagicInTag(p_155245_);
-        //this.setFluid(FluidStack.loadFluidStackFromNBT(p_155245_.getCompound("storedFluid")),0);
-        this.storedPotionEffect = (MobEffectInstance.load(p_155245_)!=null)?(MobEffectInstance.load(p_155245_)):(null);
-        this.storedPotionEffectDuration = p_155245_.getInt("storedEffectDuration");
-        this.showRenderRange = p_155245_.getBoolean("showRenderRange");
+        this.storedValueForUpgrades = tag.getInt("storedUpgradeValue");
+        this.storedEnergy = tag.getInt("storedEnergy");
+        this.storedFluid = FluidStack.loadFluidStackFromNBT(tag.getCompound("storedFluid"));
+        this.storedExperience = tag.getInt("storedExperience");
+        this.storedDust = DustMagic.getDustMagicInTag(tag);
+        this.storedPotionEffect = (MobEffectInstance.load(tag) != null) ? (MobEffectInstance.load(tag)) : (null);
+        this.storedPotionEffectDuration = tag.getInt("storedEffectDuration");
+        this.showRenderRange = tag.getBoolean("showRenderRange");
 
-        //new value added in 0.2.30
-        if(p_155245_.contains("showRenderRangeUpgrade"))
-        {
-            this.showRenderRangeUpgrade = p_155245_.getBoolean("showRenderRangeUpgrade");
+        if (tag.contains("showRenderRangeUpgrade")) {
+            this.showRenderRangeUpgrade = tag.getBoolean("showRenderRangeUpgrade");
+        } else {
+            this.showRenderRangeUpgrade = false;
         }
-        else this.showRenderRangeUpgrade = false;
 
-        int[] storedIX = p_155245_.getIntArray("intArrayXPos");
-        int[] storedIY = p_155245_.getIntArray("intArrayYPos");
-        int[] storedIZ = p_155245_.getIntArray("intArrayZPos");
+        int[] storedX = tag.getIntArray("intArrayXPos");
+        int[] storedY = tag.getIntArray("intArrayYPos");
+        int[] storedZ = tag.getIntArray("intArrayZPos");
 
-        /*
-        int[] storedIXS = p_155245_.getIntArray("intArrayXSPos");
-        int[] storedIYS = p_155245_.getIntArray("intArrayYSPos");
-        int[] storedIZS = p_155245_.getIntArray("intArrayZSPos");
-        */
-
-        for(int i=0;i<storedIX.length;i++)
-        {
-            BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
+        for (int i = 0; i < storedX.length; i++) {
+            BlockPos gotPos = new BlockPos(storedX[i], storedY[i], storedZ[i]);
             linkedPedestals.add(gotPos);
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag p_187471_) {
-        super.saveAdditional(p_187471_);
-        save(p_187471_);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        save(tag);
     }
 
-    public CompoundTag save(CompoundTag p_58888_) {
-        //System.out.println("SAVE");
-        p_58888_.put("inv", itemHandler.serializeNBT());
-        p_58888_.put("inv_private", privateItems.serializeNBT());
+    public CompoundTag save(CompoundTag tag) {
+        tag.put("inv", itemHandler.serializeNBT());
+        tag.put("inv_private", privateItems.serializeNBT());
 
-        p_58888_.putInt("storedUpgradeValue",storedValueForUpgrades);
-        p_58888_.putInt("storedEnergy",storedEnergy);
-        p_58888_.put("storedFluid",storedFluid.writeToNBT(new CompoundTag()));
-        p_58888_.putInt("storedExperience",storedExperience);
+        tag.putInt("storedUpgradeValue", storedValueForUpgrades);
+        tag.putInt("storedEnergy", storedEnergy);
+        tag.put("storedFluid", storedFluid.writeToNBT(new CompoundTag()));
+        tag.putInt("storedExperience", storedExperience);
 
-        if(storedPotionEffect!=null)storedPotionEffect.save(p_58888_);
-        p_58888_.putInt("storedEffectDuration",storedPotionEffectDuration);
-        p_58888_.putBoolean("showRenderRange",showRenderRange);
-        p_58888_.putBoolean("showRenderRangeUpgrade",showRenderRangeUpgrade);
+        if (storedPotionEffect != null) {
+            storedPotionEffect.save(tag);
+        }
+        tag.putInt("storedEffectDuration", storedPotionEffectDuration);
+        tag.putBoolean("showRenderRange", showRenderRange);
+        tag.putBoolean("showRenderRangeUpgrade", showRenderRangeUpgrade);
 
         List<Integer> storedX = new ArrayList<>();
         List<Integer> storedY = new ArrayList<>();
         List<Integer> storedZ = new ArrayList<>();
 
-        /*
-        List<Integer> storedXS = new ArrayList<Integer>();
-        List<Integer> storedYS = new ArrayList<Integer>();
-        List<Integer> storedZS = new ArrayList<Integer>();
-        */
-        for(int i=0;i<getNumLinkedPedestals();i++)
-        {
-            storedX.add(linkedPedestals.get(i).getX());
-            storedY.add(linkedPedestals.get(i).getY());
-            storedZ.add(linkedPedestals.get(i).getZ());
+        for (BlockPos pos : linkedPedestals) {
+            storedX.add(pos.getX());
+            storedY.add(pos.getY());
+            storedZ.add(pos.getZ());
         }
 
+        tag.putIntArray("intArrayXPos", storedX);
+        tag.putIntArray("intArrayYPos", storedY);
+        tag.putIntArray("intArrayZPos", storedZ);
 
-
-        p_58888_.putIntArray("intArrayXPos",storedX);
-        p_58888_.putIntArray("intArrayYPos",storedY);
-        p_58888_.putIntArray("intArrayZPos",storedZ);
-
-        /*
-        p_58888_.putIntArray("intArrayXSPos",storedXS);
-        p_58888_.putIntArray("intArrayYSPos",storedYS);
-        p_58888_.putIntArray("intArrayZSPos",storedZS);
-        */
-
-        return DustMagic.setDustMagicInTag(p_58888_,this.storedDust);
+        return DustMagic.setDustMagicInTag(tag, this.storedDust);
     }
-
 
     //This is needed so that the render boxes show up when the player is just out of normal render range of the pedestal
     @Override
     public AABB getRenderBoundingBox() {
         int range = getLinkingRange();
-        if(hasCoin())
-        {
-            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
-            {
+        if (hasCoin()) {
+            if (getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade) {
                 int upgradeRange = upgrade.getUpgradeWorkRange(getCoinOnPedestal());
-                if(upgradeRange>range)range = upgradeRange;
+                if (upgradeRange > range) {
+                    range = upgradeRange;
+                }
             }
         }
-
-
-        return new AABB(getPos().getX() - range, getPos().getY() - range, getPos().getZ() - range,getPos().getX() + range, getPos().getY() + range, getPos().getZ() + range);
+        return new AABB(getPos().getX() - range, getPos().getY() - range, getPos().getZ() - range, getPos().getX() + range, getPos().getY() + range, getPos().getZ() + range);
     }
 
     @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        /*CompoundTag nbtTagCompound = new CompoundTag();
-        save(nbtTagCompound);*/
-        //super.getUpdatePacket();
-        //return new ClientboundBlockEntityDataPacket(getPos(),42,nbtTagCompound);
-        //System.out.println("ClientBound");
         return ClientboundBlockEntityDataPacket.create(this.getPedestal());
     }
 
     @Override
     public CompoundTag getUpdateTag() {
-        //System.out.println("getUpdateTag");
         return save(new CompoundTag());
     }
 
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        //System.out.println("onDataPacket");
-        super.onDataPacket(net,pkt);
+        super.onDataPacket(net, pkt);
         BlockState state = Objects.requireNonNull(this.level).getBlockState(getPos());
         this.handleUpdateTag(pkt.getTag());
         this.level.sendBlockUpdated(getPos(), state, state, 3);
@@ -2468,7 +2420,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
-        //System.out.println("handleUpdateTag");
         this.load(tag);
     }
 
