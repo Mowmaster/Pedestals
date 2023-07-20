@@ -188,6 +188,13 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    implementation fg.deobf("curse.maven:pipez-443900:4629652")
+    implementation fg.deobf("curse.maven:jade-324717:4433884")
+    implementation fg.deobf("curse.maven:configured-457570:4462837")
+    implementation fg.deobf("curse.maven:catalogue-459701:4171024")
+    implementation fg.deobf("curse.maven:better-mods-button-541584:4608773")
+
 }
 
 // Example for how to get properties into the manifest for reading at runtime.
