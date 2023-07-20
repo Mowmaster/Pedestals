@@ -1767,18 +1767,23 @@ public class BasePedestalBlockEntity extends MowLibBaseFilterableBlockEntity
 
     public boolean canSpawnParticles()
     {
-        switch (getRendererType())
-        {
-            case 0: return false;
-            case 1: return true;
-            case 2: return true;
-            case 3: return false;
-            case 4: return false;
-            case 5: return true;
-            case 6: return false;
-            case 7: return true;
-            default: return true;
+        boolean particlesEnabled = PedestalConfig.CLIENT.pedestalRenderParticles.get();
+        if(particlesEnabled) {
+            switch (getRendererType())
+            {
+                case 0: return false;
+                case 1: return true;
+                case 2: return true;
+                case 3: return false;
+                case 4: return false;
+                case 5: return true;
+                case 6: return false;
+                case 7: return true;
+                default: return true;
+            }
         }
+        return false;
+
     }
 
     public int  getRendererType()
