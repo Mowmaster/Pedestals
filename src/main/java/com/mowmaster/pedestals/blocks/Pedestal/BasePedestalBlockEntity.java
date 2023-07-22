@@ -44,8 +44,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
@@ -53,7 +53,6 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -66,18 +65,18 @@ import java.util.Optional;
 
 public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 {
-    private ItemStackHandler itemHandler = createItemHandlerPedestal();
-    private LazyOptional<IItemHandler> itemCapability = LazyOptional.of(() -> this.itemHandler);
-    private ItemStackHandler privateItems = createPrivateItemHandler();
-    private IEnergyStorage energyHandler = createEnergyHandler();
-    private LazyOptional<IEnergyStorage> energyCapability = LazyOptional.of(() -> this.energyHandler);
-    private IFluidHandler fluidHandler = createFluidHandler();
-    private LazyOptional<IFluidHandler> fluidCapability = LazyOptional.of(() -> this.fluidHandler);
-    private IExperienceStorage experienceHandler = createExperienceHandler();
-    private LazyOptional<IExperienceStorage> experienceCapability = LazyOptional.of(() -> this.experienceHandler);
-    private IDustHandler dustHandler = createDustHandler();
-    private LazyOptional<IDustHandler> dustCapability = LazyOptional.of(() -> this.dustHandler);
-    private List<ItemStack> stacksList = new ArrayList<>();
+    private final ItemStackHandler itemHandler = createItemHandlerPedestal();
+    private final LazyOptional<IItemHandler> itemCapability = LazyOptional.of(() -> this.itemHandler);
+    private final ItemStackHandler privateItems = createPrivateItemHandler();
+    private final IEnergyStorage energyHandler = createEnergyHandler();
+    private final LazyOptional<IEnergyStorage> energyCapability = LazyOptional.of(() -> this.energyHandler);
+    private final IFluidHandler fluidHandler = createFluidHandler();
+    private final LazyOptional<IFluidHandler> fluidCapability = LazyOptional.of(() -> this.fluidHandler);
+    private final IExperienceStorage experienceHandler = createExperienceHandler();
+    private final LazyOptional<IExperienceStorage> experienceCapability = LazyOptional.of(() -> this.experienceHandler);
+    private final IDustHandler dustHandler = createDustHandler();
+    private final LazyOptional<IDustHandler> dustCapability = LazyOptional.of(() -> this.dustHandler);
+    private final List<ItemStack> stacksList = new ArrayList<>();
     private WeakReference<FakePlayer> pedestalPlayer;
     private MobEffectInstance storedPotionEffect = null;
     private int storedPotionEffectDuration = 0;
@@ -85,13 +84,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     private FluidStack storedFluid = FluidStack.EMPTY;
     private int storedExperience = 0;
     private DustMagic storedDust = DustMagic.EMPTY;
-    private final List<BlockPos> linkedPedestals = new ArrayList<BlockPos>();
+    private final List<BlockPos> linkedPedestals = new ArrayList<>();
     private int storedValueForUpgrades = 0;
     private boolean showRenderRange = false;
     private boolean showRenderRangeUpgrade = false;
     public BlockPos getPos() { return this.worldPosition; }
     private BasePedestalBlockEntity getPedestal() { return this; }
-    private int maxRate = Integer.MAX_VALUE;
 
     public boolean getRenderRange(){return this.showRenderRange;}
     public void setRenderRange(boolean setRender){ this.showRenderRange = setRender; update();}
@@ -211,10 +209,14 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             @Nonnull
             @Override
             public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                
                 IPedestalFilter filter = getIPedestalFilter();
-                if(filter == null || !filter.getFilterDirection().extract())return super.extractItem((slot>getSlots())?(0):(slot), amount, simulate);
-                return super.extractItem((slot>getSlots())?(0):(slot), Math.min(amount, (filter == null)?(amount):((!filter.getFilterDirection().extract())?(amount):(filter.canAcceptCountItems(getPedestal(),getFilterInPedestal(),  getStackInSlot((slot>getSlots())?(0):(slot)).getMaxStackSize(), getSlotSizeLimit(),getStackInSlot((slot>getSlots())?(0):(slot)))))), simulate);
+                int actualSlot = (slot > getSlots()) ? 0 : slot;
+                if (filter == null || !filter.getFilterDirection().extract()) {
+                    return super.extractItem(actualSlot, amount, simulate);
+                } else {
+                    ItemStack stackInSlot = getStackInSlot(actualSlot);
+                    return super.extractItem(actualSlot, Math.min(amount, filter.canAcceptCountItems(getPedestal(), getFilterInPedestal(), stackInSlot.getMaxStackSize(), getSlotSizeLimit(), stackInSlot)), simulate);
+                }
             }
         };
     }
@@ -515,7 +517,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public IDustHandler createDustHandler() {
         return new IDustHandler() {
-            protected void onContentsChanged() {
+            private void onContentsChanged() {
                 update();
             }
 
@@ -666,7 +668,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         ItemStack tool = pedestal.getToolStack();
         if(world instanceof ServerLevel slevel)
         {
-            return new WeakReference<FakePlayer>(new MowLibFakePlayer(slevel , MowLibOwnerUtils.getPlayerFromStack(upgrade), MowLibOwnerUtils.getPlayerNameFromStack(upgrade),pedestal.getPos(),tool,"[Pedestal_"+ pedestal.getPos().getX() + pedestal.getPos().getY() + pedestal.getPos().getZ() +"]"));
+            return new WeakReference<>(new MowLibFakePlayer(slevel , MowLibOwnerUtils.getPlayerFromStack(upgrade), MowLibOwnerUtils.getPlayerNameFromStack(upgrade), pedestal.getPos(), tool, "[Pedestal_" + pedestal.getPos().getX() + pedestal.getPos().getY() + pedestal.getPos().getZ() + "]"));
         }
         else return null;
     }
@@ -677,33 +679,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ============================================================
     ==========================================================*/
 
-
-
-
     public void dropInventoryItems(Level worldIn, BlockPos pos) {
         MowLibItemUtils.dropInventoryItems(worldIn, pos, itemHandler);
     }
 
-    public List<ItemStack> dropInventoryItemsList() {
-        List<ItemStack> returner = new ArrayList<>();
-        for(int i = 0; i < itemHandler.getSlots(); ++i) {
-            returner.add(itemHandler.getStackInSlot(i));
-        }
-
-        return returner;
-    }
-
     public void dropInventoryItemsPrivate(Level worldIn, BlockPos pos) {
         MowLibItemUtils.dropInventoryItems(worldIn,pos,privateItems);
-    }
-
-    public List<ItemStack> dropInventoryItemsPrivateList() {
-        List<ItemStack> returner = new ArrayList<>();
-        for(int i = 0; i < privateItems.getSlots(); ++i) {
-            returner.add(privateItems.getStackInSlot(i));
-        }
-
-        return returner;
     }
 
     public void dropLiquidsInWorld(Level worldIn, BlockPos pos) {
@@ -906,17 +887,15 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public ItemStack getItemInPedestal() {
-        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
+        return maybeFirstNonEmptySlot().map(itemHandler::getStackInSlot).orElse(ItemStack.EMPTY);
     }
 
     public ItemStack getMatchingItemInPedestalOrEmptySlot(ItemStack stackToMatch) {
-        return maybeFirstSlotWithSpaceForMatchingItem(stackToMatch).map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
-
+        return maybeFirstSlotWithSpaceForMatchingItem(stackToMatch).map(itemHandler::getStackInSlot).orElse(ItemStack.EMPTY);
     }
 
     public ItemStack getItemInPedestalFirst() {
-        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getStackInSlot(slot)).orElse(ItemStack.EMPTY);
-
+        return maybeFirstNonEmptySlot().map(itemHandler::getStackInSlot).orElse(ItemStack.EMPTY);
     }
 
     public int getPedestalSlots() { return itemHandler.getSlots(); }
@@ -955,11 +934,8 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public ItemStack removeItem(boolean simulate) {
-        return maybeLastNonEmptySlot().map(slot -> {
-            ItemStack stack = itemHandler.extractItem(slot, itemHandler.getStackInSlot(slot).getCount(), simulate);
-            //update();
-            return stack;
-        }).orElse(ItemStack.EMPTY);
+        return maybeLastNonEmptySlot().map(slot -> itemHandler.extractItem(slot, itemHandler.getStackInSlot(slot).getCount(), simulate))
+            .orElse(ItemStack.EMPTY);
     }
 
     //If resulting insert stack is empty it means the full stack was inserted
@@ -984,7 +960,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public int getSlotSizeLimit() {
-        return maybeFirstNonEmptySlot().map(slot -> itemHandler.getSlotLimit(slot)).orElse(itemHandler.getSlotLimit(0));
+        return maybeFirstNonEmptySlot().map(itemHandler::getSlotLimit).orElse(itemHandler.getSlotLimit(0));
     }
 
     /*============================================================================
@@ -1715,7 +1691,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     {
         if (privateItems.isItemValid(PrivateInventorySlot.LIGHT, stack)) {
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(true)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.TRUE).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
             privateItems.insertItem(PrivateInventorySlot.LIGHT, stack.split(1), false);
             update();
             level.setBlock(getPos(),newstate,3);
@@ -1730,7 +1706,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         if(hasLight())
         {
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.FALSE).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
             ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
             level.setBlock(getPos(),newstate,3);
             update();
@@ -1738,48 +1714,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         }
         else return ItemStack.EMPTY;
     }
-
-    /*public ItemStack removeLight()
-    {
-        if(hasLight())
-        {
-            BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            if(getLightBrightness()<=1)
-            {
-                boolLight = true;
-                ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
-                level.setBlock(getPos(),newstate,3);
-                return retItemStack;
-            }
-            else
-            {
-                ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
-                state.updateNeighbourShapes(this.level,getPos(),1,3);
-                return retItemStack;
-            }
-
-        }
-        else return ItemStack.EMPTY;
-    }*/
-
-    /*public ItemStack removeAllLight()
-    {
-        if(hasLight())
-        {
-            BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
-            ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, privateItems.getStackInSlot(PrivateInventorySlot.LIGHT).getCount(), false);
-            level.setBlock(getPos(),newstate,3);
-            return retItemStack;
-        }
-        else return ItemStack.EMPTY;
-    }*/
-
-    /*public int getLightBrightness()
-    {
-        return privateItems.getStackInSlot(PrivateInventorySlot.LIGHT).getCount();
-    }*/
 
     public boolean hasLight()
     {
@@ -1869,16 +1803,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return privateItems.getStackInSlot(PrivateInventorySlot.WORK_CARD);
     }
 
-    public IPedestalWorkCard getIPedestalWorkCard()
-    {
-        if(hasWorkCard())
-        {
-            return (IPedestalWorkCard)getWorkCardInPedestal().getItem();
-        }
-
-        return null;
-    }
-
     public ItemStack removeWorkCard() {
         return privateItems.extractItem(PrivateInventorySlot.WORK_CARD,1,false);
     }
@@ -1938,15 +1862,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         return privateItems.getStackInSlot(PrivateInventorySlot.REDSTONE).getCount();
     }
 
-    public boolean isPedestalBlockPowered(BasePedestalBlockEntity pedestal)
-    {
-        if(pedestal.hasRedstone())
-        {
-            //hasRedstone should mean if theres a signal, its off (reverse of normal)
-            return (this.getLevel().hasNeighborSignal(pedestal.getBlockPos()))?((pedestal.getRedstonePower()>=pedestal.getRedstonePowerNeeded())?(false):(true)):(true);
+    public boolean isPedestalBlockPowered(BasePedestalBlockEntity pedestal) {
+        if (pedestal.hasRedstone()) { // hasRedstone should mean if theres a signal, its off (reverse of normal)
+            return !this.getLevel().hasNeighborSignal(pedestal.getBlockPos()) || pedestal.getRedstonePower() < pedestal.getRedstonePowerNeeded();
+        } else {
+            return pedestal.getRedstonePower() > 0;
         }
-
-        return pedestal.getRedstonePower() > 0;
     }
 
     public int getRedstonePower() {
@@ -2142,92 +2063,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             !isPedestalBlockPowered(pedestal);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //The actual transfer methods for items
     public boolean sendItemsToPedestal(BlockPos posReceiver, List<ItemStack> itemStacksIncoming) {
         if (itemStacksIncoming.size() > 0 && level != null && level.getBlockEntity(posReceiver) instanceof BasePedestalBlockEntity receiverPedestal) {
@@ -2380,233 +2215,158 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         }
     }
 
-    public BlockPos offsetBasedOnDirection(Direction enumfacing, BlockPos posOfPedestal, double x, double y, double z)
-    {
-        BlockPos blockBelow = posOfPedestal;
-        switch (enumfacing)
-        {
-            case UP:
-                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + y, blockBelow.getZ() + z);
-            case DOWN:
-                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + y + 1D, blockBelow.getZ() + z);
-            case NORTH:
-                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + z, blockBelow.getZ() + y);
-            case SOUTH:
-                return new BlockPos(blockBelow.getX() + x, blockBelow.getY() + z, blockBelow.getZ() + y);
-            case EAST:
-                return new BlockPos(blockBelow.getX() + y, blockBelow.getY() + x, blockBelow.getZ() + z);
-            case WEST:
-                return new BlockPos(blockBelow.getX() + y, blockBelow.getY() + x, blockBelow.getZ() + z);
-            default:
-                return blockBelow;
-        }
+    public BlockPos offsetBasedOnDirection(Direction enumfacing, BlockPos posOfPedestal, double x, double y, double z) {
+        return switch (enumfacing) {
+            case UP -> new BlockPos(posOfPedestal.getX() + x, posOfPedestal.getY() + y, posOfPedestal.getZ() + z);
+            case DOWN -> new BlockPos(posOfPedestal.getX() + x, posOfPedestal.getY() + y + 1D, posOfPedestal.getZ() + z);
+            case NORTH -> new BlockPos(posOfPedestal.getX() + x, posOfPedestal.getY() + z, posOfPedestal.getZ() + y);
+            case SOUTH -> new BlockPos(posOfPedestal.getX() + x, posOfPedestal.getY() + z, posOfPedestal.getZ() + y);
+            case EAST -> new BlockPos(posOfPedestal.getX() + y, posOfPedestal.getY() + x, posOfPedestal.getZ() + z);
+            case WEST -> new BlockPos(posOfPedestal.getX() + y, posOfPedestal.getY() + x, posOfPedestal.getZ() + z);
+        };
     }
 
-
-    public BlockPos getPosOfBlockBelowPedestal(Level world, int numBelow)
-    {
+    public BlockPos getPosOfBlockBelowPedestal(Level world, int numBelow) {
         BlockState state = world.getBlockState(getPos());
 
         Direction enumfacing = (state.hasProperty(FACING))?(state.getValue(FACING)):(Direction.UP);
         BlockPos blockBelow = getPos();
-        switch (enumfacing)
-        {
-            case UP:
-                return blockBelow.offset(0,-numBelow,0);
-            case DOWN:
-                return blockBelow.offset(0,numBelow,0);
-            case NORTH:
-                return blockBelow.offset(0,0,numBelow);
-            case SOUTH:
-                return blockBelow.offset(0,0,-numBelow);
-            case EAST:
-                return blockBelow.offset(-numBelow,0,0);
-            case WEST:
-                return blockBelow.offset(numBelow,0,0);
-            default:
-                return blockBelow;
-        }
+        return switch (enumfacing) {
+            case UP -> blockBelow.offset(0, -numBelow, 0);
+            case DOWN -> blockBelow.offset(0, numBelow, 0);
+            case NORTH -> blockBelow.offset(0, 0, numBelow);
+            case SOUTH -> blockBelow.offset(0, 0, -numBelow);
+            case EAST -> blockBelow.offset(-numBelow, 0, 0);
+            case WEST -> blockBelow.offset(numBelow, 0, 0);
+        };
     }
 
-
-
-    public static void serverTick(Level level, BlockPos blockPos, BlockState blockState, BasePedestalBlockEntity e) {
-        e.tick();
-    }
-
-    public static <E extends BlockEntity> void clientTick(Level level, BlockPos blockPos, BlockState blockState, BasePedestalBlockEntity e) {
-        e.tickClient();
-    }
-
-    int partTicker = 0;
-    int impTicker = 0;
     int pedTicker = 0;
 
     public void tick() {
-        if(!level.isClientSide() &&level.isAreaLoaded(getPos(),1))
-        {
+        if(!level.isClientSide() && level.isAreaLoaded(getPos(),1)) {
             pedTicker++;
-            //if (pedTicker%getOperationSpeed() == 0) {
-            int configSpeed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
-            int speed = configSpeed;
-            if(hasSpeed())speed = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get() - getTicksReduced();
-            //Make sure speed has at least a value of 1
-            if(speed<=0)speed = 1;
-            if (pedTicker%speed == 0) {
-
-                if(!isPedestalBlockPowered(getPedestal()))
-                {
-                    if(getNumLinkedPedestals() > 0) { transferAction(); }
+            int maxTicksToTransfer = PedestalConfig.COMMON.pedestal_maxTicksToTransfer.get();
+            int speed = Math.max(maxTicksToTransfer - getTicksReduced(), 1);
+            if (pedTicker % speed == 0) {
+                if(!isPedestalBlockPowered(getPedestal())) {
+                    if (getNumLinkedPedestals() > 0) {
+                        transferAction();
+                    }
                 }
-                //make sure we dont go over max int limit, regardless of config
-                if(pedTicker >= maxRate-1){pedTicker=0;}
+                if (pedTicker >= Integer.MAX_VALUE - 1) {
+                    pedTicker = 0;
+                }
             }
 
-            if(hasCoin())
-            {
+            if (hasCoin()) {
                 Item coinInPed = getCoinOnPedestal().getItem();
-                if(coinInPed instanceof IPedestalUpgrade upgrade) {
+                if (coinInPed instanceof IPedestalUpgrade upgrade) {
                     upgrade.updateAction(level,this);
-
-                    if(hasNoCollide())
-                    {
+                    if (hasNoCollide()) {
                         upgrade.actionOnCollideWithBlock(this);
                     }
                 }
-
             }
 
-            if(canSpawnParticles())
-            {
-                BlockPos posOrientated = getPosOfBlockBelowPedestal(level,0);
-                if(getRenderRange() && pedTicker%10 == 0){
-                    MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,getPos().getX(),getPos().getY()+1.0D,getPos().getZ(),0,0,0));
+            if (canSpawnParticles()) {
+                BlockPos posOrientated = getPosOfBlockBelowPedestal(level, 0);
+                if (getRenderRange() && pedTicker % 10 == 0){
+                    MowLibPacketHandler.sendToNearby(level, getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,getPos().getX(), getPos().getY() + 1.0D, getPos().getZ(), 0, 0, 0));
                 }
-
-                if(getRenderRangeUpgrade() && pedTicker%10 == 0){
-                    MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,getPos().getX(),getPos().getY()+1.0D,getPos().getZ(),50,50,50));
+                if (getRenderRangeUpgrade() && pedTicker % 10 == 0){
+                    MowLibPacketHandler.sendToNearby(level, getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, getPos().getX(), getPos().getY() + 1.0D, getPos().getZ(), 50, 50, 50));
                 }
-
-                if(pedTicker%40 == 0){if(this.hasEnergy()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.25D,posOrientated.getY(),posOrientated.getZ()+0.25D,255,0,0));}}
-                if(pedTicker%40 == 0){if(this.hasExperience()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.75D,posOrientated.getY(),posOrientated.getZ()+0.75D,0,255,0));}}
-                if(pedTicker%40 == 0){if(this.hasFluid()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.75D,posOrientated.getY(),posOrientated.getZ()+0.25D,0,0,255));}}
-                if(References.isDustLoaded())
-                {
-                    if(pedTicker%40 == 0 && !isPedestalBlockPowered(getPedestal())){if(this.hasDust()){MowLibPacketHandler.sendToNearby(level,posOrientated,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR,posOrientated.getX()+0.25D,posOrientated.getY(),posOrientated.getZ()+0.75D,178,0,255));}}
+                if (pedTicker % 40 == 0) {
+                    if (this.hasEnergy()) {
+                        MowLibPacketHandler.sendToNearby(level, posOrientated, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, posOrientated.getX() + 0.25D, posOrientated.getY(), posOrientated.getZ() + 0.25D, 255, 0, 0));
+                    }
+                    if (this.hasExperience()) {
+                        MowLibPacketHandler.sendToNearby(level, posOrientated, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, posOrientated.getX() + 0.75D, posOrientated.getY(), posOrientated.getZ() + 0.75D, 0, 255, 0));
+                    }
+                    if (this.hasFluid()) {
+                        MowLibPacketHandler.sendToNearby(level, posOrientated, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, posOrientated.getX() + 0.75D, posOrientated.getY(), posOrientated.getZ() + 0.25D, 0, 0, 255));
+                    }
+                    if (References.isDustLoaded() && !isPedestalBlockPowered(getPedestal()) && this.hasDust()) {
+                        MowLibPacketHandler.sendToNearby(level, posOrientated, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, posOrientated.getX() + 0.25D, posOrientated.getY(), posOrientated.getZ() + 0.75D, 178, 0, 255));
+                    }
                 }
             }
-
         }
-    }
-
-    public void tickClient()
-    {
-        /*if(hasCoin())
-        {
-            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
-            {
-                upgrade.runClientStuff(this);
-            }
-        }*/
-
-
-        /*
-
-         */
     }
 
     @Override
-    public void load(CompoundTag p_155245_) {
-        super.load(p_155245_);
-        CompoundTag invTag = p_155245_.getCompound("inv");
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        CompoundTag invTag = tag.getCompound("inv");
         itemHandler.deserializeNBT(invTag);
-        CompoundTag invPrivateTag = p_155245_.getCompound("inv_private");
+        CompoundTag invPrivateTag = tag.getCompound("inv_private");
         privateItems.deserializeNBT(invPrivateTag);
 
-        this.storedValueForUpgrades = p_155245_.getInt("storedUpgradeValue");
-        this.storedEnergy = p_155245_.getInt("storedEnergy");
-        this.storedFluid = FluidStack.loadFluidStackFromNBT(p_155245_.getCompound("storedFluid"));
-        this.storedExperience = p_155245_.getInt("storedExperience");
-        this.storedDust = DustMagic.getDustMagicInTag(p_155245_);
+        this.storedValueForUpgrades = tag.getInt("storedUpgradeValue");
+        this.storedEnergy = tag.getInt("storedEnergy");
+        this.storedFluid = FluidStack.loadFluidStackFromNBT(tag.getCompound("storedFluid"));
+        this.storedExperience = tag.getInt("storedExperience");
+        this.storedDust = DustMagic.getDustMagicInTag(tag);
         //this.setFluid(FluidStack.loadFluidStackFromNBT(p_155245_.getCompound("storedFluid")),0);
-        this.storedPotionEffect = (MobEffectInstance.load(p_155245_)!=null)?(MobEffectInstance.load(p_155245_)):(null);
-        this.storedPotionEffectDuration = p_155245_.getInt("storedEffectDuration");
-        this.showRenderRange = p_155245_.getBoolean("showRenderRange");
+        this.storedPotionEffect = (MobEffectInstance.load(tag)!=null)?(MobEffectInstance.load(tag)):(null);
+        this.storedPotionEffectDuration = tag.getInt("storedEffectDuration");
+        this.showRenderRange = tag.getBoolean("showRenderRange");
 
         //new value added in 0.2.30
-        if(p_155245_.contains("showRenderRangeUpgrade"))
-        {
-            this.showRenderRangeUpgrade = p_155245_.getBoolean("showRenderRangeUpgrade");
+        if (tag.contains("showRenderRangeUpgrade")) {
+            this.showRenderRangeUpgrade = tag.getBoolean("showRenderRangeUpgrade");
+        } else {
+            this.showRenderRangeUpgrade = false;
         }
-        else this.showRenderRangeUpgrade = false;
 
-        int[] storedIX = p_155245_.getIntArray("intArrayXPos");
-        int[] storedIY = p_155245_.getIntArray("intArrayYPos");
-        int[] storedIZ = p_155245_.getIntArray("intArrayZPos");
+        int[] storedX = tag.getIntArray("intArrayXPos");
+        int[] storedY = tag.getIntArray("intArrayYPos");
+        int[] storedZ = tag.getIntArray("intArrayZPos");
 
-        /*
-        int[] storedIXS = p_155245_.getIntArray("intArrayXSPos");
-        int[] storedIYS = p_155245_.getIntArray("intArrayYSPos");
-        int[] storedIZS = p_155245_.getIntArray("intArrayZSPos");
-        */
-
-        for(int i=0;i<storedIX.length;i++)
-        {
-            BlockPos gotPos = new BlockPos(storedIX[i],storedIY[i],storedIZ[i]);
+        for (int i = 0; i < storedX.length; i++) {
+            BlockPos gotPos = new BlockPos(storedX[i], storedY[i], storedZ[i]);
             linkedPedestals.add(gotPos);
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag p_187471_) {
-        super.saveAdditional(p_187471_);
-        save(p_187471_);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        save(tag);
     }
 
-    public CompoundTag save(CompoundTag p_58888_) {
-        //System.out.println("SAVE");
-        p_58888_.put("inv", itemHandler.serializeNBT());
-        p_58888_.put("inv_private", privateItems.serializeNBT());
+    public CompoundTag save(CompoundTag tag) {
+        tag.put("inv", itemHandler.serializeNBT());
+        tag.put("inv_private", privateItems.serializeNBT());
 
-        p_58888_.putInt("storedUpgradeValue",storedValueForUpgrades);
-        p_58888_.putInt("storedEnergy",storedEnergy);
-        p_58888_.put("storedFluid",storedFluid.writeToNBT(new CompoundTag()));
-        p_58888_.putInt("storedExperience",storedExperience);
+        tag.putInt("storedUpgradeValue",storedValueForUpgrades);
+        tag.putInt("storedEnergy",storedEnergy);
+        tag.put("storedFluid",storedFluid.writeToNBT(new CompoundTag()));
+        tag.putInt("storedExperience",storedExperience);
 
-        if(storedPotionEffect!=null)storedPotionEffect.save(p_58888_);
-        p_58888_.putInt("storedEffectDuration",storedPotionEffectDuration);
-        p_58888_.putBoolean("showRenderRange",showRenderRange);
-        p_58888_.putBoolean("showRenderRangeUpgrade",showRenderRangeUpgrade);
+        if (storedPotionEffect != null) {
+            storedPotionEffect.save(tag);
+        }
+        tag.putInt("storedEffectDuration",storedPotionEffectDuration);
+        tag.putBoolean("showRenderRange",showRenderRange);
+        tag.putBoolean("showRenderRangeUpgrade",showRenderRangeUpgrade);
 
         List<Integer> storedX = new ArrayList<Integer>();
         List<Integer> storedY = new ArrayList<Integer>();
         List<Integer> storedZ = new ArrayList<Integer>();
 
-        /*
-        List<Integer> storedXS = new ArrayList<Integer>();
-        List<Integer> storedYS = new ArrayList<Integer>();
-        List<Integer> storedZS = new ArrayList<Integer>();
-        */
-        for(int i=0;i<getNumLinkedPedestals();i++)
-        {
+        for (int i = 0; i < getNumLinkedPedestals(); i++) {
             storedX.add(linkedPedestals.get(i).getX());
             storedY.add(linkedPedestals.get(i).getY());
             storedZ.add(linkedPedestals.get(i).getZ());
         }
 
+        tag.putIntArray("intArrayXPos",storedX);
+        tag.putIntArray("intArrayYPos",storedY);
+        tag.putIntArray("intArrayZPos",storedZ);
 
-
-        p_58888_.putIntArray("intArrayXPos",storedX);
-        p_58888_.putIntArray("intArrayYPos",storedY);
-        p_58888_.putIntArray("intArrayZPos",storedZ);
-
-        /*
-        p_58888_.putIntArray("intArrayXSPos",storedXS);
-        p_58888_.putIntArray("intArrayYSPos",storedYS);
-        p_58888_.putIntArray("intArrayZSPos",storedZS);
-        */
-
-        return DustMagic.setDustMagicInTag(p_58888_,this.storedDust);
+        return DustMagic.setDustMagicInTag(tag, this.storedDust);
     }
 
 
@@ -2614,15 +2374,14 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     @Override
     public AABB getRenderBoundingBox() {
         int range = getLinkingRange();
-        if(hasCoin())
-        {
-            if(getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade)
-            {
+        if (hasCoin()) {
+            if (getCoinOnPedestal().getItem() instanceof ItemUpgradeBase upgrade) {
                 int upgradeRange = upgrade.getUpgradeWorkRange(getCoinOnPedestal());
-                if(upgradeRange>range)range = upgradeRange;
+                if (upgradeRange > range) {
+                    range = upgradeRange;
+                }
             }
         }
-
 
         AABB aabb = new AABB(getPos().getX() - range, getPos().getY() - range, getPos().getZ() - range,getPos().getX() + range, getPos().getY() + range, getPos().getZ() + range);
         return aabb;
@@ -2631,23 +2390,16 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        /*CompoundTag nbtTagCompound = new CompoundTag();
-        save(nbtTagCompound);*/
-        //super.getUpdatePacket();
-        //return new ClientboundBlockEntityDataPacket(getPos(),42,nbtTagCompound);
-        //System.out.println("ClientBound");
         return ClientboundBlockEntityDataPacket.create(this.getPedestal());
     }
 
     @Override
     public CompoundTag getUpdateTag() {
-        //System.out.println("getUpdateTag");
         return save(new CompoundTag());
     }
 
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        //System.out.println("onDataPacket");
         super.onDataPacket(net,pkt);
         BlockState state = this.level.getBlockState(getPos());
         this.handleUpdateTag(pkt.getTag());
@@ -2656,7 +2408,6 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
-        //System.out.println("handleUpdateTag");
         this.load(tag);
     }
 

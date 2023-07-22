@@ -2,27 +2,17 @@ package com.mowmaster.pedestals.Items.Tools.Upgrade;
 
 import com.mowmaster.mowlib.Items.Filters.IPedestalFilter;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
-import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Tools.BaseTool;
 import com.mowmaster.pedestals.Items.Tools.IPedestalTool;
-import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import com.mowmaster.pedestals.Registry.DeferredRegisterItems;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.HitResult;
 
-import net.minecraft.world.item.Item.Properties;
+import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class FilterTool extends BaseTool implements IPedestalTool
-{
+public class FilterTool extends BaseTool implements IPedestalTool {
     public FilterTool(Properties p_41383_) {
         super(p_41383_.stacksTo(1));
     }
@@ -35,17 +25,13 @@ public class FilterTool extends BaseTool implements IPedestalTool
 
     @Override
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {
-        if(pedestal.hasFilter())
-        {
+        if(pedestal.hasFilter()) {
             ItemStack filterInPedestal = pedestal.getFilterInPedestal();
-            if(filterInPedestal.getItem() instanceof IPedestalFilter filter)
-            {
-                filter.chatDetails(player,pedestal,filterInPedestal);
+            if(filterInPedestal.getItem() instanceof IPedestalFilter filter) {
+                filter.chatDetails(player, pedestal, filterInPedestal);
             }
-        }
-        else
-        {
-            MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,"pedestals.tool_filterinpedestal_not");
+        } else {
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE, MODID + ".tool_filterinpedestal_not");
         }
     }
 }
