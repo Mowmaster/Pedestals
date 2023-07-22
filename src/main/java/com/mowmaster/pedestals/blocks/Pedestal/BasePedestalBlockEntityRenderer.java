@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.mowmaster.mowlib.Items.WorkCards.WorkCardArea;
 import com.mowmaster.mowlib.api.DefineLocations.ISelectablePoints;
+import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.ItemUpgradeBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -25,6 +26,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -37,7 +40,7 @@ import static com.mowmaster.mowlib.MowLibUtils.MowLibBlockPosUtils.*;
 import static com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock.FACING;
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
-public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<BasePedestalBlockEntity>
+public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity>
 {
 
     public BasePedestalBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
@@ -182,8 +185,6 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 }
                 if(facing== Direction.DOWN) {
                     //p_112309_.rotate(new Quaternion(0, 0, 1,180));
-
-
                     p_112309_.mulPose(Axis.ZP.rotationDegrees(180));
                     p_112309_.translate(0, -1, 0);
                     p_112309_.translate(-1, 0, 0);
@@ -193,7 +194,6 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 }
                 if(facing== Direction.NORTH) {
                     //p_112309_.rotate(new Quaternion(1, 0, 0,270));
-
                     p_112309_.mulPose(Axis.XP.rotationDegrees(270));
                     p_112309_.translate(0, -1, 0);
                     renderTileItems(world,p_112309_,p_112310_,listed,coin,toolStack,p_112311_,p_112312_,renderAugmentType,hudMessages);
@@ -227,7 +227,9 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             }
         }
     }
+
     //public static void  renderTile(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, ItemStack coin, ItemStack item, int p_112311_, int p_112312_, int renderAugmentType)
+    /*
     public static void  renderTile(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, ItemStack item, ItemStack coin, int p_112311_, int p_112312_, int renderAugmentType)
     {
         switch (renderAugmentType)
@@ -276,95 +278,66 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
 
         }
     }
+     */
 
-    public static void renderItemRotating(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, ItemStack itemStack, int p_112311_, int p_112312_)
-    {
-        if (!itemStack.isEmpty()) {
-            p_112309_.pushPose();
-            p_112309_.translate(0.5, 1.0, 0.5);
-            //p_112309_.translate(0, MathHelper.sin((worldIn.getGameTime()) / 10.0F) * 0.1 + 0.1, 0); BOBBING ITEM
-            p_112309_.scale(0.75F, 0.75F, 0.75F);
+    public static void renderItemsRotating(Level worldIn, PoseStack posStack, MultiBufferSource buffers, List<ItemStack> listed, int light, int overlay) {
+        //https://github.com/VazkiiMods/Botania/blob/1.18.x/Xplat/src/main/java/vazkii/botania/client/render/tile/RenderTileRuneAltar.java#L49
+        if(listed != null && !listed.isEmpty()) {
+            posStack.pushPose();
+            posStack.translate(0.5, 1.0, 0.5);
+            posStack.scale(0.75F, 0.75F, 0.75F);
             long time = System.currentTimeMillis();
-            float angle = (time/25) % 360;
-            //float angle = (worldIn.getGameTime()) / 20.0F * (180F / (float) Math.PI);
-            p_112309_.mulPose(Axis.YP.rotationDegrees(angle));
+            float angle = time / 25 % 360;
+            boolean rotateEnabled = PedestalConfig.CLIENT.pedestalRotateItems.get();
+            if(rotateEnabled) {
+                posStack.mulPose(Axis.YP.rotationDegrees(angle));
+            }
+            ItemStack stack = listed.get(0);
             ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
-            BakedModel baked = renderer.getModel(itemStack,worldIn,null,0);
-            renderer.render(itemStack, ItemDisplayContext.GROUND,true,p_112309_,p_112310_,p_112311_,p_112312_,baked);
-
-            //Minecraft.getInstance().getItemRenderer().renderItem(itemStack, ItemCameraTransforms.TransformType.GROUND, p_112311_, p_112312_, p_112309_, p_112310_);
-            p_112309_.popPose();
+            BakedModel bakedModel = renderer.getModel(stack, worldIn, null, 0);
+            renderer.render(stack, ItemDisplayContext.GROUND, true, posStack, buffers, light, overlay, bakedModel);
+            posStack.popPose();
         }
     }
 
-    public static void  renderTileItems(Level worldIn, PoseStack p_112309_, MultiBufferSource p_112310_, List<ItemStack> item, ItemStack coin,ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType, List<String> messages)
-    {
-        switch (renderAugmentType)
-        {
-            case 0:
-                renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.3125f,0,0,0,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
-                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
-                break;
-            case 1:
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.3125f,0,0,0,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
-                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
-                break;
-            case 2:
-                renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
-                break;
-            case 3:
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.3125f,0,0,0,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
-                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
-                break;
-            case 4:
-                renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
-                break;
-            case 5: break;
-            case 6: break;
-            case 7:
-                renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.3125f,0,0,0,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
-                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
-                break;
-            default:
-                renderItemsRotating(worldIn,p_112309_,p_112310_,item,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.3125f,0,0,0,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.3125f,0.475f,0.5f,90,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.5f,0.475f,0.6875f,180,0,1f,0,p_112311_,p_112312_);
-                renderCoin(worldIn,coin,p_112309_,p_112310_,0.6875f,0.475f,0.5f,270,0,1f,0,p_112311_,p_112312_);
-                renderTool(worldIn,toolStack,p_112309_,p_112310_,p_112311_,p_112312_);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,-0.75F, 2.25F, 0.5F, 180,0);
-                if(messages.size()>0)renderPedestalsHUD(p_112309_,p_112310_,messages,1.5F, 2.25F, 0.5F, 180,180);
-                break;
+    public static void renderTileItems(Level worldIn, PoseStack poseStack, MultiBufferSource multiBufferSource, List<ItemStack> item, ItemStack coin, ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType, List<String> messages) {
+        boolean renderUpgrades = PedestalConfig.CLIENT.pedestalRenderUpgrades.get();
+        boolean renderUpgradesInToolSlot = PedestalConfig.CLIENT.pedestalRenderUpgradeInToolSlot.get();
+        if(renderUpgradesInToolSlot) {
+            if (renderUpgrades) {
+                renderTool(worldIn, coin, poseStack, multiBufferSource, p_112311_, p_112312_);
+            }
+        } else {
+            if (renderUpgrades) {
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.5f, 0.475f, 0.3125f,0, p_112311_,p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.3125f, 0.475f, 0.5f,90, p_112311_,p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.5f, 0.475f, 0.6875f,180, p_112311_,p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.6875f, 0.475f, 0.5f,270, p_112311_,p_112312_);
+            }
+            boolean renderUpgradeExtras = PedestalConfig.CLIENT.pedestalRenderToolSlot.get();
+            if (renderUpgradeExtras) {
+                renderTool(worldIn, toolStack, poseStack, multiBufferSource, p_112311_, p_112312_);
+            }
+        }
 
+        boolean renderHUD = PedestalConfig.CLIENT.pedestalRenderHUD.get();
+        if (renderHUD) {
+            if (messages.size() > 0) {
+                renderPedestalsHUD(poseStack, multiBufferSource, messages, -0.75F, 2.25F, 0.5F, 180,0);
+                renderPedestalsHUD(poseStack, multiBufferSource, messages, 1.5F, 2.25F, 0.5F, 180,180);
+                //private static void renderPedestalsHUD(PoseStack matrixStack, MultiBufferSource buffer, List<String> messages, float x, float y, float z, int angleX, int angleY) {
+            }
+        }
+
+        boolean renderItems = PedestalConfig.CLIENT.pedestalRenderItems.get();
+        if (renderItems) {
+            if (!(renderAugmentType == 5 || renderAugmentType == 6)) {
+                renderItemsRotating(worldIn, poseStack, multiBufferSource, item, p_112311_, p_112312_);
+            }
         }
     }
 
+/*
     public static void renderItemsRotating(Level worldIn, PoseStack posStack, MultiBufferSource buffers, List<ItemStack> listed, int light, int overlay)
     {
         //https://github.com/VazkiiMods/Botania/blob/1.18.x/Xplat/src/main/java/vazkii/botania/client/render/tile/RenderTileRuneAltar.java#L49
@@ -428,18 +401,27 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             posStack.popPose();
         }
     }
+    */
 
-    public static void renderCoin(Level worldIn,ItemStack itemCoin, PoseStack p_112309_, MultiBufferSource p_112310_, float x, float y, float z, float angle, float xr, float yr, float zr, int p_112311_, int p_112312_) {
+    private static final ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+    private static BakedModel cachedModel = null;
+
+    public static void renderCoin(Level worldIn, ItemStack itemCoin, PoseStack poseStack, MultiBufferSource bufferSource, float x, float y, float z, float angle, int overlay, int light) {
         if (!itemCoin.isEmpty()) {
-            p_112309_.pushPose();
-            p_112309_.translate(x, y, z);
-            p_112309_.scale(0.1875f, 0.1875f, 0.1875f);
-            p_112309_.mulPose(Axis.YP.rotationDegrees(angle));
-            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
-            BakedModel baked = renderer.getModel(itemCoin,worldIn,null,0);
-            renderer.render(itemCoin,ItemDisplayContext.FIXED,true,p_112309_,p_112310_,p_112311_,p_112312_,baked);
-            //Minecraft.getInstance().getItemRenderer().renderItem(itemCoin, ItemCameraTransforms.TransformType.FIXED, p_112311_, p_112312_, p_112309_, p_112310_);
-            p_112309_.popPose();
+            poseStack.pushPose();
+            poseStack.translate(x, y, z);
+            poseStack.scale(0.1875f, 0.1875f, 0.1875f);
+            poseStack.mulPose(Axis.YP.rotationDegrees(angle));
+
+            // Check if the coin model is already cached
+            if (cachedModel == null || cachedModel != itemRenderer.getModel(itemCoin, worldIn, null, 0)) {
+                cachedModel = itemRenderer.getModel(itemCoin, worldIn, null, 0);
+            }
+
+            // Render the coin using the current pose stack
+            itemRenderer.render(itemCoin, ItemDisplayContext.FIXED, true, poseStack, bufferSource, overlay, light, cachedModel);
+
+            poseStack.popPose();
         }
     }
 
@@ -657,5 +639,12 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         {
             return false;
         }
+    }
+
+    @Override
+    public boolean shouldRender(BasePedestalBlockEntity blockEntity, @NotNull Vec3 playerPos) {
+        Vec3 blockPos = Vec3.atCenterOf(blockEntity.getBlockPos());
+        int renderDistance = PedestalConfig.CLIENT.pedestalRenderDistance.get();
+        return blockPos.closerThan(playerPos, renderDistance); //Only render pedestals in x blocks radius
     }
 }
