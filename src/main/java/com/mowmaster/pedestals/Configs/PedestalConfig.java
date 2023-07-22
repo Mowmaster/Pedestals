@@ -1418,13 +1418,78 @@ public class PedestalConfig
         }
     }
 
+    public static class Client {
+
+        public final ForgeConfigSpec.BooleanValue pedestalRotateItems;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderItems;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderParticles;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderHUD;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderUpgrades;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderToolSlot;
+        public final ForgeConfigSpec.BooleanValue pedestalRenderUpgradeInToolSlot;
+        public final ForgeConfigSpec.IntValue pedestalRenderDistance;
+        Client(ForgeConfigSpec.Builder builder) {
+            builder.comment("Pedestal rendering options").push("Pedestal");
+            pedestalRotateItems = builder
+                    .comment("Should items on pedestal rotate")
+                    .comment("§a§lLOW§f impact when §a§lTRUE")
+                    .comment("§2§lLOWEST§f impact when §c§lFALSE")
+                    .define("Rotate Items", true);
+            pedestalRenderItems = builder
+                    .comment("Should items be rendered on pedestal")
+                    .comment("§6§lMEDIUM§f impact when §a§lTRUE")
+                    .comment("§2§lLOWEST§f impact when §c§lFALSE")
+                    .define("Render Items", true);
+            pedestalRenderParticles = builder
+                    .comment("Should pedestals render particles")
+                    .comment("§a§lLOW§f impact when §a§lTRUE")
+                    .comment("§2§lLOWEST§f impact when §c§lFALSE")
+                    .define("Render Particles", true);
+            pedestalRenderHUD = builder
+                    .comment("Should pedestals render HUD elements?")
+                    .comment("§a§lLOW§f impact when §a§lTRUE")
+                    .comment("§2§lLOWEST§f impact when §c§lFALSE")
+                    .define("Render HUD", true);
+            pedestalRenderUpgrades = builder
+                    .comment("Should pedestals render upgrades?")
+                    .comment("This will prevent upgrades from being rendered")
+                    .comment("Set to false if you're experiencing client-side lag from Pedestals")
+                    .comment("§4§lHIGHEST§f impact when §a§lTRUE")
+                    .comment("§2§lLOWEST§f impact when §c§lFALSE")
+                    .define("Render Upgrades", true);
+            pedestalRenderToolSlot = builder
+                    .comment("Should pedestals render their Tool Slot which is located at the TOP?")
+                    .comment("§a§lLOW§f impact when §a§lTRUE")
+                    .comment("§2§lLOWEST§f impact when §c§lFALSE")
+                    .define("Render Tool Slot", true);
+            pedestalRenderUpgradeInToolSlot = builder
+                    .comment("Should the pedestal upgrades be rendered on TOP instead?")
+                    .comment("This will prevent the 'Tool Slot' from being rendered")
+                    .comment("§a§lLOW§f impact when §c§lFALSE")
+                    .comment("§2§lLOWEST§f impact when §a§lTRUE")
+                    .define("Render Upgrades in Tool Slot", false);
+            pedestalRenderDistance = builder
+                    .comment("Distance (blocks) away before Pedestal renders")
+                    .comment("§6§lMEDIUM§f impact when on §c§l64")
+                    .comment("§2§lLOWEST§f impact when on §a§l1")
+                    .defineInRange("Render Distance", 8, 1, 64);
+            builder.pop();
+        }
+    }
+
     public static final ForgeConfigSpec commonSpec;
     public static final Common COMMON;
+    public static final ForgeConfigSpec clientSpec;
+    public static final Client CLIENT;
 
     static {
         final Pair<Common, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Common::new);
         commonSpec = specPair.getRight();
         COMMON = specPair.getLeft();
+
+        final Pair<Client, ForgeConfigSpec> clientSpecPair = new ForgeConfigSpec.Builder().configure(Client::new);
+        clientSpec = clientSpecPair.getRight();
+        CLIENT = clientSpecPair.getLeft();
     }
 
     @SubscribeEvent
