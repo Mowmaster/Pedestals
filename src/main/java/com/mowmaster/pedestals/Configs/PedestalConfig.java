@@ -1432,7 +1432,7 @@ public class PedestalConfig
                     .comment("Distance (blocks) away before Pedestal renders")
                     .comment("§6§lMEDIUM§f impact when on §c§l64")
                     .comment("§2§lLOWEST§f impact when on §a§l1")
-                    .defineInRange("Render Distance", 8, 1, 64);
+                    .defineInRange("Render Distance", 32, 1, 64);
             builder.pop();
         }
     }
