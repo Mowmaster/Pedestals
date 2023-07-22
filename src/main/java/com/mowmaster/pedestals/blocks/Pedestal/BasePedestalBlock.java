@@ -101,7 +101,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
     public BasePedestalBlock(BlockBehaviour.Properties p_152915_)
     {
         super(p_152915_);
-        this.registerDefaultState(MowLibColorReference.addColorToBlockState(this.defaultBlockState(),MowLibColorReference.DEFAULTCOLOR).setValue(WATERLOGGED, Boolean.valueOf(false)).setValue(FACING, Direction.UP).setValue(LIT, Boolean.valueOf(false)).setValue(FILTER_STATUS, 0));
+        this.registerDefaultState(MowLibColorReference.addColorToBlockState(this.defaultBlockState(),MowLibColorReference.DEFAULTCOLOR).setValue(WATERLOGGED, Boolean.FALSE).setValue(FACING, Direction.UP).setValue(LIT, Boolean.FALSE).setValue(FILTER_STATUS, 0));
         this.CUP = Shapes.or(Block.box(3.0D, 0.0D, 3.0D, 13.0D, 2.0D, 13.0D),
                 Block.box(5.0D, 2.0D, 5.0D, 11.0D, 10.0D, 11.0D),
                 Block.box(4.0D, 10.0D, 4.0D, 12.0D, 12.0D, 12.0D));
@@ -195,21 +195,14 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
 
     public VoxelShape getShape(BlockState p_152021_, BlockGetter p_152022_, BlockPos p_152023_, CollisionContext p_152024_) {
         Direction direction = p_152021_.getValue(FACING);
-        switch(direction) {
-            case NORTH:
-                return (p_152021_.getValue(LIT)) ? (this.LCNORTH) : (this.CNORTH);
-            case SOUTH:
-                return (p_152021_.getValue(LIT)) ? (this.LCSOUTH) : (this.CSOUTH);
-            case EAST:
-                return (p_152021_.getValue(LIT)) ? (this.LCEAST) : (this.CEAST);
-            case WEST:
-                return (p_152021_.getValue(LIT)) ? (this.LCWEST) : (this.CWEST);
-            case DOWN:
-                return (p_152021_.getValue(LIT)) ? (this.LCDOWN) : (this.CDOWN);
-            case UP:
-            default:
-                return (p_152021_.getValue(LIT)) ? (this.LCUP) : (this.CUP);
-        }
+        return switch (direction) {
+            case NORTH -> (p_152021_.getValue(LIT)) ? (this.LCNORTH) : (this.CNORTH);
+            case SOUTH -> (p_152021_.getValue(LIT)) ? (this.LCSOUTH) : (this.CSOUTH);
+            case EAST -> (p_152021_.getValue(LIT)) ? (this.LCEAST) : (this.CEAST);
+            case WEST -> (p_152021_.getValue(LIT)) ? (this.LCWEST) : (this.CWEST);
+            case DOWN -> (p_152021_.getValue(LIT)) ? (this.LCDOWN) : (this.CDOWN);
+            default -> (p_152021_.getValue(LIT)) ? (this.LCUP) : (this.CUP);
+        };
     }
 
     public BlockState updateShape(BlockState p_152036_, Direction p_152037_, BlockState p_152038_, LevelAccessor p_152039_, BlockPos p_152040_, BlockPos p_152041_) {
@@ -314,10 +307,8 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
             if(!(p_60502_ instanceof FakePlayer))
             {
                 BlockEntity blockEntity = p_60500_.getBlockEntity(p_60501_);
-                if(blockEntity instanceof BasePedestalBlockEntity)
+                if(blockEntity instanceof BasePedestalBlockEntity pedestal)
                 {
-                    BasePedestalBlockEntity pedestal = ((BasePedestalBlockEntity)blockEntity);
-                    ItemStack itemInHand = p_60502_.getMainHandItem();
                     ItemStack itemInOffHand = p_60502_.getOffhandItem();
 
                     if(pedestal.hasFilter() && itemInOffHand.is(com.mowmaster.mowlib.Registry.DeferredRegisterItems.TOOL_FILTERTOOL.get()))
@@ -435,7 +426,6 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
 
                 int getColor;
                 int currentColor;
-                Component sameColor;
                 BlockState newState;
                 List<Item> DYES = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(new ResourceLocation("forge", "dyes"))).stream().toList();
 
@@ -621,7 +611,7 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         if(pedestal.hasRedstone())
                         {
                             MutableComponent redstoneCountInPedestal = Component.translatable(MODID + ".pedestal.message_redstone_disable");
-                            redstoneCountInPedestal.append(""+pedestal.getRedstonePowerNeeded()+"");
+                            redstoneCountInPedestal.append(String.valueOf(pedestal.getRedstonePowerNeeded()));
                             redstoneCountInPedestal.withStyle(ChatFormatting.BLACK);
                             if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
                             displayOtherComponent.append(redstoneCountInPedestal);
@@ -632,9 +622,9 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         {
                             MutableComponent pedestalFluid = pedestal.getStoredFluid().getDisplayName().copy();
                             pedestalFluid.append(Component.translatable(MODID + ".pedestal.message_separator1"));
-                            pedestalFluid.append(""+ pedestal.getStoredFluid().getAmount() + "");
+                            pedestalFluid.append(String.valueOf(pedestal.getStoredFluid().getAmount()));
                             pedestalFluid.append(Component.translatable(MODID + ".pedestal.message_separator2"));
-                            pedestalFluid.append(""+ pedestal.getFluidCapacity() + "");
+                            pedestalFluid.append(String.valueOf(pedestal.getFluidCapacity()));
                             pedestalFluid.withStyle(ChatFormatting.BLUE);
                             if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
                             displayOtherComponent.append(pedestalFluid);
@@ -645,9 +635,9 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         {
                             MutableComponent pedestalEnergy = Component.translatable(MODID + ".pedestal.message_energy");
                             pedestalEnergy.append(Component.translatable(MODID + ".pedestal.message_separator1"));
-                            pedestalEnergy.append(""+ pedestal.getStoredEnergy() + "");
+                            pedestalEnergy.append(String.valueOf(pedestal.getStoredEnergy()));
                             pedestalEnergy.append(Component.translatable(MODID + ".pedestal.message_separator2"));
-                            pedestalEnergy.append(""+ pedestal.getEnergyCapacity() + "");
+                            pedestalEnergy.append(String.valueOf(pedestal.getEnergyCapacity()));
                             pedestalEnergy.withStyle(ChatFormatting.RED);
                             if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
                             displayOtherComponent.append(pedestalEnergy);
@@ -658,9 +648,9 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         {
                             MutableComponent pedestalExperience = Component.translatable(MODID + ".pedestal.message_experience");
                             pedestalExperience.append(Component.translatable(MODID + ".pedestal.message_separator1"));
-                            pedestalExperience.append(""+ pedestal.getStoredExperience() + "");
+                            pedestalExperience.append(String.valueOf(pedestal.getStoredExperience()));
                             pedestalExperience.append(Component.translatable(MODID + ".pedestal.message_separator2"));
-                            pedestalExperience.append(""+ pedestal.getExperienceCapacity() + "");
+                            pedestalExperience.append(String.valueOf(pedestal.getExperienceCapacity()));
                             pedestalExperience.withStyle(ChatFormatting.GREEN);
                             if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
                             displayOtherComponent.append(pedestalExperience);
@@ -673,9 +663,9 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                             dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator1"));
                             dustInPedestal.append(Component.translatable(MowLibReferences.MODID + "." + MowLibColorReference.getColorName(pedestal.getStoredDust().getDustColor())));
                             dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator4"));
-                            dustInPedestal.append(""+ pedestal.getStoredDust().getDustAmount() + "");
+                            dustInPedestal.append(String.valueOf(pedestal.getStoredDust().getDustAmount()));
                             dustInPedestal.append(Component.translatable(MODID + ".pedestal.message_separator2"));
-                            dustInPedestal.append(""+ pedestal.getDustCapacity() + "");
+                            dustInPedestal.append(String.valueOf(pedestal.getDustCapacity()));
                             dustInPedestal.withStyle(ChatFormatting.LIGHT_PURPLE);
                             if(displayOther)displayOtherComponent.append(Component.translatable(MODID + ".pedestal.message_separator3"));
                             displayOtherComponent.append(dustInPedestal);
@@ -705,19 +695,15 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                             if(pedestal.getItemStacks().size()>1)
                             {
                                 List<ItemStack> stacks = pedestal.getItemStacks();
-                                Map<Item,Integer> getMapped =  Maps.<Item,Integer>newLinkedHashMap();
-                                for(int i=0;i<stacks.size();i++)
-                                {
-                                    if(stacks.get(i).isEmpty())continue;
+                                Map<Item,Integer> getMapped =  Maps.newLinkedHashMap();
+                                for (ItemStack stack : stacks) {
+                                    if (stack.isEmpty()) continue;
 
-                                    if(getMapped.containsKey(stacks.get(i).getItem()))
-                                    {
-                                        int currentValue = getMapped.getOrDefault(stacks.get(i).getItem(),0);
-                                        getMapped.replace(stacks.get(i).getItem(),currentValue, currentValue + stacks.get(i).getCount());
-                                    }
-                                    else
-                                    {
-                                        getMapped.put(stacks.get(i).getItem(),stacks.get(i).getCount());
+                                    if (getMapped.containsKey(stack.getItem())) {
+                                        int currentValue = getMapped.getOrDefault(stack.getItem(), 0);
+                                        getMapped.replace(stack.getItem(), currentValue, currentValue + stack.getCount());
+                                    } else {
+                                        getMapped.put(stack.getItem(), stack.getCount());
                                     }
                                 }
 
@@ -763,9 +749,8 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                         if(p_60506_ instanceof FakePlayer){ return InteractionResult.FAIL; }
 
                         Item item = pedestal.getStoredFluid().copy().getFluid().getBucket();
-                        if(item instanceof BucketItem)
+                        if(item instanceof BucketItem bucketItem)
                         {
-                            BucketItem bucketItem = (BucketItem) item;
                             String fluid = pedestal.getStoredFluid().getDisplayName().getString();
                             if(!pedestal.removeFluid(1000, IFluidHandler.FluidAction.EXECUTE).isEmpty())
                             {
@@ -927,7 +912,6 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
     public RenderShape getRenderShape(BlockState p_50950_) {
         return RenderShape.MODEL;
     }
-
 
     @Override
     public void neighborChanged(BlockState p_60509_, Level p_60510_, BlockPos p_60511_, Block p_60512_, BlockPos p_60513_, boolean p_60514_) {

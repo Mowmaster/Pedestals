@@ -1,7 +1,5 @@
 package com.mowmaster.pedestals.Items.Tools.Upgrade;
 
-
-import com.mowmaster.mowlib.BlockEntities.MowLibBaseFilterableBlockEntity;
 import com.mowmaster.mowlib.MowLibUtils.MowLibMessageUtils;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Tools.PedestalBaseTool;
@@ -10,7 +8,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import net.minecraft.world.item.Item.Properties;
+import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
 
 public class ToolSwapper extends PedestalBaseTool {
     public ToolSwapper(Properties p_41383_) {
@@ -25,15 +23,12 @@ public class ToolSwapper extends PedestalBaseTool {
 
     @Override
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {
-        if(pedestal.hasTool())
-        {
+        if (pedestal.hasTool()) {
             ItemStack toolInPedestal = pedestal.getActualToolStack();
-            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE,"pedestals.tool_toolinpedestal");
-            MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.WHITE,toolInPedestal.getDisplayName().getString());
-        }
-        else
-        {
-            MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,"pedestals.tool_toolinpedestal_not");
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE, MODID + ".tool_toolinpedestal");
+            MowLibMessageUtils.messagePlayerChatText(player, ChatFormatting.WHITE, toolInPedestal.getDisplayName().getString());
+        } else {
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE, MODID + ".tool_toolinpedestal_not");
         }
     }
 }

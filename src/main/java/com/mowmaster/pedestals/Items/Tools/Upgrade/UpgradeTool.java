@@ -9,6 +9,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+
 public class UpgradeTool extends PedestalBaseTool {
     public UpgradeTool(Properties p_41383_) {
         super(p_41383_.stacksTo(1));
@@ -22,19 +24,16 @@ public class UpgradeTool extends PedestalBaseTool {
 
     @Override
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {
-        if(pedestal.hasCoin())
-        {
+        if(pedestal.hasCoin()) {
             ItemStack coinInPedestal = pedestal.getCoinOnPedestal();
-            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE,"pedestals.tool_coininpedestal");
-            MowLibMessageUtils.messagePlayerChatText(player,ChatFormatting.WHITE,coinInPedestal.getDisplayName().getString());
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE, MODID + ".tool_coininpedestal");
+            MowLibMessageUtils.messagePlayerChatText(player, ChatFormatting.WHITE, coinInPedestal.getDisplayName().getString());
             if(coinInPedestal.getItem() instanceof ItemUpgradeBase upgrade)
             {
                 upgrade.sendUpgradeCustomChat(player,coinInPedestal);
             }
-        }
-        else
-        {
-            MowLibMessageUtils.messagePlayerChat(player,ChatFormatting.LIGHT_PURPLE,"pedestals.tool_coininpedestal_not");
+        } else {
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE, MODID + ".tool_coininpedestal_not");
         }
     }
 }
