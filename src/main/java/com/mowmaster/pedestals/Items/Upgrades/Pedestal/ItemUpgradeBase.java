@@ -1081,46 +1081,6 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return slot.get();
     }
 
-    public int getNextSlotEmptyOrMatching(LazyOptional<IItemHandler> cap, ItemStack stackInPedestal)
-    {
-        AtomicInteger slot = new AtomicInteger(-1);
-        if(cap.isPresent())
-        {
-            IItemHandler handler = cap.orElse(null);
-            if(handler != null)
-            {
-                int range = handler.getSlots();
-                for(int i=0;i<range;i++)
-                {
-                    ItemStack stackInSlot = handler.getStackInSlot(i);
-                    int maxSizeSlot = handler.getSlotLimit(i);
-                    if(maxSizeSlot>0)
-                    {
-                        if(stackInSlot.getMaxStackSize()>1)
-                        {
-                            if(doItemsMatch(stackInSlot,stackInPedestal) && stackInSlot.getCount() < handler.getSlotLimit(i))
-                            {
-                                slot.set(i);
-                                break;
-                            }
-                            else if(stackInSlot.isEmpty())
-                            {
-                                slot.set(i);
-                                break;
-                            }
-                            //if chest is full
-                            else if(i==range)
-                            {
-                                slot.set(i);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return slot.get();
-    }
-
     public static boolean passesMachineFilterItems(BasePedestalBlockEntity pedestal, ItemStack itemStack) {
         if (pedestal.hasFilter()) {
             ItemStack filterInPedestal = pedestal.getFilterInBlockEntity();
@@ -1807,7 +1767,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return LazyOptional.empty();
     }
 
-    public static LazyOptional<IFluidHandler> findItemHandlerAtPosEntityFluid(Level world, BlockPos pos, Direction side, boolean allowEntity) {
+    public static LazyOptional<IFluidHandler> findFluidHandlerAtPosEntity(Level world, BlockPos pos, Direction side, boolean allowEntity) {
         BlockEntity neighbourTile = world.getBlockEntity(pos);
         if (neighbourTile != null) {
             LazyOptional<IFluidHandler> cap = neighbourTile.getCapability(ForgeCapabilities.FLUID_HANDLER, side);
@@ -1831,7 +1791,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return LazyOptional.empty();
     }
 
-    public static LazyOptional<IEnergyStorage> findItemHandlerAtPosEntityEnergy(Level world, BlockPos pos, Direction side, boolean allowEntity) {
+    public static LazyOptional<IEnergyStorage> findEnergyHandlerAtPosEntity(Level world, BlockPos pos, Direction side, boolean allowEntity) {
         BlockEntity neighbourTile = world.getBlockEntity(pos);
         if (neighbourTile != null) {
             LazyOptional<IEnergyStorage> cap = neighbourTile.getCapability(ForgeCapabilities.ENERGY, side);
