@@ -193,7 +193,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             LazyOptional<IFluidHandler> cap = MowLibFluidUtils.findFluidHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
             if(hasEntityContainer(coin))
             {
-                cap = findItemHandlerAtPosEntityFluid(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+                cap = findFluidHandlerAtPosEntity(level,posInventory,getPedestalFacing(level, pedestalPos),true);
             }
             if(cap.isPresent())
             {
@@ -305,7 +305,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase implements IHasModeTypes
             LazyOptional<IEnergyStorage> cap = MowLibEnergyUtils.findEnergyHandlerAtPos(level,posInventory,getPedestalFacing(level, pedestalPos),true);
             if(hasEntityContainer(coin))
             {
-                cap = findItemHandlerAtPosEntityEnergy(level,posInventory,getPedestalFacing(level, pedestalPos),true);
+                cap = findEnergyHandlerAtPosEntity(level,posInventory,getPedestalFacing(level, pedestalPos),true);
             }
             if(cap.isPresent())
             {
