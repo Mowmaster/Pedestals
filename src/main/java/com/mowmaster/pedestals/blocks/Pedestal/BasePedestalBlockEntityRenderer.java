@@ -306,60 +306,127 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
     }
     */
 
-    public static void renderTileItems(Level worldIn, PoseStack poseStack, MultiBufferSource multiBufferSource, List<ItemStack> item, ItemStack coin, ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType, List<String> messages) {
+    private static void renderCoinAndTool(Level worldIn, PoseStack poseStack, MultiBufferSource multiBufferSource, ItemStack coin, ItemStack toolStack, int p_112311_, int p_112312_) {
         boolean renderUpgrades = PedestalConfig.CLIENT.pedestalRenderUpgrades.get();
         boolean renderUpgradesInToolSlot = PedestalConfig.CLIENT.pedestalRenderUpgradeInToolSlot.get();
-        if(renderUpgradesInToolSlot) {
+        if (renderUpgradesInToolSlot) {
             if (renderUpgrades) {
                 renderTool(worldIn, coin, poseStack, multiBufferSource, p_112311_, p_112312_);
             }
         } else {
             if (renderUpgrades) {
-                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.5f, 0.475f, 0.3125f,0, p_112311_,p_112312_);
-                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.3125f, 0.475f, 0.5f,90, p_112311_,p_112312_);
-                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.5f, 0.475f, 0.6875f,180, p_112311_,p_112312_);
-                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.6875f, 0.475f, 0.5f,270, p_112311_,p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.5f, 0.475f, 0.3125f, 0, p_112311_, p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.3125f, 0.475f, 0.5f, 90, p_112311_, p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.5f, 0.475f, 0.6875f, 180, p_112311_, p_112312_);
+                renderCoin(worldIn, coin, poseStack, multiBufferSource, 0.6875f, 0.475f, 0.5f, 270, p_112311_, p_112312_);
             }
-            boolean renderUpgradeExtras = PedestalConfig.CLIENT.pedestalRenderToolSlot.get();
-            if (renderUpgradeExtras) {
+            boolean renderToolSlot = PedestalConfig.CLIENT.pedestalRenderToolSlot.get();
+            if (renderToolSlot) {
                 renderTool(worldIn, toolStack, poseStack, multiBufferSource, p_112311_, p_112312_);
-            }
-        }
-
-        boolean renderHUD = PedestalConfig.CLIENT.pedestalRenderHUD.get();
-        if (renderHUD) {
-            if (messages.size() > 0) {
-                renderPedestalsHUD(poseStack, multiBufferSource, messages, -0.75F, 2.25F, 0.5F, 180,0);
-                renderPedestalsHUD(poseStack, multiBufferSource, messages, 1.5F, 2.25F, 0.5F, 180,180);
-                //private static void renderPedestalsHUD(PoseStack matrixStack, MultiBufferSource buffer, List<String> messages, float x, float y, float z, int angleX, int angleY) {
-            }
-        }
-
-        boolean renderItems = PedestalConfig.CLIENT.pedestalRenderItems.get();
-        if (renderItems) {
-            if (!(renderAugmentType == 5 || renderAugmentType == 6)) {
-                renderItemsRotating(worldIn, poseStack, multiBufferSource, item, p_112311_, p_112312_);
             }
         }
     }
 
-    public static void renderItemsRotating(Level worldIn, PoseStack posStack, MultiBufferSource buffers, List<ItemStack> listed, int light, int overlay) {
-        //https://github.com/VazkiiMods/Botania/blob/1.18.x/Xplat/src/main/java/vazkii/botania/client/render/tile/RenderTileRuneAltar.java#L49
-        if(listed != null && !listed.isEmpty()) {
-            posStack.pushPose();
-            posStack.translate(0.5, 1.0, 0.5);
-            posStack.scale(0.75F, 0.75F, 0.75F);
-            long time = System.currentTimeMillis();
-            float angle = time / 25 % 360;
-            boolean rotateEnabled = PedestalConfig.CLIENT.pedestalRotateItems.get();
-            if(rotateEnabled) {
-                posStack.mulPose(Vector3f.YP.rotationDegrees(angle));
+    private static void renderHUD(PoseStack poseStack, MultiBufferSource multiBufferSource, List<String> messages) {
+        boolean renderHUD = PedestalConfig.CLIENT.pedestalRenderHUD.get();
+        if (renderHUD) {
+            if (messages.size() > 0) {
+                renderPedestalsHUD(poseStack, multiBufferSource, messages, -0.75F, 2.25F, 0.5F, 180, 0);
+                renderPedestalsHUD(poseStack, multiBufferSource, messages, 1.5F, 2.25F, 0.5F, 180, 180);
             }
-            ItemStack stack = listed.get(0);
-            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
-            BakedModel bakedModel = renderer.getModel(stack, worldIn, null, 0);
-            renderer.render(stack, ItemTransforms.TransformType.GROUND, true, posStack, buffers, light, overlay, bakedModel);
-            posStack.popPose();
+        }
+    }
+
+    public static void renderTileItems(Level worldIn, PoseStack poseStack, MultiBufferSource multiBufferSource, List<ItemStack> item, ItemStack coin, ItemStack toolStack, int p_112311_, int p_112312_, int renderAugmentType, List<String> messages) {
+        switch (renderAugmentType) {
+            case 1, 3:
+                renderCoinAndTool(worldIn, poseStack, multiBufferSource, coin, toolStack, p_112311_, p_112312_);
+                renderHUD(poseStack, multiBufferSource, messages);
+                break;
+            case 2, 4:
+                renderItemsRotating(worldIn, poseStack, multiBufferSource, item, p_112311_, p_112312_);
+                renderHUD(poseStack, multiBufferSource, messages);
+                break;
+            case 5, 6: break;
+            default: // 0, 7
+                renderItemsRotating(worldIn, poseStack, multiBufferSource, item, p_112311_, p_112312_);
+                renderCoinAndTool(worldIn, poseStack, multiBufferSource, coin, toolStack, p_112311_, p_112312_);
+                renderHUD(poseStack, multiBufferSource, messages);
+                break;
+
+        }
+    }
+
+    private static void renderItemsRotating(Level worldIn, PoseStack posStack, MultiBufferSource buffers, List<ItemStack> listed, int light, int overlay) {
+        boolean renderItems = PedestalConfig.CLIENT.pedestalRenderItems.get();
+        if (renderItems) {
+            //https://github.com/VazkiiMods/Botania/blob/1.18.x/Xplat/src/main/java/vazkii/botania/client/render/tile/RenderTileRuneAltar.java#L49
+            int stacks = listed.size();
+            boolean rotateEnabled = PedestalConfig.CLIENT.pedestalRotateItems.get();
+            if (stacks > 1) {
+                posStack.pushPose();
+                double time = worldIn.getGameTime();
+
+                float[] angles = new float[stacks];
+
+                float anglePer = 360F / stacks;
+                for (int i = 0; i < angles.length; i++) {
+                    angles[i] = anglePer * i + (rotateEnabled ? (float) time : 0);
+                }
+
+                float sized = 1.25F;
+                float sizedd = 0.25F;
+                if (stacks <= 4) {
+                    sized = 0.25F;
+                    sizedd = 0.05F;
+                }
+                if (stacks <= 8 && stacks > 4) {
+                    sized = 0.5F;
+                    sizedd = 0.10F;
+                }
+                if (stacks <= 12 && stacks > 8) {
+                    sized = 0.75F;
+                    sizedd = 0.15F;
+                }
+                if (stacks <= 16 && stacks > 12) {
+                    sized = 1.0F;
+                    sizedd = 0.20F;
+                }
+
+                for (int i = 0; i < stacks; i++) {
+                    posStack.pushPose();
+                    posStack.translate(0.5F, 0.75F, 0.5F);
+                    posStack.mulPose(Vector3f.YP.rotationDegrees(angles[i]));
+                    posStack.translate(sized, 0F, sizedd);
+                    posStack.mulPose(Vector3f.YP.rotationDegrees(90F));
+                    if (rotateEnabled) {
+                        posStack.translate(0D, 0.075 * Math.sin((time + i * 10) / 5D), 0F);
+                    }
+                    ItemStack stack = listed.get(i);
+                    Minecraft mc = Minecraft.getInstance();
+                    if (!stack.isEmpty()) {
+                        mc.getItemRenderer().renderStatic(stack, ItemTransforms.TransformType.GROUND,
+                                light, overlay, posStack, buffers, 0);
+                    }
+                    posStack.popPose();
+                }
+
+                posStack.popPose();
+            } else if (stacks == 1) {
+                posStack.pushPose();
+                posStack.translate(0.5, 1.0, 0.5);
+                posStack.scale(0.75F, 0.75F, 0.75F);
+                long time = System.currentTimeMillis();
+                float angle = (time / 25) % 360;
+                if (rotateEnabled) {
+                    posStack.mulPose(Vector3f.YP.rotationDegrees(angle));
+                }
+                ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+                BakedModel baked = renderer.getModel(listed.get(0), worldIn, null, 0);
+                renderer.render(listed.get(0), ItemTransforms.TransformType.GROUND, true, posStack, buffers, light, overlay, baked);
+
+                posStack.popPose();
+            }
         }
     }
 
