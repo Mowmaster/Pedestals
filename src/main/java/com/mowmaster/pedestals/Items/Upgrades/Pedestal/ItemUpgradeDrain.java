@@ -66,7 +66,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
     }
 
     @Override
-    public boolean needsWorkCard() { return true; }
+    public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
     public int getWorkCardType() { return 0; }

@@ -138,11 +138,12 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
+        ItemStack upgradeItemStack = pedestal.getCoinOnPedestal();
         List<String> messages = new ArrayList<>();
         int supportedWorkCardType = getWorkCardType();
         if (supportedWorkCardType < 0) return messages;
 
-        if (needsWorkCard() && !pedestal.hasWorkCard()) {
+        if (needsWorkCard(upgradeItemStack) && !pedestal.hasWorkCard()) {
             messages.add(ChatFormatting.RED + "Missing Work Card");
             messages.add(ChatFormatting.WHITE + "------------------");
             messages.add(ChatFormatting.WHITE + "Upgrade Supports:");
@@ -174,27 +175,38 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                     case 3 -> messages.add(ChatFormatting.WHITE + "Pedestal Locations");
                 }
             } else {
-                if (insertedWorkCardType == 1) {
-                    List<String> errorReason = List.of(); // supports up to 3 lines
-                    if (!workCardBase.selectedAreaWithinRange(pedestal)) {
-                        errorReason = List.of(
-                            ChatFormatting.WHITE + "Area Not Within",
-                            ChatFormatting.WHITE + "Upgrade Range"
-                        );
-                    } else if (
-                        hasOperateToBedrock(pedestal.getCoinOnPedestal()) &&
-                        readBlockPosFromNBT(pedestal.getWorkCardInPedestal(), 1).getY() != readBlockPosFromNBT(pedestal.getWorkCardInPedestal(), 2).getY()
-                    ) {
-                        errorReason = List.of(
-                            ChatFormatting.WHITE + "Operate to Bedrock",
-                            ChatFormatting.WHITE + "Limits Height to 1"
-                        );
+                List<String> errorReason = List.of(); // supports up to 3 lines
+                switch (insertedWorkCardType) {
+                    case 1 -> {
+                        if (!workCardBase.selectedAreaWithinRange(pedestal)) {
+                            errorReason = List.of(
+                                ChatFormatting.WHITE + "Area Not Within",
+                                ChatFormatting.WHITE + "Upgrade Range"
+                            );
+                        } else if (
+                            hasOperateToBedrock(upgradeItemStack) &&
+                                readBlockPosFromNBT(pedestal.getWorkCardInPedestal(), 1).getY() != readBlockPosFromNBT(pedestal.getWorkCardInPedestal(), 2).getY()
+                        ) {
+                            errorReason = List.of(
+                                ChatFormatting.WHITE + "Operate to Bedrock",
+                                ChatFormatting.WHITE + "Limits Height to 1"
+                            );
+                        }
                     }
-                    if (!errorReason.isEmpty()) {
-                        messages.add(ChatFormatting.RED + "Invalid Work Area");
-                        messages.add(ChatFormatting.WHITE + "------------------");
-                        messages.addAll(errorReason);
+                    case 2 -> {
+                        if (hasRemoteStorage(upgradeItemStack) && WorkCardLocations.getNumPositions(pedestal.getWorkCardInPedestal()) > 8) {
+                            errorReason = List.of(
+                                ChatFormatting.WHITE + "Remote Inventory",
+                                ChatFormatting.WHITE + "Targeting limited",
+                                ChatFormatting.WHITE + "to 8 locations"
+                            );
+                        }
                     }
+                }
+                if (!errorReason.isEmpty()) {
+                    messages.add(ChatFormatting.RED + "Invalid Work Card");
+                    messages.add(ChatFormatting.WHITE + "------------------");
+                    messages.addAll(errorReason);
                 }
             }
         }
@@ -297,23 +309,27 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             player.displayClientMessage(capacityLabel, false);
         }
 
-        if(canModifyEntityContainers(upgrade))
-        {
-            if(getEntityContainer(upgrade))
-            {
-                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_entitycontainer_label");
-                areaLabel.withStyle(ChatFormatting.DARK_GREEN);
-                player.displayClientMessage(areaLabel, false);
+        if (canModifyEntityContainers(upgrade)) {
+            if(getEntityContainer(upgrade)) {
+                MutableComponent entityContainerLabel = Component.translatable(MODID + ".upgrade_tooltip_entitycontainer_label");
+                entityContainerLabel.withStyle(ChatFormatting.DARK_GREEN);
+                player.displayClientMessage(entityContainerLabel, false);
             }
         }
 
-        if(canModifyArea(upgrade))
-        {
-            if(getAreaIncrease(upgrade)>0)
-            {
+        if (canModifyRemoteStorage(upgrade)) {
+            if (getRemoteStorage(upgrade)) {
+                MutableComponent remoteStorageLabel = Component.translatable(MODID + ".upgrade_tooltip_remotestorage_label");
+                remoteStorageLabel.withStyle(ChatFormatting.DARK_PURPLE);
+                player.displayClientMessage(remoteStorageLabel, false);
+            }
+        }
+
+        if (canModifyArea(upgrade)) {
+            if (getAreaIncrease(upgrade)>0) {
                 MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_area_label");
                 areaLabel.withStyle(ChatFormatting.GRAY);
-                MutableComponent areaAmount = Component.literal(""+getAreaIncrease(upgrade)+"");
+                MutableComponent areaAmount = Component.literal(String.valueOf(getAreaIncrease(upgrade)));
                 areaAmount.withStyle(ChatFormatting.WHITE);
 
                 areaLabel.append(areaAmount);
@@ -321,10 +337,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
         }
 
-        if(canModifyRange(upgrade))
-        {
-            if(getRangeIncrease(upgrade)>0)
-            {
+        if (canModifyRange(upgrade)) {
+            if (getRangeIncrease(upgrade)>0) {
                 MutableComponent rangeLabel = Component.translatable(MODID + ".upgrade_tooltip_range_label");
                 rangeLabel.withStyle(ChatFormatting.GOLD);
                 MutableComponent rangeAmount = Component.literal(""+getRangeIncrease(upgrade)+"");
@@ -335,40 +349,32 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
         }
 
-        if(canModifyMagnet(upgrade))
-        {
-            if(getMagnet(upgrade))
-            {
+        if (canModifyMagnet(upgrade)) {
+            if (getMagnet(upgrade)) {
                 MutableComponent magnetLabel = Component.translatable(MODID + ".upgrade_tooltip_magnet_label");
                 magnetLabel.withStyle(ChatFormatting.DARK_RED);
                 player.displayClientMessage(magnetLabel, false);
             }
         }
 
-        if(canModifyGentleHarvest(upgrade))
-        {
-            if(getGentleHarvest(upgrade))
-            {
+        if (canModifyGentleHarvest(upgrade)) {
+            if (getGentleHarvest(upgrade)) {
                 MutableComponent gentleLabel = Component.translatable(MODID + ".upgrade_tooltip_gentle_label");
                 gentleLabel.withStyle(ChatFormatting.YELLOW);
                 player.displayClientMessage(gentleLabel, false);
             }
         }
 
-        if(canModifySuperSpeed(upgrade))
-        {
-            if(getSuperSpeed(upgrade))
-            {
+        if (canModifySuperSpeed(upgrade)) {
+            if (getSuperSpeed(upgrade)) {
                 MutableComponent sspeedLabel = Component.translatable(MODID + ".upgrade_tooltip_superspeed_label");
                 sspeedLabel.withStyle(ChatFormatting.DARK_AQUA);
                 player.displayClientMessage(sspeedLabel, false);
             }
         }
 
-        if(canModifyOperateToBedrock(upgrade))
-        {
-            if(getOperateToBedrock(upgrade))
-            {
+        if (canModifyOperateToBedrock(upgrade)) {
+            if (getOperateToBedrock(upgrade)) {
                 MutableComponent operateToBedrockLabel = Component.translatable(MODID + ".upgrade_tooltip_operatetobedrock_label");
                 operateToBedrockLabel.withStyle(ChatFormatting.GRAY);
                 player.displayClientMessage(operateToBedrockLabel, false);
@@ -384,13 +390,11 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
      */
 
 
-    public boolean needsWorkCard()
-    {
+    public boolean needsWorkCard(ItemStack upgradeItemStack) {
         return false;
     }
 
-    public int getWorkCardType()
-    {
+    public int getWorkCardType() {
         //-1 = null
         //0 = Either
         //1 = Area
@@ -464,6 +468,14 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean hasEntityContainer(ItemStack upgradeStack) {
         if (canModifyEntityContainers(upgradeStack)) {
             return getEntityContainer(upgradeStack);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasRemoteStorage(ItemStack upgradeStack) {
+        if (canModifyRemoteStorage(upgradeStack)) {
+            return getRemoteStorage(upgradeStack);
         } else {
             return false;
         }
@@ -1837,6 +1849,20 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
         }
 
+        if(canModifyRemoteStorage(p_41421_))
+        {
+            if(getRemoteStorage(p_41421_))
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_remotestorage_label");
+                areaLabel.withStyle(ChatFormatting.DARK_PURPLE);
+                p_41423_.add(areaLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_, MODID + ".upgrade_tooltip_remotestorage_allowed", ChatFormatting.DARK_PURPLE);
+            }
+        }
+
         if(canModifyArea(p_41421_))
         {
             if(getAreaIncrease(p_41421_)>0)
@@ -2149,6 +2175,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean canModifyGentleHarvest(ItemStack upgradeItemStack) { return false; }
     public boolean canModifySuperSpeed(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyEntityContainers(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyRemoteStorage(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyOperateToBedrock(ItemStack upgradeItemStack) { return false; }
 
     public boolean canAddModifierToUpgrade(ItemStack upgradeItemStack, String nbtTagString) {
@@ -2167,6 +2194,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             case "upgradegentle" -> canModifyGentleHarvest(upgradeItemStack);
             case "upgradesuperspeed" -> canModifySuperSpeed(upgradeItemStack);
             case "upgradeentitystorage" -> canModifyEntityContainers(upgradeItemStack);
+            case "upgraderemotestorage" -> canModifyRemoteStorage(upgradeItemStack);
             case "upgradeoperatetobedrock" -> canModifyOperateToBedrock(upgradeItemStack);
             default -> false;
         };
@@ -2190,6 +2218,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean getGentleHarvest(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradegentle")>=1; }
     public boolean getSuperSpeed(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradesuperspeed")>=1; }
     public boolean getEntityContainer(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeentitystorage")>=1; }
+    public boolean getRemoteStorage(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgraderemotestorage")>=1; }
     public boolean getOperateToBedrock(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeoperatetobedrock")>=1; }
 
     /*============================================================================

@@ -27,4 +27,8 @@ public class WorkCardLocations extends WorkCardBase implements ISelectablePoints
             return List.of();
         }
     }
+
+    public static int getNumPositions(ItemStack workCardStack) {
+        return WorkCardBase.readBlockPosListFromNBT(workCardStack).size();
+    }
 }

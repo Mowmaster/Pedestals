@@ -44,7 +44,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase {
     public boolean canModifyArea(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get(); }
 
     @Override
-    public boolean needsWorkCard() { return true; }
+    public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
     public int getWorkCardType() { return 1; }
