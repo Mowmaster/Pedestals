@@ -60,7 +60,7 @@ public class ItemUpgradeDropper extends ItemUpgradeBase implements IHasModeTypes
     }
 
     @Override
-    public boolean needsWorkCard() { return true; }
+    public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     //technically can do both i think???
     @Override

@@ -130,6 +130,7 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientBase(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_BASE.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_IMPORT.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_EXPORT.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_EXPORT.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_COBBLEGEN.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MAGNET.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.PEDESTAL_UPGRADE_MAGNET.get());

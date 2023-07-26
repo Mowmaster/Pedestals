@@ -60,7 +60,7 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
     public boolean canModifySuperSpeed(ItemStack upgradeItemStack) { return true; }
 
     @Override
-    public boolean needsWorkCard() { return true; }
+    public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
     public int getWorkCardType() { return 0; }
