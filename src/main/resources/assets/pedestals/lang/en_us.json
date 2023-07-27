@@ -450,12 +450,6 @@
 
 
 
-  "item.pedestals.workcard_area": "Work Area (Card)",
-  "jei.pedestals.workcard_area.description": "§5 Crouch Right Click on Two points to Select a 'Work Area' Crouch Right Click in the AIR to clear selection.",
-  "item.pedestals.workcard_locations": "Work Locations (Card)",
-  "jei.pedestals.workcard_locations.description": "§5 Click points to setup card, click in the air to clear all selections",
-  "item.pedestals.workcard_pedestals": "Pedestal Locations (Card)",
-  "jei.pedestals.workcard_pedestals.description": "§5 Click points to setup card, click in the air to clear all selections",
 
   "item.pedestals.augment_pedestal_nocollide": "Collision Effect Augment",
   "jei.pedestals.augment_pedestal_nocollide.description": "§5 Adds onCollision Pedestal Effects.",
