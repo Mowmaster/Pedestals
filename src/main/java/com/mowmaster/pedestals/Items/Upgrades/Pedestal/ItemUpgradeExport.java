@@ -19,8 +19,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.List;
 
-import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
-
 public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes {
     public ItemUpgradeExport(Properties p_41383_) {
         super(p_41383_);
@@ -98,7 +96,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes 
 
     private boolean exportItemAction(Level level, BlockPos position, BasePedestalBlockEntity pedestal, Direction pedestalFacing, ItemStack upgradeItemStack) {
         if (canTransferItems(upgradeItemStack)) {
-            int maxToTransfer = PedestalConfig.COMMON.upgrade_export_baseItemTransferSpeed.get() + getItemCapacityIncrease(upgradeItemStack);
+            int supportedTransferRate = PedestalConfig.COMMON.upgrade_export_baseItemTransferSpeed.get() + getItemCapacityIncrease(upgradeItemStack);
 
             LazyOptional<IItemHandler> cap;
             if (hasEntityContainer(upgradeItemStack)) {
@@ -111,8 +109,8 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes 
                 ItemStack stackInPedestal = pedestal.removeItem(true);
                 if (!stackInPedestal.isEmpty()) {
                     ItemStack toTransfer = stackInPedestal.copy();
-                    if (toTransfer.getCount() > maxToTransfer) {
-                        toTransfer.setCount(maxToTransfer);
+                    if (toTransfer.getCount() > supportedTransferRate) {
+                        toTransfer.setCount(supportedTransferRate);
                     }
                     ItemStack leftover = ItemHandlerHelper.insertItem(handler, toTransfer.copy(), false);
                     if (leftover.getCount() != toTransfer.getCount()) {
@@ -130,7 +128,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes 
 
     private boolean exportFluidAction(Level level, BlockPos position, BasePedestalBlockEntity pedestal, Direction pedestalFacing, ItemStack upgradeItemStack) {
         if (canTransferFluids(upgradeItemStack)) {
-            int maxToTransfer = PedestalConfig.COMMON.upgrade_export_baseFluidTransferSpeed.get() + getFluidCapacityIncrease(upgradeItemStack);
+            int supportedTransferRate = PedestalConfig.COMMON.upgrade_export_baseFluidTransferSpeed.get() + getFluidCapacityIncrease(upgradeItemStack);
 
             LazyOptional<IFluidHandler> cap;
             if (hasEntityContainer(upgradeItemStack)) {
@@ -140,8 +138,8 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes 
             }
             return cap.map(handler -> {
                 FluidStack toTransfer = pedestal.getStoredFluid().copy();
-                if (toTransfer.getAmount() > maxToTransfer) {
-                    toTransfer.setAmount(maxToTransfer);
+                if (toTransfer.getAmount() > supportedTransferRate) {
+                    toTransfer.setAmount(supportedTransferRate);
                 }
                 int amountTransferred = handler.fill(toTransfer.copy(), IFluidHandler.FluidAction.EXECUTE);
                 if (amountTransferred > 0) {
@@ -159,7 +157,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes 
 
     private boolean exportEnergyAction(Level level, BlockPos position, BasePedestalBlockEntity pedestal, Direction pedestalFacing, ItemStack upgradeItemStack) {
         if (canTransferEnergy(upgradeItemStack)) {
-            int maxToTransfer = PedestalConfig.COMMON.upgrade_export_baseEnergyTransferSpeed.get() + getEnergyCapacityIncrease(upgradeItemStack);
+            int supportedTransferRate = PedestalConfig.COMMON.upgrade_export_baseEnergyTransferSpeed.get() + getEnergyCapacityIncrease(upgradeItemStack);
 
             LazyOptional<IEnergyStorage> cap;
             if (hasEntityContainer(upgradeItemStack)) {
@@ -169,7 +167,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes 
             }
             return cap.map(handler -> {
                 if (handler.canReceive()) {
-                    int toTransfer = Math.min(maxToTransfer, pedestal.getStoredEnergy());
+                    int toTransfer = Math.min(supportedTransferRate, pedestal.getStoredEnergy());
                     int amountTransferred = handler.receiveEnergy(toTransfer, false);
                     if (amountTransferred > 0) {
                         pedestal.removeEnergy(amountTransferred, false);
@@ -184,12 +182,12 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes 
     }
     private boolean exportXPAction(Level level, BlockPos position, BasePedestalBlockEntity pedestal, Direction pedestalFacing, ItemStack upgradeItemStack) {
         if (canTransferXP(upgradeItemStack)) {
-            int maxToTransfer = PedestalConfig.COMMON.upgrade_export_baseExpTransferSpeed.get() + MowLibXpUtils.getExpCountByLevel(getXPCapacityIncrease(upgradeItemStack));
+            int supportedTransferRate = PedestalConfig.COMMON.upgrade_export_baseExpTransferSpeed.get() + MowLibXpUtils.getExpCountByLevel(getXPCapacityIncrease(upgradeItemStack));
 
             LazyOptional<IExperienceStorage> cap = MowLibXpUtils.findExperienceHandlerAtPos(level, position, pedestalFacing, true);
             return cap.map(handler -> {
                 if (handler.canReceive()) {
-                    int toTransfer = Math.min(maxToTransfer, pedestal.getStoredExperience());
+                    int toTransfer = Math.min(supportedTransferRate, pedestal.getStoredExperience());
                     int amountTransferred = handler.receiveExperience(toTransfer, false);
                     if (amountTransferred > 0) {
                         pedestal.removeExperience(amountTransferred,false);
@@ -204,13 +202,13 @@ public class ItemUpgradeExport extends ItemUpgradeBase implements IHasModeTypes 
     }
     private boolean exportDustAction(Level level, BlockPos position, BasePedestalBlockEntity pedestal, Direction pedestalFacing, ItemStack upgradeItemStack) {
         if (canTransferDust(upgradeItemStack)) {
-            int maxToTransfer = PedestalConfig.COMMON.upgrade_export_baseDustTransferSpeed.get() + getDustCapacityIncrease(upgradeItemStack);
+            int supportedTransferRate = PedestalConfig.COMMON.upgrade_export_baseDustTransferSpeed.get() + getDustCapacityIncrease(upgradeItemStack);
 
             LazyOptional<IDustHandler> cap = MowLibDustUtils.findDustHandlerAtPos(level, position, pedestalFacing);
             return cap.map(handler -> {
                 DustMagic toTransfer = pedestal.getStoredDust().copy();
-                if (toTransfer.getDustAmount() > maxToTransfer) {
-                    toTransfer.setDustAmount(maxToTransfer);
+                if (toTransfer.getDustAmount() > supportedTransferRate) {
+                    toTransfer.setDustAmount(supportedTransferRate);
                 }
                 int amountTransferred = handler.fill(toTransfer.copy(), IDustHandler.DustAction.EXECUTE);
                 if (amountTransferred > 0) {

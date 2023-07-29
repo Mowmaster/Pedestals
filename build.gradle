@@ -173,7 +173,6 @@ dependencies {
 
     implementation fg.deobf("curse.maven:mowlib-631455:4618921")
 
-
     //runtimeOnly fg.deobf("curse.maven:mows-crystal-blocks-508570:4027238")
     //runtimeOnly fg.deobf("curse.maven:cyclic-239286:4577457")
 
@@ -194,6 +193,9 @@ dependencies {
     implementation fg.deobf("curse.maven:configured-457570:4462837")
     implementation fg.deobf("curse.maven:catalogue-459701:4171024")
     implementation fg.deobf("curse.maven:better-mods-button-541584:4608773")
+//    implementation fg.deobf("curse.maven:cofh-core-69162:4385216")
+//    implementation fg.deobf("curse.maven:thermal-foundation-222880:4382373")
+//    implementation fg.deobf("curse.maven:thermal-expansion-69163:4382371")
 
 }
 

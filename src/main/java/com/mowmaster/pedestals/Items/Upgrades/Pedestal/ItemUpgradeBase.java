@@ -436,15 +436,6 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return cached;
     }
 
-    public int getUpgradeExperienceTransferRate(ItemStack upgradeStack)
-    {
-        int baseValue = PedestalConfig.COMMON.pedestal_baseXpTransferRate.get();
-        int experienceTransferRateConverted = MowLibXpUtils.getExpCountByLevel(baseValue);
-        int upgradeIncrease = getXPCapacityIncrease(upgradeStack);
-
-        return  (upgradeIncrease>0)?(MowLibXpUtils.getExpCountByLevel(upgradeIncrease+baseValue)):(experienceTransferRateConverted);
-    }
-
     public ItemStack getUpgradeDefaultTool() {
         return ItemStack.EMPTY;
     }
