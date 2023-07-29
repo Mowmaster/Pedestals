@@ -1,0 +1,17 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_import"
+    },
+    {
+      "item": "mowlib:workcard_locations"
+    },
+    {
+      "item": "minecraft:ender_pearl"
+    }
+  ],
+  "resultModificationName": "upgraderemotestorage",
+  "resultModificationValue": 1,
+  "resultModificationMaxValue": 1
+}
