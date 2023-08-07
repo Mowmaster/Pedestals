@@ -1,24 +1,18 @@
-{
 
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "MOM",
-    "OTO",
-    "MOM"
-  ],
-  "key": {
-    "M": {
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "tag": "forge:ingots/netherite"
     },
-    "O": {
+    {
       "item": "minecraft:obsidian"
     },
-    "T": {
-    "item": "pedestals:augment_pedestal_t3_storage"
+    {
+      "item": "pedestals:augment_pedestal_t3_storage"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:augment_pedestal_t4_storage"
   }
-
 }

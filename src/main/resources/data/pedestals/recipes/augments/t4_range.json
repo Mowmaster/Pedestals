@@ -1,24 +1,18 @@
-{
 
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "MOM",
-    "OTO",
-    "MOM"
-  ],
-  "key": {
-    "M": {
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "item": "minecraft:nether_star"
     },
-    "O": {
+    {
       "item": "minecraft:obsidian"
     },
-    "T": {
-    "item": "pedestals:augment_pedestal_t3_range"
+    {
+      "item": "pedestals:augment_pedestal_t3_range"
     }
-  },
+  ],
   "result": {
     "item": "pedestals:augment_pedestal_t4_range"
   }
-
 }

@@ -1,7 +1,7 @@
 {
   "type": "mowlib:dualhandedcrafting",
   "blockTarget": {
-    "item": "minecraft:obsidian"
+    "item": "minecraft:crying_obsidian"
   },
   "mainhandTool": {
     "item": "pedestals:augment_pedestal_t2_capacity"
@@ -10,6 +10,7 @@
     "tag": "forge:gems/emerald"
   },
   "result": {
-    "item": "pedestals:augment_pedestal_t3_capacity"
+    "item": "pedestals:augment_pedestal_t3_capacity",
+    "count": 2
   }
 }
