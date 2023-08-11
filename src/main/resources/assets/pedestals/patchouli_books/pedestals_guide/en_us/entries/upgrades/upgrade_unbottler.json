@@ -1,0 +1,16 @@
+{
+  "name": "UnBottler Upgrade",
+  "icon": "pedestals:upgrade_pedestal_unbottler",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Takes Inputs out of an Inventory Below the pedestal, \"Unbottles\" Fluids and XP by default, but could also work with Energy and Dust containers too."
+    },
+    {
+      "type": "crafting",
+      "text": "UnBottler Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_unbottler"
+    }
+  ]
+}

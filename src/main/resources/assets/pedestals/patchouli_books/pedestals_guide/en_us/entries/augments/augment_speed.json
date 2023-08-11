@@ -1,0 +1,39 @@
+{
+  "name": "Speed Augments",
+  "icon": "pedestals:augment_pedestal_t4_speed",
+  "category": "pedestals:augments",
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t1_speed"
+    },
+    {
+      "type": "text",
+      "text": "Decreases the time between each transfer operation$(2br)$(li)Ticks Decreased: 2$(li)Maximum allowed: 5"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t2_speed"
+    },
+    {
+      "type": "text",
+      "text": "Decreases the time between each transfer operation$(2br)$(li)Ticks Decreased: 4$(li)Maximum allowed: 5"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t3_speed"
+    },
+    {
+      "type": "text",
+      "text": "Decreases the time between each transfer operation$(2br)$(li)Ticks Decreased: 6$(li)Maximum allowed: 5"
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t4_speed"
+    },
+    {
+      "type": "text",
+      "text": "Decreases the time between each transfer operation$(2br)$(li)Ticks Decreased: 8$(li)Maximum allowed: 5"
+    }
+  ]
+}

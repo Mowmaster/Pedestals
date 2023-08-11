@@ -1,0 +1,18 @@
+{
+  "name": "Pedestal Basics",
+  "icon": "pedestals:block_pedestal",
+  "category": "pedestals:getting_started",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "pedestals:block_pedestal",
+      "text": "A Pedestal is an \"omni-tank\" capable of storing items, fluids, energy, and experience.$(br2)Pedestals can be linked together to create small networks that facilitate transfer of the things they store. They can also be supplied with a variety of Upgrades to allow for automation of various useful tasks (e.g. farming crops/trees/mobs, lava generation, smelting, and more)."
+    },
+    {
+      "type": "patchouli:crafting",
+      "text": "Some text.",
+      "recipe": "pedestals:pedestals/pedestal_stone"
+    }
+  ]
+}

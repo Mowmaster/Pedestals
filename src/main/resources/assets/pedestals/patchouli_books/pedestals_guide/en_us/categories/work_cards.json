@@ -1,0 +1,6 @@
+{
+  "name": "Work Cards",
+  "description": "This section shows the cards to define the operational work area of a pedestal upgrade",
+  "icon": "pedestals:workcard_area",
+  "sortnum": 3
+}

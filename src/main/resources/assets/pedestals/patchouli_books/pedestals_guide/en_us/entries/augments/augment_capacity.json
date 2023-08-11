@@ -1,0 +1,39 @@
+{
+  "name": "Capacity Augments",
+  "icon": "pedestals:augment_pedestal_t4_capacity",
+  "category": "pedestals:augments",
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t1_capacity"
+    },
+    {
+      "type": "text",
+      "text": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 4$(li)Fluid: 2000mb$(li)Energy: 5000 Fe/t$(li)Experience - 1 level$(li)Dust Rate: 10$(li)Maximum Upgrades: 4"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t2_capacity"
+    },
+    {
+      "type": "text",
+      "text": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 16$(li)Fluid: 4000mb$(li)Energy: 10000 Fe/t$(li)Experience - 5 levels$(li)Dust Rate: 10$(li)Maximum Upgrades: 8"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t3_capacity"
+    },
+    {
+      "type": "text",
+      "text": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 32$(li)Fluid: 8000mb$(li)Energy: 100000 Fe/t$(li)Experience - 10 levels$(li)Dust Rate: 10$(li)Maximum Upgrades: 12"
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t4_capacity"
+    },
+    {
+      "type": "text",
+      "text": "Transfer Rate$(2br)$(li)Increases Transfer Rates$$(li)Item: 64$(li)Fluid: 16000mb$(li)Energy: 1000000 Fe/t$(li)Experience - 14 levels$(li)Dust Rate: 10$(li)Maximum Upgrades: 16"
+    }
+  ]
+}

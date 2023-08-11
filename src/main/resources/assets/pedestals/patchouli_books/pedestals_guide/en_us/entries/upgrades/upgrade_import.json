@@ -1,0 +1,17 @@
+{
+  "name": "Import Upgrade",
+  "icon": "pedestals:upgrade_pedestal_import",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Imports items/fluids/energy/xp from the 'Below' Inventory into the Pedestal."
+    },
+    {
+      "type": "crafting",
+      "text": "Import Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_import",
+      "recipe2": "pedestals:upgrades/upgrade_import2"
+    }
+  ]
+}

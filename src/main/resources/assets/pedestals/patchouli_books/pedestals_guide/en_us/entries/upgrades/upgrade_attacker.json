@@ -1,0 +1,20 @@
+{
+  "name": "Attacker Upgrade",
+  "icon": "pedestals:upgrade_pedestal_attacker",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Will execute a player simulated attack in the defined work area"
+    },
+    {
+      "type": "crafting",
+      "text": "Attacker Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_attacker"
+    },
+    {
+      "type": "pedestals:modification_recipe",
+      "recipe": "pedestals:machines/upgrademodification/attacker/attacker_damage_tier_one"
+    }
+  ]
+}
