@@ -1,15 +1,15 @@
 {
-  "name": "pedestal.book.upgrades.name.smoker",
+  "name": "Smoker Upgrade",
   "icon": "pedestals:upgrade_pedestal_smoker",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.smoker"
+      "text": "Smokes items provided from a 'Below Inventory'"
     },
     {
       "type": "crafting",
-      "text": "pedestal.book.upgrades.name.smoker",
+      "text": "Smoker Upgrade",
       "recipe": "pedestals:upgrades/upgrade_smoker"
     }
   ]

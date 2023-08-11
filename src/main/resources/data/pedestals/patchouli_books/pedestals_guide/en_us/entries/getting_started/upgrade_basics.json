@@ -1,0 +1,12 @@
+{
+  "name": "Upgrade Basics",
+  "icon": "pedestals:tool_upgradetool",
+  "category": "pedestals:getting_started",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "text",
+      "text": "Some text about how the upgrade tool works"
+    }
+  ]
+}

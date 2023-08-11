@@ -1,14 +1,11 @@
-
-
-
 {
-  "name": "pedestal.book.upgrades.name.materialgen",
-  "icon": "pedestals:upgrade_pedestal_materialgen",
+  "name": "Material Generator",
+  "icon": "pedestals:upgrade_pedestal_cobblegen",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.materialgen"
+      "text": "Placing a block under the pedestal, and feeding it input fluid/energy/xp when necessary, you can generate blocks."
     },
     {
       "type": "pedestals:materialgen_recipe",

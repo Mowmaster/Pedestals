@@ -1,15 +1,15 @@
 {
-  "name": "pedestal.book.upgrades.name.crafter",
+  "name": "Crafting Upgrade",
   "icon": "pedestals:upgrade_pedestal_crafter",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.crafter"
+      "text": "Crafts items based on what is in the selected pedestals"
     },
     {
       "type": "crafting",
-      "text": "pedestal.book.upgrades.name.crafter",
+      "text": "Crafting Upgrade",
       "recipe": "pedestals:upgrades/upgrade_crafter"
     }
   ]

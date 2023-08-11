@@ -1,15 +1,15 @@
 {
-  "name": "pedestal.book.upgrades.name.unpackager",
+  "name": "Unpackager Upgrade",
   "icon": "pedestals:upgrade_pedestal_unpackager",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.unpackager"
+      "text": "Empty the package of its contents"
     },
     {
       "type": "crafting",
-      "text": "pedestal.book.upgrades.name.unpackager",
+      "text": "Unpackager Upgrade",
       "recipe": "pedestals:upgrades/upgrade_unpackager"
     }
   ]

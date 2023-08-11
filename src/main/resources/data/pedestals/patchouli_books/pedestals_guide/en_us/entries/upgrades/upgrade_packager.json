@@ -1,15 +1,15 @@
 {
-  "name": "pedestal.book.upgrades.name.packager",
+  "name": "Packager Upgrade",
   "icon": "pedestals:upgrade_pedestal_packager",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.packager"
+      "text": "Fill the contents of a package"
     },
     {
       "type": "crafting",
-      "text": "pedestal.book.upgrades.name.packager",
+      "text": "Packager Upgrade",
       "recipe": "pedestals:upgrades/upgrade_packager"
     }
   ]

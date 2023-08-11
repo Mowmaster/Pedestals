@@ -1,5 +1,6 @@
 {
-  "name": "pedestal.book.augm.category.name",
-  "description": "pedestal.book.augm.category.desc",
-  "icon": "pedestals:augment_pedestal_renderdiffuser"
+  "name": "Augments",
+  "description": "This section shows augment how the pedestals work",
+  "icon": "pedestals:augment_pedestal_renderdiffuser",
+  "sortnum": 1
 }

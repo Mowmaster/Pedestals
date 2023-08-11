@@ -1,15 +1,15 @@
 {
-  "name": "pedestal.book.upgrades.name.attacker",
+  "name": "Attacker Upgrade",
   "icon": "pedestals:upgrade_pedestal_attacker",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.attacker"
+      "text": "Will execute a player simulated attack in the defined work area"
     },
     {
       "type": "crafting",
-      "text": "pedestal.book.upgrades.name.attacker",
+      "text": "Attacker Upgrade",
       "recipe": "pedestals:upgrades/upgrade_attacker"
     },
     {

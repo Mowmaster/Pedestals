@@ -1,0 +1,39 @@
+{
+  "name": "Storage Augments",
+  "icon": "pedestals:augment_pedestal_t4_storage",
+  "category": "pedestals:augments",
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t1_storage"
+    },
+    {
+      "type": "text",
+      "text": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 4,000Mb$(li)Energy: 20,000Fe$(li)Experience levels: 10$(li)Dust rate: 50$(li)Maximum allowed 3"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t2_storage"
+    },
+    {
+      "type": "text",
+      "text": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 16,000Mb$(li)Energy: 100,000Fe$(li)Experience levels: 15$(li)Dust rate: 100$(li)Maximum allowed 7"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t3_storage"
+    },
+    {
+      "type": "text",
+      "text": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 64,000Mb$(li)Energy: 1,000,000Fe$(li)Experience levels: 20$(li)Dust rate: 200$(li)Maximum allowed 11"
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t4_storage"
+    },
+    {
+      "type": "text",
+      "text": "Increases the storage capacity of a pedestal$(2br)$(li)Stacks: 1$(li)Fluid: 256,000Mb$(li)Energy: 10,000,000Fe$(li)Experience levels: 25$(li)Dust rate: 500$(li)Maximum allowed 15"
+    }
+  ]
+}

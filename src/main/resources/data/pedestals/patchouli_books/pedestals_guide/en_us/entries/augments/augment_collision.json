@@ -1,18 +1,18 @@
 {
-  "name": "pedestal.book.augm.name.collide",
+  "name": "Collision Effect Augment",
   "icon": "pedestals:augment_pedestal_nocollide",
   "category": "pedestals:augments",
   "pages": [
     {
       "type": "image",
-      "text": "pedestal.book.augm.crft.collide",
+      "text": "To craft, right click on a piece of paper when paper collides with an animal",
       "images": [
         "pedestals:textures/patchouli/augments/round_robin_crafting.png"
       ]
     },
     {
       "type": "text",
-      "text": "pedestal.book.augm.desc.collide"
+      "text": "Used to enable specific upgrades to operate when an entity collides with the Pedestal block."
     }
   ]
 }

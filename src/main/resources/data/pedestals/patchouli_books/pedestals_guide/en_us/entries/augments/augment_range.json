@@ -1,5 +1,5 @@
 {
-  "name": "pedestal.book.augm.name.range",
+  "name": "Range Augments",
   "icon": "pedestals:augment_pedestal_t4_range",
   "category": "pedestals:augments",
   "pages": [
@@ -9,7 +9,7 @@
     },
     {
       "type": "text",
-      "text": "pedestal.book.augm.desc.t1range"
+      "text": "Increases the distance to link pedestals$(2br)$(li)Increases range: 2 Blocks$(li)Maximum allowed: 4"
     },
     {
       "type": "crafting",
@@ -17,7 +17,7 @@
     },
     {
       "type": "text",
-      "text": "pedestal.book.augm.desc.t2range"
+      "text": "Increases the distance to link pedestals$(2br)$(li)Increases range: 6 Blocks$(li)Maximum allowed: 4"
     },
     {
       "type": "crafting",
@@ -25,7 +25,7 @@
     },
     {
       "type": "text",
-      "text": "pedestal.book.augm.desc.t3range"
+      "text": "Increases the distance to link pedestals$(2br)$(li)Increases range: 8 Blocks$(li)Maximum allowed: 5"
     },
     {
       "type": "crafting",
@@ -33,7 +33,7 @@
     },
     {
       "type": "text",
-      "text": "pedestal.book.augm.desc.t4range"
+      "text": "Increases the distance to link pedestals$(2br)$(li)Increases range: 8 Blocks$(li)Maximum allowed: 7"
     }
   ]
 }

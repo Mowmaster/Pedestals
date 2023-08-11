@@ -1,15 +1,15 @@
 {
-  "name": "pedestal.book.upgrades.name.base",
+  "name": "Upgrade Base",
   "icon": "pedestals:upgrade_pedestal_base",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.base"
+      "text": "This is the base crafting item for all upgrades"
     },
     {
       "type": "crafting",
-      "text": "pedestal.book.upgrades.name.base",
+      "text": "Upgrade Base",
       "recipe": "pedestals:upgrades/upgrade_base"
     }
   ]

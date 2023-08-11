@@ -1,15 +1,15 @@
 {
-  "name": "pedestal.book.upgrades.name.breaker",
+  "name": "Breaker Upgrade",
   "icon": "pedestals:upgrade_pedestal_breaker",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.breaker"
+      "text": "Breaks Items in a work area or work locations"
     },
     {
       "type": "crafting",
-      "text": "pedestal.book.upgrades.name.breaker",
+      "text": "Breaker Upgrade",
       "recipe": "pedestals:upgrades/upgrade_breaker"
     }
   ]

@@ -1,0 +1,12 @@
+{
+  "name": "Linking Basics",
+  "icon": "pedestals:tool_linkingtool",
+  "category": "pedestals:getting_started",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "text",
+      "text": "Some text about how linking works"
+    }
+  ]
+}

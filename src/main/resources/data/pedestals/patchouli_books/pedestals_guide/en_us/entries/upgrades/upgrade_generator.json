@@ -1,15 +1,15 @@
 {
-  "name": "pedestal.book.upgrades.name.generator",
+  "name": "Generator Upgrade",
   "icon": "pedestals:upgrade_pedestal_generator",
   "category": "pedestals:upgrades",
   "pages": [
     {
       "type": "text",
-      "text": "pedestal.book.upgrades.desc.generator"
+      "text": "Creates Energy at 20rf/t"
     },
     {
       "type": "crafting",
-      "text": "pedestal.book.upgrades.name.generator",
+      "text": "Generator Upgrade",
       "recipe": "pedestals:upgrades/upgrade_generator"
     }
   ]

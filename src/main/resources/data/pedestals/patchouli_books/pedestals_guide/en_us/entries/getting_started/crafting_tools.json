@@ -1,0 +1,26 @@
+{
+  "name": "Dual-Hand Crafting",
+  "icon": "minecraft:stick",
+  "category": "pedestals:getting_started",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "text",
+      "text": "Some text about how dual-hand crafting works. This is a pretty fundamental thing in Pedestals, explain how to read the recipes. Talk about the tools, lead into the fact that the first tool you need to make is... (next page)"
+    },
+    {
+      "type": "pedestals:dualhand_crafting_recipe",
+      "header": "Linking Tool",
+      "recipe": "pedestals:tools/dualhanded_linkingtool",
+      "text": "The linking tool! That's right some more text here about what this is used for (reference/link to a page about linking?) and how it's what you use to craft the pedestal page. Probably another page about backwards linking tool.",
+      "flag": "!mod:quark"
+    },
+    {
+      "type": "pedestals:dualhand_crafting_recipe",
+      "header": "Linking Tool",
+      "recipe": "pedestals:tools/dualhanded_linkingtool_quark",
+      "text": "The linking tool! That's right some more text here about what this is used for (reference/link to a page about linking?) and how it's what you use to craft the pedestal page. Probably another page about backwards linking tool.",
+      "flag": "mod:quark"
+    }
+  ]
+}
