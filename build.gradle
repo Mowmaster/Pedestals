@@ -133,20 +133,13 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    // Put repositories for dependencies here
-    // ForgeGradle automatically adds the Forge maven and Maven Central for you
-
-    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
-    // flatDir {
-    //     dir 'libs'
-    // }
     maven {
-        // location of the maven that hosts JEI files
+        // JEI
         name = "Progwml6 maven"
         url = "https://dvs1.progwml6.com/files/maven/"
     }
-
     maven {
+        // CurseForge
         url "https://cursemaven.com"
         content {
             includeGroup "curse.maven"
@@ -154,6 +147,10 @@ repositories {
     maven {
         url "https://modmaven.dev/"
         }
+    }
+    maven {
+        // Patchouli
+        url 'https://maven.blamejared.com'
     }
 }
 
@@ -168,8 +165,8 @@ dependencies {
     // at runtime, use the full JEI jar for Forge
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
 
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${mc_version}-${patchouli_version}")
-    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${mc_version}-${patchouli_version}")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
+    implementation fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
 
     implementation fg.deobf("curse.maven:mowlib-631455:4687088")
 

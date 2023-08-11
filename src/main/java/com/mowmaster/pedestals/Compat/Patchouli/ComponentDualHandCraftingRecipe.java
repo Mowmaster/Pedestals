@@ -33,7 +33,6 @@ public class ComponentDualHandCraftingRecipe implements ICustomComponent {
 
     private void framedRenderIngredient(PoseStack ms, IComponentRenderContext context, int x, int y, int mouseX, int mouseY, Ingredient ingredient) {
         RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShaderTexture(0, context.getCraftingTexture());
         GuiComponent.blit(ms, x - 5, y - 5, 20, 102, 26, 26, 128, 256);
         context.renderIngredient(ms, x, y, mouseX, mouseY, ingredient);
@@ -41,7 +40,6 @@ public class ComponentDualHandCraftingRecipe implements ICustomComponent {
 
     private void framedRenderItemStack(PoseStack ms, IComponentRenderContext context, int x, int y, int mouseX, int mouseY, ItemStack itemStack) {
         RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShaderTexture(0, context.getCraftingTexture());
         GuiComponent.blit(ms, x - 5, y - 5, 20, 102, 26, 26, 128, 256);
         context.renderItemStack(ms, x, y, mouseX, mouseY, itemStack);
