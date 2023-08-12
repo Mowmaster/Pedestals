@@ -15,13 +15,13 @@
       "type": "patchouli:custom",
       "x": 1,
       "y": 22,
-      "class": "com.mowmaster.pedestals.Compat.Patchouli.ComponentDualHandCraftingRecipe",
+      "class": "com.mowmaster.pedestals.Compat.Patchouli.ComponentToolSwapCraftingRecipe",
       "recipe_name": "#recipe"
     },
     {
       "type": "patchouli:text",
       "x": 1,
-      "y": 82,
+      "y": 56,
       "text": "#text"
     }
   ]
