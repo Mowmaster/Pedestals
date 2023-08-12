@@ -2,7 +2,7 @@
   "name": "Linking Basics",
   "icon": "pedestals:tool_linkingtool",
   "category": "pedestals:getting_started",
-  "sortnum": 2,
+  "sortnum": 4,
   "pages": [
     {
       "type": "text",

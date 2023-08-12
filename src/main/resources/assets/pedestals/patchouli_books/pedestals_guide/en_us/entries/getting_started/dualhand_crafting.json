@@ -1,0 +1,26 @@
+{
+  "name": "Dual-Hand Crafting",
+  "icon": "minecraft:stick",
+  "category": "pedestals:getting_started",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "text",
+      "text": "Dual-Handed Crafting is one of the many ways Pedestals adds non-GUI interactions to the mod.$(br2)To perform a craft, you must have a specific item held in your mainhand, a specific item held in your offhand, and then you must perform the \"use item / place block\" action (default key-bind: right click) on a specific in-world block.$(br2)The in-world block is consumed in the process, while the mainhand and offhand items are optionally consumed, and the resulting item that is crafted is spawned in-world to be picked up by the player.$(br2)"
+    },
+    {
+      "type": "pedestals:dualhand_crafting_recipe",
+      "header": "Linking Tool",
+      "recipe": "pedestals:tools/dualhanded_linkingtool",
+      "text": "If you flipped the items that were meant to be held in your mainhand and offhand (as shown above), you'll instead craft the Backwards Linking Tool -- don't worry, the section on Tool Swapping will explain how to use that to get the Linking Tool.$(br2)",
+      "flag": "!mod:quark"
+    },
+    {
+      "type": "pedestals:dualhand_crafting_recipe",
+      "header": "Linking Tool",
+      "recipe": "pedestals:tools/dualhanded_linkingtool_quark",
+      "text": "If you flipped the items that were meant to be held in your mainhand and offhand (as shown above), you'll instead craft the Backwards Linking Tool -- don't worry, the section on Tool Swapping will explain how to use that to get the Linking Tool.$(br2)",
+      "flag": "mod:quark"
+    }
+  ]
+}
