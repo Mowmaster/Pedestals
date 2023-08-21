@@ -1260,25 +1260,31 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public BlockPos getPosOfBlockBelow(Level world, BlockPos posOfPedestal, int numBelow)
     {
         BlockState state = world.getBlockState(posOfPedestal);
-
-        Direction enumfacing = (state.hasProperty(FACING))?(state.getValue(FACING)):(Direction.UP);
-        BlockPos blockBelow = posOfPedestal;
-        switch (enumfacing)
+        if(world.getBlockEntity(posOfPedestal) instanceof BasePedestalBlockEntity pedestal)
         {
-            case UP:
-                return blockBelow.offset(0,-numBelow,0);
-            case DOWN:
-                return blockBelow.offset(0,numBelow,0);
-            case NORTH:
-                return blockBelow.offset(0,0,numBelow);
-            case SOUTH:
-                return blockBelow.offset(0,0,-numBelow);
-            case EAST:
-                return blockBelow.offset(-numBelow,0,0);
-            case WEST:
-                return blockBelow.offset(numBelow,0,0);
-            default:
-                return blockBelow;
+            return pedestal.getPosOfBlockBelowPedestal(world,numBelow);
+        }
+        else
+        {
+            Direction enumfacing = (state.hasProperty(FACING))?(state.getValue(FACING)):(Direction.UP);
+            BlockPos blockBelow = posOfPedestal;
+            switch (enumfacing)
+            {
+                case UP:
+                    return blockBelow.offset(0,-numBelow,0);
+                case DOWN:
+                    return blockBelow.offset(0,numBelow,0);
+                case NORTH:
+                    return blockBelow.offset(0,0,numBelow);
+                case SOUTH:
+                    return blockBelow.offset(0,0,-numBelow);
+                case EAST:
+                    return blockBelow.offset(-numBelow,0,0);
+                case WEST:
+                    return blockBelow.offset(numBelow,0,0);
+                default:
+                    return blockBelow;
+            }
         }
     }
 

@@ -253,6 +253,8 @@ public class JeiPedestalsPlugin implements IModPlugin
 
 
         this.registerIngredientDescription(registration, DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get());
+        this.registerIngredientDescription(registration, DeferredRegisterTileBlocks.BLOCK_RATSTATUE_PEDESTAL.get());
+        this.registerIngredientDescription(registration, DeferredRegisterTileBlocks.BLOCK_CATSTATUE_PEDESTAL.get());
     }
 
     @Override

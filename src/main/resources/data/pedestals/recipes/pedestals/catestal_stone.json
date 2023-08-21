@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 1,
+  "ingredient": {
+    "item": "pedestals:block_pedestal"
+  },
+  "result": "pedestals:block_catstatue_pedestal"
+}

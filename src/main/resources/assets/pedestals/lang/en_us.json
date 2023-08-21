@@ -664,6 +664,10 @@
 
   "block.pedestals.block_pedestal": "Pedestal",
   "jei.pedestals.block_pedestal.description": "§5Can Transport Items, Fluids, Energy, and XP - Can be Recolored with Applicator",
+  "block.pedestals.block_ratstatue_pedestal": "Rat-estal",
+  "jei.pedestals.block_ratstatue_pedestal.description": "§5Its a pedestal, but it looks like a rat! (made for https://www.twitch.tv/boba)",
+  "block.pedestals.block_catstatue_pedestal": "Cat-estal",
+  "jei.pedestals.block_catstatue_pedestal.description": "§5Its a pedestal, but it looks like a cat! (made for https://www.twitch.tv/overlite)",
 
   "death.attack.pedestal1": "%1$s was poked one too many times.",
   "death.attack.pedestal2": "%1$s got the stabby stabby.",

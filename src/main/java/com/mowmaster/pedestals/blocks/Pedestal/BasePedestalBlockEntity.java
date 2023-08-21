@@ -39,7 +39,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ToolActions;
@@ -98,8 +100,8 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     public void setRenderRangeUpgrade(boolean setRenderUpgrade){ this.showRenderRangeUpgrade = setRenderUpgrade; update();}
 
 
-    public BasePedestalBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
-        super(DeferredBlockEntityTypes.PEDESTAL.get(), p_155229_, p_155230_);
+    public BasePedestalBlockEntity(BlockEntityType<?> type, BlockPos p_155229_, BlockState p_155230_) {
+        super(type, p_155229_, p_155230_);
     }
 
     public void update()
@@ -107,6 +109,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         BlockState state = level.getBlockState(getPos());
         this.level.sendBlockUpdated(getPos(), state, state, 3);
         this.setChanged();
+    }
+
+
+    public Block getPedestalBlockForTile()
+    {
+        return DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get();
     }
 
     //9 slots, but only when it has the tank upgrade will we allow more then the first to be used.
@@ -821,7 +829,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             MowLibMessageUtils.messagePopup(player, ChatFormatting.WHITE, successLocalizedMessage);
         }
         return attemptSuccessful;
-     }
+    }
 
     /*============================================================================
     ==============================================================================
@@ -935,7 +943,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public ItemStack removeItem(boolean simulate) {
         return maybeLastNonEmptySlot().map(slot -> itemHandler.extractItem(slot, itemHandler.getStackInSlot(slot).getCount(), simulate))
-            .orElse(ItemStack.EMPTY);
+                .orElse(ItemStack.EMPTY);
     }
 
     //If resulting insert stack is empty it means the full stack was inserted
@@ -1257,12 +1265,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         int allowedInsertAmount = AugmentTieredSpeed.getAllowedInsertAmount(itemStack);
 
         return allowedInsertAmount > 0 && // is an insertable augment, and
-            (
-                // there is no existing augment, or
-                !hasSpeed() ||
-                    // this matches the existing augment and there is space left
-                    (itemStack.sameItem(currentSpeedAugments()) && numAugmentsSpeed() < allowedInsertAmount)
-            );
+                (
+                        // there is no existing augment, or
+                        !hasSpeed() ||
+                                // this matches the existing augment and there is space left
+                                (itemStack.sameItem(currentSpeedAugments()) && numAugmentsSpeed() < allowedInsertAmount)
+                );
     }
 
     public int getTicksReduced()
@@ -1330,12 +1338,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         int allowedInsertAmount = AugmentTieredCapacity.getAllowedInsertAmount(itemStack);
 
         return allowedInsertAmount > 0 && // is an insertable augment, and
-            (
-                // there is no existing augment, or
-                !hasCapacity() ||
-                    // this matches the existing augment and there is space left
-                    (itemStack.sameItem(currentCapacityAugments()) && numAugmentsCapacity() < allowedInsertAmount)
-            );
+                (
+                        // there is no existing augment, or
+                        !hasCapacity() ||
+                                // this matches the existing augment and there is space left
+                                (itemStack.sameItem(currentCapacityAugments()) && numAugmentsCapacity() < allowedInsertAmount)
+                );
     }
 
     public int getItemTransferRateIncreaseFromCapacity()
@@ -1417,12 +1425,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         int allowedInsertAmount = AugmentTieredStorage.getAllowedInsertAmount(itemStack);
 
         return allowedInsertAmount > 0 && // is an insertable augment, and
-            (
-                // there is no existing augment, or
-                !hasStorage() ||
-                    // this matches the existing augment and there is space left
-                    (itemStack.sameItem(currentStorageAugments()) && numAugmentsStorage() < allowedInsertAmount)
-            );
+                (
+                        // there is no existing augment, or
+                        !hasStorage() ||
+                                // this matches the existing augment and there is space left
+                                (itemStack.sameItem(currentStorageAugments()) && numAugmentsStorage() < allowedInsertAmount)
+                );
     }
 
     public int getItemSlotIncreaseFromStorage()
@@ -1505,12 +1513,12 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         int allowedInsertAmount = AugmentTieredRange.getAllowedInsertAmount(itemStack);
 
         return allowedInsertAmount > 0 && // is an insertable augment, and
-            (
-                // there is no existing augment, or
-                !hasRange() ||
-                    // this matches the existing augment and there is space left
-                    (itemStack.sameItem(currentRangeAugments()) && numAugmentsRange() < allowedInsertAmount)
-            );
+                (
+                        // there is no existing augment, or
+                        !hasRange() ||
+                                // this matches the existing augment and there is space left
+                                (itemStack.sameItem(currentRangeAugments()) && numAugmentsRange() < allowedInsertAmount)
+                );
     }
 
     public int getRangeIncrease()
@@ -1670,7 +1678,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     public boolean canInsertTool(ItemStack tool)
     {
         return isAllowedTool(tool) && // is an allowed tool, and
-            !hasTool(); // there is no existing tool
+                !hasTool(); // there is no existing tool
     }
 
     /*============================================================================
@@ -1691,7 +1699,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     {
         if (privateItems.isItemValid(PrivateInventorySlot.LIGHT, stack)) {
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.TRUE).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(getPedestalBlockForTile().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.TRUE).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
             privateItems.insertItem(PrivateInventorySlot.LIGHT, stack.split(1), false);
             update();
             level.setBlock(getPos(),newstate,3);
@@ -1706,7 +1714,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         if(hasLight())
         {
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.FALSE).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(getPedestalBlockForTile().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, Boolean.FALSE).setValue(FILTER_STATUS, state.getValue(FILTER_STATUS));
             ItemStack retItemStack = privateItems.extractItem(PrivateInventorySlot.LIGHT, 1, false);
             level.setBlock(getPos(),newstate,3);
             update();
@@ -1755,7 +1763,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
 
     public ItemStack removeFilter() {
         BlockState state = level.getBlockState(getPos());
-        BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(), MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, 0);
+        BlockState newstate = MowLibColorReference.addColorToBlockState(getPedestalBlockForTile().defaultBlockState(), MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, 0);
         level.setBlock(getPos(), newstate, 3);
         update();
 
@@ -1770,7 +1778,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
             ItemStack toInsert = stack.split(1);
             privateItems.insertItem(PrivateInventorySlot.FILTER, toInsert, false);
             BlockState state = level.getBlockState(getPos());
-            BlockState newstate = MowLibColorReference.addColorToBlockState(DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) toInsert.getItem()).getFilterType(toInsert)?2:1));
+            BlockState newstate = MowLibColorReference.addColorToBlockState(getPedestalBlockForTile().defaultBlockState(),MowLibColorReference.getColorFromStateInt(state)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACING, state.getValue(FACING)).setValue(LIT, state.getValue(LIT)).setValue(FILTER_STATUS, (((IPedestalFilter) toInsert.getItem()).getFilterType(toInsert)?2:1));
             level.setBlock(getPos(),newstate,3);
             update();
             return true;
@@ -2064,8 +2072,8 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     public boolean canSendToPedestal(BasePedestalBlockEntity pedestal)
     {
         return level != null &&
-            level.isLoaded(pedestal.getPos()) &&
-            !isPedestalBlockPowered(pedestal);
+                level.isLoaded(pedestal.getPos()) &&
+                !isPedestalBlockPowered(pedestal);
     }
 
     //The actual transfer methods for items

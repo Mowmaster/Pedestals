@@ -31,12 +31,10 @@ logoFile="pedestals.png" #optional
 # A text field displayed in the mod UI
 credits="Thanks to all my Patreons and Discord Community Members, Also huge thanks to Joprebond for the documentation work (patchouli guide)" #optional
 # A text field displayed in the mod UI
-authors="Mowmaster" #optional
+authors="Mowmaster, Maintainer: Prinny(mfrankov)" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-A Balanced Port of 1.16 Pedestals Mod
-Most the fun Things about 1.16 Pedestals,
-But with a hint of balance and plenty of configs for pack devs :D
+Pedestals is a Non-GUI Style mod about transferring items and automating most of the farmable things in vanilla minecraft. /n The mod makes frequent use of the players Offhand and Clicking on blocks, in air, and while crouching to eliminate the need for using GUIs to interact with the mods blocks/items.
 '''
 [[dependencies.pedestals]] #optional
 # the modid of the dependency
