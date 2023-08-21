@@ -4,6 +4,7 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntityRenderer;
 import com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal.CatStatuePedestalBlockEntityRenderer;
+import com.mowmaster.pedestals.Blocks.Pedestal.GoblinStatuePedestal.GoblinStatuePedestalBlockEntityRenderer;
 import com.mowmaster.pedestals.Blocks.Pedestal.RatStatuePedestal.RatStatuePedestalBlockEntityRenderer;
 import com.mowmaster.pedestals.Items.Filters.FilterRestricted;
 import com.mowmaster.pedestals.Items.MechanicalOnlyStorage.*;
@@ -117,6 +118,9 @@ public class ClientRegistry
         event.register((stack, color) ->
         {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_CATSTATUE_PEDESTAL.get());
 
+        event.register((stack, color) ->
+        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_GOBLINSTATUE_PEDESTAL.get());
+
     }
 
     @SubscribeEvent
@@ -128,9 +132,11 @@ public class ClientRegistry
         event.register((blockstate, blockReader, blockPos, color) ->
         {if (color == 1) {return MowLibColorReference.getColorFromStateInt(blockstate);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_RATSTATUE_PEDESTAL.get());
 
-
         event.register((blockstate, blockReader, blockPos, color) ->
         {if (color == 1) {return MowLibColorReference.getColorFromStateInt(blockstate);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_CATSTATUE_PEDESTAL.get());
+
+        event.register((blockstate, blockReader, blockPos, color) ->
+        {if (color == 1) {return MowLibColorReference.getColorFromStateInt(blockstate);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_GOBLINSTATUE_PEDESTAL.get());
     }
 
     @SubscribeEvent
@@ -175,5 +181,6 @@ public class ClientRegistry
         BlockEntityRenderers.register(DeferredBlockEntityTypes.PEDESTAL.get(), BasePedestalBlockEntityRenderer::new);
         BlockEntityRenderers.register(DeferredBlockEntityTypes.RATSTATUE_PEDESTAL.get(), RatStatuePedestalBlockEntityRenderer::new);
         BlockEntityRenderers.register(DeferredBlockEntityTypes.CATSTATUE_PEDESTAL.get(), CatStatuePedestalBlockEntityRenderer::new);
+        BlockEntityRenderers.register(DeferredBlockEntityTypes.GOBLINSTATUE_PEDESTAL.get(), GoblinStatuePedestalBlockEntityRenderer::new);
     }
 }

@@ -553,6 +553,8 @@
     "jei.pedestals.block_ratstatue_pedestal.description": "§5可以传输物品、流体、能量和经验-可以使用应用器重新上色",
     "block.pedestals.block_catstatue_pedestal": "基座",
     "jei.pedestals.block_catstatue_pedestal.description": "§5可以传输物品、流体、能量和经验-可以使用应用器重新上色",
+    "block.pedestals.block_goblinstatue_pedestal": "基座",
+    "jei.pedestals.block_goblinstatue_pedestal.description": "§5可以传输物品、流体、能量和经验-可以使用应用器重新上色",
     "death.attack.pedestal1": "%1$s被戳了太多次。",
     "death.attack.pedestal2": "%1$s被刺了一刀。",
     "death.attack.pedestal3": "%1$s被切成碎片。",

@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.Registry;
 
 import com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal.CatStatuePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.ColorablePedestal.ColorablePedestalBlockEntity;
+import com.mowmaster.pedestals.Blocks.Pedestal.GoblinStatuePedestal.GoblinStatuePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.RatStatuePedestal.RatStatuePedestalBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
@@ -28,6 +29,10 @@ public class DeferredBlockEntityTypes
     public static final RegistryObject<BlockEntityType<CatStatuePedestalBlockEntity>> CATSTATUE_PEDESTAL = BLOCK_ENTITIES.register(
             "block_entity_catstatue_pedestal",
             () -> BlockEntityType.Builder.of(CatStatuePedestalBlockEntity::new, DeferredRegisterTileBlocks.BLOCK_CATSTATUE_PEDESTAL.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<GoblinStatuePedestalBlockEntity>> GOBLINSTATUE_PEDESTAL = BLOCK_ENTITIES.register(
+            "block_entity_goblinstatue_pedestal",
+            () -> BlockEntityType.Builder.of(GoblinStatuePedestalBlockEntity::new, DeferredRegisterTileBlocks.BLOCK_GOBLINSTATUE_PEDESTAL.get()).build(null));
 
     private DeferredBlockEntityTypes() {
     }

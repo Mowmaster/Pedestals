@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Registry;
 
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal.CatStatuePedestalBlock;
+import com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal.GoblinStatuePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.ColorablePedestal.ColorablePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.RatStatuePedestal.RatStatuePedestalBlock;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
@@ -32,6 +33,9 @@ public class DeferredRegisterTileBlocks
 
     public static final RegistryObject<Block> BLOCK_CATSTATUE_PEDESTAL = registerBlock("block_catstatue_pedestal",
             () -> new CatStatuePedestalBlock(BlockBehaviour.Properties.of(Material.STONE).strength(2.0F).sound(SoundType.STONE)));
+
+    public static final RegistryObject<Block> BLOCK_GOBLINSTATUE_PEDESTAL = registerBlock("block_goblinstatue_pedestal",
+            () -> new GoblinStatuePedestalBlock(BlockBehaviour.Properties.of(Material.STONE).strength(2.0F).sound(SoundType.STONE)));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
