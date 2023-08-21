@@ -1,8 +1,7 @@
 package com.mowmaster.pedestals.Registry;
 
-import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal.CatStatuePedestalBlock;
-import com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal.GoblinStatuePedestalBlock;
+import com.mowmaster.pedestals.Blocks.Pedestal.GoblinStatuePedestal.GoblinStatuePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.ColorablePedestal.ColorablePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.RatStatuePedestal.RatStatuePedestalBlock;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;

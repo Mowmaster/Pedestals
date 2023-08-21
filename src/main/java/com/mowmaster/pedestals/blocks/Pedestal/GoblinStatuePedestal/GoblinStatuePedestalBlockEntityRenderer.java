@@ -224,6 +224,7 @@ public class GoblinStatuePedestalBlockEntityRenderer implements BlockEntityRende
         } else {
             if (renderUpgrades) {
                 renderCoin(worldIn, coin, poseStack, multiBufferSource, p_112311_, p_112312_);
+                //renderCoinTwo(worldIn, coin, poseStack, multiBufferSource, p_112311_, p_112312_);
             }
             boolean renderToolSlot = PedestalConfig.CLIENT.pedestalRenderToolSlot.get();
             if (renderToolSlot) {
@@ -321,15 +322,14 @@ public class GoblinStatuePedestalBlockEntityRenderer implements BlockEntityRende
                 posStack.pushPose();
                 if(listed.get(0).getItem() instanceof BlockItem)
                 {
-                    posStack.translate(0.5D, 0.125D, 0.1D);
+                    posStack.translate(0.5D, 0.25D, 0.20D);
                     posStack.scale(0.5F, 0.5F, 0.5F);
-                    //posStack.mulPose(Vector3f.XP.rotationDegrees(-22));
+                    posStack.mulPose(Vector3f.XP.rotationDegrees(-22));
                 }
                 else
                 {
-                    posStack.translate(0.5D, 0.0125D, 0.05D);
+                    posStack.translate(0.5D, 0.30D, 0.30D);
                     posStack.scale(0.30F, 0.30F, 0.30F);
-                    posStack.mulPose(Vector3f.XP.rotationDegrees(90));
                     posStack.mulPose(Vector3f.ZP.rotationDegrees(22));
                 }
                 ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
@@ -347,9 +347,30 @@ public class GoblinStatuePedestalBlockEntityRenderer implements BlockEntityRende
     public static void renderCoin(Level worldIn, ItemStack itemCoin, PoseStack poseStack, MultiBufferSource bufferSource, int overlay, int light) {
         if (!itemCoin.isEmpty()) {
             poseStack.pushPose();
-            poseStack.translate(0.5f, 0.875f, 0.125f);
-            poseStack.scale(0.125f, 0.125f, 0.125f);
+            poseStack.translate(0.5f, 0.8625f, 0.5f);
+            poseStack.scale(0.25f, 0.25f, 0.25f);
             poseStack.mulPose(Vector3f.XP.rotationDegrees(90));
+
+            /*
+            Earring
+            poseStack.translate(0.125f, 0.65f, 0.63f);
+            poseStack.scale(0.1f, 0.1f, 0.1f);
+            poseStack.mulPose(Vector3f.YP.rotationDegrees(22));
+
+            OnHead
+            poseStack.translate(0.5f, 0.8625f, 0.5f);
+            poseStack.scale(0.25f, 0.25f, 0.25f);
+            poseStack.mulPose(Vector3f.XP.rotationDegrees(90));
+
+            OnBack
+            poseStack.translate(0.5f, 0.35f, 0.65f);
+            poseStack.scale(0.15f, 0.15f, 0.15f);
+
+            OnGround
+            poseStack.translate(0.5f, -0.1f, 0.5f);
+            poseStack.scale(0.95f, 0.95f, 0.95f);
+            poseStack.mulPose(Vector3f.XP.rotationDegrees(90));
+    */
 
             // Check if the coin model is already cached
             if (cachedModel == null || cachedModel != itemRenderer.getModel(itemCoin, worldIn, null, 0)) {
@@ -363,19 +384,36 @@ public class GoblinStatuePedestalBlockEntityRenderer implements BlockEntityRende
         }
     }
 
-    public static void renderTool(Level worldIn,ItemStack itemTool, PoseStack p_112309_, MultiBufferSource p_112310_, int p_112311_, int p_112312_) {
-        if (!itemTool.isEmpty()) {
-            p_112309_.pushPose();
-            p_112309_.translate(0.5D, 0.6D, 0.65D);
-            p_112309_.scale(0.25F, 0.25F, 0.25F);
-            p_112309_.mulPose(Vector3f.ZP.rotationDegrees(270));
-            p_112309_.mulPose(Vector3f.YP.rotationDegrees(135));
-            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
-            BakedModel baked = renderer.getModel(itemTool,worldIn,null,0);
-            renderer.render(itemTool,ItemTransforms.TransformType.FIXED,true,p_112309_,p_112310_,p_112311_,p_112312_,baked);
-            //Minecraft.getInstance().getItemRenderer().renderItem(itemCoin, ItemCameraTransforms.TransformType.FIXED, p_112311_, p_112312_, p_112309_, p_112310_);
-            p_112309_.popPose();
+    /*public static void renderCoinTwo(Level worldIn, ItemStack itemCoin, PoseStack poseStack, MultiBufferSource bufferSource, int overlay, int light) {
+        if (!itemCoin.isEmpty()) {
+            poseStack.pushPose();
+            poseStack.translate(0.875f, 0.65f, 0.63f);
+            poseStack.scale(0.1f, 0.1f, 0.1f);
+            poseStack.mulPose(Vector3f.YP.rotationDegrees(-22));
+
+            // Check if the coin model is already cached
+            if (cachedModel == null || cachedModel != itemRenderer.getModel(itemCoin, worldIn, null, 0)) {
+                cachedModel = itemRenderer.getModel(itemCoin, worldIn, null, 0);
+            }
+
+            // Render the coin using the current pose stack
+            itemRenderer.render(itemCoin, ItemTransforms.TransformType.FIXED, true, poseStack, bufferSource, overlay, light, cachedModel);
+
+            poseStack.popPose();
         }
+    }*/
+
+    public static void renderTool(Level worldIn,ItemStack itemTool, PoseStack p_112309_, MultiBufferSource p_112310_, int p_112311_, int p_112312_) {
+        p_112309_.pushPose();
+        p_112309_.translate(0.6875D, 0.4D, 0.225D);
+        p_112309_.scale(0.25F, 0.25F, 0.25F);
+        p_112309_.mulPose(Vector3f.YP.rotationDegrees(90));
+        p_112309_.mulPose(Vector3f.ZP.rotationDegrees(270));
+        ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel baked = renderer.getModel(itemTool,worldIn,null,0);
+        renderer.render(itemTool,ItemTransforms.TransformType.FIXED,true,p_112309_,p_112310_,p_112311_,p_112312_,baked);
+        //Minecraft.getInstance().getItemRenderer().renderItem(itemCoin, ItemCameraTransforms.TransformType.FIXED, p_112311_, p_112312_, p_112309_, p_112310_);
+        p_112309_.popPose();
     }
 
 

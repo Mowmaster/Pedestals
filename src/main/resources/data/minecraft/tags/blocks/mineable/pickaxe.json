@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "pedestals:block_pedestal"
+    "pedestals:block_pedestal",
+    "pedestals:block_ratstatue_pedestal",
+    "pedestals:block_catstatue_pedestal",
+    "pedestals:block_goblinstatue_pedestal"
   ]
 }

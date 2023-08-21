@@ -1,8 +1,7 @@
-package com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal;
+package com.mowmaster.pedestals.Blocks.Pedestal.GoblinStatuePedestal;
 
 import com.mowmaster.mowlib.MowLibUtils.MowLibColorReference;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
-import com.mowmaster.pedestals.Blocks.Pedestal.GoblinStatuePedestal.GoblinStatuePedestalBlockEntity;
 import com.mowmaster.pedestals.Registry.DeferredBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -34,28 +33,12 @@ public class GoblinStatuePedestalBlock extends BasePedestalBlock
     public GoblinStatuePedestalBlock(Properties p_152915_)
     {
         super(p_152915_);
-        this.UP = Shapes.or(Block.box(5.0D, 0.0D, 2.0D, 11.0D, 10.0D, 16.0D),
-                Block.box(5.0D, 10.0D, 5.0D, 11.0D, 13.0D, 10.0D),
-                Block.box(5.0D, 10.0D, -1.0D, 11.0D, 15.0D, 5.0D));
-        this.NORTH = Shapes.or(Block.box(5.0D, 0.0D, 2.0D, 11.0D, 10.0D, 16.0D),
-                Block.box(5.0D, 10.0D, 5.0D, 11.0D, 13.0D, 10.0D),
-                Block.box(5.0D, 10.0D, -1.0D, 11.0D, 15.0D, 5.0D));
-
-        this.DOWN = Shapes.or(Block.box(5.0D, 0.0D, 0.0D, 11.0D, 10.0D, 14.0D),
-                Block.box(5.0D, 10.0D, 6.0D, 11.0D, 13.0D, 11.0D),
-                Block.box(5.0D, 10.0D, 11.0D, 11.0D, 15.0D, 17.0D));
-
-        this.SOUTH = Shapes.or(Block.box(5.0D, 0.0D, 0.0D, 11.0D, 10.0D, 14.0D),
-                Block.box(5.0D, 10.0D, 6.0D, 11.0D, 13.0D, 11.0D),
-                Block.box(5.0D, 10.0D, 11.0D, 11.0D, 15.0D, 17.0D));
-
-        this.EAST = Shapes.or(Block.box(0.0D, 0.0D, 5.0D, 14.0D, 10.0D, 11.0D),
-                Block.box(6.0D, 10.0D, 5.0D, 11.0D, 13.0D, 11.0D),
-                Block.box(11.0D, 10.0D, 5.0D, 17.0D, 15.0D, 11.0D));
-
-        this.WEST = Shapes.or(Block.box(2.0D, 0.0D, 5.0D, 16.0D, 10.0D, 11.0D),
-                Block.box(5.0D, 10.0D, 5.0D, 10.0D, 13.0D, 11.0D),
-                Block.box(-1.0D, 10.0D, 5.0D, 5.0D, 15.0D, 11.0D));
+        this.UP = Shapes.or(Block.box(4.0D, 0.0D, 5.0D, 12.0D, 14.0D, 11.0D));
+        this.NORTH = Shapes.or(Block.box(4.0D, 0.0D, 5.0D, 12.0D, 14.0D, 11.0D));
+        this.DOWN = Shapes.or(Block.box(4.0D, 0.0D, 5.0D, 12.0D, 14.0D, 11.0D));
+        this.SOUTH = Shapes.or(Block.box(4.0D, 0.0D, 5.0D, 12.0D, 14.0D, 11.0D));
+        this.EAST = Shapes.or(Block.box(5.0D, 0.0D, 4.0D, 11.0D, 14.0D, 12.0D));
+        this.WEST = Shapes.or(Block.box(5.0D, 0.0D, 4.0D, 11.0D, 14.0D, 12.0D));
     }
 
     @Override

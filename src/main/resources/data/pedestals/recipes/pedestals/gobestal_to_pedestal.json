@@ -2,7 +2,7 @@
   "type": "minecraft:stonecutting",
   "count": 1,
   "ingredient": {
-    "item": "pedestals:block_catstatue_pedestal"
+    "item": "pedestals:block_goblinstatue_pedestal"
   },
   "result": "pedestals:block_pedestal"
 }
