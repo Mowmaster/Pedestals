@@ -701,6 +701,32 @@
 
   "enchantment.level.0": "",
 
+
+  "advancements.main.root.title": "Getting Started With Pedestals!",
+  "advancements.main.root.description": "The Linking tool can link pedestals together, Crouch+Right Click on a pedestal to start, again on another pedestal to finish. Linked pedestals will transfer stuff from one to the other.",
+
+  "advancements.main.craft_worktool.title": "Work Tool",
+  "advancements.main.craft_worktool.description": "Used to Craft Work Cards, Offhand Tool and Left CLick Pedestal to Remove Work Cards, Crouch Right Click Tool In air to Swap it.",
+  "advancements.main.craft_workcard.title": "Work Card (Its not a Punch Card)",
+  "advancements.main.craft_workcard.description": "Work Cards are used to define where a pedestal does 'Work' Right Click or Crouch Right Click on Blocks to Set a Position. Doing so in air will clear it.",
+  "advancements.main.craft_upgradetool.title": "Getting Started with Pedestal Upgrades",
+  "advancements.main.craft_upgradetool.description": "Used to Craft Upgrade Bases, Offhand tool and Left click to remove upgrades from Pedestals. Right Click pedestal to display Work Area Overlay (Blue Box), Crouch Right Click on Pedestal to Display Inserted Upgrade, Crouch Right Click in air to Swap Tool",
+  "advancements.main.craft_upgrade.title": "The Basis for Life (okay, not really, but close enough)",
+  "advancements.main.craft_upgrade.description": "Used to Craft Upgrades, Offhand an Upgrade and Right Click to insert into a pedestal. Some Upgrades have a Mode Swap Configuration Function, Offhanding the upgrade and Crouch Right Clicking it in air will swap Modes, Right Clicking in Air will toggle the function on or off (All Functions on by default)  ",
+  "advancements.main.craft_toolswapper.title": "THE PEDESTAL ATE MY TOOL!!!!",
+  "advancements.main.craft_toolswapper.description": "Offhand this tool and left click a pedestal to get back your tool, without needing to break the pedestal. Crouch Right Click in air to Swap Tool",
+  "advancements.main.craft_pedestal.title": "My First Pedestal!",
+  "advancements.main.craft_pedestal.description": "Pedestals are kinda like OmniTanks, they can hold Items, Fluids, Energy, and Exp. Augments Can Increase the Buffer (storage augments) as well as Speed up/Increase transfers, or just increase the range for linking.",
+  "advancements.main.craft_filtertool.title": "Filter or not to Filter, that is the question...",
+  "advancements.main.craft_filtertool.description": "Used to Craft Filter Bases. Offhand this tool and left click a pedestal to remove inserted filter. Crouch Right Click Pedestal to display current filter settings. Crouch Right Click in air to Swap Tool",
+  "advancements.main.craft_filter.title": "Filtering Pedestals, Useful when you keep generating flint from gravel.",
+  "advancements.main.craft_filter.description": "Filter Base used to Craft Filters. To Setup a filter, offhand it and Crouch Right Click a chest(or storage block) with items, this will set the filter to the chests contents. While its in your offhand, right clicking in the air will toggle white/blacklist",
+  "advancements.main.craft_augmenttool.title": "Augmenting Pedestals (Only Effects the pedestal NOT the upgrades)",
+  "advancements.main.craft_augmenttool.description": "Used to craft augments, Offhand Tool and Left Click Pedestal to remove the related Augment, Crouch Right Click Tool In Air to Swap it to the other augment tools.",
+  "advancements.main.craft_augment.title": "Making your Pedestal Harder, Better, Faster, Stronger!",
+  "advancements.main.craft_augment.description": "Speed makes it Transfer Items faster, Capacity Increases the amount of stuff being sent, Storage Increases the internal buffer of the pedestal, Range increases the Linking Range, Diffuser can prevent particles.rendering, Round Robbin changes sending mode, Collision enables collision effects.",
+
+
   "pedestal.book.name": "Pedestals Guide (WIP)",
   "pedestal.book.common.crafting": "Crafting",
   "pedestal.book.landing.text": "Welcome to Pedestals.$(br2)Pedestals is a tech mod with the unique design twist of purposefully avoiding in-game GUIs.$(br2)This mod aims to provide a unique way to store, display, and transfer your items, fluids, energy, and experience between linked Pedestals. It also provides ways to automate various useful tasks (e.g. farming crops / trees / mobs, smelting, material generation, and more) through the use of Pedestal Upgrades."

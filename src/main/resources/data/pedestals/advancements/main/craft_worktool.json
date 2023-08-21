@@ -1,0 +1,35 @@
+{
+  "parent": "pedestals:main/craft_upgradetool",
+  "display": {
+    "icon": {
+      "item": "pedestals:tool_worktool"
+    },
+    "title": {
+      "translate": "advancements.main.craft_worktool.title"
+    },
+    "description": {
+      "translate": "advancements.main.craft_worktool.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "requirement1": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pedestals:tool_worktool"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "requirement1"
+    ]
+  ]
+}

@@ -357,7 +357,7 @@ public class GoblinStatuePedestalBlockEntityRenderer implements BlockEntityRende
             poseStack.scale(0.1f, 0.1f, 0.1f);
             poseStack.mulPose(Vector3f.YP.rotationDegrees(22));
 
-            OnHead
+            --OnHead--
             poseStack.translate(0.5f, 0.8625f, 0.5f);
             poseStack.scale(0.25f, 0.25f, 0.25f);
             poseStack.mulPose(Vector3f.XP.rotationDegrees(90));

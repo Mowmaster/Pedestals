@@ -1,0 +1,46 @@
+{
+  "criteria": {
+  "requirement1": {
+    "conditions": {
+      "items": [
+        {
+          "item": "pedestals:tool_linkingtool"
+        }
+      ]
+    },
+    "trigger": "minecraft:inventory_changed"
+  },
+  "requirement2": {
+    "trigger": "minecraft:inventory_changed",
+    "conditions": {
+      "items": [
+        {
+          "item": "pedestals:tool_linkingtoolbackwards"
+        }
+      ]
+    }
+  }
+},
+  "display": {
+    "announce_to_chat": true,
+    "background": "pedestals:textures/gui/advancements/stone.png",
+    "description": {
+      "translate": "advancements.main.root.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "pedestals:tool_linkingtool"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.main.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "requirement1",
+      "requirement2"
+    ]
+  ]
+}
