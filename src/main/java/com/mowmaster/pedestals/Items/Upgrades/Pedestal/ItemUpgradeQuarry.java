@@ -57,6 +57,16 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
     public boolean canModifyOperateToBedrock(ItemStack upgradeItemStack) { return true; }
 
     @Override
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.quarryDamageTools.get();
+    }
+
+    @Override
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.quarryDamageTools.get();
+    }
+
+    @Override
     public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
@@ -268,6 +278,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
         int currentMinY = Math.max(currentY - getNumBlocksPerOperation(coin) + 1, getMinY(coin));
         List<BlockPos> adjustedPoints = IntStream.rangeClosed(currentMinY, currentY)
             .mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
+        upgradeRepairTool(pedestal);
         if (quarryAction(level, pedestal, pedestalPos, adjustedPoints)) {
             if (currentPosition + 1 >= allPositions.size()) {
                 setCurrentPosition(coin, 0);
@@ -326,7 +337,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
                                     if (canMine(targetBlock) && passesMachineFilterItems(pedestal, targetBlock.getCloneItemStack(level, adjustedPoint, targetBlockState))) {
                                         if (
                                             removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestalPos, adjustedPoint), false) &&
-                                            (!damageToolsEnabled || pedestal.damageInsertedTool(1, false))
+                                            (!damageToolsEnabled || upgradeDamageInsertedTool(pedestal,1,false))
                                         ) {
                                             boolean targetIsBlockEntity = level.getBlockEntity(adjustedPoint) != null;
                                             if (targetIsBlockEntity) {

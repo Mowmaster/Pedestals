@@ -79,6 +79,16 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.harvester_DamageTools.get();
+    }
+
+    @Override
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.harvester_DamageTools.get();
+    }
+
+    @Override
     public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
@@ -184,7 +194,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
         List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
         if (allPositions.isEmpty()) return;
-
+        upgradeRepairTool(pedestal);
         harvesterAction(level, pedestal, allPositions);
     }
 
@@ -433,7 +443,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                                 updateHarvestedBlock(level, pedestal, blockAtPoint, currentPoint, hasGentle);
                                                                 //level.setBlockAndUpdate(currentPoint, (propInt != null && hasGentleHarvest(pedestal.getCoinOnPedestal()))?(blockAtPoint.setValue(propInt,min)):(Blocks.AIR.defaultBlockState()));
                                                                 dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                                if(damage)pedestal.damageInsertedTool(1,false);
+                                                                if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                                 if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                             }
                                                         }
@@ -442,7 +452,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                             IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
                                                             int min = (propInt == null)?(0):(Collections.min(propInt.getPossibleValues()));
                                                             updateHarvestedBlock(level, pedestal, blockAtPoint, currentPoint, hasGentle);                                                            dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                            if(damage)pedestal.damageInsertedTool(1,false);
+                                                            if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                             if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                         }
 
@@ -507,31 +517,6 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
 
                                             if(!currentPoint.equals(pedestal.getPos()))
                                             {
-                                                if(PedestalConfig.COMMON.blockBreakerDamageTools.get())
-                                                {
-                                                    if(pedestal.hasTool())
-                                                    {
-                                                        BlockPos pedestalPos = pedestal.getPos();
-                                                        if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                                                        {
-                                                            if(pedestal.damageInsertedTool(1,true))
-                                                            {
-                                                                damage = true;
-                                                            }
-                                                            else
-                                                            {
-                                                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                                                return;
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                                            return;
-                                                        }
-                                                    }
-                                                }
-
                                                 if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                                 {
                                                     boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
@@ -543,7 +528,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                             IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
                                                             int min = (propInt == null)?(0):(Collections.min(propInt.getPossibleValues()));
                                                             updateHarvestedBlock(level, pedestal, blockAtPoint, currentPoint, hasGentle);                                                            dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                            if(damage)pedestal.damageInsertedTool(1,false);
+                                                            if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                             if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
 
                                                             /*
@@ -588,7 +573,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                                                         IntegerProperty propInt = getBlockPropertyAge(blockAtPoint);
                                                         int min = (propInt == null)?(0):(Collections.min(propInt.getPossibleValues()));
                                                         updateHarvestedBlock(level, pedestal, blockAtPoint, currentPoint, hasGentle);                                                        dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                        if(damage)pedestal.damageInsertedTool(1,false);
+                                                        if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                         if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,currentPoint,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,currentPoint.getX(),currentPoint.getY()+1.0f,currentPoint.getZ(),255,246,0));
                                                     }
 

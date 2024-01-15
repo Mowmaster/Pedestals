@@ -66,6 +66,16 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.blockBreakerDamageTools.get();
+    }
+
+    @Override
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.blockBreakerDamageTools.get();
+    }
+
+    @Override
     public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
@@ -173,7 +183,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
         List<BlockPos> allPositions = getValidWorkCardPositions(pedestal);
         if (allPositions.isEmpty()) return;
-
+        upgradeRepairTool(pedestal);
         breakerAction(level, pedestal, allPositions);
     }
 
@@ -329,7 +339,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                                                     //level.removeBlock(adjustedPoint, true);
                                                     level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                     //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                    if(damage)pedestal.damageInsertedTool(1,false);
+                                                    if(damage)upgradeDamageInsertedTool(pedestal,1,false);
 
                                                     if(drops.size()>0)
                                                     {
@@ -344,8 +354,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                                                 dropXP(level, pedestal, blockAtPoint, currentPoint);
                                                 level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                 //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                if(damage)pedestal.damageInsertedTool(1,false);
-
+                                                if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                 if(drops.size()>0)
                                                 {
                                                     for (ItemStack stack: drops) {

@@ -480,6 +480,22 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
     }
 
+    public boolean hasRemoveDurabilityCost(ItemStack upgradeStack) {
+        if (canModifyRemoveDurabilityCost(upgradeStack)) {
+            return getRemoveDurabilityCost(upgradeStack);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasRepairTool(ItemStack upgradeStack) {
+        if (canModifyRepairTool(upgradeStack)) {
+            return getRepairTool(upgradeStack);
+        } else {
+            return false;
+        }
+    }
+
     public void runClientStuff(BasePedestalBlockEntity pedestal)
     {
         return;
@@ -606,6 +622,62 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             return false;
         }
         return false;
+    }
+
+    public void upgradeRepairTool(BasePedestalBlockEntity pedestal)
+    {
+        if(hasRepairTool(pedestal.getCoinOnPedestal()))
+        {
+            if(pedestal.hasTool())
+            {
+                int currentDurability = pedestal.getDurabilityRemainingOnInsertedTool();
+                int maxDurability = pedestal.getToolMaxDurability();
+                if(currentDurability < maxDurability)
+                {
+                    int baseXPCost = PedestalConfig.COMMON.upgrades_baseXPRepairCost.get();
+                    int durabilityToRepair = maxDurability - currentDurability;
+                    int potentialDurabilityToRepair = pedestal.getStoredExperience()/baseXPCost;
+                    if(durabilityToRepair>potentialDurabilityToRepair)
+                    {
+                        if(pedestal.repairInsertedTool(potentialDurabilityToRepair,true))
+                        {
+                            if(pedestal.removeExperience(potentialDurabilityToRepair*baseXPCost,true)>0)
+                            {
+                                pedestal.repairInsertedTool(potentialDurabilityToRepair,false);
+                                pedestal.removeExperience(potentialDurabilityToRepair*baseXPCost,false);
+                            }
+                            else
+                            {
+                                if(pedestal.removeExperience(baseXPCost,true)>0)
+                                {
+                                    pedestal.repairInsertedTool(1,false);
+                                    pedestal.removeExperience(baseXPCost,false);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(pedestal.repairInsertedTool(durabilityToRepair,true))
+                        {
+                            if(pedestal.removeExperience(durabilityToRepair*baseXPCost,true)>0)
+                            {
+                                pedestal.repairInsertedTool(durabilityToRepair,false);
+                                pedestal.removeExperience(durabilityToRepair*baseXPCost,false);
+                            }
+                            else
+                            {
+                                if(pedestal.removeExperience(baseXPCost,true)>0)
+                                {
+                                    pedestal.repairInsertedTool(1,false);
+                                    pedestal.removeExperience(baseXPCost,false);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
@@ -2183,6 +2255,15 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return LazyOptional.empty();
     }
 
+    public boolean upgradeDamageInsertedTool(BasePedestalBlockEntity pedestal, int damageAmount, boolean simulate) {
+        if(hasRemoveDurabilityCost(pedestal.getCoinOnPedestal()))
+        {
+            return pedestal.damageInsertedTool(0,simulate);
+        }
+
+        return pedestal.damageInsertedTool(damageAmount,simulate);
+    }
+
 
     /*============================================================================
     ==============================================================================
@@ -2207,6 +2288,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean canModifyEntityContainers(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyRemoteStorage(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyOperateToBedrock(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) { return false; }
 
     public boolean canAddModifierToUpgrade(ItemStack upgradeItemStack, String nbtTagString) {
         return switch (nbtTagString) {
@@ -2226,6 +2309,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             case "upgradeentitystorage" -> canModifyEntityContainers(upgradeItemStack);
             case "upgraderemotestorage" -> canModifyRemoteStorage(upgradeItemStack);
             case "upgradeoperatetobedrock" -> canModifyOperateToBedrock(upgradeItemStack);
+            case "upgraderemovedurabilitycost" -> canModifyRemoveDurabilityCost(upgradeItemStack);
+            case "upgraderepairtool" -> canModifyRepairTool(upgradeItemStack);
             default -> false;
         };
     }
@@ -2250,6 +2335,8 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean getEntityContainer(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeentitystorage")>=1; }
     public boolean getRemoteStorage(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgraderemotestorage")>=1; }
     public boolean getOperateToBedrock(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeoperatetobedrock")>=1; }
+    public boolean getRemoveDurabilityCost(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgraderemovedurabilitycost")>=1; }
+    public boolean getRepairTool(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgraderepairtool")>=1; }
 
     /*============================================================================
     ==============================================================================

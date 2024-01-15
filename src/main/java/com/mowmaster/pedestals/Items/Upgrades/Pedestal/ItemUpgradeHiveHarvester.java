@@ -51,6 +51,15 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
     public boolean canModifyArea(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get(); }
 
     @Override
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.hiveharvester_DamageTools.get();
+    }
+
+    @Override
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.hiveharvester_DamageTools.get();
+    }
+    @Override
     public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
@@ -142,6 +151,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
 
         int currentPosition = getCurrentPosition(coin);
         BlockPos targetPos = allPositions.get(currentPosition);
+        upgradeRepairTool(pedestal);
         if (harvesterAction(level, pedestal, targetPos)) {
             if (currentPosition + 1 == allPositions.size()) {
                 setCurrentPosition(pedestal, 0);
@@ -244,7 +254,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
                                 }
                             }
                             if (toolStackIsDamageable && damage) {
-                                pedestal.damageTool(toolStack, 1, false);
+                                upgradeDamageInsertedTool(pedestal,1,false);
                             }
                             if (pedestal.canSpawnParticles()) {
                                 MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, targetPos.getX(), targetPos.getY()+1.0f, targetPos.getZ(), 255, 246, 0));

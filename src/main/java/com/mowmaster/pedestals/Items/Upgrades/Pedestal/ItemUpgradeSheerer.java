@@ -48,6 +48,16 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.sheerer_DamageTools.get();
+    }
+
+    @Override
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.sheerer_DamageTools.get();
+    }
+
+    @Override
     public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
@@ -161,6 +171,7 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        upgradeRepairTool(pedestal);
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if (fakePlayerReference != null && fakePlayerReference.get() != null) {
             FakePlayer fakePlayer = fakePlayerReference.get();
@@ -200,7 +211,7 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
                                             {
                                                 if(toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize()<=1)
                                                 {
-                                                    pedestal.damageTool(toolStack,1,false);
+                                                    upgradeDamageInsertedTool(pedestal,1,false);
                                                 }
                                             }
                                             if(!hasSuperSpeed(coin))break;

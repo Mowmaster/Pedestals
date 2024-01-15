@@ -61,6 +61,16 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.chopperDamageTools.get();
+    }
+
+    @Override
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.chopperDamageTools.get();
+    }
+
+    @Override
     public boolean canModifySuperSpeed(ItemStack upgradeItemStack) {
         return true;
     }
@@ -263,6 +273,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                 {
                     if(listed.size()>0)
                     {
+                        upgradeRepairTool(pedestal);
                         chopperAction(level,pedestal);
                     }
                     else if(workCardBase.selectedAreaWithinRange(pedestal) && !hasBlockListCustomNBTTags(coin,"_validlist"))
@@ -498,8 +509,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                                                                                 //level.removeBlock(adjustedPoint, true);
                                                                                 level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                                                 //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                                                if(damage)pedestal.damageInsertedTool(1,false);
-
+                                                                                if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                                                 if(drops.size()>0)
                                                                                 {
                                                                                     for (ItemStack stack: drops) {
@@ -513,8 +523,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                                                                             dropXP(level, pedestal, blockAtPoint, adjustedPoint);
                                                                             level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                                             //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                                            if(damage)pedestal.damageInsertedTool(1,false);
-
+                                                                            if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                                             if(drops.size()>0)
                                                                             {
                                                                                 for (ItemStack stack: drops) {
@@ -586,8 +595,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                                                                                 //level.removeBlock(adjustedPoint, true);
                                                                                 level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                                                 //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                                                if(damage)pedestal.damageInsertedTool(1,false);
-
+                                                                                if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                                                 if(drops.size()>0)
                                                                                 {
                                                                                     for (ItemStack stack: drops) {
@@ -601,8 +609,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
                                                                             dropXP(level, pedestal, blockAtPoint, adjustedPoint);
                                                                             level.setBlockAndUpdate(adjustedPoint, Blocks.AIR.defaultBlockState());
                                                                             //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                                            if(damage)pedestal.damageInsertedTool(1,false);
-
+                                                                            if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                                                             if(drops.size()>0)
                                                                             {
                                                                                 for (ItemStack stack: drops) {

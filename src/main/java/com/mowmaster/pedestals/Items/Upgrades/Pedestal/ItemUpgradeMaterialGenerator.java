@@ -44,6 +44,15 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     public boolean canModifyItemCapacity(ItemStack upgradeItemStack) { return true; }
 
     @Override
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.cobbleGeneratorDamageTools.get();
+    }
+
+    @Override
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.cobbleGeneratorDamageTools.get();
+    }
+    @Override
     public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
 
     @Override
@@ -195,7 +204,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             pedestal.removeDust(toRemove, IDustHandler.DustAction.EXECUTE);
         }
         if (damage) {
-            pedestal.damageInsertedTool(multiplier, false);
+            upgradeDamageInsertedTool(pedestal,multiplier,false);
         }
     }
 
@@ -219,7 +228,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        boolean damage = canDamageTool(pedestal.getLevel(), pedestal, PedestalConfig.COMMON.cobbleGeneratorDamageTools.get());
+        upgradeRepairTool(pedestal);
         boolean allowrun = allowRun(pedestal, PedestalConfig.COMMON.cobbleGeneratorDamageTools.get());
 
         if(allowrun)

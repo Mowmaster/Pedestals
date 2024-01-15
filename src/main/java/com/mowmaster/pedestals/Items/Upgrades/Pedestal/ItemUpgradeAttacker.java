@@ -70,6 +70,16 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifyRemoveDurabilityCost(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.attacker_DamageTools.get();
+    }
+
+    @Override
+    public boolean canModifyRepairTool(ItemStack upgradeItemStack) {
+        return PedestalConfig.COMMON.attacker_DamageTools.get();
+    }
+
+    @Override
     public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
@@ -436,6 +446,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
 
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
+        upgradeRepairTool(pedestal);
         attackerAction(level, pedestal, pedestalPos, coin);
     }
 
@@ -473,30 +484,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                     ItemStack toolStack = pedestal.getToolStack().copy();
                     fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, toolStack);
 
-                    if(PedestalConfig.COMMON.attacker_DamageTools.get())
-                    {
-                        if(pedestal.hasTool())
-                        {
-                            if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                            {
-                                if(pedestal.damageInsertedTool(1,true))
-                                {
-                                    damage = true;
-                                }
-                                else
-                                {
-                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                    canRun = false;
-                                }
-                            }
-                            else
-                            {
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                canRun = false;
-                            }
-                        }
-                    }
-
                     if(canRun)
                     {
                         for (LivingEntity getEntity : entities)
@@ -509,7 +496,7 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                                 if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), false))
                                 {
                                     doAttack(pedestal, fakePlayer, getEntity);
-                                    if(damage)pedestal.damageInsertedTool(1,false);
+                                    if(damage)upgradeDamageInsertedTool(pedestal,1,false);
                                 }
                             }
                         }
