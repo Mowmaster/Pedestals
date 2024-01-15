@@ -111,10 +111,12 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue augment_t4RangeInsertable;
 
 
+        public final ForgeConfigSpec.BooleanValue cobbleGeneratorRequireTools;
         public final ForgeConfigSpec.BooleanValue cobbleGeneratorDamageTools;
 
         public final ForgeConfigSpec.BooleanValue blockBreakerBreakEntities;
-        public final ForgeConfigSpec.BooleanValue blockBreakerDamageTools;
+        public final ForgeConfigSpec.BooleanValue blockBreaker_RequireTools;
+        public final ForgeConfigSpec.BooleanValue blockBreaker_DamageTools;
         public final ForgeConfigSpec.IntValue upgrade_blockbreaker_baseEnergyCost;
         public final ForgeConfigSpec.BooleanValue upgrade_blockbreaker_energy_distance_multiplier;
         public final ForgeConfigSpec.DoubleValue upgrade_blockbreaker_energyMultiplier;
@@ -155,7 +157,8 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_filler_selectedMultiplier;
         public final ForgeConfigSpec.IntValue upgrade_filler_baseBlocksPlaced;
 
-        public final ForgeConfigSpec.BooleanValue quarryDamageTools;
+        public final ForgeConfigSpec.BooleanValue quarry_RequireTools;
+        public final ForgeConfigSpec.BooleanValue quarry_DamageTools;
         public final ForgeConfigSpec.IntValue upgrade_quarry_baseEnergyCost;
         public final ForgeConfigSpec.DoubleValue upgrade_quarry_energyMultiplier;
         public final ForgeConfigSpec.BooleanValue upgrade_quarry_energy_distance_multiplier;
@@ -170,7 +173,9 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_quarry_selectedMultiplier;
         public final ForgeConfigSpec.IntValue upgrade_quarry_baseBlocksMined;
 
-        public final ForgeConfigSpec.BooleanValue chopperDamageTools;
+
+        public final ForgeConfigSpec.BooleanValue chopper_RequireTools;
+        public final ForgeConfigSpec.BooleanValue chopper_DamageTools;
         public final ForgeConfigSpec.IntValue upgrade_chopper_baseEnergyCost;
         public final ForgeConfigSpec.BooleanValue upgrade_chopper_energy_distance_multiplier;
         public final ForgeConfigSpec.DoubleValue upgrade_chopper_energyMultiplier;
@@ -194,6 +199,7 @@ public class PedestalConfig
         public final ForgeConfigSpec.BooleanValue upgrade_magnet_selectedAllowed;
         public final ForgeConfigSpec.DoubleValue upgrade_magnet_selectedMultiplier;
 
+        public final ForgeConfigSpec.BooleanValue harvester_RequireTools;
         public final ForgeConfigSpec.BooleanValue harvester_DamageTools;
         public final ForgeConfigSpec.IntValue upgrade_harvester_baseEnergyCost;
         public final ForgeConfigSpec.BooleanValue upgrade_harvester_energy_distance_multiplier;
@@ -235,6 +241,7 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_fertilizer_selectedMultiplier;
 
         public final ForgeConfigSpec.BooleanValue hiveharvester_DamageTools;
+        public final ForgeConfigSpec.BooleanValue hiveharvester_RequireTools;
         public final ForgeConfigSpec.IntValue upgrade_hiveharvester_baseEnergyCost;
         public final ForgeConfigSpec.BooleanValue upgrade_hiveharvester_energy_distance_multiplier;
         public final ForgeConfigSpec.DoubleValue upgrade_hiveharvester_energyMultiplier;
@@ -285,6 +292,7 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue upgrade_drain_baseBlocksPlaced;
 
         public final ForgeConfigSpec.BooleanValue sheerer_DamageTools;
+        public final ForgeConfigSpec.BooleanValue sheerer_RequireTools;
         public final ForgeConfigSpec.IntValue upgrade_sheerer_baseEnergyCost;
         public final ForgeConfigSpec.BooleanValue upgrade_sheerer_energy_distance_multiplier;
         public final ForgeConfigSpec.DoubleValue upgrade_sheerer_energyMultiplier;
@@ -299,6 +307,7 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_sheerer_selectedMultiplier;
 
         public final ForgeConfigSpec.BooleanValue milker_DamageTools;
+        public final ForgeConfigSpec.BooleanValue milker_RequireTools;
         public final ForgeConfigSpec.IntValue upgrade_milker_baseEnergyCost;
         public final ForgeConfigSpec.BooleanValue upgrade_milker_energy_distance_multiplier;
         public final ForgeConfigSpec.DoubleValue upgrade_milker_energyMultiplier;
@@ -313,6 +322,7 @@ public class PedestalConfig
         public final ForgeConfigSpec.DoubleValue upgrade_milker_selectedMultiplier;
 
         public final ForgeConfigSpec.BooleanValue breeder_DamageTools;
+        public final ForgeConfigSpec.BooleanValue breeder_RequireTools;
         public final ForgeConfigSpec.IntValue upgrade_breeder_baseEnergyCost;
         public final ForgeConfigSpec.BooleanValue upgrade_breeder_energy_distance_multiplier;
         public final ForgeConfigSpec.DoubleValue upgrade_breeder_energyMultiplier;
@@ -329,6 +339,7 @@ public class PedestalConfig
         public final ForgeConfigSpec.IntValue upgrade_breeder_entityLimitBreedingCount;
 
         public final ForgeConfigSpec.BooleanValue attacker_DamageTools;
+        public final ForgeConfigSpec.BooleanValue attacker_RequireTools;
         public final ForgeConfigSpec.IntValue upgrade_attacker_baseEnergyCost;
         public final ForgeConfigSpec.BooleanValue upgrade_attacker_energy_distance_multiplier;
         public final ForgeConfigSpec.DoubleValue upgrade_attacker_energyMultiplier;
@@ -523,6 +534,10 @@ public class PedestalConfig
                     .comment("Material Generator Damages Inserted Tools")
                     .define("materialGenToolDamage",false);
             builder.pop();
+            cobbleGeneratorRequireTools = builder
+                    .comment("Material Generator Requires Inserted Tools")
+                    .define("materialGenToolRequired",false);
+            builder.pop();
 
             builder.comment("Import Upgrade Configs").push("Import_Upgrade_Configs");
             upgrade_import_baseItemTransferSpeed = builder
@@ -595,7 +610,10 @@ public class PedestalConfig
 
 
             builder.comment("Breaker Configs").push("Breaker_Configs");
-            blockBreakerDamageTools = builder
+            blockBreaker_RequireTools = builder
+                    .comment("Block Breaker Requires Inserted Tools")
+                    .define("blockBreakerRequireTools",false);
+            blockBreaker_DamageTools = builder
                     .comment("Block Breaker Damages Inserted Tools")
                     .define("blockBreakerDamageTools",false);
             upgrade_blockbreaker_baseEnergyCost = builder
@@ -722,7 +740,10 @@ public class PedestalConfig
 
 
             builder.comment("Quarry Configs").push("Quarry_Configs");
-            quarryDamageTools = builder
+            quarry_RequireTools = builder
+                    .comment("Quarry Requires Inserted Tools")
+                    .define("quarryRequireTools",false);
+            quarry_DamageTools = builder
                     .comment("Quarry Damages Inserted Tools")
                     .define("quarryDamageTools",false);
             upgrade_quarry_baseEnergyCost = builder
@@ -769,7 +790,10 @@ public class PedestalConfig
 
 
             builder.comment("Chopper Configs").push("Chopper_Configs");
-            chopperDamageTools = builder
+            chopper_RequireTools = builder
+                    .comment("Chopper Requires Inserted Tools")
+                    .define("chopper_requires_tools",false);
+            chopper_DamageTools = builder
                     .comment("Chopper Damages Inserted Tools")
                     .define("chopper_damages_tools",false);
             upgrade_chopper_baseEnergyCost = builder
@@ -813,6 +837,9 @@ public class PedestalConfig
 
 
             builder.comment("Harvester Configs").push("Harvester_Configs");
+            harvester_RequireTools = builder
+                    .comment("Harvester Requires Inserted Tools")
+                    .define("harvester_requires_tools",false);
             harvester_DamageTools = builder
                     .comment("Harvester Damages Inserted Tools")
                     .define("harvester_damage_tools",false);
@@ -939,6 +966,9 @@ public class PedestalConfig
 
 
             builder.comment("Hive Harvester Configs").push("Hive_Harvester_Configs");
+            hiveharvester_RequireTools = builder
+                    .comment("Hive Harvester Requires Inserted Tools")
+                    .define("hiveharvester_requires_tools",false);
             hiveharvester_DamageTools = builder
                     .comment("Hive Harvester Damages Inserted Tools")
                     .define("hiveharvester_damage_tools",false);
@@ -1096,6 +1126,9 @@ public class PedestalConfig
 
 
             builder.comment("Sheerer Configs").push("Sheerer_Configs");
+            sheerer_RequireTools = builder
+                    .comment("Sheerer Requires Inserted Tools")
+                    .define("shearer_requires_tools",false);
             sheerer_DamageTools = builder
                     .comment("Sheerer Damages Inserted Tools")
                     .define("shearer_damages_tools",false);
@@ -1138,8 +1171,11 @@ public class PedestalConfig
             builder.pop();
 
             builder.comment("Milker Configs").push("Milker_Configs");
+            milker_RequireTools = builder
+                    .comment("Milker Requires Inserted Tools (Currently Not Implemented)")
+                    .define("milker_requires_tools",false);
             milker_DamageTools = builder
-                    .comment("Milker Damages Inserted Tools")
+                    .comment("Milker Damages Inserted Tools (Currently Not Implemented)")
                     .define("milker_damages_tools",false);
             upgrade_milker_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Milker]")
@@ -1180,8 +1216,11 @@ public class PedestalConfig
             builder.pop();
 
             builder.comment("Mob Breeder Configs").push("Mob_Breeder_Configs");
+            breeder_RequireTools = builder
+                    .comment("Mob Breeder Requires Inserted Tools (Currently Not Implemented)")
+                    .define("breeder_requires_tools",false);
             breeder_DamageTools = builder
-                    .comment("Mob Breeder Damages Inserted Tools")
+                    .comment("Mob Breeder Damages Inserted Tools (Currently Not Implemented)")
                     .define("breeder_damages_tools",false);
             upgrade_breeder_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Mob Breeder]")
@@ -1230,6 +1269,9 @@ public class PedestalConfig
 
 
             builder.comment("Attacker Configs").push("Attacker_Configs");
+            attacker_RequireTools = builder
+                    .comment("Attacker Requires Inserted Tools")
+                    .define("attacker_requires_tools",false);
             attacker_DamageTools = builder
                     .comment("Attacker Damages Inserted Tools")
                     .define("attacker_damages_tools",false);

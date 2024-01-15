@@ -212,6 +212,24 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
         if(xpdrop>0)blockAtPoint.getBlock().popExperience((ServerLevel)level,currentPoint,xpdrop);
     }
 
+    public boolean allowRun(BasePedestalBlockEntity pedestal, boolean damage)
+    {
+        if(PedestalConfig.COMMON.blockBreaker_RequireTools.get())
+        {
+            if(pedestal.hasTool())
+            {
+                if(damage)
+                {
+                    return pedestal.damageInsertedTool(1,true);
+                }
+                else return true;
+            }
+            else return false;
+        }
+
+        return true;
+    }
+
     public void breakerAction(Level level, BasePedestalBlockEntity pedestal, List<BlockPos> listed)
     {
         if(!level.isClientSide())
@@ -232,47 +250,40 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                         if(ForgeEventFactory.doPlayerHarvestCheck((getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()), blockAtPoint, true)) {
                             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, currentPoint, blockAtPoint, (getPlayer.get() == null)?(pedestal.getPedestalPlayer(pedestal).get()):(getPlayer.get()));
                             if (!MinecraftForge.EVENT_BUS.post(e)) {
-                                boolean damage = false;
+                                boolean damage = canDamageTool(level, pedestal, PedestalConfig.COMMON.blockBreaker_DamageTools.get());
+                                boolean allowrun = allowRun(pedestal, damage);
                                 if(!currentPoint.equals(pedestal.getPos()))
                                 {
-                                    if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
+                                    if(allowrun)
                                     {
-                                        if(PedestalConfig.COMMON.blockBreakerDamageTools.get())
+                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), true))
                                         {
-                                            if(pedestal.hasTool())
+                                            if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
                                             {
-                                                BlockPos pedestalPos = pedestal.getPos();
-                                                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                                                {
-                                                    if(pedestal.damageInsertedTool(1,true))
+                                                boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
+                                                List<ItemStack> drops = getBlockDrops(level, pedestal, getPlayer.get(), blockAtPoint);
+                                                if(level.getBlockEntity(currentPoint) !=null){
+                                                    if(canRemoveBlockEntities)
                                                     {
-                                                        damage = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                                        return;
+                                                        blockAtPoint.onRemove(level,currentPoint,blockAtPoint,true);
+                                                        dropXP(level, pedestal, blockAtPoint, currentPoint);
+                                                        level.removeBlockEntity(currentPoint);
+                                                        //level.removeBlock(adjustedPoint, true);
+                                                        level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
+                                                        //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
+                                                        if(damage)pedestal.damageInsertedTool(1,false);
+
+                                                        if(drops.size()>0)
+                                                        {
+                                                            for (ItemStack stack: drops) {
+                                                                MowLibItemUtils.spawnItemStack(level,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),stack);
+                                                            }
+                                                        }
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                                    return;
-                                                }
-                                            }
-                                        }
-
-                                        if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),currentPoint), false))
-                                        {
-                                            boolean canRemoveBlockEntities = PedestalConfig.COMMON.blockBreakerBreakEntities.get();
-                                            List<ItemStack> drops = getBlockDrops(level, pedestal, getPlayer.get(), blockAtPoint);
-                                            if(level.getBlockEntity(currentPoint) !=null){
-                                                if(canRemoveBlockEntities)
-                                                {
-                                                    blockAtPoint.onRemove(level,currentPoint,blockAtPoint,true);
                                                     dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                    level.removeBlockEntity(currentPoint);
-                                                    //level.removeBlock(adjustedPoint, true);
                                                     level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
                                                     //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
                                                     if(damage)pedestal.damageInsertedTool(1,false);
@@ -285,23 +296,9 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                                                     }
                                                 }
                                             }
-                                            else
-                                            {
-                                                dropXP(level, pedestal, blockAtPoint, currentPoint);
-                                                level.setBlockAndUpdate(currentPoint, Blocks.AIR.defaultBlockState());
-                                                //level.playLocalSound(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ(), blockAtPoint.getSoundType().getBreakSound(), SoundSource.BLOCKS,1.0F,1.0F,true);
-                                                if(damage)pedestal.damageInsertedTool(1,false);
-
-                                                if(drops.size()>0)
-                                                {
-                                                    for (ItemStack stack: drops) {
-                                                        MowLibItemUtils.spawnItemStack(level,currentPoint.getX(),currentPoint.getY(),currentPoint.getZ(),stack);
-                                                    }
-                                                }
+                                            else {
+                                                fuelRemoved = false;
                                             }
-                                        }
-                                        else {
-                                            fuelRemoved = false;
                                         }
                                     }
                                 }

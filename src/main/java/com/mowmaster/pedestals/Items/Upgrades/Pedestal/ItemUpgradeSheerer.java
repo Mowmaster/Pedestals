@@ -122,6 +122,24 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
         return new ItemStack(Items.SHEARS);
     }
 
+    public boolean allowRun(BasePedestalBlockEntity pedestal, boolean damage)
+    {
+        if(PedestalConfig.COMMON.sheerer_RequireTools.get())
+        {
+            if(pedestal.hasTool())
+            {
+                if(damage)
+                {
+                    return pedestal.damageInsertedTool(1,true);
+                }
+                else return true;
+            }
+            else return false;
+        }
+
+        return true;
+    }
+
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
@@ -130,36 +148,13 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
             ItemStack workCardItemStack = pedestal.getWorkCardInPedestal();
             if (workCardItemStack.getItem() instanceof WorkCardArea) {
                 List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal, getUpgradeWorkRange(coin));
-                boolean canRun = true;
-                boolean damage = false;
+
+                boolean damage = canDamageTool(level, pedestal, PedestalConfig.COMMON.sheerer_DamageTools.get());;
+                boolean canRun = allowRun(pedestal, damage);
 
                 if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
                 {
                     ItemStack toolStack = (pedestal.hasItem())?(pedestal.getItemInPedestal()):(pedestal.getToolStack());
-
-                    if(PedestalConfig.COMMON.sheerer_DamageTools.get())
-                    {
-                        if(pedestal.hasTool())
-                        {
-                            if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
-                            {
-                                if(pedestal.damageInsertedTool(1,true))
-                                {
-                                    damage = true;
-                                }
-                                else
-                                {
-                                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                    canRun = false;
-                                }
-                            }
-                            else
-                            {
-                                if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
-                                canRun = false;
-                            }
-                        }
-                    }
 
                     if(canRun)
                     {

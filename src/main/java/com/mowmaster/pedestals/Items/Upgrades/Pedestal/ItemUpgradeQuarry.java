@@ -169,6 +169,24 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
             !cannotBreakBlocks.contains(targetBlock);
     }
 
+    public boolean allowRun(BasePedestalBlockEntity pedestal, boolean damage)
+    {
+        if(PedestalConfig.COMMON.quarry_RequireTools.get())
+        {
+            if(pedestal.hasTool())
+            {
+                if(damage)
+                {
+                    return pedestal.damageInsertedTool(1,true);
+                }
+                else return true;
+            }
+            else return false;
+        }
+
+        return true;
+    }
+
     private void dropXP(Level level, BasePedestalBlockEntity pedestal, BlockState blockAtPoint, BlockPos currentPoint) {
         int fortune = (EnchantmentHelper.getEnchantments(pedestal.getToolStack()).containsKey(Enchantments.BLOCK_FORTUNE))?(EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE,pedestal.getToolStack())):(0);
         int silky = (EnchantmentHelper.getEnchantments(pedestal.getToolStack()).containsKey(Enchantments.SILK_TOUCH))?(EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH,pedestal.getToolStack())):(0);
@@ -253,8 +271,9 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
             FakePlayer fakePlayer = fakePlayerReference.get();
 
             List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
-            boolean damageToolsEnabled = PedestalConfig.COMMON.quarryDamageTools.get();
-            if (removeFuelForActionMultiple(pedestal, distances, true)) {
+            boolean damageToolsEnabled = canDamageTool(level, pedestal, PedestalConfig.COMMON.quarry_DamageTools.get());
+            boolean allowrun = allowRun(pedestal, damageToolsEnabled);
+            if (removeFuelForActionMultiple(pedestal, distances, true) && allowrun) {
                 if (!damageToolsEnabled || (pedestal.hasTool() && pedestal.damageInsertedTool(adjustedPoints.size(), true))) {
                     for (BlockPos adjustedPoint : adjustedPoints) {
                         if (adjustedPoint.equals(pedestalPos)) {
