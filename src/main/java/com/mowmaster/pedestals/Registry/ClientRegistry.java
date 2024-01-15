@@ -96,6 +96,7 @@ public class ClientRegistry
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.FILTER_BLOCKS_ON_CLICK_FUZZY.get());
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get());
+        ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.AUGMENT_PEDESTAL_TRANSFERTOGGLE.get());
 
         ItemModelPropertiesDust.dustItemModes(DeferredRegisterItems.TOOL_MANIFEST.get());
 

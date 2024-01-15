@@ -25,7 +25,7 @@ public class AugmentTool_Collide extends BaseTool implements IPedestalTool
     public ItemStack getMainTool() { return DeferredRegisterItems.TOOL_AUGMENTS_COLLIDE.get().getDefaultInstance(); }
 
     @Override
-    public ItemStack getSwappedTool() { return DeferredRegisterItems.TOOL_AUGMENTS_SPEED.get().getDefaultInstance(); }
+    public ItemStack getSwappedTool() { return DeferredRegisterItems.TOOL_AUGMENTS_TRANSFERTOGGLE.get().getDefaultInstance(); }
 
     @Override
     public void getPedestalDetail(BasePedestalBlockEntity pedestal, Player player) {

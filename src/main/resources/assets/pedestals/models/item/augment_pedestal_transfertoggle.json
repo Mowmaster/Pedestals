@@ -1,0 +1,18 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "pedestals:items/augments/renderaugment"
+  },
+  "overrides": [
+    { "predicate": { "pedestals:augment_mode": 0}, "model": "pedestals:item/augment_transfertoggle/augment_item"},
+    { "predicate": { "pedestals:augment_mode": 1}, "model": "pedestals:item/augment_transfertoggle/augment_fluid"},
+    { "predicate": { "pedestals:augment_mode": 2}, "model": "pedestals:item/augment_transfertoggle/augment_energy"},
+    { "predicate": { "pedestals:augment_mode": 3}, "model": "pedestals:item/augment_transfertoggle/augment_xp"},
+    { "predicate": { "pedestals:augment_mode": 4}, "model": "pedestals:item/augment_transfertoggle/augment_dust"},
+    { "predicate": { "pedestals:augment_mode": 5}, "model": "pedestals:item/augment_transfertoggle/augment_item_off"},
+    { "predicate": { "pedestals:augment_mode": 6}, "model": "pedestals:item/augment_transfertoggle/augment_fluid_off"},
+    { "predicate": { "pedestals:augment_mode": 7}, "model": "pedestals:item/augment_transfertoggle/augment_energy_off"},
+    { "predicate": { "pedestals:augment_mode": 8}, "model": "pedestals:item/augment_transfertoggle/augment_xp_off"},
+    { "predicate": { "pedestals:augment_mode": 9}, "model": "pedestals:item/augment_transfertoggle/augment_dust_off"}
+  ]
+}

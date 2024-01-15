@@ -2090,7 +2090,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             if(getRepairTool(p_41421_))
             {
                 MutableComponent repairTool = Component.translatable(MODID + ".upgrade_tooltip_upgraderepairtool_label");
-                repairTool.withStyle(ChatFormatting.GRAY);
+                repairTool.withStyle(ChatFormatting.GREEN);
                 p_41423_.add(repairTool);
             }
             else {

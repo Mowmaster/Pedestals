@@ -155,6 +155,7 @@
   "pedestals.manifest.description.augments.has_signal": "Is Receiving Redstone Signal",
   "pedestals.manifest.description.augments.has_robin": "Has Round Robin Augment",
   "pedestals.manifest.description.augments.has_collide": "Has Collide Effect Augment",
+  "pedestals.manifest.description.augments.has_transfertoggle": "Has Transfer Toggle Augment",
 
   "pedestals.manifest.description.augments.has_speed": "Has Speed Augment",
   "pedestals.manifest.description.augments.has_capacity": "Has Capacity Augment",
@@ -263,6 +264,15 @@
   "pedestals.mode_augment_iu": "Disable: Item & Upgrade Render",
   "pedestals.mode_augment_piu": "Disable: Particles / Item & Upgrade Render",
 
+  "pedestals.augment_transfertoggle_item": "Item Transfer",
+  "pedestals.augment_transfertoggle_fluid": "Fluid Transfer",
+  "pedestals.augment_transfertoggle_energy": "Energy Transfer",
+  "pedestals.augment_transfertoggle_xp": "Exp Transfer",
+  "pedestals.augment_transfertoggle_dust": "Dust Transfer",
+  "pedestals.augment_transfertoggle_on": "Toggled ON",
+  "pedestals.augment_transfertoggle_off": "Toggled OFF",
+
+
   "pedestals.tool_link_success_linkingtool": "Linked Successfully, Sending to Receiver",
   "pedestals.tool_link_success_backwardslinkingtool": "Linked Successfully, Receiving from Sender",
   "pedestals.tool_link_unsucess": "Linking Failed, Max Connections Reached",
@@ -300,6 +310,8 @@
 
   "pedestals.tool.augment.collide": "Has Collision Augment",
   "pedestals.tool.augment.collide_not": "Does not have Collision Augment",
+  "pedestals.tool.augment.transfertoggle": "Has Transfer Toggle Augment",
+  "pedestals.tool.augment.transfertoggle_not": "Does not have Transfer Toggle Augment",
   "pedestals.tool.augment.diffuser": "Has Particle Diffuser Augment",
   "pedestals.tool.augment.diffuser_not": "Does not have Particle Diffuser Augment",
   "pedestals.tool.augment.roundrobin": "Has Round Robin Augment",
@@ -374,6 +386,8 @@
   "jei.pedestals.tool_augments_diffuser.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
   "item.pedestals.tool_augments_roundrobin": "Round Robin Augment Tool",
   "jei.pedestals.tool_augments_roundrobin.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
+  "item.pedestals.tool_augments_transfertoggle": "Transfer Toggle Augment Tool",
+  "jei.pedestals.tool_augments_transfertoggle.interaction": "§3 Offhand Tool and Left Click to Remove Related Augment from Pedestal. Crouch Right Click in Air to Switch Tool.",
 
 
   "pedestals.filter_type": "Filter Type: ",
@@ -478,6 +492,10 @@
   "jei.pedestals.augment_pedestal_renderdiffuser.description": "§5 Disables Particles and Item/Upgrade Render on Pedestals.",
   "jei.pedestals.augment_pedestal_renderdiffuser.interaction": "§3 Offhand Item, Crouch Right Click in Air to Toggle",
   "jei.pedestals.augment_pedestal_renderdiffuser.crafting": "Crafted when a Linking Tool is Right Clicked on the ground near paper when its raining.",
+
+  "item.pedestals.augment_pedestal_transfertoggle": "Transfer Toggle Augment",
+  "jei.pedestals.augment_pedestal_transfertoggle.description": "§5 Enables/Disables the pedestal from transferring stuff.",
+  "jei.pedestals.augment_pedestal_transfertoggle.interaction": "§3 Right Click in Air to Toggle On/Off, Crouch Right Click in Air to Swap Type",
 
   "item.pedestals.augment_pedestal_t1_capacity": "Capacity Augment (Tier 1)",
   "jei.pedestals.augment_pedestal_t1_capacity.description": "§5 Increases the transfer rate slightly for each upgrade inserted.",

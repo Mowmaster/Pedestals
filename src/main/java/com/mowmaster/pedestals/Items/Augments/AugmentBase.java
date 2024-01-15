@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items.Augments;
 
+import com.mowmaster.mowlib.Items.BaseUseInteractionItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -11,7 +12,7 @@ import java.util.List;
 
 import net.minecraft.world.item.Item.Properties;
 
-public class AugmentBase extends Item implements IPedestalAugment
+public class AugmentBase extends BaseUseInteractionItem implements IPedestalAugment
 {
 
     public AugmentBase(Properties p_41383_) {

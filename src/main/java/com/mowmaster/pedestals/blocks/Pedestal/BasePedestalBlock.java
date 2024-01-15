@@ -358,6 +358,10 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                     {
                         ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeNoCollide());
                     }
+                    else if(pedestal.hasTransferToggleAugment() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_TRANSFERTOGGLE.get()))
+                    {
+                        ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeTransferToggleAugment());
+                    }
                     else if(pedestal.hasSpeed() && itemInOffHand.is(DeferredRegisterItems.TOOL_AUGMENTS_SPEED.get()))
                     {
                         if(p_60502_.isShiftKeyDown()){ItemHandlerHelper.giveItemToPlayer(p_60502_,pedestal.removeAllSpeed());}
@@ -545,6 +549,13 @@ public class BasePedestalBlock extends MowLibBaseBlock implements SimpleWaterlog
                 else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_NOCOLLIDE.get()))
                 {
                     if(pedestal.attemptAddNoCollide(itemInOffHand))
+                    {
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                else if(itemInOffHand.getItem().equals(DeferredRegisterItems.AUGMENT_PEDESTAL_TRANSFERTOGGLE.get()))
+                {
+                    if(pedestal.attemptAddTransferToggleAugment(itemInOffHand))
                     {
                         return InteractionResult.SUCCESS;
                     }

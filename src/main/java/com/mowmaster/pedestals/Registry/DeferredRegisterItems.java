@@ -62,6 +62,9 @@ public class DeferredRegisterItems
             () -> new AugmentTool_Robin(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> TOOL_AUGMENTS_COLLIDE = ITEMS.register("tool_augments_collide",
             () -> new AugmentTool_Collide(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> TOOL_AUGMENTS_TRANSFERTOGGLE = ITEMS.register("tool_augments_transfertoggle",
+            () -> new AugmentTool_TransferToggle(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
+
 
     public static final RegistryObject<Item> TOOL_MANIFEST = ITEMS.register("tool_manifesttool",
             () -> new PedestalManifestTool(new Item.Properties().stacksTo(1).tab(PedestalsTab.TAB_ITEMS)));
@@ -201,6 +204,8 @@ public class DeferredRegisterItems
             () -> new AugmentRenderDiffuser(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
     public static final RegistryObject<Item> AUGMENT_PEDESTAL_NOCOLLIDE = ITEMS.register("augment_pedestal_nocollide",
             () -> new AugmentBase(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
+    public static final RegistryObject<Item> AUGMENT_PEDESTAL_TRANSFERTOGGLE = ITEMS.register("augment_pedestal_transfertoggle",
+            () -> new AugmentTransferToggle(new Item.Properties().tab(PedestalsTab.TAB_ITEMS)));
 
 
 

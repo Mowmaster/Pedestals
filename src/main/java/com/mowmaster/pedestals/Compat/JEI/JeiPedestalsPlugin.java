@@ -96,6 +96,7 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_DIFFUSER.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_ROUNDROBIN.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_COLLIDE.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_AUGMENTS_TRANSFERTOGGLE.get());
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.TOOL_MANIFEST.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.TOOL_MANIFEST.get());
@@ -152,6 +153,8 @@ public class JeiPedestalsPlugin implements IModPlugin
         this.registerIngredientDescription(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get());
         this.registerIngredientInteraction(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get());
         this.registerIngredientCrafting(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_RENDERDIFFUSER.get());
+        this.registerIngredientDescription(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_TRANSFERTOGGLE.get());
+        this.registerIngredientInteraction(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_TRANSFERTOGGLE.get());
 
         this.registerIngredientDescription(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_T1_CAPACITY.get());
         this.registerIngredientDescription(registration, DeferredRegisterItems.AUGMENT_PEDESTAL_T2_CAPACITY.get());

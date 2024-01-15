@@ -243,6 +243,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         static final int AUGMENT_TIERED_RANGE = 10;
         static final int TOOL = 11;
         static final int WORK_CARD = 12;
+        static final int AUGMENT_TRANSFERTOGGLE = 13;
     }
 
     private ItemStackHandler createPrivateItemHandler() {
@@ -289,6 +290,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                     case PrivateInventorySlot.AUGMENT_TIERED_RANGE -> canInsertAugmentRange(stack);
                     case PrivateInventorySlot.TOOL -> canInsertTool(stack);
                     case PrivateInventorySlot.WORK_CARD -> stack.getItem() instanceof IPedestalWorkCard && !hasWorkCard();
+                    case PrivateInventorySlot.AUGMENT_TRANSFERTOGGLE -> stack.is(DeferredRegisterItems.AUGMENT_PEDESTAL_TRANSFERTOGGLE.get()) && !hasTransferToggleAugment();
                     default -> false;
                 };
             }
@@ -2047,6 +2049,61 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     ==============================================================================
     ============================================================================*/
 
+    /*============================================================================
+    ==============================================================================
+    =======================   TRANSFER TOGGLE START    ===========================
+    ==============================================================================
+    ============================================================================*/
+
+    public boolean attemptAddTransferToggleAugment(ItemStack stack)
+    {
+        if (privateItems.isItemValid(PrivateInventorySlot.AUGMENT_TRANSFERTOGGLE, stack)) {
+            privateItems.insertItem(PrivateInventorySlot.AUGMENT_TRANSFERTOGGLE, stack.split(1), false);
+            // update();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public ItemStack removeTransferToggleAugment()
+    {
+        return privateItems.extractItem(PrivateInventorySlot.AUGMENT_TRANSFERTOGGLE, 1, false);
+    }
+
+    public boolean hasTransferToggleAugment()
+    {
+        return !privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TRANSFERTOGGLE).isEmpty();
+    }
+
+    public ItemStack getTransferToggleAugment()
+    {
+        return privateItems.getStackInSlot(PrivateInventorySlot.AUGMENT_TRANSFERTOGGLE);
+    }
+
+    public boolean transferToggleAugmentAllowTransfer(int type)
+    {
+        /*
+        0 - items
+        1 - fluids
+        2 - energy
+        3 - xp
+        4 - dust
+         */
+        if(getTransferToggleAugment().getItem() instanceof AugmentTransferToggle transferToggleItem)
+        {
+            return !transferToggleItem.getTransferToggle(type, getTransferToggleAugment());
+        }
+
+        return false;
+    }
+
+    /*============================================================================
+    ==============================================================================
+    =======================    TRANSFER TOGGLE END     ===========================
+    ==============================================================================
+    ============================================================================*/
+
 
 
     /*============================================================================
@@ -2199,11 +2256,37 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                 if(isPedestalInRange(posReceiver))
                 {
                     if(canSendToPedestal(pedestal)) {
-                        if(sendItemsToPedestal(posReceiver,getItemStacks())) { hasSent = true; }
-                        if(sendFluidsToPedestal(posReceiver,getStoredFluid())) { hasSent = true; }
-                        if(sendEnergyToPedestal(posReceiver,getStoredEnergy())) { hasSent = true; }
-                        if(sendExperienceToPedestal(posReceiver,getStoredExperience())) { hasSent = true; }
-                        if(sendDustToPedestal(posReceiver,getStoredDust())) { hasSent = true; }
+                        if(hasTransferToggleAugment())
+                        {
+                            if(transferToggleAugmentAllowTransfer(0))
+                            {
+                                if(sendItemsToPedestal(posReceiver,getItemStacks()))hasSent = true;
+                            }
+                            if(transferToggleAugmentAllowTransfer(1))
+                            {
+                                if(sendFluidsToPedestal(posReceiver,getStoredFluid()))hasSent = true;
+                            }
+                            if(transferToggleAugmentAllowTransfer(2))
+                            {
+                                if(sendEnergyToPedestal(posReceiver,getStoredEnergy()))hasSent = true;
+                            }
+                            if(transferToggleAugmentAllowTransfer(3))
+                            {
+                                if(sendExperienceToPedestal(posReceiver,getStoredExperience()))hasSent = true;
+                            }
+                            if(transferToggleAugmentAllowTransfer(4))
+                            {
+                                if(sendDustToPedestal(posReceiver,getStoredDust()))hasSent = true;
+                            }
+                        }
+                        else
+                        {
+                            if(sendItemsToPedestal(posReceiver,getItemStacks())) { hasSent = true; }
+                            if(sendFluidsToPedestal(posReceiver,getStoredFluid())) { hasSent = true; }
+                            if(sendEnergyToPedestal(posReceiver,getStoredEnergy())) { hasSent = true; }
+                            if(sendExperienceToPedestal(posReceiver,getStoredExperience())) { hasSent = true; }
+                            if(sendDustToPedestal(posReceiver,getStoredDust())) { hasSent = true; }
+                        }
 
                         if(hasSent) {
                             if (canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,getPos(),new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_BEAM,posReceiver.getX(),posReceiver.getY(),posReceiver.getZ(),getPos().getX(),getPos().getY(),getPos().getZ()));

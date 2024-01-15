@@ -1,0 +1,6 @@
+{
+  "parent": "pedestals:item/augment_pedestal_renderdiffuser",
+  "textures": {
+    "layer0": "pedestals:items/augments/augment_transfertoggle_dust"
+  }
+}

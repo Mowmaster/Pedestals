@@ -164,8 +164,11 @@ public class PedestalManifestTool extends BaseTool implements IPedestalTool
 
                             boolean hasRoundRobin = ped.hasRRobin();
                             boolean hasCollide = ped.hasNoCollide();
+                            boolean hasTransferToggle = ped.hasTransferToggleAugment();
                             MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasRoundRobin,"_hasrobin");
                             MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasCollide,"_hascollide");
+                            MowLibCompoundTagUtils.writeBooleanToNBT(MODID,getTagOnItem,hasTransferToggle,"_hastransfertoggle");
+
 
                             MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsSpeed(),"_intaugmentspeed");
                             MowLibCompoundTagUtils.writeIntegerToNBT(MODID,getTagOnItem,ped.numAugmentsCapacity(),"_intaugmentcapacity");
@@ -230,6 +233,7 @@ public class PedestalManifestTool extends BaseTool implements IPedestalTool
             boolean hasSignal = MowLibCompoundTagUtils.readBooleanFromNBT(MODID,getTagOnItem,"_hassignal");
             boolean hasRobin = MowLibCompoundTagUtils.readBooleanFromNBT(MODID,getTagOnItem,"_hasrobin");
             boolean hasCollide = MowLibCompoundTagUtils.readBooleanFromNBT(MODID,getTagOnItem,"_hascollide");
+            boolean hasTransferToggle = MowLibCompoundTagUtils.readBooleanFromNBT(MODID,getTagOnItem,"_hastransfertoggle");
 
             boolean hasSpeed = MowLibCompoundTagUtils.readBooleanFromNBT(MODID,getTagOnItem,"_hasspeed");
             boolean hasCapacity = MowLibCompoundTagUtils.readBooleanFromNBT(MODID,getTagOnItem,"_hascapacity");
@@ -267,6 +271,18 @@ public class PedestalManifestTool extends BaseTool implements IPedestalTool
                     MutableComponent hasAugmentCollide = Component.translatable(MODID + ".manifest.description.augments.has_collide");
                     hasAugmentCollide.withStyle(ChatFormatting.DARK_PURPLE);
                     p_41423_.add(hasAugmentCollide);
+                }
+                if(hasTransferToggle)
+                {
+                    MutableComponent hasTransferToggleComp = Component.translatable(MODID + ".manifest.description.augments.has_transfertoggle");
+                    hasTransferToggleComp.withStyle(ChatFormatting.GOLD);
+                    p_41423_.add(hasTransferToggleComp);
+                }
+                if(hasTransferToggle)
+                {
+                    MutableComponent hasTransferToggleComp = Component.translatable(MODID + ".manifest.description.augments.has_transfertoggle");
+                    hasTransferToggleComp.withStyle(ChatFormatting.GOLD);
+                    p_41423_.add(hasTransferToggleComp);
                 }
             }
 
