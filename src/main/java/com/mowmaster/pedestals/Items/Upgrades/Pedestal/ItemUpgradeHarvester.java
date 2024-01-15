@@ -147,14 +147,14 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
             {
                 if(pedestal.getActualToolStack().isEmpty())
                 {
-                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                    messages.add(ChatFormatting.BLACK + "Needs Tool");
                 }
             }
             if(PedestalConfig.COMMON.harvester_DamageTools.get())
             {
-                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                if(pedestal.hasTool() && pedestal.getDurabilityRemainingOnInsertedTool()<=1)
                 {
-                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.BLACK + "Inserted Tool");
                     messages.add(ChatFormatting.RED + "Is Broken");
                 }
             }
@@ -165,7 +165,11 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
 
     @Override
     public ItemStack getUpgradeDefaultTool() {
-        if(isQuarkLoaded()) { return new ItemStack(Items.STICK);}
+        if(PedestalConfig.COMMON.harvester_RequireTools.get())
+        {
+            return ItemStack.EMPTY;
+        }
+        else if(isQuarkLoaded()) { return new ItemStack(Items.STICK);}
         return new ItemStack(Items.STONE_HOE);
     }
 
@@ -398,7 +402,7 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
             {
                 boolean hasGentle = hasGentleHarvest(pedestal.getCoinOnPedestal());
                 boolean damage = canDamageTool(level, pedestal, PedestalConfig.COMMON.harvester_DamageTools.get());
-                boolean allowrun = allowRun(pedestal, damage);
+                boolean allowrun = allowRun(pedestal, PedestalConfig.COMMON.harvester_DamageTools.get());
                 if(hasSuperSpeed(pedestal.getCoinOnPedestal()))
                 {
                     for(BlockPos currentPoint:listed)

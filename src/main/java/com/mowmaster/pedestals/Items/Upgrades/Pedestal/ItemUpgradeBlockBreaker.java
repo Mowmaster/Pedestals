@@ -130,6 +130,21 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                     messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
                 }
             }
+            if(PedestalConfig.COMMON.blockBreakerRequireTools.get())
+            {
+                if(pedestal.getActualToolStack().isEmpty())
+                {
+                    messages.add(ChatFormatting.BLACK + "Needs Tool");
+                }
+            }
+            if(PedestalConfig.COMMON.blockBreakerDamageTools.get())
+            {
+                if(pedestal.hasTool() && pedestal.getDurabilityRemainingOnInsertedTool()<=1)
+                {
+                    messages.add(ChatFormatting.BLACK + "Inserted Tool");
+                    messages.add(ChatFormatting.RED + "Is Broken");
+                }
+            }
         }
 
         return messages;
@@ -137,6 +152,10 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
 
     @Override
     public ItemStack getUpgradeDefaultTool() {
+        if(PedestalConfig.COMMON.blockBreakerRequireTools.get())
+        {
+            return ItemStack.EMPTY;
+        }
         return new ItemStack(Items.STONE_PICKAXE);
     }
 
@@ -282,7 +301,7 @@ public class ItemUpgradeBlockBreaker extends ItemUpgradeBase
                 BlockPos currentPoint = listed.get(currentPosition);
                 BlockState blockAtPoint = level.getBlockState(currentPoint);
                 boolean damage = canDamageTool(level, pedestal, PedestalConfig.COMMON.blockBreakerDamageTools.get());
-                boolean allowrun = allowRun(pedestal, damage);
+                boolean allowrun = allowRun(pedestal, PedestalConfig.COMMON.blockBreakerDamageTools.get());
 
                 boolean fuelRemoved = true;
 

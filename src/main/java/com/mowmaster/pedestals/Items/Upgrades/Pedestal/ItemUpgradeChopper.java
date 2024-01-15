@@ -134,14 +134,14 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
             {
                 if(pedestal.getActualToolStack().isEmpty())
                 {
-                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                    messages.add(ChatFormatting.BLACK + "Needs Tool");
                 }
             }
             if(PedestalConfig.COMMON.chopperDamageTools.get())
             {
-                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                if(pedestal.hasTool() && pedestal.getDurabilityRemainingOnInsertedTool()<=1)
                 {
-                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.BLACK + "Inserted Tool");
                     messages.add(ChatFormatting.RED + "Is Broken");
                 }
             }
@@ -152,6 +152,11 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
 
     @Override
     public ItemStack getUpgradeDefaultTool() {
+
+        if(PedestalConfig.COMMON.chopperRequireTools.get())
+        {
+            return ItemStack.EMPTY;
+        }
         return new ItemStack(Items.IRON_AXE);
     }
 
@@ -445,7 +450,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
             {
                 ItemStack card = pedestal.getWorkCardInPedestal();
                 boolean damage = canDamageTool(level, pedestal, PedestalConfig.COMMON.chopperDamageTools.get());
-                boolean allowrun = allowRun(pedestal, damage);
+                boolean allowrun = allowRun(pedestal, PedestalConfig.COMMON.chopperDamageTools.get());
                 if(card.getItem() instanceof WorkCardBase workCardBase)
                 {
                     WeakReference<FakePlayer> getPlayer = pedestal.getPedestalPlayer(pedestal);

@@ -109,14 +109,14 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
             {
                 if(pedestal.getActualToolStack().isEmpty())
                 {
-                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                    messages.add(ChatFormatting.BLACK + "Needs Tool");
                 }
             }
             if(PedestalConfig.COMMON.quarryDamageTools.get())
             {
-                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                if(pedestal.hasTool() && pedestal.getDurabilityRemainingOnInsertedTool()<=1)
                 {
-                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.BLACK + "Inserted Tool");
                     messages.add(ChatFormatting.RED + "Is Broken");
                 }
             }
@@ -127,6 +127,11 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
 
     @Override
     public ItemStack getUpgradeDefaultTool() {
+
+        if(PedestalConfig.COMMON.quarryRequireTools.get())
+        {
+            return ItemStack.EMPTY;
+        }
         return new ItemStack(Items.IRON_PICKAXE);
     }
 
@@ -303,7 +308,7 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
 
             List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
             boolean damageToolsEnabled = canDamageTool(level, pedestal, PedestalConfig.COMMON.quarryDamageTools.get());
-            boolean allowrun = allowRun(pedestal, damageToolsEnabled);
+            boolean allowrun = allowRun(pedestal, PedestalConfig.COMMON.quarryDamageTools.get());
             if (removeFuelForActionMultiple(pedestal, distances, true) && allowrun) {
                 if (!damageToolsEnabled || (pedestal.hasTool() && pedestal.damageInsertedTool(adjustedPoints.size(), true))) {
                     for (BlockPos adjustedPoint : adjustedPoints) {

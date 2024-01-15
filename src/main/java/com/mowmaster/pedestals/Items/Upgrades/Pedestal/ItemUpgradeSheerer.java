@@ -115,14 +115,14 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
             {
                 if(pedestal.getActualToolStack().isEmpty())
                 {
-                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                    messages.add(ChatFormatting.BLACK + "Needs Tool");
                 }
             }
             if(PedestalConfig.COMMON.sheerer_DamageTools.get())
             {
-                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                if(pedestal.hasTool() && pedestal.getDurabilityRemainingOnInsertedTool()<=1)
                 {
-                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.BLACK + "Inserted Tool");
                     messages.add(ChatFormatting.RED + "Is Broken");
                 }
             }
@@ -133,6 +133,11 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
 
     @Override
     public ItemStack getUpgradeDefaultTool() {
+
+        if(PedestalConfig.COMMON.sheerer_RequireTools.get())
+        {
+            return ItemStack.EMPTY;
+        }
         return new ItemStack(Items.SHEARS);
     }
 
@@ -164,7 +169,7 @@ public class ItemUpgradeSheerer extends ItemUpgradeBase
                 List<LivingEntity> entities = WorkCardArea.getEntitiesInRangeOfUpgrade(level, LivingEntity.class, workCardItemStack, pedestal);
 
                 boolean damage = canDamageTool(level, pedestal, PedestalConfig.COMMON.sheerer_DamageTools.get());
-                boolean canRun = allowRun(pedestal, damage);
+                boolean canRun = allowRun(pedestal, PedestalConfig.COMMON.sheerer_DamageTools.get());
 
                 if(removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(),pedestalPos), true))
                 {

@@ -47,7 +47,12 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     public int getUpgradeWorkRange(ItemStack coinUpgrade) { return 0; }
 
     @Override
-    public ItemStack getUpgradeDefaultTool() { return new ItemStack(Items.STONE_PICKAXE); }
+    public ItemStack getUpgradeDefaultTool() {
+        if(PedestalConfig.COMMON.cobbleGeneratorRequireTools.get())
+        {
+            return ItemStack.EMPTY;
+        }
+        return new ItemStack(Items.STONE_PICKAXE); }
 
     @Override
     public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
@@ -57,14 +62,14 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             {
                 if(pedestal.getActualToolStack().isEmpty())
                 {
-                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                    messages.add(ChatFormatting.BLACK + "Needs Tool");
                 }
             }
             if(PedestalConfig.COMMON.cobbleGeneratorDamageTools.get())
             {
-                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                if(pedestal.hasTool() && pedestal.getDurabilityRemainingOnInsertedTool()<=1)
                 {
-                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.BLACK + "Inserted Tool");
                     messages.add(ChatFormatting.RED + "Is Broken");
                 }
             }
@@ -215,7 +220,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
         boolean damage = canDamageTool(pedestal.getLevel(), pedestal, PedestalConfig.COMMON.cobbleGeneratorDamageTools.get());
-        boolean allowrun = allowRun(pedestal, damage);
+        boolean allowrun = allowRun(pedestal, PedestalConfig.COMMON.cobbleGeneratorDamageTools.get());
 
         if(allowrun)
         {

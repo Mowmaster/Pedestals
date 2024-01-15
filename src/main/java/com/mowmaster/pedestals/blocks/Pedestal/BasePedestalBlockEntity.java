@@ -1627,14 +1627,19 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
     }
 
     public boolean damageInsertedTool(int damageAmount, boolean simulate) {
-        if (getDurabilityRemainingOnInsertedTool() > damageAmount) {
-            if (!simulate) {
-                getToolStack().setDamageValue(getToolDamageValue() + damageAmount);
+        if(getDurabilityRemainingOnInsertedTool() > 1)
+        {
+            if (getDurabilityRemainingOnInsertedTool() > damageAmount) {
+                if (!simulate) {
+                    getToolStack().setDamageValue(getToolDamageValue() + damageAmount);
+                    update();
+                }
+                return true;
+            } else {
+                return false;
             }
-            return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public boolean damageTool(ItemStack stackTool, int damageAmount, boolean simulate)
@@ -1649,6 +1654,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
                     {
                         int newDamageAmount = stackTool.getDamageValue() + damageAmount;
                         stackTool.setDamageValue(newDamageAmount);
+                        update();
                         return true;
                     }
                 }
