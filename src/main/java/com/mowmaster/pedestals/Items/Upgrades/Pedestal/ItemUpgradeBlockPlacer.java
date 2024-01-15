@@ -95,6 +95,21 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
                 messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
                 messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
             }
+            if(PedestalConfig.COMMON.blockBreakerRequireTools.get())
+            {
+                if(pedestal.getActualToolStack().isEmpty())
+                {
+                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                }
+            }
+            if(PedestalConfig.COMMON.blockBreakerDamageTools.get())
+            {
+                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                {
+                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.RED + "Is Broken");
+                }
+            }
         }
 
         return messages;

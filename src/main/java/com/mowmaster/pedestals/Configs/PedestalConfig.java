@@ -1170,10 +1170,10 @@ public class PedestalConfig
 
             builder.comment("Milker Configs").push("Milker_Configs");
             milker_DamageTools = builder
-                    .comment("Milker Damages Inserted Tools")
+                    .comment("Milker Damages Inserted Tools (Not Implemented)")
                     .define("milker_damages_tools",false);
             milker_RequireTools = builder
-                    .comment("Milker Requires Inserted Tool")
+                    .comment("Milker Requires Inserted Tool (Not Implemented)")
                     .define("milker_RequireTools",false);
             upgrade_milker_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Milker]")
@@ -1215,10 +1215,10 @@ public class PedestalConfig
 
             builder.comment("Mob Breeder Configs").push("Mob_Breeder_Configs");
             breeder_DamageTools = builder
-                    .comment("Mob Breeder Damages Inserted Tools")
+                    .comment("Mob Breeder Damages Inserted Tools (Not Implemented)")
                     .define("breeder_damages_tools",false);
             breeder_RequireTools = builder
-                    .comment("Mob Breeder Requires Inserted Tool")
+                    .comment("Mob Breeder Requires Inserted Tool (Not Implemented)")
                     .define("breeder_RequireTools",false);
             upgrade_breeder_baseEnergyCost = builder
                     .comment("Base RF cost per upgrade operation [Mob Breeder]")

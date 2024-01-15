@@ -105,6 +105,21 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
                 messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
                 messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
             }
+            if(PedestalConfig.COMMON.quarryRequireTools.get())
+            {
+                if(pedestal.getActualToolStack().isEmpty())
+                {
+                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                }
+            }
+            if(PedestalConfig.COMMON.quarryDamageTools.get())
+            {
+                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                {
+                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.RED + "Is Broken");
+                }
+            }
         }
 
         return messages;
@@ -263,14 +278,33 @@ public class ItemUpgradeQuarry extends ItemUpgradeBase {
         }
     }
 
+    public boolean allowRun(BasePedestalBlockEntity pedestal, boolean damage)
+    {
+        if(PedestalConfig.COMMON.quarryRequireTools.get())
+        {
+            if(pedestal.hasTool())
+            {
+                if(damage)
+                {
+                    return pedestal.damageInsertedTool(1,true);
+                }
+                else return true;
+            }
+            else return false;
+        }
+
+        return true;
+    }
+
     public boolean quarryAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, List<BlockPos> adjustedPoints) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if(fakePlayerReference != null && fakePlayerReference.get() != null) {
             FakePlayer fakePlayer = fakePlayerReference.get();
 
             List<Integer> distances = adjustedPoints.stream().map(point -> getDistanceBetweenPoints(pedestalPos, point)).toList();
-            boolean damageToolsEnabled = PedestalConfig.COMMON.quarryDamageTools.get();
-            if (removeFuelForActionMultiple(pedestal, distances, true)) {
+            boolean damageToolsEnabled = canDamageTool(level, pedestal, PedestalConfig.COMMON.quarryDamageTools.get());
+            boolean allowrun = allowRun(pedestal, damageToolsEnabled);
+            if (removeFuelForActionMultiple(pedestal, distances, true) && allowrun) {
                 if (!damageToolsEnabled || (pedestal.hasTool() && pedestal.damageInsertedTool(adjustedPoints.size(), true))) {
                     for (BlockPos adjustedPoint : adjustedPoints) {
                         if (adjustedPoint.equals(pedestalPos)) {

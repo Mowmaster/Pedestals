@@ -578,6 +578,39 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
     }
 
+    public boolean canDamageTool(Level level, BasePedestalBlockEntity pedestal, boolean config)
+    {
+        if(config)
+        {
+            if(pedestal.hasTool())
+            {
+                BlockPos pedestalPos = pedestal.getPos();
+                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                {
+                    if(pedestal.damageInsertedTool(1,true))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                        return false;
+                    }
+                }
+                else
+                {
+                    if(pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level,pedestalPos,new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED,pedestalPos.getX(),pedestalPos.getY()+1.0f,pedestalPos.getZ(),255,255,255));
+                    return false;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
+
+
+
     public int getDistanceBetweenPoints(BlockPos pointOne, BlockPos posToCompare)
     {
         int x = pointOne.getX();

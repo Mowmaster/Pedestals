@@ -10,6 +10,7 @@ import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Configs.PedestalConfig;
 import com.mowmaster.pedestals.PedestalUtils.References;
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -47,6 +48,29 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
 
     @Override
     public ItemStack getUpgradeDefaultTool() { return new ItemStack(Items.STONE_PICKAXE); }
+
+    @Override
+    public List<String> getUpgradeHUD(BasePedestalBlockEntity pedestal) {
+        List<String> messages = super.getUpgradeHUD(pedestal);
+        if (messages.isEmpty()) {
+            if(PedestalConfig.COMMON.cobbleGeneratorRequireTools.get())
+            {
+                if(pedestal.getActualToolStack().isEmpty())
+                {
+                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                }
+            }
+            if(PedestalConfig.COMMON.cobbleGeneratorDamageTools.get())
+            {
+                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                {
+                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.RED + "Is Broken");
+                }
+            }
+        }
+        return messages;
+    }
 
     public List<ItemStack> getItemsToGenerate(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack blockToBreak) {
         Block generatedBlock = Block.byItem(blockToBreak.getItem());
@@ -118,6 +142,7 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
 
     private int getGeneratorMultiplier(BasePedestalBlockEntity pedestal, ItemStack upgrade, FluidStack fluidStackNeeded, int energyNeeded, int experienceNeeded, DustMagic dustNeeded) {
         int multiplier = Math.max(1, getItemCapacityIncrease(upgrade));
+        boolean damage = canDamageTool(pedestal.getLevel(), pedestal, PedestalConfig.COMMON.cobbleGeneratorDamageTools.get());
         if (!fluidStackNeeded.isEmpty()) {
             FluidStack storedFluid = pedestal.getStoredFluid();
             if (!storedFluid.isFluidEqual(fluidStackNeeded)) {
@@ -140,13 +165,14 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
                 multiplier = Math.min(multiplier, storedDust.getDustAmount() / dustNeeded.getDustAmount());
             }
         }
-        if (PedestalConfig.COMMON.cobbleGeneratorDamageTools.get()) {
+        if (damage) {
             multiplier = Math.min(multiplier, pedestal.getDurabilityRemainingOnInsertedTool());
         }
         return multiplier;
     }
 
     private void consumeFuel(BasePedestalBlockEntity pedestal, FluidStack fluidStackNeeded, int energyNeeded, int experienceNeeded, DustMagic dustNeeded, int multiplier) {
+        boolean damage = canDamageTool(pedestal.getLevel(), pedestal, PedestalConfig.COMMON.cobbleGeneratorDamageTools.get());
         if (!fluidStackNeeded.isEmpty()) {
             FluidStack toRemove = fluidStackNeeded.copy();
             toRemove.setAmount(fluidStackNeeded.getAmount() * multiplier);
@@ -163,49 +189,73 @@ public class ItemUpgradeMaterialGenerator extends ItemUpgradeBase {
             toRemove.setDustAmount(dustNeeded.getDustColor() * multiplier);
             pedestal.removeDust(toRemove, IDustHandler.DustAction.EXECUTE);
         }
-        if (PedestalConfig.COMMON.cobbleGeneratorDamageTools.get()) {
+        if (damage) {
             pedestal.damageInsertedTool(multiplier, false);
         }
     }
 
+    public boolean allowRun(BasePedestalBlockEntity pedestal, boolean damage)
+    {
+        if(PedestalConfig.COMMON.cobbleGeneratorRequireTools.get())
+        {
+            if(pedestal.hasTool())
+            {
+                if(damage)
+                {
+                    return pedestal.damageInsertedTool(1,true);
+                }
+                else return true;
+            }
+            else return false;
+        }
+
+        return true;
+    }
+
     @Override
     public void upgradeAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, ItemStack coin) {
-        ItemStack recipeResult = getGeneratorRecipeResult(level, pedestal, pedestalPos, coin);
-        if (recipeResult.isEmpty()) {
-            if (pedestal.canSpawnParticles()) {
-                MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 50, 50, 50));
+        boolean damage = canDamageTool(pedestal.getLevel(), pedestal, PedestalConfig.COMMON.cobbleGeneratorDamageTools.get());
+        boolean allowrun = allowRun(pedestal, damage);
+
+        if(allowrun)
+        {
+            ItemStack recipeResult = getGeneratorRecipeResult(level, pedestal, pedestalPos, coin);
+            if (recipeResult.isEmpty()) {
+                if (pedestal.canSpawnParticles()) {
+                    MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 50, 50, 50));
+                }
+                return;
             }
-            return;
-        }
 
-        List<ItemStack> getCobbleGenOutputs = getItemsToGenerate(level, pedestal, pedestalPos, recipeResult);
-        if (getCobbleGenOutputs.isEmpty()) {
-            return;
-        }
-
-        FluidStack fluidStackNeeded = MowLibCompoundTagUtils.readFluidStackFromNBT(References.MODID,coin.getTag(),"_fluidStack");
-        int energyNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_energyNeeded");
-        int experienceNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_xpNeeded");
-        DustMagic dustNeeded = DustMagic.getDustMagicInTag(coin.getTag());
-
-        int multiplier = getGeneratorMultiplier(pedestal, coin, fluidStackNeeded, energyNeeded, experienceNeeded, dustNeeded);
-        if (multiplier == 0) {
-            if(pedestal.canSpawnParticles()) {
-                MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 255, 255, 255));
+            List<ItemStack> getCobbleGenOutputs = getItemsToGenerate(level, pedestal, pedestalPos, recipeResult);
+            if (getCobbleGenOutputs.isEmpty()) {
+                return;
             }
-            return;
-        }
 
-        for (ItemStack output : getCobbleGenOutputs) {
-            if (output.isEmpty()) continue;
+            FluidStack fluidStackNeeded = MowLibCompoundTagUtils.readFluidStackFromNBT(References.MODID,coin.getTag(),"_fluidStack");
+            int energyNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_energyNeeded");
+            int experienceNeeded = MowLibCompoundTagUtils.readIntegerFromNBT(References.MODID,coin.getTag(),"_xpNeeded");
+            DustMagic dustNeeded = DustMagic.getDustMagicInTag(coin.getTag());
 
-            if (pedestal.hasSpaceForItem(output)) {
-                int numToAdd = Math.min(output.getCount() * multiplier, output.getMaxStackSize());
-                ItemStack toAdd = output.copy();
-                toAdd.setCount(numToAdd);
-                ItemStack remainder = pedestal.addItemStack(toAdd, false);
-                int fuelConsumedMultiplier = (int)Math.ceil((double)(toAdd.getCount() - remainder.getCount()) / output.getCount());
-                consumeFuel(pedestal, fluidStackNeeded, energyNeeded, experienceNeeded, dustNeeded, fuelConsumedMultiplier);
+            int multiplier = getGeneratorMultiplier(pedestal, coin, fluidStackNeeded, energyNeeded, experienceNeeded, dustNeeded);
+            if (multiplier == 0) {
+                if(pedestal.canSpawnParticles()) {
+                    MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 255, 255, 255));
+                }
+                return;
+            }
+
+            for (ItemStack output : getCobbleGenOutputs) {
+                if (output.isEmpty()) continue;
+
+                if (pedestal.hasSpaceForItem(output)) {
+                    int numToAdd = Math.min(output.getCount() * multiplier, output.getMaxStackSize());
+                    ItemStack toAdd = output.copy();
+                    toAdd.setCount(numToAdd);
+                    ItemStack remainder = pedestal.addItemStack(toAdd, false);
+                    int fuelConsumedMultiplier = (int)Math.ceil((double)(toAdd.getCount() - remainder.getCount()) / output.getCount());
+                    consumeFuel(pedestal, fluidStackNeeded, energyNeeded, experienceNeeded, dustNeeded, fuelConsumedMultiplier);
+                }
             }
         }
     }

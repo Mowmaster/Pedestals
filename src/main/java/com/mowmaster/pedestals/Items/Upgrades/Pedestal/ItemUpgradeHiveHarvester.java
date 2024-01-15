@@ -99,6 +99,21 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
                 messages.add(ChatFormatting.LIGHT_PURPLE + "Needs Dust");
                 messages.add(ChatFormatting.LIGHT_PURPLE + "To Operate");
             }
+            if(PedestalConfig.COMMON.hiveharvester_RequireTools.get())
+            {
+                if(pedestal.getActualToolStack().isEmpty())
+                {
+                    messages.add(ChatFormatting.GRAY + "Needs Tool");
+                }
+            }
+            if(PedestalConfig.COMMON.hiveharvester_DamageTools.get())
+            {
+                if(pedestal.getDurabilityRemainingOnInsertedTool()>0)
+                {
+                    messages.add(ChatFormatting.GRAY + "Inserted Tool");
+                    messages.add(ChatFormatting.RED + "Is Broken");
+                }
+            }
         }
         return messages;
     }
@@ -162,6 +177,24 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
             targetBlockState.getValue(HONEY_LEVEL) >= 5;
     }
 
+    public boolean allowRun(BasePedestalBlockEntity pedestal, boolean damage)
+    {
+        if(PedestalConfig.COMMON.hiveharvester_RequireTools.get())
+        {
+            if(pedestal.hasTool())
+            {
+                if(damage)
+                {
+                    return pedestal.damageInsertedTool(1,true);
+                }
+                else return true;
+            }
+            else return false;
+        }
+
+        return true;
+    }
+
     public boolean harvesterAction(Level level, BasePedestalBlockEntity pedestal, BlockPos targetPos) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if (fakePlayerReference != null && fakePlayerReference.get() != null) {
@@ -169,17 +202,20 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
             BlockPos pedestalPos = pedestal.getPos();
             BlockState targetBlockState = level.getBlockState(targetPos);
             Block targetBlock = targetBlockState.getBlock();
+            boolean damage = canDamageTool(level, pedestal, PedestalConfig.COMMON.hiveharvester_DamageTools.get());
+            boolean allowrun = allowRun(pedestal, damage);
             if (
                 removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestalPos, targetPos), true) &&
                     targetBlock instanceof BeehiveBlock beehiveBlock &&
                     canHarvest(level, targetPos, targetBlockState, targetBlock) &&
-                    passesFilter(pedestal, targetBlock)
+                    passesFilter(pedestal, targetBlock) &&
+                    allowrun
             ) {
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(level, targetPos, targetBlockState, fakePlayer);
                 if (!MinecraftForge.EVENT_BUS.post(e)) {
                     ItemStack toolStack = pedestal.hasItem() ? pedestal.getItemInPedestal() : pedestal.getToolStack();
                     boolean toolStackIsDamageable = toolStack.getItem().isDamageable(toolStack) && toolStack.getMaxStackSize() <= 1;
-                    if (PedestalConfig.COMMON.hiveharvester_DamageTools.get()) {
+                    if (damage) {
                         if (toolStackIsDamageable && !pedestal.damageTool(toolStack, 1, true)) {
                             if (pedestal.canSpawnParticles()) MowLibPacketHandler.sendToNearby(level, pedestalPos, new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR_CENTERED, pedestalPos.getX(), pedestalPos.getY() + 1.0f, pedestalPos.getZ(), 255, 255, 255));
                             return false; // tool does not have sufficient durability
@@ -202,7 +238,7 @@ public class ItemUpgradeHiveHarvester extends ItemUpgradeBase {
                                     }
                                 }
                             }
-                            if (toolStackIsDamageable && PedestalConfig.COMMON.hiveharvester_DamageTools.get()) {
+                            if (toolStackIsDamageable && damage) {
                                 pedestal.damageTool(toolStack, 1, false);
                             }
                             if (pedestal.canSpawnParticles()) {
