@@ -1,0 +1,16 @@
+{
+  "name": "Bottler Upgrade",
+  "icon": "pedestals:upgrade_pedestal_bottler",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Takes Inputs out of an Inventory Below the pedestal, \"Bottles\" Fluids and XP by default, but could also work with Energy and Dust containers too."
+    },
+    {
+      "type": "crafting",
+      "text": "Bottler Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_bottler"
+    }
+  ]
+}

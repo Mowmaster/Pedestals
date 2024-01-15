@@ -1,0 +1,16 @@
+{
+  "name": "Packager Upgrade",
+  "icon": "pedestals:upgrade_pedestal_packager",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Fill the contents of a package"
+    },
+    {
+      "type": "crafting",
+      "text": "Packager Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_packager"
+    }
+  ]
+}

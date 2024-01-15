@@ -1,0 +1,16 @@
+{
+  "name": "Work Locations",
+  "icon": "pedestals:workcard_locations",
+  "category": "pedestals:work_cards",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Allows you to set the locations where the pedestal will work"
+    },
+    {
+      "type": "crafting",
+      "text": "Work Locations",
+      "recipe": "pedestals:work_area/location_card"
+    }
+  ]
+}

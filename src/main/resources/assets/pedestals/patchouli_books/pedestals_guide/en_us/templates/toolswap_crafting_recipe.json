@@ -1,0 +1,28 @@
+{
+  "components": [
+    {
+      "type": "patchouli:header",
+      "text": "#header",
+      "x": -1,
+      "y": -1
+    },
+    {
+      "type": "patchouli:separator",
+      "x": -1,
+      "y": -1
+    },
+    {
+      "type": "patchouli:custom",
+      "x": 1,
+      "y": 22,
+      "class": "com.mowmaster.pedestals.Compat.Patchouli.ComponentToolSwapCraftingRecipe",
+      "recipe_name": "#recipe"
+    },
+    {
+      "type": "patchouli:text",
+      "x": 1,
+      "y": 56,
+      "text": "#text"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "name": "Range Augments",
+  "icon": "pedestals:augment_pedestal_t4_range",
+  "category": "pedestals:augments",
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t1_range"
+    },
+    {
+      "type": "text",
+      "text": "Increases the distance to link pedestals$(2br)$(li)Increases range: 2 Blocks$(li)Maximum allowed: 4"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t2_range"
+    },
+    {
+      "type": "text",
+      "text": "Increases the distance to link pedestals$(2br)$(li)Increases range: 6 Blocks$(li)Maximum allowed: 4"
+    },
+    {
+      "type": "crafting",
+      "recipe2": "pedestals:augments/t3_range"
+    },
+    {
+      "type": "text",
+      "text": "Increases the distance to link pedestals$(2br)$(li)Increases range: 8 Blocks$(li)Maximum allowed: 5"
+    },
+    {
+      "type": "crafting",
+      "recipe": "pedestals:augments/t4_range"
+    },
+    {
+      "type": "text",
+      "text": "Increases the distance to link pedestals$(2br)$(li)Increases range: 8 Blocks$(li)Maximum allowed: 7"
+    }
+  ]
+}

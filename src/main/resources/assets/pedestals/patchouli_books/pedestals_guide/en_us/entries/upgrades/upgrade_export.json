@@ -1,0 +1,16 @@
+{
+  "name": "Export Upgrade",
+  "icon": "pedestals:upgrade_pedestal_export",
+  "category": "pedestals:upgrades",
+  "pages": [
+     {
+      "type": "text",
+      "text": "Exports items/fluids/energy/xp from the Pedestal into the 'Below' Inventory."
+    },
+    {
+      "type": "crafting",
+      "text": "Export Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_export"
+    }
+  ]
+}

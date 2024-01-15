@@ -1,0 +1,18 @@
+{
+  "name": "Tool Swapping",
+  "icon": "pedestals:tool_linkingtoolbackwards",
+  "category": "pedestals:getting_started",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "text",
+      "text": "Tool Swapping was introduced to reduce the total number of unique tools that you need to craft as part of the mod (as there are 14 at the time of writing this entry). Instead, specific tools can swap into other tools in three sets of groupings: linking tools, upgrade tools, and augment tools.$(br2)To perform a tool swap, you must have a specific item held in your mainhand, and then you must perform the \"use item / place block\" action (default key-bind: right click) while holding the shift key down and ensuring to $(bold)not$() hit any in-world block.$(br2)"
+    },
+    {
+      "type": "pedestals:toolswap_crafting_recipe",
+      "header": "Linking Tool",
+      "recipe": "pedestals:tools/tool_swap/linking_swapping/toolswap_backwards_to_linking",
+      "text": "As mentioned, if you previously crafted the Backwards Linking Tool, you can now tool swap to get the Linking Tool.$(br2)You can also swap from the Linking Tool into the Backwards Linking Tool (and back, and forth, and back, and forth)!$(br2)$(br2)"
+    }
+  ]
+}

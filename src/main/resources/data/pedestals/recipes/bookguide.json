@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "result": {
+    "item": "patchouli:guide_book",
+    "nbt": {
+      "patchouli:book": "pedestals:pedestals_guide"
+    },
+    "count": 1
+  },
+  "ingredients": [
+    {
+      "item": "pedestals:tool_upgradetool"
+    },
+    {
+      "item": "minecraft:book"
+    }
+  ]
+}

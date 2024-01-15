@@ -1,23 +1,21 @@
-/*
 package com.mowmaster.pedestals.Compat.Patchouli;
 
 import com.mowmaster.pedestals.Recipes.CobbleGenRecipe;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.Level;
 import vazkii.patchouli.api.IComponentProcessor;
 import vazkii.patchouli.api.IVariable;
 import vazkii.patchouli.api.IVariableProvider;
 
-import java.util.Arrays;
 
 public class MaterialGenProcessor implements IComponentProcessor {
 
     CobbleGenRecipe recipe;
 
     @Override
-    public void setup(IVariableProvider variables) {
-        RecipeManager manager = Minecraft.getInstance().level.getRecipeManager();
+    public void setup(Level level, IVariableProvider variables) {
+        RecipeManager manager = level.getRecipeManager();
         String recipeID = variables.get("recipe").asString();
         try {
             recipe = (CobbleGenRecipe) manager.byKey(new ResourceLocation(recipeID)).orElse(null);
@@ -26,7 +24,7 @@ public class MaterialGenProcessor implements IComponentProcessor {
     }
 
     @Override
-    public IVariable process(String key) {
+    public IVariable process(Level level, String key) {
         if (recipe == null)
             return null;
         if (key.equals("recipe")) {
@@ -56,4 +54,3 @@ public class MaterialGenProcessor implements IComponentProcessor {
         return null;
     }
 }
-*/

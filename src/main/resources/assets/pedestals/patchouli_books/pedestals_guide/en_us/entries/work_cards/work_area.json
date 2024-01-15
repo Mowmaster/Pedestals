@@ -1,0 +1,16 @@
+{
+  "name": "Work Area",
+  "icon": "pedestals:workcard_area",
+  "category": "pedestals:work_cards",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Allows you to do define the area where the pedestal will work"
+    },
+    {
+      "type": "crafting",
+      "text": "Work Area",
+      "recipe": "pedestals:work_area/area_card"
+    }
+  ]
+}

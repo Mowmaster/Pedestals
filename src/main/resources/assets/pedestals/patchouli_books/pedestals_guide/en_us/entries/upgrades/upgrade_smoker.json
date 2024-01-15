@@ -1,0 +1,16 @@
+{
+  "name": "Smoker Upgrade",
+  "icon": "pedestals:upgrade_pedestal_smoker",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Smokes items provided from a 'Below Inventory'"
+    },
+    {
+      "type": "crafting",
+      "text": "Smoker Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_smoker"
+    }
+  ]
+}

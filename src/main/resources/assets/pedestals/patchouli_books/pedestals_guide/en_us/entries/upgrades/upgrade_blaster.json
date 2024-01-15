@@ -1,0 +1,16 @@
+{
+  "name": "Blaster Upgrade",
+  "icon": "pedestals:upgrade_pedestal_blaster",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Acts like a blast furnace and will use items from the inventory below"
+    },
+    {
+      "type": "crafting",
+      "text": "Blaster Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_blaster"
+    }
+  ]
+}

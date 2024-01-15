@@ -1,0 +1,18 @@
+{
+  "name": "Particle and Render Augment",
+  "icon": "pedestals:augment_pedestal_renderdiffuser",
+  "category": "pedestals:augments",
+  "pages": [
+    {
+      "type": "image",
+      "text": "To craft, right click on a piece of paper with a linking wand when its raining outside",
+      "images": [
+        "pedestals:textures/patchouli/augments/round_robin_crafting.png"
+      ]
+    },
+    {
+      "type": "text",
+      "text": "Makes the pedestal tranasfer in order of the first linked to its last. If the pedestal cannot send to another pedestal, it will move to the next one"
+    }
+  ]
+}

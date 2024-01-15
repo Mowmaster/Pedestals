@@ -1,0 +1,16 @@
+{
+  "name": "Smelter Upgrade",
+  "icon": "pedestals:upgrade_pedestal_smelter",
+  "category": "pedestals:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Smelts items provided from a 'Below Inventory'"
+    },
+    {
+      "type": "crafting",
+      "text": "Smelter Upgrade",
+      "recipe": "pedestals:upgrades/upgrade_smelter"
+    }
+  ]
+}

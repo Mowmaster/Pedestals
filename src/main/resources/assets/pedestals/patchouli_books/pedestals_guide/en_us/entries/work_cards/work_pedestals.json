@@ -1,0 +1,16 @@
+{
+  "name": "Pedestal Locations",
+  "icon": "pedestals:workcard_area",
+  "category": "pedestals:work_cards",
+  "pages": [
+    {
+      "type": "text",
+      "text": "Pedestals set the pedestals to use in a operation"
+    },
+    {
+      "type": "crafting",
+      "text": "Pedestal Locations",
+      "recipe": "pedestals:work_area/pedestal_card"
+    }
+  ]
+}
