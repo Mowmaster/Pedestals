@@ -1619,6 +1619,7 @@ public class BasePedestalBlockEntity extends MowLibBaseBlockEntity
         if (getDurabilityRemainingOnInsertedTool() < getToolMaxDurability()) {
             if(!simulate) {
                 getToolStack().setDamageValue(getToolDamageValue() - repairAmount);
+                update();
             }
             return true;
         } else {

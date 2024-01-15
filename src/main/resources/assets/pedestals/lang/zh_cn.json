@@ -86,6 +86,8 @@
     "pedestals.upgrade_modification.upgradeentitystorage": "实体容器目标",
     "pedestals.upgrade_modification.upgraderemotestorage": "远程容器目标",
     "pedestals.upgrade_modification.upgradeoperatetobedrock": "工作到到基岩层",
+    "pedestals.upgrade_modification.upgraderemovedurabilitycost": "消除耐久性成本",
+    "pedestals.upgrade_modification.upgraderepairtool": "维修工具",
     "pedestals.upgrade_modification.separatorone": " +",
     "pedestals.upgrade_modification.separatortwo": " ",
     "pedestals.upgrade_modification.separatorthree": "最大值：",

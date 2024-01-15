@@ -380,6 +380,22 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 player.displayClientMessage(operateToBedrockLabel, false);
             }
         }
+
+        if (canModifyRemoveDurabilityCost(upgrade)) {
+            if (getRemoveDurabilityCost(upgrade)) {
+                MutableComponent upgraderemovedurabilitycost = Component.translatable(MODID + ".upgrade_tooltip_upgraderemovedurabilitycost_label");
+                upgraderemovedurabilitycost.withStyle(ChatFormatting.LIGHT_PURPLE);
+                player.displayClientMessage(upgraderemovedurabilitycost, false);
+            }
+        }
+
+        if (canModifyRepairTool(upgrade)) {
+            if (getRepairTool(upgrade)) {
+                MutableComponent repairtool = Component.translatable(MODID + ".upgrade_tooltip_upgraderepairtool_label");
+                repairtool.withStyle(ChatFormatting.GREEN);
+                player.displayClientMessage(repairtool, false);
+            }
+        }
     }
 
     /*
@@ -2053,6 +2069,32 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
             else {
                 MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_operatetobedrock_allowed",ChatFormatting.DARK_AQUA);
+            }
+        }
+
+        if(canModifyRemoveDurabilityCost(p_41421_))
+        {
+            if(getRemoveDurabilityCost(p_41421_))
+            {
+                MutableComponent removeDurabilityCost = Component.translatable(MODID + ".upgrade_tooltip_upgraderemovedurabilitycost_label");
+                removeDurabilityCost.withStyle(ChatFormatting.LIGHT_PURPLE);
+                p_41423_.add(removeDurabilityCost);
+            }
+            else {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_upgraderemovedurabilitycost_allowed",ChatFormatting.DARK_AQUA);
+            }
+        }
+
+        if(canModifyRepairTool(p_41421_))
+        {
+            if(getRepairTool(p_41421_))
+            {
+                MutableComponent repairTool = Component.translatable(MODID + ".upgrade_tooltip_upgraderepairtool_label");
+                repairTool.withStyle(ChatFormatting.GRAY);
+                p_41423_.add(repairTool);
+            }
+            else {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_upgraderepairtool_allowed",ChatFormatting.DARK_AQUA);
             }
         }
 

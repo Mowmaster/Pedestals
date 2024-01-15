@@ -526,7 +526,6 @@ public class PedestalConfig
             upgrades_baseSelectionRange = builder
                     .comment("The Base Distance from the Pedestal for Upgrade Block Selections to be 'In Range' ")
                     .defineInRange("upgrades_baseSelectionRange", 8, 1, Integer.MAX_VALUE);
-            builder.pop();
             upgrades_baseXPRepairCost = builder
                     .comment("The Base XP Cost (Value, not Levels) to repair 1 durability of a tool")
                     .defineInRange("upgrades_baseSelectionRange", 4, 1, Integer.MAX_VALUE);

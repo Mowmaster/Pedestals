@@ -28,6 +28,8 @@ public class ToolSwapper extends BaseTool implements IPedestalTool {
             ItemStack toolInPedestal = pedestal.getActualToolStack();
             MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE, MODID + ".tool_toolinpedestal");
             MowLibMessageUtils.messagePlayerChatText(player, ChatFormatting.WHITE, toolInPedestal.getDisplayName().getString());
+            MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE, MODID + ".tool_toolinpedestal_durability");
+            MowLibMessageUtils.messagePlayerChatText(player, ChatFormatting.WHITE, ""+ pedestal.getDurabilityRemainingOnInsertedTool() + '/' +pedestal.getToolMaxDurability());
         } else {
             MowLibMessageUtils.messagePlayerChat(player, ChatFormatting.LIGHT_PURPLE, MODID + ".tool_toolinpedestal_not");
         }

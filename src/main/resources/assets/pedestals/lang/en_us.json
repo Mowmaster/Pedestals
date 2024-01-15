@@ -92,6 +92,8 @@
   "pedestals.upgrade_modification.upgradeentitystorage": "Entity Inv. Targeting",
   "pedestals.upgrade_modification.upgraderemotestorage": "Remote Inv. Targeting",
   "pedestals.upgrade_modification.upgradeoperatetobedrock": "Operate to Bedrock",
+  "pedestals.upgrade_modification.upgraderemovedurabilitycost": "Remove Durability Cost",
+  "pedestals.upgrade_modification.upgraderepairtool": "Auto Tool Repair",
   "pedestals.upgrade_modification.separatorone": " +",
   "pedestals.upgrade_modification.separatortwo": " ",
   "pedestals.upgrade_modification.separatorthree": "Max: ",
@@ -235,6 +237,12 @@
   "pedestals.upgrade_tooltip_remotestorage_allowed": "Can Add Remote Inv. Targeting",
   "pedestals.upgrade_tooltip_remotestorage_label": "Has Remote Inv. Targeting",
 
+  "pedestals.upgrade_tooltip_upgraderemovedurabilitycost_allowed": "Can Add Remove Durability Cost",
+  "pedestals.upgrade_tooltip_upgraderemovedurabilitycost_label": "Durability Cost Removed",
+
+  "pedestals.upgrade_tooltip_upgraderepairtool_allowed": "Can Add Tool Auto Repair",
+  "pedestals.upgrade_tooltip_upgraderepairtool_label": "Has Tool Auto Repair using stored Xp",
+
 
   "pedestals.error": "ERROR",
   "pedestals.description_shift": "Press 'Shift' for More Info",
@@ -270,7 +278,9 @@
 
   "pedestals.tool_change": "Tool Changed: ",
   "pedestals.tool_toolinpedestal": "===== Tool In Pedestal =====",
+  "pedestals.tool_toolinpedestal_durability": "===== Tool Durability =====",
   "pedestals.tool_toolinpedestal_not": "No Inserted Tool",
+
   "pedestals.tool_coininpedestal": "===== Upgrade In Pedestal =====",
   "pedestals.tool_coininpedestal_not": "No Inserted Upgrade",
   "pedestals.tool_filterinpedestal_not": "No Inserted Filter",
