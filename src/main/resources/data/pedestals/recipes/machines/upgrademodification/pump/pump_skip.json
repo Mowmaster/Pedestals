@@ -1,0 +1,17 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    {
+      "item": "pedestals:upgrade_pedestal_pump"
+    },
+    {
+      "tag": "minecraft:coals"
+    },
+    {
+      "tag": "minecraft:logs"
+    }
+  ],
+  "resultModificationName": "upgradeskip",
+  "resultModificationValue": 1,
+  "resultModificationMaxValue": 1
+}

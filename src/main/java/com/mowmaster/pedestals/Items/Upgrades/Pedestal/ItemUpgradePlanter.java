@@ -55,6 +55,11 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
     }
 
     @Override
+    public boolean canModifyWorkPositionSkip(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public boolean needsWorkCard(ItemStack upgradeItemStack) { return true; }
 
     @Override
@@ -124,11 +129,11 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
 
         if (hasSuperSpeed(pedestal.getCoinOnPedestal())) {
             for (BlockPos plantAtPos: allPositions) {
-                planterAction(level, pedestal, plantAtPos);
+                planterAction(level, pedestal, plantAtPos,!hasWorkPositionSkip(pedestal.getCoinOnPedestal()));
             }
         } else {
             int currentPosition = getCurrentPosition(pedestal);
-            if (planterAction(level, pedestal, allPositions.get(currentPosition))) {
+            if (planterAction(level, pedestal, allPositions.get(currentPosition),!hasWorkPositionSkip(pedestal.getCoinOnPedestal()))) {
                 if (currentPosition + 1 == allPositions.size()) {
                     setCurrentPosition(pedestal, 0);
                 } else {
@@ -193,7 +198,8 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
         };
     }
 
-    public boolean planterAction(Level level, BasePedestalBlockEntity pedestal, BlockPos targetPos) {
+    //Added Boolean to allow skipping if the condition is valid but it cant work.
+    public boolean planterAction(Level level, BasePedestalBlockEntity pedestal, BlockPos targetPos, Boolean skip) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if (fakePlayerReference != null && fakePlayerReference.get() != null) {
             FakePlayer fakePlayer = fakePlayerReference.get();
@@ -217,6 +223,10 @@ public class ItemUpgradePlanter extends ItemUpgradeBase {
                             MowLibPacketHandler.sendToNearby(pedestal.getLevel(), pedestal.getPos(), new MowLibPacketParticles(MowLibPacketParticles.EffectType.ANY_COLOR, targetPos.getX() + 0.5D, targetPos.getY() + 0.5D, targetPos.getZ() + 0.5D, 100, 255, 100));
                         }
                         return true;
+                    }
+                    else
+                    {
+                        return skip;
                     }
                 } else {
                     return true; // iterate over spots that can't be planted on (needed for the water in the center of most crop farms)

@@ -44,6 +44,11 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
     }
 
     @Override
+    public boolean canModifyWorkPositionSkip(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public boolean canModifyArea(ItemStack upgradeItemStack) { return PedestalConfig.COMMON.upgrade_require_sized_selectable_area.get(); }
 
     @Override
@@ -116,7 +121,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
         if (allPositions.isEmpty()) return;
 
         int currentPosition = getCurrentPosition(pedestal);
-        if (placerAction(level, pedestal, allPositions.get(currentPosition))) {
+        if (placerAction(level, pedestal, allPositions.get(currentPosition),!hasWorkPositionSkip(pedestal.getCoinOnPedestal()))) {
             if (currentPosition + 1 == allPositions.size()) {
                 setCurrentPosition(pedestal, 0);
             } else {
@@ -161,7 +166,7 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
             );
     }
 
-    public boolean placerAction(Level level, BasePedestalBlockEntity pedestal, BlockPos targetPos) {
+    public boolean placerAction(Level level, BasePedestalBlockEntity pedestal, BlockPos targetPos, Boolean skip) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if (fakePlayerReference != null && fakePlayerReference.get() != null) {
             FakePlayer fakePlayer = fakePlayerReference.get();
@@ -183,6 +188,10 @@ public class ItemUpgradeBlockPlacer extends ItemUpgradeBase
                     removeFuelForAction(pedestal, getDistanceBetweenPoints(pedestal.getPos(), targetPos), false);
                     pedestal.removeItemStack(toPlace, false);
                     return true;
+                }
+                else
+                {
+                    return skip;
                 }
             }
             /*

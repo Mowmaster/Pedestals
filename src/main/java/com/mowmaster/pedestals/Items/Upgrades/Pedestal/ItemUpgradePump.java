@@ -49,6 +49,11 @@ public class ItemUpgradePump extends ItemUpgradeBase {
     public boolean canModifyBlockCapacity(ItemStack upgradeItemStack) { return true; }
 
     @Override
+    public boolean canModifyWorkPositionSkip(ItemStack upgradeItemStack) {
+        return true;
+    }
+
+    @Override
     public boolean canModifyRange(ItemStack upgradeItemStack) { return true; }
 
     @Override
@@ -252,7 +257,7 @@ public class ItemUpgradePump extends ItemUpgradeBase {
         int currentMinY = Math.max(currentY - getNumBlocksPerOperation(coin) + 1, getMinY(coin));
         List<BlockPos> adjustedPoints = IntStream.rangeClosed(currentMinY, currentY)
             .mapToObj(y -> new BlockPos(currentPoint.getX(), y, currentPoint.getZ())).toList();
-        if (pedestal.spaceForFluid() >= (FluidType.BUCKET_VOLUME * adjustedPoints.size()) && pumpAction(level, pedestal, pedestalPos, adjustedPoints)) {
+        if (pedestal.spaceForFluid() >= (FluidType.BUCKET_VOLUME * adjustedPoints.size()) && pumpAction(level, pedestal, pedestalPos, adjustedPoints,hasWorkPositionSkip(pedestal.getCoinOnPedestal()))) {
             if (currentPosition + 1 >= allPositions.size()) {
                 setCurrentPosition(coin, 0);
                 if (hasOperateToBedrock(coin)) {
@@ -267,7 +272,7 @@ public class ItemUpgradePump extends ItemUpgradeBase {
         }
     }
 
-    public boolean pumpAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, List<BlockPos> adjustedPoints) {
+    public boolean pumpAction(Level level, BasePedestalBlockEntity pedestal, BlockPos pedestalPos, List<BlockPos> adjustedPoints, Boolean skip) {
         WeakReference<FakePlayer> fakePlayerReference = pedestal.getPedestalPlayer(pedestal);
         if(fakePlayerReference != null && fakePlayerReference.get() != null) {
             FakePlayer fakePlayer = fakePlayerReference.get();
@@ -303,6 +308,10 @@ public class ItemUpgradePump extends ItemUpgradeBase {
                                         if (resultPlace == InteractionResult.CONSUME) {
                                             toRemove.setCount(1); // only remove 1 item
                                             pedestal.removeItemStack(toRemove,false);
+                                        }
+                                        else
+                                        {
+                                            return skip;
                                         }
                                     }
                                 }

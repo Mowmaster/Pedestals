@@ -89,6 +89,7 @@
   "pedestals.upgrade_modification.upgrademagnet": "Magnet Effects",
   "pedestals.upgrade_modification.upgradegentle": "Gentle Harvest",
   "pedestals.upgrade_modification.upgradesuperspeed": "Super Speed",
+  "pedestals.upgrade_modification.upgradeskip": "Workarea Skip (Toggle)",
   "pedestals.upgrade_modification.upgradeentitystorage": "Entity Inv. Targeting",
   "pedestals.upgrade_modification.upgraderemotestorage": "Remote Inv. Targeting",
   "pedestals.upgrade_modification.upgradeoperatetobedrock": "Operate to Bedrock",
@@ -228,6 +229,9 @@
 
   "pedestals.upgrade_tooltip_superspeed_allowed": "Can Add Super Speed",
   "pedestals.upgrade_tooltip_superspeed_label": "Has Super Speed",
+
+  "pedestals.upgrade_tooltip_workareaskip_allowed": "Can Toggle Workarea Skip",
+  "pedestals.upgrade_tooltip_workareaskip_label": "Has Workarea Skip Toggled",
 
   "pedestals.upgrade_tooltip_operatetobedrock_allowed": "Can Add Operate to Bedrock",
   "pedestals.upgrade_tooltip_operatetobedrock_label": "Has Operate to Bedrock",

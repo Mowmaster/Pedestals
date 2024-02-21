@@ -456,6 +456,14 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return ItemStack.EMPTY;
     }
 
+    public boolean hasWorkPositionSkip(ItemStack upgradeStack) {
+        if (canModifyWorkPositionSkip(upgradeStack)) {
+            return getWorkPositionSkip(upgradeStack);
+        } else {
+            return false;
+        }
+    }
+
     public boolean hasSuperSpeed(ItemStack upgradeStack) {
         if (canModifySuperSpeed(upgradeStack)) {
             return getSuperSpeed(upgradeStack);
@@ -2059,6 +2067,20 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             }
         }
 
+        if(canModifyWorkPositionSkip(p_41421_))
+        {
+            if(getWorkPositionSkip(p_41421_))
+            {
+                MutableComponent areaLabel = Component.translatable(MODID + ".upgrade_tooltip_workareaskip_label");
+                areaLabel.withStyle(ChatFormatting.BLUE);
+                p_41423_.add(areaLabel);
+            }
+            else
+            {
+                MowLibTooltipUtils.addTooltipMessageWithStyle(p_41423_,MODID + ".upgrade_tooltip_workareaskip_allowed",ChatFormatting.BLUE);
+            }
+        }
+
         if(canModifyOperateToBedrock(p_41421_))
         {
             if(getOperateToBedrock(p_41421_))
@@ -2327,6 +2349,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean canModifyMagnet(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyGentleHarvest(ItemStack upgradeItemStack) { return false; }
     public boolean canModifySuperSpeed(ItemStack upgradeItemStack) { return false; }
+    public boolean canModifyWorkPositionSkip(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyEntityContainers(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyRemoteStorage(ItemStack upgradeItemStack) { return false; }
     public boolean canModifyOperateToBedrock(ItemStack upgradeItemStack) { return false; }
@@ -2348,6 +2371,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
             case "upgrademagnet" -> canModifyMagnet(upgradeItemStack);
             case "upgradegentle" -> canModifyGentleHarvest(upgradeItemStack);
             case "upgradesuperspeed" -> canModifySuperSpeed(upgradeItemStack);
+            case "upgradeskip" -> canModifyWorkPositionSkip(upgradeItemStack);
             case "upgradeentitystorage" -> canModifyEntityContainers(upgradeItemStack);
             case "upgraderemotestorage" -> canModifyRemoteStorage(upgradeItemStack);
             case "upgradeoperatetobedrock" -> canModifyOperateToBedrock(upgradeItemStack);
@@ -2374,6 +2398,7 @@ public class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public boolean getMagnet(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgrademagnet")>=1; }
     public boolean getGentleHarvest(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradegentle")>=1; }
     public boolean getSuperSpeed(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradesuperspeed")>=1; }
+    public boolean getWorkPositionSkip(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeskip")>=1; }
     public boolean getEntityContainer(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeentitystorage")>=1; }
     public boolean getRemoteStorage(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgraderemotestorage")>=1; }
     public boolean getOperateToBedrock(ItemStack upgradeItemStack) { return MowLibCompoundTagUtils.readIntegerFromNBT(MODID,upgradeItemStack.getOrCreateTag(),"upgradeoperatetobedrock")>=1; }
