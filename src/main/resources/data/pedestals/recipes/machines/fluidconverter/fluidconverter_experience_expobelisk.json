@@ -1,7 +1,7 @@
 {
   "type": "pedestals:fluidconverter",
   "inputFluidStack": {
-    "fluid": "experienceobelisk:raw_experience",
+    "fluid": "experienceobelisk:cognitium",
     "count": 250
   },
   "experience": {
