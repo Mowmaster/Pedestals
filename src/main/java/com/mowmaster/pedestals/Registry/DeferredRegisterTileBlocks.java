@@ -3,6 +3,7 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal.CatStatuePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.GoblinStatuePedestal.GoblinStatuePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.ColorablePedestal.ColorablePedestalBlock;
+import com.mowmaster.pedestals.Blocks.Pedestal.OmegaPedestal.OmegaPedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.RatStatuePedestal.RatStatuePedestalBlock;
 import com.mowmaster.pedestals.PedestalTab.PedestalsTab;
 import net.minecraft.world.item.BlockItem;
@@ -26,6 +27,9 @@ public class DeferredRegisterTileBlocks
 
     public static final RegistryObject<Block> BLOCK_PEDESTAL = registerBlock("block_pedestal",
             () -> new ColorablePedestalBlock(BlockBehaviour.Properties.of(Material.STONE).strength(2.0F).sound(SoundType.STONE)));
+
+    public static final RegistryObject<Block> BLOCK_OMEGAPEDESTAL = registerBlock("block_omegapedestal",
+            () -> new OmegaPedestalBlock(BlockBehaviour.Properties.of(Material.STONE).strength(2.0F).sound(SoundType.STONE)));
 
     public static final RegistryObject<Block> BLOCK_RATSTATUE_PEDESTAL = registerBlock("block_ratstatue_pedestal",
             () -> new RatStatuePedestalBlock(BlockBehaviour.Properties.of(Material.STONE).strength(2.0F).sound(SoundType.STONE)));

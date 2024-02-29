@@ -695,7 +695,9 @@
   "jei.pedestals.upgrade_pedestal_cobblegen.description": "§5Based on the 'Below' Block and Inserted Tool, will generate items putting the outputs in the pedestal.",
 
   "block.pedestals.block_pedestal": "Pedestal",
-  "jei.pedestals.block_pedestal.description": "§5Can Transport Items, Fluids, Energy, and XP. §3Offhand Dye and Right Click to Color",
+  "jei.pedestals.block_pedestal.description": "§5Can Transport Items and be Augmented to transport Fluids, Energy, and XP. §3Offhand Dye and Right Click to Color",
+  "block.pedestals.block_omegapedestal": "Omega Pedestal",
+  "jei.pedestals.block_omegapedestal.description": "§5Can Transport Items, Fluids, Energy, and XP. §3Offhand Dye and Right Click to Color",
   "block.pedestals.block_ratstatue_pedestal": "Rat-estal",
   "jei.pedestals.block_ratstatue_pedestal.description": "§5Its a pedestal, but it looks like a rat! (made for https://www.twitch.tv/boba) §3Offhand Dye and Right Click to Color",
   "block.pedestals.block_catstatue_pedestal": "Cat-estal",

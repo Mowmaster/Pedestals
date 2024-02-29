@@ -4,6 +4,7 @@ package com.mowmaster.pedestals.Registry;
 import com.mowmaster.pedestals.Blocks.Pedestal.CatStatuePedestal.CatStatuePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.ColorablePedestal.ColorablePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.GoblinStatuePedestal.GoblinStatuePedestalBlockEntity;
+import com.mowmaster.pedestals.Blocks.Pedestal.OmegaPedestal.OmegaPedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.RatStatuePedestal.RatStatuePedestalBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
@@ -21,6 +22,11 @@ public class DeferredBlockEntityTypes
     public static final RegistryObject<BlockEntityType<ColorablePedestalBlockEntity>> PEDESTAL = BLOCK_ENTITIES.register(
             "block_entity_pedestal",
             () -> BlockEntityType.Builder.of(ColorablePedestalBlockEntity::new, DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get()).build(null));
+
+
+    public static final RegistryObject<BlockEntityType<OmegaPedestalBlockEntity>> OMEGAPEDESTAL = BLOCK_ENTITIES.register(
+            "block_entity_omegapedestal",
+            () -> BlockEntityType.Builder.of(OmegaPedestalBlockEntity::new, DeferredRegisterTileBlocks.BLOCK_OMEGAPEDESTAL.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<RatStatuePedestalBlockEntity>> RATSTATUE_PEDESTAL = BLOCK_ENTITIES.register(
             "block_entity_ratstatue_pedestal",

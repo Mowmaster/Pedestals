@@ -114,6 +114,9 @@ public class ClientRegistry
         {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get());
 
         event.register((stack, color) ->
+        {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_OMEGAPEDESTAL.get());
+
+        event.register((stack, color) ->
         {if (color == 1) {return MowLibColorReference.getColorFromItemStackInt(stack);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_RATSTATUE_PEDESTAL.get());
 
         event.register((stack, color) ->
@@ -129,6 +132,9 @@ public class ClientRegistry
 
         event.register((blockstate, blockReader, blockPos, color) ->
         {if (color == 1) {return MowLibColorReference.getColorFromStateInt(blockstate);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_PEDESTAL.get());
+
+        event.register((blockstate, blockReader, blockPos, color) ->
+        {if (color == 1) {return MowLibColorReference.getColorFromStateInt(blockstate);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_OMEGAPEDESTAL.get());
 
         event.register((blockstate, blockReader, blockPos, color) ->
         {if (color == 1) {return MowLibColorReference.getColorFromStateInt(blockstate);} else {return -1;}}, DeferredRegisterTileBlocks.BLOCK_RATSTATUE_PEDESTAL.get());
@@ -180,6 +186,7 @@ public class ClientRegistry
     public static void registerBlockEntityRenderers()
     {
         BlockEntityRenderers.register(DeferredBlockEntityTypes.PEDESTAL.get(), BasePedestalBlockEntityRenderer::new);
+        BlockEntityRenderers.register(DeferredBlockEntityTypes.OMEGAPEDESTAL.get(), BasePedestalBlockEntityRenderer::new);
         BlockEntityRenderers.register(DeferredBlockEntityTypes.RATSTATUE_PEDESTAL.get(), RatStatuePedestalBlockEntityRenderer::new);
         BlockEntityRenderers.register(DeferredBlockEntityTypes.CATSTATUE_PEDESTAL.get(), CatStatuePedestalBlockEntityRenderer::new);
         BlockEntityRenderers.register(DeferredBlockEntityTypes.GOBLINSTATUE_PEDESTAL.get(), GoblinStatuePedestalBlockEntityRenderer::new);
