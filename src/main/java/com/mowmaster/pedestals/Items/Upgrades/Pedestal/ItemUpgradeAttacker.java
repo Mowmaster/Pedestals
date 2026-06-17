@@ -51,6 +51,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.mowmaster.pedestals.PedestalUtils.References.MODID;
+import com.mowmaster.pedestals.api.ModDamageTypes;
 
 public class ItemUpgradeAttacker extends ItemUpgradeBase
 {
@@ -323,69 +324,13 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                     }
 
                     Vec3 vec3 = toAttack.getDeltaMovement();
-                    List<String> list = Arrays.asList("pedestal1", "pedestal2", "pedestal3", "pedestal4", "pedestal5", "pedestal6", "pedestal7", "pedestal8", "pedestal9", "pedestal10", "pedestal11", "pedestal12");
-                    Random rn = new Random();
-                    Holder<DamageType> type = new Holder<DamageType>() {
-                        @Override
-                        public DamageType value() {
-                            return new DamageType(list.get(rn.nextInt(list.size())),0.5F);
-                        }
 
-                        @Override
-                        public boolean isBound() {
-                            return false;
-                        }
+                    // DamageSource source = new DamageSource(type,player);
 
-                        @Override
-                        public boolean is(ResourceLocation p_205713_) {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean is(ResourceKey<DamageType> p_205712_) {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean is(Predicate<ResourceKey<DamageType>> p_205711_) {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean is(TagKey<DamageType> p_205705_) {
-                            return false;
-                        }
-
-                        @Override
-                        public Stream<TagKey<DamageType>> tags() {
-                            return null;
-                        }
-
-                        @Override
-                        public Either<ResourceKey<DamageType>, DamageType> unwrap() {
-                            return null;
-                        }
-
-                        @Override
-                        public Optional<ResourceKey<DamageType>> unwrapKey() {
-                            return Optional.empty();
-                        }
-
-                        @Override
-                        public Kind kind() {
-                            return null;
-                        }
-
-                        @Override
-                        public boolean canSerializeIn(HolderOwner<DamageType> p_255833_) {
-                            return false;
-                        }
-                    };
-
-                    DamageSource source = new DamageSource(type,player);
-
-                    //DamageSource source = new EntityDamageSource(list.get(rn.nextInt(list.size())), player);
-                    boolean flag5 = toAttack.hurt(source, damageFloat+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 1.0F));
+                    // DamageSource source = new EntityDamageSource("", player);
+                    // player.attack(p_36347_);
+                    boolean flag5 = ModDamageTypes.pedestal(player, toAttack, damageFloat+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 1.0F));
+                    // boolean flag5 = toAttack.hurt(source, damageFloat+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 1.0F));
                     if (flag5) {
                         if (i > 0) {
                             if (toAttack instanceof LivingEntity) {
@@ -404,7 +349,8 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
                             for(LivingEntity livingentity : player.level().getEntitiesOfClass(LivingEntity.class, player.getItemInHand(InteractionHand.MAIN_HAND).getSweepHitBox(player, toAttack))) {
                                 if (livingentity != player && livingentity != toAttack && !player.isAlliedTo(livingentity) && (!(livingentity instanceof ArmorStand) || !((ArmorStand)livingentity).isMarker()) && player.canAttack(livingentity)) { // Original check was dist < 3, range is 3, so vanilla used padding=0
                                     livingentity.knockback((double)0.4F, (double)Mth.sin(player.getYRot() * ((float)Math.PI / 180F)), (double)(-Mth.cos(player.getYRot() * ((float)Math.PI / 180F))));
-                                    livingentity.hurt(source, f3+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 0.5F));
+                                    // livingentity.hurt(source, f3+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 0.5F));
+                                    ModDamageTypes.pedestal(player, livingentity, f3+(getDamageCapacityIncrease(pedestal.getCoinOnPedestal()) * 0.5F));
                                 }
                             }
 
