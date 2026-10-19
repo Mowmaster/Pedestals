@@ -1,9 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "blockBelow": {
-    "item": "minecraft:polished_diorite"
-  },
-  "result": {
-    "item": "minecraft:diorite"
-  }
-}

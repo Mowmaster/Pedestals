@@ -1,9 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "blockBelow": {
-    "item": "minecraft:tuff"
-  },
-  "result": {
-    "item": "minecraft:tuff"
-  }
-}

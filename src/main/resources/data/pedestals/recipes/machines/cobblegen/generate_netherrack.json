@@ -1,9 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "blockBelow": {
-    "item": "minecraft:nether_bricks"
-  },
-  "result": {
-    "item": "minecraft:netherrack"
-  }
-}

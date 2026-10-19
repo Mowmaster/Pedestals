@@ -1,9 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "blockBelow": {
-    "item": "minecraft:big_dripleaf"
-  },
-  "result": {
-    "item": "minecraft:dripstone_block"
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "type": "mowlib:toolswapcrafting",
-  "mainhandTool": {
-    "item": "pedestals:tool_augments_roundrobin"
-  },
-  "result": {
-    "item": "pedestals:tool_augments_collide"
-  }
-}

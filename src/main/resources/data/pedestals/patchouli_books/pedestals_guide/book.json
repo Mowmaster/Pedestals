@@ -1,9 +1,0 @@
-{
-  "name": "pedestal.book.name",
-  "landing_text": "pedestal.book.landing.text",
-  "version": 2,
-  "i18n": true,
-  "use_blocky_font": true,
-  "use_resource_pack": true,
-  "show_progress": false
-}

@@ -1,9 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "blockBelow": {
-    "item": "minecraft:rooted_dirt"
-  },
-  "result": {
-    "item": "minecraft:podzol"
-  }
-}
