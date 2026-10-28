@@ -1,13 +1,4 @@
 {
-  "itemGroup.projectcookbook": "Example Mod Tab",
-  "block.projectcookbook.example_block": "Example Block",
-  "item.projectcookbook.example_item": "Example Item",
+  "itemGroup.pedestals": "Pedestals"
 
-  "projectcookbook.configuration.title": "ProjectCookbook Configs",
-  "projectcookbook.configuration.section.projectcookbook.common.toml": "ProjectCookbook Configs",
-  "projectcookbook.configuration.section.projectcookbook.common.toml.title": "ProjectCookbook Configs",
-  "projectcookbook.configuration.items": "Item List",
-  "projectcookbook.configuration.logDirtBlock": "Log Dirt Block",
-  "projectcookbook.configuration.magicNumberIntroduction": "Magic Number Text",
-  "projectcookbook.configuration.magicNumber": "Magic Number"
 }
