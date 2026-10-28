@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_import",
+    "#c:gems/emerald",
+    "minecraft:bucket"
+  ],
+  "modifier": "upgradefluidcapacity",
+  "value": 4000,
+  "max": 64000
+}

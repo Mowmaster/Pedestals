@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:fluid",
+      "value": "minecraft:milk"
+    }
+  ],
+  "type": "pedestals:unbottler",
+  "input": "minecraft:milk_bucket",
+  "fluid": {
+    "id": "minecraft:milk",
+    "amount": 1000
+  },
+  "result": {
+    "id": "minecraft:bucket"
+  }
+}

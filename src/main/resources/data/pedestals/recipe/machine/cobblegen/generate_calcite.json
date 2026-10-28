@@ -1,0 +1,7 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:amethyst_block",
+  "result": {
+    "id": "minecraft:calcite"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_smelter",
+    "#c:gems/diamond",
+    "minecraft:obsidian"
+  ],
+  "modifier": "upgradespeed",
+  "value": 5,
+  "max": 200
+}

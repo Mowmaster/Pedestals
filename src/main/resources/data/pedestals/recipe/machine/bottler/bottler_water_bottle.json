@@ -1,0 +1,16 @@
+{
+  "type": "pedestals:bottler",
+  "input": "minecraft:glass_bottle",
+  "fluid": {
+    "ingredient": "minecraft:water",
+    "amount": 250
+  },
+  "result": {
+    "id": "minecraft:potion",
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "minecraft:water"
+      }
+    }
+  }
+}

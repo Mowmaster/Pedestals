@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_export",
+    "#c:storage_blocks/emerald",
+    "#c:chests/wooden"
+  ],
+  "modifier": "upgradeitemcapacity",
+  "value": 16,
+  "max": 64
+}

@@ -1,0 +1,14 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mysticalagriculture"
+    }
+  ],
+  "type": "pedestals:unbottler",
+  "input": "mysticalagriculture:experience_droplet",
+  "experience": 12,
+  "result": {
+    "id": "minecraft:"
+  }
+}

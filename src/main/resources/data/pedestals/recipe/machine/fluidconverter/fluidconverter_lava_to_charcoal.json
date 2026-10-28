@@ -1,0 +1,12 @@
+{
+  "type": "pedestals:fluidconverter",
+  "fluid": {
+    "ingredient": "minecraft:lava",
+    "amount": 1000
+  },
+  "experience": 1,
+  "result": {
+    "id": "minecraft:charcoal",
+    "count": 12
+  }
+}

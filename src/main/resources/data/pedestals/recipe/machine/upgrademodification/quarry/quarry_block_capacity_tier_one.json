@@ -1,0 +1,12 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_quarry",
+    "#c:gems/emerald",
+    "minecraft:crying_obsidian",
+    "minecraft:obsidian"
+  ],
+  "modifier": "upgradeblockcapacity",
+  "value": 4,
+  "max": 64
+}

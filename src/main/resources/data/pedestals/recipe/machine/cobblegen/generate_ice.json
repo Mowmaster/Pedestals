@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:packed_ice",
+  "fluid": {
+    "ingredient": "minecraft:water",
+    "amount": 1000
+  },
+  "result": {
+    "id": "minecraft:ice"
+  }
+}

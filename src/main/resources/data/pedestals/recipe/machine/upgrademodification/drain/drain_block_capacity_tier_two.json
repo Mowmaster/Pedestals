@@ -1,0 +1,12 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_drain",
+    "#c:storage_blocks/emerald",
+    "minecraft:crying_obsidian",
+    "minecraft:obsidian"
+  ],
+  "modifier": "upgradeblockcapacity",
+  "value": 16,
+  "max": 64
+}

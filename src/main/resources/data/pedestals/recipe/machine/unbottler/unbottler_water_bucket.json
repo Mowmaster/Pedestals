@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:unbottler",
+  "input": "minecraft:water_bucket",
+  "fluid": {
+    "id": "minecraft:water",
+    "amount": 1000
+  },
+  "result": {
+    "id": "minecraft:bucket"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "cyclic"
+    }
+  ],
+  "type": "pedestals:fluidconverter",
+  "fluid": {
+    "ingredient": "cyclic:xpjuice",
+    "amount": 250
+  },
+  "experience": 11
+}

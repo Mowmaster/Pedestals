@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:bottler",
+  "input": "minecraft:bucket",
+  "fluid": {
+    "ingredient": "minecraft:water",
+    "amount": 1000
+  },
+  "result": {
+    "id": "minecraft:water_bucket"
+  }
+}

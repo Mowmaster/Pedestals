@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_export",
+    "minecraft:nether_star",
+    "minecraft:wither_skeleton_skull"
+  ],
+  "modifier": "upgradeentitystorage",
+  "value": 1,
+  "max": 1
+}

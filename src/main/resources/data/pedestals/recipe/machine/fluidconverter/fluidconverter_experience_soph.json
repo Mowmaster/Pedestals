@@ -1,0 +1,14 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "sophisticatedcore"
+    }
+  ],
+  "type": "pedestals:fluidconverter",
+  "fluid": {
+    "ingredient": "sophisticatedcore:xp_still",
+    "amount": 250
+  },
+  "experience": 11
+}

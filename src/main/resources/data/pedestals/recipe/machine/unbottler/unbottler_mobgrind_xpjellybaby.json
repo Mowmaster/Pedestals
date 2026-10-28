@@ -1,0 +1,14 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mob_grinding_utils"
+    }
+  ],
+  "type": "pedestals:unbottler",
+  "input": "mob_grinding_utils:solid_xp_baby",
+  "experience": 12,
+  "result": {
+    "id": "minecraft:"
+  }
+}

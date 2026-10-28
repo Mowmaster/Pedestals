@@ -1,0 +1,7 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:big_dripleaf",
+  "result": {
+    "id": "minecraft:dripstone_block"
+  }
+}
