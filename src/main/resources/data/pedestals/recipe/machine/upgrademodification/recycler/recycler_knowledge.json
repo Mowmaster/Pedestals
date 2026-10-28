@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_recycler",
+    "pedestals:mechanical_storage_xp",
+    "minecraft:enchanted_book"
+  ],
+  "modifier": "upgradeknowledge",
+  "value": 1,
+  "max": 10
+}

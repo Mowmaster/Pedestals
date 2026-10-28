@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_recycler",
+    "minecraft:nether_star",
+    "minecraft:diamond_pickaxe"
+  ],
+  "modifier": "upgradedropchance",
+  "value": 1,
+  "max": 10
+}

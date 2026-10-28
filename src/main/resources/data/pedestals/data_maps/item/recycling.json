@@ -1,0 +1,869 @@
+{
+  "values": {
+    "minecraft:bow": {
+      "results": [
+        {
+          "id": "minecraft:stick",
+          "count": 3
+        },
+        {
+          "id": "minecraft:string",
+          "count": 3
+        }
+      ]
+    },
+    "minecraft:brush": {
+      "results": [
+        {
+          "id": "minecraft:feather"
+        },
+        {
+          "id": "minecraft:copper_ingot"
+        },
+        {
+          "id": "minecraft:stick"
+        }
+      ]
+    },
+    "minecraft:carrot_on_a_stick": {
+      "results": [
+        {
+          "id": "minecraft:fishing_rod"
+        },
+        {
+          "id": "minecraft:carrot"
+        }
+      ]
+    },
+    "minecraft:copper_axe": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:copper_boots": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot",
+          "count": 4
+        }
+      ]
+    },
+    "minecraft:copper_chestplate": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot",
+          "count": 8
+        }
+      ]
+    },
+    "minecraft:copper_helmet": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot",
+          "count": 5
+        }
+      ]
+    },
+    "minecraft:copper_hoe": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:copper_leggings": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot",
+          "count": 7
+        }
+      ]
+    },
+    "minecraft:copper_pickaxe": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:copper_shovel": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:copper_spear": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:copper_sword": {
+      "results": [
+        {
+          "id": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick"
+        }
+      ]
+    },
+    "minecraft:crossbow": {
+      "results": [
+        {
+          "id": "minecraft:stick",
+          "count": 3
+        },
+        {
+          "id": "minecraft:iron_ingot"
+        },
+        {
+          "id": "minecraft:string",
+          "count": 2
+        },
+        {
+          "id": "minecraft:tripwire_hook"
+        }
+      ]
+    },
+    "minecraft:diamond_axe": {
+      "results": [
+        {
+          "id": "minecraft:diamond",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:diamond_boots": {
+      "results": [
+        {
+          "id": "minecraft:diamond",
+          "count": 4
+        }
+      ]
+    },
+    "minecraft:diamond_chestplate": {
+      "results": [
+        {
+          "id": "minecraft:diamond",
+          "count": 8
+        }
+      ]
+    },
+    "minecraft:diamond_helmet": {
+      "results": [
+        {
+          "id": "minecraft:diamond",
+          "count": 5
+        }
+      ]
+    },
+    "minecraft:diamond_hoe": {
+      "results": [
+        {
+          "id": "minecraft:diamond",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:diamond_leggings": {
+      "results": [
+        {
+          "id": "minecraft:diamond",
+          "count": 7
+        }
+      ]
+    },
+    "minecraft:diamond_pickaxe": {
+      "results": [
+        {
+          "id": "minecraft:diamond",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:diamond_shovel": {
+      "results": [
+        {
+          "id": "minecraft:diamond"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:diamond_spear": {
+      "results": [
+        {
+          "id": "minecraft:diamond"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:diamond_sword": {
+      "results": [
+        {
+          "id": "minecraft:diamond",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick"
+        }
+      ]
+    },
+    "minecraft:fishing_rod": {
+      "results": [
+        {
+          "id": "minecraft:stick",
+          "count": 3
+        },
+        {
+          "id": "minecraft:string",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:flint_and_steel": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot"
+        },
+        {
+          "id": "minecraft:flint"
+        }
+      ]
+    },
+    "minecraft:golden_axe": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:golden_boots": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot",
+          "count": 4
+        }
+      ]
+    },
+    "minecraft:golden_chestplate": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot",
+          "count": 8
+        }
+      ]
+    },
+    "minecraft:golden_helmet": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    "minecraft:golden_hoe": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:golden_leggings": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot",
+          "count": 7
+        }
+      ]
+    },
+    "minecraft:golden_pickaxe": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:golden_shovel": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:golden_spear": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:golden_sword": {
+      "results": [
+        {
+          "id": "minecraft:gold_ingot",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick"
+        }
+      ]
+    },
+    "minecraft:iron_axe": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:iron_boots": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 4
+        }
+      ]
+    },
+    "minecraft:iron_chestplate": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 8
+        }
+      ]
+    },
+    "minecraft:iron_helmet": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 5
+        }
+      ]
+    },
+    "minecraft:iron_hoe": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:iron_leggings": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 7
+        }
+      ]
+    },
+    "minecraft:iron_pickaxe": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:iron_shovel": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:iron_spear": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:iron_sword": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick"
+        }
+      ]
+    },
+    "minecraft:leather_boots": {
+      "results": [
+        {
+          "id": "minecraft:leather",
+          "count": 4
+        }
+      ]
+    },
+    "minecraft:leather_chestplate": {
+      "results": [
+        {
+          "id": "minecraft:leather",
+          "count": 8
+        }
+      ]
+    },
+    "minecraft:leather_helmet": {
+      "results": [
+        {
+          "id": "minecraft:leather",
+          "count": 5
+        }
+      ]
+    },
+    "minecraft:leather_leggings": {
+      "results": [
+        {
+          "id": "minecraft:leather",
+          "count": 7
+        }
+      ]
+    },
+    "minecraft:mace": {
+      "results": [
+        {
+          "id": "minecraft:heavy_core"
+        },
+        {
+          "id": "minecraft:breeze_rod"
+        }
+      ]
+    },
+    "minecraft:netherite_axe": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_boots": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond",
+          "count": 4
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_chestplate": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond",
+          "count": 8
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_helmet": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond",
+          "count": 5
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_hoe": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_leggings": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond",
+          "count": 7
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_pickaxe": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_shovel": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_spear": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:netherite_sword": {
+      "results": [
+        {
+          "id": "minecraft:netherite_ingot"
+        },
+        {
+          "id": "minecraft:diamond",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick"
+        },
+        {
+          "id": "minecraft:netherite_upgrade_smithing_template"
+        }
+      ]
+    },
+    "minecraft:shears": {
+      "results": [
+        {
+          "id": "minecraft:iron_ingot",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:shield": {
+      "results": [
+        {
+          "id": "minecraft:oak_planks",
+          "count": 6
+        },
+        {
+          "id": "minecraft:iron_ingot"
+        }
+      ]
+    },
+    "minecraft:stone_axe": {
+      "results": [
+        {
+          "id": "minecraft:cobblestone",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:stone_hoe": {
+      "results": [
+        {
+          "id": "minecraft:cobblestone",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:stone_pickaxe": {
+      "results": [
+        {
+          "id": "minecraft:cobblestone",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:stone_shovel": {
+      "results": [
+        {
+          "id": "minecraft:cobblestone"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:stone_spear": {
+      "results": [
+        {
+          "id": "minecraft:cobblestone"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:stone_sword": {
+      "results": [
+        {
+          "id": "minecraft:cobblestone",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick"
+        }
+      ]
+    },
+    "minecraft:turtle_helmet": {
+      "results": [
+        {
+          "id": "minecraft:turtle_scute",
+          "count": 5
+        }
+      ]
+    },
+    "minecraft:warped_fungus_on_a_stick": {
+      "results": [
+        {
+          "id": "minecraft:fishing_rod"
+        },
+        {
+          "id": "minecraft:warped_fungus"
+        }
+      ]
+    },
+    "minecraft:wolf_armor": {
+      "results": [
+        {
+          "id": "minecraft:armadillo_scute",
+          "count": 6
+        }
+      ]
+    },
+    "minecraft:wooden_axe": {
+      "results": [
+        {
+          "id": "minecraft:oak_planks",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:wooden_hoe": {
+      "results": [
+        {
+          "id": "minecraft:oak_planks",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:wooden_pickaxe": {
+      "results": [
+        {
+          "id": "minecraft:oak_planks",
+          "count": 3
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:wooden_shovel": {
+      "results": [
+        {
+          "id": "minecraft:oak_planks"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:wooden_spear": {
+      "results": [
+        {
+          "id": "minecraft:oak_planks"
+        },
+        {
+          "id": "minecraft:stick",
+          "count": 2
+        }
+      ]
+    },
+    "minecraft:wooden_sword": {
+      "results": [
+        {
+          "id": "minecraft:oak_planks",
+          "count": 2
+        },
+        {
+          "id": "minecraft:stick"
+        }
+      ]
+    }
+  }
+}
