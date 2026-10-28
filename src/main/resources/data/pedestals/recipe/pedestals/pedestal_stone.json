@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": "minecraft:stone",
+    "L": "#pedestals:linkingtools",
+    "S": "minecraft:stone_slab"
+  },
+  "pattern": [
+    "SLS",
+    " B ",
+    "BBB"
+  ],
+  "result": {
+    "components": {
+      "minecraft:dyed_color": 11184810
+    },
+    "id": "pedestals:block_pedestal"
+  }
+}

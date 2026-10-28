@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.QOLHandler;
 
 import com.mowmaster.pedestals.Blocks.BlockRegistry;
+import com.mowmaster.pedestals.Items.ItemRegistry;
 import com.mowmaster.pedestals.PedestalReferences;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
@@ -21,11 +22,15 @@ public class CreativeTabRegistry
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, PedestalReferences.MODID);
 
 
-    // The plain pedestal, then one pre-dyed pedestal per dye colour (the colour rides on the item's dyed_color)
+    // Tools, filters, the plain pedestal, then one pre-dyed pedestal per dye colour (the colour rides on dyed_color)
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> PEDESTALS_TAB = TABS.register("pedestals", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.pedestals"))
             .icon(() -> new ItemStack(BlockRegistry.BLOCK_PEDESTAL.get()))
             .displayItems((parameters, output) -> {
+                output.accept(ItemRegistry.TOOL_LINKINGTOOL.get());
+                output.accept(ItemRegistry.TOOL_LINKINGTOOLBACKWARDS.get());
+                output.accept(ItemRegistry.TOOL_FILTERTOOL.get());
+                ItemRegistry.FILTERS.forEach(filter -> output.accept(filter.get()));
                 output.accept(BlockRegistry.BLOCK_PEDESTAL.get());
                 for (DyeColor dye : DyeColor.values())
                 {

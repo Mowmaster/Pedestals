@@ -4,7 +4,9 @@ import com.mojang.logging.LogUtils;
 import com.mowmaster.pedestals.Blocks.BlockRegistry;
 import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.pedestals.Items.ItemRegistry;
+import com.mowmaster.pedestals.Items.PedestalDataComponents;
 import com.mowmaster.pedestals.QOLHandler.CreativeTabRegistry;
+import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -21,6 +23,8 @@ public class pedestals {
     // FML passes the mod event bus and container in automatically
     public pedestals(IEventBus modEventBus, ModContainer modContainer) {
         // Each DeferredRegister has to be hooked to the mod bus, or nothing in it gets registered
+        PedestalTransportTypes.register(modEventBus);
+        PedestalDataComponents.register(modEventBus);
         ItemRegistry.register(modEventBus);
         BlockRegistry.register(modEventBus);
         libBlockEntityRegistry.register(modEventBus);

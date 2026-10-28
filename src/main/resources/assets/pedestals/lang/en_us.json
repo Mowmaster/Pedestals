@@ -1,4 +1,56 @@
 {
   "itemGroup.pedestals": "Pedestals",
-  "block.pedestals.block_pedestal": "Pedestal"
+  "block.pedestals.block_pedestal": "Pedestal",
+
+  "item.pedestals.tool_linkingtool": "Linking Tool",
+  "item.pedestals.tool_linkingtoolbackwards": "Backwards Linking Tool",
+  "item.pedestals.tool_filter": "Filter Tool",
+
+  "item.pedestals.filter_base": "Filter Base",
+  "item.pedestals.filter_item": "Item Filter",
+  "item.pedestals.filter_itemstack": "Itemstack Filter",
+  "item.pedestals.filter_mod": "Mod Filter",
+  "item.pedestals.filter_restricted": "Restricted Filter",
+  "item.pedestals.filter_durability": "Durability Filter",
+  "item.pedestals.filter_enchanted": "isEnchanted Filter",
+  "item.pedestals.filter_enchantedcount": "Enchanted Count Filter",
+  "item.pedestals.filter_enchantedexact": "Enchanted Exact Filter",
+  "item.pedestals.filter_enchantedfuzzy": "Enchanted Fuzzy Filter",
+  "item.pedestals.filter_food": "Food Filter",
+
+  "transport_type.pedestals.items": "Items",
+  "transport_type.pedestals.fluids": "Fluids",
+  "transport_type.pedestals.energy": "Energy",
+  "transport_type.pedestals.experience": "Experience",
+
+  "pedestals.pedestal.message_energy": "Energy",
+  "pedestals.pedestal.message_experience": "Experience",
+
+  "pedestals.filter_direction.insert": "Inserting",
+  "pedestals.filter_direction.extract": "Extracting",
+  "pedestals.filter_direction.neutral": "Machines",
+  "pedestals.filter.tooltip_filterdirection": "Filter applies on ",
+  "pedestals.tooltip_mode": "Mode: ",
+  "pedestals.filter_type": "Filter Type: ",
+  "pedestals.filter_type_whitelist": "Whitelist",
+  "pedestals.filter_type_blacklist": "Blacklist",
+  "pedestals.filter_type_above": "Durability Above",
+  "pedestals.filter_type_below": "Durability Below",
+  "pedestals.filter_type_changed": "Filter Type Change: ",
+  "pedestals.filter_mode_changed": "Filter Mode: ",
+  "pedestals.filter_changed": "Filter Changed",
+  "pedestals.filter.message_twohanded": "Cannot Be Holding Filters in Both Hands for this Action",
+  "pedestals.tool_filter_missing": "Pedestal Does Not Have A Filter",
+
+  "pedestals.tool_link_success_linkingtool": "Linked Successfully, Sending to Receiver",
+  "pedestals.tool_link_success_backwardslinkingtool": "Linked Successfully, Receiving from Sender",
+  "pedestals.tool_link_unsucess": "Linking Failed, Max Connections Reached",
+  "pedestals.tool_link_removed": "Connection Removed",
+  "pedestals.tool_link_itsself": "Cannot be Linked to Itself",
+  "pedestals.tool_link_distance": "Linking Failed, Out of Range",
+  "pedestals.tool_link_start_linkingtool": "Receiver Pedestal Position has been saved.",
+  "pedestals.tool_link_start_backwardslinkingtool": "Sender Pedestal Position has been saved.",
+  "pedestals.tool_link_cleared": "Saved Position Cleared",
+  "pedestals.tool_tip_block_selected": "Block Selected: ",
+  "pedestals.tool_tip_block_unselected": "No Selection"
 }

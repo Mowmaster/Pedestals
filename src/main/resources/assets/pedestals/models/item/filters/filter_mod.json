@@ -1,0 +1,7 @@
+{
+  "parent": "pedestals:item/filters/filter_template",
+  "textures": {
+    "frame": "pedestals:item/filters/filteritemdefault",
+    "icon": "pedestals:item/filters/filtermod"
+  }
+}

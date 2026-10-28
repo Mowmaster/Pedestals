@@ -1,0 +1,41 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "pedestals:filter_mode",
+    "cases": [
+      {
+        "when": "pedestals:items",
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/filters/filter_food_items"
+        }
+      },
+      {
+        "when": "pedestals:fluids",
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/filters/filter_food_fluids"
+        }
+      },
+      {
+        "when": "pedestals:energy",
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/filters/filter_food_energy"
+        }
+      },
+      {
+        "when": "pedestals:experience",
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/filters/filter_food_experience"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "pedestals:item/filters/filter_food"
+    }
+  }
+}

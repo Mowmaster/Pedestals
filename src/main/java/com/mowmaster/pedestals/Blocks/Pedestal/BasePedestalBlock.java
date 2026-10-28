@@ -1,11 +1,16 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
+import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
+import com.mowmaster.pedestals.Items.Tools.FilterToolItem;
+import com.mowmaster.pedestals.Items.Tools.LinkingToolItem;
 import com.mowmaster.pedestals.TintHandler.IColorableBlock;
 import com.mowmaster.pedestals.TintHandler.ITintHolder;
 import com.mowmaster.pedestals.TintHandler.libPixelBox;
+import com.mowmaster.pedestals.api.filter.IPedestalFilter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Prediction;
@@ -26,6 +31,8 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -38,6 +45,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,14 +53,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// The pedestal: holds items, shows them on top, and (later) takes upgrades and augments.
+// The pedestal: holds items, fluid, energy and experience (and add-on transport types), sends them down its links,
+// and (later) takes upgrades and augments.
 // Ported from 1.20: the colour now lives in the block entity (ITintHolder) instead of three blockstate properties,
 // so it can be any RGB colour and dyes mix like CrystalBlocks' blocks.
-// Controls (as in 1.20): right-click inserts the held item, left-click takes one out (sneak: the whole stack).
-// A dye or glowstone in the OFFHAND is applied on right-click; glowstone in the offhand + left-click takes the light back.
+// Controls (as in 1.20): right-click inserts the held item (buckets fill/empty the tank), left-click takes one out
+// (sneak: the whole stack). Empty hand: right-click shows the items, sneak + right-click shows everything else.
+// In the OFFHAND, applied on right-click: a filter (goes in), a dye, glowstone.
+// In the OFFHAND, applied on left-click: the filter tool (takes the filter out), glowstone (takes the light out).
 public class BasePedestalBlock extends Block implements IColorableBlock, SimpleWaterloggedBlock
 {
-    // 0 = no filter, 1 = whitelist, 2 = blacklist. Filters aren't ported yet, so this stays 0 for now.
+    // 0 = no filter, 1 = whitelist, 2 = blacklist (for the filter's current mode; picks the model with the filter band)
     public static final IntegerProperty FILTER_STATUS = IntegerProperty.create("filter_status", 0, 2);
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -139,6 +150,15 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         return new BasePedestalBlockEntity(pos, state);
     }
 
+    // Only the server ticks pedestals (transfers). The cast is safe because of the type check before it.
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
+    {
+        if (level.isClientSide() || type != libBlockEntityRegistry.PEDESTAL.get()) return null;
+        return (BlockEntityTicker<T>) (BlockEntityTicker<BasePedestalBlockEntity>) (tickLevel, tickPos, tickState, pedestal) -> pedestal.serverTick();
+    }
+
     // ---- Placement ----
 
     // Like the end rod: the top points away from the face you clicked, and placing onto the top of another
@@ -159,7 +179,15 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack)
     {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (level.isClientSide() || stack.has(DataComponents.DYED_COLOR)) return;
+        if (level.isClientSide()) return;
+
+        // A linking tool with a selection in the offhand links the new pedestal straight away (as in 1.20)
+        if (placer instanceof Player player && player.getOffhandItem().getItem() instanceof LinkingToolItem tool)
+        {
+            tool.linkWith(level, player, player.getOffhandItem(), pos);
+        }
+
+        if (stack.has(DataComponents.DYED_COLOR)) return;
 
         BlockPos support = pos.relative(state.getValue(FACING).getOpposite());
         if (level.getBlockEntity(support) instanceof BasePedestalBlockEntity supportPedestal
@@ -180,6 +208,17 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 
         ItemStack offhand = player.getOffhandItem();
+
+        // Filter in the offhand: put it in (one filter per pedestal; the filter tool takes it out)
+        if (offhand.getItem() instanceof IPedestalFilter && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        {
+            if (!level.isClientSide())
+            {
+                if (pedestal.hasFilter()) return InteractionResult.FAIL;
+                pedestal.insertFilter(offhand);
+            }
+            return InteractionResult.SUCCESS;
+        }
 
         // Dye in the offhand: colour the pedestal (mixes like leather armour, same as CrystalBlocks)
         if (IColorableBlock.dyeColorOf(offhand) != null)
@@ -207,6 +246,10 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         {
             if (!level.isClientSide())
             {
+                // Buckets and other fluid containers fill from / empty into the pedestal's tank first
+                // (NeoForge's helper does the swap in the player's hand and plays the sound)
+                if (FluidUtil.interactWithFluidHandler(player, hand, level, pos, null, null)) return InteractionResult.SUCCESS;
+
                 int inserted = pedestal.insertItem(stack, false);
                 if (inserted == 0) return InteractionResult.FAIL;
                 stack.shrink(inserted);
@@ -216,13 +259,21 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         return InteractionResult.PASS;
     }
 
-    // Empty main hand: show the stored items above the hotbar
+    // Empty main hand: items above the hotbar, or (sneaking) the other types in chat
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult)
     {
-        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal && pedestal.hasItem())
+        if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)) return InteractionResult.SUCCESS;
+
+        if (player.isShiftKeyDown())
         {
-            player.sendOverlayMessage(pedestal.describeContents());
+            // Sneaking: fluid, energy, experience (and add-on types) in chat, one line each
+            pedestal.describeOtherContents().forEach(player::sendSystemMessage);
+        }
+        else
+        {
+            Component items = pedestal.describeItems();
+            if (items != null) player.sendOverlayMessage(items);
         }
         return InteractionResult.SUCCESS;
     }
@@ -238,6 +289,20 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
 
     private static void leftClick(BlockState state, Level level, BlockPos pos, Player player)
     {
+        // Filter tool in the offhand: take the filter out
+        if (player.getOffhandItem().getItem() instanceof FilterToolItem)
+        {
+            if (level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal && pedestal.hasFilter())
+            {
+                giveToPlayer(player, pedestal.removeFilter());
+            }
+            else
+            {
+                player.sendOverlayMessage(Component.translatable("pedestals.tool_filter_missing"));
+            }
+            return;
+        }
+
         // Glowstone in the offhand: take the light back out
         if (player.getOffhandItem().is(Items.GLOWSTONE) && state.getValue(LIT))
         {
