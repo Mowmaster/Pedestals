@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Blocks;
 
+import com.mowmaster.pedestals.Items.ItemRegistry;
 import com.mowmaster.pedestals.PedestalReferences;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
@@ -35,15 +36,7 @@ public class BlockRegistry
 
     private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block)
     {
-        ItemRegistry.CBITEMS.registerItem(name, properties -> new BlockItem(block.get(), properties.useBlockDescriptionPrefix()));
-    }
-
-    // Book items don't stack (each carries its own contents), and work like bundles in inventories (BookItem)
-    private static <T extends Block> DeferredBlock<T> registerBook(String name, Function<BlockBehaviour.Properties, T> function)
-    {
-        DeferredBlock<T> toReturn = BCBLOCKS.registerBlock(name, function);
-        ItemRegistry.CBITEMS.registerItem(name, properties -> new BookItem(toReturn.get(), properties.useBlockDescriptionPrefix().stacksTo(1)));
-        return toReturn;
+        ItemRegistry.PEDESTAL_ITEMS.registerItem(name, properties -> new BlockItem(block.get(), properties.useBlockDescriptionPrefix()));
     }
 
     public static void register(IEventBus eventBus)
