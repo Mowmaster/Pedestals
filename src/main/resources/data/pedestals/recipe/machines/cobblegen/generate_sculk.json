@@ -1,0 +1,8 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:sculk_catalyst",
+  "experience": 1,
+  "result": {
+    "id": "minecraft:sculk"
+  }
+}

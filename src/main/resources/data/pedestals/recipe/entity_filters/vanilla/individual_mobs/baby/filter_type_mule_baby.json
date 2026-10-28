@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:black_concrete_powder",
+  "entity": "minecraft:mule",
+  "baby": true
+}

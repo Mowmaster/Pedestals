@@ -2,34 +2,49 @@ package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.pedestals.Config;
+import com.mowmaster.pedestals.Items.PedestalDataComponents;
 import com.mowmaster.pedestals.PedestalReferences;
 import com.mowmaster.pedestals.TintHandler.ITintHolder;
 import com.mowmaster.pedestals.TintHandler.libTintData;
+import com.mowmaster.pedestals.Transport.EnergyTransportType;
+import com.mowmaster.pedestals.Transport.ExperienceTransportType;
 import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
 import com.mowmaster.pedestals.api.filter.FilterDirection;
 import com.mowmaster.pedestals.api.filter.IPedestalFilter;
 import com.mowmaster.pedestals.api.transport.PedestalStorage;
 import com.mowmaster.pedestals.api.transport.PedestalStorageHost;
 import com.mowmaster.pedestals.api.transport.PedestalTransportType;
+import com.mowmaster.pedestals.api.upgrade.IPedestalUpgrade;
+import com.mowmaster.pedestals.api.upgrade.IWorkCard;
+import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
+import net.minecraft.world.item.ShearsItem;
+import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
@@ -43,12 +58,15 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-// The pedestal's storage, links, filter and colour.
+// The pedestal's storage, links, filter, upgrade and colour.
 // Storage: one PedestalStorage per registered transport type (items, fluids, energy, experience, and any type
 // another mod registers), each exposed to pipes through its capability (see the types' registerCapability).
 // Links: every TICKS_TO_TRANSFER ticks it sends to the first linked pedestal that accepts anything, every type at once.
-// Not ported yet: upgrades, augments (speed, capacity, storage, range, round robin), work cards, redstone counts.
+// Upgrades: one upgrade, one tool and one work card, all put in from the offhand. The upgrade is ticked every
+// server tick (IPedestalUpgrade#tick) and keeps its per-pedestal state in getUpgradeData().
+// Not ported yet: augments (speed, capacity, storage, range, round robin, no-collide), redstone counts.
 public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder, PedestalStorageHost
 {
     // LinkedHashMap keeps the registry order, so types are always tried in the same order
@@ -58,6 +76,16 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     private final List<BlockPos> links = new ArrayList<>();
     private ItemStack filter = ItemStack.EMPTY;
     private int transferTicks;
+
+    private ItemStack upgrade = ItemStack.EMPTY;
+    private ItemStack tool = ItemStack.EMPTY;
+    private ItemStack workCard = ItemStack.EMPTY;
+    // The upgrade's own saved state for this pedestal (1.20 kept it on the upgrade item's NBT)
+    private CompoundTag upgradeData = new CompoundTag();
+    // Worked out from the work card when first needed; cleared whenever the upgrade, tool or card changes.
+    // "transient" in spirit: never saved.
+    private @Nullable List<BlockPos> workPositions;
+    private @Nullable PedestalFakePlayer fakePlayer;
 
     public BasePedestalBlockEntity(BlockPos pos, BlockState state)
     {
@@ -73,6 +101,32 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     {
         setChanged();
         if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    // ---- Where it points ----
+
+    public Direction getFacing()
+    {
+        BlockState state = getBlockState();
+        return state.hasProperty(BasePedestalBlock.FACING) ? state.getValue(BasePedestalBlock.FACING) : Direction.UP;
+    }
+
+    // The block the pedestal stands on (1.20's getPosOfBlockBelow(level, pos, 1)): the inventory most upgrades use
+    public BlockPos getPosBelow()
+    {
+        return worldPosition.relative(getFacing().getOpposite());
+    }
+
+    // The block the top of the pedestal points at
+    public BlockPos getPosAbove()
+    {
+        return worldPosition.relative(getFacing());
+    }
+
+    // A redstone signal turns links and upgrades off
+    public boolean isPowered()
+    {
+        return level != null && level.hasNeighborSignal(worldPosition);
     }
 
     // ---- Storage ----
@@ -96,7 +150,21 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         else setChanged();
     }
 
-    // ---- Items (used by the block's clicks and the renderer) ----
+    // Takes energy and experience for an upgrade's work, both or neither. false (and nothing taken) if there
+    // isn't enough of either. simulate = only check.
+    public boolean removeFuel(int energy, int experience, boolean simulate)
+    {
+        if (energy <= 0 && experience <= 0) return true;
+        try (Transaction transaction = Transaction.openRoot())
+        {
+            if (energy > 0 && getStorage(PedestalTransportTypes.ENERGY.get()).extract(EnergyTransportType.ENERGY, energy, transaction) < energy) return false;
+            if (experience > 0 && getStorage(PedestalTransportTypes.EXPERIENCE.get()).extract(ExperienceTransportType.EXPERIENCE, experience, transaction) < experience) return false;
+            if (!simulate) transaction.commit();
+            return true;
+        }
+    }
+
+    // ---- Items (used by the block's clicks, the renderer and upgrades) ----
 
     public boolean hasItem()
     {
@@ -115,6 +183,19 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return ItemStack.EMPTY;
     }
 
+    // Copies of every stack in the pedestal
+    public List<ItemStack> getItemStacks()
+    {
+        PedestalStorage<ItemResource> items = getItemStorage();
+        List<ItemStack> stacks = new ArrayList<>();
+        for (int index = 0; index < items.size(); index++)
+        {
+            ItemStack stack = ItemUtil.getStack(items, index);
+            if (!stack.isEmpty()) stacks.add(stack);
+        }
+        return stacks;
+    }
+
     // Puts as much of the stack in as fits (and as the filter allows); returns how many went in
     public int insertItem(ItemStack stack, boolean simulate)
     {
@@ -126,6 +207,12 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
             if (!simulate) transaction.commit();
             return inserted;
         }
+    }
+
+    // true if the whole stack fits
+    public boolean canInsertItem(ItemStack stack)
+    {
+        return stack.isEmpty() || insertItem(stack, true) == stack.getCount();
     }
 
     // Takes up to maxAmount (and at most one normal stack) from the last slot that has something, like 1.20
@@ -147,12 +234,24 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return ItemStack.EMPTY;
     }
 
+    // Takes up to amount of this exact item (any slots); returns how many were taken
+    public int removeItem(ItemResource resource, int amount, boolean simulate)
+    {
+        if (resource.isEmpty() || amount <= 0) return 0;
+        try (Transaction transaction = Transaction.openRoot())
+        {
+            int extracted = getItemStorage().extract(resource, amount, transaction);
+            if (!simulate) transaction.commit();
+            return extracted;
+        }
+    }
+
     public @Nullable Component describeItems()
     {
         return getItemStorage().describe();
     }
 
-    // Everything but items, one line per type (fluid, energy, experience...)
+    // Everything but items, one line per type (fluid, energy, experience...), then the upgrade, tool and work card
     public List<Component> describeOtherContents()
     {
         List<Component> lines = new ArrayList<>();
@@ -161,12 +260,20 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
             Component line = storage.describe();
             if (line != null) lines.add(line);
         });
+        if (hasUpgrade()) lines.add(Component.translatable(PedestalReferences.MODID + ".pedestal.message_upgrade").append(upgrade.getHoverName()).withStyle(ChatFormatting.LIGHT_PURPLE));
+        if (hasTool()) lines.add(Component.translatable(PedestalReferences.MODID + ".pedestal.message_tool").append(tool.getHoverName()).withStyle(ChatFormatting.GRAY));
+        if (hasWorkCard()) lines.add(Component.translatable(PedestalReferences.MODID + ".pedestal.message_workcard").append(workCard.getHoverName()).withStyle(ChatFormatting.GRAY));
         return lines;
     }
 
-    // 0-15 by how full the item slots are, same maths as a chest
+    // 0-15: the upgrade's own signal if it has one, otherwise how full the item slots are (same maths as a chest)
     public int getRedstoneSignal()
     {
+        if (upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade)
+        {
+            int signal = pedestalUpgrade.getComparatorSignal(this, upgrade);
+            if (signal >= 0) return Math.min(signal, 15);
+        }
         return ResourceHandlerUtil.getRedstoneSignalFromResourceHandler(getItemStorage());
     }
 
@@ -178,6 +285,9 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         if (level == null) return;
         storages.values().forEach(storage -> storage.onPedestalRemoved(level, pos));
         Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), filter);
+        if (hasUpgrade()) Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), takeUpgrade());
+        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), tool);
+        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), workCard);
     }
 
     // ---- Filter ----
@@ -231,11 +341,229 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return pedestalFilter.allows(filter, type, resource);
     }
 
+    // For upgrades that read the filter themselves (breakers, placers...): only NEUTRAL filters apply, as in 1.20
+    public <R extends Resource> boolean machineFilterAllows(PedestalTransportType<R> type, R resource)
+    {
+        return filterAllows(type, resource, FilterDirection.NEUTRAL);
+    }
+
+    public boolean machineFilterAllows(ItemStack stack)
+    {
+        return stack.isEmpty() || machineFilterAllows(PedestalTransportTypes.ITEMS.get(), ItemResource.of(stack));
+    }
+
     @Override
     public <R extends Resource> int filterLimit(PedestalTransportType<R> type, R resource, int capacity)
     {
         if (!(filter.getItem() instanceof IPedestalFilter pedestalFilter) || pedestalFilter.getDirection(filter) != FilterDirection.INSERT) return capacity;
         return pedestalFilter.limit(filter, type, resource, capacity);
+    }
+
+    // ---- Upgrade ----
+
+    public boolean hasUpgrade()
+    {
+        return !upgrade.isEmpty();
+    }
+
+    // The upgrade itself (not a copy): upgrades may change its components
+    public ItemStack getUpgrade()
+    {
+        return upgrade;
+    }
+
+    // Takes one upgrade from the stack; false if there's already one or it isn't an upgrade
+    public boolean insertUpgrade(ItemStack stack, @Nullable Player player)
+    {
+        if (hasUpgrade() || !(stack.getItem() instanceof IPedestalUpgrade pedestalUpgrade)) return false;
+        upgrade = stack.split(1);
+        resetUpgradeState();
+        if (level instanceof ServerLevel serverLevel) pedestalUpgrade.onAdded(serverLevel, this, upgrade, player);
+        update();
+        return true;
+    }
+
+    public ItemStack removeUpgrade()
+    {
+        ItemStack removed = takeUpgrade();
+        update();
+        return removed;
+    }
+
+    private ItemStack takeUpgrade()
+    {
+        if (upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade && level instanceof ServerLevel serverLevel)
+        {
+            pedestalUpgrade.onRemoved(serverLevel, this, upgrade);
+        }
+        ItemStack removed = upgrade;
+        upgrade = ItemStack.EMPTY;
+        resetUpgradeState();
+        return removed;
+    }
+
+    // Per-pedestal state for the upgrade. Change it freely, then call upgradeDataChanged() so it's saved.
+    public CompoundTag getUpgradeData()
+    {
+        return upgradeData;
+    }
+
+    public void upgradeDataChanged()
+    {
+        setChanged();
+    }
+
+    // The upgrade starts over: saved state, work positions and fake player are thrown away
+    // (1.20's actionOnRemovedFromPedestal / resetCachedValidWorkCardPositions)
+    public void resetUpgradeState()
+    {
+        upgradeData = new CompoundTag();
+        workPositions = null;
+        fakePlayer = null;
+        setChanged();
+    }
+
+    // ---- Tool ----
+
+    // What counts as a tool (1.20's isAllowedTool): anything that mines or fights, bows, tridents and shears
+    public static boolean isAllowedTool(ItemStack stack)
+    {
+        if (stack.isEmpty()) return false;
+        if (stack.has(DataComponents.TOOL) || stack.has(DataComponents.WEAPON)) return true;
+        if (stack.getItem() instanceof ProjectileWeaponItem || stack.getItem() instanceof TridentItem || stack.getItem() instanceof ShearsItem) return true;
+        return stack.canPerformAction(ItemAbilities.SHEARS_HARVEST) || stack.canPerformAction(ItemAbilities.SWORD_SWEEP);
+    }
+
+    public boolean hasTool()
+    {
+        return !tool.isEmpty();
+    }
+
+    // The inserted tool itself (empty if none)
+    public ItemStack getTool()
+    {
+        return tool;
+    }
+
+    // The tool upgrades use: the inserted one, or the upgrade's default tool
+    public ItemStack getToolStack()
+    {
+        if (hasTool()) return tool;
+        return upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade ? pedestalUpgrade.getDefaultTool() : ItemStack.EMPTY;
+    }
+
+    public boolean insertTool(ItemStack stack)
+    {
+        if (hasTool() || !isAllowedTool(stack)) return false;
+        tool = stack.split(1);
+        resetUpgradeState();
+        update();
+        return true;
+    }
+
+    public ItemStack removeTool()
+    {
+        ItemStack removed = tool;
+        tool = ItemStack.EMPTY;
+        resetUpgradeState();
+        update();
+        return removed;
+    }
+
+    // Call after an upgrade wore the tool down (it may have broken: then the slot is empty)
+    public void toolChanged()
+    {
+        if (tool.isEmpty()) tool = ItemStack.EMPTY;
+        update();
+    }
+
+    // ---- Work card ----
+
+    public boolean hasWorkCard()
+    {
+        return !workCard.isEmpty();
+    }
+
+    public ItemStack getWorkCard()
+    {
+        return workCard;
+    }
+
+    public boolean insertWorkCard(ItemStack stack)
+    {
+        if (hasWorkCard() || !(stack.getItem() instanceof IWorkCard)) return false;
+        workCard = stack.split(1);
+        resetUpgradeState();
+        update();
+        return true;
+    }
+
+    public ItemStack removeWorkCard()
+    {
+        ItemStack removed = workCard;
+        workCard = ItemStack.EMPTY;
+        resetUpgradeState();
+        update();
+        return removed;
+    }
+
+    // The work card's positions in range of the upgrade, if the card is a kind the upgrade uses. Worked out once and
+    // kept until the upgrade or card changes (the card's positions can't change while it's in the pedestal), so
+    // upgrades still need to check what's at each position every time.
+    public List<BlockPos> getWorkPositions()
+    {
+        if (workPositions == null)
+        {
+            workPositions = List.of();
+            if (upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade && workCard.getItem() instanceof IWorkCard card)
+            {
+                WorkCardType wanted = pedestalUpgrade.getWorkCardType(upgrade);
+                if (wanted != null && wanted.accepts(card.getWorkCardType()))
+                {
+                    workPositions = List.copyOf(card.getPositions(workCard, this, pedestalUpgrade.getWorkRange(upgrade)));
+                }
+            }
+        }
+        return workPositions;
+    }
+
+    // An area work card's box (for finding entities), if the upgrade uses it and it's in range
+    public Optional<AABB> getWorkArea()
+    {
+        if (upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade && workCard.getItem() instanceof IWorkCard card)
+        {
+            WorkCardType wanted = pedestalUpgrade.getWorkCardType(upgrade);
+            if (wanted != null && wanted.accepts(card.getWorkCardType()))
+            {
+                return card.getArea(workCard, this, pedestalUpgrade.getWorkRange(upgrade));
+            }
+        }
+        return Optional.empty();
+    }
+
+    // ---- Fake player ----
+
+    // The player the upgrade acts as, standing on the pedestal. Made again when the upgrade changes (new owner).
+    public PedestalFakePlayer getFakePlayer(ServerLevel serverLevel)
+    {
+        if (fakePlayer == null || fakePlayer.level() != serverLevel)
+        {
+            fakePlayer = new PedestalFakePlayer(serverLevel, upgrade.get(PedestalDataComponents.UPGRADE_OWNER.get()));
+        }
+        fakePlayer.standOn(worldPosition);
+        return fakePlayer;
+    }
+
+    // ---- Particles (1.20 sent its own particle packets; vanilla's dust particle takes any colour) ----
+
+    public void spawnParticles(ServerLevel serverLevel, double x, double y, double z, int rgb)
+    {
+        serverLevel.sendParticles(new DustParticleOptions(rgb, 1.0F), x, y, z, 4, 0.1, 0.1, 0.1, 0);
+    }
+
+    public void spawnParticles(ServerLevel serverLevel, BlockPos pos, int rgb)
+    {
+        spawnParticles(serverLevel, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, rgb);
     }
 
     // ---- Links ----
@@ -253,7 +581,11 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     // Within the range on every axis (a cube around the pedestal, as in 1.20)
     public boolean isInRange(BlockPos target)
     {
-        int range = getLinkingRange();
+        return isInRange(target, getLinkingRange());
+    }
+
+    public boolean isInRange(BlockPos target, int range)
+    {
         return Math.abs(target.getX() - worldPosition.getX()) <= range
                 && Math.abs(target.getY() - worldPosition.getY()) <= range
                 && Math.abs(target.getZ() - worldPosition.getZ()) <= range;
@@ -306,15 +638,21 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return LinkResult.ADDED;
     }
 
-    // ---- Transfer (server only, called every tick by the block's ticker) ----
+    // ---- Ticking (server only, called every tick by the block's ticker) ----
 
     public void serverTick()
     {
-        if (level == null || links.isEmpty()) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        if (upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade)
+        {
+            pedestalUpgrade.tick(serverLevel, this, upgrade);
+        }
+
+        if (links.isEmpty()) return;
         if (++transferTicks < Config.TICKS_TO_TRANSFER.getAsInt()) return;
         transferTicks = 0;
-        // A redstone signal turns the pedestal off
-        if (level.hasNeighborSignal(worldPosition)) return;
+        if (isPowered()) return;
 
         Iterator<BlockPos> iterator = links.iterator();
         while (iterator.hasNext())
@@ -376,6 +714,10 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         storages.forEach((type, storage) -> storage.serialize(storageOutput.child(type.getId().toString())));
         if (!links.isEmpty()) output.store("links", BlockPos.CODEC.listOf(), links);
         if (!filter.isEmpty()) output.store("filter", ItemStack.CODEC, filter);
+        if (!upgrade.isEmpty()) output.store("upgrade", ItemStack.CODEC, upgrade);
+        if (!tool.isEmpty()) output.store("tool", ItemStack.CODEC, tool);
+        if (!workCard.isEmpty()) output.store("work_card", ItemStack.CODEC, workCard);
+        if (!upgradeData.isEmpty()) output.store("upgrade_data", CompoundTag.CODEC, upgradeData);
         tints.save(output);
     }
 
@@ -388,6 +730,11 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         links.clear();
         input.read("links", BlockPos.CODEC.listOf()).ifPresent(links::addAll);
         filter = input.read("filter", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        upgrade = input.read("upgrade", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        tool = input.read("tool", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        workCard = input.read("work_card", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        upgradeData = input.read("upgrade_data", CompoundTag.CODEC).orElseGet(CompoundTag::new);
+        workPositions = null;
         tints.load(input);
     }
 

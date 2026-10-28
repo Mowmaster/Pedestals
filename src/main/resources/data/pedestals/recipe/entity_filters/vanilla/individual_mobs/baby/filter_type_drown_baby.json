@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:blue_glazed_terracotta",
+  "entity": "minecraft:drowned",
+  "baby": true
+}

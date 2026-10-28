@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:green_glazed_terracotta",
+  "entity": "minecraft:tadpole"
+}

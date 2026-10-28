@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:mossy_cobblestone",
+  "entity": "minecraft:zombie_villager",
+  "baby": true
+}

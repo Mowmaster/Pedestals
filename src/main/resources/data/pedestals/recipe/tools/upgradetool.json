@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:bookshelf",
+    "#c:rods/wooden",
+    "#c:ingots/gold"
+  ],
+  "result": {
+    "id": "pedestals:tool_upgradetool"
+  }
+}

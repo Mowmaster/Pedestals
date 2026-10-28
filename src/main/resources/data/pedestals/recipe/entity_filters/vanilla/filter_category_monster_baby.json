@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:waxed_copper_block",
+  "category": "monster",
+  "baby": true
+}

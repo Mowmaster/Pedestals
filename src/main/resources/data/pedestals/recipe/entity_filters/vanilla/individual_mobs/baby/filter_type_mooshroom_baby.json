@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:red_concrete_powder",
+  "entity": "minecraft:mooshroom",
+  "baby": true
+}

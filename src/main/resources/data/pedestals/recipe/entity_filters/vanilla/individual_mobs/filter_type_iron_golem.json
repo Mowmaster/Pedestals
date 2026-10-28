@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:iron_block",
+  "entity": "minecraft:iron_golem"
+}

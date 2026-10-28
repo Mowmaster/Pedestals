@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:slime_block",
+  "entity": "minecraft:experience_orb"
+}

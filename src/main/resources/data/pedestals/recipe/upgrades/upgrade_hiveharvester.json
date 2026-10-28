@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_base",
+    "minecraft:shears",
+    "minecraft:honeycomb"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_hiveharvester"
+  }
+}

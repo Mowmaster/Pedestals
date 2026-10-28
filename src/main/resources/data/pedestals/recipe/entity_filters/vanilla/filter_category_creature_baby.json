@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:raw_gold_block",
+  "category": "creature",
+  "baby": true
+}

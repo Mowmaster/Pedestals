@@ -1,0 +1,7 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:polished_basalt",
+  "result": {
+    "id": "minecraft:basalt"
+  }
+}

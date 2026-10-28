@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:orange_concrete_powder",
+  "entity": "minecraft:camel",
+  "baby": true
+}

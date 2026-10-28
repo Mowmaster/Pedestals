@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:gray_glazed_terracotta",
+  "entity": "minecraft:panda",
+  "baby": true
+}

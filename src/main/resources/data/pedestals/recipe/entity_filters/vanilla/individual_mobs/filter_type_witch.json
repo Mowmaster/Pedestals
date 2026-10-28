@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:brown_wool",
+  "entity": "minecraft:witch"
+}

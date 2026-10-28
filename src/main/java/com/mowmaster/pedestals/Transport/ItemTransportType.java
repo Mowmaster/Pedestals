@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Transport;
 
+import com.mojang.serialization.Codec;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.api.filter.FilterDirection;
@@ -8,18 +9,31 @@ import com.mowmaster.pedestals.api.transport.PedestalStorageHost;
 import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
+import net.neoforged.neoforge.transfer.resource.ResourceStack;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,6 +68,107 @@ public class ItemTransportType extends PedestalTransportType<ItemResource>
     {
         event.registerBlockEntity(Capabilities.Item.BLOCK, pedestal, (blockEntity, side) -> blockEntity.getStorage(this));
     }
+
+    // ---- Other things' storage ----
+
+    @Override
+    public @Nullable ResourceHandler<ItemResource> getBlockHandler(Level level, BlockPos pos, @Nullable Direction side)
+    {
+        return level.getCapability(Capabilities.Item.BLOCK, pos, side);
+    }
+
+    // ENTITY_AUTOMATION is the one meant for machines (chest minecarts, ...)
+    @Override
+    public @Nullable ResourceHandler<ItemResource> getEntityHandler(Entity entity, @Nullable Direction side)
+    {
+        return Capabilities.Item.ENTITY_AUTOMATION.getCapability(entity, side);
+    }
+
+    // Items inside items: shulker boxes, bundles...
+    @Override
+    public @Nullable ResourceHandler<ItemResource> getItemHandler(ItemAccess access)
+    {
+        return access.getCapability(Capabilities.Item.ITEM);
+    }
+
+    // ---- Upgrades ----
+
+    @Override
+    public String getCapacityModifier()
+    {
+        return "upgradeitemcapacity";
+    }
+
+    @Override
+    public int getDefaultUpgradeRate(PedestalStorageHost host)
+    {
+        return Config.ITEM_TRANSFER_RATE.getAsInt();
+    }
+
+    // Drops up to amount (at most one stack) of the first item, at the centre of pos, without throwing it.
+    // Only into open space (air, fluids, grass...), as in 1.20.
+    @Override
+    public boolean dropInWorld(ServerLevel level, BlockPos pos, PedestalStorage<ItemResource> from, int amount, @Nullable ServerPlayer cause)
+    {
+        if (!level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) return false;
+        ResourceStack<ItemResource> taken;
+        try (Transaction transaction = Transaction.openRoot())
+        {
+            ItemResource first = ResourceHandlerUtil.findExtractableResource(from, resource -> true, transaction);
+            if (first == null) return false;
+            int extracted = from.extract(first, Math.min(amount, first.getMaxStackSize()), transaction);
+            if (extracted <= 0) return false;
+            taken = new ResourceStack<>(first, extracted);
+            transaction.commit();
+        }
+        Vec3 centre = Vec3.atCenterOf(pos);
+        ItemEntity dropped = new ItemEntity(level, centre.x, centre.y, centre.z, taken.resource().toStack(taken.amount()), 0, 0, 0);
+        dropped.setDefaultPickUpDelay();
+        level.addFreshEntity(dropped);
+        return true;
+    }
+
+    // Picks up item entities: as many as fit (up to amount)
+    @Override
+    public boolean absorbEntity(ServerLevel level, Entity entity, PedestalStorage<ItemResource> into, int amount)
+    {
+        if (!(entity instanceof ItemEntity itemEntity) || itemEntity.getItem().isEmpty()) return false;
+        ItemStack stack = itemEntity.getItem();
+        int inserted;
+        try (Transaction transaction = Transaction.openRoot())
+        {
+            inserted = ResourceHandlerUtil.insertStacking(into, ItemResource.of(stack), Math.min(amount, stack.getCount()), transaction);
+            if (inserted <= 0) return false;
+            transaction.commit();
+        }
+        ItemStack left = stack.copyWithCount(stack.getCount() - inserted);
+        if (left.isEmpty()) itemEntity.discard();
+        else itemEntity.setItem(left);
+        return true;
+    }
+
+    // ---- Packets ----
+
+    @Override
+    public Codec<ItemResource> getResourceCodec()
+    {
+        return ItemResource.CODEC;
+    }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, ItemResource> getResourceStreamCodec()
+    {
+        return ItemResource.STREAM_CODEC;
+    }
+
+    // "Stone x3456"
+    @Override
+    public Component describeAmount(ItemResource resource, int amount)
+    {
+        return Component.empty().append(resource.getHoverName()).append(" x" + amount);
+    }
+
+    // ---- Filters ----
 
     @Override
     public boolean usesFilterList()

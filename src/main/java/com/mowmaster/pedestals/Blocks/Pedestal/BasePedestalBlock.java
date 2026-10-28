@@ -1,12 +1,15 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
+import com.mowmaster.pedestals.Items.ItemRegistry;
 import com.mowmaster.pedestals.Items.Tools.FilterToolItem;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolItem;
 import com.mowmaster.pedestals.TintHandler.IColorableBlock;
 import com.mowmaster.pedestals.TintHandler.ITintHolder;
 import com.mowmaster.pedestals.TintHandler.libPixelBox;
 import com.mowmaster.pedestals.api.filter.IPedestalFilter;
+import com.mowmaster.pedestals.api.upgrade.IPedestalUpgrade;
+import com.mowmaster.pedestals.api.upgrade.IWorkCard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -54,13 +57,14 @@ import java.util.List;
 import java.util.Map;
 
 // The pedestal: holds items, fluid, energy and experience (and add-on transport types), sends them down its links,
-// and (later) takes upgrades and augments.
+// and takes an upgrade, a tool and a work card (augments come later).
 // Ported from 1.20: the colour now lives in the block entity (ITintHolder) instead of three blockstate properties,
 // so it can be any RGB colour and dyes mix like CrystalBlocks' blocks.
 // Controls (as in 1.20): right-click inserts the held item (buckets fill/empty the tank), left-click takes one out
 // (sneak: the whole stack). Empty hand: right-click shows the items, sneak + right-click shows everything else.
-// In the OFFHAND, applied on right-click: a filter (goes in), a dye, glowstone.
-// In the OFFHAND, applied on left-click: the filter tool (takes the filter out), glowstone (takes the light out).
+// In the OFFHAND, applied on right-click: a filter, an upgrade, a work card or a tool (each goes in), a dye, glowstone.
+// In the OFFHAND, applied on left-click (each takes its thing out): the filter tool, the upgrade tool, the tool
+// swapper (the tool), the work card tool, glowstone (the light).
 public class BasePedestalBlock extends Block implements IColorableBlock, SimpleWaterloggedBlock
 {
     // 0 = no filter, 1 = whitelist, 2 = blacklist (for the filter's current mode; picks the model with the filter band)
@@ -220,6 +224,23 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
             return InteractionResult.SUCCESS;
         }
 
+        // Upgrade, work card or tool in the offhand: put it in (one of each per pedestal)
+        if (offhand.getItem() instanceof IPedestalUpgrade && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        {
+            if (!level.isClientSide() && !pedestal.insertUpgrade(offhand, player)) return InteractionResult.FAIL;
+            return InteractionResult.SUCCESS;
+        }
+        if (offhand.getItem() instanceof IWorkCard && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        {
+            if (!level.isClientSide() && !pedestal.insertWorkCard(offhand)) return InteractionResult.FAIL;
+            return InteractionResult.SUCCESS;
+        }
+        if (BasePedestalBlockEntity.isAllowedTool(offhand) && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        {
+            if (!level.isClientSide() && !pedestal.insertTool(offhand)) return InteractionResult.FAIL;
+            return InteractionResult.SUCCESS;
+        }
+
         // Dye in the offhand: colour the pedestal (mixes like leather armour, same as CrystalBlocks)
         if (IColorableBlock.dyeColorOf(offhand) != null)
         {
@@ -301,6 +322,30 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
                 player.sendOverlayMessage(Component.translatable("pedestals.tool_filter_missing"));
             }
             return;
+        }
+
+        // Upgrade tool / tool swapper / work card tool in the offhand: take the upgrade / tool / work card out
+        if (level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        {
+            ItemStack offhand = player.getOffhandItem();
+            if (offhand.is(ItemRegistry.TOOL_UPGRADETOOL.get()))
+            {
+                if (pedestal.hasUpgrade()) giveToPlayer(player, pedestal.removeUpgrade());
+                else player.sendOverlayMessage(Component.translatable("pedestals.tool_upgrade_missing"));
+                return;
+            }
+            if (offhand.is(ItemRegistry.TOOL_TOOLSWAPPER.get()))
+            {
+                if (pedestal.hasTool()) giveToPlayer(player, pedestal.removeTool());
+                else player.sendOverlayMessage(Component.translatable("pedestals.tool_tool_missing"));
+                return;
+            }
+            if (offhand.is(ItemRegistry.TOOL_WORKTOOL.get()))
+            {
+                if (pedestal.hasWorkCard()) giveToPlayer(player, pedestal.removeWorkCard());
+                else player.sendOverlayMessage(Component.translatable("pedestals.tool_workcard_missing"));
+                return;
+            }
         }
 
         // Glowstone in the offhand: take the light back out

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_base",
+    "minecraft:wheat_seeds",
+    "minecraft:beetroot_seeds",
+    "minecraft:potato",
+    "minecraft:carrot"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_planter"
+  }
+}

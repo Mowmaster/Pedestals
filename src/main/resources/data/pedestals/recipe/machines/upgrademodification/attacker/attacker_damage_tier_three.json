@@ -1,0 +1,12 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_attacker",
+    "#c:gems/diamond",
+    "minecraft:diamond_sword"
+  ],
+  "modifier": "upgradedamagecapacity",
+  "value": 1,
+  "min": 6,
+  "max": 9
+}

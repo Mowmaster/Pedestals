@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:gray_concrete_powder",
+  "entity": "minecraft:donkey",
+  "baby": true
+}

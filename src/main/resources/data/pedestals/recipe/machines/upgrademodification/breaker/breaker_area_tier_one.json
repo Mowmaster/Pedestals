@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_breaker",
+    "#c:ingots/gold",
+    "minecraft:obsidian"
+  ],
+  "modifier": "upgradearea",
+  "value": 1,
+  "max": 21
+}

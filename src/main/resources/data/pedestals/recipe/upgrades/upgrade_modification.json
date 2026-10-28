@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_base",
+    "#c:gems/emerald",
+    "#c:gems/lapis",
+    "#c:gems/diamond",
+    "#c:gems/quartz",
+    "#c:gems/amethyst",
+    "#c:gems/prismarine"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_modifications"
+  }
+}

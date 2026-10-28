@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:gilded_blackstone",
+  "entity": "minecraft:piglin_brute"
+}

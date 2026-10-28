@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:cracked_polished_blackstone_bricks",
+  "entity": "minecraft:zoglin",
+  "baby": true
+}

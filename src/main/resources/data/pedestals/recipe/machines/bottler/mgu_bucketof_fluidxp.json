@@ -1,0 +1,14 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mob_grinding_utils"
+    }
+  ],
+  "type": "pedestals:bottler",
+  "input": "minecraft:bucket",
+  "experience": 50,
+  "result": {
+    "id": "mob_grinding_utils:fluid_xp_bucket"
+  }
+}

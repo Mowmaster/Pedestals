@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_base",
+    "minecraft:lava_bucket",
+    "minecraft:water_bucket"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_cobblegen"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:black_stained_glass",
+  "entity": "minecraft:warden"
+}

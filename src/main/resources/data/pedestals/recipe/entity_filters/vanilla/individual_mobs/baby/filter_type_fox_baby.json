@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:cyan_concrete_powder",
+  "entity": "minecraft:fox",
+  "baby": true
+}

@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:dripstone_block",
+  "category": "underground_water_creature"
+}

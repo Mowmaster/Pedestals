@@ -1,0 +1,7 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:muddy_mangrove_roots",
+  "result": {
+    "id": "minecraft:mud"
+  }
+}

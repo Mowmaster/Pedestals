@@ -6,6 +6,7 @@ import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.pedestals.Items.ItemRegistry;
 import com.mowmaster.pedestals.Items.PedestalDataComponents;
 import com.mowmaster.pedestals.QOLHandler.CreativeTabRegistry;
+import com.mowmaster.pedestals.Recipes.PedestalRecipes;
 import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -29,6 +30,7 @@ public class pedestals {
         BlockRegistry.register(modEventBus);
         libBlockEntityRegistry.register(modEventBus);
         CreativeTabRegistry.register(modEventBus);
+        PedestalRecipes.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.LOCAL, Config.SPEC);
     }

@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:blue_concrete_powder",
+  "entity": "minecraft:rabbit",
+  "baby": true
+}

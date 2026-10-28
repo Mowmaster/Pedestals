@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:light_gray_glazed_terracotta",
+  "entity": "minecraft:polar_bear",
+  "baby": true
+}

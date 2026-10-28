@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:pink_stained_glass",
+  "entity": "minecraft:piglin",
+  "baby": true
+}

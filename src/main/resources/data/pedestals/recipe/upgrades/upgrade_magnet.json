@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_base",
+    "minecraft:iron_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_magnet"
+  }
+}

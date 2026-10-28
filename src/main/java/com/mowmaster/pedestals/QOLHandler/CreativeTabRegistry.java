@@ -22,7 +22,8 @@ public class CreativeTabRegistry
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, PedestalReferences.MODID);
 
 
-    // Tools, filters, the plain pedestal, then one pre-dyed pedestal per dye colour (the colour rides on dyed_color)
+    // Tools, filters, work cards, upgrades, (empty) storage packets, the plain pedestal, then one pre-dyed pedestal
+    // per dye colour (the colour rides on dyed_color)
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> PEDESTALS_TAB = TABS.register("pedestals", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.pedestals"))
             .icon(() -> new ItemStack(BlockRegistry.BLOCK_PEDESTAL.get()))
@@ -30,7 +31,13 @@ public class CreativeTabRegistry
                 output.accept(ItemRegistry.TOOL_LINKINGTOOL.get());
                 output.accept(ItemRegistry.TOOL_LINKINGTOOLBACKWARDS.get());
                 output.accept(ItemRegistry.TOOL_FILTERTOOL.get());
+                output.accept(ItemRegistry.TOOL_UPGRADETOOL.get());
+                output.accept(ItemRegistry.TOOL_TOOLSWAPPER.get());
+                output.accept(ItemRegistry.TOOL_WORKTOOL.get());
                 ItemRegistry.FILTERS.forEach(filter -> output.accept(filter.get()));
+                ItemRegistry.WORKCARDS.forEach(card -> output.accept(card.get()));
+                ItemRegistry.UPGRADES.forEach(upgrade -> output.accept(upgrade.get()));
+                ItemRegistry.PACKETS.forEach(packet -> output.accept(packet.get()));
                 output.accept(BlockRegistry.BLOCK_PEDESTAL.get());
                 for (DyeColor dye : DyeColor.values())
                 {

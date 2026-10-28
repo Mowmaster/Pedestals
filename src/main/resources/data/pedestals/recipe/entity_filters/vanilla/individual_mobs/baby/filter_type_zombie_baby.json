@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:cracked_stone_bricks",
+  "entity": "minecraft:zombie",
+  "baby": true
+}

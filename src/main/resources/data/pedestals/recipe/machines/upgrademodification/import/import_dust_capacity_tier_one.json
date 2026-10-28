@@ -1,0 +1,17 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "effectscrolls"
+    }
+  ],
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_import",
+    "#c:gems/emerald",
+    "effectscrolls:crystal"
+  ],
+  "modifier": "upgradedustcapacity",
+  "value": 1000,
+  "max": 100000
+}

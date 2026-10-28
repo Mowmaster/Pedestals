@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:emerald_block",
+  "entity": "minecraft:villager"
+}

@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:white_glazed_terracotta",
+  "entity": "minecraft:wither_skeleton"
+}

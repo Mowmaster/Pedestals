@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:cracked_nether_bricks",
+  "entity": "minecraft:zombified_piglin",
+  "baby": true
+}

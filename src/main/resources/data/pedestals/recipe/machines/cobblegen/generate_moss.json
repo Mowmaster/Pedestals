@@ -1,0 +1,7 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:spore_blossom",
+  "result": {
+    "id": "minecraft:moss_block"
+  }
+}

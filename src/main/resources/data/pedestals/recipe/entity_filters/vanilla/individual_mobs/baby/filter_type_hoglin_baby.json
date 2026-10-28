@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:brown_concrete_powder",
+  "entity": "minecraft:hoglin",
+  "baby": true
+}

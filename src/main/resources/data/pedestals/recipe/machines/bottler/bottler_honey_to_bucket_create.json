@@ -1,0 +1,17 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "pedestals:bottler",
+  "input": "minecraft:glass_bottle",
+  "fluid": {
+    "ingredient": "create:honey",
+    "amount": 1000
+  },
+  "result": {
+    "id": "create:honey_bucket"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:purple_glazed_terracotta",
+  "entity": "minecraft:salmon"
+}

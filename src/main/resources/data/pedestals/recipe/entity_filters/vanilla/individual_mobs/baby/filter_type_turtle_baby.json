@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:lime_concrete_powder",
+  "entity": "minecraft:turtle",
+  "baby": true
+}

@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:purple_concrete_powder",
+  "entity": "minecraft:sheep",
+  "baby": true
+}

@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:yellow_concrete_powder",
+  "entity": "minecraft:bee",
+  "baby": true
+}

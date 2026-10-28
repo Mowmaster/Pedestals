@@ -1,0 +1,5 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:snow_block",
+  "entity": "minecraft:snow_golem"
+}

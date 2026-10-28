@@ -1,0 +1,102 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "pedestals:upgrade_mode_display",
+    "on_true": {
+      "type": "minecraft:select",
+      "property": "minecraft:component",
+      "component": "pedestals:upgrade_mode_display",
+      "cases": [
+        {
+          "when": {
+            "type": "pedestals:items",
+            "enabled": true
+          },
+          "model": {
+            "type": "minecraft:model",
+            "model": "pedestals:item/upgrades/import/items_on"
+          }
+        },
+        {
+          "when": {
+            "type": "pedestals:items",
+            "enabled": false
+          },
+          "model": {
+            "type": "minecraft:model",
+            "model": "pedestals:item/upgrades/import/items_off"
+          }
+        },
+        {
+          "when": {
+            "type": "pedestals:fluids",
+            "enabled": true
+          },
+          "model": {
+            "type": "minecraft:model",
+            "model": "pedestals:item/upgrades/import/fluids_on"
+          }
+        },
+        {
+          "when": {
+            "type": "pedestals:fluids",
+            "enabled": false
+          },
+          "model": {
+            "type": "minecraft:model",
+            "model": "pedestals:item/upgrades/import/fluids_off"
+          }
+        },
+        {
+          "when": {
+            "type": "pedestals:energy",
+            "enabled": true
+          },
+          "model": {
+            "type": "minecraft:model",
+            "model": "pedestals:item/upgrades/import/energy_on"
+          }
+        },
+        {
+          "when": {
+            "type": "pedestals:energy",
+            "enabled": false
+          },
+          "model": {
+            "type": "minecraft:model",
+            "model": "pedestals:item/upgrades/import/energy_off"
+          }
+        },
+        {
+          "when": {
+            "type": "pedestals:experience",
+            "enabled": true
+          },
+          "model": {
+            "type": "minecraft:model",
+            "model": "pedestals:item/upgrades/import/experience_on"
+          }
+        },
+        {
+          "when": {
+            "type": "pedestals:experience",
+            "enabled": false
+          },
+          "model": {
+            "type": "minecraft:model",
+            "model": "pedestals:item/upgrades/import/experience_off"
+          }
+        }
+      ],
+      "fallback": {
+        "type": "minecraft:model",
+        "model": "pedestals:item/upgrade_pedestal_import"
+      }
+    },
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "pedestals:item/upgrades/import/items_on"
+    }
+  }
+}

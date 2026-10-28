@@ -1,0 +1,7 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:bricks",
+  "result": {
+    "id": "minecraft:clay"
+  }
+}

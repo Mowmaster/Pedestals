@@ -1,0 +1,7 @@
+{
+  "type": "pedestals:cobblegen",
+  "block_below": "minecraft:warped_nylium",
+  "result": {
+    "id": "minecraft:brown_mushroom_block"
+  }
+}

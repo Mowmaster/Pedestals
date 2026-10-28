@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:dried_kelp_block",
+  "category": "water_creature",
+  "baby": true
+}

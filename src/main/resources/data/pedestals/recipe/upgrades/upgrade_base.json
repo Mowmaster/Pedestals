@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:tool_upgradetool",
+    "#c:ingots/gold"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_base"
+  }
+}

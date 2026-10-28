@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:red_glazed_terracotta",
+  "entity": "minecraft:strider",
+  "baby": true
+}

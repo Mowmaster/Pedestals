@@ -1,0 +1,8 @@
+{
+  "type": "pedestals:unbottler",
+  "input": "minecraft:experience_bottle",
+  "experience": 11,
+  "result": {
+    "id": "minecraft:glass_bottle"
+  }
+}

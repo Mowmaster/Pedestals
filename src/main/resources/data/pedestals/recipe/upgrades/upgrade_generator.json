@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_base",
+    "minecraft:copper_ingot",
+    "minecraft:redstone",
+    "minecraft:furnace"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_generator"
+  }
+}

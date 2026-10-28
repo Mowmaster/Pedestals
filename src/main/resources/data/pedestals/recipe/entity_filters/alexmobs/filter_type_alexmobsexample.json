@@ -1,0 +1,11 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "alexmobsmodidhere"
+    }
+  ],
+  "type": "pedestals:entity_filter",
+  "input": "alexmobsmodidhere:trashpandafoodblock",
+  "entity": "alexmobs:trashpanda"
+}

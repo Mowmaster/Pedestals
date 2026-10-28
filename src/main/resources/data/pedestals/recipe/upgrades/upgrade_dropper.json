@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_base",
+    "minecraft:dropper"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_dropper"
+  }
+}

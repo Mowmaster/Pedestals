@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    " I ",
+    "SSS"
+  ],
+  "key": {
+    "S": "minecraft:stick",
+    "I": "pedestals:tool_work"
+  },
+  "result": {
+    "id": "pedestals:workcard_belocations"
+  }
+}

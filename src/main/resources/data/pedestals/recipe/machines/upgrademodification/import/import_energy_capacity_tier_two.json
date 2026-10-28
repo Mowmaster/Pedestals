@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_import",
+    "#c:storage_blocks/emerald",
+    "minecraft:redstone_block"
+  ],
+  "modifier": "upgradeenergycapacity",
+  "value": 20000,
+  "max": 100000
+}

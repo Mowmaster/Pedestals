@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:brown_glazed_terracotta",
+  "entity": "minecraft:wolf",
+  "baby": true
+}

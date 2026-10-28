@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:pink_concrete_powder",
+  "entity": "minecraft:pig",
+  "baby": true
+}

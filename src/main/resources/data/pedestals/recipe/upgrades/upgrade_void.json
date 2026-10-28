@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_base",
+    "minecraft:ender_pearl",
+    "minecraft:cactus",
+    "minecraft:lava_bucket"
+  ],
+  "result": {
+    "id": "pedestals:upgrade_pedestal_void"
+  }
+}

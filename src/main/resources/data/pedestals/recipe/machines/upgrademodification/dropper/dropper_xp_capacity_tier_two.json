@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_dropper",
+    "#c:storage_blocks/emerald",
+    "minecraft:experience_bottle"
+  ],
+  "modifier": "upgradexpcapacity",
+  "value": 10,
+  "max": 100
+}

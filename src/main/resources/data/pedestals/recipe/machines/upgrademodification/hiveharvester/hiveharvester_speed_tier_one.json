@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_hiveharvester",
+    "#c:gems/diamond",
+    "minecraft:obsidian"
+  ],
+  "modifier": "upgradespeed",
+  "value": 2,
+  "max": 40
+}

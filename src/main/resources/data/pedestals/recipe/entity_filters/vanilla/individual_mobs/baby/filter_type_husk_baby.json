@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:pink_glazed_terracotta",
+  "entity": "minecraft:husk",
+  "baby": true
+}

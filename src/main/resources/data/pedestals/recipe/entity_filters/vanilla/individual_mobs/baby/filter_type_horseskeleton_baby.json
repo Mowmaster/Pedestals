@@ -1,0 +1,6 @@
+{
+  "type": "pedestals:entity_filter",
+  "input": "minecraft:yellow_stained_glass",
+  "entity": "minecraft:skeleton_horse",
+  "baby": true
+}

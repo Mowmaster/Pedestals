@@ -1,9 +1,12 @@
 package com.mowmaster.pedestals;
 
+import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
+import com.mowmaster.pedestals.api.transport.PedestalStorageHost;
+import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-// Pedestal settings, same names and defaults as 1.20's PedestalConfig (the template's example values are gone).
-// Augment values come back with the augments.
+// Pedestal and upgrade settings, same names and defaults as 1.20's PedestalConfig (the template's example values
+// are gone). Augment values come back with the augments; dust values and the packets' discharge timers are gone.
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
@@ -12,7 +15,7 @@ public class Config {
     }
 
     public static final ModConfigSpec.IntValue TICKS_TO_TRANSFER = BUILDER
-            .comment("Ticks between transfers to linked pedestals (before augments)")
+            .comment("Ticks between transfers to linked pedestals (before augments), and between upgrade operations (before speed modifiers)")
             .defineInRange("pedestal_ticksToTransfer", 40, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue LINKING_RANGE = BUILDER
             .comment("How far (in blocks, on each axis) a pedestal can link (before augments)")
@@ -49,7 +52,179 @@ public class Config {
 
     static {
         BUILDER.pop();
+        BUILDER.push("upgrades");
+    }
+
+    // ---- Every upgrade ----
+
+    public static final ModConfigSpec.BooleanValue BREAK_BLOCK_ENTITIES = BUILDER
+            .comment("Lets breakers, quarries and pumps break blocks with block entities (chests, machines...)")
+            .define("allowBreakEntities", false);
+    public static final ModConfigSpec.BooleanValue REQUIRE_SIZED_AREA = BUILDER
+            .comment("Limit a work card area's size by the upgrade's area modifier (3x3x3 without modifiers)")
+            .define("upgrade_toggleable_require_selectable_size", false);
+    public static final ModConfigSpec.IntValue SELECTION_RANGE = BUILDER
+            .comment("How far (in blocks, on each axis) a work card's positions can be from the pedestal (before range modifiers)")
+            .defineInRange("upgrades_baseSelectionRange", 8, 1, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue PACKAGE_MAX_STACKS = BUILDER
+            .comment("Most item stacks the packager puts in one package")
+            .defineInRange("bulkstorage_item_max_stacks", 54, 1, Integer.MAX_VALUE);
+
+    // ---- Transfer rates (per operation, before capacity modifiers). Experience is in points. ----
+
+    public static final TransferRates IMPORT_RATES = TransferRates.define("import", 4, 1000, 5000, 7);
+    public static final TransferRates EXPORT_RATES = TransferRates.define("export", 4, 1000, 5000, 7);
+    public static final TransferRates DROPPER_RATES = TransferRates.define("dropper", 1, 1000, 5000, 7);
+
+    public static final ModConfigSpec.BooleanValue DROPPER_LIGHTNING = BUILDER
+            .comment("The dropper can drop lightning bolts with energy (each bolt costs the dropper's energy amount)")
+            .define("upgrade_dropper_can_drop_bolt", true);
+
+    // ---- Tools: whether an upgrade needs a tool inserted, and whether it wears it down ----
+
+    public static final ToolRules BREAKER_TOOLS = ToolRules.define("blockBreaker", "Block Breaker");
+    public static final ToolRules QUARRY_TOOLS = ToolRules.define("quarry", "Quarry");
+    public static final ToolRules CHOPPER_TOOLS = ToolRules.define("chopper", "Chopper");
+    public static final ToolRules HARVESTER_TOOLS = ToolRules.define("harvester", "Harvester");
+    public static final ToolRules HIVE_HARVESTER_TOOLS = ToolRules.define("hiveharvester", "Hive Harvester");
+    public static final ToolRules SHEARER_TOOLS = ToolRules.define("shearer", "Shearer");
+    public static final ToolRules ATTACKER_TOOLS = ToolRules.define("attacker", "Attacker");
+    public static final ToolRules MATERIAL_GENERATOR_TOOLS = ToolRules.define("materialGen", "Material Generator");
+
+    // ---- Fuel: energy/experience each operation costs ----
+
+    public static final FuelCost MAGNET_FUEL = FuelCost.define("magnet", "Magnet", 0, true);
+    public static final FuelCost BREAKER_FUEL = FuelCost.define("blockbreaker", "Block Breaker", 0, true);
+    public static final FuelCost PLACER_FUEL = FuelCost.define("blockplacer", "Block Placer", 0, true);
+    public static final FuelCost FILLER_FUEL = FuelCost.define("filler", "Filler", 0, true);
+    public static final FuelCost QUARRY_FUEL = FuelCost.define("quarry", "Quarry", 500, false);
+    public static final FuelCost CHOPPER_FUEL = FuelCost.define("chopper", "Chopper", 0, true);
+    public static final FuelCost HARVESTER_FUEL = FuelCost.define("harvester", "Harvester", 0, true);
+    public static final FuelCost PLANTER_FUEL = FuelCost.define("planter", "Planter", 0, true);
+    public static final FuelCost FERTILIZER_FUEL = FuelCost.define("fertilizer", "Fertilizer", 0, true);
+    public static final FuelCost HIVE_HARVESTER_FUEL = FuelCost.define("hiveharvester", "Hive Harvester", 0, true);
+    public static final FuelCost PUMP_FUEL = FuelCost.define("pump", "Pump", 0, true);
+    public static final FuelCost DRAIN_FUEL = FuelCost.define("drain", "Drain", 0, true);
+    public static final FuelCost SHEARER_FUEL = FuelCost.define("sheerer", "Shearer", 0, true);
+    public static final FuelCost MILKER_FUEL = FuelCost.define("milker", "Milker", 0, true);
+    public static final FuelCost BREEDER_FUEL = FuelCost.define("breeder", "Mob Breeder", 0, true);
+    public static final FuelCost ATTACKER_FUEL = FuelCost.define("attacker", "Attacker", 0, true);
+    public static final FuelCost FAN_FUEL = FuelCost.define("fan", "Fan", 0, true);
+
+    // ---- Per-upgrade settings ----
+
+    public static final ModConfigSpec.IntValue FILLER_BLOCKS = BUILDER
+            .comment("Blocks the filler places per operation (before block capacity modifiers)")
+            .defineInRange("upgrade_filler_base_blocks_placed", 4, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue QUARRY_BLOCKS = BUILDER
+            .comment("Blocks the quarry mines per operation (before block capacity modifiers)")
+            .defineInRange("upgrade_quarry_base_blocks_mined", 4, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue PUMP_BLOCKS = BUILDER
+            .comment("Fluid blocks the pump takes per operation (before block capacity modifiers)")
+            .defineInRange("upgrade_pump_base_blocks_mined", 4, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.BooleanValue PUMP_WATERLOGGED = BUILDER
+            .comment("The pump also takes water out of waterlogged blocks")
+            .define("upgrade_pump_waterlogged", false);
+    public static final ModConfigSpec.IntValue DRAIN_BLOCKS = BUILDER
+            .comment("Fluid blocks the drain places per operation (before block capacity modifiers)")
+            .defineInRange("upgrade_drain_base_blocks_placed", 4, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.BooleanValue BREEDER_LIMIT = BUILDER
+            .comment("The mob breeder stops when there are too many animals in its area")
+            .define("upgrade_breeder_has_limit", false);
+    public static final ModConfigSpec.IntValue BREEDER_LIMIT_COUNT = BUILDER
+            .comment("How many animals is too many (with the limit on)")
+            .defineInRange("upgrade_breeder_limit_count", 20, 1, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue SMELTER_ENERGY = BUILDER
+            .comment("Energy the smelter uses per tick of cooking")
+            .defineInRange("upgrade_smelter_base_energy_cost", 20, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue BLASTER_ENERGY = BUILDER
+            .comment("Energy the blast furnace upgrade uses per tick of cooking")
+            .defineInRange("upgrade_blast_base_energy_cost", 20, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue SMOKER_ENERGY = BUILDER
+            .comment("Energy the smoker upgrade uses per tick of cooking")
+            .defineInRange("upgrade_smoker_base_energy_cost", 20, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue GENERATOR_ENERGY = BUILDER
+            .comment("Energy the generator makes per tick of burning fuel")
+            .defineInRange("upgrade_generator_base_energy_production", 20, 0, Integer.MAX_VALUE);
+
+    static {
+        BUILDER.pop();
     }
 
     static final ModConfigSpec SPEC = BUILDER.build();
+
+    // ---- Groups of values (records: see AmountResource) ----
+
+    // Base rates for an upgrade that moves every transport type. Add-on types use their default upgrade rate.
+    public record TransferRates(ModConfigSpec.IntValue items, ModConfigSpec.IntValue fluids,
+                                ModConfigSpec.IntValue energy, ModConfigSpec.IntValue experience)
+    {
+        static TransferRates define(String upgrade, int items, int fluids, int energy, int experience)
+        {
+            String prefix = "upgrade_" + upgrade + "_base_";
+            return new TransferRates(
+                    BUILDER.comment("Items per operation [" + upgrade + "]").defineInRange(prefix + "item_rate", items, 0, Integer.MAX_VALUE),
+                    BUILDER.comment("Fluid (mB) per operation [" + upgrade + "]").defineInRange(prefix + "fluid_rate", fluids, 0, Integer.MAX_VALUE),
+                    BUILDER.comment("Energy per operation [" + upgrade + "]").defineInRange(prefix + "energy_rate", energy, 0, Integer.MAX_VALUE),
+                    BUILDER.comment("Experience points per operation [" + upgrade + "]").defineInRange(prefix + "exp_rate", experience, 0, Integer.MAX_VALUE));
+        }
+
+        // The base rate for a type (before its capacity modifier)
+        public int get(PedestalTransportType<?> type, PedestalStorageHost host)
+        {
+            if (type == PedestalTransportTypes.ITEMS.get()) return items.getAsInt();
+            if (type == PedestalTransportTypes.FLUIDS.get()) return fluids.getAsInt();
+            if (type == PedestalTransportTypes.ENERGY.get()) return energy.getAsInt();
+            if (type == PedestalTransportTypes.EXPERIENCE.get()) return experience.getAsInt();
+            return type.getDefaultUpgradeRate(host);
+        }
+    }
+
+    public record ToolRules(ModConfigSpec.BooleanValue require, ModConfigSpec.BooleanValue damage)
+    {
+        static ToolRules define(String key, String name)
+        {
+            return new ToolRules(
+                    BUILDER.comment(name + " only works with a tool inserted").define(key + "_requires_tools", false),
+                    BUILDER.comment(name + " wears down the inserted tool").define(key + "_damages_tools", false));
+        }
+    }
+
+    // cost = (base + selected * (distance or 1)) * multiplier, for energy and experience separately.
+    // selected only counts when "selected_allowed" is on; distance is from the pedestal to the work position.
+    public record FuelCost(ModConfigSpec.IntValue energy, ModConfigSpec.BooleanValue energyDistance, ModConfigSpec.DoubleValue energyMultiplier,
+                           ModConfigSpec.IntValue experience, ModConfigSpec.BooleanValue experienceDistance, ModConfigSpec.DoubleValue experienceMultiplier,
+                           ModConfigSpec.BooleanValue selectedAllowed, ModConfigSpec.DoubleValue selectedMultiplier)
+    {
+        static FuelCost define(String key, String name, int energy, boolean energyDistance)
+        {
+            String prefix = "upgrade_" + key + "_";
+            return new FuelCost(
+                    BUILDER.comment("Base energy cost per operation [" + name + "]").defineInRange(prefix + "base_energy_cost", energy, 0, Integer.MAX_VALUE),
+                    BUILDER.comment("Distance to the work counts towards the energy cost (needs selected_allowed) [" + name + "]").define(prefix + "energy_distance_multiplier", energyDistance),
+                    BUILDER.comment("Energy cost multiplier [" + name + "]").defineInRange(prefix + "energy_multiplier", 1.0D, 0.0D, Integer.MAX_VALUE),
+                    BUILDER.comment("Base experience cost per operation [" + name + "]").defineInRange(prefix + "base_xp_cost", 0, 0, Integer.MAX_VALUE),
+                    BUILDER.comment("Distance to the work counts towards the experience cost (needs selected_allowed) [" + name + "]").define(prefix + "xp_distance_multiplier", true),
+                    BUILDER.comment("Experience cost multiplier [" + name + "]").defineInRange(prefix + "xp_multiplier", 1.0D, 0.0D, Integer.MAX_VALUE),
+                    BUILDER.comment("Add a cost for how far the work is from the pedestal [" + name + "]").define(prefix + "selected_allowed", false),
+                    BUILDER.comment("Cost per block of distance [" + name + "]").defineInRange(prefix + "selected_multiplier", 1.0D, 0.0D, Integer.MAX_VALUE));
+        }
+
+        public int energyCost(int distance)
+        {
+            return cost(energy.getAsInt(), energyDistance.getAsBoolean(), energyMultiplier.getAsDouble(), distance);
+        }
+
+        public int experienceCost(int distance)
+        {
+            return cost(experience.getAsInt(), experienceDistance.getAsBoolean(), experienceMultiplier.getAsDouble(), distance);
+        }
+
+        private int cost(int base, boolean useDistance, double multiplier, int distance)
+        {
+            if (base <= 0) return 0; // as in 1.20: no base cost means the upgrade doesn't use this fuel at all
+            double selected = selectedAllowed.getAsBoolean() ? selectedMultiplier.getAsDouble() * (useDistance ? distance : 1) : 0;
+            return (int) Math.round((base + selected) * multiplier);
+        }
+    }
 }
