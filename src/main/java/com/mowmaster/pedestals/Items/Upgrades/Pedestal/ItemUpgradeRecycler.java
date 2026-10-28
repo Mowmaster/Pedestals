@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
@@ -8,6 +9,8 @@ import com.mowmaster.pedestals.PedestalTags;
 import com.mowmaster.pedestals.Recipes.RecyclingMaterials;
 import com.mowmaster.pedestals.Transport.ExperienceTransportType;
 import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
+import com.mowmaster.pedestals.api.transport.AmountResource;
+import com.mowmaster.pedestals.api.transport.PedestalStorage;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -34,15 +37,20 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 // 1.16's experience grindstone and recycler in one upgrade. Takes enchanted things, tools and armour from the
 // inventory below, one at a time. Turn the two steps on and off like the transport upgrades (only items and
 // experience do anything):
 //
 // Experience (the grindstone), always done first: removes every enchantment except curses, like the vanilla
-// grindstone, and puts the experience in the pedestal. Skipped if the pedestal can't hold all of it.
+// grindstone, and puts the experience in the pedestal (skipped if the pedestal can't hold all of it). Then curses
+// can go too, but they cost experience instead: each takes what it would have been worth (its minimum enchanting
+// cost) out of the pedestal, counting what this item just gave. Curses it can't pay for stay on.
 // Enchanted books with nothing left become books.
 //
 // Items (the recycler): breaks the item down into what it was crafted from, using the pedestals:recycling data map
@@ -97,16 +105,22 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
             ItemStack input = resource.toStack(1);
             if (!canProcess(input) || !pedestal.machineFilterAllows(input)) continue;
 
-            // Grindstone step: strip the enchantments, if the experience fits
+            // Grindstone step: strip the enchantments if the experience fits, then the curses it can pay for.
+            // points is what the pedestal gains, less what the curses cost (it can be negative).
             int points = 0;
+            boolean ground = false;
             ItemStack item = input;
             if (experience)
             {
                 int value = grindstoneExperience(level.getRandom(), input, getModifier(upgrade, UpgradeModifiers.KNOWLEDGE));
-                if (value > 0 && experienceFits(pedestal, value))
+                boolean stripEnchantments = value > 0 && experienceFits(pedestal, value);
+                if (!stripEnchantments) value = 0;
+                Set<Holder<Enchantment>> curses = affordableCurses(input, storedExperience(pedestal) + value);
+                if (stripEnchantments || !curses.isEmpty())
                 {
-                    points = value;
-                    item = removeNonCurses(input.copy());
+                    ground = true;
+                    points = value - curseCost(input, curses);
+                    item = removeEnchantments(input.copy(), enchantment -> curses.contains(enchantment) || (stripEnchantments && !enchantment.is(EnchantmentTags.CURSE)));
                 }
             }
 
@@ -130,7 +144,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                     }
                 }
             }
-            else if (!items && points == 0)
+            else if (!items && !ground)
             {
                 continue; // nothing this mode can do with it
             }
@@ -138,8 +152,8 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
             if (process(pedestal, inventory, index, resource, outputs, points))
             {
                 if (recipeHundredths > 0) addRecipeExperience(pedestal, recipeHundredths);
-                level.playSound(null, pedestal.getBlockPos(), points > 0 ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_DESTROY,
-                        SoundSource.BLOCKS, points > 0 ? 0.25F : 0.15F, 1.0F);
+                level.playSound(null, pedestal.getBlockPos(), ground ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_DESTROY,
+                        SoundSource.BLOCKS, ground ? 0.25F : 0.15F, 1.0F);
                 return; // one item per operation
             }
         }
@@ -166,7 +180,9 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                 int inserted = ResourceHandlerUtil.insertStacking(pedestal.getItemStorage(), ItemResource.of(stack), stack.getCount(), transaction);
                 if (output == 0 && inserted <= 0) return false;
             }
-            if (points > 0 && pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, points, transaction) != points) return false;
+            PedestalStorage<AmountResource> experience = pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get());
+            if (points > 0 && experience.insert(ExperienceTransportType.EXPERIENCE, points, transaction) != points) return false;
+            if (points < 0 && experience.extract(ExperienceTransportType.EXPERIENCE, -points, transaction) != -points) return false;
             transaction.commit();
             return true;
         }
@@ -197,11 +213,47 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
         } // not committed: only a test
     }
 
-    // GrindstoneMenu.removeNonCursesFrom: updateEnchantments changes the stored enchantments of books and the
-    // enchantments of anything else; the repair cost drops to what the remaining curses need
-    private static ItemStack removeNonCurses(ItemStack item)
+    private static int storedExperience(BasePedestalBlockEntity pedestal)
     {
-        ItemEnchantments remaining = EnchantmentHelper.updateEnchantments(item, enchantments -> enchantments.removeIf(enchantment -> !enchantment.is(EnchantmentTags.CURSE)));
+        return pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).getAmountAsInt(0);
+    }
+
+    // What a curse costs to remove: what it would be worth if it weren't a curse (its minimum enchanting cost)
+    private static int curseCost(Holder<Enchantment> curse, int level)
+    {
+        return curse.value().getMinCost(level);
+    }
+
+    // The item's curses that available experience pays for, in the item's order (each paid one uses some up)
+    private static Set<Holder<Enchantment>> affordableCurses(ItemStack stack, int available)
+    {
+        Set<Holder<Enchantment>> curses = new HashSet<>();
+        for (Object2IntMap.Entry<Holder<Enchantment>> entry : EnchantmentHelper.getEnchantmentsForCrafting(stack).entrySet())
+        {
+            if (!entry.getKey().is(EnchantmentTags.CURSE)) continue;
+            int cost = curseCost(entry.getKey(), entry.getIntValue());
+            if (cost > available) continue;
+            available -= cost;
+            curses.add(entry.getKey());
+        }
+        return curses;
+    }
+
+    private static int curseCost(ItemStack stack, Set<Holder<Enchantment>> curses)
+    {
+        int total = 0;
+        for (Object2IntMap.Entry<Holder<Enchantment>> entry : EnchantmentHelper.getEnchantmentsForCrafting(stack).entrySet())
+        {
+            if (curses.contains(entry.getKey())) total += curseCost(entry.getKey(), entry.getIntValue());
+        }
+        return total;
+    }
+
+    // GrindstoneMenu.removeNonCursesFrom, for any set of enchantments: updateEnchantments changes the stored
+    // enchantments of books and the enchantments of anything else; the repair cost drops to what's left
+    private static ItemStack removeEnchantments(ItemStack item, Predicate<Holder<Enchantment>> remove)
+    {
+        ItemEnchantments remaining = EnchantmentHelper.updateEnchantments(item, enchantments -> enchantments.removeIf(remove));
         if (item.is(Items.ENCHANTED_BOOK) && remaining.isEmpty()) item = item.transmuteCopy(Items.BOOK);
         int repairCost = 0;
         for (int curse = 0; curse < remaining.size(); curse++) repairCost = AnvilMenu.calculateIncreasedRepairCost(repairCost);
