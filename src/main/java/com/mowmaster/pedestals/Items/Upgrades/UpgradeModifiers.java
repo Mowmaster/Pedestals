@@ -25,6 +25,9 @@ public record UpgradeModifiers(Map<String, Integer> values)
     public static final String ENTITY_CONTAINERS = "upgradeentitystorage";
     public static final String REMOTE_STORAGE = "upgraderemotestorage";
     public static final String OPERATE_TO_BEDROCK = "upgradeoperatetobedrock";
+    // Enchanter upgrade
+    public static final String TREASURE_CHANCE = "upgradetreasurechance";
+    public static final String PURIFIED = "upgradepurified";
     // Capacity modifiers are one per transport type: see PedestalTransportType#getCapacityModifier
     // (upgradeitemcapacity, upgradefluidcapacity, upgradeenergycapacity, upgradexpcapacity, ...).
     // Upgrades list this to accept every type's capacity modifier.

@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_enchanter",
+    "minecraft:nether_star",
+    "#c:storage_blocks/emerald"
+  ],
+  "modifier": "upgradepurified",
+  "value": 1,
+  "max": 10
+}

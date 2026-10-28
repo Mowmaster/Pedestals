@@ -124,6 +124,8 @@ public class ItemRegistry {
             properties -> new ItemUpgradeCooking<>(properties, RecipeType.BLASTING, Config.BLASTER_ENERGY));
     public static final DeferredItem<ItemUpgradeGenerator> PEDESTAL_UPGRADE_GENERATOR = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_generator", ItemUpgradeGenerator::new);
     public static final DeferredItem<ItemUpgradeMaterialGenerator> PEDESTAL_UPGRADE_COBBLEGEN = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_cobblegen", ItemUpgradeMaterialGenerator::new);
+    // From 1.16 (coin/xpenchanter)
+    public static final DeferredItem<ItemUpgradeEnchanter> PEDESTAL_UPGRADE_ENCHANTER = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_enchanter", ItemUpgradeEnchanter::new);
 
     // For the creative tab, in display order (1.20's order)
     public static final List<DeferredItem<? extends Item>> UPGRADES = List.of(PEDESTAL_UPGRADE_BASE, PEDESTAL_UPGRADE_IMPORT,
@@ -134,7 +136,8 @@ public class ItemRegistry {
             PEDESTAL_UPGRADE_SHEARER, PEDESTAL_UPGRADE_MILKER, PEDESTAL_UPGRADE_BREEDER, PEDESTAL_UPGRADE_ATTACKER,
             PEDESTAL_UPGRADE_FAN, PEDESTAL_UPGRADE_BOTTLER, PEDESTAL_UPGRADE_UNBOTTLER, PEDESTAL_UPGRADE_PACKAGER,
             PEDESTAL_UPGRADE_UNPACKAGER, PEDESTAL_UPGRADE_CRAFTER, PEDESTAL_UPGRADE_MODIFICATIONS, PEDESTAL_UPGRADE_SMELTER,
-            PEDESTAL_UPGRADE_SMOKER, PEDESTAL_UPGRADE_BLASTER, PEDESTAL_UPGRADE_GENERATOR, PEDESTAL_UPGRADE_COBBLEGEN);
+            PEDESTAL_UPGRADE_SMOKER, PEDESTAL_UPGRADE_BLASTER, PEDESTAL_UPGRADE_GENERATOR, PEDESTAL_UPGRADE_COBBLEGEN,
+            PEDESTAL_UPGRADE_ENCHANTER);
 
     public static final List<DeferredItem<? extends Item>> WORKCARDS = List.of(WORKCARD_AREA, WORKCARD_LOCATIONS, WORKCARD_PEDESTALS);
 

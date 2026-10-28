@@ -89,6 +89,7 @@
   "item.pedestals.upgrade_pedestal_modifications": "Modification Infusion Upgrade",
   "item.pedestals.upgrade_pedestal_dropper": "Dropper Upgrade",
   "item.pedestals.upgrade_pedestal_cobblegen": "Material Generator",
+  "item.pedestals.upgrade_pedestal_enchanter": "Enchanter Upgrade",
   "item.pedestals.tool_work": "Work Card Tool",
   "item.pedestals.tool_upgradetool.tooltip": "Offhand + left-click a pedestal: take its upgrade out",
   "item.pedestals.tool_toolswapper.tooltip": "Offhand + left-click a pedestal: take its tool out",
@@ -137,6 +138,9 @@
   "pedestals.modifier.upgradeentitystorage": "Entity Inventories",
   "pedestals.modifier.upgraderemotestorage": "Remote Inventories",
   "pedestals.modifier.upgradeoperatetobedrock": "Operate to Bedrock",
+  "pedestals.modifier.upgradetreasurechance": "Treasure Chance",
+  "pedestals.modifier.upgradepurified": "Purified",
+  "pedestals.upgrade_tooltip_enchanter_power": "Enchanting Power: 2 per bookshelf on the work card, up to %s",
   "pedestals.bulkstorage_item": "Contents:",
   "pedestals.bulkstorage_empty": "Empty"
 }
