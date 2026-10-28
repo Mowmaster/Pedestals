@@ -98,7 +98,7 @@ public class EnergyTransportType extends PedestalTransportType<AmountResource>
     @Override
     public boolean dropInWorld(ServerLevel level, BlockPos pos, PedestalStorage<AmountResource> from, int amount, @Nullable ServerPlayer cause)
     {
-        if (!Config.DROPPER_LIGHTNING.getAsBoolean() || amount <= 0) return false;
+        /*if (!Config.DROPPER_LIGHTNING.getAsBoolean() || amount <= 0) return false;
         LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
         if (bolt == null) return false;
         try (Transaction transaction = Transaction.openRoot())
@@ -110,7 +110,7 @@ public class EnergyTransportType extends PedestalTransportType<AmountResource>
         bolt.setCause(cause);
         level.addFreshEntity(bolt);
         level.playSound(null, pos, SoundEvents.TRIDENT_THUNDER.value(), SoundSource.WEATHER, 5.0F, 1.0F);
-        return true;
+        return true;*/
     }
 
     // ---- Packets: the resource is always ENERGY, so nothing needs saving but the amount ----

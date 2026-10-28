@@ -89,7 +89,7 @@ public class ItemUpgradeChopper extends ItemUpgradeBase
         Set<BlockPos> bottoms = new LinkedHashSet<>();
         for (BlockPos pos : area) bottoms.add(new BlockPos(pos.getX(), minY, pos.getZ()));
         List<BlockPos> sorted = new ArrayList<>(bottoms);
-        sorted.sort(Comparator.comparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ).reversed());
+        sorted.sort(Comparator.<BlockPos>comparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ).reversed());
         return sorted;
     }
 

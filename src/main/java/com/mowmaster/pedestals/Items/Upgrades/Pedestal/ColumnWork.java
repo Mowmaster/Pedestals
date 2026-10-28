@@ -81,7 +81,7 @@ public class ColumnWork
         Set<BlockPos> columns = new LinkedHashSet<>();
         for (BlockPos pos : area) columns.add(new BlockPos(pos.getX(), 0, pos.getZ()));
         List<BlockPos> sorted = new ArrayList<>(columns);
-        sorted.sort(Comparator.comparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ).reversed());
+        sorted.sort(Comparator.<BlockPos>comparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ).reversed());
         return sorted;
     }
 }
