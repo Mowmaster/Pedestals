@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:polished_andesite",
-  "result": {
-    "id": "minecraft:andesite"
-  }
-}

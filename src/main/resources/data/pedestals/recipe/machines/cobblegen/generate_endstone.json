@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:purpur_block",
-  "result": {
-    "id": "minecraft:end_stone"
-  }
-}

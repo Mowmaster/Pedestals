@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:crimson_nylium",
-  "result": {
-    "id": "minecraft:red_mushroom_block"
-  }
-}

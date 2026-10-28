@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:polished_diorite",
-  "result": {
-    "id": "minecraft:diorite"
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:rooted_dirt",
-  "result": {
-    "id": "minecraft:podzol"
-  }
-}

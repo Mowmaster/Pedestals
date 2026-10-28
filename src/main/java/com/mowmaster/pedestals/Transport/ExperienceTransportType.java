@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Transport;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Storage.StoragePacketItem;
@@ -155,7 +156,7 @@ public class ExperienceTransportType extends PedestalTransportType<AmountResourc
     @Override
     public Codec<AmountResource> getResourceCodec()
     {
-        return Codec.unit(EXPERIENCE);
+        return MapCodec.unitCodec(EXPERIENCE);
     }
 
     @Override

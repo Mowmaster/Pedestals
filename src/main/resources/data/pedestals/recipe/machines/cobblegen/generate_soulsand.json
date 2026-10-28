@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:soul_soil",
-  "result": {
-    "id": "minecraft:soul_sand"
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:ice",
-  "result": {
-    "id": "minecraft:snow_block"
-  }
-}

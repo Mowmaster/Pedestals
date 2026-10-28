@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:chiseled_sandstone",
-  "result": {
-    "id": "minecraft:sand"
-  }
-}

@@ -1,6 +1,7 @@
 package com.mowmaster.pedestals.Transport;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Storage.StoragePacketItem;
@@ -110,7 +111,8 @@ public class EnergyTransportType extends PedestalTransportType<AmountResource>
         bolt.setCause(cause);
         level.addFreshEntity(bolt);
         level.playSound(null, pos, SoundEvents.TRIDENT_THUNDER.value(), SoundSource.WEATHER, 5.0F, 1.0F);
-        return true;*/
+         */
+        return true;
     }
 
     // ---- Packets: the resource is always ENERGY, so nothing needs saving but the amount ----
@@ -118,7 +120,7 @@ public class EnergyTransportType extends PedestalTransportType<AmountResource>
     @Override
     public Codec<AmountResource> getResourceCodec()
     {
-        return Codec.unit(ENERGY);
+        return MapCodec.unitCodec(ENERGY);
     }
 
     @Override

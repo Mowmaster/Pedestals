@@ -1,7 +1,0 @@
-{
-  "type": "pedestals:cobblegen",
-  "block_below": "minecraft:gilded_blackstone",
-  "result": {
-    "id": "minecraft:blackstone"
-  }
-}
