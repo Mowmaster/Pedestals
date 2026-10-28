@@ -1,0 +1,8 @@
+{
+  "parent": "pedestals:block/pedestal/base_pedestal_models/pedestal_block_filter",
+  "textures": {
+    "filter": "pedestals:block/pedestal/filter_black",
+    "type": "pedestals:block/block_crystal_stone",
+    "typepart":"pedestals:block/block_crystal_stone"
+  }
+}

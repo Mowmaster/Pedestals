@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Blocks;
 
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Items.ItemRegistry;
 import com.mowmaster.pedestals.PedestalReferences;
 import net.minecraft.world.item.BlockItem;
@@ -17,6 +18,12 @@ import java.util.function.Function;
 public class BlockRegistry
 {
     public static final DeferredRegister.Blocks BCBLOCKS = DeferredRegister.createBlocks(PedestalReferences.MODID);
+
+    // Same id as 1.20 so old recipes/advancements/Patchouli pages still point at it.
+    // lightLevel replaces 1.20's getLightEmission override: full light while glowstone is in it.
+    public static final DeferredBlock<BasePedestalBlock> BLOCK_PEDESTAL = registerBlock("block_pedestal",
+            properties -> new BasePedestalBlock(properties.strength(2.0f).sound(SoundType.STONE).noOcclusion()
+                    .lightLevel(state -> state.getValue(BasePedestalBlock.LIT) ? 15 : 0)));
 
     // ---- Books: items per page by cover (as in 1.20), 8 pages unless the recipe gives more ----
 
