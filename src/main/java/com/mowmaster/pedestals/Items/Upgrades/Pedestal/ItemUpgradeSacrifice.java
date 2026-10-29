@@ -67,8 +67,8 @@ import java.util.function.Consumer;
 // Enchantment type: needs a chiseled bookshelf under the pedestal, and input pedestals selected with a pedestals work
 // card. The first enchanted book in the bookshelf decides the inputs: what its first enchantment's
 // pedestals:anvil_overlevel recipe asks for at the next level (Sharpness V -> VI). They're shown as ghost items over
-// the input pedestals, with the amount each currently needs.
-// Whenever this pedestal is empty, one input is picked at random:
+// Whenever this pedestal is empty, the next input (picked at random in advance, shown as a comparator signal: 1 for the
+// first input, up to 15) is used:
 //  - if the input pedestals have enough of it, that's used up, its amount doubles for next time, and a sacrifice
 //    with the book's enchantments, the first raised to the next level, goes into this pedestal (the book stays);
 //  - if not, the book itself is burned into a sacrifice at its own level, and the inputs' amounts reset (all of
@@ -85,6 +85,8 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
     private static final String MULTIPLIERS = "sacrifice_multipliers";
     // A doubling cap, so the amounts can't overflow
     private static final int MAX_MULTIPLIER = 1 << 20;
+    // The input the next sacrifice will use (picked at random in advance, so the comparator can show it)
+    private static final String NEXT_INPUT = "sacrifice_next_input";
 
     public ItemUpgradeSacrifice(Properties properties)
     {
@@ -144,7 +146,7 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
     {
         if (isMobMode(upgrade) || !level.getBlockState(pedestal.getPosBelow()).is(Blocks.CHISELED_BOOKSHELF))
         {
-            pedestal.setGhosts(List.of());
+            stop(level, pedestal);
             return;
         }
         ResourceHandler<ItemResource> shelf = getInventoryBelow(level, pedestal);
@@ -160,7 +162,7 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
         }
         if (bookSlot < 0)
         {
-            pedestal.setGhosts(List.of());
+            stop(level, pedestal);
             return;
         }
         ItemResource bookResource = shelf.getResource(bookSlot);
@@ -174,40 +176,72 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
                 .getRecipeFor(PedestalRecipes.ANVIL_OVERLEVEL.get(), new AnvilOverlevelRecipe.Input(enchantment), level);
         if (recipe.isEmpty())
         {
-            pedestal.setGhosts(List.of());
+            stop(level, pedestal);
             return;
         }
         List<Input> inputs = inputs(level, recipe.get().value().cost(), nextLevel, Math.max(1, nextLevel - enchantment.value().getMaxLevel()));
         if (inputs.isEmpty())
         {
-            pedestal.setGhosts(List.of());
+            stop(level, pedestal);
             return;
         }
 
         // The multipliers start over for a different book (enchantment and level)
         String key = enchantment.unwrapKey().map(k -> k.identifier().toString()).orElse("?") + "@" + first.getIntValue();
         List<Integer> multipliers = new ArrayList<>(pedestal.getUpgradeData().read(MULTIPLIERS, Codec.INT.listOf()).orElse(List.of()));
-        if (!key.equals(pedestal.getUpgradeData().getStringOr(KEY, "")) || multipliers.size() != inputs.size())
+        boolean newBook = !key.equals(pedestal.getUpgradeData().getStringOr(KEY, "")) || multipliers.size() != inputs.size();
+        if (newBook)
         {
             multipliers.clear();
             for (int index = 0; index < inputs.size(); index++) multipliers.add(1);
         }
+        int next = pedestal.getUpgradeData().getIntOr(NEXT_INPUT, -1);
+        if (newBook || next < 0 || next >= inputs.size()) next = level.getRandom().nextInt(inputs.size());
 
         List<BasePedestalBlockEntity> pedestals = inputPedestals(level, pedestal);
-        if (!pedestal.hasItem()) sacrifice(level, pedestal, pedestals, inputs, multipliers, shelf, bookSlot, bookResource, enchantments, enchantment, nextLevel);
+        if (!pedestal.hasItem())
+        {
+            sacrifice(level, pedestal, pedestals, inputs, next, multipliers, shelf, bookSlot, bookResource, enchantments, enchantment, nextLevel);
+            next = level.getRandom().nextInt(inputs.size());
+        }
 
         pedestal.getUpgradeData().putString(KEY, key);
         pedestal.getUpgradeData().store(MULTIPLIERS, Codec.INT.listOf(), multipliers);
         pedestal.upgradeDataChanged();
+        setNextInput(level, pedestal, next);
         pedestal.setGhosts(ghosts(pedestals, inputs, multipliers));
+    }
+
+    // Nothing to do: no ghosts, no signal
+    private static void stop(ServerLevel level, BasePedestalBlockEntity pedestal)
+    {
+        pedestal.setGhosts(List.of());
+        setNextInput(level, pedestal, -1);
+    }
+
+    private static void setNextInput(ServerLevel level, BasePedestalBlockEntity pedestal, int next)
+    {
+        if (pedestal.getUpgradeData().getIntOr(NEXT_INPUT, -1) == next) return;
+        pedestal.getUpgradeData().putInt(NEXT_INPUT, next);
+        pedestal.upgradeDataChanged();
+        // Comparators only re-read their signal when told it changed
+        level.updateNeighbourForOutputSignal(pedestal.getBlockPos(), pedestal.getBlockState().getBlock());
+    }
+
+    // The comparator shows which input the next sacrifice will use: 1 for the first, up to 15 (0 = none, or the 16th
+    // input on). Without this the pedestal would show how full it is, which is always 15 with a sacrifice in it.
+    @Override
+    public int getComparatorSignal(BasePedestalBlockEntity pedestal, ItemStack upgrade)
+    {
+        int next = pedestal.getUpgradeData().getIntOr(NEXT_INPUT, -1);
+        return next >= 0 && next < 15 ? next + 1 : 0;
     }
 
     // One go: a random input pays for an overleveled sacrifice, or the book burns
     private static void sacrifice(ServerLevel level, BasePedestalBlockEntity pedestal, List<BasePedestalBlockEntity> pedestals, List<Input> inputs,
-                                  List<Integer> multipliers, ResourceHandler<ItemResource> shelf, int bookSlot, ItemResource bookResource,
+                                  int chosen, List<Integer> multipliers, ResourceHandler<ItemResource> shelf, int bookSlot, ItemResource bookResource,
                                   ItemEnchantments enchantments, Holder<Enchantment> enchantment, int nextLevel)
     {
-        int chosen = level.getRandom().nextInt(inputs.size());
         Input input = inputs.get(chosen);
         int needed = input.needed(multipliers.get(chosen));
 
@@ -320,7 +354,8 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
         for (int index = 0; index < inputs.size(); index++)
         {
             Input input = inputs.get(index);
-            int needed = input.needed(multipliers.get(index));
+            int needed = input.needed(multipliers.get(index)) - available(pedestals, input);
+            if (needed <= 0) continue;
             BasePedestalBlockEntity at = supplier(pedestals, input);
             if (at == null && nextEmpty < empty.size()) at = empty.get(nextEmpty++);
             Optional<BlockPos> above = at == null ? Optional.empty() : Optional.of(at.getBlockPos());
@@ -343,6 +378,35 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
             }
         }
         return ghosts;
+    }
+
+    // How much of this input the input pedestals have between them
+    private static int available(List<BasePedestalBlockEntity> pedestals, Input input)
+    {
+        long total = 0;
+        for (BasePedestalBlockEntity source : pedestals)
+        {
+            if (input.item() != null)
+            {
+                for (ItemStack stack : source.getItemStacks())
+                {
+                    if (!StoragePacketItem.isPacket(stack) && input.item().test(stack)) total += stack.getCount();
+                }
+            }
+            else if (input.fluid() != null)
+            {
+                FluidResource stored = source.getStorage(PedestalTransportTypes.FLUIDS.get()).getResource(0);
+                if (hasPacket(source, PedestalTransportTypes.FLUIDS.get()) && !stored.isEmpty() && input.fluid().ingredient().test(stored.toStack(1)))
+                {
+                    total += source.getStorage(PedestalTransportTypes.FLUIDS.get()).getAmountAsInt(0);
+                }
+            }
+            else if (hasPacket(source, PedestalTransportTypes.ENERGY.get()))
+            {
+                total += source.getStorage(PedestalTransportTypes.ENERGY.get()).getAmountAsInt(0);
+            }
+        }
+        return (int) Math.min(Integer.MAX_VALUE, total);
     }
 
     // The first input pedestal that has some of this input
