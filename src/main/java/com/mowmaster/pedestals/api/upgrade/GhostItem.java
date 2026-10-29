@@ -11,15 +11,16 @@ import java.util.List;
 import java.util.Optional;
 
 // An item an upgrade wants to show the player but doesn't have: a missing input, drawn as a floating, pulsing item
-// with a label (the amount needed) above it. Upgrades set these with BasePedestalBlockEntity#setGhosts; the pedestal
+// with a label above it (the amount needed, or what it is) and optionally a second one below (an amount). Upgrades set these with BasePedestalBlockEntity#setGhosts; the pedestal
 // syncs them to clients and its renderer draws them.
 // above: the block to show it above (an input pedestal). Empty = circling the upgrade's own pedestal.
-public record GhostItem(Optional<BlockPos> above, ItemStack stack, Component label)
+public record GhostItem(Optional<BlockPos> above, ItemStack stack, Component label, Optional<Component> below)
 {
     public static final Codec<GhostItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             BlockPos.CODEC.optionalFieldOf("above").forGetter(GhostItem::above),
             ItemStack.CODEC.fieldOf("stack").forGetter(GhostItem::stack),
-            ComponentSerialization.CODEC.fieldOf("label").forGetter(GhostItem::label))
+            ComponentSerialization.CODEC.fieldOf("label").forGetter(GhostItem::label),
+            ComponentSerialization.CODEC.optionalFieldOf("below").forGetter(GhostItem::below))
             .apply(instance, GhostItem::new));
 
     // Records compare their fields with equals, but ItemStack doesn't have one (two equal stacks aren't "equal"), so
@@ -31,7 +32,8 @@ public record GhostItem(Optional<BlockPos> above, ItemStack stack, Component lab
         {
             GhostItem a = first.get(index);
             GhostItem b = second.get(index);
-            if (!a.above().equals(b.above()) || !ItemStack.matches(a.stack(), b.stack()) || !a.label().equals(b.label())) return false;
+            if (!a.above().equals(b.above()) || !ItemStack.matches(a.stack(), b.stack()) || !a.label().equals(b.label())
+                    || !a.below().equals(b.below())) return false;
         }
         return true;
     }

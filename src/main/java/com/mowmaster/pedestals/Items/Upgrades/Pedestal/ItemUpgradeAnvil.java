@@ -618,9 +618,12 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
             AnvilCost cost = charge.cost();
             for (AnvilCost.AnvilIngredient ingredient : cost.ingredientsAt(charge.level()))
             {
-                int needed = ingredient.count() * charge.times();
-                int found = takeItems(sources, ingredient.ingredient(), needed);
-                if (found < needed) missing.add(Missing.item(ingredient.ingredient().display().resolveForFirstStack(SlotDisplayContext.fromLevel(level)), needed - found));
+                ItemStack display = ingredient.ingredient().display().resolveForFirstStack(SlotDisplayContext.fromLevel(level));
+                // Potions don't stack, so one is always enough: no recipe count, multiplier or extra-pedestal factor
+                boolean potion = isPotion(display);
+                int needed = potion ? 1 : ingredient.count() * charge.times();
+                int found = takeItems(sources, ingredient.ingredient(), needed, potion);
+                if (found < needed) missing.add(Missing.item(display, needed - found));
             }
             if (cost.fluid().isPresent())
             {
@@ -749,6 +752,12 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
     // Up to amount of the items that pass the test, from the input pedestals in order; returns how many it found
     private static int takeItems(List<Source> sources, Predicate<ItemStack> test, int amount)
     {
+        return takeItems(sources, test, amount, false);
+    }
+
+    // ignoreFactor: take exactly amount, even from the 10th input pedestal on (potions)
+    private static int takeItems(List<Source> sources, Predicate<ItemStack> test, int amount, boolean ignoreFactor)
+    {
         int found = 0;
         for (Source source : sources)
         {
@@ -756,9 +765,10 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
             {
                 if (found >= amount) return found;
                 if (stack.isEmpty() || !test.test(stack)) continue;
-                int taking = Math.min(amount - found, stack.getCount() / source.factor);
+                int factor = ignoreFactor ? 1 : source.factor;
+                int taking = Math.min(amount - found, stack.getCount() / factor);
                 if (taking <= 0) continue;
-                source.take(stack, taking * source.factor);
+                source.take(stack, taking * factor);
                 found += taking;
             }
         }
@@ -808,7 +818,8 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         {
             // An ingredient with nothing to show (an empty tag) shows a barrier
             if (display.isEmpty()) return new Missing(new ItemStack(Items.BARRIER), amount, Unit.ITEMS, true, null, null);
-            return new Missing(display.copyWithCount(1), amount, Unit.ITEMS, true, potionEffects(display), null);
+            boolean potion = isPotion(display);
+            return new Missing(display.copyWithCount(1), potion ? 1 : amount, Unit.ITEMS, !potion, potionEffects(display), null);
         }
 
         // A potion's effects as its tooltip names them: "Harming II", "Speed, Strength"... (null if it has none)
@@ -860,20 +871,20 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
             return item != null ? new ItemStack(item) : new ItemStack(Items.BARRIER);
         }
 
-        Component label(int factor)
+        // Items: "x3" (and a potion's effects) above. Stored types: what it is above ("Lava", "Energy"), the amount below.
+        GhostItem ghost(Optional<BlockPos> above, int factor)
         {
-            if (unit == Unit.BLOCKED) return Component.translatable("pedestals.anvil_cannot_apply");
             int total = perPedestal ? amount * factor : amount;
-            MutableComponent text = Component.literal(switch (unit)
+            return switch (unit)
             {
-                case ITEMS -> "x" + total;
-                case MILLIBUCKETS -> total + " mB";
-                case ENERGY -> total + " FE";
-                case EXPERIENCE -> total + " XP";
-                case BLOCKED -> "";
-            });
-            if (detail != null) text.append(" ").append(detail);
-            return text;
+                case BLOCKED -> new GhostItem(above, display, Component.translatable("pedestals.anvil_cannot_apply"), Optional.empty());
+                case ITEMS -> new GhostItem(above, display, detail == null ? Component.literal("x" + total)
+                        : Component.literal("x" + total + " ").append(detail), Optional.empty());
+                case MILLIBUCKETS -> new GhostItem(above, display, detail != null ? detail : PedestalTransportTypes.FLUIDS.get().getName(),
+                        Optional.of(Component.literal(total + " mB")));
+                case ENERGY -> new GhostItem(above, display, PedestalTransportTypes.ENERGY.get().getName(), Optional.of(Component.literal(total + " FE")));
+                case EXPERIENCE -> new GhostItem(above, display, PedestalTransportTypes.EXPERIENCE.get().getName(), Optional.of(Component.literal(total + " XP")));
+            };
         }
     }
 
@@ -894,22 +905,27 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         int extraPedestals = 0;
         for (Missing input : missing)
         {
-            if (input.at() != null) ghosts.add(new GhostItem(Optional.of(input.at()), input.display(), input.label(1)));
+            if (input.at() != null) ghosts.add(input.ghost(Optional.of(input.at()), 1));
             else if (input.perPedestal() && nextEmpty < empty.size())
             {
                 int index = empty.get(nextEmpty++);
-                ghosts.add(new GhostItem(Optional.of(inputs.get(index).getBlockPos()), input.display(), input.label(factor(index))));
+                ghosts.add(input.ghost(Optional.of(inputs.get(index).getBlockPos()), factor(index)));
             }
             else
             {
                 int factor = input.perPedestal() ? factor(inputs.size() + extraPedestals++) : 1;
-                ghosts.add(new GhostItem(Optional.empty(), input.display(), input.label(factor)));
+                ghosts.add(input.ghost(Optional.empty(), factor));
             }
         }
         return ghosts;
     }
 
     // ---- Small helpers ----
+
+    private static boolean isPotion(ItemStack stack)
+    {
+        return stack.has(DataComponents.POTION_CONTENTS);
+    }
 
     // How many of a material the input pedestal at this index (0 = first) uses up per one needed:
     // 1 for the first FREE_INPUTS, then 2, 3, 4...

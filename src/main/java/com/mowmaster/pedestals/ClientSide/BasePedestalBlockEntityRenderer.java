@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.api.upgrade.GhostItem;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -17,6 +18,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -49,12 +51,21 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
     private static final float COIN_Y = 0.475f;
     // Block and sky light both at full: ghosts glow the same in the dark
     private static final int FULL_BRIGHT = 0xF000F0;
+    // Ghost labels: half a name tag's size (name tags use 0.025 blocks per font pixel), white on vanilla's dark backing.
+    // Heights are from the ghost's centre to the top edge of the text.
+    private static final float TEXT_SCALE = 0.0125f;
+    private static final float LABEL_ABOVE = 0.875f;
+    private static final float LABEL_BELOW = -0.3f;
+    private static final int TEXT_COLOR = 0xFFFFFFFF;
+    private static final int TEXT_BACKGROUND = 0x40000000;
 
     private final ItemModelResolver itemModelResolver;
+    private final Font font;
 
     public BasePedestalBlockEntityRenderer(BlockEntityRendererProvider.Context context)
     {
         this.itemModelResolver = context.itemModelResolver();
+        this.font = context.font();
     }
 
     @Override
@@ -99,6 +110,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             Ghost render = state.ghosts.get(index);
             itemModelResolver.updateForTopItem(render.item, ghost.stack(), ItemDisplayContext.GROUND, level, null, seed + index);
             render.label = ghost.label();
+            render.below = ghost.below().orElse(null);
             if (ghost.above().isPresent() && level != null)
             {
                 // Just above the other pedestal's top, whichever way it faces, relative to this block
@@ -190,21 +202,33 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
     }
 
     // A ghost: bobbing and pulsing, lit at full brightness, always turned to face the camera (like a thrown snowball),
-    // with its label floating above (a name tag, which faces the camera by itself)
-    private static void submitGhost(Ghost ghost, State state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
+    // with its labels above and below
+    private void submitGhost(Ghost ghost, State state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
     {
         double wave = Math.toRadians(state.spin * 2);
         poseStack.pushPose();
         poseStack.translate(0f, (float) (0.05 * Math.sin(wave)), 0f);
-        if (ghost.label != null)
-        {
-            submitNodeCollector.submitNameTag(poseStack, new Vec3(0, 0.6, 0), 0, ghost.label, true, FULL_BRIGHT, camera);
-        }
+        if (ghost.label != null) submitLabel(ghost.label, LABEL_ABOVE, poseStack, submitNodeCollector, camera);
+        if (ghost.below != null) submitLabel(ghost.below, LABEL_BELOW, poseStack, submitNodeCollector, camera);
         poseStack.rotate(camera.orientation);
         // Half as big again as before (0.45 pulsing by 0.05)
         float size = 0.675f + 0.075f * (float) Math.sin(wave * 2);
         poseStack.scale(size, size, size);
         ghost.item.submit(poseStack, submitNodeCollector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        poseStack.popPose();
+    }
+
+    // One line of text facing the camera, centred, its top edge y above the current point. This is what a name tag
+    // does (SubmitNodeCollection#submitNameTag), at our own size and height. The scale's y is negative because text
+    // is laid out downwards (screen style) while the world's y goes up.
+    private void submitLabel(Component text, float y, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
+    {
+        poseStack.pushPose();
+        poseStack.translate(0f, y, 0f);
+        poseStack.rotate(camera.orientation);
+        poseStack.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
+        FormattedCharSequence line = text.getVisualOrderText();
+        submitNodeCollector.submitText(poseStack, -font.width(line) / 2f, 0f, line, false, Font.DisplayMode.NORMAL, FULL_BRIGHT, TEXT_COLOR, TEXT_BACKGROUND, 0);
         poseStack.popPose();
     }
 
@@ -238,6 +262,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
     {
         final ItemStackRenderState item = new ItemStackRenderState();
         @Nullable Component label;
+        @Nullable Component below;
         Vec3 offset = Vec3.ZERO;
         int orbitIndex = -1;
     }
