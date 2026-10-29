@@ -33,15 +33,17 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Repairable;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.world.item.enchantment.Repairable;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
@@ -799,12 +801,33 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
     // Something a plan couldn't find: what to show and how much is needed (before any extra-pedestal factor).
     // perPedestal: whether it comes from input pedestals (and so costs more on the 10th one on); experience doesn't.
     // at: a fixed place to show it (above an input pedestal whose input can't be used); null = wherever there's room
-    private record Missing(ItemStack display, int amount, Unit unit, boolean perPedestal, @Nullable Component fluidName, @Nullable BlockPos at)
+    // detail: extra text after the amount (a fluid's name, a potion's effects)
+    private record Missing(ItemStack display, int amount, Unit unit, boolean perPedestal, @Nullable Component detail, @Nullable BlockPos at)
     {
         static Missing item(ItemStack display, int amount)
         {
             // An ingredient with nothing to show (an empty tag) shows a barrier
-            return new Missing(display.isEmpty() ? new ItemStack(Items.BARRIER) : display.copyWithCount(1), amount, Unit.ITEMS, true, null, null);
+            if (display.isEmpty()) return new Missing(new ItemStack(Items.BARRIER), amount, Unit.ITEMS, true, null, null);
+            return new Missing(display.copyWithCount(1), amount, Unit.ITEMS, true, potionEffects(display), null);
+        }
+
+        // A potion's effects as its tooltip names them: "Harming II", "Speed, Strength"... (null if it has none)
+        private static @Nullable Component potionEffects(ItemStack stack)
+        {
+            PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
+            if (contents == null) return null;
+            MutableComponent text = null;
+            for (MobEffectInstance effect : contents.getAllEffects())
+            {
+                Component name = effect.getEffect().value().getDisplayName();
+                // Vanilla's own keys: "potion.withAmplifier" is "%s %s", "potion.potency.1" is "II"...
+                MutableComponent line = effect.getAmplifier() > 0
+                        ? Component.translatable("potion.withAmplifier", name, Component.translatable("potion.potency." + effect.getAmplifier()))
+                        : name.copy();
+                if (text == null) text = line;
+                else text.append(", ").append(line);
+            }
+            return text;
         }
 
         // Shown as a fluid packet, since an input pedestal needs one to give fluid
@@ -849,7 +872,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
                 case EXPERIENCE -> total + " XP";
                 case BLOCKED -> "";
             });
-            if (fluidName != null) text.append(" ").append(fluidName);
+            if (detail != null) text.append(" ").append(detail);
             return text;
         }
     }

@@ -198,10 +198,11 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         poseStack.translate(0f, (float) (0.05 * Math.sin(wave)), 0f);
         if (ghost.label != null)
         {
-            submitNodeCollector.submitNameTag(poseStack, new Vec3(0, 0.45, 0), 0, ghost.label, true, FULL_BRIGHT, camera);
+            submitNodeCollector.submitNameTag(poseStack, new Vec3(0, 0.6, 0), 0, ghost.label, true, FULL_BRIGHT, camera);
         }
         poseStack.rotate(camera.orientation);
-        float size = 0.45f + 0.05f * (float) Math.sin(wave * 2);
+        // Half as big again as before (0.45 pulsing by 0.05)
+        float size = 0.675f + 0.075f * (float) Math.sin(wave * 2);
         poseStack.scale(size, size, size);
         ghost.item.submit(poseStack, submitNodeCollector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
         poseStack.popPose();
