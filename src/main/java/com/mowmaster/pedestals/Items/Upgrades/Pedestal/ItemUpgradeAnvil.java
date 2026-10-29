@@ -78,7 +78,7 @@ import java.util.function.Predicate;
 //  - Combine: the first enchanted book or enchanted item on each input pedestal is merged in, in order. Inputs merge
 //    with each other first (two Sharpness V books make Sharpness VI), then onto the item (equal levels go up one,
 //    otherwise the higher level wins). Costs what the anvil would, with no 40 level cap. Inputs that end up adding
-//    nothing are dropped above the anvil; if nothing at all can go on, the item just comes out unchanged.
+//    nothing are dropped above the anvil. If none of them can go on, the anvil pauses (see below).
 //    - Past the maximum level needs the enchantment's pedestals:anvil_overlevel recipe, multiplied by how far past
 //      the maximum it ends up (without a recipe it stops at the maximum).
 //    - Any item takes any enchantment, even ones it normally can't (a stick with Sharpness), except items in
@@ -94,6 +94,8 @@ import java.util.function.Predicate;
 // result is made. If something goes missing on the way (or the card, tool or upgrade changes), everything collected
 // so far is dropped above the anvil (fluid and energy as packets).
 //
+// When the item can't be made yet, the anvil pauses on it (the next item waits) and shows what's wrong as ghost
+// items; a redstone signal skips it (it comes out unchanged, with a villager's "no").
 // Missing inputs are shown as ghost items with the amount needed (see GhostItem): above empty input pedestals first,
 // then circling the anvil when there aren't enough input pedestals. Fluid and energy show as their storage packet
 // (a pedestal needs one to give them), and missing experience as an experience packet circling the anvil.
@@ -102,6 +104,8 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
     // Input pedestals past this many make their materials cost more
     public static final int FREE_INPUTS = 9;
     private static final String PLAN = "anvil_plan";
+    // The item the anvil is paused on (showing what it's missing), for a redstone signal to skip
+    private static final String STUCK = "anvil_stuck";
 
     public ItemUpgradeAnvil(Properties properties)
     {
@@ -112,6 +116,53 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
     public WorkCardType getWorkCardType(ItemStack upgrade)
     {
         return WorkCardType.PEDESTALS;
+    }
+
+    // While powered the anvil does nothing, except that the item it's paused on is skipped: it comes out unchanged
+    @Override
+    public void tick(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade)
+    {
+        if (pedestal.isPowered())
+        {
+            if (readPlan(level, pedestal) == null) skipStuck(level, pedestal);
+            return;
+        }
+        super.tick(level, pedestal, upgrade);
+    }
+
+    private static void skipStuck(ServerLevel level, BasePedestalBlockEntity pedestal)
+    {
+        Optional<ItemStack> stuck = pedestal.getUpgradeData().read(STUCK, ItemStack.CODEC, ops(level));
+        if (stuck.isEmpty()) return;
+        setStuck(level, pedestal, null);
+        pedestal.setGhosts(List.of());
+        ResourceHandler<ItemResource> inventory = getInventoryBelow(level, pedestal);
+        for (int slot = 0; inventory != null && slot < inventory.size(); slot++)
+        {
+            ItemResource resource = inventory.getResource(slot);
+            if (!ItemStack.isSameItemSameComponents(resource.toStack(1), stuck.get())) continue;
+            try (Transaction transaction = Transaction.openRoot())
+            {
+                if (inventory.extract(slot, resource, 1, transaction) != 1) return;
+                if (ResourceHandlerUtil.insertStacking(pedestal.getItemStorage(), resource, 1, transaction) != 1) return;
+                transaction.commit();
+            }
+            refused(level, pedestal);
+            return;
+        }
+    }
+
+    private static void setStuck(ServerLevel level, BasePedestalBlockEntity pedestal, @Nullable ItemStack target)
+    {
+        if (target == null) pedestal.getUpgradeData().remove(STUCK);
+        else pedestal.getUpgradeData().store(STUCK, ItemStack.CODEC, ops(level), target);
+        pedestal.upgradeDataChanged();
+    }
+
+    // An item coming out unchanged
+    private static void refused(ServerLevel level, BasePedestalBlockEntity pedestal)
+    {
+        level.playSound(null, pedestal.getBlockPos(), SoundEvents.VILLAGER_NO, SoundSource.BLOCKS, 0.5F, 1.0F);
     }
 
     // ---- The plan ----
@@ -241,8 +292,12 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         Vec3 above = Vec3.atCenterOf(pedestal.getPosAbove());
         for (ItemStack leftover : plan.leftovers()) Containers.dropItemStack(level, above.x, above.y, above.z, leftover.copy());
         savePlan(level, pedestal, null);
-        level.playSound(null, pedestal.getBlockPos(), SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.25F, 1.0F);
-        pedestal.spawnParticles(level, pedestal.getPosAbove(), 0x00FF00);
+        if (plan.experience() == 0 && ItemStack.matches(plan.result(), plan.target())) refused(level, pedestal); // passed through unchanged
+        else
+        {
+            level.playSound(null, pedestal.getBlockPos(), SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.25F, 1.0F);
+            pedestal.spawnParticles(level, pedestal.getPosAbove(), 0x00FF00);
+        }
     }
 
     // Gives back everything collected so far (dropped above the anvil) and forgets the plan
@@ -296,8 +351,9 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         }
         int stored = experience(pedestal).getAmountAsInt(0);
 
-        // The first item that can be worked on wins; if none can, the first one's missing inputs are shown
-        List<Missing> shown = null;
+        // Items are tried in order. An item the anvil can't do anything with is passed over; the first that can be
+        // worked on is, unless it's missing something: then the anvil pauses on it and shows what's missing
+        // (a redstone signal skips it)
         for (int index = 0; index < inventory.size(); index++)
         {
             ItemResource resource = inventory.getResource(index);
@@ -319,11 +375,18 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
             if (plan != null)
             {
                 pedestal.setGhosts(List.of());
+                setStuck(level, pedestal, null);
                 return plan;
             }
-            if (shown == null && !missing.isEmpty()) shown = missing;
+            if (!missing.isEmpty())
+            {
+                pedestal.setGhosts(ghosts(level, pedestal, inputs, missing));
+                setStuck(level, pedestal, target);
+                return null;
+            }
         }
-        pedestal.setGhosts(shown == null ? List.of() : ghosts(level, pedestal, inputs, shown));
+        pedestal.setGhosts(List.of());
+        setStuck(level, pedestal, null);
         return null;
     }
 
@@ -507,9 +570,13 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         NamedInput name = findName(sources);
         if (used.isEmpty() && name == null)
         {
-            // There were enchanted inputs but none could go on (blacklisted, conflicts without a recipe or too many
-            // inputs, lower levels...): the item comes out as it is and the inputs stay where they are
-            return inputs.isEmpty() ? null : new Plan(target, target.copy(), 0, List.of(), 0, List.of());
+            if (inputs.isEmpty()) return null;
+            // A blacklisted item comes straight out unchanged
+            if (blacklisted) return new Plan(target, target.copy(), 0, List.of(), 0, List.of());
+            // Otherwise the anvil pauses, marking every input that can't go on (a lower level, a conflict without a
+            // recipe...), until they're changed or a redstone signal skips the item
+            for (EnchantInput input : inputs) missing.add(Missing.blocked(input.source().pedestal.getBlockPos()));
+            return null;
         }
 
         ItemStack result = target.copy();
@@ -731,12 +798,13 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
 
     // Something a plan couldn't find: what to show and how much is needed (before any extra-pedestal factor).
     // perPedestal: whether it comes from input pedestals (and so costs more on the 10th one on); experience doesn't.
-    private record Missing(ItemStack display, int amount, Unit unit, boolean perPedestal, @Nullable Component fluidName)
+    // at: a fixed place to show it (above an input pedestal whose input can't be used); null = wherever there's room
+    private record Missing(ItemStack display, int amount, Unit unit, boolean perPedestal, @Nullable Component fluidName, @Nullable BlockPos at)
     {
         static Missing item(ItemStack display, int amount)
         {
             // An ingredient with nothing to show (an empty tag) shows a barrier
-            return new Missing(display.isEmpty() ? new ItemStack(Items.BARRIER) : display.copyWithCount(1), amount, Unit.ITEMS, true, null);
+            return new Missing(display.isEmpty() ? new ItemStack(Items.BARRIER) : display.copyWithCount(1), amount, Unit.ITEMS, true, null, null);
         }
 
         // Shown as a fluid packet, since an input pedestal needs one to give fluid
@@ -744,17 +812,23 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         {
             List<Holder<Fluid>> fluids = fluid.ingredient().fluids();
             Component name = fluids.isEmpty() ? null : fluids.getFirst().value().getFluidType().getDescription();
-            return new Missing(packet(PedestalTransportTypes.FLUIDS.get()), amount, Unit.MILLIBUCKETS, true, name);
+            return new Missing(packet(PedestalTransportTypes.FLUIDS.get()), amount, Unit.MILLIBUCKETS, true, name, null);
         }
 
         static Missing energy(int amount)
         {
-            return new Missing(packet(PedestalTransportTypes.ENERGY.get()), amount, Unit.ENERGY, true, null);
+            return new Missing(packet(PedestalTransportTypes.ENERGY.get()), amount, Unit.ENERGY, true, null, null);
         }
 
         static Missing experience(int points)
         {
-            return new Missing(packet(PedestalTransportTypes.EXPERIENCE.get()), points, Unit.EXPERIENCE, false, null);
+            return new Missing(packet(PedestalTransportTypes.EXPERIENCE.get()), points, Unit.EXPERIENCE, false, null, null);
+        }
+
+        // The input on this pedestal can't be used
+        static Missing blocked(BlockPos pedestal)
+        {
+            return new Missing(new ItemStack(Items.BARRIER), 0, Unit.BLOCKED, false, null, pedestal);
         }
 
         private static ItemStack packet(PedestalTransportType<?> type)
@@ -765,6 +839,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
 
         Component label(int factor)
         {
+            if (unit == Unit.BLOCKED) return Component.translatable("pedestals.anvil_cannot_apply");
             int total = perPedestal ? amount * factor : amount;
             MutableComponent text = Component.literal(switch (unit)
             {
@@ -772,13 +847,14 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
                 case MILLIBUCKETS -> total + " mB";
                 case ENERGY -> total + " FE";
                 case EXPERIENCE -> total + " XP";
+                case BLOCKED -> "";
             });
             if (fluidName != null) text.append(" ").append(fluidName);
             return text;
         }
     }
 
-    private enum Unit { ITEMS, MILLIBUCKETS, ENERGY, EXPERIENCE }
+    private enum Unit { ITEMS, MILLIBUCKETS, ENERGY, EXPERIENCE, BLOCKED }
 
     // Each missing input goes above an empty input pedestal (its amount scaled for that pedestal); experience, and
     // anything left over when there are no more empty input pedestals, circles the anvil (scaled for the next
@@ -795,7 +871,8 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         int extraPedestals = 0;
         for (Missing input : missing)
         {
-            if (input.perPedestal() && nextEmpty < empty.size())
+            if (input.at() != null) ghosts.add(new GhostItem(Optional.of(input.at()), input.display(), input.label(1)));
+            else if (input.perPedestal() && nextEmpty < empty.size())
             {
                 int index = empty.get(nextEmpty++);
                 ghosts.add(new GhostItem(Optional.of(inputs.get(index).getBlockPos()), input.display(), input.label(factor(index))));

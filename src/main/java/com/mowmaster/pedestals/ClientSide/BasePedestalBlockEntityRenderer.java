@@ -23,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,48 +159,52 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             poseStack.popPose();
         }
 
-        // Ghosts circling this pedestal, evenly spaced, a little higher and wider than its own item
-        for (int index = 0; index < state.ghostCount; index++)
-        {
-            Ghost ghost = state.ghosts.get(index);
-            if (ghost.orbitIndex < 0) continue;
-            poseStack.pushPose();
-            poseStack.translate(0.5f, 1.2f, 0.5f);
-            poseStack.rotateDegrees(Axis.YP, state.spin + 360f * ghost.orbitIndex / state.orbitCount);
-            poseStack.translate(0.9f, 0f, 0f);
-            submitGhost(ghost, state, poseStack, submitNodeCollector, camera);
-            poseStack.popPose();
-        }
         poseStack.popPose();
 
-        // Ghosts above other pedestals (already placed in world directions)
+        // Ghosts are drawn in world directions (not turned with the pedestal), so they can face the camera
         for (int index = 0; index < state.ghostCount; index++)
         {
             Ghost ghost = state.ghosts.get(index);
-            if (ghost.orbitIndex >= 0) continue;
+            Vec3 offset = ghost.orbitIndex < 0 ? ghost.offset : orbitOffset(state, ghost.orbitIndex);
             poseStack.pushPose();
-            poseStack.translate(ghost.offset.x, ghost.offset.y, ghost.offset.z);
+            poseStack.translate(offset.x, offset.y, offset.z);
             submitGhost(ghost, state, poseStack, submitNodeCollector, camera);
             poseStack.popPose();
         }
     }
 
-    // A ghost: bobbing and pulsing, lit at full brightness, with its label floating above (a name tag, which always
-    // turns to face the camera)
+    // Where a ghost circling this pedestal is now: evenly spaced round it, a little higher and wider than its own
+    // item, or straight above it if it's the only one. Worked out as if the pedestal stood on the ground, then turned
+    // the way it faces (Vector3f.rotate applies the quaternion to the point).
+    private static Vec3 orbitOffset(State state, int orbitIndex)
+    {
+        Vector3f point;
+        if (state.orbitCount == 1) point = new Vector3f(0f, 1.1f, 0f);
+        else
+        {
+            double angle = Math.toRadians(state.spin + 360.0 * orbitIndex / state.orbitCount);
+            point = new Vector3f((float) Math.cos(angle) * 0.9f, 0.7f, (float) Math.sin(angle) * 0.9f);
+        }
+        point.rotate(state.facing.getRotation());
+        return new Vec3(0.5 + point.x(), 0.5 + point.y(), 0.5 + point.z());
+    }
+
+    // A ghost: bobbing and pulsing, lit at full brightness, always turned to face the camera (like a thrown snowball),
+    // with its label floating above (a name tag, which faces the camera by itself)
     private static void submitGhost(Ghost ghost, State state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
     {
         double wave = Math.toRadians(state.spin * 2);
         poseStack.pushPose();
         poseStack.translate(0f, (float) (0.05 * Math.sin(wave)), 0f);
-        float size = 0.45f + 0.05f * (float) Math.sin(wave * 2);
-        poseStack.scale(size, size, size);
-        poseStack.rotateDegrees(Axis.YP, -state.spin);
-        ghost.item.submit(poseStack, submitNodeCollector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
-        poseStack.popPose();
         if (ghost.label != null)
         {
             submitNodeCollector.submitNameTag(poseStack, new Vec3(0, 0.45, 0), 0, ghost.label, true, FULL_BRIGHT, camera);
         }
+        poseStack.rotate(camera.orientation);
+        float size = 0.45f + 0.05f * (float) Math.sin(wave * 2);
+        poseStack.scale(size, size, size);
+        ghost.item.submit(poseStack, submitNodeCollector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        poseStack.popPose();
     }
 
     // Normally just this block and the space above it; with ghosts, out to every pedestal they float over.

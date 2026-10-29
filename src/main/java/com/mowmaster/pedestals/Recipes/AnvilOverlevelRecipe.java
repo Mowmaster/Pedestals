@@ -80,5 +80,12 @@ public final class AnvilOverlevelRecipe extends PedestalMachineRecipe<AnvilOverl
         {
             return 0;
         }
+
+        // Recipe lookups skip inputs that count as empty (no items), and this input never has items
+        @Override
+        public boolean isEmpty()
+        {
+            return false;
+        }
     }
 }
