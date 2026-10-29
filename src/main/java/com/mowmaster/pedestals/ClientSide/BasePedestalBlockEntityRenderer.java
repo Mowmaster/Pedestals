@@ -54,7 +54,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
     // Ghost labels: half a name tag's size (name tags use 0.025 blocks per font pixel), white on vanilla's dark backing.
     // Heights are from the ghost's centre to the top edge of the text.
     private static final float TEXT_SCALE = 0.0125f;
-    private static final float LABEL_ABOVE = 0.875f;
+    private static final float LABEL_ABOVE = 0.6f;
     private static final float LABEL_BELOW = -0.3f;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
     private static final int TEXT_BACKGROUND = 0x40000000;

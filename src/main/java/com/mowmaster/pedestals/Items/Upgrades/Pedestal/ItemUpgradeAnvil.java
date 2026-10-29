@@ -630,11 +630,11 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
                 SizedFluidIngredient fluid = cost.fluid().get();
                 int needed = fluid.amount() * charge.times();
                 int found = takeFluid(sources, fluid, needed);
-                if (found < needed) missing.add(Missing.fluid(fluid, needed - found));
+                if (found < needed) missing.add(Missing.fluid(fluid, needed - found, fluidSupplier(sources, fluid)));
             }
             int energy = cost.energy() * charge.times();
             int foundEnergy = energy > 0 ? takeEnergy(sources, energy) : 0;
-            if (foundEnergy < energy) missing.add(Missing.energy(energy - foundEnergy));
+            if (foundEnergy < energy) missing.add(Missing.energy(energy - foundEnergy, energySupplier(sources)));
             levels += cost.experienceLevels() * charge.times();
         }
         if (missing.size() > before) return null;
@@ -694,6 +694,11 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         @Nullable FluidResource fluid;
         int fluidAmount;
         int energy;
+        // Whether it has the packet for that type, and whether that storage is already full
+        boolean fluidPacket;
+        boolean fluidFull;
+        boolean energyPacket;
+        boolean energyFull;
         PacketContents<ItemResource> takenItems = new PacketContents<>(PedestalTransportTypes.ITEMS.get(), List.of());
         PacketContents<FluidResource> takenFluid = new PacketContents<>(PedestalTransportTypes.FLUIDS.get(), List.of());
         PacketContents<AmountResource> takenEnergy = new PacketContents<>(PedestalTransportTypes.ENERGY.get(), List.of());
@@ -716,10 +721,15 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
                     PedestalStorage<FluidResource> fluids = pedestal.getStorage(PedestalTransportTypes.FLUIDS.get());
                     fluid = fluids.getResource(0);
                     fluidAmount = fluids.getAmountAsInt(0);
+                    fluidPacket = true;
+                    fluidFull = !fluid.isEmpty() && fluidAmount >= fluids.getCapacityAsInt(0, fluid);
                 }
                 else if (type == PedestalTransportTypes.ENERGY.get())
                 {
-                    energy = pedestal.getStorage(PedestalTransportTypes.ENERGY.get()).getAmountAsInt(0);
+                    PedestalStorage<AmountResource> energyStorage = pedestal.getStorage(PedestalTransportTypes.ENERGY.get());
+                    energy = energyStorage.getAmountAsInt(0);
+                    energyPacket = true;
+                    energyFull = energy >= energyStorage.getCapacityAsInt(0, EnergyTransportType.ENERGY);
                 }
             }
         }
@@ -809,17 +819,19 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
     // ---- Missing inputs ----
 
     // Something a plan couldn't find: what to show and how much is needed (before any extra-pedestal factor).
-    // perPedestal: whether it comes from input pedestals (and so costs more on the 10th one on); experience doesn't.
-    // at: a fixed place to show it (above an input pedestal whose input can't be used); null = wherever there's room
+    // perPedestal: whether it comes from an input pedestal (so it's shown over one); experience comes from the anvil.
+    // scales: whether the amount goes up on the 10th input pedestal on (potions don't: one is always enough).
+    // at: a fixed place to show it (the input pedestal that's short of a stored type, or whose input can't be used);
+    //     null = over the next empty input pedestal, or circling the anvil
     // detail: extra text after the amount (a fluid's name, a potion's effects)
-    private record Missing(ItemStack display, int amount, Unit unit, boolean perPedestal, @Nullable Component detail, @Nullable BlockPos at)
+    private record Missing(ItemStack display, int amount, Unit unit, boolean perPedestal, boolean scales, @Nullable Component detail, @Nullable BlockPos at)
     {
         static Missing item(ItemStack display, int amount)
         {
             // An ingredient with nothing to show (an empty tag) shows a barrier
-            if (display.isEmpty()) return new Missing(new ItemStack(Items.BARRIER), amount, Unit.ITEMS, true, null, null);
+            if (display.isEmpty()) return new Missing(new ItemStack(Items.BARRIER), amount, Unit.ITEMS, true, true, null, null);
             boolean potion = isPotion(display);
-            return new Missing(display.copyWithCount(1), potion ? 1 : amount, Unit.ITEMS, !potion, potionEffects(display), null);
+            return new Missing(display.copyWithCount(1), potion ? 1 : amount, Unit.ITEMS, true, !potion, potionEffects(display), null);
         }
 
         // A potion's effects as its tooltip names them: "Harming II", "Speed, Strength"... (null if it has none)
@@ -842,27 +854,27 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         }
 
         // Shown as a fluid packet, since an input pedestal needs one to give fluid
-        static Missing fluid(SizedFluidIngredient fluid, int amount)
+        static Missing fluid(SizedFluidIngredient fluid, int amount, @Nullable BlockPos at)
         {
             List<Holder<Fluid>> fluids = fluid.ingredient().fluids();
             Component name = fluids.isEmpty() ? null : fluids.getFirst().value().getFluidType().getDescription();
-            return new Missing(packet(PedestalTransportTypes.FLUIDS.get()), amount, Unit.MILLIBUCKETS, true, name, null);
+            return new Missing(packet(PedestalTransportTypes.FLUIDS.get()), amount, Unit.MILLIBUCKETS, true, true, name, at);
         }
 
-        static Missing energy(int amount)
+        static Missing energy(int amount, @Nullable BlockPos at)
         {
-            return new Missing(packet(PedestalTransportTypes.ENERGY.get()), amount, Unit.ENERGY, true, null, null);
+            return new Missing(packet(PedestalTransportTypes.ENERGY.get()), amount, Unit.ENERGY, true, true, null, at);
         }
 
         static Missing experience(int points)
         {
-            return new Missing(packet(PedestalTransportTypes.EXPERIENCE.get()), points, Unit.EXPERIENCE, false, null, null);
+            return new Missing(packet(PedestalTransportTypes.EXPERIENCE.get()), points, Unit.EXPERIENCE, false, false, null, null);
         }
 
         // The input on this pedestal can't be used
         static Missing blocked(BlockPos pedestal)
         {
-            return new Missing(new ItemStack(Items.BARRIER), 0, Unit.BLOCKED, false, null, pedestal);
+            return new Missing(new ItemStack(Items.BARRIER), 0, Unit.BLOCKED, false, false, null, pedestal);
         }
 
         private static ItemStack packet(PedestalTransportType<?> type)
@@ -874,7 +886,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         // Items: "x3" (and a potion's effects) above. Stored types: what it is above ("Lava", "Energy"), the amount below.
         GhostItem ghost(Optional<BlockPos> above, int factor)
         {
-            int total = perPedestal ? amount * factor : amount;
+            int total = scales ? amount * factor : amount;
             return switch (unit)
             {
                 case BLOCKED -> new GhostItem(above, display, Component.translatable("pedestals.anvil_cannot_apply"), Optional.empty());
@@ -905,7 +917,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         int extraPedestals = 0;
         for (Missing input : missing)
         {
-            if (input.at() != null) ghosts.add(input.ghost(Optional.of(input.at()), 1));
+            if (input.at() != null) ghosts.add(input.ghost(Optional.of(input.at()), factorAt(inputs, input.at())));
             else if (input.perPedestal() && nextEmpty < empty.size())
             {
                 int index = empty.get(nextEmpty++);
@@ -918,6 +930,42 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
             }
         }
         return ghosts;
+    }
+
+    // The extra-pedestal factor of the input pedestal at pos
+    private static int factorAt(List<BasePedestalBlockEntity> inputs, BlockPos pos)
+    {
+        for (int index = 0; index < inputs.size(); index++)
+        {
+            if (inputs.get(index).getBlockPos().equals(pos)) return factor(index);
+        }
+        return 1;
+    }
+
+    // Where a short stored type is shown: the input pedestal already giving it (it has the packet and holds this
+    // fluid, or failing that an empty one) as long as its storage isn't full. null = none, so the ghost goes over an
+    // empty input pedestal instead.
+    private static @Nullable BlockPos fluidSupplier(List<Source> sources, SizedFluidIngredient fluid)
+    {
+        for (Source source : sources)
+        {
+            if (source.fluidPacket && !source.fluidFull && source.fluid != null && !source.fluid.isEmpty()
+                    && fluid.ingredient().test(source.fluid.toStack(1))) return source.pedestal.getBlockPos();
+        }
+        for (Source source : sources)
+        {
+            if (source.fluidPacket && !source.fluidFull && (source.fluid == null || source.fluid.isEmpty())) return source.pedestal.getBlockPos();
+        }
+        return null;
+    }
+
+    private static @Nullable BlockPos energySupplier(List<Source> sources)
+    {
+        for (Source source : sources)
+        {
+            if (source.energyPacket && !source.energyFull) return source.pedestal.getBlockPos();
+        }
+        return null;
     }
 
     // ---- Small helpers ----
