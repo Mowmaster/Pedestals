@@ -378,9 +378,13 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 {
                     if (!player.isShiftKeyDown() && !player.isSpectator()) pullFromPlayer(pedestal, type, player, rate);
                 }
-                else if (!(entity instanceof LivingEntity)) type.absorbEntity(level, entity, pedestal.getStorage(type), rate);
-            }
+                else if (!(entity instanceof LivingEntity)) absorbFrom(level, pedestal, type, entity, rate);            }
         }
+    }
+
+    private static <R extends Resource> void absorbFrom(ServerLevel level, BasePedestalBlockEntity pedestal, PedestalTransportType<R> type, Entity entity, int rate)
+    {
+        type.absorbEntity(level, entity, pedestal.getStorage(type), rate);
     }
 
     private static <R extends Resource> void pullFromPlayer(BasePedestalBlockEntity pedestal, PedestalTransportType<R> type, Player player, int rate)
