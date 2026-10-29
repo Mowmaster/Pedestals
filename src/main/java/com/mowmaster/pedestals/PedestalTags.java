@@ -21,6 +21,9 @@ public class PedestalTags
     public static final TagKey<Block> CANT_PUMP = block("pedestals_cant_pump");
     // The recycler won't take these
     public static final TagKey<Item> CANNOT_RECYCLE = item("pedestals_cannot_recycle");
+    // The XP anvil only gives these enchantments they could normally take (no conflicting ones, nothing on items that
+    // can't be enchanted); if nothing else applies, the item just comes out
+    public static final TagKey<Item> ANVIL_BLACKLIST = item("pedestals_anvil_blacklist");
     // All upgrades (for recipe ingredients)
     public static final TagKey<Item> UPGRADES = item("upgrades");
     // The drain won't place these fluids

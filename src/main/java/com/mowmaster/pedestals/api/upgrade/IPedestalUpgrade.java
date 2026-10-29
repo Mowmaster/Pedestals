@@ -27,6 +27,12 @@ public interface IPedestalUpgrade
     {
     }
 
+    // Just before the pedestal throws away its upgrade data (the tool or work card changed, or a new upgrade went in).
+    // Not called when the upgrade itself is taken out: onRemoved runs then instead.
+    default void onUpgradeDataReset(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade)
+    {
+    }
+
     // The comparator output while this upgrade is in (0-15), or -1 to use the pedestal's item fill level
     default int getComparatorSignal(BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {

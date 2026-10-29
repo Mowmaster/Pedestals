@@ -1,0 +1,16 @@
+{
+  "type": "pedestals:anvil_conflict",
+  "first": "minecraft:breach",
+  "second": "minecraft:impaling",
+  "ingredients": [
+    {
+      "ingredient": "minecraft:nether_star",
+      "count": 1
+    },
+    {
+      "ingredient": "minecraft:dragon_breath",
+      "count": 1
+    }
+  ],
+  "experience_levels": 10
+}

@@ -1,0 +1,19 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_anvil",
+    {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "minecraft:enchanted_book",
+      "components": {
+        "minecraft:stored_enchantments": {
+          "minecraft:mending": 1
+        }
+      }
+    },
+    "minecraft:nether_star"
+  ],
+  "modifier": "upgrademending",
+  "value": 1,
+  "max": 1
+}

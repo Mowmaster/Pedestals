@@ -1,0 +1,33 @@
+{
+  "type": "pedestals:anvil_overlevel",
+  "enchantments": "minecraft:sharpness",
+  "ingredients": [
+    {
+      "ingredient": "minecraft:netherite_ingot",
+      "count": 1,
+      "levels": "5-10"
+    },
+    {
+      "ingredient": "minecraft:nether_star",
+      "count": 1,
+      "levels": "11-20"
+    },
+    {
+      "ingredient": {
+        "neoforge:ingredient_type": "neoforge:components",
+        "items": "minecraft:potion",
+        "components": {
+          "minecraft:potion_contents": {
+            "potion": "minecraft:strong_harming"
+          }
+        }
+      },
+      "count": 1
+    }
+  ],
+  "fluid": {
+    "ingredient": "minecraft:lava",
+    "amount": 1000
+  },
+  "experience_levels": 5
+}

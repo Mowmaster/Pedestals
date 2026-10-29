@@ -14,6 +14,7 @@ import com.mowmaster.pedestals.api.filter.IPedestalFilter;
 import com.mowmaster.pedestals.api.transport.PedestalStorage;
 import com.mowmaster.pedestals.api.transport.PedestalStorageHost;
 import com.mowmaster.pedestals.api.transport.PedestalTransportType;
+import com.mowmaster.pedestals.api.upgrade.GhostItem;
 import com.mowmaster.pedestals.api.upgrade.IPedestalUpgrade;
 import com.mowmaster.pedestals.api.upgrade.IWorkCard;
 import com.mowmaster.pedestals.api.upgrade.WorkCardType;
@@ -80,6 +81,8 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     private ItemStack upgrade = ItemStack.EMPTY;
     private ItemStack tool = ItemStack.EMPTY;
     private ItemStack workCard = ItemStack.EMPTY;
+    // Items the upgrade is missing, shown to players (synced to clients)
+    private List<GhostItem> ghosts = List.of();
     // The upgrade's own saved state for this pedestal (1.20 kept it on the upgrade item's NBT)
     private CompoundTag upgradeData = new CompoundTag();
     // Worked out from the work card when first needed; cleared whenever the upgrade, tool or card changes.
@@ -417,9 +420,15 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     // (1.20's actionOnRemovedFromPedestal / resetCachedValidWorkCardPositions)
     public void resetUpgradeState()
     {
+        // Lets the upgrade hand back anything it was keeping in its data (the XP anvil's collected inputs)
+        if (upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade && level instanceof ServerLevel serverLevel)
+        {
+            pedestalUpgrade.onUpgradeDataReset(serverLevel, this, upgrade);
+        }
         upgradeData = new CompoundTag();
         workPositions = null;
         fakePlayer = null;
+        ghosts = List.of();
         setChanged();
     }
 
@@ -539,6 +548,21 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
             }
         }
         return Optional.empty();
+    }
+
+    // ---- Ghost items ----
+
+    public List<GhostItem> getGhosts()
+    {
+        return ghosts;
+    }
+
+    // Replaces the ghost items; clients are only sent an update when they actually changed
+    public void setGhosts(List<GhostItem> newGhosts)
+    {
+        if (GhostItem.same(ghosts, newGhosts)) return;
+        ghosts = List.copyOf(newGhosts);
+        update();
     }
 
     // ---- Fake player ----
@@ -717,6 +741,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         if (!upgrade.isEmpty()) output.store("upgrade", ItemStack.CODEC, upgrade);
         if (!tool.isEmpty()) output.store("tool", ItemStack.CODEC, tool);
         if (!workCard.isEmpty()) output.store("work_card", ItemStack.CODEC, workCard);
+        if (!ghosts.isEmpty()) output.store("ghosts", GhostItem.CODEC.listOf(), ghosts);
         if (!upgradeData.isEmpty()) output.store("upgrade_data", CompoundTag.CODEC, upgradeData);
         tints.save(output);
     }
@@ -733,6 +758,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         upgrade = input.read("upgrade", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         tool = input.read("tool", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         workCard = input.read("work_card", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        ghosts = input.read("ghosts", GhostItem.CODEC.listOf()).orElse(List.of());
         upgradeData = input.read("upgrade_data", CompoundTag.CODEC).orElseGet(CompoundTag::new);
         workPositions = null;
         tints.load(input);

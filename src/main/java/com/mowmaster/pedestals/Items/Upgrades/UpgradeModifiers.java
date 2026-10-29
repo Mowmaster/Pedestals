@@ -31,6 +31,8 @@ public record UpgradeModifiers(Map<String, Integer> values)
     // Recycler upgrade
     public static final String DROP_CHANCE = "upgradedropchance";
     public static final String KNOWLEDGE = "upgradeknowledge";
+    // XP anvil upgrade
+    public static final String MENDING = "upgrademending";
     // Capacity modifiers are one per transport type: see PedestalTransportType#getCapacityModifier
     // (upgradeitemcapacity, upgradefluidcapacity, upgradeenergycapacity, upgradexpcapacity, ...).
     // Upgrades list this to accept every type's capacity modifier.

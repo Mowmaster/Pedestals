@@ -2,6 +2,7 @@ package com.mowmaster.pedestals.Transport;
 
 import com.mojang.serialization.Codec;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.ClientSide.ClientTransferParticles;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Storage.StoragePacketItem;
 import com.mowmaster.pedestals.api.filter.FilterDirection;
@@ -18,6 +19,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -25,6 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -239,5 +242,13 @@ public class FluidTransportType extends PedestalTransportType<FluidResource>
                     .append(": " + stored.getAmount() + "/" + getCapacity())
                     .withStyle(type.getColor());
         }
+    }
+
+    // Bubbles in the fluid's colour. Fluid colours are only known on the client, so the work is in a client class.
+    @Override
+    public void addTransferParticles(Level level, Vec3 from, Vec3 to, @Nullable FluidResource resource, RandomSource random)
+    {
+        if (resource == null || resource.isEmpty()) super.addTransferParticles(level, from, to, resource, random);
+        else ClientTransferParticles.fluid(level, from, to, resource, random);
     }
 }

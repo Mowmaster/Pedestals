@@ -2,10 +2,13 @@ package com.mowmaster.pedestals.api.transport;
 
 import com.mojang.serialization.Codec;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Network.TransferParticlesPayload;
 import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.TrailParticleOption;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -13,11 +16,13 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
@@ -26,7 +31,6 @@ import net.neoforged.neoforge.transfer.resource.Resource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Objects;
 
 // One kind of thing a pedestal can hold and send down its links: items, fluids, energy, experience, or anything
@@ -212,5 +216,43 @@ public abstract class PedestalTransportType<R extends Resource>
     public Component getName()
     {
         return Component.translatable(getId().toLanguageKey("transport_type")).withStyle(color);
+    }
+
+    // ---- Particles ----
+
+    // Shows some of this type moving from one place to another (the XP anvil drawing from its input pedestals).
+    // Call it on the server; nearby players get a TransferParticlesPayload and draw it with addTransferParticles.
+    public void sendTransferParticles(ServerLevel level, Vec3 from, Vec3 to, @Nullable R resource)
+    {
+        TransferParticlesPayload.send(level, this, from, to, resource);
+    }
+
+    // Runs on the CLIENT. resource is what moved (null if the type has no resource stream codec).
+    // Default: sparks in the type's colour flying from `from` to `to`. Override to draw your own; anything client-only
+    // (textures, tints...) must be in a separate client class called from here, as this class also loads on servers.
+    public void addTransferParticles(Level level, Vec3 from, Vec3 to, @Nullable R resource, RandomSource random)
+    {
+        addTrailParticles(level, from, to, getRgb(), 6, random);
+    }
+
+    // Particles in colour rgb that each fly from near `from` to `to` in about a second (vanilla's trail particle)
+    protected static void addTrailParticles(Level level, Vec3 from, Vec3 to, int rgb, int count, RandomSource random)
+    {
+        for (int particle = 0; particle < count; particle++)
+        {
+            Vec3 start = from.add(random.nextGaussian() * 0.15, random.nextGaussian() * 0.15, random.nextGaussian() * 0.15);
+            level.addParticle(new TrailParticleOption(to, rgb, 15 + random.nextInt(15)), start.x, start.y, start.z, 0, 0, 0);
+        }
+    }
+
+    // count particles at random points along the line from `from` to `to`, each drifting on towards `to`
+    protected static void addParticlesAlong(Level level, ParticleOptions particle, Vec3 from, Vec3 to, int count, RandomSource random)
+    {
+        Vec3 direction = to.subtract(from).normalize().scale(0.1);
+        for (int index = 0; index < count; index++)
+        {
+            Vec3 at = from.lerp(to, random.nextDouble()).add(random.nextGaussian() * 0.08, random.nextGaussian() * 0.08, random.nextGaussian() * 0.08);
+            level.addParticle(particle, at.x, at.y, at.z, direction.x, direction.y + 0.05, direction.z);
+        }
     }
 }

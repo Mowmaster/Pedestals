@@ -126,6 +126,8 @@ public class ItemRegistry {
     public static final DeferredItem<ItemUpgradeMaterialGenerator> PEDESTAL_UPGRADE_COBBLEGEN = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_cobblegen", ItemUpgradeMaterialGenerator::new);
     // From 1.16 (coin/xpenchanter)
     public static final DeferredItem<ItemUpgradeEnchanter> PEDESTAL_UPGRADE_ENCHANTER = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_enchanter", ItemUpgradeEnchanter::new);
+    // From 1.16 (coin/xpanvil)
+    public static final DeferredItem<ItemUpgradeAnvil> PEDESTAL_UPGRADE_ANVIL = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_anvil", ItemUpgradeAnvil::new);
 
     // For the creative tab, in display order (1.20's order)
     public static final List<DeferredItem<? extends Item>> UPGRADES = List.of(PEDESTAL_UPGRADE_BASE, PEDESTAL_UPGRADE_IMPORT,
@@ -137,7 +139,7 @@ public class ItemRegistry {
             PEDESTAL_UPGRADE_FAN, PEDESTAL_UPGRADE_BOTTLER, PEDESTAL_UPGRADE_UNBOTTLER, PEDESTAL_UPGRADE_PACKAGER,
             PEDESTAL_UPGRADE_UNPACKAGER, PEDESTAL_UPGRADE_CRAFTER, PEDESTAL_UPGRADE_MODIFICATIONS, PEDESTAL_UPGRADE_SMELTER,
             PEDESTAL_UPGRADE_SMOKER, PEDESTAL_UPGRADE_BLASTER, PEDESTAL_UPGRADE_GENERATOR, PEDESTAL_UPGRADE_COBBLEGEN,
-            PEDESTAL_UPGRADE_ENCHANTER);
+            PEDESTAL_UPGRADE_ENCHANTER, PEDESTAL_UPGRADE_ANVIL);
 
     public static final List<DeferredItem<? extends Item>> WORKCARDS = List.of(WORKCARD_AREA, WORKCARD_LOCATIONS, WORKCARD_PEDESTALS);
 

@@ -13,6 +13,7 @@ import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,6 +22,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -236,6 +238,25 @@ public class EnergyTransportType extends PedestalTransportType<AmountResource>
         public int extract(int index, AmountResource resource, int amount, TransactionContext transaction)
         {
             return ENERGY.equals(resource) && amount > 0 ? handler.extract(amount, transaction) : 0;
+        }
+    }
+
+    // A lightning bolt: electric sparks along a zig-zag line
+    @Override
+    public void addTransferParticles(Level level, Vec3 from, Vec3 to, @Nullable AmountResource resource, RandomSource random)
+    {
+        int segments = 8;
+        Vec3 previous = from;
+        for (int segment = 1; segment <= segments; segment++)
+        {
+            Vec3 next = from.lerp(to, (double) segment / segments);
+            if (segment < segments) next = next.add(random.nextGaussian() * 0.15, random.nextGaussian() * 0.15, random.nextGaussian() * 0.15);
+            for (int spark = 0; spark < 3; spark++)
+            {
+                Vec3 at = previous.lerp(next, random.nextDouble());
+                level.addParticle(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 0, 0, 0);
+            }
+            previous = next;
         }
     }
 }

@@ -22,6 +22,8 @@ public class PedestalRecipes
     public static final DeferredHolder<RecipeType<?>, RecipeType<MaterialGeneratorRecipe>> MATERIAL_GENERATOR = type("cobblegen");
     public static final DeferredHolder<RecipeType<?>, RecipeType<UpgradeModificationRecipe>> UPGRADE_MODIFICATION = type("upgrademodification_global");
     public static final DeferredHolder<RecipeType<?>, RecipeType<EntityFilterRecipe>> ENTITY_FILTER = type("entity_filter");
+    public static final DeferredHolder<RecipeType<?>, RecipeType<AnvilOverlevelRecipe>> ANVIL_OVERLEVEL = type("anvil_overlevel");
+    public static final DeferredHolder<RecipeType<?>, RecipeType<AnvilConflictRecipe>> ANVIL_CONFLICT = type("anvil_conflict");
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BottlerRecipe>> BOTTLER_SERIALIZER =
             SERIALIZERS.register("bottler", () -> new RecipeSerializer<>(BottlerRecipe.MAP_CODEC, BottlerRecipe.STREAM_CODEC));
@@ -35,6 +37,10 @@ public class PedestalRecipes
             SERIALIZERS.register("upgrademodification_global", () -> new RecipeSerializer<>(UpgradeModificationRecipe.MAP_CODEC, UpgradeModificationRecipe.STREAM_CODEC));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<EntityFilterRecipe>> ENTITY_FILTER_SERIALIZER =
             SERIALIZERS.register("entity_filter", () -> new RecipeSerializer<>(EntityFilterRecipe.MAP_CODEC, EntityFilterRecipe.STREAM_CODEC));
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AnvilOverlevelRecipe>> ANVIL_OVERLEVEL_SERIALIZER =
+            SERIALIZERS.register("anvil_overlevel", () -> new RecipeSerializer<>(AnvilOverlevelRecipe.MAP_CODEC, AnvilOverlevelRecipe.STREAM_CODEC));
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AnvilConflictRecipe>> ANVIL_CONFLICT_SERIALIZER =
+            SERIALIZERS.register("anvil_conflict", () -> new RecipeSerializer<>(AnvilConflictRecipe.MAP_CODEC, AnvilConflictRecipe.STREAM_CODEC));
 
     // RecipeType has no methods to implement, so "new RecipeType<>() {...}" makes one on the spot (an anonymous
     // class); toString gives it a readable name in logs

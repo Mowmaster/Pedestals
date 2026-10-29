@@ -36,6 +36,7 @@
     "pedestals:upgrade_pedestal_blaster",
     "pedestals:upgrade_pedestal_crafter",
     "pedestals:upgrade_pedestal_cobblegen",
-    "pedestals:upgrade_pedestal_enchanter"
+    "pedestals:upgrade_pedestal_enchanter",
+    "pedestals:upgrade_pedestal_anvil"
   ]
 }

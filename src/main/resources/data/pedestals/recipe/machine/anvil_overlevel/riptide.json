@@ -1,0 +1,27 @@
+{
+  "type": "pedestals:anvil_overlevel",
+  "enchantments": "minecraft:riptide",
+  "ingredients": [
+    {
+      "ingredient": "minecraft:nether_star",
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "neoforge:ingredient_type": "neoforge:components",
+        "items": "minecraft:potion",
+        "components": {
+          "minecraft:potion_contents": {
+            "potion": "minecraft:strong_harming"
+          }
+        }
+      },
+      "count": 1
+    }
+  ],
+  "fluid": {
+    "ingredient": "minecraft:lava",
+    "amount": 1000
+  },
+  "experience_levels": 5
+}

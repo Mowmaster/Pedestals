@@ -20,6 +20,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -193,5 +194,13 @@ public class ExperienceTransportType extends PedestalTransportType<AmountResourc
                     .append(": " + amount + "/" + getAllowedCapacity())
                     .withStyle(type.getColor());
         }
+    }
+
+    // Glowing green and yellow specks, like experience orbs, flying to the target
+    @Override
+    public void addTransferParticles(Level level, Vec3 from, Vec3 to, @Nullable AmountResource resource, RandomSource random)
+    {
+        addTrailParticles(level, from, to, 0x80FF20, 4, random);
+        addTrailParticles(level, from, to, 0xD4FF4A, 4, random);
     }
 }

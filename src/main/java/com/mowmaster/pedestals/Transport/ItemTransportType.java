@@ -10,6 +10,10 @@ import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -17,9 +21,11 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -259,5 +265,20 @@ public class ItemTransportType extends PedestalTransportType<ItemResource>
             }
             return message.withStyle(type.getColor());
         }
+    }
+
+    // Bits of the item: a block's breaking particles, or an item's (like an item breaking or being eaten)
+    @Override
+    public void addTransferParticles(Level level, Vec3 from, Vec3 to, @Nullable ItemResource resource, RandomSource random)
+    {
+        if (resource == null || resource.isEmpty())
+        {
+            super.addTransferParticles(level, from, to, resource, random);
+            return;
+        }
+        ParticleOptions particle = resource.getItem() instanceof BlockItem blockItem
+                ? new BlockParticleOption(ParticleTypes.BLOCK, blockItem.getBlock().defaultBlockState())
+                : new ItemParticleOption(ParticleTypes.ITEM, resource.getItem());
+        addParticlesAlong(level, particle, from, to, 10, random);
     }
 }
