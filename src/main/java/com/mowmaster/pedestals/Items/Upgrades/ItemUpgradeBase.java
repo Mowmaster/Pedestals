@@ -407,7 +407,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
         if (type == PedestalTransportTypes.EXPERIENCE.get())
         {
-            int amount = Math.min(rate, player.totalExperience);
+            int amount = Math.min(rate, playerExperience(player));
             if (amount <= 0) return;
             int inserted;
             try (Transaction transaction = Transaction.openRoot())
@@ -416,8 +416,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 if (inserted <= 0) return;
                 transaction.commit();
             }
-            // giveExperiencePoints only steps down one level per call, so it's taken a point at a time
-            for (int point = 0; point < inserted; point++) player.giveExperiencePoints(-1);
+            setPlayerExperience(player, playerExperience(player) - inserted);
             return;
         }
         PedestalStorage<R> storage = pedestal.getStorage(type);
@@ -433,6 +432,30 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
                 return;
             }
         }
+    }
+
+    // The player's real total points, from their level and progress bar. Player#totalExperience can't be used:
+    // vanilla only raises it in giveExperiencePoints, so levels from commands or spent at an enchanting table
+    // or anvil never show up in it.
+    private static int playerExperience(Player player)
+    {
+        long points = ExperienceTransportType.pointsForLevel(player.experienceLevel)
+                + Math.round(player.experienceProgress * player.getXpNeededForNextLevel());
+        return (int) Math.min(points, Integer.MAX_VALUE);
+    }
+
+    // Sets the player to exactly this many points (level + progress bar), all at once
+    private static void setPlayerExperience(Player player, int points)
+    {
+        points = Math.max(0, points);
+        int level = 0;
+        while (ExperienceTransportType.pointsForLevel(level + 1) <= points) level++;
+        player.experienceLevel = level;
+        // getXpNeededForNextLevel reads experienceLevel, so it's set first
+        player.experienceProgress = (float) (points - ExperienceTransportType.pointsForLevel(level)) / player.getXpNeededForNextLevel();
+        player.totalExperience = points;
+        // Adding 0 levels changes nothing, but on the server it makes the player resend their xp bar to the client
+        player.giveExperienceLevels(0);
     }
 
     // ---- Tooltip ----
