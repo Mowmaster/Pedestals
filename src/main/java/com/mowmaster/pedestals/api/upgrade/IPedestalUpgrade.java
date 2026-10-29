@@ -2,9 +2,11 @@ package com.mowmaster.pedestals.api.upgrade;
 
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import java.util.List;
 
 // Implemented by upgrade items. A pedestal holds one upgrade and calls it every server tick.
 // Most upgrades should extend ItemUpgradeBase instead, which adds the work speed, modifiers, fuel, tools, mode
@@ -30,6 +32,12 @@ public interface IPedestalUpgrade
     // Just before the pedestal throws away its upgrade data (the tool or work card changed, or a new upgrade went in).
     // Not called when the upgrade itself is taken out: onRemoved runs then instead.
     default void onUpgradeDataReset(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade)
+    {
+    }
+
+    // With the pedestal's collision augment, once per operation: the entities touching the pedestal (in its block
+    // space: lying on top of it, or a player standing on it). ItemUpgradeBase calls this from its tick.
+    default void onCollide(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade, List<Entity> touching)
     {
     }
 

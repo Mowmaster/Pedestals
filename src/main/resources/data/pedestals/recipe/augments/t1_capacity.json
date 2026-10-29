@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:gems/emerald",
+    "minecraft:obsidian",
+    "pedestals:tool_augments_capacity"
+  ],
+  "result": {
+    "id": "pedestals:augment_pedestal_t1_capacity"
+  }
+}

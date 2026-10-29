@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:ingots/netherite",
+    "minecraft:obsidian",
+    "pedestals:augment_pedestal_t1_storage"
+  ],
+  "result": {
+    "id": "pedestals:augment_pedestal_t2_storage"
+  }
+}

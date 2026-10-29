@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:rods",
+    "minecraft:obsidian",
+    "minecraft:bookshelf"
+  ],
+  "result": {
+    "id": "pedestals:tool_augments_speed"
+  }
+}

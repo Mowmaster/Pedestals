@@ -85,13 +85,14 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
 
         // The last number is a seed for items whose model picks randomly; the position keeps it steady per pedestal
         int seed = (int) pedestal.getBlockPos().asLong();
-        ItemStack stack = pedestal.getItemInPedestal();
+        // The particle & render augment can hide the item, and the upgrade with the tool
+        ItemStack stack = pedestal.rendersItem() ? pedestal.getItemInPedestal() : ItemStack.EMPTY;
         itemModelResolver.updateForTopItem(state.item, stack, ItemDisplayContext.GROUND, pedestal.getLevel(), null, seed);
         // FIXED is the item frame look: flat, full size, no bobbing. 1.20 used it for both of these too.
-        itemModelResolver.updateForTopItem(state.upgrade, pedestal.getUpgrade(), ItemDisplayContext.FIXED, pedestal.getLevel(), null, seed);
+        itemModelResolver.updateForTopItem(state.upgrade, pedestal.rendersUpgrade() ? pedestal.getUpgrade() : ItemStack.EMPTY, ItemDisplayContext.FIXED, pedestal.getLevel(), null, seed);
         // Only the inserted tool, not the upgrade's default one (1.20 showed the default too; drop the
         // hasTool check, i.e. use getToolStack(), if you want that back)
-        itemModelResolver.updateForTopItem(state.tool, pedestal.getTool(), ItemDisplayContext.FIXED, pedestal.getLevel(), null, seed);
+        itemModelResolver.updateForTopItem(state.tool, pedestal.rendersUpgrade() ? pedestal.getTool() : ItemStack.EMPTY, ItemDisplayContext.FIXED, pedestal.getLevel(), null, seed);
 
         extractGhosts(pedestal, state, seed);
     }

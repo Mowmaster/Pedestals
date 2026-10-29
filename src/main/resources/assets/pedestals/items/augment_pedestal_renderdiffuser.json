@@ -1,0 +1,55 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "pedestals:diffuser_mode",
+    "cases": [
+      {
+        "when": 1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/augments/diffuser_i"
+        }
+      },
+      {
+        "when": 2,
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/augments/diffuser_u"
+        }
+      },
+      {
+        "when": 3,
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/augments/diffuser_pi"
+        }
+      },
+      {
+        "when": 4,
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/augments/diffuser_pu"
+        }
+      },
+      {
+        "when": 5,
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/augments/diffuser_iu"
+        }
+      },
+      {
+        "when": 6,
+        "model": {
+          "type": "minecraft:model",
+          "model": "pedestals:item/augments/diffuser_piu"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "pedestals:item/augments/diffuser_p"
+    }
+  }
+}

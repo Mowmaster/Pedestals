@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.Items;
 
+import com.mojang.serialization.Codec;
 import com.mowmaster.pedestals.Items.Filters.FilterData;
 import com.mowmaster.pedestals.Items.Storage.PacketContents;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeMode;
@@ -70,6 +71,10 @@ public class PedestalDataComponents
     // Unit is Minecraft's "no value" type, for components that only matter by being there.
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> SACRIFICE_MOB =
             COMPONENTS.registerComponentType("sacrifice_mob", builder -> builder.persistent(Unit.CODEC).networkSynchronized(Unit.STREAM_CODEC));
+
+    // The particle & render augment's mode (0-6, see AugmentItem#hidesParticles etc.); absent = 0
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> DIFFUSER_MODE =
+            COMPONENTS.registerComponentType("diffuser_mode", builder -> builder.persistent(Codec.intRange(0, 6)).networkSynchronized(ByteBufCodecs.VAR_INT));
 
     public static void register(IEventBus eventBus)
     {

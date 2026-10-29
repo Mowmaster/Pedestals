@@ -57,7 +57,21 @@ public class FluidTransportType extends PedestalTransportType<FluidResource>
     @Override
     public int getTransferRate(PedestalStorageHost host)
     {
-        return Config.FLUID_TRANSFER_RATE.getAsInt();
+        return Config.FLUID_TRANSFER_RATE.getAsInt() + host.getTransferBonus(this);
+    }
+
+    // ---- Augments ----
+
+    @Override
+    public int getCapacityAugmentBonus(int tier)
+    {
+        return tier < 1 || tier > Config.CAPACITY_AUGMENTS.size() ? 0 : Config.CAPACITY_AUGMENTS.get(tier - 1).fluids().getAsInt();
+    }
+
+    @Override
+    public int getStorageAugmentBonus(int tier)
+    {
+        return tier < 1 || tier > Config.STORAGE_AUGMENTS.size() ? 0 : Config.STORAGE_AUGMENTS.get(tier - 1).fluids().getAsInt();
     }
 
     @Override
@@ -197,7 +211,7 @@ public class FluidTransportType extends PedestalTransportType<FluidResource>
 
         public int getCapacity()
         {
-            return Config.FLUID_STORAGE.getAsInt();
+            return Config.FLUID_STORAGE.getAsInt() + host.getStorageBonus(type);
         }
 
         @Override

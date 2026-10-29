@@ -57,7 +57,21 @@ public class EnergyTransportType extends PedestalTransportType<AmountResource>
     @Override
     public int getTransferRate(PedestalStorageHost host)
     {
-        return Config.ENERGY_TRANSFER_RATE.getAsInt();
+        return Config.ENERGY_TRANSFER_RATE.getAsInt() + host.getTransferBonus(this);
+    }
+
+    // ---- Augments ----
+
+    @Override
+    public int getCapacityAugmentBonus(int tier)
+    {
+        return tier < 1 || tier > Config.CAPACITY_AUGMENTS.size() ? 0 : Config.CAPACITY_AUGMENTS.get(tier - 1).energy().getAsInt();
+    }
+
+    @Override
+    public int getStorageAugmentBonus(int tier)
+    {
+        return tier < 1 || tier > Config.STORAGE_AUGMENTS.size() ? 0 : Config.STORAGE_AUGMENTS.get(tier - 1).energy().getAsInt();
     }
 
     // Other mods' cables see a normal NeoForge EnergyHandler
@@ -141,7 +155,7 @@ public class EnergyTransportType extends PedestalTransportType<AmountResource>
         @Override
         public int getCapacity()
         {
-            return Config.ENERGY_STORAGE.getAsInt();
+            return (int) Math.min(Integer.MAX_VALUE, (long) Config.ENERGY_STORAGE.getAsInt() + host.getStorageBonus(type));
         }
 
         // The energy drops as a mechanical energy storage packet (as in 1.20)

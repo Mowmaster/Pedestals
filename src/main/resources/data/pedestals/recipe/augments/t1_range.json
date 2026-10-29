@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:nether_star",
+    "minecraft:obsidian",
+    "pedestals:tool_augments_range"
+  ],
+  "result": {
+    "id": "pedestals:augment_pedestal_t1_range"
+  }
+}

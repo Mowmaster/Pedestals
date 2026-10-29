@@ -34,9 +34,11 @@ public class CreativeTabRegistry
                 output.accept(ItemRegistry.TOOL_UPGRADETOOL.get());
                 output.accept(ItemRegistry.TOOL_TOOLSWAPPER.get());
                 output.accept(ItemRegistry.TOOL_WORKTOOL.get());
+                ItemRegistry.AUGMENT_TOOLS.forEach(tool -> output.accept(tool.get()));
                 ItemRegistry.FILTERS.forEach(filter -> output.accept(filter.get()));
                 ItemRegistry.WORKCARDS.forEach(card -> output.accept(card.get()));
                 ItemRegistry.UPGRADES.forEach(upgrade -> output.accept(upgrade.get()));
+                ItemRegistry.AUGMENTS.forEach(augment -> output.accept(augment.get()));
                 ItemRegistry.PACKETS.forEach(packet -> output.accept(packet.get()));
                 output.accept(ItemRegistry.SACRIFICE.get());
                 output.accept(BlockRegistry.BLOCK_PEDESTAL.get());

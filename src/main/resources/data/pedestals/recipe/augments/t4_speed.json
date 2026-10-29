@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:gems/diamond",
+    "minecraft:obsidian",
+    "pedestals:augment_pedestal_t3_speed"
+  ],
+  "result": {
+    "id": "pedestals:augment_pedestal_t4_speed"
+  }
+}

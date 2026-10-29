@@ -56,11 +56,25 @@ public class ExperienceTransportType extends PedestalTransportType<AmountResourc
         return new Storage(host, this);
     }
 
-    // As in 1.20: the rate is in levels, counted from level 0 (1 level = 7 points)
+    // As in 1.20: the rate is in levels, counted from level 0 (1 level = 7 points); capacity augments add levels
     @Override
     public int getTransferRate(PedestalStorageHost host)
     {
-        return pointsForLevel(Config.XP_TRANSFER_RATE.getAsInt());
+        return pointsForLevel(Config.XP_TRANSFER_RATE.getAsInt() + host.getTransferBonus(this));
+    }
+
+    // ---- Augments ----
+
+    @Override
+    public int getCapacityAugmentBonus(int tier)
+    {
+        return tier < 1 || tier > Config.CAPACITY_AUGMENTS.size() ? 0 : Config.CAPACITY_AUGMENTS.get(tier - 1).experience().getAsInt();
+    }
+
+    @Override
+    public int getStorageAugmentBonus(int tier)
+    {
+        return tier < 1 || tier > Config.STORAGE_AUGMENTS.size() ? 0 : Config.STORAGE_AUGMENTS.get(tier - 1).experience().getAsInt();
     }
 
     @Override
@@ -176,7 +190,7 @@ public class ExperienceTransportType extends PedestalTransportType<AmountResourc
         @Override
         public int getCapacity()
         {
-            return pointsForLevel(Config.XP_STORAGE.getAsInt());
+            return pointsForLevel(Config.XP_STORAGE.getAsInt() + host.getStorageBonus(type));
         }
 
         // The experience drops as a mechanical experience storage packet (as in 1.20)

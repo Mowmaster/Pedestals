@@ -74,7 +74,7 @@ public class ItemUpgradeEnchanter extends ItemUpgradeBase
     public void tick(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
         super.tick(level, pedestal, upgrade);
-        if (!pedestal.isPowered() && pedestal.getUpgradeData().getBooleanOr(HAS_ITEMS, false)) streamParticles(level, pedestal);
+        if (!pedestal.isPowered() && pedestal.canSpawnParticles() && pedestal.getUpgradeData().getBooleanOr(HAS_ITEMS, false)) streamParticles(level, pedestal);
     }
 
     @Override

@@ -15,4 +15,16 @@ public interface PedestalStorageHost
 
     // The most of this resource the filter allows the pedestal to hold (capacity if the filter doesn't limit it)
     <R extends Resource> int filterLimit(PedestalTransportType<R> type, R resource, int capacity);
+
+    // What the pedestal's capacity augments add to this type's link transfer rate, and its storage augments to its
+    // storage (in the type's own units: experience in levels, items in extra stacks). 0 without augments.
+    default int getTransferBonus(PedestalTransportType<?> type)
+    {
+        return 0;
+    }
+
+    default int getStorageBonus(PedestalTransportType<?> type)
+    {
+        return 0;
+    }
 }

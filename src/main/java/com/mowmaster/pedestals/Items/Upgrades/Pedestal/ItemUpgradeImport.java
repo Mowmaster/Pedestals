@@ -9,13 +9,13 @@ import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.resource.Resource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
 // Pulls from the block below into the pedestal: the first thing it can take of every enabled transport type
@@ -79,5 +79,12 @@ public class ItemUpgradeImport extends ItemUpgradeBase
             transaction.commit();
             return true;
         }
+    }
+
+    // With the collision augment: also pulls from what touches the pedestal (see ItemUpgradeBase#pullFromTouching)
+    @Override
+    public void onCollide(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade, List<Entity> touching)
+    {
+        pullFromTouching(level, pedestal, upgrade, touching);
     }
 }

@@ -146,6 +146,21 @@ public abstract class PedestalTransportType<R extends Resource>
         return true;
     }
 
+    // ---- Augments ----
+
+    // What one capacity augment of this tier (1-4) adds to the link transfer rate, and one storage augment to the
+    // storage, in whatever units getTransferRate and the storage use (see PedestalStorageHost#getTransferBonus).
+    // Default 0: augments don't affect an add-on type unless it says how much.
+    public int getCapacityAugmentBonus(int tier)
+    {
+        return 0;
+    }
+
+    public int getStorageAugmentBonus(int tier)
+    {
+        return 0;
+    }
+
     // ---- Storage packets ----
 
     // How this type's resource is saved, so storage packets can hold it. null = this type has no packets.

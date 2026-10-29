@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.transfer.resource.Resource;
 import org.jetbrains.annotations.Nullable;
-
+import java.util.List;
 import java.util.Optional;
 
 // Pulls things lying in the work card's area into the pedestal, for every enabled transport type: items, xp orbs and
@@ -87,5 +87,12 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase
         boolean unlimited = type == PedestalTransportTypes.ITEMS.get() || type == PedestalTransportTypes.EXPERIENCE.get();
         int amount = unlimited ? Integer.MAX_VALUE : getRate(upgrade, type, Config.IMPORT_RATES.get(type, pedestal));
         return type.absorbEntity(level, entity, pedestal.getStorage(type), amount);
+    }
+
+    // With the collision augment: also pulls from what touches the pedestal (see ItemUpgradeBase#pullFromTouching)
+    @Override
+    public void onCollide(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade, List<Entity> touching)
+    {
+        pullFromTouching(level, pedestal, upgrade, touching);
     }
 }

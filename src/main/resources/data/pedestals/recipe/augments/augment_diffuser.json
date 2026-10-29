@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "pedestals:tool_augments_diffuser",
+    "minecraft:paper"
+  ],
+  "result": {
+    "id": "pedestals:augment_pedestal_renderdiffuser"
+  }
+}

@@ -192,7 +192,7 @@ public class ItemUpgradeReactor extends ItemUpgradeBase
         data.store(WEAR, Codec.unboundedMap(Codec.STRING, Codec.INT), wear);
         pedestal.upgradeDataChanged();
 
-        PedestalTransportTypes.ITEMS.get().sendTransferParticles(level, topOf(source), topOf(pedestal), ItemResource.of(sacrifice));
+        if (pedestal.canSpawnParticles()) PedestalTransportTypes.ITEMS.get().sendTransferParticles(level, topOf(source), topOf(pedestal), ItemResource.of(sacrifice));
         level.playSound(null, pedestal.getBlockPos(), SoundEvents.BLAZE_SHOOT, SoundSource.BLOCKS, 0.5F, 0.8F);
         applyEffects(level, pedestal, tier);
         chooseNext(level, pedestal, data, positions);

@@ -5,6 +5,8 @@ import com.mowmaster.pedestals.api.transport.PedestalStorageHost;
 import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.List;
+
 // Pedestal and upgrade settings, same names and defaults as 1.20's PedestalConfig (the template's example values
 // are gone). Augment values come back with the augments; dust values and the packets' discharge timers are gone.
 public class Config {
@@ -177,6 +179,29 @@ public class Config {
             .comment("Extra blocks of effect range per tier")
             .defineInRange("upgrade_reactor_effect_range_per_tier", 10, 0, Integer.MAX_VALUE);
 
+    // ---- Augments (tiers 1-4, same values as 1.20). Each list is tier 1 first. ----
+
+    public static final List<AmountAugment> CAPACITY_AUGMENTS = List.of(
+            AmountAugment.define("capacity", 1, 2, 2000, 5000, 1, 4),
+            AmountAugment.define("capacity", 2, 4, 4000, 10000, 5, 8),
+            AmountAugment.define("capacity", 3, 8, 8000, 100000, 10, 12),
+            AmountAugment.define("capacity", 4, 16, 16000, 1000000, 15, 16));
+    public static final List<AmountAugment> STORAGE_AUGMENTS = List.of(
+            AmountAugment.define("storage", 1, 1, 4000, 20000, 10, 3),
+            AmountAugment.define("storage", 2, 1, 16000, 100000, 15, 7),
+            AmountAugment.define("storage", 3, 1, 64000, 1000000, 20, 11),
+            AmountAugment.define("storage", 4, 1, 265000, 10000000, 25, 15));
+    public static final List<SimpleAugment> SPEED_AUGMENTS = List.of(
+            SimpleAugment.define("speed", "Ticks taken off the time between link transfers", 1, 2, 5),
+            SimpleAugment.define("speed", "Ticks taken off the time between link transfers", 2, 4, 5),
+            SimpleAugment.define("speed", "Ticks taken off the time between link transfers", 3, 6, 5),
+            SimpleAugment.define("speed", "Ticks taken off the time between link transfers", 4, 8, 5));
+    public static final List<SimpleAugment> RANGE_AUGMENTS = List.of(
+            SimpleAugment.define("range", "Blocks added to the linking range", 1, 2, 4),
+            SimpleAugment.define("range", "Blocks added to the linking range", 2, 6, 4),
+            SimpleAugment.define("range", "Blocks added to the linking range", 3, 8, 5),
+            SimpleAugment.define("range", "Blocks added to the linking range", 4, 8, 7));
+
     static {
         BUILDER.pop();
     }
@@ -207,6 +232,39 @@ public class Config {
             if (type == PedestalTransportTypes.ENERGY.get()) return energy.getAsInt();
             if (type == PedestalTransportTypes.EXPERIENCE.get()) return experience.getAsInt();
             return type.getDefaultUpgradeRate(host);
+        }
+    }
+
+    // A capacity or storage augment tier: what one augment adds per built-in transport type (capacity: to the link
+    // transfer rate; storage: to the storage, items as extra stacks), experience in levels, and how many can go in.
+    // Add-on types give their own values (PedestalTransportType#getCapacityAugmentBonus / getStorageAugmentBonus).
+    public record AmountAugment(ModConfigSpec.IntValue items, ModConfigSpec.IntValue fluids, ModConfigSpec.IntValue energy,
+                                ModConfigSpec.IntValue experience, ModConfigSpec.IntValue insertable)
+    {
+        static AmountAugment define(String kind, int tier, int items, int fluids, int energy, int experience, int insertable)
+        {
+            String prefix = "augment_t" + tier + "_" + kind + "_";
+            String name = " [" + kind + " augment, tier " + tier + "]";
+            String what = kind.equals("capacity") ? "Added to the transfer rate: " : "Added to the storage: ";
+            return new AmountAugment(
+                    BUILDER.comment(what + (kind.equals("capacity") ? "items" : "item stacks") + name).defineInRange(prefix + "items", items, 0, Integer.MAX_VALUE),
+                    BUILDER.comment(what + "fluid (mB)" + name).defineInRange(prefix + "fluids", fluids, 0, Integer.MAX_VALUE),
+                    BUILDER.comment(what + "energy" + name).defineInRange(prefix + "energy", energy, 0, Integer.MAX_VALUE),
+                    BUILDER.comment(what + "experience (levels)" + name).defineInRange(prefix + "experience", experience, 0, Integer.MAX_VALUE),
+                    BUILDER.comment("How many can go in one pedestal" + name).defineInRange(prefix + "insertable", insertable, 1, 64));
+        }
+    }
+
+    // A speed or range augment tier: what one augment does, and how many can go in
+    public record SimpleAugment(ModConfigSpec.IntValue amount, ModConfigSpec.IntValue insertable)
+    {
+        static SimpleAugment define(String kind, String comment, int tier, int amount, int insertable)
+        {
+            String prefix = "augment_t" + tier + "_" + kind + "_";
+            String name = " [" + kind + " augment, tier " + tier + "]";
+            return new SimpleAugment(
+                    BUILDER.comment(comment + name).defineInRange(prefix + "amount", amount, 0, Integer.MAX_VALUE),
+                    BUILDER.comment("How many can go in one pedestal" + name).defineInRange(prefix + "insertable", insertable, 1, 64));
         }
     }
 

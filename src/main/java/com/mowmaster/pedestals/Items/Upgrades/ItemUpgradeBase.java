@@ -3,9 +3,12 @@ package com.mowmaster.pedestals.Items.Upgrades;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.PedestalFakePlayer;
 import com.mowmaster.pedestals.Config;
+import com.mowmaster.pedestals.Items.Augments.AugmentType;
 import com.mowmaster.pedestals.Items.PedestalDataComponents;
 import com.mowmaster.pedestals.PedestalReferences;
+import com.mowmaster.pedestals.Transport.ExperienceTransportType;
 import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
+import com.mowmaster.pedestals.api.transport.PedestalStorage;
 import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import com.mowmaster.pedestals.api.upgrade.IPedestalUpgrade;
 import com.mowmaster.pedestals.api.upgrade.WorkCardType;
@@ -18,6 +21,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -27,10 +32,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.resource.Resource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -63,7 +69,13 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public void tick(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
         if (pedestal.isPowered()) return;
-        if (level.getGameTime() % getOperationTicks(upgrade) == 0) upgradeAction(level, pedestal, upgrade);
+        if (level.getGameTime() % getOperationTicks(upgrade) != 0) return;
+        upgradeAction(level, pedestal, upgrade);
+        if (pedestal.hasAugment(AugmentType.COLLIDE))
+        {
+            List<Entity> touching = level.getEntities((Entity) null, new AABB(pedestal.getBlockPos()), Entity::isAlive);
+            if (!touching.isEmpty()) onCollide(level, pedestal, upgrade, touching);
+        }
     }
 
     // The upgrade's work, once per operation
@@ -346,6 +358,77 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         pedestal.getUpgradeData().putInt(key, (current + 1) % size);
         pedestal.upgradeDataChanged();
         return current;
+    }
+
+    // ---- Collision augment ----
+
+    // For upgrades that pull things in (import, magnet), with the collision augment: for every enabled type, from
+    // what touches the pedestal. Things lying on it: whatever the type takes from them (items, xp orbs, a bucket's
+    // fluid...). Players standing on it (not sneaking): the first inventory stack that fits, experience, and other
+    // types out of the items they carry (buckets, batteries).
+    protected void pullFromTouching(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade, List<Entity> touching)
+    {
+        for (Entity entity : touching)
+        {
+            for (PedestalTransportType<?> type : getTransportTypes(upgrade))
+            {
+                if (!entity.isAlive()) break;
+                int rate = type.getTransferRate(pedestal);
+                if (entity instanceof Player player)
+                {
+                    if (!player.isShiftKeyDown() && !player.isSpectator()) pullFromPlayer(pedestal, type, player, rate);
+                }
+                else if (!(entity instanceof LivingEntity)) type.absorbEntity(level, entity, pedestal.getStorage(type), rate);
+            }
+        }
+    }
+
+    private static <R extends Resource> void pullFromPlayer(BasePedestalBlockEntity pedestal, PedestalTransportType<R> type, Player player, int rate)
+    {
+        Inventory inventory = player.getInventory();
+        if (type == PedestalTransportTypes.ITEMS.get())
+        {
+            // The main inventory only (slots 0-35), never armour or the offhand
+            for (int slot = 0; slot < Inventory.INVENTORY_SIZE; slot++)
+            {
+                ItemStack stack = inventory.getItem(slot);
+                if (stack.isEmpty()) continue;
+                int inserted = pedestal.insertItem(stack.copyWithCount(Math.min(stack.getCount(), rate)), false);
+                if (inserted <= 0) continue;
+                stack.shrink(inserted);
+                inventory.setChanged();
+                return;
+            }
+            return;
+        }
+        if (type == PedestalTransportTypes.EXPERIENCE.get())
+        {
+            int amount = Math.min(rate, player.totalExperience);
+            if (amount <= 0) return;
+            int inserted;
+            try (Transaction transaction = Transaction.openRoot())
+            {
+                inserted = pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, amount, transaction);
+                if (inserted <= 0) return;
+                transaction.commit();
+            }
+            // giveExperiencePoints only steps down one level per call, so it's taken a point at a time
+            for (int point = 0; point < inserted; point++) player.giveExperiencePoints(-1);
+            return;
+        }
+        PedestalStorage<R> storage = pedestal.getStorage(type);
+        for (int slot = 0; slot < Inventory.INVENTORY_SIZE; slot++)
+        {
+            if (inventory.getItem(slot).isEmpty()) continue;
+            ResourceHandler<R> handler = type.getItemHandler(ItemAccess.forPlayerSlot(player, slot));
+            if (handler == null) continue;
+            try (Transaction transaction = Transaction.openRoot())
+            {
+                if (type.transfer(handler, storage, rate, transaction) <= 0) continue;
+                transaction.commit();
+                return;
+            }
+        }
     }
 
     // ---- Tooltip ----

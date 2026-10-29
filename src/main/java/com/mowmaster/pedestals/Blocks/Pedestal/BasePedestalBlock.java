@@ -1,7 +1,9 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
+import com.mowmaster.pedestals.Items.Augments.AugmentItem;
 import com.mowmaster.pedestals.Items.ItemRegistry;
+import com.mowmaster.pedestals.Items.Tools.AugmentToolItem;
 import com.mowmaster.pedestals.Items.Tools.FilterToolItem;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolItem;
 import com.mowmaster.pedestals.TintHandler.IColorableBlock;
@@ -51,7 +53,6 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -224,6 +225,20 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
             return InteractionResult.SUCCESS;
         }
 
+        // Augment in the offhand: put one in (tiered ones stack up to their limit)
+        if (offhand.getItem() instanceof AugmentItem && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        {
+            if (!level.isClientSide() && !pedestal.insertAugment(offhand)) return InteractionResult.FAIL;
+            return InteractionResult.SUCCESS;
+        }
+
+        // Augment tool in the main hand: what the pedestal has of that kind, in chat
+        if (stack.getItem() instanceof AugmentToolItem augmentTool && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        {
+            if (!level.isClientSide()) pedestal.describeAugment(augmentTool.getType()).forEach(player::sendSystemMessage);
+            return InteractionResult.SUCCESS;
+        }
+
         // Upgrade, work card or tool in the offhand: put it in (one of each per pedestal)
         if (offhand.getItem() instanceof IPedestalUpgrade && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
         {
@@ -344,6 +359,13 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
             {
                 if (pedestal.hasWorkCard()) giveToPlayer(player, pedestal.removeWorkCard());
                 else player.sendOverlayMessage(Component.translatable("pedestals.tool_workcard_missing"));
+                return;
+            }
+            // Augment tool: take that kind of augment out (sneak: all of them)
+            if (offhand.getItem() instanceof AugmentToolItem augmentTool)
+            {
+                if (pedestal.hasAugment(augmentTool.getType())) giveToPlayer(player, pedestal.removeAugment(augmentTool.getType(), player.isShiftKeyDown()));
+                else player.sendOverlayMessage(Component.translatable("pedestals.tool.augment." + augmentTool.getType().key() + "_not"));
                 return;
             }
         }

@@ -268,7 +268,7 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
             }
             if (ResourceHandlerUtil.insertStacking(pedestal.getItemStorage(), ItemResource.of(result), 1, transaction) != 1) return;
             transaction.commit();
-            if (source != null) particles.forEach(Runnable::run);
+            if (source != null && pedestal.canSpawnParticles()) particles.forEach(Runnable::run);
             level.playSound(null, pedestal.getBlockPos(), source != null ? SoundEvents.ENCHANTMENT_TABLE_USE : SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS, 0.5F, 1.0F);
         }
     }

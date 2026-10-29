@@ -10,6 +10,7 @@ import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
@@ -43,6 +44,9 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ItemTransportType extends PedestalTransportType<ItemResource>
 {
     public ItemTransportType()
@@ -59,7 +63,21 @@ public class ItemTransportType extends PedestalTransportType<ItemResource>
     @Override
     public int getTransferRate(PedestalStorageHost host)
     {
-        return Config.ITEM_TRANSFER_RATE.getAsInt();
+        return Config.ITEM_TRANSFER_RATE.getAsInt() + host.getTransferBonus(this);
+    }
+
+    // ---- Augments ----
+
+    @Override
+    public int getCapacityAugmentBonus(int tier)
+    {
+        return tier < 1 || tier > Config.CAPACITY_AUGMENTS.size() ? 0 : Config.CAPACITY_AUGMENTS.get(tier - 1).items().getAsInt();
+    }
+
+    @Override
+    public int getStorageAugmentBonus(int tier)
+    {
+        return tier < 1 || tier > Config.STORAGE_AUGMENTS.size() ? 0 : Config.STORAGE_AUGMENTS.get(tier - 1).items().getAsInt();
     }
 
     // The item on top is drawn by the client
@@ -211,6 +229,31 @@ public class ItemTransportType extends PedestalTransportType<ItemResource>
             super(Config.ITEM_SLOTS.getAsInt());
             this.host = host;
             this.type = type;
+        }
+
+        // How many stacks it should have: the config's base plus the storage augments' extra stacks
+        public int wantedSize()
+        {
+            return Math.max(1, Config.ITEM_SLOTS.getAsInt() + host.getStorageBonus(type));
+        }
+
+        // Changes the number of stacks to wantedSize (setStacks is NeoForge's way to resize). Stacks that no
+        // longer fit are returned, for the pedestal to drop; with shrink = false it only ever grows (when loading,
+        // where nothing can be dropped yet).
+        public List<ItemStack> resize(boolean shrink)
+        {
+            int size = wantedSize();
+            if (size == stacks.size() || (!shrink && size < stacks.size())) return List.of();
+            List<ItemStack> overflow = new ArrayList<>();
+            NonNullList<ItemStack> resized = NonNullList.withSize(size, ItemStack.EMPTY);
+            for (int index = 0; index < stacks.size(); index++)
+            {
+                if (index < size) resized.set(index, stacks.get(index));
+                else if (!stacks.get(index).isEmpty()) overflow.add(stacks.get(index));
+            }
+            setStacks(resized);
+            if (!overflow.isEmpty() || size != stacks.size()) host.onStorageChanged(type);
+            return overflow;
         }
 
         @Override

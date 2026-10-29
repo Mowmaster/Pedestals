@@ -2,12 +2,15 @@ package com.mowmaster.pedestals.Blocks.Pedestal;
 
 import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.pedestals.Config;
+import com.mowmaster.pedestals.Items.Augments.AugmentItem;
+import com.mowmaster.pedestals.Items.Augments.AugmentType;
 import com.mowmaster.pedestals.Items.PedestalDataComponents;
 import com.mowmaster.pedestals.PedestalReferences;
 import com.mowmaster.pedestals.TintHandler.ITintHolder;
 import com.mowmaster.pedestals.TintHandler.libTintData;
 import com.mowmaster.pedestals.Transport.EnergyTransportType;
 import com.mowmaster.pedestals.Transport.ExperienceTransportType;
+import com.mowmaster.pedestals.Transport.ItemTransportType;
 import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
 import com.mowmaster.pedestals.api.filter.FilterDirection;
 import com.mowmaster.pedestals.api.filter.IPedestalFilter;
@@ -53,8 +56,8 @@ import net.neoforged.neoforge.transfer.resource.Resource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -67,7 +70,10 @@ import java.util.Optional;
 // Links: every TICKS_TO_TRANSFER ticks it sends to the first linked pedestal that accepts anything, every type at once.
 // Upgrades: one upgrade, one tool and one work card, all put in from the offhand. The upgrade is ticked every
 // server tick (IPedestalUpgrade#tick) and keeps its per-pedestal state in getUpgradeData().
-// Not ported yet: augments (speed, capacity, storage, range, round robin, no-collide), redstone counts.
+// Augments (see AugmentItem / AugmentType): speed (fewer ticks between link transfers), capacity (higher transfer
+// rates), storage (bigger storages, more item stacks), range (longer links), round robin (links take turns),
+// particle & render (hides particles / the item / the upgrade) and collision (upgrades also act on touching entities).
+// Not ported yet: redstone counts.
 public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder, PedestalStorageHost
 {
     // LinkedHashMap keeps the registry order, so types are always tried in the same order
@@ -81,6 +87,11 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     private ItemStack upgrade = ItemStack.EMPTY;
     private ItemStack tool = ItemStack.EMPTY;
     private ItemStack workCard = ItemStack.EMPTY;
+    // Augments by kind; a tiered kind is a stack of up to its tier's insertable amount. EnumMap: a map keyed by an
+    // enum, kept in the enum's order.
+    private final Map<AugmentType, ItemStack> augments = new EnumMap<>(AugmentType.class);
+    // With the round robin augment: the link to try first next time
+    private int roundRobinNext;
     // Items the upgrade is missing, shown to players (synced to clients)
     private List<GhostItem> ghosts = List.of();
     // The upgrade's own saved state for this pedestal (1.20 kept it on the upgrade item's NBT)
@@ -291,6 +302,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         if (hasUpgrade()) Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), takeUpgrade());
         Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), tool);
         Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), workCard);
+        augments.values().forEach(augment -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), augment));
     }
 
     // ---- Filter ----
@@ -582,6 +594,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
 
     public void spawnParticles(ServerLevel serverLevel, double x, double y, double z, int rgb)
     {
+        if (!canSpawnParticles()) return;
         serverLevel.sendParticles(new DustParticleOptions(rgb, 1.0F), x, y, z, 4, 0.1, 0.1, 0.1, 0);
     }
 
@@ -599,7 +612,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
 
     public int getLinkingRange()
     {
-        return Config.LINKING_RANGE.getAsInt();
+        return Config.LINKING_RANGE.getAsInt() + getAugmentAmount(AugmentType.RANGE);
     }
 
     // Within the range on every axis (a cube around the pedestal, as in 1.20)
@@ -674,25 +687,179 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         }
 
         if (links.isEmpty()) return;
-        if (++transferTicks < Config.TICKS_TO_TRANSFER.getAsInt()) return;
+        if (++transferTicks < getTransferTicks()) return;
         transferTicks = 0;
         if (isPowered()) return;
 
-        Iterator<BlockPos> iterator = links.iterator();
-        while (iterator.hasNext())
+        // One receiver per transfer, like 1.20: the first that takes anything. With the round robin augment the
+        // links take turns: the search starts after the last one that received.
+        boolean roundRobin = hasAugment(AugmentType.ROUND_ROBIN);
+        int count = links.size();
+        int start = roundRobin ? Math.floorMod(roundRobinNext, count) : 0;
+        List<BlockPos> gone = new ArrayList<>();
+        for (int step = 0; step < count; step++)
         {
-            BlockPos target = iterator.next();
+            int index = (start + step) % count;
+            BlockPos target = links.get(index);
             if (!level.isLoaded(target)) continue;
             if (!(level.getBlockEntity(target) instanceof BasePedestalBlockEntity receiver))
             {
-                // The pedestal there is gone
-                iterator.remove();
-                setChanged();
+                gone.add(target); // the pedestal there is gone
                 continue;
             }
             if (!isInRange(target) || level.hasNeighborSignal(target)) continue;
-            if (sendTo(receiver)) return; // one receiver per transfer, like 1.20 (round robin comes with augments)
+            if (sendTo(receiver))
+            {
+                if (roundRobin) roundRobinNext = index + 1;
+                break;
+            }
         }
+        if (!gone.isEmpty())
+        {
+            links.removeAll(gone);
+            setChanged();
+        }
+    }
+
+    // Ticks between link transfers: the config's, less the speed augments (at least 1)
+    public int getTransferTicks()
+    {
+        return Math.max(1, Config.TICKS_TO_TRANSFER.getAsInt() - getAugmentAmount(AugmentType.SPEED));
+    }
+
+    // ---- Augments ----
+
+    public ItemStack getAugment(AugmentType type)
+    {
+        return augments.getOrDefault(type, ItemStack.EMPTY);
+    }
+
+    public boolean hasAugment(AugmentType type)
+    {
+        return !getAugment(type).isEmpty();
+    }
+
+    // Puts one augment from the stack in: into an empty slot, or onto the same tier of a tiered kind while there's
+    // room. false if it can't go in.
+    public boolean insertAugment(ItemStack stack)
+    {
+        if (!(stack.getItem() instanceof AugmentItem augment)) return false;
+        AugmentType type = augment.getType();
+        ItemStack current = getAugment(type);
+        if (current.isEmpty()) augments.put(type, stack.split(1));
+        else if (type.tiered() && current.is(stack.getItem()) && current.getCount() < augment.getInsertable())
+        {
+            stack.shrink(1);
+            current.grow(1);
+        }
+        else return false;
+        augmentsChanged(type);
+        return true;
+    }
+
+    // Takes one augment of a kind out, or all of them
+    public ItemStack removeAugment(AugmentType type, boolean all)
+    {
+        ItemStack current = getAugment(type);
+        if (current.isEmpty()) return ItemStack.EMPTY;
+        ItemStack removed = all ? current : current.split(1);
+        if (all || current.isEmpty()) augments.remove(type);
+        augmentsChanged(type);
+        return removed;
+    }
+
+    private void augmentsChanged(AugmentType type)
+    {
+        if (type == AugmentType.STORAGE) resizeItemStorage(true);
+        update(); // clients need the augments too (the particle & render augment changes what's drawn)
+    }
+
+    // Storage augments add or take away item stacks; stacks that no longer fit drop above the pedestal
+    private void resizeItemStorage(boolean shrink)
+    {
+        if (!(getItemStorage() instanceof ItemTransportType.Storage itemStorage)) return;
+        List<ItemStack> overflow = itemStorage.resize(shrink);
+        if (level == null) return;
+        BlockPos above = getPosAbove();
+        overflow.forEach(stack -> Containers.dropItemStack(level, above.getX(), above.getY(), above.getZ(), stack));
+    }
+
+    // Ticks taken off (speed) or blocks added (range) by all the augments of that kind
+    public int getAugmentAmount(AugmentType type)
+    {
+        ItemStack stack = getAugment(type);
+        return stack.getItem() instanceof AugmentItem augment ? augment.getAmount() * stack.getCount() : 0;
+    }
+
+    @Override
+    public int getTransferBonus(PedestalTransportType<?> type)
+    {
+        ItemStack stack = getAugment(AugmentType.CAPACITY);
+        return stack.getItem() instanceof AugmentItem augment ? type.getCapacityAugmentBonus(augment.getTier()) * stack.getCount() : 0;
+    }
+
+    @Override
+    public int getStorageBonus(PedestalTransportType<?> type)
+    {
+        ItemStack stack = getAugment(AugmentType.STORAGE);
+        return stack.getItem() instanceof AugmentItem augment ? type.getStorageAugmentBonus(augment.getTier()) * stack.getCount() : 0;
+    }
+
+    // The particle & render augment's choices (all true without one)
+    public boolean canSpawnParticles()
+    {
+        return !hasAugment(AugmentType.DIFFUSER) || !AugmentItem.hidesParticles(AugmentItem.getDiffuserMode(getAugment(AugmentType.DIFFUSER)));
+    }
+
+    public boolean rendersItem()
+    {
+        return !hasAugment(AugmentType.DIFFUSER) || !AugmentItem.hidesItem(AugmentItem.getDiffuserMode(getAugment(AugmentType.DIFFUSER)));
+    }
+
+    public boolean rendersUpgrade()
+    {
+        return !hasAugment(AugmentType.DIFFUSER) || !AugmentItem.hidesUpgrade(AugmentItem.getDiffuserMode(getAugment(AugmentType.DIFFUSER)));
+    }
+
+    // What the pedestal has of one kind, for the augment tools (1.20's getPedestalDetail)
+    public List<Component> describeAugment(AugmentType type)
+    {
+        String modid = PedestalReferences.MODID;
+        List<Component> lines = new ArrayList<>();
+        ItemStack stack = getAugment(type);
+        if (stack.isEmpty())
+        {
+            lines.add(Component.translatable(modid + ".tool.augment." + type.key() + "_not").withStyle(ChatFormatting.DARK_AQUA));
+            return lines;
+        }
+        if (!type.tiered())
+        {
+            lines.add(Component.translatable(modid + ".tool.augment." + type.key()).withStyle(ChatFormatting.AQUA));
+            return lines;
+        }
+        int insertable = stack.getItem() instanceof AugmentItem augment ? augment.getInsertable() : stack.getCount();
+        lines.add(stack.getHoverName().copy().append(" ").append(Component.translatable(modid + ".tool.augment.inserted").withStyle(ChatFormatting.AQUA))
+                .append(Component.literal(stack.getCount() + "/" + insertable).withStyle(ChatFormatting.WHITE)));
+        switch (type)
+        {
+            case SPEED -> lines.add(Component.translatable(modid + ".tool.augment.speed").withStyle(ChatFormatting.AQUA)
+                    .append(Component.literal(getTransferTicks() + "/" + Config.TICKS_TO_TRANSFER.getAsInt()).withStyle(ChatFormatting.WHITE)));
+            case RANGE -> lines.add(Component.translatable(modid + ".tool.augment.range").withStyle(ChatFormatting.AQUA)
+                    .append(Component.literal(String.valueOf(getLinkingRange())).withStyle(ChatFormatting.WHITE)));
+            case CAPACITY -> storages.keySet().forEach(transportType -> lines.add(Component.literal(" ").append(transportType.getName())
+                    .append(Component.translatable(modid + ".tool.augment.rate").append(String.valueOf(transportType.getTransferRate(this))).withStyle(ChatFormatting.WHITE))));
+            case STORAGE -> storages.forEach((transportType, storage) -> lines.add(Component.literal(" ").append(transportType.getName())
+                    .append(Component.translatable(modid + ".tool.augment.capacity").append(capacityText(transportType, storage)).withStyle(ChatFormatting.WHITE))));
+            default -> {}
+        }
+        return lines;
+    }
+
+    // Items: how many stacks; anything else: the first slot's capacity
+    private static <R extends Resource> String capacityText(PedestalTransportType<?> type, PedestalStorage<R> storage)
+    {
+        if (type == PedestalTransportTypes.ITEMS.get()) return String.valueOf(storage.size());
+        return String.valueOf(storage.getCapacityAsLong(0, storage.getResource(0)));
     }
 
     private boolean sendTo(BasePedestalBlockEntity receiver)
@@ -741,6 +908,8 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         if (!upgrade.isEmpty()) output.store("upgrade", ItemStack.CODEC, upgrade);
         if (!tool.isEmpty()) output.store("tool", ItemStack.CODEC, tool);
         if (!workCard.isEmpty()) output.store("work_card", ItemStack.CODEC, workCard);
+        augments.forEach((type, augment) -> output.store("augment_" + type.key(), ItemStack.CODEC, augment));
+        if (roundRobinNext > 0) output.putInt("round_robin_next", roundRobinNext);
         if (!ghosts.isEmpty()) output.store("ghosts", GhostItem.CODEC.listOf(), ghosts);
         if (!upgradeData.isEmpty()) output.store("upgrade_data", CompoundTag.CODEC, upgradeData);
         tints.save(output);
@@ -750,8 +919,16 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     protected void loadAdditional(ValueInput input)
     {
         super.loadAdditional(input);
+        augments.clear();
+        for (AugmentType type : AugmentType.values())
+        {
+            input.read("augment_" + type.key(), ItemStack.CODEC).ifPresent(augment -> augments.put(type, augment));
+        }
+        roundRobinNext = input.getIntOr("round_robin_next", 0);
         ValueInput storageInput = input.childOrEmpty("storage");
         storages.forEach((type, storage) -> storage.deserialize(storageInput.childOrEmpty(type.getId().toString())));
+        // A saved item storage has the size it was saved with; make room for the storage augments
+        resizeItemStorage(false);
         links.clear();
         input.read("links", BlockPos.CODEC.listOf()).ifPresent(links::addAll);
         filter = input.read("filter", ItemStack.CODEC).orElse(ItemStack.EMPTY);

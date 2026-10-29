@@ -261,7 +261,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         }
         Vec3 from = topOf(input);
         Vec3 to = topOf(pedestal);
-        for (PacketContents<?> contents : step.take()) sendParticles(level, contents, from, to);
+        if (pedestal.canSpawnParticles()) for (PacketContents<?> contents : step.take()) sendParticles(level, contents, from, to);
         savePlan(level, pedestal, plan.advance());
     }
 
