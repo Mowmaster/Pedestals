@@ -8,6 +8,7 @@ import com.mowmaster.pedestals.Items.Upgrades.UpgradeOwner;
 import com.mowmaster.pedestals.PedestalReferences;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.util.Unit;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
@@ -64,6 +65,11 @@ public class PedestalDataComponents
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<PacketContents<?>>> PACKET_CONTENTS =
             COMPONENTS.registerComponentType("packet_contents", builder -> builder.persistent(PacketContents.CODEC).networkSynchronized(PacketContents.STREAM_CODEC));
+
+    // On a sacrifice upgrade: present = mob mode, absent = enchantment mode (also picks the item model).
+    // Unit is Minecraft's "no value" type, for components that only matter by being there.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> SACRIFICE_MOB =
+            COMPONENTS.registerComponentType("sacrifice_mob", builder -> builder.persistent(Unit.CODEC).networkSynchronized(Unit.STREAM_CODEC));
 
     public static void register(IEventBus eventBus)
     {

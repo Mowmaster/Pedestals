@@ -38,6 +38,7 @@ public class CreativeTabRegistry
                 ItemRegistry.WORKCARDS.forEach(card -> output.accept(card.get()));
                 ItemRegistry.UPGRADES.forEach(upgrade -> output.accept(upgrade.get()));
                 ItemRegistry.PACKETS.forEach(packet -> output.accept(packet.get()));
+                output.accept(ItemRegistry.SACRIFICE.get());
                 output.accept(BlockRegistry.BLOCK_PEDESTAL.get());
                 for (DyeColor dye : DyeColor.values())
                 {

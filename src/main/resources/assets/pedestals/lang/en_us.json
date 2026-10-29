@@ -91,6 +91,9 @@
   "item.pedestals.upgrade_pedestal_cobblegen": "Material Generator",
   "item.pedestals.upgrade_pedestal_enchanter": "Enchanter Upgrade",
   "item.pedestals.upgrade_pedestal_anvil": "Anvil Upgrade",
+  "item.pedestals.upgrade_pedestal_sacrifice": "Sacrifice Upgrade",
+  "item.pedestals.upgrade_pedestal_reactor": "Enchantment Sacrifice Reactor",
+  "item.pedestals.sacrifice": "Enchantment Sacrifice",
   "item.pedestals.tool_work": "Work Card Tool",
   "item.pedestals.tool_upgradetool.tooltip": "Offhand + left-click a pedestal: take its upgrade out",
   "item.pedestals.tool_toolswapper.tooltip": "Offhand + left-click a pedestal: take its tool out",
@@ -145,6 +148,8 @@
   "pedestals.modifier.upgradeknowledge": "Knowledge",
   "pedestals.modifier.upgrademending": "Mending",
   "pedestals.anvil_cannot_apply": "Can't be applied",
+  "pedestals.sacrifice_mode.enchantment": "Enchantment",
+  "pedestals.sacrifice_mode.mob": "Mob (not made yet)",
   "pedestals.upgrade_tooltip_enchanter_power": "Enchanting Power: 2 per bookshelf on the work card, up to %s",
   "pedestals.bulkstorage_item": "Contents:",
   "pedestals.bulkstorage_empty": "Empty"

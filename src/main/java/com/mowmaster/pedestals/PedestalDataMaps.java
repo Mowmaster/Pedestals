@@ -1,8 +1,10 @@
 package com.mowmaster.pedestals;
 
+import com.mowmaster.pedestals.Items.Upgrades.ReactorEffect;
 import com.mowmaster.pedestals.Recipes.RecyclingMaterials;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -19,9 +21,14 @@ public class PedestalDataMaps
     public static final DataMapType<Item, RecyclingMaterials> RECYCLING = DataMapType.builder(
             Identifier.fromNamespaceAndPath(PedestalReferences.MODID, "recycling"), Registries.ITEM, RecyclingMaterials.CODEC).build();
 
+    // data/<namespace>/data_maps/mob_effect/reactor_effects.json: the effects the sacrifice reactor gives
+    public static final DataMapType<MobEffect, ReactorEffect> REACTOR_EFFECTS = DataMapType.builder(
+            Identifier.fromNamespaceAndPath(PedestalReferences.MODID, "reactor_effects"), Registries.MOB_EFFECT, ReactorEffect.CODEC).build();
+
     @SubscribeEvent
     public static void register(RegisterDataMapTypesEvent event)
     {
         event.register(RECYCLING);
+        event.register(REACTOR_EFFECTS);
     }
 }

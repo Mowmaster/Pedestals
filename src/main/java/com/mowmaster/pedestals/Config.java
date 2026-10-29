@@ -147,6 +147,36 @@ public class Config {
             .comment("Energy the generator makes per tick of burning fuel")
             .defineInRange("upgrade_generator_base_energy_production", 20, 0, Integer.MAX_VALUE);
 
+    // ---- Sacrifice upgrade and sacrifice reactor ----
+
+    public static final ModConfigSpec.BooleanValue SACRIFICE_RESET_ALL = BUILDER
+            .comment("When the sacrifice upgrade uses up its book, reset every input's cost (false: only the input that ran short)")
+            .define("upgrade_sacrifice_reset_all_inputs", true);
+    public static final ModConfigSpec.IntValue REACTOR_ENERGY_PER_XP = BUILDER
+            .comment("Energy the sacrifice reactor makes per experience point it burns, at tier 1 (before the other multipliers)")
+            .defineInRange("upgrade_reactor_energy_per_xp", 100, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue REACTOR_TIER_BONUS = BUILDER
+            .comment("Percent more energy per experience point for each tier above 1 (100 = tier 2 makes double, tier 3 triple...)")
+            .defineInRange("upgrade_reactor_tier_bonus_percent", 100, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue REACTOR_VARIETY_BONUS = BUILDER
+            .comment("Percent more energy for each different kind of sacrifice among the recently burned ones, after the first")
+            .defineInRange("upgrade_reactor_variety_bonus_percent", 50, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue REACTOR_WEAR = BUILDER
+            .comment("Percent less energy each time the same kind of sacrifice is burned again (it recovers when it drops out of the recent ones)")
+            .defineInRange("upgrade_reactor_wear_percent", 5, 0, 100);
+    public static final ModConfigSpec.IntValue REACTOR_RECENT = BUILDER
+            .comment("How many of the last burned sacrifices count as recent (for wear and variety)")
+            .defineInRange("upgrade_reactor_recent_count", 10, 1, 1000);
+    public static final ModConfigSpec.IntValue REACTOR_BURN_SECONDS = BUILDER
+            .comment("Seconds a sacrifice burns per tier (tier 1 = this, tier 2 = twice this...)")
+            .defineInRange("upgrade_reactor_burn_seconds_per_tier", 8, 1, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue REACTOR_RANGE_BASE = BUILDER
+            .comment("Blocks the reactor's effects reach at tier 0 (like a beacon: base + per tier x tier)")
+            .defineInRange("upgrade_reactor_effect_range_base", 10, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue REACTOR_RANGE_PER_TIER = BUILDER
+            .comment("Extra blocks of effect range per tier")
+            .defineInRange("upgrade_reactor_effect_range_per_tier", 10, 0, Integer.MAX_VALUE);
+
     static {
         BUILDER.pop();
     }

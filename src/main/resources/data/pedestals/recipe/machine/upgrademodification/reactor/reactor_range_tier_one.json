@@ -1,0 +1,11 @@
+{
+  "type": "pedestals:upgrademodification_global",
+  "ingredients": [
+    "pedestals:upgrade_pedestal_reactor",
+    "minecraft:nether_star",
+    "minecraft:obsidian"
+  ],
+  "modifier": "upgraderange",
+  "value": 4,
+  "max": 64
+}

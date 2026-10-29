@@ -1,0 +1,24 @@
+{
+  "values": {
+    "minecraft:speed": {
+      "tier": 1,
+      "max_level": 3
+    },
+    "minecraft:haste": {
+      "tier": 2,
+      "max_level": 3
+    },
+    "minecraft:jump_boost": {
+      "tier": 3,
+      "max_level": 3
+    },
+    "minecraft:resistance": {
+      "tier": 4,
+      "max_level": 3
+    },
+    "minecraft:regeneration": {
+      "tier": 5,
+      "max_level": 3
+    }
+  }
+}
