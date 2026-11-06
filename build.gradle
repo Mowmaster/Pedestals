@@ -27,7 +27,14 @@ sourceSets.main.resources {
 }
 
 repositories {
-    // Add here additional repositories if required by some of the dependencies below.
+    // MowLib, published from the MowLib project with `gradlew publishToMavenLocal`.
+    // content { includeGroup ... } only looks for MowLib here, so nothing else is accidentally taken from the
+    // local repository.
+    mavenLocal {
+        content {
+            includeGroup 'com.mowmaster.mowlib'
+        }
+    }
 }
 
 base {
@@ -132,6 +139,15 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    // MowLib: compile against it, run with it in dev, and bundle it inside the Bibliomania jar (Jar-in-Jar),
+    // so players don't install it separately. Jar-in-Jar needs a version range: if several mods bundle MowLib,
+    // NeoForge loads the newest version every range allows.
+    jarJar(implementation(group: 'com.mowmaster.mowlib', name: 'mowlib')) {
+        version {
+            strictly '[0.0.1,1.0.0)'
+            prefer '0.0.1'
+        }
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
