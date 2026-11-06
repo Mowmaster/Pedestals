@@ -5,9 +5,9 @@
       "modid": "effectscrolls"
     }
   ],
-  "type": "pedestals:upgrademodification_global",
+  "type": "ironpedestals:upgrademodification_global",
   "ingredients": [
-    "pedestals:upgrade_pedestal_import",
+    "ironpedestals:upgrade_pedestal_import",
     "#c:gems/emerald",
     "effectscrolls:crystal"
   ],

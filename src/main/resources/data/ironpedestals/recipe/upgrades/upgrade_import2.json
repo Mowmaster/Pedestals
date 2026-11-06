@@ -2,9 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "pedestals:upgrade_pedestal_export"
+    "ironpedestals:upgrade_pedestal_export"
   ],
   "result": {
-    "id": "pedestals:upgrade_pedestal_import"
+    "id": "ironpedestals:upgrade_pedestal_import"
   }
 }

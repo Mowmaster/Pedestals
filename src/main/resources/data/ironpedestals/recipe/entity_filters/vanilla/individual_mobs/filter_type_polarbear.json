@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:entity_filter",
+  "type": "ironpedestals:entity_filter",
   "input": "minecraft:light_gray_terracotta",
   "entity": "minecraft:polar_bear"
 }

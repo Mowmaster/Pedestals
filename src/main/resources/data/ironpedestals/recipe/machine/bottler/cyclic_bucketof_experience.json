@@ -17,7 +17,7 @@
       ]
     }
   ],
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "minecraft:bucket",
   "experience": 44,
   "result": {

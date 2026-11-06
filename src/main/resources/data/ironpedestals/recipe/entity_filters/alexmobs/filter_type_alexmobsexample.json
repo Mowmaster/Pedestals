@@ -5,7 +5,7 @@
       "modid": "alexmobsmodidhere"
     }
   ],
-  "type": "pedestals:entity_filter",
+  "type": "ironpedestals:entity_filter",
   "input": "alexmobsmodidhere:trashpandafoodblock",
   "entity": "alexmobs:trashpanda"
 }

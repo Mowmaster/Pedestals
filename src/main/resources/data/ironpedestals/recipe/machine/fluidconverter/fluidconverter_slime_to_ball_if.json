@@ -5,7 +5,7 @@
       "modid": "industrialforegoing"
     }
   ],
-  "type": "pedestals:fluidconverter",
+  "type": "ironpedestals:fluidconverter",
   "fluid": {
     "ingredient": "industrialforegoing:pink_slime",
     "amount": 250

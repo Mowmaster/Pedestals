@@ -1,7 +1,7 @@
 {
-  "type": "pedestals:upgrademodification_global",
+  "type": "ironpedestals:upgrademodification_global",
   "ingredients": [
-    "pedestals:upgrade_pedestal_enchanter",
+    "ironpedestals:upgrade_pedestal_enchanter",
     "minecraft:nether_star",
     "#c:storage_blocks/emerald"
   ],

@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:cobblegen",
+  "type": "ironpedestals:cobblegen",
   "block_below": "minecraft:polished_andesite",
   "result": {
     "id": "minecraft:andesite"

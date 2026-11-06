@@ -4,9 +4,9 @@
   "ingredients": [
     "#c:gems/diamond",
     "minecraft:obsidian",
-    "pedestals:augment_pedestal_t3_speed"
+    "ironpedestals:augment_pedestal_t3_speed"
   ],
   "result": {
-    "id": "pedestals:augment_pedestal_t4_speed"
+    "id": "ironpedestals:augment_pedestal_t4_speed"
   }
 }

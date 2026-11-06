@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pedestals:item/upgrade_pedestal_cobblegen"
+    "model": "ironpedestals:item/upgrade_pedestal_cobblegen"
   }
 }

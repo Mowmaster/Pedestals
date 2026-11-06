@@ -1,158 +1,158 @@
 {
   "variants": {
     "facing=down,filter_status=0,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal",
+      "model": "ironpedestals:block/ironpedestals/pedestal",
       "x": 180
     },
     "facing=down,filter_status=0,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit",
+      "model": "ironpedestals:block/ironpedestals/pedestallit",
       "x": 180
     },
     "facing=down,filter_status=1,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_white",
+      "model": "ironpedestals:block/ironpedestals/pedestal_white",
       "x": 180
     },
     "facing=down,filter_status=1,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_white",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_white",
       "x": 180
     },
     "facing=down,filter_status=2,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_black",
+      "model": "ironpedestals:block/ironpedestals/pedestal_black",
       "x": 180
     },
     "facing=down,filter_status=2,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_black",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_black",
       "x": 180
     },
     "facing=east,filter_status=0,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal",
+      "model": "ironpedestals:block/ironpedestals/pedestal",
       "x": 90,
       "y": 90
     },
     "facing=east,filter_status=0,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit",
+      "model": "ironpedestals:block/ironpedestals/pedestallit",
       "x": 90,
       "y": 90
     },
     "facing=east,filter_status=1,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_white",
+      "model": "ironpedestals:block/ironpedestals/pedestal_white",
       "x": 90,
       "y": 90
     },
     "facing=east,filter_status=1,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_white",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_white",
       "x": 90,
       "y": 90
     },
     "facing=east,filter_status=2,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_black",
+      "model": "ironpedestals:block/ironpedestals/pedestal_black",
       "x": 90,
       "y": 90
     },
     "facing=east,filter_status=2,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_black",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_black",
       "x": 90,
       "y": 90
     },
     "facing=north,filter_status=0,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal",
+      "model": "ironpedestals:block/ironpedestals/pedestal",
       "x": 90
     },
     "facing=north,filter_status=0,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit",
+      "model": "ironpedestals:block/ironpedestals/pedestallit",
       "x": 90
     },
     "facing=north,filter_status=1,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_white",
+      "model": "ironpedestals:block/ironpedestals/pedestal_white",
       "x": 90
     },
     "facing=north,filter_status=1,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_white",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_white",
       "x": 90
     },
     "facing=north,filter_status=2,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_black",
+      "model": "ironpedestals:block/ironpedestals/pedestal_black",
       "x": 90
     },
     "facing=north,filter_status=2,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_black",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_black",
       "x": 90
     },
     "facing=south,filter_status=0,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal",
+      "model": "ironpedestals:block/ironpedestals/pedestal",
       "x": 90,
       "y": 180
     },
     "facing=south,filter_status=0,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit",
+      "model": "ironpedestals:block/ironpedestals/pedestallit",
       "x": 90,
       "y": 180
     },
     "facing=south,filter_status=1,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_white",
+      "model": "ironpedestals:block/ironpedestals/pedestal_white",
       "x": 90,
       "y": 180
     },
     "facing=south,filter_status=1,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_white",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_white",
       "x": 90,
       "y": 180
     },
     "facing=south,filter_status=2,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_black",
+      "model": "ironpedestals:block/ironpedestals/pedestal_black",
       "x": 90,
       "y": 180
     },
     "facing=south,filter_status=2,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_black",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_black",
       "x": 90,
       "y": 180
     },
     "facing=up,filter_status=0,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal"
+      "model": "ironpedestals:block/ironpedestals/pedestal"
     },
     "facing=up,filter_status=0,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit"
+      "model": "ironpedestals:block/ironpedestals/pedestallit"
     },
     "facing=up,filter_status=1,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_white"
+      "model": "ironpedestals:block/ironpedestals/pedestal_white"
     },
     "facing=up,filter_status=1,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_white"
+      "model": "ironpedestals:block/ironpedestals/pedestallit_white"
     },
     "facing=up,filter_status=2,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_black"
+      "model": "ironpedestals:block/ironpedestals/pedestal_black"
     },
     "facing=up,filter_status=2,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_black"
+      "model": "ironpedestals:block/ironpedestals/pedestallit_black"
     },
     "facing=west,filter_status=0,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal",
+      "model": "ironpedestals:block/ironpedestals/pedestal",
       "x": 90,
       "y": 270
     },
     "facing=west,filter_status=0,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit",
+      "model": "ironpedestals:block/ironpedestals/pedestallit",
       "x": 90,
       "y": 270
     },
     "facing=west,filter_status=1,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_white",
+      "model": "ironpedestals:block/ironpedestals/pedestal_white",
       "x": 90,
       "y": 270
     },
     "facing=west,filter_status=1,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_white",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_white",
       "x": 90,
       "y": 270
     },
     "facing=west,filter_status=2,lit=false": {
-      "model": "pedestals:block/pedestal/pedestal_black",
+      "model": "ironpedestals:block/ironpedestals/pedestal_black",
       "x": 90,
       "y": 270
     },
     "facing=west,filter_status=2,lit=true": {
-      "model": "pedestals:block/pedestal/pedestallit_black",
+      "model": "ironpedestals:block/ironpedestals/pedestallit_black",
       "x": 90,
       "y": 270
     }

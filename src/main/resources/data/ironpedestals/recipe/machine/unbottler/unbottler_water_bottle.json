@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": {
     "neoforge:ingredient_type": "neoforge:components",
     "items": "minecraft:potion",

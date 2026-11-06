@@ -2,12 +2,12 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "pedestals:upgrade_pedestal_base",
+    "ironpedestals:upgrade_pedestal_base",
     "minecraft:wheat",
     "minecraft:carrot",
     "#minecraft:small_flowers"
   ],
   "result": {
-    "id": "pedestals:upgrade_pedestal_breeder"
+    "id": "ironpedestals:upgrade_pedestal_breeder"
   }
 }

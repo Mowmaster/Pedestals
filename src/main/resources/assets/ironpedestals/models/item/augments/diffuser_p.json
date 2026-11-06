@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "pedestals:item/augments/augment_renderdiffuser_p"
+    "layer0": "ironpedestals:item/augments/augment_renderdiffuser_p"
   }
 }

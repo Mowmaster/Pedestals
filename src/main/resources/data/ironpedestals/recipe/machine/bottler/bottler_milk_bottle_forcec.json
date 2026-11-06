@@ -5,7 +5,7 @@
       "modid": "forcecraft"
     }
   ],
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "forcecraft:force_flask",
   "fluid": {
     "ingredient": "minecraft:milk",

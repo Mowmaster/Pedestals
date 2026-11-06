@@ -2,12 +2,12 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "pedestals:upgrade_pedestal_base",
+    "ironpedestals:upgrade_pedestal_base",
     "minecraft:pumpkin_seeds",
     "minecraft:melon_seeds",
     "minecraft:sweet_berries"
   ],
   "result": {
-    "id": "pedestals:upgrade_pedestal_planter"
+    "id": "ironpedestals:upgrade_pedestal_planter"
   }
 }

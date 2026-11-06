@@ -4,9 +4,9 @@
   "ingredients": [
     "minecraft:nether_star",
     "minecraft:obsidian",
-    "pedestals:tool_augments_range"
+    "ironpedestals:tool_augments_range"
   ],
   "result": {
-    "id": "pedestals:augment_pedestal_t1_range"
+    "id": "ironpedestals:augment_pedestal_t1_range"
   }
 }

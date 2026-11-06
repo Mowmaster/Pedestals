@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "minecraft:glass_bottle",
   "experience": 11,
   "result": {

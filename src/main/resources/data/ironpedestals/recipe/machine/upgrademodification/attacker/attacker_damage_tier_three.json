@@ -1,7 +1,7 @@
 {
-  "type": "pedestals:upgrademodification_global",
+  "type": "ironpedestals:upgrademodification_global",
   "ingredients": [
-    "pedestals:upgrade_pedestal_attacker",
+    "ironpedestals:upgrade_pedestal_attacker",
     "#c:gems/diamond",
     "minecraft:diamond_sword"
   ],

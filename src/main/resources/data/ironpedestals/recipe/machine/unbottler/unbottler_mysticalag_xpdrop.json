@@ -5,7 +5,7 @@
       "modid": "mysticalagriculture"
     }
   ],
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": "mysticalagriculture:experience_droplet",
   "experience": 12,
   "result": {

@@ -5,7 +5,7 @@
       "modid": "productivebees"
     }
   ],
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "minecraft:glass_bottle",
   "fluid": {
     "ingredient": "productivebees:honey",

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "pedestals:item/augments/roundrobin"
+    "layer0": "ironpedestals:item/augments/roundrobin"
   }
 }

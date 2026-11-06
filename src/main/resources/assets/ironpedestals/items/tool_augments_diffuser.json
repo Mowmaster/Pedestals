@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pedestals:item/tool_augments_diffuser"
+    "model": "ironpedestals:item/tool_augments_diffuser"
   }
 }

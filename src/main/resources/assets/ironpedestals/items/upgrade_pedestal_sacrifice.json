@@ -2,14 +2,14 @@
   "model": {
     "type": "minecraft:condition",
     "property": "minecraft:has_component",
-    "component": "pedestals:sacrifice_mob",
+    "component": "ironpedestals:sacrifice_mob",
     "on_true": {
       "type": "minecraft:model",
-      "model": "pedestals:item/upgrades/sacrifice/mob"
+      "model": "ironpedestals:item/upgrades/sacrifice/mob"
     },
     "on_false": {
       "type": "minecraft:model",
-      "model": "pedestals:item/upgrades/sacrifice/enchantment"
+      "model": "ironpedestals:item/upgrades/sacrifice/enchantment"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pedestals:item/workcard_belocations"
+    "model": "ironpedestals:item/workcard_belocations"
   }
 }

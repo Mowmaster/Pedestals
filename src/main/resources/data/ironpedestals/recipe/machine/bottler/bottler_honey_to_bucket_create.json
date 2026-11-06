@@ -5,7 +5,7 @@
       "modid": "create"
     }
   ],
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "minecraft:glass_bottle",
   "fluid": {
     "ingredient": "create:honey",

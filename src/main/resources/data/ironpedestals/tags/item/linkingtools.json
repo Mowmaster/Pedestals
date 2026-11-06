@@ -1,6 +1,6 @@
 {
   "values": [
-    "pedestals:tool_linkingtool",
-    "pedestals:tool_linkingtoolbackwards"
+    "ironpedestals:tool_linkingtool",
+    "ironpedestals:tool_linkingtoolbackwards"
   ]
 }

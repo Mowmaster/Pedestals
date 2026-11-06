@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "pedestals:item/augments/t3_capacity"
+    "layer0": "ironpedestals:item/augments/t3_capacity"
   }
 }

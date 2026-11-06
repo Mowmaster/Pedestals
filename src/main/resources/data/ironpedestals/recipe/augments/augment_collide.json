@@ -2,10 +2,10 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "pedestals:tool_augments_collide",
+    "ironpedestals:tool_augments_collide",
     "minecraft:paper"
   ],
   "result": {
-    "id": "pedestals:augment_pedestal_nocollide"
+    "id": "ironpedestals:augment_pedestal_nocollide"
   }
 }

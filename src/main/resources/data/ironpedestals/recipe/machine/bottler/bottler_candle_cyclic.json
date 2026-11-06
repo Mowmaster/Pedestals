@@ -5,7 +5,7 @@
       "modid": "cyclic"
     }
   ],
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "#c:strings",
   "fluid": {
     "ingredient": "cyclic:wax",

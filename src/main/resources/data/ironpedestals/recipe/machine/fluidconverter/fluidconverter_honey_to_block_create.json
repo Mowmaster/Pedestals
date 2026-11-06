@@ -5,7 +5,7 @@
       "modid": "create"
     }
   ],
-  "type": "pedestals:fluidconverter",
+  "type": "ironpedestals:fluidconverter",
   "fluid": {
     "ingredient": "create:honey",
     "amount": 1000

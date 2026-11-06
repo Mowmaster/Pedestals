@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": "minecraft:lava_bucket",
   "fluid": {
     "id": "minecraft:lava",

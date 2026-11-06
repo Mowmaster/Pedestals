@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": "minecraft:experience_bottle",
   "experience": 11,
   "result": {

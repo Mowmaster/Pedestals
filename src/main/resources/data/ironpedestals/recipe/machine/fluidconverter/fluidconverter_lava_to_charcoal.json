@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:fluidconverter",
+  "type": "ironpedestals:fluidconverter",
   "fluid": {
     "ingredient": "minecraft:lava",
     "amount": 1000

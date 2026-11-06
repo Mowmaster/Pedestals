@@ -5,7 +5,7 @@
       "modid": "sophisticatedcore"
     }
   ],
-  "type": "pedestals:fluidconverter",
+  "type": "ironpedestals:fluidconverter",
   "fluid": {
     "ingredient": "sophisticatedcore:xp_still",
     "amount": 250

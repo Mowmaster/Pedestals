@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "minecraft:bucket",
   "fluid": {
     "ingredient": "minecraft:lava",

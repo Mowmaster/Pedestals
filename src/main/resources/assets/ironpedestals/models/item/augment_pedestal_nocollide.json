@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "pedestals:item/augments/nocollide"
+    "layer0": "ironpedestals:item/augments/nocollide"
   }
 }

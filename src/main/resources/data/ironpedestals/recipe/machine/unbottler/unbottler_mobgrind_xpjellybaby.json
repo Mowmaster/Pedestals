@@ -5,7 +5,7 @@
       "modid": "mob_grinding_utils"
     }
   ],
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": "mob_grinding_utils:solid_xp_baby",
   "experience": 12,
   "result": {

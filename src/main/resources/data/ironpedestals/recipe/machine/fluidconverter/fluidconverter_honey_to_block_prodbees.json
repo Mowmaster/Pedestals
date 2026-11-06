@@ -5,7 +5,7 @@
       "modid": "productivebees"
     }
   ],
-  "type": "pedestals:fluidconverter",
+  "type": "ironpedestals:fluidconverter",
   "fluid": {
     "ingredient": "productivebees:honey",
     "amount": 1000

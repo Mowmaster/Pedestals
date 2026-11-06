@@ -6,7 +6,7 @@
       "value": "minecraft:milk"
     }
   ],
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": "minecraft:milk_bucket",
   "fluid": {
     "id": "minecraft:milk",

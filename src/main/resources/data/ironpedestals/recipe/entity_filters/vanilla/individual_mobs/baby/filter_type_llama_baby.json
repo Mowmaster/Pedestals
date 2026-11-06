@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:entity_filter",
+  "type": "ironpedestals:entity_filter",
   "input": "minecraft:green_concrete_powder",
   "entity": "minecraft:llama",
   "baby": true

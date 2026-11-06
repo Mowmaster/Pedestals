@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pedestals:block/pedestal/pedestal",
+    "model": "ironpedestals:block/ironpedestals/pedestal",
     "tints": [
       {
         "type": "minecraft:dye",

@@ -5,7 +5,7 @@
       "modid": "cofh_core"
     }
   ],
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "minecraft:glass_bottle",
   "fluid": {
     "ingredient": "cofh_core:honey",

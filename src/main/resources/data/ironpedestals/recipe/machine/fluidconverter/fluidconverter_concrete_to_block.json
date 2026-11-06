@@ -5,7 +5,7 @@
       "modid": "immersiveengineering"
     }
   ],
-  "type": "pedestals:fluidconverter",
+  "type": "ironpedestals:fluidconverter",
   "fluid": {
     "ingredient": "immersiveengineering:concrete",
     "amount": 500

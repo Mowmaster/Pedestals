@@ -1,9 +1,9 @@
 {
-  "parent": "pedestals:block/pedestal/base_pedestal_models/pedestal_blocklit",
+  "parent": "ironpedestals:block/ironpedestals/base_pedestal_models/pedestal_blocklit",
   "textures": {
-    "filter": "pedestals:block/block_crystal_stone",
-    "glow":"pedestals:block/pedestal/ancientglowstone",
-    "type": "pedestals:block/block_crystal_stone",
-    "typepart":"pedestals:block/block_crystal_stone"
+    "filter": "ironpedestals:block/block_crystal_stone",
+    "glow":"ironpedestals:block/pedestal/ancientglowstone",
+    "type": "ironpedestals:block/block_crystal_stone",
+    "typepart":"ironpedestals:block/block_crystal_stone"
   }
 }

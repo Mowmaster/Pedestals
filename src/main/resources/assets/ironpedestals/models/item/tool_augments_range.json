@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "pedestals:item/tool_augments_range"
+    "layer0": "ironpedestals:item/tool_augments_range"
   }
 }

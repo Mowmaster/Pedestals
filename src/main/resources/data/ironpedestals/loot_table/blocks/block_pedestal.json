@@ -15,11 +15,11 @@
             ],
             "source": "block_entity"
           },
-          "name": "pedestals:block_pedestal"
+          "name": "ironpedestals:block_pedestal"
         }
       ],
       "rolls": 1
     }
   ],
-  "random_sequence": "pedestals:blocks/block_pedestal"
+  "random_sequence": "ironpedestals:blocks/block_pedestal"
 }

@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pedestals:item/storage/storage_item_default",
+    "model": "ironpedestals:item/storage/storage_item_default",
     "tints": [
       {
         "type": "minecraft:constant",

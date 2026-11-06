@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:entity_filter",
+  "type": "ironpedestals:entity_filter",
   "input": "minecraft:mossy_stone_bricks",
   "entity": "minecraft:zombie_villager"
 }

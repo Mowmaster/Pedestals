@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:entity_filter",
+  "type": "ironpedestals:entity_filter",
   "input": "minecraft:orange_glazed_terracotta",
   "entity": "minecraft:sniffer",
   "baby": true

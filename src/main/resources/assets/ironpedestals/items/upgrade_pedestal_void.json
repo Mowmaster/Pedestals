@@ -2,11 +2,11 @@
   "model": {
     "type": "minecraft:condition",
     "property": "minecraft:has_component",
-    "component": "pedestals:upgrade_mode_display",
+    "component": "ironpedestals:upgrade_mode_display",
     "on_true": {
       "type": "minecraft:select",
       "property": "minecraft:component",
-      "component": "pedestals:upgrade_mode_display",
+      "component": "ironpedestals:upgrade_mode_display",
       "cases": [
         {
           "when": {
@@ -15,7 +15,7 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "pedestals:item/upgrades/void/items_on"
+            "model": "ironpedestals:item/upgrades/void/items_on"
           }
         },
         {
@@ -25,7 +25,7 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "pedestals:item/upgrades/void/items_off"
+            "model": "ironpedestals:item/upgrades/void/items_off"
           }
         },
         {
@@ -35,7 +35,7 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "pedestals:item/upgrades/void/fluids_on"
+            "model": "ironpedestals:item/upgrades/void/fluids_on"
           }
         },
         {
@@ -45,7 +45,7 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "pedestals:item/upgrades/void/fluids_off"
+            "model": "ironpedestals:item/upgrades/void/fluids_off"
           }
         },
         {
@@ -55,7 +55,7 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "pedestals:item/upgrades/void/energy_on"
+            "model": "ironpedestals:item/upgrades/void/energy_on"
           }
         },
         {
@@ -65,7 +65,7 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "pedestals:item/upgrades/void/energy_off"
+            "model": "ironpedestals:item/upgrades/void/energy_off"
           }
         },
         {
@@ -75,7 +75,7 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "pedestals:item/upgrades/void/experience_on"
+            "model": "ironpedestals:item/upgrades/void/experience_on"
           }
         },
         {
@@ -85,18 +85,18 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "pedestals:item/upgrades/void/experience_off"
+            "model": "ironpedestals:item/upgrades/void/experience_off"
           }
         }
       ],
       "fallback": {
         "type": "minecraft:model",
-        "model": "pedestals:item/upgrade_pedestal_void"
+        "model": "ironpedestals:item/upgrade_pedestal_void"
       }
     },
     "on_false": {
       "type": "minecraft:model",
-      "model": "pedestals:item/upgrades/void/items_on"
+      "model": "ironpedestals:item/upgrades/void/items_on"
     }
   }
 }

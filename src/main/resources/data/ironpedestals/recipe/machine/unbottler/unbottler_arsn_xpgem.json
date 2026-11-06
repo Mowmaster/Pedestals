@@ -5,7 +5,7 @@
       "modid": "ars_nouveau"
     }
   ],
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": "ars_nouveau:experience_gem",
   "experience": 3
 }

@@ -5,7 +5,7 @@
       "modid": "mob_grinding_utils"
     }
   ],
-  "type": "pedestals:bottler",
+  "type": "ironpedestals:bottler",
   "input": "minecraft:bucket",
   "experience": 50,
   "result": {

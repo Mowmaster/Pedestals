@@ -4,9 +4,9 @@
   "ingredients": [
     "#c:gems/emerald",
     "minecraft:obsidian",
-    "pedestals:augment_pedestal_t3_capacity"
+    "ironpedestals:augment_pedestal_t3_capacity"
   ],
   "result": {
-    "id": "pedestals:augment_pedestal_t4_capacity"
+    "id": "ironpedestals:augment_pedestal_t4_capacity"
   }
 }

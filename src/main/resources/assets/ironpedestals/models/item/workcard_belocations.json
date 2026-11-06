@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "pedestals:item/workcards/pedestal"
+    "layer0": "ironpedestals:item/workcards/pedestal"
   }
 }

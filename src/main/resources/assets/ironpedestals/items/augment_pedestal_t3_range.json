@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pedestals:item/augment_pedestal_t3_range"
+    "model": "ironpedestals:item/augment_pedestal_t3_range"
   }
 }

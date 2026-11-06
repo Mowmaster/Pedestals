@@ -5,7 +5,7 @@
       "modid": "create"
     }
   ],
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": "minecraft:honey_bottle",
   "fluid": {
     "id": "create:honey",

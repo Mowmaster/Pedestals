@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pedestals:item/tool_linkingtool"
+    "model": "ironpedestals:item/tool_linkingtool"
   }
 }

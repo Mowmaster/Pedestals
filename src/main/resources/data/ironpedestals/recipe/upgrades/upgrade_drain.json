@@ -2,10 +2,10 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "pedestals:upgrade_pedestal_base",
+    "ironpedestals:upgrade_pedestal_base",
     "minecraft:dispenser"
   ],
   "result": {
-    "id": "pedestals:upgrade_pedestal_drain"
+    "id": "ironpedestals:upgrade_pedestal_drain"
   }
 }

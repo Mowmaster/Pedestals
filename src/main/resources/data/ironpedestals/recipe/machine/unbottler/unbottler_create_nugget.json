@@ -5,7 +5,7 @@
       "modid": "create"
     }
   ],
-  "type": "pedestals:unbottler",
+  "type": "ironpedestals:unbottler",
   "input": "create:experience_nugget",
   "experience": 2
 }

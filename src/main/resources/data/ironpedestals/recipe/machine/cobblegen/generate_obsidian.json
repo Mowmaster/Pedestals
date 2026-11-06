@@ -1,5 +1,5 @@
 {
-  "type": "pedestals:cobblegen",
+  "type": "ironpedestals:cobblegen",
   "block_below": "minecraft:crying_obsidian",
   "fluid": {
     "ingredient": "minecraft:lava",

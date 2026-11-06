@@ -5,7 +5,7 @@
       "modid": "cyclic"
     }
   ],
-  "type": "pedestals:fluidconverter",
+  "type": "ironpedestals:fluidconverter",
   "fluid": {
     "ingredient": "cyclic:slime",
     "amount": 250

@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "pedestals:upgrade_pedestal_base",
+    "ironpedestals:upgrade_pedestal_base",
     "#minecraft:planks",
     "#minecraft:planks",
     "#minecraft:planks",
@@ -13,6 +13,6 @@
     "#minecraft:planks"
   ],
   "result": {
-    "id": "pedestals:upgrade_pedestal_unpackager"
+    "id": "ironpedestals:upgrade_pedestal_unpackager"
   }
 }
