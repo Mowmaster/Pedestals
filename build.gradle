@@ -144,8 +144,8 @@ dependencies {
     // NeoForge loads the newest version every range allows.
     jarJar(implementation(group: 'com.mowmaster.mowlib', name: 'mowlib')) {
         version {
-            strictly '[0.0.4,1.0.0)'
-            prefer '0.0.4'
+            strictly '[0.0.5,1.0.0)'
+            prefer '0.0.5'
         }
     }
 }

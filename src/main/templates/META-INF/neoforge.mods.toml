@@ -83,7 +83,7 @@ Pedestal like blocks that act as machines once upgraded
 [[dependencies.${mod_id}]]
 modId="mowlib"
 type="required"
-versionRange="[0.0.4,1.0.0)"
+versionRange="[0.0.5,1.0.0)"
 ordering="AFTER"
 side="BOTH"
 

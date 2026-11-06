@@ -1,4 +1,4 @@
-NeoForge 26.3.0.94, Minecraft 26.3, Java 25. Port of Pedestals from 1.20 (`Pedestals-120`, with `MowLib-120`) and 1.16 for selected features, with no separate library mod. I'm coming from 1.20 and JDK 8. Explain new APIs and modern Java features as you use them. I copy code in myself, so give complete, clearly placed snippets.
+NeoForge 26.3.0.94, Minecraft 26.3, Java 25. Used NeoForge-26x version of Pedestals as a Basis. I'm coming from 1.20 and JDK 8. Explain new APIs and modern Java features as you use them. I copy code in myself, so give complete, clearly placed snippets.
 
 ## Project state
 - Transport types are MowLib's (`com.mowmaster.mowlib.transport`: `TransportType`, `TransportTypes` ITEMS/FLUIDS/ENERGY/EXPERIENCE, ids `mowlib:*`). Pedestals' own numbers per type (link rate, capacity, augment bonuses, capacity modifier, upgrade rates) are in `Transport/PedestalTransportRules` (built-in rules registered in common setup; add-on types register their own, or get rate/capacity 0). The pedestal answers `TransportStorageHost#getCapacity` from those rules. `PedestalTransportTypeAliases` keeps the old `pedestals:items`... ids as aliases.
