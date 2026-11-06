@@ -3,10 +3,10 @@ package com.mowmaster.pedestals.Recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mowmaster.mowlib.transport.EnergyTransportType;
+import com.mowmaster.mowlib.transport.ExperienceTransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Transport.EnergyTransportType;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -44,10 +44,10 @@ public record MachineReturn(Optional<FluidStackTemplate> fluid, int energy, int 
         if (fluid.isPresent())
         {
             FluidStack stack = fluid.get().create();
-            if (pedestal.getStorage(PedestalTransportTypes.FLUIDS.get()).insert(FluidResource.of(stack), stack.getAmount(), transaction) < stack.getAmount()) return false;
+            if (pedestal.getStorage(TransportTypes.FLUIDS.get()).insert(FluidResource.of(stack), stack.getAmount(), transaction) < stack.getAmount()) return false;
         }
-        if (energy > 0 && pedestal.getStorage(PedestalTransportTypes.ENERGY.get()).insert(EnergyTransportType.ENERGY, energy, transaction) < energy) return false;
-        if (experience > 0 && pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, experience, transaction) < experience) return false;
+        if (energy > 0 && pedestal.getStorage(TransportTypes.ENERGY.get()).insert(EnergyTransportType.ENERGY, energy, transaction) < energy) return false;
+        if (experience > 0 && pedestal.getStorage(TransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, experience, transaction) < experience) return false;
         return true;
     }
 }

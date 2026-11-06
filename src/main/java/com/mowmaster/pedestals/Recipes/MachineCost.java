@@ -3,11 +3,11 @@ package com.mowmaster.pedestals.Recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mowmaster.mowlib.transport.EnergyTransportType;
+import com.mowmaster.mowlib.transport.ExperienceTransportType;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Transport.EnergyTransportType;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -48,7 +48,7 @@ public record MachineCost(Optional<SizedFluidIngredient> fluid, int energy, int 
     public boolean fluidMatches(BasePedestalBlockEntity pedestal)
     {
         if (fluid.isEmpty()) return true;
-        FluidResource stored = pedestal.getStorage(PedestalTransportTypes.FLUIDS.get()).getResource(0);
+        FluidResource stored = pedestal.getStorage(TransportTypes.FLUIDS.get()).getResource(0);
         return !stored.isEmpty() && fluid.get().ingredient().test(stored.toStack(fluid.get().amount()));
     }
 
@@ -57,13 +57,13 @@ public record MachineCost(Optional<SizedFluidIngredient> fluid, int energy, int 
     {
         if (fluid.isPresent())
         {
-            PedestalStorage<FluidResource> fluids = pedestal.getStorage(PedestalTransportTypes.FLUIDS.get());
+            TransportStorage<FluidResource> fluids = pedestal.getStorage(TransportTypes.FLUIDS.get());
             FluidResource stored = fluids.getResource(0);
             int amount = fluid.get().amount() * times;
             if (!fluidMatches(pedestal) || fluids.extract(stored, amount, transaction) < amount) return false;
         }
-        if (energy > 0 && pedestal.getStorage(PedestalTransportTypes.ENERGY.get()).extract(EnergyTransportType.ENERGY, energy * times, transaction) < energy * times) return false;
-        if (experience > 0 && pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).extract(ExperienceTransportType.EXPERIENCE, experience * times, transaction) < experience * times) return false;
+        if (energy > 0 && pedestal.getStorage(TransportTypes.ENERGY.get()).extract(EnergyTransportType.ENERGY, energy * times, transaction) < energy * times) return false;
+        if (experience > 0 && pedestal.getStorage(TransportTypes.EXPERIENCE.get()).extract(ExperienceTransportType.EXPERIENCE, experience * times, transaction) < experience * times) return false;
         return true;
     }
 

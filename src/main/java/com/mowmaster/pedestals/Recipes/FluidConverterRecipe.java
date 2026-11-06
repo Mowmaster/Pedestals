@@ -3,7 +3,7 @@ package com.mowmaster.pedestals.Recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -69,7 +69,7 @@ public final class FluidConverterRecipe extends PedestalMachineRecipe<PedestalRe
     @Override
     public boolean matches(PedestalRecipeInput recipeInput, Level level)
     {
-        FluidResource stored = recipeInput.pedestal().getStorage(PedestalTransportTypes.FLUIDS.get()).getResource(0);
+        FluidResource stored = recipeInput.pedestal().getStorage(TransportTypes.FLUIDS.get()).getResource(0);
         return !stored.isEmpty() && fluid.ingredient().test(stored.toStack(fluid.amount()));
     }
 

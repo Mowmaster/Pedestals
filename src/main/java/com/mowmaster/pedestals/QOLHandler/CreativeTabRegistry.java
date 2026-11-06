@@ -1,5 +1,6 @@
 package com.mowmaster.pedestals.QOLHandler;
 
+import com.mowmaster.mowlib.registry.MowLibItems;
 import com.mowmaster.pedestals.Blocks.BlockRegistry;
 import com.mowmaster.pedestals.Items.ItemRegistry;
 import com.mowmaster.pedestals.PedestalReferences;
@@ -30,12 +31,12 @@ public class CreativeTabRegistry
             .displayItems((parameters, output) -> {
                 output.accept(ItemRegistry.TOOL_LINKINGTOOL.get());
                 output.accept(ItemRegistry.TOOL_LINKINGTOOLBACKWARDS.get());
-                output.accept(ItemRegistry.TOOL_FILTERTOOL.get());
+                output.accept(MowLibItems.TOOL_FILTER.get());
                 output.accept(ItemRegistry.TOOL_UPGRADETOOL.get());
                 output.accept(ItemRegistry.TOOL_TOOLSWAPPER.get());
-                output.accept(ItemRegistry.TOOL_WORKTOOL.get());
+                output.accept(MowLibItems.TOOL_WORK.get());
                 ItemRegistry.AUGMENT_TOOLS.forEach(tool -> output.accept(tool.get()));
-                ItemRegistry.FILTERS.forEach(filter -> output.accept(filter.get()));
+                MowLibItems.FILTERS.forEach(filter -> output.accept(filter.get()));
                 ItemRegistry.WORKCARDS.forEach(card -> output.accept(card.get()));
                 ItemRegistry.UPGRADES.forEach(upgrade -> output.accept(upgrade.get()));
                 ItemRegistry.AUGMENTS.forEach(augment -> output.accept(augment.get()));
