@@ -1,6 +1,12 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
-import com.mojang.serialization.Codec;
+import com.mowmaster.mowlib.ghost.GhostItem;
+import com.mowmaster.mowlib.transport.EnergyTransportType;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.util.MowLibTextUtils;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.ItemRegistry;
@@ -13,12 +19,7 @@ import com.mowmaster.pedestals.PedestalReferences;
 import com.mowmaster.pedestals.Recipes.AnvilCost;
 import com.mowmaster.pedestals.Recipes.AnvilOverlevelRecipe;
 import com.mowmaster.pedestals.Recipes.PedestalRecipes;
-import com.mowmaster.pedestals.Transport.EnergyTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
-import com.mowmaster.pedestals.api.upgrade.GhostItem;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -32,12 +33,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -96,7 +95,7 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
     @Override
     public WorkCardType getWorkCardType(ItemStack upgrade)
     {
-        return WorkCardType.PEDESTALS;
+        return WorkCardType.MACHINES;
     }
 
     public static boolean isMobMode(ItemStack upgrade)
@@ -295,26 +294,26 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
                     ItemResource resource = ItemResource.of(stack);
                     int got = source.getItemStorage().extract(resource, Math.min(needed - found - taken, stack.getCount()), transaction);
                     Vec3 from = topOf(source);
-                    if (got > 0) particles.add(() -> PedestalTransportTypes.ITEMS.get().sendTransferParticles(level, from, to, resource));
+                    if (got > 0) particles.add(() -> TransportTypes.ITEMS.get().sendTransferParticles(level, from, to, resource));
                     taken += got;
                 }
             }
             else if (input.fluid() != null)
             {
-                if (!hasPacket(source, PedestalTransportTypes.FLUIDS.get())) continue;
-                PedestalStorage<FluidResource> fluids = source.getStorage(PedestalTransportTypes.FLUIDS.get());
+                if (!hasPacket(source, TransportTypes.FLUIDS.get())) continue;
+                TransportStorage<FluidResource> fluids = source.getStorage(TransportTypes.FLUIDS.get());
                 FluidResource stored = fluids.getResource(0);
                 if (stored.isEmpty() || !input.fluid().ingredient().test(stored.toStack(1))) continue;
                 taken = fluids.extract(stored, needed - found, transaction);
                 Vec3 from = topOf(source);
-                if (taken > 0) particles.add(() -> PedestalTransportTypes.FLUIDS.get().sendTransferParticles(level, from, to, stored));
+                if (taken > 0) particles.add(() -> TransportTypes.FLUIDS.get().sendTransferParticles(level, from, to, stored));
             }
             else
             {
-                if (!hasPacket(source, PedestalTransportTypes.ENERGY.get())) continue;
-                taken = source.getStorage(PedestalTransportTypes.ENERGY.get()).extract(EnergyTransportType.ENERGY, needed - found, transaction);
+                if (!hasPacket(source, TransportTypes.ENERGY.get())) continue;
+                taken = source.getStorage(TransportTypes.ENERGY.get()).extract(EnergyTransportType.ENERGY, needed - found, transaction);
                 Vec3 from = topOf(source);
-                if (taken > 0) particles.add(() -> PedestalTransportTypes.ENERGY.get().sendTransferParticles(level, from, to, EnergyTransportType.ENERGY));
+                if (taken > 0) particles.add(() -> TransportTypes.ENERGY.get().sendTransferParticles(level, from, to, EnergyTransportType.ENERGY));
             }
             if (taken > 0 && firstSource == null) firstSource = source;
             found += taken;
@@ -337,9 +336,9 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
         }
         if (cost.fluid().isPresent())
         {
-            inputs.add(new Input(packet(PedestalTransportTypes.FLUIDS.get()), null, cost.fluid().get(), cost.fluid().get().amount() * times, false));
+            inputs.add(new Input(packet(TransportTypes.FLUIDS.get()), null, cost.fluid().get(), cost.fluid().get().amount() * times, false));
         }
-        if (cost.energy() > 0) inputs.add(new Input(packet(PedestalTransportTypes.ENERGY.get()), null, null, cost.energy() * times, false));
+        if (cost.energy() > 0) inputs.add(new Input(packet(TransportTypes.ENERGY.get()), null, null, cost.energy() * times, false));
         return inputs;
     }
 
@@ -362,19 +361,19 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
             if (input.item() != null)
             {
                 MutableComponent label = Component.literal("x" + needed);
-                Component effects = potionEffects(input.display());
+                Component effects = MowLibTextUtils.potionEffects(input.display());
                 if (effects != null) label.append(" ").append(effects);
                 ghosts.add(new GhostItem(above, input.display(), label, Optional.empty()));
             }
             else if (input.fluid() != null)
             {
                 List<Holder<Fluid>> fluids = input.fluid().ingredient().fluids();
-                Component name = fluids.isEmpty() ? PedestalTransportTypes.FLUIDS.get().getName() : fluids.getFirst().value().getFluidType().getDescription();
+                Component name = fluids.isEmpty() ? TransportTypes.FLUIDS.get().getName() : fluids.getFirst().value().getFluidType().getDescription();
                 ghosts.add(new GhostItem(above, input.display(), name, Optional.of(Component.literal(needed + " mB"))));
             }
             else
             {
-                ghosts.add(new GhostItem(above, input.display(), PedestalTransportTypes.ENERGY.get().getName(), Optional.of(Component.literal(needed + " FE"))));
+                ghosts.add(new GhostItem(above, input.display(), TransportTypes.ENERGY.get().getName(), Optional.of(Component.literal(needed + " FE"))));
             }
         }
         return ghosts;
@@ -395,15 +394,15 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
             }
             else if (input.fluid() != null)
             {
-                FluidResource stored = source.getStorage(PedestalTransportTypes.FLUIDS.get()).getResource(0);
-                if (hasPacket(source, PedestalTransportTypes.FLUIDS.get()) && !stored.isEmpty() && input.fluid().ingredient().test(stored.toStack(1)))
+                FluidResource stored = source.getStorage(TransportTypes.FLUIDS.get()).getResource(0);
+                if (hasPacket(source, TransportTypes.FLUIDS.get()) && !stored.isEmpty() && input.fluid().ingredient().test(stored.toStack(1)))
                 {
-                    total += source.getStorage(PedestalTransportTypes.FLUIDS.get()).getAmountAsInt(0);
+                    total += source.getStorage(TransportTypes.FLUIDS.get()).getAmountAsInt(0);
                 }
             }
-            else if (hasPacket(source, PedestalTransportTypes.ENERGY.get()))
+            else if (hasPacket(source, TransportTypes.ENERGY.get()))
             {
-                total += source.getStorage(PedestalTransportTypes.ENERGY.get()).getAmountAsInt(0);
+                total += source.getStorage(TransportTypes.ENERGY.get()).getAmountAsInt(0);
             }
         }
         return (int) Math.min(Integer.MAX_VALUE, total);
@@ -423,30 +422,12 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
             }
             else if (input.fluid() != null)
             {
-                FluidResource stored = source.getStorage(PedestalTransportTypes.FLUIDS.get()).getResource(0);
-                if (hasPacket(source, PedestalTransportTypes.FLUIDS.get()) && !stored.isEmpty() && input.fluid().ingredient().test(stored.toStack(1))) return source;
+                FluidResource stored = source.getStorage(TransportTypes.FLUIDS.get()).getResource(0);
+                if (hasPacket(source, TransportTypes.FLUIDS.get()) && !stored.isEmpty() && input.fluid().ingredient().test(stored.toStack(1))) return source;
             }
-            else if (hasPacket(source, PedestalTransportTypes.ENERGY.get())) return source;
+            else if (hasPacket(source, TransportTypes.ENERGY.get())) return source;
         }
         return null;
-    }
-
-    // A potion's effects as its tooltip names them ("Harming II"), or null
-    private static @Nullable Component potionEffects(ItemStack stack)
-    {
-        PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
-        if (contents == null) return null;
-        MutableComponent text = null;
-        for (MobEffectInstance effect : contents.getAllEffects())
-        {
-            Component name = effect.getEffect().value().getDisplayName();
-            MutableComponent line = effect.getAmplifier() > 0
-                    ? Component.translatable("potion.withAmplifier", name, Component.translatable("potion.potency." + effect.getAmplifier()))
-                    : name.copy();
-            if (text == null) text = line;
-            else text.append(", ").append(line);
-        }
-        return text;
     }
 
     // ---- Small helpers ----
@@ -467,7 +448,7 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
         return pedestals;
     }
 
-    private static boolean hasPacket(BasePedestalBlockEntity pedestal, PedestalTransportType<?> type)
+    private static boolean hasPacket(BasePedestalBlockEntity pedestal, TransportType<?> type)
     {
         for (ItemStack stack : pedestal.getItemStacks())
         {
@@ -476,7 +457,7 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
         return false;
     }
 
-    private static ItemStack packet(PedestalTransportType<?> type)
+    private static ItemStack packet(TransportType<?> type)
     {
         StoragePacketItem item = StoragePacketItem.forType(type);
         return item != null ? new ItemStack(item) : new ItemStack(Items.BARRIER);

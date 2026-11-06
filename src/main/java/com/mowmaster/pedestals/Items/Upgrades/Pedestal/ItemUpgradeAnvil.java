@@ -1,10 +1,17 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mowmaster.mowlib.ghost.GhostItem;
+import com.mowmaster.mowlib.transport.AmountResource;
+import com.mowmaster.mowlib.transport.EnergyTransportType;
+import com.mowmaster.mowlib.transport.ExperienceTransportType;
+import com.mowmaster.mowlib.transport.TransportContents;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.util.MowLibTextUtils;
+import com.mowmaster.mowlib.util.MowLibXpUtils;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.Items.Storage.PacketContents;
 import com.mowmaster.pedestals.Items.Storage.StoragePacketItem;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
@@ -13,14 +20,9 @@ import com.mowmaster.pedestals.Recipes.AnvilConflictRecipe;
 import com.mowmaster.pedestals.Recipes.AnvilCost;
 import com.mowmaster.pedestals.Recipes.AnvilOverlevelRecipe;
 import com.mowmaster.pedestals.Recipes.PedestalRecipes;
-import com.mowmaster.pedestals.Transport.EnergyTransportType;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.AmountResource;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
-import com.mowmaster.pedestals.api.upgrade.GhostItem;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -28,16 +30,13 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -117,7 +116,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
     @Override
     public WorkCardType getWorkCardType(ItemStack upgrade)
     {
-        return WorkCardType.PEDESTALS;
+        return WorkCardType.MACHINES;
     }
 
     // While powered the anvil does nothing, except that the item it's paused on is skipped: it comes out unchanged
@@ -193,12 +192,12 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         }
     }
 
-    // What to take from one input pedestal: one PacketContents per transport type
-    private record Step(BlockPos pedestal, List<PacketContents<?>> take)
+    // What to take from one input pedestal: one TransportContents per transport type
+    private record Step(BlockPos pedestal, List<TransportContents<?>> take)
     {
         static final Codec<Step> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BlockPos.CODEC.fieldOf("pedestal").forGetter(Step::pedestal),
-                PacketContents.CODEC.listOf().fieldOf("take").forGetter(Step::take))
+                TransportContents.CODEC.listOf().fieldOf("take").forGetter(Step::take))
                 .apply(instance, Step::new));
     }
 
@@ -249,7 +248,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         }
         try (Transaction transaction = Transaction.openRoot())
         {
-            for (PacketContents<?> contents : step.take())
+            for (TransportContents<?> contents : step.take())
             {
                 if (!extractAll(input, contents, transaction))
                 {
@@ -261,7 +260,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         }
         Vec3 from = topOf(input);
         Vec3 to = topOf(pedestal);
-        if (pedestal.canSpawnParticles()) for (PacketContents<?> contents : step.take()) sendParticles(level, contents, from, to);
+        if (pedestal.canSpawnParticles()) for (TransportContents<?> contents : step.take()) sendParticles(level, contents, from, to);
         savePlan(level, pedestal, plan.advance());
     }
 
@@ -315,7 +314,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         Vec3 above = Vec3.atCenterOf(pedestal.getPosAbove());
         for (int step = 0; step < plan.next() && step < plan.steps().size(); step++)
         {
-            for (PacketContents<?> contents : plan.steps().get(step).take()) drop(level, above, contents);
+            for (TransportContents<?> contents : plan.steps().get(step).take()) drop(level, above, contents);
         }
     }
 
@@ -649,7 +648,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
     private static @Nullable Plan build(ItemStack target, ItemStack result, int levels, List<Source> sources, List<ItemStack> leftovers,
                                         int stored, List<Missing> missing)
     {
-        int points = ExperienceTransportType.pointsForLevel(levels);
+        int points = MowLibXpUtils.pointsForLevel(levels);
         if (points > stored)
         {
             missing.add(Missing.experience(points - stored));
@@ -658,7 +657,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         List<Step> steps = new ArrayList<>();
         for (Source source : sources)
         {
-            List<PacketContents<?>> taken = source.taken();
+            List<TransportContents<?>> taken = source.taken();
             if (!taken.isEmpty()) steps.add(new Step(source.pedestal.getBlockPos(), taken));
         }
         return new Plan(target, result, points, steps, 0, leftovers);
@@ -699,9 +698,9 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         boolean fluidFull;
         boolean energyPacket;
         boolean energyFull;
-        PacketContents<ItemResource> takenItems = new PacketContents<>(PedestalTransportTypes.ITEMS.get(), List.of());
-        PacketContents<FluidResource> takenFluid = new PacketContents<>(PedestalTransportTypes.FLUIDS.get(), List.of());
-        PacketContents<AmountResource> takenEnergy = new PacketContents<>(PedestalTransportTypes.ENERGY.get(), List.of());
+        TransportContents<ItemResource> takenItems = new TransportContents<>(TransportTypes.ITEMS.get(), List.of());
+        TransportContents<FluidResource> takenFluid = new TransportContents<>(TransportTypes.FLUIDS.get(), List.of());
+        TransportContents<AmountResource> takenEnergy = new TransportContents<>(TransportTypes.ENERGY.get(), List.of());
 
         Source(BasePedestalBlockEntity pedestal, int factor)
         {
@@ -715,18 +714,18 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
                     continue;
                 }
                 // A packet says this pedestal gives that type (the packet itself stays)
-                PedestalTransportType<?> type = packet.getType();
-                if (type == PedestalTransportTypes.FLUIDS.get())
+                TransportType<?> type = packet.getType();
+                if (type == TransportTypes.FLUIDS.get())
                 {
-                    PedestalStorage<FluidResource> fluids = pedestal.getStorage(PedestalTransportTypes.FLUIDS.get());
+                    TransportStorage<FluidResource> fluids = pedestal.getStorage(TransportTypes.FLUIDS.get());
                     fluid = fluids.getResource(0);
                     fluidAmount = fluids.getAmountAsInt(0);
                     fluidPacket = true;
                     fluidFull = !fluid.isEmpty() && fluidAmount >= fluids.getCapacityAsInt(0, fluid);
                 }
-                else if (type == PedestalTransportTypes.ENERGY.get())
+                else if (type == TransportTypes.ENERGY.get())
                 {
-                    PedestalStorage<AmountResource> energyStorage = pedestal.getStorage(PedestalTransportTypes.ENERGY.get());
+                    TransportStorage<AmountResource> energyStorage = pedestal.getStorage(TransportTypes.ENERGY.get());
                     energy = energyStorage.getAmountAsInt(0);
                     energyPacket = true;
                     energyFull = energy >= energyStorage.getCapacityAsInt(0, EnergyTransportType.ENERGY);
@@ -742,9 +741,9 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
             stack.shrink(amount);
         }
 
-        List<PacketContents<?>> taken()
+        List<TransportContents<?>> taken()
         {
-            List<PacketContents<?>> taken = new ArrayList<>();
+            List<TransportContents<?>> taken = new ArrayList<>();
             if (!takenItems.isEmpty()) taken.add(takenItems);
             if (!takenFluid.isEmpty()) taken.add(takenFluid);
             if (!takenEnergy.isEmpty()) taken.add(takenEnergy);
@@ -831,26 +830,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
             // An ingredient with nothing to show (an empty tag) shows a barrier
             if (display.isEmpty()) return new Missing(new ItemStack(Items.BARRIER), amount, Unit.ITEMS, true, true, null, null);
             boolean potion = isPotion(display);
-            return new Missing(display.copyWithCount(1), potion ? 1 : amount, Unit.ITEMS, true, !potion, potionEffects(display), null);
-        }
-
-        // A potion's effects as its tooltip names them: "Harming II", "Speed, Strength"... (null if it has none)
-        private static @Nullable Component potionEffects(ItemStack stack)
-        {
-            PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
-            if (contents == null) return null;
-            MutableComponent text = null;
-            for (MobEffectInstance effect : contents.getAllEffects())
-            {
-                Component name = effect.getEffect().value().getDisplayName();
-                // Vanilla's own keys: "potion.withAmplifier" is "%s %s", "potion.potency.1" is "II"...
-                MutableComponent line = effect.getAmplifier() > 0
-                        ? Component.translatable("potion.withAmplifier", name, Component.translatable("potion.potency." + effect.getAmplifier()))
-                        : name.copy();
-                if (text == null) text = line;
-                else text.append(", ").append(line);
-            }
-            return text;
+            return new Missing(display.copyWithCount(1), potion ? 1 : amount, Unit.ITEMS, true, !potion, MowLibTextUtils.potionEffects(display), null);
         }
 
         // Shown as a fluid packet, since an input pedestal needs one to give fluid
@@ -858,17 +838,17 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         {
             List<Holder<Fluid>> fluids = fluid.ingredient().fluids();
             Component name = fluids.isEmpty() ? null : fluids.getFirst().value().getFluidType().getDescription();
-            return new Missing(packet(PedestalTransportTypes.FLUIDS.get()), amount, Unit.MILLIBUCKETS, true, true, name, at);
+            return new Missing(packet(TransportTypes.FLUIDS.get()), amount, Unit.MILLIBUCKETS, true, true, name, at);
         }
 
         static Missing energy(int amount, @Nullable BlockPos at)
         {
-            return new Missing(packet(PedestalTransportTypes.ENERGY.get()), amount, Unit.ENERGY, true, true, null, at);
+            return new Missing(packet(TransportTypes.ENERGY.get()), amount, Unit.ENERGY, true, true, null, at);
         }
 
         static Missing experience(int points)
         {
-            return new Missing(packet(PedestalTransportTypes.EXPERIENCE.get()), points, Unit.EXPERIENCE, false, false, null, null);
+            return new Missing(packet(TransportTypes.EXPERIENCE.get()), points, Unit.EXPERIENCE, false, false, null, null);
         }
 
         // The input on this pedestal can't be used
@@ -877,7 +857,7 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
             return new Missing(new ItemStack(Items.BARRIER), 0, Unit.BLOCKED, false, false, null, pedestal);
         }
 
-        private static ItemStack packet(PedestalTransportType<?> type)
+        private static ItemStack packet(TransportType<?> type)
         {
             StoragePacketItem item = StoragePacketItem.forType(type);
             return item != null ? new ItemStack(item) : new ItemStack(Items.BARRIER);
@@ -892,10 +872,10 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
                 case BLOCKED -> new GhostItem(above, display, Component.translatable("pedestals.anvil_cannot_apply"), Optional.empty());
                 case ITEMS -> new GhostItem(above, display, detail == null ? Component.literal("x" + total)
                         : Component.literal("x" + total + " ").append(detail), Optional.empty());
-                case MILLIBUCKETS -> new GhostItem(above, display, detail != null ? detail : PedestalTransportTypes.FLUIDS.get().getName(),
+                case MILLIBUCKETS -> new GhostItem(above, display, detail != null ? detail : TransportTypes.FLUIDS.get().getName(),
                         Optional.of(Component.literal(total + " mB")));
-                case ENERGY -> new GhostItem(above, display, PedestalTransportTypes.ENERGY.get().getName(), Optional.of(Component.literal(total + " FE")));
-                case EXPERIENCE -> new GhostItem(above, display, PedestalTransportTypes.EXPERIENCE.get().getName(), Optional.of(Component.literal(total + " XP")));
+                case ENERGY -> new GhostItem(above, display, TransportTypes.ENERGY.get().getName(), Optional.of(Component.literal(total + " FE")));
+                case EXPERIENCE -> new GhostItem(above, display, TransportTypes.EXPERIENCE.get().getName(), Optional.of(Component.literal(total + " XP")));
             };
         }
     }
@@ -987,9 +967,9 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         return stack.getOrDefault(DataComponents.REPAIR_COST, 0);
     }
 
-    private static PedestalStorage<AmountResource> experience(BasePedestalBlockEntity pedestal)
+    private static TransportStorage<AmountResource> experience(BasePedestalBlockEntity pedestal)
     {
-        return pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get());
+        return pedestal.getStorage(TransportTypes.EXPERIENCE.get());
     }
 
     // The middle of the pedestal's top face (it can face any way)
@@ -998,11 +978,11 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         return Vec3.atCenterOf(pedestal.getBlockPos()).add(pedestal.getFacing().getUnitVec3().scale(0.5));
     }
 
-    // These take PacketContents<R> so that R (the type's resource class) has a name inside them;
-    // called with a PacketContents<?>, Java fills R in ("wildcard capture")
-    private static <R extends Resource> boolean extractAll(BasePedestalBlockEntity from, PacketContents<R> contents, TransactionContext transaction)
+    // These take TransportContents<R> so that R (the type's resource class) has a name inside them;
+    // called with a TransportContents<?>, Java fills R in ("wildcard capture")
+    private static <R extends Resource> boolean extractAll(BasePedestalBlockEntity from, TransportContents<R> contents, TransactionContext transaction)
     {
-        PedestalStorage<R> storage = from.getStorage(contents.type());
+        TransportStorage<R> storage = from.getStorage(contents.type());
         for (ResourceStack<R> stack : contents.contents())
         {
             if (storage.extract(stack.resource(), stack.amount(), transaction) != stack.amount()) return false;
@@ -1010,16 +990,16 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
         return true;
     }
 
-    private static <R extends Resource> void sendParticles(ServerLevel level, PacketContents<R> contents, Vec3 from, Vec3 to)
+    private static <R extends Resource> void sendParticles(ServerLevel level, TransportContents<R> contents, Vec3 from, Vec3 to)
     {
         for (ResourceStack<R> stack : contents.contents()) contents.type().sendTransferParticles(level, from, to, stack.resource());
     }
 
     // Items drop as items, anything else as a storage packet of that type (lost if the type has no packet)
-    private static <R extends Resource> void drop(ServerLevel level, Vec3 at, PacketContents<R> contents)
+    private static <R extends Resource> void drop(ServerLevel level, Vec3 at, TransportContents<R> contents)
     {
         if (contents.isEmpty()) return;
-        if (contents.type() != (Object) PedestalTransportTypes.ITEMS.get())
+        if (contents.type() != (Object) TransportTypes.ITEMS.get())
         {
             Containers.dropItemStack(level, at.x, at.y, at.z, StoragePacketItem.create(contents));
             return;

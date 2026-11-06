@@ -1,17 +1,17 @@
 package com.mowmaster.pedestals.Items.Upgrades;
 
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.util.MowLibOwner;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.PedestalFakePlayer;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Augments.AugmentType;
 import com.mowmaster.pedestals.Items.PedestalDataComponents;
 import com.mowmaster.pedestals.PedestalReferences;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
+import com.mowmaster.pedestals.Transport.PedestalTransportRules;
 import com.mowmaster.pedestals.api.upgrade.IPedestalUpgrade;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,7 +22,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,10 +31,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.resource.Resource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +89,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     @Override
     public void onAdded(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade, @Nullable Player player)
     {
-        if (player != null) upgrade.set(PedestalDataComponents.UPGRADE_OWNER.get(), new UpgradeOwner(player.getUUID(), player.getName().getString()));
+        if (player != null) upgrade.set(PedestalDataComponents.UPGRADE_OWNER.get(), MowLibOwner.of(player));
     }
 
     @Override
@@ -126,17 +123,18 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     // An upgrade's rate for a type: the base rate plus that type's capacity modifier
-    public int getRate(ItemStack upgrade, PedestalTransportType<?> type, int baseRate)
+    public int getRate(ItemStack upgrade, TransportType<?> type, int baseRate)
     {
-        return type.getUpgradeRate(baseRate, getModifier(upgrade, type.getCapacityModifier()));
+        PedestalTransportRules rules = PedestalTransportRules.of(type);
+        return rules.upgradeRate(baseRate, getModifier(upgrade, rules.capacityModifier(type)));
     }
 
     // The type a capacity modifier belongs to, or null if it isn't one
-    private static @Nullable PedestalTransportType<?> capacityType(String modifier)
+    private static @Nullable TransportType<?> capacityType(String modifier)
     {
-        for (PedestalTransportType<?> type : PedestalTransportTypes.REGISTRY)
+        for (TransportType<?> type : TransportTypes.REGISTRY)
         {
-            if (type.getCapacityModifier().equals(modifier)) return type;
+            if (PedestalTransportRules.of(type).capacityModifier(type).equals(modifier)) return type;
         }
         return null;
     }
@@ -151,7 +149,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
         if (modifiers.contains(UpgradeModifiers.ANY_CAPACITY))
         {
-            for (PedestalTransportType<?> type : PedestalTransportTypes.REGISTRY) allowed.add(type.getCapacityModifier());
+            for (TransportType<?> type : TransportTypes.REGISTRY) allowed.add(PedestalTransportRules.of(type).capacityModifier(type));
         }
         allowed.removeIf(modifier -> !canModify(upgrade, modifier));
         return allowed;
@@ -252,7 +250,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     public static UpgradeMode getMode(ItemStack upgrade)
     {
         UpgradeMode mode = upgrade.get(PedestalDataComponents.UPGRADE_MODE.get());
-        return mode != null ? mode : new UpgradeMode(PedestalTransportTypes.ITEMS.getId(), List.of());
+        return mode != null ? mode : new UpgradeMode(TransportTypes.ITEMS.getId(), List.of());
     }
 
     private static void setMode(ItemStack upgrade, UpgradeMode mode)
@@ -262,16 +260,16 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     // Whether the upgrade works on this type (always true for upgrades without transport modes)
-    public boolean canTransport(ItemStack upgrade, PedestalTransportType<?> type)
+    public boolean canTransport(ItemStack upgrade, TransportType<?> type)
     {
         return !usesTransportModes() || getMode(upgrade).isEnabled(type.getId());
     }
 
     // The types this upgrade works on, in registry order
-    public List<PedestalTransportType<?>> getTransportTypes(ItemStack upgrade)
+    public List<TransportType<?>> getTransportTypes(ItemStack upgrade)
     {
-        List<PedestalTransportType<?>> types = new ArrayList<>();
-        for (PedestalTransportType<?> type : PedestalTransportTypes.REGISTRY)
+        List<TransportType<?>> types = new ArrayList<>();
+        for (TransportType<?> type : TransportTypes.REGISTRY)
         {
             if (canTransport(upgrade, type)) types.add(type);
         }
@@ -306,9 +304,9 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     }
 
     // The type after this one in the registry, wrapping round to the first
-    private static PedestalTransportType<?> nextType(net.minecraft.resources.Identifier current)
+    private static TransportType<?> nextType(net.minecraft.resources.Identifier current)
     {
-        List<PedestalTransportType<?>> types = PedestalTransportTypes.REGISTRY.stream().toList();
+        List<TransportType<?>> types = TransportTypes.REGISTRY.stream().toList();
         for (int index = 0; index < types.size(); index++)
         {
             if (types.get(index).getId().equals(current)) return types.get((index + 1) % types.size());
@@ -318,7 +316,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     private static Component typeName(net.minecraft.resources.Identifier id)
     {
-        PedestalTransportType<?> type = PedestalTransportTypes.REGISTRY.getValue(id);
+        TransportType<?> type = TransportTypes.REGISTRY.getValue(id);
         return type != null ? type.getName() : Component.literal(id.toString());
     }
 
@@ -336,7 +334,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     // A type's handler at pos: the block's, or (with entities = true, for the entity container modifier) the first
     // entity's in that block space, like a chest minecart
     protected static <R extends Resource> @Nullable ResourceHandler<R> findHandler(ServerLevel level, BlockPos pos, @Nullable Direction side,
-                                                                                    PedestalTransportType<R> type, boolean entities)
+                                                                                    TransportType<R> type, boolean entities)
     {
         ResourceHandler<R> handler = type.getBlockHandler(level, pos, side);
         if (handler != null || !entities) return handler;
@@ -370,92 +368,29 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     {
         for (Entity entity : touching)
         {
-            for (PedestalTransportType<?> type : getTransportTypes(upgrade))
+            for (TransportType<?> type : getTransportTypes(upgrade))
             {
                 if (!entity.isAlive()) break;
-                int rate = type.getTransferRate(pedestal);
+                int rate = pedestal.getTransferRate(type);
                 if (entity instanceof Player player)
                 {
                     if (!player.isShiftKeyDown() && !player.isSpectator()) pullFromPlayer(pedestal, type, player, rate);
                 }
-                else if (!(entity instanceof LivingEntity)) absorbFrom(level, pedestal, type, entity, rate);            }
+                else if (!(entity instanceof LivingEntity)) absorbFrom(level, pedestal, type, entity, rate);
+            }
         }
     }
 
-    private static <R extends Resource> void absorbFrom(ServerLevel level, BasePedestalBlockEntity pedestal, PedestalTransportType<R> type, Entity entity, int rate)
+    private static <R extends Resource> void absorbFrom(ServerLevel level, BasePedestalBlockEntity pedestal, TransportType<R> type, Entity entity, int rate)
     {
         type.absorbEntity(level, entity, pedestal.getStorage(type), rate);
     }
 
-    private static <R extends Resource> void pullFromPlayer(BasePedestalBlockEntity pedestal, PedestalTransportType<R> type, Player player, int rate)
+    // MowLib's types know how to take from a player: items the first main-inventory stack that fits, experience the
+    // player's real XP, other types out of the items they carry
+    private static <R extends Resource> void pullFromPlayer(BasePedestalBlockEntity pedestal, TransportType<R> type, Player player, int rate)
     {
-        Inventory inventory = player.getInventory();
-        if (type == PedestalTransportTypes.ITEMS.get())
-        {
-            // The main inventory only (slots 0-35), never armour or the offhand
-            for (int slot = 0; slot < Inventory.INVENTORY_SIZE; slot++)
-            {
-                ItemStack stack = inventory.getItem(slot);
-                if (stack.isEmpty()) continue;
-                int inserted = pedestal.insertItem(stack.copyWithCount(Math.min(stack.getCount(), rate)), false);
-                if (inserted <= 0) continue;
-                stack.shrink(inserted);
-                inventory.setChanged();
-                return;
-            }
-            return;
-        }
-        if (type == PedestalTransportTypes.EXPERIENCE.get())
-        {
-            int amount = Math.min(rate, playerExperience(player));
-            if (amount <= 0) return;
-            int inserted;
-            try (Transaction transaction = Transaction.openRoot())
-            {
-                inserted = pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, amount, transaction);
-                if (inserted <= 0) return;
-                transaction.commit();
-            }
-            setPlayerExperience(player, playerExperience(player) - inserted);
-            return;
-        }
-        PedestalStorage<R> storage = pedestal.getStorage(type);
-        for (int slot = 0; slot < Inventory.INVENTORY_SIZE; slot++)
-        {
-            if (inventory.getItem(slot).isEmpty()) continue;
-            ResourceHandler<R> handler = type.getItemHandler(ItemAccess.forPlayerSlot(player, slot));
-            if (handler == null) continue;
-            try (Transaction transaction = Transaction.openRoot())
-            {
-                if (type.transfer(handler, storage, rate, transaction) <= 0) continue;
-                transaction.commit();
-                return;
-            }
-        }
-    }
-
-    // The player's real total points, from their level and progress bar. Player#totalExperience can't be used:
-    // vanilla only raises it in giveExperiencePoints, so levels from commands or spent at an enchanting table
-    // or anvil never show up in it.
-    private static int playerExperience(Player player)
-    {
-        long points = ExperienceTransportType.pointsForLevel(player.experienceLevel)
-                + Math.round(player.experienceProgress * player.getXpNeededForNextLevel());
-        return (int) Math.min(points, Integer.MAX_VALUE);
-    }
-
-    // Sets the player to exactly this many points (level + progress bar), all at once
-    private static void setPlayerExperience(Player player, int points)
-    {
-        points = Math.max(0, points);
-        int level = 0;
-        while (ExperienceTransportType.pointsForLevel(level + 1) <= points) level++;
-        player.experienceLevel = level;
-        // getXpNeededForNextLevel reads experienceLevel, so it's set first
-        player.experienceProgress = (float) (points - ExperienceTransportType.pointsForLevel(level)) / player.getXpNeededForNextLevel();
-        player.totalExperience = points;
-        // Adding 0 levels changes nothing, but on the server it makes the player resend their xp bar to the client
-        player.giveExperienceLevels(0);
+        type.pullFromPlayer(player, pedestal.getStorage(type), rate);
     }
 
     // ---- Tooltip ----
@@ -469,7 +404,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         {
             UpgradeMode mode = getMode(stack);
             tooltip.accept(Component.translatable(MODID + ".upgrade_tooltip_mode").append(typeName(mode.selected())).withStyle(ChatFormatting.GOLD));
-            for (PedestalTransportType<?> type : PedestalTransportTypes.REGISTRY)
+            for (TransportType<?> type : TransportTypes.REGISTRY)
             {
                 boolean enabled = mode.isEnabled(type.getId());
                 tooltip.accept(Component.literal(" ").append(type.getName()).append(": ")
@@ -482,7 +417,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         if (cardType != null)
         {
             tooltip.accept(Component.translatable(MODID + ".upgrade_tooltip_workcard")
-                    .append(Component.translatable(MODID + ".workcard_type." + cardType.name().toLowerCase())).withStyle(ChatFormatting.GRAY));
+                    .append(cardType.getName()).withStyle(ChatFormatting.GRAY));
         }
 
         Config.FuelCost cost = getFuelCost();
@@ -514,7 +449,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     // "Speed", "Range", "Fluids Capacity"... (pedestals.modifier.<name>; capacity modifiers use the type's name)
     public static Component modifierName(String modifier)
     {
-        PedestalTransportType<?> type = capacityType(modifier);
+        TransportType<?> type = capacityType(modifier);
         if (type != null) return Component.translatable(MODID + ".modifier.capacity", type.getName());
         return Component.translatableWithFallback(MODID + ".modifier." + modifier, modifier);
     }

@@ -2,7 +2,7 @@
   "type": "pedestals:upgrademodification_global",
   "ingredients": [
     "pedestals:upgrade_pedestal_export",
-    "pedestals:workcard_locations",
+    "mowlib:workcard_locations",
     "minecraft:ender_pearl"
   ],
   "modifier": "upgraderemotestorage",

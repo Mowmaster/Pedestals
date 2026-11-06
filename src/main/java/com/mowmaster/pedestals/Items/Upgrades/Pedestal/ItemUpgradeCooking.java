@@ -1,11 +1,11 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.EnergyTransportType;
+import com.mowmaster.mowlib.transport.ExperienceTransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.Transport.EnergyTransportType;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -91,7 +91,7 @@ public class ItemUpgradeCooking<T extends AbstractCookingRecipe> extends ItemUpg
             int cost = energyPerTick.getAsInt();
             if (cost > 0)
             {
-                int stored = pedestal.getStorage(PedestalTransportTypes.ENERGY.get()).getAmountAsInt(0);
+                int stored = pedestal.getStorage(TransportTypes.ENERGY.get()).getAmountAsInt(0);
                 ticks = Math.min(ticks, stored / cost);
                 if (ticks <= 0) return;
                 pedestal.removeFuel(cost * ticks, 0, false);
@@ -130,7 +130,7 @@ public class ItemUpgradeCooking<T extends AbstractCookingRecipe> extends ItemUpg
         {
             try (Transaction transaction = Transaction.openRoot())
             {
-                pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, total / 100, transaction);
+                pedestal.getStorage(TransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, total / 100, transaction);
                 transaction.commit();
             }
         }

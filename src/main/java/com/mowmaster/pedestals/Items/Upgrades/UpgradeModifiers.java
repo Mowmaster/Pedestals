@@ -33,7 +33,7 @@ public record UpgradeModifiers(Map<String, Integer> values)
     public static final String KNOWLEDGE = "upgradeknowledge";
     // XP anvil upgrade
     public static final String MENDING = "upgrademending";
-    // Capacity modifiers are one per transport type: see PedestalTransportType#getCapacityModifier
+    // Capacity modifiers are one per transport type: see TransportType#getCapacityModifier
     // (upgradeitemcapacity, upgradefluidcapacity, upgradeenergycapacity, upgradexpcapacity, ...).
     // Upgrades list this to accept every type's capacity modifier.
     public static final String ANY_CAPACITY = "*capacity";

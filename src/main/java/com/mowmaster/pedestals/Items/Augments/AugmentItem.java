@@ -1,10 +1,11 @@
 package com.mowmaster.pedestals.Items.Augments;
 
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.PedestalDataComponents;
 import com.mowmaster.pedestals.PedestalReferences;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
+import com.mowmaster.pedestals.Transport.PedestalTransportRules;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -126,9 +127,10 @@ public class AugmentItem extends Item
             case RANGE -> tooltip.accept(Component.translatable(MODID + ".augments_range_increase").append(String.valueOf(getAmount())).withStyle(ChatFormatting.YELLOW));
             case CAPACITY, STORAGE -> {
                 tooltip.accept(Component.translatable(MODID + (type == AugmentType.CAPACITY ? ".augments_capacity_title" : ".augments_storage_title")).withStyle(ChatFormatting.YELLOW));
-                for (PedestalTransportType<?> transportType : PedestalTransportTypes.REGISTRY)
+                for (TransportType<?> transportType : TransportTypes.REGISTRY)
                 {
-                    int amount = type == AugmentType.CAPACITY ? transportType.getCapacityAugmentBonus(tier) : transportType.getStorageAugmentBonus(tier);
+                    PedestalTransportRules rules = PedestalTransportRules.of(transportType);
+                    int amount = type == AugmentType.CAPACITY ? rules.capacityAugmentBonus(tier) : rules.storageAugmentBonus(tier);
                     if (amount <= 0) continue;
                     // pedestals.augment_amount.<capacity|storage>.<type namespace>.<type path>, e.g. "+%s mB"; plain "+N" if missing
                     String key = MODID + ".augment_amount." + type.key() + "." + transportType.getId().getNamespace() + "." + transportType.getId().getPath();

@@ -1,24 +1,24 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
+import com.mowmaster.mowlib.filter.ITransportFilter;
+import com.mowmaster.mowlib.registry.MowLibItems;
+import com.mowmaster.mowlib.storage.StorageInteractions;
+import com.mowmaster.mowlib.tint.IColorableBlock;
+import com.mowmaster.mowlib.tint.ITintHolder;
+import com.mowmaster.mowlib.util.CBPixelBox;
+import com.mowmaster.mowlib.workcard.IWorkCard;
 import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.pedestals.Items.Augments.AugmentItem;
 import com.mowmaster.pedestals.Items.ItemRegistry;
 import com.mowmaster.pedestals.Items.Tools.AugmentToolItem;
-import com.mowmaster.pedestals.Items.Tools.FilterToolItem;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolItem;
-import com.mowmaster.pedestals.TintHandler.IColorableBlock;
-import com.mowmaster.pedestals.TintHandler.ITintHolder;
-import com.mowmaster.pedestals.TintHandler.libPixelBox;
-import com.mowmaster.pedestals.api.filter.IPedestalFilter;
 import com.mowmaster.pedestals.api.upgrade.IPedestalUpgrade;
-import com.mowmaster.pedestals.api.upgrade.IWorkCard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -50,7 +50,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
@@ -76,17 +75,17 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
     // The model's boxes, standing upright (facing up). Same numbers as the 1.20 shapes.
-    private static final List<libPixelBox> UNLIT_BOXES = List.of(
-            new libPixelBox(3, 0, 3, 13, 2, 13),     // base
-            new libPixelBox(5, 2, 5, 11, 10, 11),    // pillar
-            new libPixelBox(4, 10, 4, 12, 12, 12));  // top
-    private static final List<libPixelBox> LIT_BOXES = List.of(
-            new libPixelBox(3, 0, 3, 13, 2, 13),
-            new libPixelBox(4, 2, 4, 12, 3, 12),     // glowstone ring
-            new libPixelBox(5, 3, 5, 11, 4, 11),
-            new libPixelBox(4.5, 4, 4.5, 11.5, 5, 11.5),
-            new libPixelBox(5, 5, 5, 11, 10, 11),
-            new libPixelBox(4, 10, 4, 12, 12, 12));
+    private static final List<CBPixelBox> UNLIT_BOXES = List.of(
+            new CBPixelBox(3, 0, 3, 13, 2, 13),     // base
+            new CBPixelBox(5, 2, 5, 11, 10, 11),    // pillar
+            new CBPixelBox(4, 10, 4, 12, 12, 12));  // top
+    private static final List<CBPixelBox> LIT_BOXES = List.of(
+            new CBPixelBox(3, 0, 3, 13, 2, 13),
+            new CBPixelBox(4, 2, 4, 12, 3, 12),     // glowstone ring
+            new CBPixelBox(5, 3, 5, 11, 4, 11),
+            new CBPixelBox(4.5, 4, 4.5, 11.5, 5, 11.5),
+            new CBPixelBox(5, 5, 5, 11, 10, 11),
+            new CBPixelBox(4, 10, 4, 12, 12, 12));
 
     private final Map<BlockState, VoxelShape> shapes = new HashMap<>();
 
@@ -102,8 +101,8 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         // Work every shape out once, rotated the same way the blockstate file rotates the model
         for (BlockState state : stateDefinition.getPossibleStates())
         {
-            List<libPixelBox> boxes = state.getValue(LIT) ? LIT_BOXES : UNLIT_BOXES;
-            shapes.put(state, libPixelBox.union(boxes.stream().map(box -> place(box, state.getValue(FACING))).toList()));
+            List<CBPixelBox> boxes = state.getValue(LIT) ? LIT_BOXES : UNLIT_BOXES;
+            shapes.put(state, CBPixelBox.union(boxes.stream().map(box -> box.rotateFromUp(state.getValue(FACING))).toList()));
         }
     }
 
@@ -113,27 +112,8 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         builder.add(FACING, LIT, FILTER_STATUS, WATERLOGGED);
     }
 
-    // ---- Rotations, matching blockstates/block_pedestal.json: up as modelled, down = x 180, sideways = x 90 then y ----
-
-    public static int xQuarterTurns(Direction facing)
-    {
-        return switch (facing)
-        {
-            case UP -> 0;
-            case DOWN -> 2;
-            default -> 1;
-        };
-    }
-
-    public static int yQuarterTurns(Direction facing)
-    {
-        return facing.getAxis().isVertical() ? 0 : libPixelBox.quarterTurns(facing);
-    }
-
-    private static libPixelBox place(libPixelBox box, Direction facing)
-    {
-        return box.rotateX(xQuarterTurns(facing)).rotateY(yQuarterTurns(facing));
-    }
+    // Rotations match blockstates/block_pedestal.json: up as modelled, down = x 180, sideways = x 90 then y
+    // (MowLib's CBPixelBox#rotateFromUp does exactly that)
 
     @Override
     protected @NotNull VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context)
@@ -215,12 +195,12 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         ItemStack offhand = player.getOffhandItem();
 
         // Filter in the offhand: put it in (one filter per pedestal; the filter tool takes it out)
-        if (offhand.getItem() instanceof IPedestalFilter && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        if (offhand.getItem() instanceof ITransportFilter && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
         {
             if (!level.isClientSide())
             {
                 if (pedestal.hasFilter()) return InteractionResult.FAIL;
-                pedestal.insertFilter(offhand);
+                StorageInteractions.insertFilter(player, pedestal);
             }
             return InteractionResult.SUCCESS;
         }
@@ -284,11 +264,10 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
             {
                 // Buckets and other fluid containers fill from / empty into the pedestal's tank first
                 // (NeoForge's helper does the swap in the player's hand and plays the sound)
-                if (FluidUtil.interactWithFluidHandler(player, hand, level, pos, null, null)) return InteractionResult.SUCCESS;
+                if (StorageInteractions.useFluidContainer(player, hand, level, pos)) return InteractionResult.SUCCESS;
 
-                int inserted = pedestal.insertItem(stack, false);
-                if (inserted == 0) return InteractionResult.FAIL;
-                stack.shrink(inserted);
+                // As much of the held stack as fits; creative players keep theirs
+                if (StorageInteractions.insertHeld(player, hand, pedestal.getItemStorage()) == 0) return InteractionResult.FAIL;
             }
             return InteractionResult.SUCCESS;
         }
@@ -325,19 +304,8 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
 
     private static void leftClick(BlockState state, Level level, BlockPos pos, Player player)
     {
-        // Filter tool in the offhand: take the filter out
-        if (player.getOffhandItem().getItem() instanceof FilterToolItem)
-        {
-            if (level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal && pedestal.hasFilter())
-            {
-                giveToPlayer(player, pedestal.removeFilter());
-            }
-            else
-            {
-                player.sendOverlayMessage(Component.translatable("pedestals.tool_filter_missing"));
-            }
-            return;
-        }
+        // Filter tool in the offhand: take the filter out (or say there isn't one)
+        if (level.getBlockEntity(pos) instanceof BasePedestalBlockEntity filterHolder && StorageInteractions.removeFilter(player, filterHolder)) return;
 
         // Upgrade tool / tool swapper / work card tool in the offhand: take the upgrade / tool / work card out
         if (level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
@@ -355,7 +323,7 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
                 else player.sendOverlayMessage(Component.translatable("pedestals.tool_tool_missing"));
                 return;
             }
-            if (offhand.is(ItemRegistry.TOOL_WORKTOOL.get()))
+            if (offhand.is(MowLibItems.TOOL_WORK.get()))
             {
                 if (pedestal.hasWorkCard()) giveToPlayer(player, pedestal.removeWorkCard());
                 else player.sendOverlayMessage(Component.translatable("pedestals.tool_workcard_missing"));
@@ -385,10 +353,10 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         }
     }
 
-    // Into the inventory, or dropped at the player's feet if it's full. The client is sent the inventory change.
+    // Into the inventory, or dropped at the player's feet if it's full
     private static void giveToPlayer(Player player, ItemStack stack)
     {
-        if (!stack.isEmpty()) player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
+        StorageInteractions.giveToPlayer(player, stack);
     }
 
     // Creative players don't break pedestals by left-clicking (that takes items out instead, as in 1.20);

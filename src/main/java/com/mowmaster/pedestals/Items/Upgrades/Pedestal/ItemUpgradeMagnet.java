@@ -1,12 +1,12 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -66,7 +66,7 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase
             int distance = distance(pedestal.getBlockPos(), entity.blockPosition());
             if (!useFuel(pedestal, distance, true)) return;
             boolean taken = false;
-            for (PedestalTransportType<?> type : getTransportTypes(upgrade))
+            for (TransportType<?> type : getTransportTypes(upgrade))
             {
                 if (!entity.isAlive()) break; // a type took all of it
                 taken |= absorb(level, pedestal, upgrade, type, entity);
@@ -81,10 +81,10 @@ public class ItemUpgradeMagnet extends ItemUpgradeBase
     }
 
     private <R extends Resource> boolean absorb(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade,
-                                                PedestalTransportType<R> type, Entity entity)
+                                                TransportType<R> type, Entity entity)
     {
         // Items and experience: as much as fits (1.20 had no limit); other types: the import upgrade's rate
-        boolean unlimited = type == PedestalTransportTypes.ITEMS.get() || type == PedestalTransportTypes.EXPERIENCE.get();
+        boolean unlimited = type == TransportTypes.ITEMS.get() || type == TransportTypes.EXPERIENCE.get();
         int amount = unlimited ? Integer.MAX_VALUE : getRate(upgrade, type, Config.IMPORT_RATES.get(type, pedestal));
         return type.absorbEntity(level, entity, pedestal.getStorage(type), amount);
     }

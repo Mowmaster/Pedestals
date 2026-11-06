@@ -1,8 +1,9 @@
 package com.mowmaster.pedestals;
 
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.PedestalStorageHost;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.pedestals.Transport.PedestalTransportRules;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
@@ -225,19 +226,19 @@ public class Config {
         }
 
         // The base rate for a type (before its capacity modifier)
-        public int get(PedestalTransportType<?> type, PedestalStorageHost host)
+        public int get(TransportType<?> type, BasePedestalBlockEntity pedestal)
         {
-            if (type == PedestalTransportTypes.ITEMS.get()) return items.getAsInt();
-            if (type == PedestalTransportTypes.FLUIDS.get()) return fluids.getAsInt();
-            if (type == PedestalTransportTypes.ENERGY.get()) return energy.getAsInt();
-            if (type == PedestalTransportTypes.EXPERIENCE.get()) return experience.getAsInt();
-            return type.getDefaultUpgradeRate(host);
+            if (type == TransportTypes.ITEMS.get()) return items.getAsInt();
+            if (type == TransportTypes.FLUIDS.get()) return fluids.getAsInt();
+            if (type == TransportTypes.ENERGY.get()) return energy.getAsInt();
+            if (type == TransportTypes.EXPERIENCE.get()) return experience.getAsInt();
+            return PedestalTransportRules.of(type).defaultUpgradeRate(pedestal);
         }
     }
 
     // A capacity or storage augment tier: what one augment adds per built-in transport type (capacity: to the link
     // transfer rate; storage: to the storage, items as extra stacks), experience in levels, and how many can go in.
-    // Add-on types give their own values (PedestalTransportType#getCapacityAugmentBonus / getStorageAugmentBonus).
+    // Add-on types give their own values (PedestalTransportRules#capacityAugmentBonus / storageAugmentBonus).
     public record AmountAugment(ModConfigSpec.IntValue items, ModConfigSpec.IntValue fluids, ModConfigSpec.IntValue energy,
                                 ModConfigSpec.IntValue experience, ModConfigSpec.IntValue insertable)
     {

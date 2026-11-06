@@ -2,7 +2,7 @@
   "type": "pedestals:upgrademodification_global",
   "ingredients": [
     "pedestals:upgrade_pedestal_pump",
-    "pedestals:workcard_area",
+    "mowlib:workcard_area",
     "minecraft:stone_button"
   ],
   "modifier": "upgradeoperatetobedrock",

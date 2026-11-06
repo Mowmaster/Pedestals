@@ -10,7 +10,7 @@
       "cases": [
         {
           "when": {
-            "type": "pedestals:items",
+            "type": "mowlib:items",
             "enabled": true
           },
           "model": {
@@ -20,7 +20,7 @@
         },
         {
           "when": {
-            "type": "pedestals:items",
+            "type": "mowlib:items",
             "enabled": false
           },
           "model": {
@@ -30,7 +30,7 @@
         },
         {
           "when": {
-            "type": "pedestals:fluids",
+            "type": "mowlib:fluids",
             "enabled": true
           },
           "model": {
@@ -40,7 +40,7 @@
         },
         {
           "when": {
-            "type": "pedestals:fluids",
+            "type": "mowlib:fluids",
             "enabled": false
           },
           "model": {
@@ -50,7 +50,7 @@
         },
         {
           "when": {
-            "type": "pedestals:energy",
+            "type": "mowlib:energy",
             "enabled": true
           },
           "model": {
@@ -60,7 +60,7 @@
         },
         {
           "when": {
-            "type": "pedestals:energy",
+            "type": "mowlib:energy",
             "enabled": false
           },
           "model": {
@@ -70,7 +70,7 @@
         },
         {
           "when": {
-            "type": "pedestals:experience",
+            "type": "mowlib:experience",
             "enabled": true
           },
           "model": {
@@ -80,7 +80,7 @@
         },
         {
           "when": {
-            "type": "pedestals:experience",
+            "type": "mowlib:experience",
             "enabled": false
           },
           "model": {

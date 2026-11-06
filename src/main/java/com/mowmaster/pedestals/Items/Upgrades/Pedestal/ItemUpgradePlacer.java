@@ -1,12 +1,13 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.util.MowLibBlockActions;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.PedestalFakePlayer;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeWorld;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.BlockItem;
@@ -48,7 +49,7 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
     public static boolean canPlaceWith(BasePedestalBlockEntity pedestal, ItemStack stack)
     {
         return UpgradeWorld.canPlace(stack) && stack.getItem() instanceof BlockItem blockItem
-                && !UpgradeWorld.isPlant(blockItem.getBlock()) && pedestal.machineFilterAllows(stack);
+                && !MowLibBlockActions.isPlant(blockItem.getBlock()) && pedestal.machineFilterAllows(stack);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class ItemUpgradePlacer extends ItemUpgradeBase
         if (!useFuel(pedestal, distance, true)) return;
 
         PedestalFakePlayer player = pedestal.getFakePlayer(level);
-        if (!UpgradeWorld.placeBlock(level, player, toPlace, target)) return;
+        if (!MowLibBlockActions.placeBlock(level, player, toPlace, target)) return;
         useFuel(pedestal, distance, false);
         pedestal.removeItem(ItemResource.of(toPlace), 1, false);
         pedestal.getUpgradeData().putInt("position", (index + 1) % positions.size());

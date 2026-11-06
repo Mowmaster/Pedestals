@@ -139,13 +139,13 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    // MowLib: compile against it, run with it in dev, and bundle it inside the Bibliomania jar (Jar-in-Jar),
+    // MowLib: compile against it, run with it in dev, and bundle it inside the Pedestals jar (Jar-in-Jar),
     // so players don't install it separately. Jar-in-Jar needs a version range: if several mods bundle MowLib,
     // NeoForge loads the newest version every range allows.
     jarJar(implementation(group: 'com.mowmaster.mowlib', name: 'mowlib')) {
         version {
-            strictly '[0.0.1,1.0.0)'
-            prefer '0.0.1'
+            strictly '[0.0.4,1.0.0)'
+            prefer '0.0.4'
         }
     }
 }

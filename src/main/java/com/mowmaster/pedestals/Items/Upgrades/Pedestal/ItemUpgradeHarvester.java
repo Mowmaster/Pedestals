@@ -1,12 +1,13 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.util.MowLibBlockActions;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.PedestalFakePlayer;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeWorld;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.block.SugarCaneBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.neoforged.neoforge.common.CommonHooks;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,10 +92,10 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
                 if (!canHarvest(level, target, state) || !UpgradeWorld.canBreak(level, pedestal, target, state)) continue;
                 int distance = distance(pedestal.getBlockPos(), target);
                 if (!useFuel(pedestal, distance, true)) return;
-                IntegerProperty age = ageProperty(state);
+                IntegerProperty age = MowLibBlockActions.ageProperty(state);
                 boolean harvested = gentle && age != null && !isTallPlant(state.getBlock())
                         ? replant(level, player, target, state, age)
-                        : UpgradeWorld.breakBlock(level, player, target, target);
+                        : MowLibBlockActions.breakBlock(level, player, target, target);
                 if (harvested) useFuel(pedestal, distance, false);
             }
         }
@@ -110,23 +110,13 @@ public class ItemUpgradeHarvester extends ItemUpgradeBase
         return block instanceof GrowingPlantBlock || block instanceof BambooStalkBlock || block instanceof SugarCaneBlock || block instanceof CactusBlock;
     }
 
-    // The block's "age" property, if it has one (1.20's getBlockPropertyAge)
-    public static @Nullable IntegerProperty ageProperty(BlockState state)
-    {
-        for (Property<?> property : state.getProperties())
-        {
-            if (property instanceof IntegerProperty integer && property.getName().equalsIgnoreCase("age")) return integer;
-        }
-        return null;
-    }
-
     private static boolean canHarvest(ServerLevel level, BlockPos pos, BlockState state)
     {
         Block block = state.getBlock();
         if (isTallPlant(block)) return level.getBlockState(pos.below()).is(block); // keep the bottom one
         if (state.is(Blocks.MELON) || state.is(Blocks.PUMPKIN)) return true;
         if (block instanceof StemBlock) return false;
-        IntegerProperty age = ageProperty(state);
+        IntegerProperty age = MowLibBlockActions.ageProperty(state);
         return age != null && state.getValue(age).equals(Collections.max(age.getPossibleValues()));
     }
 

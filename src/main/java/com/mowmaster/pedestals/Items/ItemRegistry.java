@@ -1,29 +1,19 @@
 package com.mowmaster.pedestals.Items;
 
+import com.mowmaster.mowlib.MowLibReferences;
+import com.mowmaster.mowlib.registry.MowLibItems;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Augments.AugmentItem;
 import com.mowmaster.pedestals.Items.Augments.AugmentType;
-import com.mowmaster.pedestals.Items.Filters.DurabilityFilterItem;
-import com.mowmaster.pedestals.Items.Filters.EnchantedCountFilterItem;
-import com.mowmaster.pedestals.Items.Filters.EnchantedExactFilterItem;
-import com.mowmaster.pedestals.Items.Filters.EnchantedFilterItem;
-import com.mowmaster.pedestals.Items.Filters.EnchantedFuzzyFilterItem;
-import com.mowmaster.pedestals.Items.Filters.FoodFilterItem;
-import com.mowmaster.pedestals.Items.Filters.ItemFilterItem;
-import com.mowmaster.pedestals.Items.Filters.ItemStackFilterItem;
-import com.mowmaster.pedestals.Items.Filters.ModFilterItem;
-import com.mowmaster.pedestals.Items.Filters.RestrictedFilterItem;
 import com.mowmaster.pedestals.Items.Storage.StoragePacketItem;
 import com.mowmaster.pedestals.Items.Tools.AugmentToolItem;
-import com.mowmaster.pedestals.Items.Tools.FilterToolItem;
 import com.mowmaster.pedestals.Items.Tools.LinkingToolItem;
 import com.mowmaster.pedestals.Items.Tools.PedestalToolItem;
 import com.mowmaster.pedestals.Items.Upgrades.Pedestal.*;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardAreaItem;
-import com.mowmaster.pedestals.Items.WorkCards.WorkCardLocationsItem;
 import com.mowmaster.pedestals.Items.WorkCards.WorkCardPedestalsItem;
 import com.mowmaster.pedestals.PedestalReferences;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.BlastingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -44,47 +34,25 @@ public class ItemRegistry {
             properties -> new LinkingToolItem(properties, false));
     public static final DeferredItem<LinkingToolItem> TOOL_LINKINGTOOLBACKWARDS = PEDESTAL_ITEMS.registerItem("tool_linkingtoolbackwards",
             properties -> new LinkingToolItem(properties, true));
-    // Was mowlib:tool_filter
-    public static final DeferredItem<FilterToolItem> TOOL_FILTERTOOL = PEDESTAL_ITEMS.registerItem("tool_filter", FilterToolItem::new);
-    // In the offhand, left-click a pedestal to take its upgrade / tool / work card out (the work tool was mowlib:tool_work)
+    // In the offhand, left-click a pedestal to take its upgrade / tool out (the filter tool and work card tool are
+    // MowLib's: MowLibItems.TOOL_FILTER / TOOL_WORK)
     public static final DeferredItem<PedestalToolItem> TOOL_UPGRADETOOL = PEDESTAL_ITEMS.registerItem("tool_upgradetool", PedestalToolItem::new);
     public static final DeferredItem<PedestalToolItem> TOOL_TOOLSWAPPER = PEDESTAL_ITEMS.registerItem("tool_toolswapper", PedestalToolItem::new);
-    public static final DeferredItem<PedestalToolItem> TOOL_WORKTOOL = PEDESTAL_ITEMS.registerItem("tool_work", PedestalToolItem::new);
 
-    // ---- Filters (were mowlib:filter_*; same names, now in the pedestals namespace) ----
-    // The blank filter is only a crafting ingredient for the others
-    public static final DeferredItem<Item> FILTER_BASE = PEDESTAL_ITEMS.registerSimpleItem("filter_base");
-    public static final DeferredItem<ItemFilterItem> FILTER_ITEM = PEDESTAL_ITEMS.registerItem("filter_item", ItemFilterItem::new);
-    public static final DeferredItem<ItemStackFilterItem> FILTER_ITEMSTACK = PEDESTAL_ITEMS.registerItem("filter_itemstack", ItemStackFilterItem::new);
-    public static final DeferredItem<ModFilterItem> FILTER_MOD = PEDESTAL_ITEMS.registerItem("filter_mod", ModFilterItem::new);
-    public static final DeferredItem<RestrictedFilterItem> FILTER_RESTRICTED = PEDESTAL_ITEMS.registerItem("filter_restricted", RestrictedFilterItem::new);
-    public static final DeferredItem<DurabilityFilterItem> FILTER_DURABILITY = PEDESTAL_ITEMS.registerItem("filter_durability", DurabilityFilterItem::new);
-    public static final DeferredItem<EnchantedFilterItem> FILTER_ENCHANTED = PEDESTAL_ITEMS.registerItem("filter_enchanted", EnchantedFilterItem::new);
-    public static final DeferredItem<EnchantedCountFilterItem> FILTER_ENCHANTED_COUNT = PEDESTAL_ITEMS.registerItem("filter_enchantedcount", EnchantedCountFilterItem::new);
-    public static final DeferredItem<EnchantedExactFilterItem> FILTER_ENCHANTED_EXACT = PEDESTAL_ITEMS.registerItem("filter_enchantedexact", EnchantedExactFilterItem::new);
-    public static final DeferredItem<EnchantedFuzzyFilterItem> FILTER_ENCHANTED_FUZZY = PEDESTAL_ITEMS.registerItem("filter_enchantedfuzzy", EnchantedFuzzyFilterItem::new);
-    public static final DeferredItem<FoodFilterItem> FILTER_FOOD = PEDESTAL_ITEMS.registerItem("filter_food", FoodFilterItem::new);
-
-    // For the creative tab, in display order
-    public static final List<DeferredItem<? extends Item>> FILTERS = List.of(FILTER_BASE, FILTER_ITEM, FILTER_ITEMSTACK, FILTER_MOD,
-            FILTER_RESTRICTED, FILTER_DURABILITY, FILTER_ENCHANTED, FILTER_ENCHANTED_COUNT, FILTER_ENCHANTED_EXACT,
-            FILTER_ENCHANTED_FUZZY, FILTER_FOOD);
-
-    // ---- Work cards (were mowlib:workcard_*) ----
-    public static final DeferredItem<WorkCardAreaItem> WORKCARD_AREA = PEDESTAL_ITEMS.registerItem("workcard_area", WorkCardAreaItem::new);
-    public static final DeferredItem<WorkCardLocationsItem> WORKCARD_LOCATIONS = PEDESTAL_ITEMS.registerItem("workcard_locations", WorkCardLocationsItem::new);
+    // ---- Work cards: the area and locations cards are MowLib's; this one only takes pedestals. MowLib's Blank Work
+    // Card turns into any IWorkCard through its picker menu, so this card is picked there too (no recipe). ----
     public static final DeferredItem<WorkCardPedestalsItem> WORKCARD_PEDESTALS = PEDESTAL_ITEMS.registerItem("workcard_belocations", WorkCardPedestalsItem::new);
 
     // ---- Storage packets, one per transport type (same ids as 1.20's mechanical storage items) ----
     // The transport type holders are Suppliers, so the item finds its type once registries are done
     public static final DeferredItem<StoragePacketItem> MECHANICAL_STORAGE_ITEM = PEDESTAL_ITEMS.registerItem("mechanical_storage_item",
-            properties -> new StoragePacketItem(properties, PedestalTransportTypes.ITEMS));
+            properties -> new StoragePacketItem(properties, TransportTypes.ITEMS));
     public static final DeferredItem<StoragePacketItem> MECHANICAL_STORAGE_FLUID = PEDESTAL_ITEMS.registerItem("mechanical_storage_fluid",
-            properties -> new StoragePacketItem(properties, PedestalTransportTypes.FLUIDS));
+            properties -> new StoragePacketItem(properties, TransportTypes.FLUIDS));
     public static final DeferredItem<StoragePacketItem> MECHANICAL_STORAGE_ENERGY = PEDESTAL_ITEMS.registerItem("mechanical_storage_energy",
-            properties -> new StoragePacketItem(properties, PedestalTransportTypes.ENERGY));
+            properties -> new StoragePacketItem(properties, TransportTypes.ENERGY));
     public static final DeferredItem<StoragePacketItem> MECHANICAL_STORAGE_XP = PEDESTAL_ITEMS.registerItem("mechanical_storage_xp",
-            properties -> new StoragePacketItem(properties, PedestalTransportTypes.EXPERIENCE));
+            properties -> new StoragePacketItem(properties, TransportTypes.EXPERIENCE));
 
     // ---- Upgrades (same ids as 1.20) ----
     // The blank coin every upgrade is crafted from; it isn't an upgrade itself
@@ -210,13 +178,26 @@ public class ItemRegistry {
     public static final List<DeferredItem<? extends Item>> AUGMENT_TOOLS = List.of(TOOL_AUGMENTS_SPEED, TOOL_AUGMENTS_CAPACITY, TOOL_AUGMENTS_STORAGE,
             TOOL_AUGMENTS_RANGE, TOOL_AUGMENTS_ROUNDROBIN, TOOL_AUGMENTS_DIFFUSER, TOOL_AUGMENTS_COLLIDE);
 
-    public static final List<DeferredItem<? extends Item>> WORKCARDS = List.of(WORKCARD_AREA, WORKCARD_LOCATIONS, WORKCARD_PEDESTALS);
+    // For the creative tab: MowLib's work cards, then Pedestals' own
+    public static final List<DeferredItem<? extends Item>> WORKCARDS = List.of(MowLibItems.WORKCARD_BASE, MowLibItems.WORKCARD_AREA,
+            MowLibItems.WORKCARD_LOCATIONS, WORKCARD_PEDESTALS);
 
     public static final List<DeferredItem<? extends Item>> PACKETS = List.of(MECHANICAL_STORAGE_ITEM, MECHANICAL_STORAGE_FLUID,
             MECHANICAL_STORAGE_ENERGY, MECHANICAL_STORAGE_XP);
 
+    // Items that moved to MowLib, under the ids they have there (1.20's MowLib ids again)
+    private static final List<String> MOVED_TO_MOWLIB = List.of("tool_filter", "tool_work", "filter_base", "filter_item",
+            "filter_itemstack", "filter_mod", "filter_restricted", "filter_durability", "filter_enchanted", "filter_enchantedcount",
+            "filter_enchantedexact", "filter_enchantedfuzzy", "filter_food", "workcard_area", "workcard_locations");
+
     public static void register(IEventBus eventBus)
     {
+        // Old worlds keep these items as pedestals:<id>: addAlias(old id, new id) points those at mowlib:<id>.
+        // It has to happen before the registry is built, so before PEDESTAL_ITEMS is registered.
+        for (String id : MOVED_TO_MOWLIB)
+        {
+            PEDESTAL_ITEMS.addAlias(Identifier.fromNamespaceAndPath(PedestalReferences.MODID, id), MowLibReferences.id(id));
+        }
         PEDESTAL_ITEMS.register(eventBus);
     }
 }

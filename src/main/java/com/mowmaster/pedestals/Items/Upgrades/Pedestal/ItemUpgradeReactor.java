@@ -1,6 +1,12 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 import com.mojang.serialization.Codec;
+import com.mowmaster.mowlib.transport.AmountResource;
+import com.mowmaster.mowlib.transport.EnergyTransportType;
+import com.mowmaster.mowlib.transport.ExperienceTransportType;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.SacrificeItem;
@@ -8,12 +14,6 @@ import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.ReactorEffect;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
 import com.mowmaster.pedestals.PedestalDataMaps;
-import com.mowmaster.pedestals.Transport.EnergyTransportType;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.AmountResource;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -77,7 +77,7 @@ public class ItemUpgradeReactor extends ItemUpgradeBase
     @Override
     public WorkCardType getWorkCardType(ItemStack upgrade)
     {
-        return WorkCardType.PEDESTALS;
+        return WorkCardType.MACHINES;
     }
 
     // Works once a second, whatever the speed (the amounts are per second)
@@ -113,8 +113,8 @@ public class ItemUpgradeReactor extends ItemUpgradeBase
         int left = data.getIntOr(BURN_LEFT, 0);
         int perSecond = data.getIntOr(XP_PER_SECOND, 0);
         double energyPerXp = data.getDoubleOr(ENERGY_PER_XP, 0);
-        PedestalStorage<AmountResource> experience = pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get());
-        PedestalStorage<AmountResource> energy = energy(pedestal);
+        TransportStorage<AmountResource> experience = pedestal.getStorage(TransportTypes.EXPERIENCE.get());
+        TransportStorage<AmountResource> energy = energy(pedestal);
 
         // As much of this second's experience as there is, and as there's room for the energy it makes
         int room = energy.getCapacityAsInt(0, EnergyTransportType.ENERGY) - energy.getAmountAsInt(0);
@@ -192,7 +192,7 @@ public class ItemUpgradeReactor extends ItemUpgradeBase
         data.store(WEAR, Codec.unboundedMap(Codec.STRING, Codec.INT), wear);
         pedestal.upgradeDataChanged();
 
-        if (pedestal.canSpawnParticles()) PedestalTransportTypes.ITEMS.get().sendTransferParticles(level, topOf(source), topOf(pedestal), ItemResource.of(sacrifice));
+        if (pedestal.canSpawnParticles()) TransportTypes.ITEMS.get().sendTransferParticles(level, topOf(source), topOf(pedestal), ItemResource.of(sacrifice));
         level.playSound(null, pedestal.getBlockPos(), SoundEvents.BLAZE_SHOOT, SoundSource.BLOCKS, 0.5F, 0.8F);
         applyEffects(level, pedestal, tier);
         chooseNext(level, pedestal, data, positions);
@@ -235,9 +235,9 @@ public class ItemUpgradeReactor extends ItemUpgradeBase
 
     // ---- Small helpers ----
 
-    private static PedestalStorage<AmountResource> energy(BasePedestalBlockEntity pedestal)
+    private static TransportStorage<AmountResource> energy(BasePedestalBlockEntity pedestal)
     {
-        return pedestal.getStorage(PedestalTransportTypes.ENERGY.get());
+        return pedestal.getStorage(TransportTypes.ENERGY.get());
     }
 
     private static Vec3 topOf(BasePedestalBlockEntity pedestal)

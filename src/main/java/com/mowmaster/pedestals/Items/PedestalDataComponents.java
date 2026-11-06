@@ -1,11 +1,10 @@
 package com.mowmaster.pedestals.Items;
 
 import com.mojang.serialization.Codec;
-import com.mowmaster.pedestals.Items.Filters.FilterData;
-import com.mowmaster.pedestals.Items.Storage.PacketContents;
+import com.mowmaster.mowlib.MowLibReferences;
+import com.mowmaster.mowlib.util.MowLibOwner;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeMode;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.Items.Upgrades.UpgradeOwner;
 import com.mowmaster.pedestals.PedestalReferences;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
@@ -17,22 +16,12 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.List;
-
 // Item data components replace 1.20's stack NBT. persistent = saved with the item, networkSynchronized = sent to
 // clients (needed for tooltips and item models).
 public class PedestalDataComponents
 {
     public static final DeferredRegister.DataComponents COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, PedestalReferences.MODID);
-
-    // The transport type a filter is currently set to (its "mode"). Separate from FILTER_DATA so the item model
-    // can switch texture on it (items/<filter>.json uses a "minecraft:component" select).
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Identifier>> FILTER_MODE =
-            COMPONENTS.registerComponentType("filter_mode", builder -> builder.persistent(Identifier.CODEC).networkSynchronized(Identifier.STREAM_CODEC));
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<FilterData>> FILTER_DATA =
-            COMPONENTS.registerComponentType("filter_data", builder -> builder.persistent(FilterData.CODEC).networkSynchronized(FilterData.STREAM_CODEC));
 
     // The pedestal a linking tool has selected
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockPos>> LINKED_POS =
@@ -53,19 +42,8 @@ public class PedestalDataComponents
             COMPONENTS.registerComponentType("upgrade_mode_display", builder -> builder.persistent(UpgradeMode.Display.CODEC).networkSynchronized(UpgradeMode.Display.STREAM_CODEC));
 
     // The player who put the upgrade in a pedestal (removed when it's taken out)
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<UpgradeOwner>> UPGRADE_OWNER =
-            COMPONENTS.registerComponentType("upgrade_owner", builder -> builder.persistent(UpgradeOwner.CODEC).networkSynchronized(UpgradeOwner.STREAM_CODEC));
-
-    // ---- Work cards: the selected positions (area cards keep two corners) ----
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<BlockPos>>> WORK_POSITIONS =
-            COMPONENTS.registerComponentType("work_positions", builder -> builder.persistent(BlockPos.CODEC.listOf())
-                    .networkSynchronized(BlockPos.STREAM_CODEC.apply(ByteBufCodecs.list())));
-
-    // ---- Storage packets ----
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PacketContents<?>>> PACKET_CONTENTS =
-            COMPONENTS.registerComponentType("packet_contents", builder -> builder.persistent(PacketContents.CODEC).networkSynchronized(PacketContents.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MowLibOwner>> UPGRADE_OWNER =
+            COMPONENTS.registerComponentType("upgrade_owner", builder -> builder.persistent(MowLibOwner.CODEC).networkSynchronized(MowLibOwner.STREAM_CODEC));
 
     // On a sacrifice upgrade: present = mob mode, absent = enchantment mode (also picks the item model).
     // Unit is Minecraft's "no value" type, for components that only matter by being there.
@@ -78,6 +56,18 @@ public class PedestalDataComponents
 
     public static void register(IEventBus eventBus)
     {
+        // Components that moved to MowLib (filters, work cards, storage packets): old items in saved worlds carry
+        // the pedestals: ids, which these aliases point at the mowlib: ones. addAlias(old id, new id) has to happen
+        // before the registry is built, so it's done here, before COMPONENTS is registered.
+        alias("filter_mode", "filter_mode");
+        alias("filter_data", "filter_data");
+        alias("work_positions", "work_positions");
+        alias("packet_contents", "transport_contents");
         COMPONENTS.register(eventBus);
+    }
+
+    private static void alias(String pedestalsId, String mowlibId)
+    {
+        COMPONENTS.addAlias(Identifier.fromNamespaceAndPath(PedestalReferences.MODID, pedestalsId), MowLibReferences.id(mowlibId));
     }
 }

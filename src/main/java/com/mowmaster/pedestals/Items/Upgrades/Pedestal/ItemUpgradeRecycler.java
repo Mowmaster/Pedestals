@@ -1,16 +1,16 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
 
+import com.mowmaster.mowlib.transport.AmountResource;
+import com.mowmaster.mowlib.transport.ExperienceTransportType;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
 import com.mowmaster.pedestals.PedestalDataMaps;
 import com.mowmaster.pedestals.PedestalTags;
 import com.mowmaster.pedestals.Recipes.RecyclingMaterials;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.AmountResource;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -95,8 +95,8 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
     {
         ResourceHandler<ItemResource> inventory = getInventoryBelow(level, pedestal);
         if (inventory == null) return;
-        boolean items = canTransport(upgrade, PedestalTransportTypes.ITEMS.get());
-        boolean experience = canTransport(upgrade, PedestalTransportTypes.EXPERIENCE.get());
+        boolean items = canTransport(upgrade, TransportTypes.ITEMS.get());
+        boolean experience = canTransport(upgrade, TransportTypes.EXPERIENCE.get());
 
         for (int index = 0; index < inventory.size(); index++)
         {
@@ -180,7 +180,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
                 int inserted = ResourceHandlerUtil.insertStacking(pedestal.getItemStorage(), ItemResource.of(stack), stack.getCount(), transaction);
                 if (output == 0 && inserted <= 0) return false;
             }
-            PedestalStorage<AmountResource> experience = pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get());
+            TransportStorage<AmountResource> experience = pedestal.getStorage(TransportTypes.EXPERIENCE.get());
             if (points > 0 && experience.insert(ExperienceTransportType.EXPERIENCE, points, transaction) != points) return false;
             if (points < 0 && experience.extract(ExperienceTransportType.EXPERIENCE, -points, transaction) != -points) return false;
             transaction.commit();
@@ -209,13 +209,13 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
     {
         try (Transaction transaction = Transaction.openRoot())
         {
-            return pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, points, transaction) == points;
+            return pedestal.getStorage(TransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, points, transaction) == points;
         } // not committed: only a test
     }
 
     private static int storedExperience(BasePedestalBlockEntity pedestal)
     {
-        return pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).getAmountAsInt(0);
+        return pedestal.getStorage(TransportTypes.EXPERIENCE.get()).getAmountAsInt(0);
     }
 
     // What a curse costs to remove: what it would be worth if it weren't a curse (its minimum enchanting cost)
@@ -321,7 +321,7 @@ public class ItemUpgradeRecycler extends ItemUpgradeBase
         {
             try (Transaction transaction = Transaction.openRoot())
             {
-                pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, points, transaction);
+                pedestal.getStorage(TransportTypes.EXPERIENCE.get()).insert(ExperienceTransportType.EXPERIENCE, points, transaction);
                 transaction.commit();
             }
         }

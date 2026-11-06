@@ -1,11 +1,12 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.ExperienceTransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.util.MowLibXpUtils;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -116,7 +117,7 @@ public class ItemUpgradeEnchanter extends ItemUpgradeBase
     {
         int power = Math.max(1, getPower(level, pedestal)); // the table also charges at least 1 level
         int cost = experienceCost(power);
-        if (pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).getAmountAsInt(0) < cost) return;
+        if (pedestal.getStorage(TransportTypes.EXPERIENCE.get()).getAmountAsInt(0) < cost) return;
 
         RandomSource random = level.getRandom();
         List<EnchantmentInstance> enchantments = selectEnchantments(level, random, input, power);
@@ -143,7 +144,7 @@ public class ItemUpgradeEnchanter extends ItemUpgradeBase
         {
             if (inventory.extract(index, resource, 1, transaction) != 1) return;
             if (ResourceHandlerUtil.insertStacking(pedestal.getItemStorage(), ItemResource.of(result), 1, transaction) != 1) return;
-            if (pedestal.getStorage(PedestalTransportTypes.EXPERIENCE.get()).extract(ExperienceTransportType.EXPERIENCE, cost, transaction) != cost) return;
+            if (pedestal.getStorage(TransportTypes.EXPERIENCE.get()).extract(ExperienceTransportType.EXPERIENCE, cost, transaction) != cost) return;
             transaction.commit();
         }
         level.playSound(null, pedestal.getBlockPos(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 0.35F, 1.0F);
@@ -177,7 +178,7 @@ public class ItemUpgradeEnchanter extends ItemUpgradeBase
     public static int experienceCost(int power)
     {
         int levels = Mth.clamp(power / 10, 1, 30);
-        return ExperienceTransportType.pointsForLevel(30) - ExperienceTransportType.pointsForLevel(30 - levels);
+        return MowLibXpUtils.pointsForLevel(30) - MowLibXpUtils.pointsForLevel(30 - levels);
     }
 
     // EnchantmentHelper.selectEnchantment with two changes:

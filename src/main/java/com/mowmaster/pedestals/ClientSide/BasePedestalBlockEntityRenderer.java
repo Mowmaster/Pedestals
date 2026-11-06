@@ -2,10 +2,9 @@ package com.mowmaster.pedestals.ClientSide;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import com.mowmaster.mowlib.client.GhostItemRenderer;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlock;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.pedestals.api.upgrade.GhostItem;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -15,27 +14,20 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
 
 // Draws what's on the pedestal, whichever way the pedestal faces:
 //  - the stored item spinning on top
 //  - the upgrade as a small "coin" on each of the pillar's four sides
 //  - the tool lying flat on the top
 //  - the upgrade's ghost items (missing inputs): pulsing items with the amount needed above them, over the input
-//    pedestals they belong on, or circling this pedestal
+//    pedestals they belong on, or circling this pedestal (drawn by MowLib's GhostItemRenderer)
 // 26.x renderers work in two steps (see CrystalBlocks' chest renderer): extractRenderState copies what's needed
 // out of the block entity, then submit draws from that copy only.
 // Not ported yet from 1.20: several items orbiting, range boxes, render augments, the client render options.
@@ -49,23 +41,14 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             {0.5f, 0.6875f, 180f},
             {0.6875f, 0.5f, 270f}};
     private static final float COIN_Y = 0.475f;
-    // Block and sky light both at full: ghosts glow the same in the dark
-    private static final int FULL_BRIGHT = 0xF000F0;
-    // Ghost labels: half a name tag's size (name tags use 0.025 blocks per font pixel), white on vanilla's dark backing.
-    // Heights are from the ghost's centre to the top edge of the text.
-    private static final float TEXT_SCALE = 0.0125f;
-    private static final float LABEL_ABOVE = 0.6f;
-    private static final float LABEL_BELOW = -0.3f;
-    private static final int TEXT_COLOR = 0xFFFFFFFF;
-    private static final int TEXT_BACKGROUND = 0x40000000;
 
     private final ItemModelResolver itemModelResolver;
-    private final Font font;
+    private final GhostItemRenderer ghostRenderer;
 
     public BasePedestalBlockEntityRenderer(BlockEntityRendererProvider.Context context)
     {
         this.itemModelResolver = context.itemModelResolver();
-        this.font = context.font();
+        this.ghostRenderer = new GhostItemRenderer(context.itemModelResolver(), context.font());
     }
 
     @Override
@@ -94,40 +77,13 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         // hasTool check, i.e. use getToolStack(), if you want that back)
         itemModelResolver.updateForTopItem(state.tool, pedestal.rendersUpgrade() ? pedestal.getTool() : ItemStack.EMPTY, ItemDisplayContext.FIXED, pedestal.getLevel(), null, seed);
 
-        extractGhosts(pedestal, state, seed);
-    }
-
-    private void extractGhosts(BasePedestalBlockEntity pedestal, State state, int seed)
-    {
-        List<GhostItem> ghosts = pedestal.getGhosts();
-        Level level = pedestal.getLevel();
-        // The render states are kept between frames and only added to, so nothing is made every frame
-        while (state.ghosts.size() < ghosts.size()) state.ghosts.add(new Ghost());
-        state.ghostCount = ghosts.size();
-        state.orbitCount = 0;
-        for (int index = 0; index < ghosts.size(); index++)
-        {
-            GhostItem ghost = ghosts.get(index);
-            Ghost render = state.ghosts.get(index);
-            itemModelResolver.updateForTopItem(render.item, ghost.stack(), ItemDisplayContext.GROUND, level, null, seed + index);
-            render.label = ghost.label();
-            render.below = ghost.below().orElse(null);
-            if (ghost.above().isPresent() && level != null)
-            {
-                // Just above the other pedestal's top, whichever way it faces, relative to this block
-                BlockPos at = ghost.above().get();
-                Direction facing = level.getBlockState(at).getOptionalValue(BasePedestalBlock.FACING).orElse(Direction.UP);
-                render.offset = Vec3.atCenterOf(at).subtract(Vec3.atLowerCornerOf(pedestal.getBlockPos())).add(facing.getUnitVec3().scale(0.95));
-                render.orbitIndex = -1;
-            }
-            else render.orbitIndex = state.orbitCount++;
-        }
+        ghostRenderer.extract(state.ghosts, pedestal.getGhosts(), pedestal.getLevel(), pedestal.getBlockPos(), seed);
     }
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
     {
-        if (state.item.isEmpty() && state.upgrade.isEmpty() && state.tool.isEmpty() && state.ghostCount == 0) return;
+        if (state.item.isEmpty() && state.upgrade.isEmpty() && state.tool.isEmpty() && state.ghosts.isEmpty()) return;
 
         poseStack.pushPose();
         // Turn the whole block so "up" points the way the pedestal faces (getRotation turns UP onto that direction).
@@ -175,62 +131,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         poseStack.popPose();
 
         // Ghosts are drawn in world directions (not turned with the pedestal), so they can face the camera
-        for (int index = 0; index < state.ghostCount; index++)
-        {
-            Ghost ghost = state.ghosts.get(index);
-            Vec3 offset = ghost.orbitIndex < 0 ? ghost.offset : orbitOffset(state, ghost.orbitIndex);
-            poseStack.pushPose();
-            poseStack.translate(offset.x, offset.y, offset.z);
-            submitGhost(ghost, state, poseStack, submitNodeCollector, camera);
-            poseStack.popPose();
-        }
-    }
-
-    // Where a ghost circling this pedestal is now: evenly spaced round it, a little higher and wider than its own
-    // item, or straight above it if it's the only one. Worked out as if the pedestal stood on the ground, then turned
-    // the way it faces (Vector3f.rotate applies the quaternion to the point).
-    private static Vec3 orbitOffset(State state, int orbitIndex)
-    {
-        Vector3f point;
-        if (state.orbitCount == 1) point = new Vector3f(0f, 1.1f, 0f);
-        else
-        {
-            double angle = Math.toRadians(state.spin + 360.0 * orbitIndex / state.orbitCount);
-            point = new Vector3f((float) Math.cos(angle) * 0.9f, 0.7f, (float) Math.sin(angle) * 0.9f);
-        }
-        point.rotate(state.facing.getRotation());
-        return new Vec3(0.5 + point.x(), 0.5 + point.y(), 0.5 + point.z());
-    }
-
-    // A ghost: bobbing and pulsing, lit at full brightness, always turned to face the camera (like a thrown snowball),
-    // with its labels above and below
-    private void submitGhost(Ghost ghost, State state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
-    {
-        double wave = Math.toRadians(state.spin * 2);
-        poseStack.pushPose();
-        poseStack.translate(0f, (float) (0.05 * Math.sin(wave)), 0f);
-        if (ghost.label != null) submitLabel(ghost.label, LABEL_ABOVE, poseStack, submitNodeCollector, camera);
-        if (ghost.below != null) submitLabel(ghost.below, LABEL_BELOW, poseStack, submitNodeCollector, camera);
-        poseStack.rotate(camera.orientation);
-        // Half as big again as before (0.45 pulsing by 0.05)
-        float size = 0.675f + 0.075f * (float) Math.sin(wave * 2);
-        poseStack.scale(size, size, size);
-        ghost.item.submit(poseStack, submitNodeCollector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
-        poseStack.popPose();
-    }
-
-    // One line of text facing the camera, centred, its top edge y above the current point. This is what a name tag
-    // does (SubmitNodeCollection#submitNameTag), at our own size and height. The scale's y is negative because text
-    // is laid out downwards (screen style) while the world's y goes up.
-    private void submitLabel(Component text, float y, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
-    {
-        poseStack.pushPose();
-        poseStack.translate(0f, y, 0f);
-        poseStack.rotate(camera.orientation);
-        poseStack.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
-        FormattedCharSequence line = text.getVisualOrderText();
-        submitNodeCollector.submitText(poseStack, -font.width(line) / 2f, 0f, line, false, Font.DisplayMode.NORMAL, FULL_BRIGHT, TEXT_COLOR, TEXT_BACKGROUND, 0);
-        poseStack.popPose();
+        ghostRenderer.submit(state.ghosts, state.facing, state.spin, poseStack, submitNodeCollector, camera);
     }
 
     // Normally just this block and the space above it; with ghosts, out to every pedestal they float over.
@@ -238,12 +139,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
     @Override
     public AABB getRenderBoundingBox(BasePedestalBlockEntity pedestal)
     {
-        AABB box = new AABB(pedestal.getBlockPos()).inflate(1.5);
-        for (GhostItem ghost : pedestal.getGhosts())
-        {
-            if (ghost.above().isPresent()) box = box.minmax(new AABB(ghost.above().get()).inflate(1.5));
-        }
-        return box;
+        return GhostItemRenderer.boundingBox(pedestal.getBlockPos(), pedestal.getGhosts());
     }
 
     public static class State extends BlockEntityRenderState
@@ -253,18 +149,6 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
         final ItemStackRenderState tool = new ItemStackRenderState();
         Direction facing = Direction.UP;
         float spin;
-        final List<Ghost> ghosts = new ArrayList<>();
-        int ghostCount;
-        int orbitCount;
-    }
-
-    // One ghost: orbitIndex is its place in the circle round this pedestal, or -1 when it floats above offset
-    static class Ghost
-    {
-        final ItemStackRenderState item = new ItemStackRenderState();
-        @Nullable Component label;
-        @Nullable Component below;
-        Vec3 offset = Vec3.ZERO;
-        int orbitIndex = -1;
+        final GhostItemRenderer.Ghosts ghosts = new GhostItemRenderer.Ghosts();
     }
 }

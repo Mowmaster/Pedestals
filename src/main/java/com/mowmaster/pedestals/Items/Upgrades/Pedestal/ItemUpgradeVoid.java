@@ -1,10 +1,10 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,12 +33,12 @@ public class ItemUpgradeVoid extends ItemUpgradeBase
     @Override
     protected void upgradeAction(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
-        for (PedestalTransportType<?> type : getTransportTypes(upgrade)) voidType(pedestal, type);
+        for (TransportType<?> type : getTransportTypes(upgrade)) voidType(pedestal, type);
     }
 
-    private static <R extends Resource> void voidType(BasePedestalBlockEntity pedestal, PedestalTransportType<R> type)
+    private static <R extends Resource> void voidType(BasePedestalBlockEntity pedestal, TransportType<R> type)
     {
-        PedestalStorage<R> storage = pedestal.getStorage(type);
+        TransportStorage<R> storage = pedestal.getStorage(type);
         if (storage.isEmpty()) return;
         try (Transaction transaction = Transaction.openRoot())
         {

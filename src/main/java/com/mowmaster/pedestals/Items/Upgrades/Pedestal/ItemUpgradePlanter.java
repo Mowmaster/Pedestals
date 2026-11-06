@@ -1,12 +1,12 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.util.MowLibBlockActions;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.Items.Upgrades.UpgradeWorld;
 import com.mowmaster.pedestals.PedestalTags;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.BlockItem;
@@ -50,7 +50,7 @@ public class ItemUpgradePlanter extends ItemUpgradeBase
     {
         if (stack.isEmpty() || !pedestal.machineFilterAllows(stack)) return false;
         if (stack.getItem() instanceof SpecialPlantable) return true;
-        return stack.getItem() instanceof BlockItem blockItem && UpgradeWorld.isPlant(blockItem.getBlock())
+        return stack.getItem() instanceof BlockItem blockItem && MowLibBlockActions.isPlant(blockItem.getBlock())
                 && !blockItem.getBlock().defaultBlockState().is(PedestalTags.CANNOT_PLACE);
     }
 
@@ -70,7 +70,7 @@ public class ItemUpgradePlanter extends ItemUpgradeBase
             int distance = distance(pedestal.getBlockPos(), target);
             if (!useFuel(pedestal, distance, true)) return;
             // The seed's own placing code checks the soil (farmland, dirt, soul sand...)
-            if (UpgradeWorld.placeBlock(level, pedestal.getFakePlayer(level), seed, target))
+            if (MowLibBlockActions.placeBlock(level, pedestal.getFakePlayer(level), seed, target))
             {
                 useFuel(pedestal, distance, false);
                 pedestal.removeItem(ItemResource.of(seed), 1, false);

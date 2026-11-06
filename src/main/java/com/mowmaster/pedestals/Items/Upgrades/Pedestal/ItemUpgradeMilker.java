@@ -1,12 +1,12 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.PedestalFakePlayer;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.animal.Animal;
@@ -114,7 +114,7 @@ public class ItemUpgradeMilker extends ItemUpgradeBase
         if (fluid.isEmpty()) return false;
         try (Transaction transaction = Transaction.openRoot())
         {
-            if (pedestal.getStorage(PedestalTransportTypes.FLUIDS.get()).insert(FluidResource.of(fluid), fluid.getAmount(), transaction) < fluid.getAmount()) return false;
+            if (pedestal.getStorage(TransportTypes.FLUIDS.get()).insert(FluidResource.of(fluid), fluid.getAmount(), transaction) < fluid.getAmount()) return false;
             transaction.commit();
             return true;
         }

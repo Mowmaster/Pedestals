@@ -1,11 +1,11 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
 import com.mowmaster.pedestals.Recipes.PedestalRecipes;
 import com.mowmaster.pedestals.Recipes.UpgradeModificationRecipe;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +32,7 @@ public class ItemUpgradeModifications extends ItemUpgradeBase
     @Override
     public WorkCardType getWorkCardType(ItemStack upgrade)
     {
-        return WorkCardType.PEDESTALS;
+        return WorkCardType.MACHINES;
     }
 
     @Override

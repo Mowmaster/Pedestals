@@ -2,6 +2,8 @@ package com.mowmaster.pedestals.Items.Upgrades;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,12 +15,24 @@ import java.util.List;
 // A transport upgrade's settings (import, export, void, magnet, dropper, packager...): which transport types it
 // works on. 1.20 had one boolean per mode (items/fluids/energy/xp/dust); here it's the ids of the turned-off types,
 // so add-on types work too. selected = the type the offhand clicks currently change.
+// Type ids are loaded as the type's current id: upgrades saved before the types moved to MowLib say pedestals:items,
+// which is an alias of mowlib:items (see PedestalTransportTypeAliases).
 public record UpgradeMode(Identifier selected, List<Identifier> disabled)
 {
+    // An id loaded through this becomes the type's current one; ids of types that aren't there stay as they are
+    private static final Codec<Identifier> TYPE_ID = Identifier.CODEC.xmap(UpgradeMode::currentId, id -> id);
+
     public static final Codec<UpgradeMode> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Identifier.CODEC.fieldOf("selected").forGetter(UpgradeMode::selected),
-            Identifier.CODEC.listOf().optionalFieldOf("disabled", List.of()).forGetter(UpgradeMode::disabled))
+            TYPE_ID.fieldOf("selected").forGetter(UpgradeMode::selected),
+            TYPE_ID.listOf().optionalFieldOf("disabled", List.of()).forGetter(UpgradeMode::disabled))
             .apply(instance, UpgradeMode::new));
+
+    // Registry#getValue follows aliases, so an old id finds the type and getId gives its id now
+    private static Identifier currentId(Identifier id)
+    {
+        TransportType<?> type = TransportTypes.REGISTRY.getValue(id);
+        return type != null ? type.getId() : id;
+    }
 
     public static final StreamCodec<ByteBuf, UpgradeMode> STREAM_CODEC = StreamCodec.composite(
             Identifier.STREAM_CODEC, UpgradeMode::selected,
@@ -54,11 +68,11 @@ public record UpgradeMode(Identifier selected, List<Identifier> disabled)
     }
 
     // Its own component so the item model can match it exactly:
-    // "when": {"type": "pedestals:items", "enabled": true} in items/upgrade_pedestal_import.json
+    // "when": {"type": "mowlib:items", "enabled": true} in items/upgrade_pedestal_import.json
     public record Display(Identifier type, boolean enabled)
     {
         public static final Codec<Display> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Identifier.CODEC.fieldOf("type").forGetter(Display::type),
+                TYPE_ID.fieldOf("type").forGetter(Display::type),
                 Codec.BOOL.fieldOf("enabled").forGetter(Display::enabled))
                 .apply(instance, Display::new));
 

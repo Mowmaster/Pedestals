@@ -1,12 +1,13 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.util.MowLibBlockActions;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Blocks.Pedestal.PedestalFakePlayer;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeWorld;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -74,7 +75,7 @@ public class ItemUpgradeBreaker extends ItemUpgradeBase
             PedestalFakePlayer player = playerWithTool(level, pedestal);
             try
             {
-                if (UpgradeWorld.breakBlock(level, player, target, target)) useFuel(pedestal, distance, false);
+                if (MowLibBlockActions.breakBlock(level, player, target, target)) useFuel(pedestal, distance, false);
             }
             finally
             {

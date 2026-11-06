@@ -1,14 +1,14 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.TransportContents;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
-import com.mowmaster.pedestals.Items.Storage.PacketContents;
 import com.mowmaster.pedestals.Items.Storage.StoragePacketItem;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -42,9 +42,9 @@ public class ItemUpgradePackager extends ItemUpgradeBase
     @Override
     protected void upgradeAction(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
-        for (PedestalTransportType<?> type : getTransportTypes(upgrade))
+        for (TransportType<?> type : getTransportTypes(upgrade))
         {
-            if (type == PedestalTransportTypes.ITEMS.get()) packageInventory(level, pedestal);
+            if (type == TransportTypes.ITEMS.get()) packageInventory(level, pedestal);
             else packageStorage(pedestal, type);
         }
     }
@@ -70,19 +70,19 @@ public class ItemUpgradePackager extends ItemUpgradeBase
             {
                 total += inventory.extract(index, item, inventory.getAmountAsInt(index), transaction);
             }
-            ItemStack packet = StoragePacketItem.create(new PacketContents<>(PedestalTransportTypes.ITEMS.get(), List.of(new ResourceStack<>(item, total))));
+            ItemStack packet = StoragePacketItem.create(new TransportContents<>(TransportTypes.ITEMS.get(), List.of(new ResourceStack<>(item, total))));
             if (!insertPacket(pedestal, packet, transaction)) return;
             transaction.commit();
         }
     }
 
-    private static <R extends Resource> void packageStorage(BasePedestalBlockEntity pedestal, PedestalTransportType<R> type)
+    private static <R extends Resource> void packageStorage(BasePedestalBlockEntity pedestal, TransportType<R> type)
     {
-        PedestalStorage<R> storage = pedestal.getStorage(type);
+        TransportStorage<R> storage = pedestal.getStorage(type);
         if (StoragePacketItem.forType(type) == null || storage.isEmpty() || !ResourceHandlerUtil.isFull(storage)) return;
         try (Transaction transaction = Transaction.openRoot())
         {
-            ItemStack packet = StoragePacketItem.create(StoragePacketItem.extractAll(type, storage, transaction));
+            ItemStack packet = StoragePacketItem.create(TransportContents.extractAll(type, storage, transaction));
             if (!insertPacket(pedestal, packet, transaction)) return;
             transaction.commit();
         }

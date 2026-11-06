@@ -1,11 +1,11 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -44,7 +44,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase
             // Pedestals are skipped (1.20 behaviour), the other locations still get their turn
             if (level.getBlockEntity(target) instanceof BasePedestalBlockEntity) continue;
             boolean moved = false;
-            for (PedestalTransportType<?> type : getTransportTypes(upgrade))
+            for (TransportType<?> type : getTransportTypes(upgrade))
             {
                 moved |= exportType(level, pedestal, upgrade, type, target, pedestal.getFacing(), entities);
             }
@@ -53,7 +53,7 @@ public class ItemUpgradeExport extends ItemUpgradeBase
     }
 
     private <R extends Resource> boolean exportType(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade,
-                                                    PedestalTransportType<R> type, BlockPos target, Direction side, boolean entities)
+                                                    TransportType<R> type, BlockPos target, Direction side, boolean entities)
     {
         ResourceHandler<R> to = findHandler(level, target, side, type, entities);
         if (to == null || pedestal.getStorage(type).isEmpty()) return false;

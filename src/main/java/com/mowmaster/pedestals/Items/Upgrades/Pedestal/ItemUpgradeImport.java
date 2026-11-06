@@ -1,11 +1,11 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -58,7 +58,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
             // Never pull out of other pedestals (that's what links are for)
             if (level.getBlockEntity(target) instanceof BasePedestalBlockEntity) return;
             boolean moved = false;
-            for (PedestalTransportType<?> type : getTransportTypes(upgrade))
+            for (TransportType<?> type : getTransportTypes(upgrade))
             {
                 moved |= importType(level, pedestal, upgrade, type, target, pedestal.getFacing(), entities);
             }
@@ -67,7 +67,7 @@ public class ItemUpgradeImport extends ItemUpgradeBase
     }
 
     private <R extends Resource> boolean importType(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade,
-                                                    PedestalTransportType<R> type, BlockPos target, Direction side, boolean entities)
+                                                    TransportType<R> type, BlockPos target, Direction side, boolean entities)
     {
         ResourceHandler<R> from = findHandler(level, target, side, type, entities);
         if (from == null) return false;

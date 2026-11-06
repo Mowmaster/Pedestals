@@ -1,26 +1,32 @@
 package com.mowmaster.pedestals.Blocks.Pedestal;
 
+import com.mowmaster.mowlib.filter.FilterDirection;
+import com.mowmaster.mowlib.filter.IFilterHolder;
+import com.mowmaster.mowlib.filter.ITransportFilter;
+import com.mowmaster.mowlib.ghost.GhostItem;
+import com.mowmaster.mowlib.storage.StorageInteractions;
+import com.mowmaster.mowlib.tint.CBTintData;
+import com.mowmaster.mowlib.tint.ITintHolder;
+import com.mowmaster.mowlib.transport.EnergyTransportType;
+import com.mowmaster.mowlib.transport.ExperienceTransportType;
+import com.mowmaster.mowlib.transport.ItemTransportType;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportStorageHost;
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.workcard.IWorkCard;
+import com.mowmaster.mowlib.workcard.IWorkCardHolder;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Augments.AugmentItem;
 import com.mowmaster.pedestals.Items.Augments.AugmentType;
 import com.mowmaster.pedestals.Items.PedestalDataComponents;
+import com.mowmaster.pedestals.Items.Storage.StoragePacketItem;
+import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.PedestalReferences;
-import com.mowmaster.pedestals.TintHandler.ITintHolder;
-import com.mowmaster.pedestals.TintHandler.libTintData;
-import com.mowmaster.pedestals.Transport.EnergyTransportType;
-import com.mowmaster.pedestals.Transport.ExperienceTransportType;
-import com.mowmaster.pedestals.Transport.ItemTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.filter.FilterDirection;
-import com.mowmaster.pedestals.api.filter.IPedestalFilter;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
-import com.mowmaster.pedestals.api.transport.PedestalStorageHost;
-import com.mowmaster.pedestals.api.transport.PedestalTransportType;
-import com.mowmaster.pedestals.api.upgrade.GhostItem;
+import com.mowmaster.pedestals.Transport.PedestalTransportRules;
 import com.mowmaster.pedestals.api.upgrade.IPedestalUpgrade;
-import com.mowmaster.pedestals.api.upgrade.IWorkCard;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -34,6 +40,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
@@ -42,6 +49,7 @@ import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -65,8 +73,9 @@ import java.util.Map;
 import java.util.Optional;
 
 // The pedestal's storage, links, filter, upgrade and colour.
-// Storage: one PedestalStorage per registered transport type (items, fluids, energy, experience, and any type
-// another mod registers), each exposed to pipes through its capability (see the types' registerCapability).
+// Storage: one TransportStorage per registered transport type (items, fluids, energy, experience, and any type
+// another mod registers; the types are MowLib's), each exposed to pipes through its capability (PedestalCapabilities).
+// How much a link moves and how big each storage is are Pedestals' own numbers: PedestalTransportRules.
 // Links: every TICKS_TO_TRANSFER ticks it sends to the first linked pedestal that accepts anything, every type at once.
 // Upgrades: one upgrade, one tool and one work card, all put in from the offhand. The upgrade is ticked every
 // server tick (IPedestalUpgrade#tick) and keeps its per-pedestal state in getUpgradeData().
@@ -74,11 +83,11 @@ import java.util.Optional;
 // rates), storage (bigger storages, more item stacks), range (longer links), round robin (links take turns),
 // particle & render (hides particles / the item / the upgrade) and collision (upgrades also act on touching entities).
 // Not ported yet: redstone counts.
-public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder, PedestalStorageHost
+public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder, TransportStorageHost, IFilterHolder, IWorkCardHolder
 {
     // LinkedHashMap keeps the registry order, so types are always tried in the same order
-    private final Map<PedestalTransportType<?>, PedestalStorage<?>> storages = new LinkedHashMap<>();
-    private final libTintData tints = new libTintData(this, 1);
+    private final Map<TransportType<?>, TransportStorage<?>> storages = new LinkedHashMap<>();
+    private final CBTintData tints = new CBTintData(this, 1);
     // Pedestals this one sends to
     private final List<BlockPos> links = new ArrayList<>();
     private ItemStack filter = ItemStack.EMPTY;
@@ -104,7 +113,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     public BasePedestalBlockEntity(BlockPos pos, BlockState state)
     {
         super(libBlockEntityRegistry.PEDESTAL.get(), pos, state);
-        for (PedestalTransportType<?> type : PedestalTransportTypes.REGISTRY)
+        for (TransportType<?> type : TransportTypes.REGISTRY)
         {
             storages.put(type, type.createStorage(this));
         }
@@ -147,18 +156,31 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
 
     // The storage for a type. The cast is safe: the map only ever pairs a type with the storage it made.
     @SuppressWarnings("unchecked")
-    public <R extends Resource> PedestalStorage<R> getStorage(PedestalTransportType<R> type)
+    public <R extends Resource> TransportStorage<R> getStorage(TransportType<R> type)
     {
-        return (PedestalStorage<R>) storages.get(type);
+        return (TransportStorage<R>) storages.get(type);
     }
 
-    public PedestalStorage<ItemResource> getItemStorage()
+    public TransportStorage<ItemResource> getItemStorage()
     {
-        return getStorage(PedestalTransportTypes.ITEMS.get());
+        return getStorage(TransportTypes.ITEMS.get());
+    }
+
+    // How big a type's storage is (MowLib's storages ask this): the config plus storage augments
+    @Override
+    public int getCapacity(TransportType<?> type)
+    {
+        return PedestalTransportRules.of(type).capacity(this);
+    }
+
+    // How much one link transfer moves: the config plus capacity augments
+    public int getTransferRate(TransportType<?> type)
+    {
+        return PedestalTransportRules.of(type).transferRate(this);
     }
 
     @Override
-    public void onStorageChanged(PedestalTransportType<?> type)
+    public void onStorageChanged(TransportType<?> type)
     {
         if (type.syncsToClient()) update();
         else setChanged();
@@ -171,8 +193,8 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         if (energy <= 0 && experience <= 0) return true;
         try (Transaction transaction = Transaction.openRoot())
         {
-            if (energy > 0 && getStorage(PedestalTransportTypes.ENERGY.get()).extract(EnergyTransportType.ENERGY, energy, transaction) < energy) return false;
-            if (experience > 0 && getStorage(PedestalTransportTypes.EXPERIENCE.get()).extract(ExperienceTransportType.EXPERIENCE, experience, transaction) < experience) return false;
+            if (energy > 0 && getStorage(TransportTypes.ENERGY.get()).extract(EnergyTransportType.ENERGY, energy, transaction) < energy) return false;
+            if (experience > 0 && getStorage(TransportTypes.EXPERIENCE.get()).extract(ExperienceTransportType.EXPERIENCE, experience, transaction) < experience) return false;
             if (!simulate) transaction.commit();
             return true;
         }
@@ -188,7 +210,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     // The stack shown on top: the first slot that has something
     public ItemStack getItemInPedestal()
     {
-        PedestalStorage<ItemResource> items = getItemStorage();
+        TransportStorage<ItemResource> items = getItemStorage();
         for (int index = 0; index < items.size(); index++)
         {
             ItemStack stack = ItemUtil.getStack(items, index);
@@ -200,7 +222,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     // Copies of every stack in the pedestal
     public List<ItemStack> getItemStacks()
     {
-        PedestalStorage<ItemResource> items = getItemStorage();
+        TransportStorage<ItemResource> items = getItemStorage();
         List<ItemStack> stacks = new ArrayList<>();
         for (int index = 0; index < items.size(); index++)
         {
@@ -213,14 +235,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     // Puts as much of the stack in as fits (and as the filter allows); returns how many went in
     public int insertItem(ItemStack stack, boolean simulate)
     {
-        if (stack.isEmpty()) return 0;
-        // try-with-resources: the transaction is closed at the end of the block, and anything not committed is undone
-        try (Transaction transaction = Transaction.openRoot())
-        {
-            int inserted = ResourceHandlerUtil.insertStacking(getItemStorage(), ItemResource.of(stack), stack.getCount(), transaction);
-            if (!simulate) transaction.commit();
-            return inserted;
-        }
+        return StorageInteractions.insertStack(getItemStorage(), stack, simulate);
     }
 
     // true if the whole stack fits
@@ -232,20 +247,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     // Takes up to maxAmount (and at most one normal stack) from the last slot that has something, like 1.20
     public ItemStack removeItem(int maxAmount)
     {
-        PedestalStorage<ItemResource> items = getItemStorage();
-        for (int index = items.size() - 1; index >= 0; index--)
-        {
-            ItemResource resource = items.getResource(index);
-            if (resource.isEmpty()) continue;
-            int amount = Math.min(maxAmount, resource.getMaxStackSize());
-            try (Transaction transaction = Transaction.openRoot())
-            {
-                int extracted = items.extract(index, resource, amount, transaction);
-                transaction.commit();
-                return resource.toStack(extracted);
-            }
-        }
-        return ItemStack.EMPTY;
+        return StorageInteractions.extractStack(getItemStorage(), maxAmount);
     }
 
     // Takes up to amount of this exact item (any slots); returns how many were taken
@@ -270,7 +272,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     {
         List<Component> lines = new ArrayList<>();
         storages.forEach((type, storage) -> {
-            if (type == PedestalTransportTypes.ITEMS.get()) return; // "return" in a lambda just skips this entry
+            if (type == TransportTypes.ITEMS.get()) return; // "return" in a lambda just skips this entry
             Component line = storage.describe();
             if (line != null) lines.add(line);
         });
@@ -297,7 +299,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     {
         super.preRemoveSideEffects(pos, state);
         if (level == null) return;
-        storages.values().forEach(storage -> storage.onPedestalRemoved(level, pos));
+        for (TransportType<?> type : storages.keySet()) dropStorage(level, pos, type);
         Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), filter);
         if (hasUpgrade()) Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), takeUpgrade());
         Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), tool);
@@ -305,27 +307,40 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         augments.values().forEach(augment -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), augment));
     }
 
-    // ---- Filter ----
+    // Items spill; the other types become a storage packet if Pedestals has one for them, otherwise whatever the
+    // storage itself leaves behind (experience: orbs)
+    private <R extends Resource> void dropStorage(Level level, BlockPos pos, TransportType<R> type)
+    {
+        TransportStorage<R> storage = getStorage(type);
+        if (type != TransportTypes.ITEMS.get() && StoragePacketItem.forType(type) != null) StoragePacketItem.dropStorage(level, pos, type, storage);
+        else storage.dropContents(level, pos);
+    }
 
+    // ---- Filter (IFilterHolder) ----
+
+    @Override
     public boolean hasFilter()
     {
         return !filter.isEmpty();
     }
 
+    @Override
     public ItemStack getFilter()
     {
         return filter;
     }
 
     // Takes one filter from the stack; false if there's already one or it isn't a filter
+    @Override
     public boolean insertFilter(ItemStack stack)
     {
-        if (hasFilter() || !(stack.getItem() instanceof IPedestalFilter)) return false;
+        if (hasFilter() || !(stack.getItem() instanceof ITransportFilter)) return false;
         filter = stack.split(1);
         filterChanged();
         return true;
     }
 
+    @Override
     public ItemStack removeFilter()
     {
         ItemStack removed = filter;
@@ -339,7 +354,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     {
         if (level != null)
         {
-            int status = filter.getItem() instanceof IPedestalFilter pedestalFilter ? (pedestalFilter.isBlacklist(filter) ? 2 : 1) : 0;
+            int status = filterStatus();
             BlockState state = getBlockState();
             if (state.getValue(BasePedestalBlock.FILTER_STATUS) != status)
             {
@@ -349,29 +364,30 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         update();
     }
 
+    // TransportStorageHost and IFilterHolder both have a default for these two, so Java makes the class pick one:
+    // Interface.super.method(...) calls that interface's default (a filter only acts in the direction it's set to)
     @Override
-    public <R extends Resource> boolean filterAllows(PedestalTransportType<R> type, R resource, FilterDirection direction)
+    public <R extends Resource> boolean filterAllows(TransportType<R> type, R resource, FilterDirection direction)
     {
-        if (!(filter.getItem() instanceof IPedestalFilter pedestalFilter) || pedestalFilter.getDirection(filter) != direction) return true;
-        return pedestalFilter.allows(filter, type, resource);
+        return IFilterHolder.super.filterAllows(type, resource, direction);
     }
 
     // For upgrades that read the filter themselves (breakers, placers...): only NEUTRAL filters apply, as in 1.20
-    public <R extends Resource> boolean machineFilterAllows(PedestalTransportType<R> type, R resource)
+    public <R extends Resource> boolean machineFilterAllows(TransportType<R> type, R resource)
     {
         return filterAllows(type, resource, FilterDirection.NEUTRAL);
     }
 
+    @Override
     public boolean machineFilterAllows(ItemStack stack)
     {
-        return stack.isEmpty() || machineFilterAllows(PedestalTransportTypes.ITEMS.get(), ItemResource.of(stack));
+        return stack.isEmpty() || machineFilterAllows(TransportTypes.ITEMS.get(), ItemResource.of(stack));
     }
 
     @Override
-    public <R extends Resource> int filterLimit(PedestalTransportType<R> type, R resource, int capacity)
+    public <R extends Resource> int filterLimit(TransportType<R> type, R resource, int capacity)
     {
-        if (!(filter.getItem() instanceof IPedestalFilter pedestalFilter) || pedestalFilter.getDirection(filter) != FilterDirection.INSERT) return capacity;
-        return pedestalFilter.limit(filter, type, resource, capacity);
+        return IFilterHolder.super.filterLimit(type, resource, capacity);
     }
 
     // ---- Upgrade ----
@@ -548,6 +564,14 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return workPositions;
     }
 
+    // IWorkCardHolder: with require_sized_area on, an area card's box may be no bigger than the upgrade's area size
+    @Override
+    public int getMaxAreaSize()
+    {
+        if (!Config.REQUIRE_SIZED_AREA.getAsBoolean() || !(upgrade.getItem() instanceof ItemUpgradeBase base)) return -1;
+        return base.getAreaSize(upgrade);
+    }
+
     // An area work card's box (for finding entities), if the upgrade uses it and it's in range
     public Optional<AABB> getWorkArea()
     {
@@ -621,6 +645,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return isInRange(target, getLinkingRange());
     }
 
+    @Override
     public boolean isInRange(BlockPos target, int range)
     {
         return Math.abs(target.getX() - worldPosition.getX()) <= range
@@ -791,18 +816,18 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return stack.getItem() instanceof AugmentItem augment ? augment.getAmount() * stack.getCount() : 0;
     }
 
-    @Override
-    public int getTransferBonus(PedestalTransportType<?> type)
+    // What the capacity augments add to a type's transfer rate, and the storage augments to its storage, in the
+    // units the type's rules add them in (experience: levels)
+    public int getTransferBonus(PedestalTransportRules rules)
     {
         ItemStack stack = getAugment(AugmentType.CAPACITY);
-        return stack.getItem() instanceof AugmentItem augment ? type.getCapacityAugmentBonus(augment.getTier()) * stack.getCount() : 0;
+        return stack.getItem() instanceof AugmentItem augment ? rules.capacityAugmentBonus(augment.getTier()) * stack.getCount() : 0;
     }
 
-    @Override
-    public int getStorageBonus(PedestalTransportType<?> type)
+    public int getStorageBonus(PedestalTransportRules rules)
     {
         ItemStack stack = getAugment(AugmentType.STORAGE);
-        return stack.getItem() instanceof AugmentItem augment ? type.getStorageAugmentBonus(augment.getTier()) * stack.getCount() : 0;
+        return stack.getItem() instanceof AugmentItem augment ? rules.storageAugmentBonus(augment.getTier()) * stack.getCount() : 0;
     }
 
     // The particle & render augment's choices (all true without one)
@@ -847,7 +872,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
             case RANGE -> lines.add(Component.translatable(modid + ".tool.augment.range").withStyle(ChatFormatting.AQUA)
                     .append(Component.literal(String.valueOf(getLinkingRange())).withStyle(ChatFormatting.WHITE)));
             case CAPACITY -> storages.keySet().forEach(transportType -> lines.add(Component.literal(" ").append(transportType.getName())
-                    .append(Component.translatable(modid + ".tool.augment.rate").append(String.valueOf(transportType.getTransferRate(this))).withStyle(ChatFormatting.WHITE))));
+                    .append(Component.translatable(modid + ".tool.augment.rate").append(String.valueOf(getTransferRate(transportType))).withStyle(ChatFormatting.WHITE))));
             case STORAGE -> storages.forEach((transportType, storage) -> lines.add(Component.literal(" ").append(transportType.getName())
                     .append(Component.translatable(modid + ".tool.augment.capacity").append(capacityText(transportType, storage)).withStyle(ChatFormatting.WHITE))));
             default -> {}
@@ -856,16 +881,16 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     }
 
     // Items: how many stacks; anything else: the first slot's capacity
-    private static <R extends Resource> String capacityText(PedestalTransportType<?> type, PedestalStorage<R> storage)
+    private static <R extends Resource> String capacityText(TransportType<?> type, TransportStorage<R> storage)
     {
-        if (type == PedestalTransportTypes.ITEMS.get()) return String.valueOf(storage.size());
+        if (type == TransportTypes.ITEMS.get()) return String.valueOf(storage.size());
         return String.valueOf(storage.getCapacityAsLong(0, storage.getResource(0)));
     }
 
     private boolean sendTo(BasePedestalBlockEntity receiver)
     {
         boolean sent = false;
-        for (PedestalTransportType<?> type : storages.keySet())
+        for (TransportType<?> type : storages.keySet())
         {
             // "sent |= x" is "sent = sent | x": every type gets its turn even after one has sent something
             sent |= send(type, receiver);
@@ -873,16 +898,16 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return sent;
     }
 
-    // A generic helper so the storages' types line up: Java can't move between two PedestalStorage<?> directly,
-    // but inside here both are PedestalStorage<R> for the same R
-    private <R extends Resource> boolean send(PedestalTransportType<R> type, BasePedestalBlockEntity receiver)
+    // A generic helper so the storages' types line up: Java can't move between two TransportStorage<?> directly,
+    // but inside here both are TransportStorage<R> for the same R
+    private <R extends Resource> boolean send(TransportType<R> type, BasePedestalBlockEntity receiver)
     {
-        PedestalStorage<R> from = getStorage(type);
-        PedestalStorage<R> to = receiver.getStorage(type);
+        TransportStorage<R> from = getStorage(type);
+        TransportStorage<R> to = receiver.getStorage(type);
         if (from == null || to == null || from.isEmpty()) return false;
         try (Transaction transaction = Transaction.openRoot())
         {
-            int moved = type.transfer(from, to, type.getTransferRate(this), transaction);
+            int moved = type.transfer(from, to, getTransferRate(type), transaction);
             transaction.commit();
             return moved > 0;
         }
@@ -895,7 +920,8 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     @Override public int getTint(int tintIndex) { return tints.getTint(tintIndex); }
 
     // ---- Saving ----
-    // Each type saves under storage/<type id>, e.g. storage/pedestals:fluids, so add-on types can't clash
+    // Each type saves under storage/<type id>, e.g. storage/mowlib:fluids, so add-on types can't clash. Pedestals saved
+    // before the move to MowLib used storage/pedestals:<path> for the built-in types; loading falls back to that.
 
     @Override
     protected void saveAdditional(ValueOutput output)
@@ -926,7 +952,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         }
         roundRobinNext = input.getIntOr("round_robin_next", 0);
         ValueInput storageInput = input.childOrEmpty("storage");
-        storages.forEach((type, storage) -> storage.deserialize(storageInput.childOrEmpty(type.getId().toString())));
+        storages.forEach((type, storage) -> storage.deserialize(storageFor(storageInput, type)));
         // A saved item storage has the size it was saved with; make room for the storage augments
         resizeItemStorage(false);
         links.clear();
@@ -939,6 +965,16 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         upgradeData = input.read("upgrade_data", CompoundTag.CODEC).orElseGet(CompoundTag::new);
         workPositions = null;
         tints.load(input);
+    }
+
+    // A type's saved storage: under its id, or for MowLib's built-in types under the id they had in Pedestals.
+    // ValueInput#child is an Optional (empty when the key isn't there); Optional#or tries the next one.
+    private static ValueInput storageFor(ValueInput storageInput, TransportType<?> type)
+    {
+        String id = type.getId().toString();
+        return storageInput.child(id)
+                .or(() -> storageInput.child(Identifier.fromNamespaceAndPath(PedestalReferences.MODID, type.getId().getPath()).toString()))
+                .orElseGet(() -> storageInput.childOrEmpty(id));
     }
 
     // ---- Syncing to clients ----

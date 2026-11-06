@@ -1,14 +1,14 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.FluidTransportType;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
 import com.mowmaster.pedestals.PedestalTags;
-import com.mowmaster.pedestals.Transport.FluidTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
-import com.mowmaster.pedestals.api.transport.PedestalStorage;
-import com.mowmaster.pedestals.api.upgrade.WorkCardType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -54,8 +54,8 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
     protected void upgradeAction(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
         List<BlockPos> positions = pedestal.getWorkPositions();
-        FluidTransportType fluids = PedestalTransportTypes.FLUIDS.get();
-        PedestalStorage<FluidResource> storage = pedestal.getStorage(fluids);
+        FluidTransportType fluids = TransportTypes.FLUIDS.get();
+        TransportStorage<FluidResource> storage = pedestal.getStorage(fluids);
         if (positions.isEmpty() || storage.getAmountAsInt(0) < FluidType.BUCKET_VOLUME) return;
         FluidResource stored = storage.getResource(0);
         if (stored.getFluid().is(PedestalTags.CANNOT_PLACE_FLUID) || !pedestal.machineFilterAllows(fluids, stored)) return;
@@ -82,7 +82,7 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
         pedestal.upgradeDataChanged();
     }
 
-    private static boolean place(ServerLevel level, BasePedestalBlockEntity pedestal, PedestalStorage<FluidResource> storage,
+    private static boolean place(ServerLevel level, BasePedestalBlockEntity pedestal, TransportStorage<FluidResource> storage,
                                  FluidResource stored, BlockPos target, BlockState state)
     {
         if (state.hasProperty(BlockStateProperties.WATERLOGGED))
@@ -97,6 +97,6 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
             return true;
         }
         // Otherwise the same as the dropper: a source block where there's room (water boils away in the nether)
-        return PedestalTransportTypes.FLUIDS.get().dropInWorld(level, target, storage, FluidType.BUCKET_VOLUME, pedestal.getFakePlayer(level));
+        return TransportTypes.FLUIDS.get().dropInWorld(level, target, storage, FluidType.BUCKET_VOLUME, pedestal.getFakePlayer(level));
     }
 }

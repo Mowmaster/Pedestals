@@ -1,11 +1,11 @@
 package com.mowmaster.pedestals.Items.Upgrades.Pedestal;
 
+import com.mowmaster.mowlib.transport.EnergyTransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.pedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.pedestals.Config;
 import com.mowmaster.pedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.pedestals.Items.Upgrades.UpgradeModifiers;
-import com.mowmaster.pedestals.Transport.EnergyTransportType;
-import com.mowmaster.pedestals.Transport.PedestalTransportTypes;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
@@ -53,7 +53,7 @@ public class ItemUpgradeGenerator extends ItemUpgradeBase
             try (Transaction transaction = Transaction.openRoot())
             {
                 // Only burns when all the energy fits, so none is wasted
-                if (pedestal.getStorage(PedestalTransportTypes.ENERGY.get()).insert(EnergyTransportType.ENERGY, energy, transaction) < energy) return;
+                if (pedestal.getStorage(TransportTypes.ENERGY.get()).insert(EnergyTransportType.ENERGY, energy, transaction) < energy) return;
                 transaction.commit();
             }
             setBurnTime(pedestal, burnLeft - ticks);
