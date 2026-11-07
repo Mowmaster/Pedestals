@@ -170,7 +170,8 @@ public final class PedestalBeams
             {
                 // A still beam keeps its chevrons where they are (time 0)
                 strip(pose, buffer, beam.from().subtract(camera), beam.to().subtract(camera), beam.color(), beam.animated() ? frame.time() : 0);
-            }        });
+            }
+        });
     }
 
     // A flat strip from a to b (camera-relative), turned towards the camera: its sideways direction is at right
