@@ -476,8 +476,8 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         }
         for (TransportType<?> type : TransportTypes.REGISTRY)
         {
-            PedestalTransportRules rules = PedestalTransportRules.of(type);
-            int value = getModifier(stack, rules.capacityModifier(type));
+            PedestalTransportRules typeRules = PedestalTransportRules.of(type);
+            int value = getModifier(stack, typeRules.capacityModifier(type));
             if (value <= 0) continue;
             // ironpedestals.upgrade_tooltip_rate.<namespace>.<path>, e.g. "%s levels"; the plain number if missing
             String key = MODID + ".upgrade_tooltip_rate." + type.getId().getNamespace() + "." + type.getId().getPath();
