@@ -48,6 +48,8 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
     private static final int SLOT_BORDER = 0xFFA08A5E;
     private static final int SLOT_FILL = 0xFFDCCCA0;
     private static final int GHOST_FADE = 0xB0DCCCA0;
+    // An augment that's off is faded with the paper's own colour (it has no slot behind it)
+    private static final int PAPER_FADE = 0xB0EDE0BB;
     // A link row's remove button and the square for a link that isn't loaded (no colour to show)
     private static final int REMOVE_RED = 0xFFC0302A;
     private static final int UNKNOWN_TINT = 0xFF8A8A8A;
@@ -122,10 +124,9 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
         {
             int x = augmentButtonX(type);
             int y = topPos + PedestalMenu.PARTS_Y - 1;
-            SlotGrid.slot(graphics, x, y, SLOT_BORDER, SLOT_FILL);
-            // blit draws (part of) any texture: here the whole 16x16 icon at its own size
+            // blit draws (part of) any texture: here the whole 16x16 icon at its own size, straight on the paper
             graphics.blit(RenderPipelines.GUI_TEXTURED, type.icon(pedestal().getDiffuserMode()), x + 1, y + 1, 0, 0, 16, 16, 16, 16);
-            if (!pedestal().hasAugment(type)) SlotGrid.fill(graphics, x, y, GHOST_FADE);
+            if (!pedestal().hasAugment(type)) SlotGrid.fill(graphics, x, y, PAPER_FADE);
         }
     }
 
