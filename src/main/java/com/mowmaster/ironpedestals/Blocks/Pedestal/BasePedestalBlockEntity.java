@@ -101,6 +101,8 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     private final List<BlockPos> links = new ArrayList<>();
     private ItemStack filter = ItemStack.EMPTY;
     private int transferTicks;
+    // A storage that doesn't sync straight away changed since the last client update (see onStorageChanged)
+    private boolean clientUpdatePending;
 
     private ItemStack upgrade = ItemStack.EMPTY;
     private ItemStack tool = ItemStack.EMPTY;
@@ -228,11 +230,17 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return PedestalTransportRules.of(type).transferRate(this);
     }
 
-    @Override
+    // Items go to clients straight away (the renderer shows them). Fluids, energy, experience and add-on types change
+    // far more often (every tick, for some), so they're only saved now and sent to clients at most twice a second
+    // (serverTick), which keeps the menu's gauges and the sneak summary current.
     public void onStorageChanged(TransportType<?> type)
     {
         if (type.syncsToClient()) update();
-        else setChanged();
+        else
+        {
+            setChanged();
+            clientUpdatePending = true;
+        }
     }
 
     // Takes energy and experience for an upgrade's work, both or neither. false (and nothing taken) if there
@@ -882,6 +890,13 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
 
         // Once a second: item stacks and fluid tanks follow the tier's config, so config changes apply on the fly
         if (serverLevel.getGameTime() % 20 == 0) resizeStorages(true);
+
+        // Every half second at most: send clients the fluid / energy / experience changes (onStorageChanged)
+        if (clientUpdatePending && serverLevel.getGameTime() % 10 == 0)
+        {
+            clientUpdatePending = false;
+            update();
+        }
 
         if (upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade)
         {
