@@ -20,7 +20,6 @@ public class PedestalRecipes
     public static final DeferredHolder<RecipeType<?>, RecipeType<UnbottlerRecipe>> UNBOTTLER = type("unbottler");
     public static final DeferredHolder<RecipeType<?>, RecipeType<FluidConverterRecipe>> FLUID_CONVERTER = type("fluidconverter");
     public static final DeferredHolder<RecipeType<?>, RecipeType<MaterialGeneratorRecipe>> MATERIAL_GENERATOR = type("cobblegen");
-    public static final DeferredHolder<RecipeType<?>, RecipeType<UpgradeModificationRecipe>> UPGRADE_MODIFICATION = type("upgrademodification_global");
     public static final DeferredHolder<RecipeType<?>, RecipeType<EntityFilterRecipe>> ENTITY_FILTER = type("entity_filter");
     public static final DeferredHolder<RecipeType<?>, RecipeType<AnvilOverlevelRecipe>> ANVIL_OVERLEVEL = type("anvil_overlevel");
     public static final DeferredHolder<RecipeType<?>, RecipeType<AnvilConflictRecipe>> ANVIL_CONFLICT = type("anvil_conflict");
@@ -33,8 +32,12 @@ public class PedestalRecipes
             SERIALIZERS.register("fluidconverter", () -> new RecipeSerializer<>(FluidConverterRecipe.MAP_CODEC, FluidConverterRecipe.STREAM_CODEC));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<MaterialGeneratorRecipe>> MATERIAL_GENERATOR_SERIALIZER =
             SERIALIZERS.register("cobblegen", () -> new RecipeSerializer<>(MaterialGeneratorRecipe.MAP_CODEC, MaterialGeneratorRecipe.STREAM_CODEC));
-    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<UpgradeModificationRecipe>> UPGRADE_MODIFICATION_SERIALIZER =
-            SERIALIZERS.register("upgrademodification_global", () -> new RecipeSerializer<>(UpgradeModificationRecipe.MAP_CODEC, UpgradeModificationRecipe.STREAM_CODEC));
+    // Vanilla recipe types (crafting, smithing) with Pedestals' own logic: an upgrade crafted up a tier, and the
+    // Upgrade smithing template unlocking a special modifier
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<UpgradeTierRecipe>> UPGRADE_TIER_SERIALIZER =
+            SERIALIZERS.register("upgrade_tier", () -> new RecipeSerializer<>(UpgradeTierRecipe.MAP_CODEC, UpgradeTierRecipe.STREAM_CODEC));
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<UpgradeSmithingRecipe>> UPGRADE_SMITHING_SERIALIZER =
+            SERIALIZERS.register("upgrade_smithing", () -> new RecipeSerializer<>(UpgradeSmithingRecipe.MAP_CODEC, UpgradeSmithingRecipe.STREAM_CODEC));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<EntityFilterRecipe>> ENTITY_FILTER_SERIALIZER =
             SERIALIZERS.register("entity_filter", () -> new RecipeSerializer<>(EntityFilterRecipe.MAP_CODEC, EntityFilterRecipe.STREAM_CODEC));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AnvilOverlevelRecipe>> ANVIL_OVERLEVEL_SERIALIZER =

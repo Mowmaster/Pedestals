@@ -15,7 +15,16 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "ironpedestals:item/upgrades/import/items_on"
+            "model": "ironpedestals:item/upgrades/import/items_on",
+            "tints": [
+              {
+                "type": "ironpedestals:upgrade_tier"
+              },
+              {
+                "type": "ironpedestals:upgrade_tier",
+                "symbol": true
+              }
+            ]
           }
         },
         {
@@ -25,7 +34,16 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "ironpedestals:item/upgrades/import/items_off"
+            "model": "ironpedestals:item/upgrades/import/items_off",
+            "tints": [
+              {
+                "type": "ironpedestals:upgrade_tier"
+              },
+              {
+                "type": "ironpedestals:upgrade_tier",
+                "symbol": true
+              }
+            ]
           }
         },
         {
@@ -35,7 +53,16 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "ironpedestals:item/upgrades/import/fluids_on"
+            "model": "ironpedestals:item/upgrades/import/fluids_on",
+            "tints": [
+              {
+                "type": "ironpedestals:upgrade_tier"
+              },
+              {
+                "type": "ironpedestals:upgrade_tier",
+                "symbol": true
+              }
+            ]
           }
         },
         {
@@ -45,7 +72,16 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "ironpedestals:item/upgrades/import/fluids_off"
+            "model": "ironpedestals:item/upgrades/import/fluids_off",
+            "tints": [
+              {
+                "type": "ironpedestals:upgrade_tier"
+              },
+              {
+                "type": "ironpedestals:upgrade_tier",
+                "symbol": true
+              }
+            ]
           }
         },
         {
@@ -55,7 +91,16 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "ironpedestals:item/upgrades/import/energy_on"
+            "model": "ironpedestals:item/upgrades/import/energy_on",
+            "tints": [
+              {
+                "type": "ironpedestals:upgrade_tier"
+              },
+              {
+                "type": "ironpedestals:upgrade_tier",
+                "symbol": true
+              }
+            ]
           }
         },
         {
@@ -65,7 +110,16 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "ironpedestals:item/upgrades/import/energy_off"
+            "model": "ironpedestals:item/upgrades/import/energy_off",
+            "tints": [
+              {
+                "type": "ironpedestals:upgrade_tier"
+              },
+              {
+                "type": "ironpedestals:upgrade_tier",
+                "symbol": true
+              }
+            ]
           }
         },
         {
@@ -75,7 +129,16 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "ironpedestals:item/upgrades/import/experience_on"
+            "model": "ironpedestals:item/upgrades/import/experience_on",
+            "tints": [
+              {
+                "type": "ironpedestals:upgrade_tier"
+              },
+              {
+                "type": "ironpedestals:upgrade_tier",
+                "symbol": true
+              }
+            ]
           }
         },
         {
@@ -85,18 +148,45 @@
           },
           "model": {
             "type": "minecraft:model",
-            "model": "ironpedestals:item/upgrades/import/experience_off"
+            "model": "ironpedestals:item/upgrades/import/experience_off",
+            "tints": [
+              {
+                "type": "ironpedestals:upgrade_tier"
+              },
+              {
+                "type": "ironpedestals:upgrade_tier",
+                "symbol": true
+              }
+            ]
           }
         }
       ],
       "fallback": {
         "type": "minecraft:model",
-        "model": "ironpedestals:item/upgrade_pedestal_import"
+        "model": "ironpedestals:item/upgrade_pedestal_import",
+        "tints": [
+          {
+            "type": "ironpedestals:upgrade_tier"
+          },
+          {
+            "type": "ironpedestals:upgrade_tier",
+            "symbol": true
+          }
+        ]
       }
     },
     "on_false": {
       "type": "minecraft:model",
-      "model": "ironpedestals:item/upgrades/import/items_on"
+      "model": "ironpedestals:item/upgrades/import/items_on",
+      "tints": [
+        {
+          "type": "ironpedestals:upgrade_tier"
+        },
+        {
+          "type": "ironpedestals:upgrade_tier",
+          "symbol": true
+        }
+      ]
     }
   }
 }

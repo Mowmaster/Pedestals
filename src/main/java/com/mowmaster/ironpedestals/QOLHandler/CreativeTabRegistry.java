@@ -39,6 +39,7 @@ public class CreativeTabRegistry
                 ItemRegistry.AUGMENTS.forEach(augment -> output.accept(augment.get()));
                 ItemRegistry.PACKETS.forEach(packet -> output.accept(packet.get()));
                 output.accept(ItemRegistry.SACRIFICE.get());
+                output.accept(ItemRegistry.SMITHING_TEMPLATE_UPGRADE.get());
                 BlockRegistry.PEDESTALS.forEach(pedestal -> output.accept(pedestal.get()));
 
             }).build());

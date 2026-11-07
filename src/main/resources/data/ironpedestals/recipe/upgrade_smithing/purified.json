@@ -1,0 +1,15 @@
+{
+  "type": "ironpedestals:upgrade_smithing",
+  "template": "ironpedestals:smithing_template_upgrade",
+  "base": "#ironpedestals:upgrades",
+  "addition": {
+    "neoforge:ingredient_type": "neoforge:components",
+    "items": "minecraft:potion",
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "minecraft:strong_healing"
+      }
+    }
+  },
+  "modifier": "upgradepurified"
+}

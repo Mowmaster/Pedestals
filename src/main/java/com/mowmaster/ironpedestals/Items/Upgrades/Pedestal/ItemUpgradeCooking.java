@@ -3,6 +3,7 @@ package com.mowmaster.ironpedestals.Items.Upgrades.Pedestal;
 import com.mowmaster.mowlib.transport.ExperienceTransportType;
 import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.ironpedestals.Config;
 import com.mowmaster.ironpedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.ironpedestals.Items.Upgrades.UpgradeModifiers;
 import net.minecraft.core.registries.Registries;
@@ -41,6 +42,14 @@ public class ItemUpgradeCooking<T extends AbstractCookingRecipe> extends ItemUpg
         super(properties, UpgradeModifiers.SPEED);
         this.recipeType = recipeType;
         this.energyPerTick = energyPerTick;
+    }
+
+    // Furnaces cook several ticks' worth per tick: their speed is upgrade_furnace_speed_multiplier (5) times the
+    // tier's ticks_reduced, so tier 1 cooks 25 ticks per tick and tier 5 the cap of 200
+    @Override
+    protected int speedMultiplier()
+    {
+        return Config.FURNACE_SPEED_MULTIPLIER.getAsInt();
     }
 
     @Override

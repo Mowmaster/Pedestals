@@ -1,6 +1,15 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "ironpedestals:item/upgrade_pedestal_sheerer"
+    "model": "ironpedestals:item/upgrade_pedestal_sheerer",
+    "tints": [
+      {
+        "type": "ironpedestals:upgrade_tier"
+      },
+      {
+        "type": "ironpedestals:upgrade_tier",
+        "symbol": true
+      }
+    ]
   }
 }

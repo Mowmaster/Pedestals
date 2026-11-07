@@ -1,6 +1,15 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "ironpedestals:item/upgrade_pedestal_cobblegen"
+    "model": "ironpedestals:item/upgrade_pedestal_cobblegen",
+    "tints": [
+      {
+        "type": "ironpedestals:upgrade_tier"
+      },
+      {
+        "type": "ironpedestals:upgrade_tier",
+        "symbol": true
+      }
+    ]
   }
 }

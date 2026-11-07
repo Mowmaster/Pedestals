@@ -16,7 +16,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -40,10 +39,13 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 // Shared upgrade behaviour (1.20's ItemUpgradeBase). Subclasses do their work in upgradeAction, which runs every
-// (TICKS_TO_TRANSFER - speed modifier) ticks while the pedestal isn't powered.
+// (TICKS_TO_TRANSFER - speed) ticks while the pedestal isn't powered.
 //
-// Modifiers: pass the names the upgrade accepts to the constructor (UpgradeModifiers.SPEED, ANY_CAPACITY...);
-// the modification upgrade can only add those.
+// Tiers (UpgradeTier, in the upgrade_tier component): speed, transfer rates, block capacity and super speed come
+// from the tier. Range and area come from the pedestal's range. The special modifiers (entity containers, remote
+// storage...) are unlocked with the Upgrade smithing template (UpgradeSmithingRecipe).
+// Modifiers: pass the names the upgrade uses to the constructor (UpgradeModifiers.SPEED, ANY_CAPACITY...); a tier
+// or the template only affects the ones listed.
 // Transport modes: upgrades that move every transport type (import, export, magnet...) override
 // usesTransportModes. With the upgrade in the OFFHAND, right-click toggles the selected type on/off and
 // sneak + right-click selects the next type (the item model shows which).
@@ -78,7 +80,7 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
     // The upgrade's work, once per operation
     protected abstract void upgradeAction(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack upgrade);
 
-    // Ticks between operations: the pedestal's transfer speed, less the speed modifier (at least 1)
+    // Ticks between operations: the pedestal's transfer speed, less the tier's speed (at least 1)
     public int getOperationTicks(ItemStack upgrade)
     {
         return Math.max(1, Config.TICKS_TO_TRANSFER.getAsInt() - getModifier(upgrade, UpgradeModifiers.SPEED));
@@ -98,23 +100,50 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         upgrade.remove(PedestalDataComponents.UPGRADE_OWNER.get());
     }
 
-    // ---- Modifiers ----
+    // ---- Tier and modifiers ----
+
+    public static UpgradeTier getTier(ItemStack upgrade)
+    {
+        return UpgradeTier.of(upgrade);
+    }
 
     public static UpgradeModifiers getModifiers(ItemStack upgrade)
     {
         return upgrade.getOrDefault(PedestalDataComponents.UPGRADE_MODIFIERS.get(), UpgradeModifiers.EMPTY);
     }
 
-    // Whether this upgrade takes this modifier (the modification recipes check this)
+    // Whether this upgrade uses this modifier (the smithing template and the tooltip check this)
     public boolean canModify(ItemStack upgrade, String modifier)
     {
         return modifiers.contains(modifier) || (modifiers.contains(UpgradeModifiers.ANY_CAPACITY) && capacityType(modifier) != null);
     }
 
-    // The modifier's value, 0 if the upgrade doesn't take it
+    // The speed is the tier's ticks_reduced times this (the furnace upgrades override it)
+    protected int speedMultiplier()
+    {
+        return 1;
+    }
+
+    // The modifier's value, 0 if the upgrade doesn't use it:
+    //   speed          the tier's ticks_reduced (x speedMultiplier)
+    //   super speed    1 from upgrade_super_speed_tier on
+    //   block capacity the tier's item rate / upgrade_block_capacity_divisor (0 at tier 0)
+    //   capacities     the tier's rate for that type, in the config's units (experience: levels; 0 at tier 0)
+    //   anything else  what the smithing template stored (UpgradeModifiers.SPECIALS)
     public int getModifier(ItemStack upgrade, String modifier)
     {
-        return canModify(upgrade, modifier) ? getModifiers(upgrade).get(modifier) : 0;
+        if (!canModify(upgrade, modifier)) return 0;
+        UpgradeTier tier = getTier(upgrade);
+        Config.UpgradeTierValues values = tier.config();
+        if (modifier.equals(UpgradeModifiers.SPEED)) return values.ticksReduced().getAsInt() * speedMultiplier();
+        if (modifier.equals(UpgradeModifiers.SUPER_SPEED)) return tier.tier() >= Config.SUPER_SPEED_TIER.getAsInt() ? 1 : 0;
+        if (modifier.equals(UpgradeModifiers.BLOCK_CAPACITY))
+        {
+            return tier.tier() == 0 ? 0 : values.itemRate().getAsInt() / Config.BLOCK_CAPACITY_DIVISOR.getAsInt();
+        }
+        TransportType<?> type = capacityType(modifier);
+        if (type != null) return tier.tier() == 0 ? 0 : tierRate(values, type);
+        return getModifiers(upgrade).get(modifier);
     }
 
     public boolean hasModifier(ItemStack upgrade, String modifier)
@@ -122,11 +151,23 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return getModifier(upgrade, modifier) >= 1;
     }
 
-    // An upgrade's rate for a type: the base rate plus that type's capacity modifier
+    // A tier's rate for one of the four built-in types (other types: 0, so the upgrade's base rate is used)
+    private static int tierRate(Config.UpgradeTierValues values, TransportType<?> type)
+    {
+        if (type == TransportTypes.ITEMS.get()) return values.itemRate().getAsInt();
+        if (type == TransportTypes.FLUIDS.get()) return values.fluidRate().getAsInt();
+        if (type == TransportTypes.ENERGY.get()) return values.energyRate().getAsInt();
+        if (type == TransportTypes.EXPERIENCE.get()) return values.xpRate().getAsInt();
+        return 0;
+    }
+
+    // An upgrade's rate for a type: tier 0 (or a type the tier has no value for) uses the upgrade's own base rate;
+    // other tiers use the tier's rate (experience turned from levels into points by the type's rules)
     public int getRate(ItemStack upgrade, TransportType<?> type, int baseRate)
     {
         PedestalTransportRules rules = PedestalTransportRules.of(type);
-        return rules.upgradeRate(baseRate, getModifier(upgrade, rules.capacityModifier(type)));
+        int tierValue = getModifier(upgrade, rules.capacityModifier(type));
+        return tierValue > 0 ? rules.upgradeRate(0, tierValue) : baseRate;
     }
 
     // The type a capacity modifier belongs to, or null if it isn't one
@@ -139,35 +180,25 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
         return null;
     }
 
-    // Every modifier this upgrade takes, with ANY_CAPACITY spelled out as each type's capacity modifier
-    public List<String> getAllowedModifiers(ItemStack upgrade)
+    // The special modifiers (smithing template) this upgrade uses, sorted by name
+    public List<String> getSpecialModifiers(ItemStack upgrade)
     {
-        List<String> allowed = new ArrayList<>();
-        for (String modifier : modifiers)
-        {
-            if (!modifier.equals(UpgradeModifiers.ANY_CAPACITY)) allowed.add(modifier);
-        }
-        if (modifiers.contains(UpgradeModifiers.ANY_CAPACITY))
-        {
-            for (TransportType<?> type : TransportTypes.REGISTRY) allowed.add(PedestalTransportRules.of(type).capacityModifier(type));
-        }
-        allowed.removeIf(modifier -> !canModify(upgrade, modifier));
-        return allowed;
+        return UpgradeModifiers.SPECIALS.keySet().stream().filter(modifier -> canModify(upgrade, modifier)).sorted().toList();
     }
 
     // ---- Work cards ----
 
-    // How far work card positions may be: the pedestal tier's work range plus the range modifier (0 without a card type)
+    // How far work card positions may be: the pedestal's work range (0 without a card type)
     @Override
     public int getWorkRange(BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
-        return getWorkCardType(upgrade) == null ? 0 : pedestal.getTierValues().workRange().getAsInt() + getModifier(upgrade, UpgradeModifiers.RANGE);
+        return getWorkCardType(upgrade) == null ? 0 : pedestal.getTierValues().workRange().getAsInt();
     }
 
-    // The largest area card the upgrade works with when REQUIRE_SIZED_AREA is on (2 = a 3x3x3 box)
-    public int getAreaSize(ItemStack upgrade)
+    // The largest area card box the upgrade works with when REQUIRE_SIZED_AREA is on: the pedestal's range too
+    public int getAreaSize(BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
-        return 2 + getModifier(upgrade, UpgradeModifiers.AREA);
+        return pedestal.getTierValues().workRange().getAsInt();
     }
 
     // ---- Fuel ----
@@ -435,14 +466,37 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
             tooltip.accept(Component.translatable(MODID + ".upgrade_tooltip_tool_required").withStyle(ChatFormatting.GRAY));
         }
 
-        UpgradeModifiers values = getModifiers(stack);
-        for (String modifier : getAllowedModifiers(stack))
+        // Tier: its speed and rates, then the specials this upgrade can have
+        UpgradeTier tier = getTier(stack);
+        tooltip.accept(Component.translatable(MODID + ".upgrade_tier", tier.tier(), Component.translatable(MODID + ".upgrade_tier." + tier.key()))
+                .withStyle(ChatFormatting.GOLD));
+        if (canModify(stack, UpgradeModifiers.SPEED))
         {
-            int value = values.get(modifier);
-            MutableComponent line = modifierName(modifier).copy().append(": ");
-            if (value > 0) line.append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.WHITE));
-            else line.append(Component.translatable(MODID + ".upgrade_tooltip_modifier_allowed").withStyle(ChatFormatting.DARK_GRAY));
-            tooltip.accept(line.withStyle(ChatFormatting.AQUA));
+            tooltip.accept(Component.translatable(MODID + ".upgrade_tooltip_speed", getOperationTicks(stack)).withStyle(ChatFormatting.AQUA));
+        }
+        for (TransportType<?> type : TransportTypes.REGISTRY)
+        {
+            PedestalTransportRules rules = PedestalTransportRules.of(type);
+            int value = getModifier(stack, rules.capacityModifier(type));
+            if (value <= 0) continue;
+            // ironpedestals.upgrade_tooltip_rate.<namespace>.<path>, e.g. "%s levels"; the plain number if missing
+            String key = MODID + ".upgrade_tooltip_rate." + type.getId().getNamespace() + "." + type.getId().getPath();
+            tooltip.accept(Component.literal(" ").append(type.getName()).append(": ")
+                    .append(Component.translatableWithFallback(key, String.valueOf(value), value)).withStyle(ChatFormatting.AQUA));
+        }
+        int blocks = getModifier(stack, UpgradeModifiers.BLOCK_CAPACITY);
+        if (blocks > 0) tooltip.accept(Component.translatable(MODID + ".upgrade_tooltip_blocks", blocks).withStyle(ChatFormatting.AQUA));
+        if (hasModifier(stack, UpgradeModifiers.SUPER_SPEED))
+        {
+            tooltip.accept(Component.translatable(MODID + ".modifier." + UpgradeModifiers.SUPER_SPEED).withStyle(ChatFormatting.LIGHT_PURPLE));
+        }
+        for (String modifier : getSpecialModifiers(stack))
+        {
+            boolean unlocked = getModifiers(stack).get(modifier) > 0;
+            tooltip.accept(modifierName(modifier).copy().append(": ")
+                    .append(Component.translatable(MODID + (unlocked ? ".upgrade_tooltip_unlocked" : ".upgrade_tooltip_locked"))
+                            .withStyle(unlocked ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY))
+                    .withStyle(ChatFormatting.AQUA));
         }
     }
 

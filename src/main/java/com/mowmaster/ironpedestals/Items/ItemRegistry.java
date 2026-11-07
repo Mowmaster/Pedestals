@@ -13,8 +13,12 @@ import com.mowmaster.ironpedestals.Items.Tools.LinkingToolItem;
 import com.mowmaster.ironpedestals.Items.Tools.PedestalToolItem;
 import com.mowmaster.ironpedestals.Items.Upgrades.Pedestal.*;
 import com.mowmaster.ironpedestals.Items.WorkCards.WorkCardPedestalsItem;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.SmithingTemplateItem;
 import net.minecraft.world.item.crafting.BlastingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
@@ -86,7 +90,6 @@ public class ItemRegistry {
     public static final DeferredItem<ItemUpgradePackager> PEDESTAL_UPGRADE_PACKAGER = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_packager", ItemUpgradePackager::new);
     public static final DeferredItem<ItemUpgradeUnpackager> PEDESTAL_UPGRADE_UNPACKAGER = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_unpackager", ItemUpgradeUnpackager::new);
     public static final DeferredItem<ItemUpgradeCrafter> PEDESTAL_UPGRADE_CRAFTER = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_crafter", ItemUpgradeCrafter::new);
-    public static final DeferredItem<ItemUpgradeModifications> PEDESTAL_UPGRADE_MODIFICATIONS = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_modifications", ItemUpgradeModifications::new);
     public static final DeferredItem<ItemUpgradeCooking<SmeltingRecipe>> PEDESTAL_UPGRADE_SMELTER = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_smelter",
             properties -> new ItemUpgradeCooking<>(properties, RecipeType.SMELTING, Config.SMELTER_ENERGY));
     public static final DeferredItem<ItemUpgradeCooking<SmokingRecipe>> PEDESTAL_UPGRADE_SMOKER = PEDESTAL_ITEMS.registerItem("upgrade_pedestal_smoker",
@@ -104,6 +107,24 @@ public class ItemRegistry {
 
     // Made by the sacrifice upgrade, burned by the reactor
     public static final DeferredItem<SacrificeItem> SACRIFICE = PEDESTAL_ITEMS.registerItem("sacrifice", SacrificeItem::new);
+
+    private static final String TEMPLATE_KEY = "item." + IronPedestalReferences.MODID + ".smithing_template.upgrade.";
+
+    // ---- Upgrade smithing template (found in dungeon chests; 8 diamonds around one make two) ----
+    // Template + upgrade + an unlock item in a smithing table unlocks one special modifier (UpgradeSmithingRecipe).
+    // SmithingTemplateItem's arguments: what it applies to, which unlock items it takes, the two slot hints, and the
+    // icons the empty slots show (sprite ids in the gui atlas: our own for the upgrade, vanilla's for the additions).
+    public static final DeferredItem<SmithingTemplateItem> SMITHING_TEMPLATE_UPGRADE = PEDESTAL_ITEMS.registerItem("smithing_template_upgrade",
+            properties -> new SmithingTemplateItem(
+                    Component.translatable(TEMPLATE_KEY + "applies_to").withStyle(ChatFormatting.BLUE),
+                    Component.translatable(TEMPLATE_KEY + "ingredients").withStyle(ChatFormatting.BLUE),
+                    Component.translatable(TEMPLATE_KEY + "base_slot_description"),
+                    Component.translatable(TEMPLATE_KEY + "additions_slot_description"),
+                    List.of(Identifier.fromNamespaceAndPath(IronPedestalReferences.MODID, "container/slot/upgrade")),
+                    List.of(Identifier.withDefaultNamespace("container/slot/ingot"), Identifier.withDefaultNamespace("container/slot/emerald"),
+                            Identifier.withDefaultNamespace("container/slot/diamond"), Identifier.withDefaultNamespace("container/slot/potion"),
+                            Identifier.withDefaultNamespace("container/slot/quartz")),
+                    properties.rarity(Rarity.UNCOMMON)));
 
     // ---- Augments (same ids as 1.20; the tiered speed / capacity / storage / range ones became pedestal tiers) ----
     public static final DeferredItem<AugmentItem> AUGMENT_ROUNDROBIN = augment("augment_pedestal_roundrobin", AugmentType.ROUND_ROBIN);
@@ -144,7 +165,7 @@ public class ItemRegistry {
             PEDESTAL_UPGRADE_FLUIDCONVERTER, PEDESTAL_UPGRADE_DROPPER, PEDESTAL_UPGRADE_PUMP, PEDESTAL_UPGRADE_DRAIN,
             PEDESTAL_UPGRADE_SHEARER, PEDESTAL_UPGRADE_MILKER, PEDESTAL_UPGRADE_BREEDER, PEDESTAL_UPGRADE_ATTACKER,
             PEDESTAL_UPGRADE_FAN, PEDESTAL_UPGRADE_BOTTLER, PEDESTAL_UPGRADE_UNBOTTLER, PEDESTAL_UPGRADE_PACKAGER,
-            PEDESTAL_UPGRADE_UNPACKAGER, PEDESTAL_UPGRADE_CRAFTER, PEDESTAL_UPGRADE_MODIFICATIONS, PEDESTAL_UPGRADE_SMELTER,
+            PEDESTAL_UPGRADE_UNPACKAGER, PEDESTAL_UPGRADE_CRAFTER, PEDESTAL_UPGRADE_SMELTER,
             PEDESTAL_UPGRADE_SMOKER, PEDESTAL_UPGRADE_BLASTER, PEDESTAL_UPGRADE_GENERATOR, PEDESTAL_UPGRADE_COBBLEGEN,
             PEDESTAL_UPGRADE_ENCHANTER, PEDESTAL_UPGRADE_ANVIL, PEDESTAL_UPGRADE_SACRIFICE, PEDESTAL_UPGRADE_REACTOR);
 

@@ -35,14 +35,7 @@ public class ItemUpgradePump extends ItemUpgradeBase
 {
     public ItemUpgradePump(Properties properties)
     {
-        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.BLOCK_CAPACITY, UpgradeModifiers.RANGE, UpgradeModifiers.AREA, UpgradeModifiers.OPERATE_TO_BEDROCK);
-    }
-
-    @Override
-    public boolean canModify(ItemStack upgrade, String modifier)
-    {
-        if (modifier.equals(UpgradeModifiers.AREA)) return Config.REQUIRE_SIZED_AREA.getAsBoolean();
-        return super.canModify(upgrade, modifier);
+        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.BLOCK_CAPACITY, UpgradeModifiers.OPERATE_TO_BEDROCK);
     }
 
     @Override

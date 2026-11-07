@@ -1,0 +1,15 @@
+{
+  "type": "ironpedestals:upgrade_smithing",
+  "template": "ironpedestals:smithing_template_upgrade",
+  "base": "#ironpedestals:upgrades",
+  "addition": {
+    "neoforge:ingredient_type": "neoforge:components",
+    "items": "minecraft:enchanted_book",
+    "components": {
+      "minecraft:stored_enchantments": {
+        "minecraft:silk_touch": 1
+      }
+    }
+  },
+  "modifier": "upgradegentle"
+}

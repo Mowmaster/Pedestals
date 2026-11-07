@@ -89,7 +89,7 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
 
     public ItemUpgradeSacrifice(Properties properties)
     {
-        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.RANGE);
+        super(properties, UpgradeModifiers.SPEED);
     }
 
     @Override

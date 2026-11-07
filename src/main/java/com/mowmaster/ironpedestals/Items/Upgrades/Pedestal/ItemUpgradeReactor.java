@@ -71,7 +71,7 @@ public class ItemUpgradeReactor extends ItemUpgradeBase
 
     public ItemUpgradeReactor(Properties properties)
     {
-        super(properties, UpgradeModifiers.RANGE);
+        super(properties);
     }
 
     @Override

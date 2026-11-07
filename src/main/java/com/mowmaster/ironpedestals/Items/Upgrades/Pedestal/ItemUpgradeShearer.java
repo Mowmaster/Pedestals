@@ -24,14 +24,7 @@ public class ItemUpgradeShearer extends ItemUpgradeBase
 {
     public ItemUpgradeShearer(Properties properties)
     {
-        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.SUPER_SPEED, UpgradeModifiers.RANGE, UpgradeModifiers.AREA);
-    }
-
-    @Override
-    public boolean canModify(ItemStack upgrade, String modifier)
-    {
-        if (modifier.equals(UpgradeModifiers.AREA)) return Config.REQUIRE_SIZED_AREA.getAsBoolean();
-        return super.canModify(upgrade, modifier);
+        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.SUPER_SPEED);
     }
 
     @Override

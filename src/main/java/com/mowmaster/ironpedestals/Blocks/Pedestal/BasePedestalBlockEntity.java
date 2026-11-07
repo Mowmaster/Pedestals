@@ -645,7 +645,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     public int getMaxAreaSize()
     {
         if (!Config.REQUIRE_SIZED_AREA.getAsBoolean() || !(upgrade.getItem() instanceof ItemUpgradeBase base)) return -1;
-        return base.getAreaSize(upgrade);
+        return base.getAreaSize(this, upgrade);
     }
 
     // An area work card's box (for finding entities), if the upgrade uses it and it's in range

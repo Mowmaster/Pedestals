@@ -1,6 +1,5 @@
 package com.mowmaster.ironpedestals.Items.Upgrades.Pedestal;
 
-import com.mowmaster.ironpedestals.IronPedestalReferences;
 import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.ironpedestals.Blocks.Pedestal.PedestalFakePlayer;
@@ -8,13 +7,9 @@ import com.mowmaster.ironpedestals.Config;
 import com.mowmaster.ironpedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.ironpedestals.Items.Upgrades.UpgradeModifiers;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -25,23 +20,14 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 // Attacks every mob in the work card's area each operation, as a player swinging the pedestal's tool (a stick if
-// none is in): the tool's damage, enchantments, sweeping and wear all work like a player's attack. The damage
-// modifier adds that much damage. The block under the pedestal can limit which mobs (see EntityTargets). Players
-// are never attacked.
+// none is in): the tool's damage, enchantments, sweeping and wear all work like a player's attack (better tools and
+// enchantments are how it hits harder; there's no damage modifier). The block under the pedestal can limit which
+// mobs (see EntityTargets). Players are never attacked.
 public class ItemUpgradeAttacker extends ItemUpgradeBase
 {
-    private static final Identifier BONUS_DAMAGE = Identifier.fromNamespaceAndPath(IronPedestalReferences.MODID, "attacker_damage_modifier");
-
     public ItemUpgradeAttacker(Properties properties)
     {
-        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.DAMAGE_CAPACITY, UpgradeModifiers.RANGE, UpgradeModifiers.AREA);
-    }
-
-    @Override
-    public boolean canModify(ItemStack upgrade, String modifier)
-    {
-        if (modifier.equals(UpgradeModifiers.AREA)) return Config.REQUIRE_SIZED_AREA.getAsBoolean();
-        return super.canModify(upgrade, modifier);
+        super(properties, UpgradeModifiers.SPEED);
     }
 
     @Override
@@ -76,9 +62,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         Predicate<Entity> targets = EntityTargets.forPedestal(level, pedestal);
 
         PedestalFakePlayer player = playerWithTool(level, pedestal);
-        AttributeInstance damage = player.getAttribute(Attributes.ATTACK_DAMAGE);
-        int bonus = getModifier(upgrade, UpgradeModifiers.DAMAGE_CAPACITY);
-        if (damage != null && bonus > 0) damage.addOrUpdateTransientModifier(new AttributeModifier(BONUS_DAMAGE, bonus, AttributeModifier.Operation.ADD_VALUE));
         try
         {
             for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, area.get(), entity -> entity.isAlive() && !(entity instanceof Player)))
@@ -96,7 +79,6 @@ public class ItemUpgradeAttacker extends ItemUpgradeBase
         }
         finally
         {
-            if (damage != null) damage.removeModifier(BONUS_DAMAGE);
             finishWithTool(pedestal, player);
         }
     }

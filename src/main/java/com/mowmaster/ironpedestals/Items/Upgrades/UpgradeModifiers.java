@@ -8,17 +8,20 @@ import net.minecraft.network.codec.StreamCodec;
 import java.util.HashMap;
 import java.util.Map;
 
-// The modifiers applied to an upgrade by the modification upgrade (1.20 kept these as ints in the stack's NBT, under
-// the same names). Item components must never change once made, so this is a record with an unmodifiable map, and
-// "changing" a value makes a new UpgradeModifiers (with) that is set back on the stack.
+// An upgrade's modifiers, by name (1.20 kept these as ints in the stack's NBT, under the same names). Item components
+// must never change once made, so this is a record with an unmodifiable map, and "changing" a value makes a new
+// UpgradeModifiers (with) that is set back on the stack.
+//
+// Where each value comes from now (ItemUpgradeBase#getModifier):
+//   speed, super speed, block capacity, capacities -> the upgrade's tier (UpgradeTier)
+//   range, area                                    -> the pedestal's range (not modifiers any more)
+//   the SPECIALS                                   -> stored here, set to their max by the Upgrade smithing template
+// An upgrade lists the names it takes in its constructor (ItemUpgradeBase).
 public record UpgradeModifiers(Map<String, Integer> values)
 {
-    // The 1.20 names: the modification recipes refer to these
+    // The 1.20 names
     public static final String SPEED = "upgradespeed";
-    public static final String DAMAGE_CAPACITY = "upgradedamagecapacity";
     public static final String BLOCK_CAPACITY = "upgradeblockcapacity";
-    public static final String AREA = "upgradearea";
-    public static final String RANGE = "upgraderange";
     public static final String MAGNET = "upgrademagnet";
     public static final String GENTLE_HARVEST = "upgradegentle";
     public static final String SUPER_SPEED = "upgradesuperspeed";
@@ -37,6 +40,19 @@ public record UpgradeModifiers(Map<String, Integer> values)
     // (upgradeitemcapacity, upgradefluidcapacity, upgradeenergycapacity, upgradexpcapacity, ...).
     // Upgrades list this to accept every type's capacity modifier.
     public static final String ANY_CAPACITY = "*capacity";
+
+    // The modifiers the Upgrade smithing template unlocks, and the value it sets (the 1.20 recipes' max).
+    // Map.of keeps no order, so the tooltip sorts by name.
+    public static final Map<String, Integer> SPECIALS = Map.of(
+            ENTITY_CONTAINERS, 1,
+            REMOTE_STORAGE, 1,
+            OPERATE_TO_BEDROCK, 1,
+            GENTLE_HARVEST, 1,
+            TREASURE_CHANCE, 10,
+            PURIFIED, 10,
+            DROP_CHANCE, 10,
+            KNOWLEDGE, 10,
+            MENDING, 1);
 
     public static final UpgradeModifiers EMPTY = new UpgradeModifiers(Map.of());
 

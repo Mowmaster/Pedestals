@@ -1,6 +1,15 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "ironpedestals:item/upgrade_pedestal_planter"
+    "model": "ironpedestals:item/upgrade_pedestal_planter",
+    "tints": [
+      {
+        "type": "ironpedestals:upgrade_tier"
+      },
+      {
+        "type": "ironpedestals:upgrade_tier",
+        "symbol": true
+      }
+    ]
   }
 }

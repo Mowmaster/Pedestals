@@ -27,7 +27,7 @@ public class ItemUpgradeCrafter extends ItemUpgradeBase
 {
     public ItemUpgradeCrafter(Properties properties)
     {
-        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.RANGE);
+        super(properties, UpgradeModifiers.SPEED);
     }
 
     @Override

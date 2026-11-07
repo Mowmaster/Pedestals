@@ -78,6 +78,15 @@ public class Config {
     public static final ModConfigSpec.IntValue SELECTION_RANGE = BUILDER
             .comment("How far (in blocks, on each axis) a work card's positions can be from a tier 0 pedestal (before range modifiers; tiers 1-6 use their own range)")
             .defineInRange("upgrades_baseSelectionRange", 8, 1, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue FURNACE_SPEED_MULTIPLIER = BUILDER
+            .comment("The smelter, smoker and blast furnace upgrades use this many times their tier's ticks_reduced as their speed (cooking ticks per operation, at most 200)")
+            .defineInRange("upgrade_furnace_speed_multiplier", 5, 1, 200);
+    public static final ModConfigSpec.IntValue BLOCK_CAPACITY_DIVISOR = BUILDER
+            .comment("Block capacity (extra blocks per operation for the filler, quarry, pump and drain) is the upgrade tier's item_transfer_rate divided by this")
+            .defineInRange("upgrade_block_capacity_divisor", 4, 1, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue SUPER_SPEED_TIER = BUILDER
+            .comment("From this upgrade tier on, the chopper, fertilizer, harvester, magnet, milker, planter and shearer upgrades work on every position at once (super speed)")
+            .defineInRange("upgrade_super_speed_tier", 6, 1, 7);
     public static final ModConfigSpec.IntValue PACKAGE_MAX_STACKS = BUILDER
             .comment("Most item stacks the packager puts in one package")
             .defineInRange("bulkstorage_item_max_stacks", 54, 1, Integer.MAX_VALUE);
@@ -209,6 +218,24 @@ public class Config {
 
     static {
         BUILDER.pop();
+        BUILDER.comment("Upgrade tiers 1-6. Tier 0 (a plain upgrade) uses each upgrade's own base values from [upgrades].").push("upgrade_tiers");
+    }
+
+    // ---- Upgrade tiers: index = tier (0 = a plain upgrade: no ticks taken off, the upgrade's own base rates; see
+    // UpgradeTier). Values: ticks taken off pedestal_ticksToTransfer between operations; transfer rates per operation
+    // (items, mB, FE, levels). ----
+
+    public static final List<UpgradeTierValues> UPGRADE_TIERS = List.of(
+            UpgradeTierValues.base(),
+            UpgradeTierValues.define(1, "copper", 5, 8, 8000, 10000, 5),
+            UpgradeTierValues.define(2, "iron", 10, 16, 16000, 20000, 10),
+            UpgradeTierValues.define(3, "gold", 20, 32, 32000, 50000, 15),
+            UpgradeTierValues.define(4, "diamond", 30, 64, 64000, 100000, 20),
+            UpgradeTierValues.define(5, "netherite", 40, 128, 128000, 500000, 30),
+            UpgradeTierValues.define(6, "netherstar", 40, 256, 256000, 1000000, 50));
+
+    static {
+        BUILDER.pop();
     }
 
     static final ModConfigSpec SPEC = BUILDER.build();
@@ -297,6 +324,36 @@ public class Config {
                     stacks::getAsInt, stackCapacity::getAsInt, tanks::getAsInt,
                     fluidStorage::getAsInt, energyStorage::getAsInt, xpStorage::getAsInt,
                     rangeValue::getAsInt, rangeValue::getAsInt);
+        }
+    }
+
+    // One upgrade tier's numbers. Tier 0's rates are 0, meaning "the upgrade's own base rate" (ItemUpgradeBase#getRate).
+    // Experience is in levels.
+    public record UpgradeTierValues(IntSupplier ticksReduced, IntSupplier itemRate, IntSupplier fluidRate,
+                                    IntSupplier energyRate, IntSupplier xpRate)
+    {
+        static UpgradeTierValues base()
+        {
+            return new UpgradeTierValues(() -> 0, () -> 0, () -> 0, () -> 0, () -> 0);
+        }
+
+        // [upgrade_tiers.tier_<n>_<name>]
+        static UpgradeTierValues define(int tier, String name, int ticksReduced, int itemRate, int fluidRate, int energyRate, int xpRate)
+        {
+            String label = " [upgrade tier " + tier + ": " + name + "]";
+            BUILDER.push("tier_" + tier + "_" + name);
+            ModConfigSpec.IntValue speed = BUILDER.comment("Ticks taken off pedestal_ticksToTransfer (40 by default) between operations; never fewer than 1 tick" + label)
+                    .defineInRange("ticks_reduced", ticksReduced, 0, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue items = BUILDER.comment("Items moved per operation (block capacity is this / upgrade_block_capacity_divisor)" + label)
+                    .defineInRange("item_transfer_rate", itemRate, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue fluids = BUILDER.comment("Fluid (mB) moved per operation" + label)
+                    .defineInRange("fluid_transfer_rate", fluidRate, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue energy = BUILDER.comment("Energy moved per operation" + label)
+                    .defineInRange("energy_transfer_rate", energyRate, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue xp = BUILDER.comment("Experience moved per operation, in levels (counted from level 0)" + label)
+                    .defineInRange("xp_transfer_rate", xpRate, 1, Integer.MAX_VALUE);
+            BUILDER.pop();
+            return new UpgradeTierValues(speed::getAsInt, items::getAsInt, fluids::getAsInt, energy::getAsInt, xp::getAsInt);
         }
     }
 

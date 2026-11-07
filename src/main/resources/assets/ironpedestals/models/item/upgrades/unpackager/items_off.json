@@ -1,8 +1,9 @@
 {
-  "parent": "ironpedestals:item/upgrades/pedestal_upgrade",
+  "parent": "ironpedestals:item/upgrades/pedestal_upgrade_modes",
   "textures": {
     "coin": "ironpedestals:item/models/upgrades/pedestal_upgrade_i",
-    "letter": "ironpedestals:item/models/upgrades/pedestal_upgrade_i",
-    "part": "ironpedestals:item/models/upgrades/pedestal_upgrade_i"
+    "letter": "ironpedestals:item/models/upgrades/symbols/pedestal_upgrade_i",
+    "part": "ironpedestals:item/models/upgrades/pedestal_upgrade_i",
+    "symbol_dark": "ironpedestals:item/models/upgrades/symbols_dark/pedestal_upgrade_i"
   }
 }

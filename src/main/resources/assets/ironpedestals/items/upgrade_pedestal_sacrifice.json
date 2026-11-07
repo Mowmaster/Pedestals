@@ -5,11 +5,29 @@
     "component": "ironpedestals:sacrifice_mob",
     "on_true": {
       "type": "minecraft:model",
-      "model": "ironpedestals:item/upgrades/sacrifice/mob"
+      "model": "ironpedestals:item/upgrades/sacrifice/mob",
+      "tints": [
+        {
+          "type": "ironpedestals:upgrade_tier"
+        },
+        {
+          "type": "ironpedestals:upgrade_tier",
+          "symbol": true
+        }
+      ]
     },
     "on_false": {
       "type": "minecraft:model",
-      "model": "ironpedestals:item/upgrades/sacrifice/enchantment"
+      "model": "ironpedestals:item/upgrades/sacrifice/enchantment",
+      "tints": [
+        {
+          "type": "ironpedestals:upgrade_tier"
+        },
+        {
+          "type": "ironpedestals:upgrade_tier",
+          "symbol": true
+        }
+      ]
     }
   }
 }

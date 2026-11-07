@@ -1,0 +1,7 @@
+{
+  "type": "ironpedestals:upgrade_smithing",
+  "template": "ironpedestals:smithing_template_upgrade",
+  "base": "#ironpedestals:upgrades",
+  "addition": "minecraft:ender_pearl",
+  "modifier": "upgraderemotestorage"
+}

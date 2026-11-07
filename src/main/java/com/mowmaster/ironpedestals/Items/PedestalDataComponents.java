@@ -5,6 +5,7 @@ import com.mowmaster.mowlib.MowLibReferences;
 import com.mowmaster.mowlib.util.MowLibOwner;
 import com.mowmaster.ironpedestals.Items.Upgrades.UpgradeMode;
 import com.mowmaster.ironpedestals.Items.Upgrades.UpgradeModifiers;
+import com.mowmaster.ironpedestals.Items.Upgrades.UpgradeTier;
 import com.mowmaster.ironpedestals.IronPedestalReferences;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
@@ -29,7 +30,12 @@ public class PedestalDataComponents
 
     // ---- Upgrades ----
 
-    // Modifiers added by the modification upgrade (speed, range, area, capacities...)
+    // The upgrade's tier, 1-6 (absent = tier 0; see UpgradeTier). Also picks the tint of its item model.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> UPGRADE_TIER =
+            COMPONENTS.registerComponentType("upgrade_tier", builder -> builder.persistent(Codec.intRange(0, UpgradeTier.MAX)).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    // The special modifiers unlocked with the Upgrade smithing template (entity containers, remote storage...).
+    // Speed, capacities, super speed and block capacity come from the tier; range and area from the pedestal.
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<UpgradeModifiers>> UPGRADE_MODIFIERS =
             COMPONENTS.registerComponentType("upgrade_modifiers", builder -> builder.persistent(UpgradeModifiers.CODEC).networkSynchronized(UpgradeModifiers.STREAM_CODEC));
 

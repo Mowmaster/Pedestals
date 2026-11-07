@@ -62,7 +62,7 @@ public class ItemUpgradeEnchanter extends ItemUpgradeBase
 
     public ItemUpgradeEnchanter(Properties properties)
     {
-        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.RANGE, UpgradeModifiers.TREASURE_CHANCE, UpgradeModifiers.PURIFIED);
+        super(properties, UpgradeModifiers.SPEED, UpgradeModifiers.TREASURE_CHANCE, UpgradeModifiers.PURIFIED);
     }
 
     @Override
