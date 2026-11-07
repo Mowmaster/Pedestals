@@ -30,7 +30,7 @@ public enum PedestalTier
     DIAMOND(4, "block_pedestal_diamond", () -> Blocks.DIAMOND_BLOCK, 0x62EDE4),
     NETHERITE(5, "block_pedestal_netherite", () -> Blocks.NETHERITE_BLOCK, 0x423D3F),
     // 26.x: the 16 concretes are one collection by dye colour; pick(DyeColor.WHITE) is white concrete
-    NETHERSTAR(6, "block_pedestal_netherstar", () -> Blocks.CONCRETE.pick(DyeColor.WHITE), 0xCFD5D6);
+    NETHERSTAR(6, "block_pedestal_netherstar", () -> Blocks.CONCRETE.pick(DyeColor.PURPLE), 0xCFD5D6);
     private final int tier;
     private final String id;
     private final @Nullable Supplier<Block> colorBlock;
