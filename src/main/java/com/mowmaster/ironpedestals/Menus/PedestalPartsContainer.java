@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-// The pedestal's upgrade, tool, work card, filter and augments seen as a 7-slot Container (one per PedestalPart),
+// The pedestal's upgrade, tool, work card and filter seen as a 4-slot Container (one per PedestalPart),
 // which is what vanilla Slots work on. Nothing is stored here: every read and write goes straight to the block
 // entity, so the menu and the block (and its offhand clicks) always agree. Only the server changes anything: on the
 // client (the menu's prediction of a click) taking hands back a copy and putting does nothing, and the screen catches

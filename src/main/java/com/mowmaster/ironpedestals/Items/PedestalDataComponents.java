@@ -60,10 +60,6 @@ public class PedestalDataComponents
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> SACRIFICE_MOB =
             COMPONENTS.registerComponentType("sacrifice_mob", builder -> builder.persistent(Unit.CODEC).networkSynchronized(Unit.STREAM_CODEC));
 
-    // The particle & render augment's mode (0-6, see AugmentItem#hidesParticles etc.); absent = 0
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> DIFFUSER_MODE =
-            COMPONENTS.registerComponentType("diffuser_mode", builder -> builder.persistent(Codec.intRange(0, 6)).networkSynchronized(ByteBufCodecs.VAR_INT));
-
     public static void register(IEventBus eventBus)
     {
         // Components that moved to MowLib (filters, work cards, storage packets): old items in saved worlds carry

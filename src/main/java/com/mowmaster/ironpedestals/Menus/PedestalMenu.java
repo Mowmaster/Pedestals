@@ -1,6 +1,7 @@
 package com.mowmaster.ironpedestals.Menus;
 
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
+import com.mowmaster.ironpedestals.Items.Augments.AugmentType;
 import com.mowmaster.ironpedestals.Transport.PedestalItemStorage;
 import com.mowmaster.ironpedestals.api.upgrade.IPedestalUpgrade;
 import com.mowmaster.mowlib.transport.TransportStorage;
@@ -14,12 +15,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 
-// The pedestal's menu (empty-hand right-click): its item stacks, the upgrade / tool / filter / work card slots, the
-// three augment slots, and the player's inventory. Server and client each build one: the server's from the block
+// The pedestal's menu (empty-hand right-click): its item stacks, the upgrade / tool / filter / work card slots, and
+// the player's inventory (the three augments are buttons the screen draws at AUGMENTS_X, see clickMenuButton). Server and client each build one: the server's from the block
 // entity (PedestalMenu(id, inventory, pedestal)), the client's from the position the server sends (fromNetwork),
 // reading the client's copy of the same block entity. Vanilla then keeps the slots in step.
 //
-// Slot order (quickMoveStack relies on it): the pedestal's stacks, the 7 parts (PedestalPart order), then the
+// Slot order (quickMoveStack relies on it): the pedestal's stacks, the 4 parts (PedestalPart order), then the
 // player's 27 inventory slots and 9 hotbar slots. Stacks past the first 27 are on further pages: only the shown
 // page's slots are active (the screen picks the page; it's client-only, the server doesn't need it).
 public class PedestalMenu extends AbstractContainerMenu
@@ -59,16 +60,12 @@ public class PedestalMenu extends AbstractContainerMenu
             addSlot(new PedestalSlots.Storage(storage, storage::set, index, x, y, () -> page == slotPage));
         }
 
-        // Upgrade, tool, filter, then the work card (shown only while the upgrade uses one, or one is in), and the
-        // three augments on the right
+        // Upgrade, tool, filter, then the work card (shown only while the upgrade uses one, or one is in)
         PedestalPartsContainer parts = new PedestalPartsContainer(pedestal, inventory.player);
         addSlot(new PedestalSlots.Part(parts, PedestalPart.UPGRADE, ITEMS_X, PARTS_Y, () -> true));
         addSlot(new PedestalSlots.Part(parts, PedestalPart.TOOL, ITEMS_X + 18, PARTS_Y, () -> true));
         addSlot(new PedestalSlots.Part(parts, PedestalPart.WORK_CARD, ITEMS_X + 54, PARTS_Y, this::showsWorkCard));
         addSlot(new PedestalSlots.Part(parts, PedestalPart.FILTER, ITEMS_X + 36, PARTS_Y, () -> true));
-        addSlot(new PedestalSlots.Part(parts, PedestalPart.ROUND_ROBIN, AUGMENTS_X, PARTS_Y, () -> true));
-        addSlot(new PedestalSlots.Part(parts, PedestalPart.DIFFUSER, AUGMENTS_X + 18, PARTS_Y, () -> true));
-        addSlot(new PedestalSlots.Part(parts, PedestalPart.COLLIDE, AUGMENTS_X + 36, PARTS_Y, () -> true));
 
         // The player's inventory and hotbar (vanilla's helper: 3 rows, then the hotbar 4 pixels lower)
         addStandardInventorySlots(inventory, ITEMS_X, INVENTORY_Y);
@@ -121,9 +118,33 @@ public class PedestalMenu extends AbstractContainerMenu
         return usesCard || pedestal.hasWorkCard();
     }
 
+    // ---- The augment buttons ----
+
+    // Button ids sent by the screen (vanilla's menu button message, MultiPlayerGameMode#handleInventoryButtonClick):
+    // 0-2 switch that augment (AugmentType order) on or off, CYCLE_DIFFUSER picks the particle & render augment's
+    // next mode. This runs on the server, which checks the id.
+    public static final int CYCLE_DIFFUSER = 10;
+
+    @Override
+    public boolean clickMenuButton(Player player, int id)
+    {
+        AugmentType[] types = AugmentType.values();
+        if (id >= 0 && id < types.length)
+        {
+            pedestal.toggleAugment(types[id]);
+            return true;
+        }
+        if (id == CYCLE_DIFFUSER)
+        {
+            pedestal.cycleDiffuserMode();
+            return true;
+        }
+        return false;
+    }
+
     // ---- Shift-click ----
 
-    // From the player: into the matching empty part slots first (upgrade, tool, filter, work card, augment), then
+    // From the player: into the matching empty part slots first (upgrade, tool, filter, work card), then
     // into the pedestal's stacks. From the pedestal: into the player's inventory, one normal stack at a time (vanilla
     // repeats a shift-click while it keeps returning the same item, so a big pedestal slot empties in one click).
     @Override

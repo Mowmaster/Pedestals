@@ -21,7 +21,6 @@ import com.mowmaster.mowlib.workcard.IWorkCardHolder;
 import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.ironpedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.ironpedestals.Config;
-import com.mowmaster.ironpedestals.Items.Augments.AugmentItem;
 import com.mowmaster.ironpedestals.Items.Augments.AugmentType;
 import com.mowmaster.ironpedestals.Items.PedestalDataComponents;
 import com.mowmaster.ironpedestals.Items.Storage.StoragePacketItem;
@@ -72,7 +71,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +89,7 @@ import java.util.function.Predicate;
 // server tick (IPedestalUpgrade#tick) and keeps its per-pedestal state in getUpgradeData().
 // Tier (PedestalTier, from the block): ticks between link transfers, link transfer rates, item stacks and how much
 // each holds, fluid tanks, storage sizes and the link / work card range, all from Config.TIERS.
-// Augments (see AugmentItem / AugmentType): round robin (links take turns), particle & render (hides particles /
+// Augments (AugmentType; switched on and off with the menu's buttons, no items): round robin (links take turns), particle & render (hides particles /
 // the item / the upgrade) and collision (upgrades also act on touching entities).
 // Not ported yet: redstone counts.
 public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder, TransportStorageHost, IFilterHolder, IWorkCardHolder
@@ -106,8 +105,10 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     private ItemStack upgrade = ItemStack.EMPTY;
     private ItemStack tool = ItemStack.EMPTY;
     private ItemStack workCard = ItemStack.EMPTY;
-    // Augments by kind, one of each. EnumMap: a map keyed by an enum, kept in the enum's order.
-    private final Map<AugmentType, ItemStack> augments = new EnumMap<>(AugmentType.class);
+    // The augments that are on. EnumSet: a set of an enum's values (stored as bits, kept in the enum's order).
+    private final EnumSet<AugmentType> augments = EnumSet.noneOf(AugmentType.class);
+    // The particle & render augment's mode (what it hides, see AugmentType#hidesParticles...)
+    private int diffuserMode;
     // With the round robin augment: the link to try first next time
     private int roundRobinNext;
     // Items the upgrade is missing, shown to players (synced to clients)
@@ -382,7 +383,29 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         if (hasUpgrade()) Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), takeUpgrade());
         Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), tool);
         Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), workCard);
-        augments.values().forEach(augment -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), augment));
+        if (level instanceof ServerLevel serverLevel) removeLinksTo(serverLevel, pos);
+    }
+
+    // A broken pedestal's links go: its own go with it, and every loaded pedestal close enough to link here stops
+    // sending to it. Pedestals in unloaded chunks drop the link the next time they try to send (serverTick).
+    // Looks through the chunks within the largest link range any tier has (block entities are kept per chunk).
+    private static void removeLinksTo(ServerLevel level, BlockPos pos)
+    {
+        int range = 0;
+        for (Config.TierValues tier : Config.TIERS) range = Math.max(range, tier.linkRange().getAsInt());
+        int chunks = (range >> 4) + 1;
+        int centreX = pos.getX() >> 4, centreZ = pos.getZ() >> 4;
+        for (int chunkX = centreX - chunks; chunkX <= centreX + chunks; chunkX++)
+        {
+            for (int chunkZ = centreZ - chunks; chunkZ <= centreZ + chunks; chunkZ++)
+            {
+                if (!level.hasChunk(chunkX, chunkZ)) continue;
+                for (BlockEntity blockEntity : level.getChunk(chunkX, chunkZ).getBlockEntities().values())
+                {
+                    if (blockEntity instanceof BasePedestalBlockEntity sender && !sender.worldPosition.equals(pos)) sender.removeLink(pos);
+                }
+            }
+        }
     }
 
     // Items spill; the other types become a storage packet if Pedestals has one for them, otherwise whatever the
@@ -908,32 +931,28 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
 
     // ---- Augments ----
 
-    public ItemStack getAugment(AugmentType type)
-    {
-        return augments.getOrDefault(type, ItemStack.EMPTY);
-    }
-
     public boolean hasAugment(AugmentType type)
     {
-        return !getAugment(type).isEmpty();
+        return augments.contains(type);
     }
 
-    // Puts one augment from the stack in; false if it isn't one or the pedestal has that kind already
-    public boolean insertAugment(ItemStack stack)
+    // Switches an augment on or off (the menu's buttons, PedestalMenu#clickMenuButton)
+    public void toggleAugment(AugmentType type)
     {
-        if (!(stack.getItem() instanceof AugmentItem augment) || hasAugment(augment.getType())) return false;
-        augments.put(augment.getType(), stack.split(1));
+        if (!augments.remove(type)) augments.add(type);
         update(); // clients need the augments too (the particle & render augment changes what's drawn)
-        return true;
     }
 
-    // Takes that kind of augment out (EMPTY if there isn't one)
-    public ItemStack removeAugment(AugmentType type)
+    public int getDiffuserMode()
     {
-        ItemStack removed = augments.remove(type);
-        if (removed == null) return ItemStack.EMPTY;
+        return diffuserMode;
+    }
+
+    // The particle & render augment's next mode
+    public void cycleDiffuserMode()
+    {
+        diffuserMode = (diffuserMode + 1) % AugmentType.DIFFUSER_MODES;
         update();
-        return removed;
     }
 
     // Item stacks and fluid tanks follow the tier (the storages resize to what getCapacity / getFluidTankCount say).
@@ -964,26 +983,17 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     // The particle & render augment's choices (all true without one)
     public boolean canSpawnParticles()
     {
-        return !hasAugment(AugmentType.DIFFUSER) || !AugmentItem.hidesParticles(AugmentItem.getDiffuserMode(getAugment(AugmentType.DIFFUSER)));
+        return !hasAugment(AugmentType.DIFFUSER) || !AugmentType.hidesParticles(diffuserMode);
     }
 
     public boolean rendersItem()
     {
-        return !hasAugment(AugmentType.DIFFUSER) || !AugmentItem.hidesItem(AugmentItem.getDiffuserMode(getAugment(AugmentType.DIFFUSER)));
+        return !hasAugment(AugmentType.DIFFUSER) || !AugmentType.hidesItem(diffuserMode);
     }
 
     public boolean rendersUpgrade()
     {
-        return !hasAugment(AugmentType.DIFFUSER) || !AugmentItem.hidesUpgrade(AugmentItem.getDiffuserMode(getAugment(AugmentType.DIFFUSER)));
-    }
-
-    // Whether the pedestal has that kind, for the augment tools (1.20's getPedestalDetail)
-    public List<Component> describeAugment(AugmentType type)
-    {
-        String key = IronPedestalReferences.MODID + ".tool.augment." + type.key();
-        return hasAugment(type)
-                ? List.of(Component.translatable(key).withStyle(ChatFormatting.AQUA))
-                : List.of(Component.translatable(key + "_not").withStyle(ChatFormatting.DARK_AQUA));
+        return !hasAugment(AugmentType.DIFFUSER) || !AugmentType.hidesUpgrade(diffuserMode);
     }
 
     private boolean sendTo(BasePedestalBlockEntity receiver)
@@ -1033,7 +1043,8 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         if (!upgrade.isEmpty()) output.store("upgrade", ItemStack.CODEC, upgrade);
         if (!tool.isEmpty()) output.store("tool", ItemStack.CODEC, tool);
         if (!workCard.isEmpty()) output.store("work_card", ItemStack.CODEC, workCard);
-        augments.forEach((type, augment) -> output.store("augment_" + type.key(), ItemStack.CODEC, augment));
+        augments.forEach(type -> output.putBoolean("augment_" + type.key(), true));
+        if (diffuserMode > 0) output.putInt("diffuser_mode", diffuserMode);
         if (roundRobinNext > 0) output.putInt("round_robin_next", roundRobinNext);
         if (!ghosts.isEmpty()) output.store("ghosts", GhostItem.CODEC.listOf(), ghosts);
         if (!upgradeData.isEmpty()) output.store("upgrade_data", CompoundTag.CODEC, upgradeData);
@@ -1047,8 +1058,11 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         augments.clear();
         for (AugmentType type : AugmentType.values())
         {
-            input.read("augment_" + type.key(), ItemStack.CODEC).ifPresent(augment -> augments.put(type, augment));
+            String key = "augment_" + type.key();
+            // Pedestals saved while augments were items kept the item under the same key: having one means it's on
+            if (input.getBooleanOr(key, false) || input.read(key, CompoundTag.CODEC).isPresent()) augments.add(type);
         }
+        diffuserMode = Math.clamp(input.getIntOr("diffuser_mode", 0), 0, AugmentType.DIFFUSER_MODES - 1);
         roundRobinNext = input.getIntOr("round_robin_next", 0);
         ValueInput storageInput = input.childOrEmpty("storage");
         storages.forEach((type, storage) -> storage.deserialize(storageFor(storageInput, type)));

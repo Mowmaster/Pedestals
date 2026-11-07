@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.ironpedestals.Config;
 import com.mowmaster.ironpedestals.IronPedestalReferences;
+import com.mowmaster.ironpedestals.Items.Augments.AugmentType;
 import com.mowmaster.ironpedestals.Menus.PedestalLinkPayload;
 import com.mowmaster.ironpedestals.Menus.PedestalMenu;
 import com.mowmaster.ironpedestals.Menus.PedestalSlots;
@@ -20,6 +21,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +108,44 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
                 SlotGrid.fill(graphics, x, y, GHOST_FADE);
             }
         }
+        extractAugmentButtons(graphics);
         extractLinks(graphics);
+    }
+
+    // ---- Augment buttons ----
+
+    // The three augment buttons, in a row where the augment slots used to be: each is its icon in a slot frame,
+    // faded while off ("ghost") and in full while on. The particle & render augment's icon shows its mode.
+    private void extractAugmentButtons(GuiGraphicsExtractor graphics)
+    {
+        for (AugmentType type : AugmentType.values())
+        {
+            int x = augmentButtonX(type);
+            int y = topPos + PedestalMenu.PARTS_Y - 1;
+            SlotGrid.slot(graphics, x, y, SLOT_BORDER, SLOT_FILL);
+            // blit draws (part of) any texture: here the whole 16x16 icon at its own size
+            graphics.blit(RenderPipelines.GUI_TEXTURED, type.icon(pedestal().getDiffuserMode()), x + 1, y + 1, 0, 0, 16, 16, 16, 16);
+            if (!pedestal().hasAugment(type)) SlotGrid.fill(graphics, x, y, GHOST_FADE);
+        }
+    }
+
+    // A button's frame's left edge (one pixel left of where an item in it would go)
+    private int augmentButtonX(AugmentType type)
+    {
+        return leftPos + PedestalMenu.AUGMENTS_X + type.ordinal() * 18 - 1;
+    }
+
+    // The augment button under the point, or null
+    private @Nullable AugmentType augmentAt(double mouseX, double mouseY)
+    {
+        int y = topPos + PedestalMenu.PARTS_Y - 1;
+        if (mouseY < y || mouseY >= y + SlotGrid.SLOT) return null;
+        for (AugmentType type : AugmentType.values())
+        {
+            int x = augmentButtonX(type);
+            if (mouseX >= x && mouseX < x + SlotGrid.SLOT) return type;
+        }
+        return null;
     }
 
     // The labels, relative to the left paper's corner: the title and tier, the page (when there's more than one),
@@ -215,6 +255,20 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
                     : List.of(Component.translatable(MODID + key), Component.translatable(MODID + ".screen.unloaded"));
             graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
         }
+        else if (augmentAt(mouseX, mouseY) != null)
+        {
+            AugmentType type = augmentAt(mouseX, mouseY);
+            boolean on = pedestal().hasAugment(type);
+            List<Component> lines = new ArrayList<>();
+            lines.add(Component.translatable(MODID + ".screen.augment." + type.key()));
+            lines.add(Component.translatable(MODID + (on ? ".screen.augment_on" : ".screen.augment_off")));
+            if (type == AugmentType.DIFFUSER)
+            {
+                lines.add(Component.translatable(AugmentType.diffuserModeKey(pedestal().getDiffuserMode())));
+                lines.add(Component.translatable(MODID + ".screen.augment_mode_hint"));
+            }
+            graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
+        }
         else if (hoveredSlot instanceof PedestalSlots.Part part && !part.hasItem() && menu.getCarried().isEmpty())
         {
             // ironpedestals.screen.slot.<part>: what goes in it
@@ -237,6 +291,19 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
+        // Augment buttons: left-click switches it on/off, right-click on the particle & render one changes its mode.
+        // The server does it (vanilla's menu button message, PedestalMenu#clickMenuButton); the screen shows the
+        // result when the pedestal's update arrives.
+        AugmentType augment = augmentAt(event.x(), event.y());
+        if (augment != null)
+        {
+            if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) minecraft.gameMode.handleInventoryButtonClick(menu.containerId, augment.ordinal());
+            else if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT && augment == AugmentType.DIFFUSER)
+            {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, PedestalMenu.CYCLE_DIFFUSER);
+            }
+            return true;
+        }
         // Since 26.3 mouse buttons use SDL's numbers, so compare with InputConstants rather than 0
         if (event.button() == InputConstants.MOUSE_BUTTON_LEFT)
         {

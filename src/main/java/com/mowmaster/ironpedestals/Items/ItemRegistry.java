@@ -5,10 +5,7 @@ import com.mowmaster.mowlib.MowLibReferences;
 import com.mowmaster.mowlib.registry.MowLibItems;
 import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.ironpedestals.Config;
-import com.mowmaster.ironpedestals.Items.Augments.AugmentItem;
-import com.mowmaster.ironpedestals.Items.Augments.AugmentType;
 import com.mowmaster.ironpedestals.Items.Storage.StoragePacketItem;
-import com.mowmaster.ironpedestals.Items.Tools.AugmentToolItem;
 import com.mowmaster.ironpedestals.Items.Tools.LinkingToolItem;
 import com.mowmaster.ironpedestals.Items.Tools.PedestalToolItem;
 import com.mowmaster.ironpedestals.Items.Upgrades.Pedestal.*;
@@ -124,37 +121,6 @@ public class ItemRegistry {
                             Identifier.withDefaultNamespace("container/slot/quartz")),
                     properties.rarity(Rarity.UNCOMMON)));
 
-    // ---- Augments (same ids as 1.20; the tiered speed / capacity / storage / range ones became pedestal tiers) ----
-    public static final DeferredItem<AugmentItem> AUGMENT_ROUNDROBIN = augment("augment_pedestal_roundrobin", AugmentType.ROUND_ROBIN);
-    public static final DeferredItem<AugmentItem> AUGMENT_RENDERDIFFUSER = augment("augment_pedestal_renderdiffuser", AugmentType.DIFFUSER);
-    public static final DeferredItem<AugmentItem> AUGMENT_NOCOLLIDE = augment("augment_pedestal_nocollide", AugmentType.COLLIDE);
-
-    // The augment tools, one per kind (ids tool_augments_<key>)
-    public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_ROUNDROBIN = registerAugmentTool(AugmentType.ROUND_ROBIN);
-    public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_DIFFUSER = registerAugmentTool(AugmentType.DIFFUSER);
-    public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_COLLIDE = registerAugmentTool(AugmentType.COLLIDE);
-
-    private static DeferredItem<AugmentItem> augment(String id, AugmentType type)
-    {
-        return PEDESTAL_ITEMS.registerItem(id, properties -> new AugmentItem(properties, type));
-    }
-
-    private static DeferredItem<AugmentToolItem> registerAugmentTool(AugmentType type)
-    {
-        return PEDESTAL_ITEMS.registerItem("tool_augments_" + type.key(), properties -> new AugmentToolItem(properties, type));
-    }
-
-    // The tool for an augment kind
-    public static Item augmentTool(AugmentType type)
-    {
-        return switch (type)
-        {
-            case ROUND_ROBIN -> TOOL_AUGMENTS_ROUNDROBIN.get();
-            case DIFFUSER -> TOOL_AUGMENTS_DIFFUSER.get();
-            case COLLIDE -> TOOL_AUGMENTS_COLLIDE.get();
-        };
-    }
-
     // For the creative tab, in display order (1.20's order)
     public static final List<DeferredItem<? extends Item>> UPGRADES = List.of(PEDESTAL_UPGRADE_BASE, PEDESTAL_UPGRADE_IMPORT,
             PEDESTAL_UPGRADE_EXPORT, PEDESTAL_UPGRADE_MAGNET, PEDESTAL_UPGRADE_BREAKER, PEDESTAL_UPGRADE_PLACER, PEDESTAL_UPGRADE_FILLER,
@@ -166,10 +132,6 @@ public class ItemRegistry {
             PEDESTAL_UPGRADE_UNPACKAGER, PEDESTAL_UPGRADE_CRAFTER, PEDESTAL_UPGRADE_SMELTER,
             PEDESTAL_UPGRADE_SMOKER, PEDESTAL_UPGRADE_BLASTER, PEDESTAL_UPGRADE_GENERATOR, PEDESTAL_UPGRADE_COBBLEGEN,
             PEDESTAL_UPGRADE_ENCHANTER, PEDESTAL_UPGRADE_ANVIL, PEDESTAL_UPGRADE_SACRIFICE, PEDESTAL_UPGRADE_REACTOR);
-
-    public static final List<DeferredItem<? extends Item>> AUGMENTS = List.of(AUGMENT_ROUNDROBIN, AUGMENT_RENDERDIFFUSER, AUGMENT_NOCOLLIDE);
-
-    public static final List<DeferredItem<? extends Item>> AUGMENT_TOOLS = List.of(TOOL_AUGMENTS_ROUNDROBIN, TOOL_AUGMENTS_DIFFUSER, TOOL_AUGMENTS_COLLIDE);
 
     // For the creative tab: MowLib's work cards, then Pedestals' own
     public static final List<DeferredItem<? extends Item>> WORKCARDS = List.of(MowLibItems.WORKCARD_BASE, MowLibItems.WORKCARD_AREA,

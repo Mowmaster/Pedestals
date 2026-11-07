@@ -1,8 +1,6 @@
 package com.mowmaster.ironpedestals.Menus;
 
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
-import com.mowmaster.ironpedestals.Items.Augments.AugmentItem;
-import com.mowmaster.ironpedestals.Items.Augments.AugmentType;
 import com.mowmaster.ironpedestals.Items.ItemRegistry;
 import com.mowmaster.ironpedestals.api.upgrade.IPedestalUpgrade;
 import com.mowmaster.mowlib.filter.ITransportFilter;
@@ -17,7 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Supplier;
 
 // The one-item slots of a pedestal besides its item storage, in the order the menu adds them: the upgrade, tool,
-// work card and filter, then the three augments. Each knows what may go in, how to read, put and take its item on
+// work card and filter (the augments are buttons now, see PedestalMenu#clickMenuButton). Each knows what may go in,
+// how to read, put and take its item on
 // the block entity (so inserting runs the same code as the offhand clicks: an upgrade's onAdded, the filter's
 // whitelist band...), and which item the screen shows faded in it while it's empty (the "ghost").
 public enum PedestalPart
@@ -25,10 +24,7 @@ public enum PedestalPart
     UPGRADE(() -> ItemRegistry.PEDESTAL_UPGRADE_BASE.get()),
     TOOL(() -> Items.IRON_PICKAXE),
     WORK_CARD(() -> MowLibItems.WORKCARD_BASE.get()),
-    FILTER(() -> MowLibItems.FILTER_BASE.get()),
-    ROUND_ROBIN(() -> ItemRegistry.AUGMENT_ROUNDROBIN.get()),
-    DIFFUSER(() -> ItemRegistry.AUGMENT_RENDERDIFFUSER.get()),
-    COLLIDE(() -> ItemRegistry.AUGMENT_NOCOLLIDE.get());
+    FILTER(() -> MowLibItems.FILTER_BASE.get());
 
     private final Supplier<ItemLike> ghost;
 
@@ -42,18 +38,6 @@ public enum PedestalPart
         return new ItemStack(ghost.get());
     }
 
-    // The augment kind for the three augment parts, null for the others
-    public @Nullable AugmentType augment()
-    {
-        return switch (this)
-        {
-            case ROUND_ROBIN -> AugmentType.ROUND_ROBIN;
-            case DIFFUSER -> AugmentType.DIFFUSER;
-            case COLLIDE -> AugmentType.COLLIDE;
-            default -> null;
-        };
-    }
-
     public boolean mayPlace(ItemStack stack)
     {
         if (stack.isEmpty()) return false;
@@ -63,7 +47,6 @@ public enum PedestalPart
             case TOOL -> BasePedestalBlockEntity.isAllowedTool(stack);
             case WORK_CARD -> stack.getItem() instanceof IWorkCard;
             case FILTER -> stack.getItem() instanceof ITransportFilter;
-            default -> stack.getItem() instanceof AugmentItem augment && augment.getType() == augment();
         };
     }
 
@@ -75,7 +58,6 @@ public enum PedestalPart
             case TOOL -> pedestal.getTool();
             case WORK_CARD -> pedestal.getWorkCard();
             case FILTER -> pedestal.getFilter();
-            default -> pedestal.getAugment(augment());
         };
     }
 
@@ -89,7 +71,6 @@ public enum PedestalPart
             case TOOL -> pedestal.removeTool();
             case WORK_CARD -> pedestal.removeWorkCard();
             case FILTER -> pedestal.removeFilter();
-            default -> pedestal.removeAugment(augment());
         };
     }
 
@@ -105,7 +86,6 @@ public enum PedestalPart
             case TOOL -> pedestal.insertTool(one);
             case WORK_CARD -> pedestal.insertWorkCard(one);
             case FILTER -> pedestal.insertFilter(one);
-            default -> pedestal.insertAugment(one);
         }
     }
 }

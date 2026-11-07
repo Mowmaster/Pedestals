@@ -9,9 +9,7 @@ import com.mowmaster.mowlib.util.CBPixelBox;
 import com.mowmaster.mowlib.workcard.IWorkCard;
 import com.mowmaster.ironpedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.ironpedestals.Menus.PedestalMenu;
-import com.mowmaster.ironpedestals.Items.Augments.AugmentItem;
 import com.mowmaster.ironpedestals.Items.ItemRegistry;
-import com.mowmaster.ironpedestals.Items.Tools.AugmentToolItem;
 import com.mowmaster.ironpedestals.Items.Tools.LinkingToolItem;
 import com.mowmaster.ironpedestals.api.upgrade.IPedestalUpgrade;
 import net.minecraft.core.BlockPos;
@@ -59,12 +57,13 @@ import java.util.List;
 import java.util.Map;
 
 // The pedestal: holds items, fluid, energy and experience (and add-on transport types), sends them down its links,
-// and takes an upgrade, a tool, a work card and augments. One block per tier (PedestalTier): the tier sets how fast
+// and takes an upgrade, a tool, a work card and augments (switched in its menu). One block per tier (PedestalTier): the tier sets how fast
 // and how much it moves, how much it holds, its range and its undyed colour.
 // Ported from 1.20: the colour now lives in the block entity (ITintHolder) instead of three blockstate properties,
 // so it can be any RGB colour and dyes mix like CrystalBlocks' blocks.
 // Controls (as in 1.20): right-click inserts the held item (buckets fill/empty the tank), left-click takes one out
 // (sneak: the whole stack). Empty hand: right-click shows the items, sneak + right-click shows everything else.
+// In the MAIN hand, right-click: a dye or the Color Palette colours it; anything else goes in.
 // In the OFFHAND, applied on right-click: a filter, an upgrade, a work card or a tool (each goes in), a dye, glowstone.
 // In the OFFHAND, applied on left-click (each takes its thing out): the filter tool, the upgrade tool, the tool
 // swapper (the tool), the work card tool, glowstone (the light).
@@ -212,6 +211,10 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         // The linking tool does its own thing (LinkingToolItem#useOn); PASS hands the click on to the item
         if (stack.getItem() instanceof LinkingToolItem) return InteractionResult.PASS;
 
+        // A dye, a Custom Dye or MowLib's Color Palette (its selected dye) in the main hand: colour the pedestal.
+        // IColorableBlock#dyeColorOf knows all three; tryDyeBlock mixes like leather armour and uses nothing up.
+        if (IColorableBlock.dyeColorOf(stack) != null) return tryDyeBlock(stack, state, level, pos, player, hitResult);
+
         ItemStack offhand = player.getOffhandItem();
 
         // Filter in the offhand: put it in (one filter per pedestal; the filter tool takes it out)
@@ -222,20 +225,6 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
                 if (pedestal.hasFilter()) return InteractionResult.FAIL;
                 StorageInteractions.insertFilter(player, pedestal);
             }
-            return InteractionResult.SUCCESS;
-        }
-
-        // Augment in the offhand: put it in (one of each kind)
-        if (offhand.getItem() instanceof AugmentItem && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
-        {
-            if (!level.isClientSide() && !pedestal.insertAugment(offhand)) return InteractionResult.FAIL;
-            return InteractionResult.SUCCESS;
-        }
-
-        // Augment tool in the main hand: what the pedestal has of that kind, in chat
-        if (stack.getItem() instanceof AugmentToolItem augmentTool && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
-        {
-            if (!level.isClientSide()) pedestal.describeAugment(augmentTool.getType()).forEach(player::sendSystemMessage);
             return InteractionResult.SUCCESS;
         }
 
@@ -349,13 +338,6 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
             {
                 if (pedestal.hasWorkCard()) giveToPlayer(player, pedestal.removeWorkCard());
                 else player.sendOverlayMessage(Component.translatable("ironpedestals.tool_workcard_missing"));
-                return;
-            }
-            // Augment tool: take that kind of augment out
-            if (offhand.getItem() instanceof AugmentToolItem augmentTool)
-            {
-                if (pedestal.hasAugment(augmentTool.getType())) giveToPlayer(player, pedestal.removeAugment(augmentTool.getType()));
-                else player.sendOverlayMessage(Component.translatable("ironpedestals.tool.augment." + augmentTool.getType().key() + "_not"));
                 return;
             }
         }
