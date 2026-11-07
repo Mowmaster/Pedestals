@@ -8,6 +8,7 @@ import com.mowmaster.mowlib.tint.ITintHolder;
 import com.mowmaster.mowlib.util.CBPixelBox;
 import com.mowmaster.mowlib.workcard.IWorkCard;
 import com.mowmaster.ironpedestals.Blocks.libBlockEntityRegistry;
+import com.mowmaster.ironpedestals.ClientSide.PedestalClientHooks;
 import com.mowmaster.ironpedestals.Items.Augments.AugmentItem;
 import com.mowmaster.ironpedestals.Items.ItemRegistry;
 import com.mowmaster.ironpedestals.Items.Tools.AugmentToolItem;
@@ -289,21 +290,20 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         return InteractionResult.PASS;
     }
 
-    // Empty main hand: items above the hotbar, or (sneaking) the other types in chat
+    // Empty main hand: the pedestal screen (items, upgrade, tool, work card, filter, augments, links; client only, it
+    // reads the synced block entity), or (sneaking) the fluid, energy and experience in chat
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult)
     {
-        if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)) return InteractionResult.SUCCESS;
-
-        if (player.isShiftKeyDown())
+        if (level.isClientSide())
         {
-            // Sneaking: fluid, energy, experience (and add-on types) in chat, one line each
-            pedestal.describeOtherContents().forEach(player::sendSystemMessage);
+            if (!player.isShiftKeyDown()) PedestalClientHooks.openPedestalScreen(pos);
+            return InteractionResult.SUCCESS;
         }
-        else
+        if (player.isShiftKeyDown() && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
         {
-            Component items = pedestal.describeItems();
-            if (items != null) player.sendOverlayMessage(items);
+            // Sneaking: tier, fluid, energy, experience (and add-on types), upgrade, tool and work card in chat
+            pedestal.describeOtherContents().forEach(player::sendSystemMessage);
         }
         return InteractionResult.SUCCESS;
     }

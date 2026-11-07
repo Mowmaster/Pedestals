@@ -161,5 +161,22 @@
   "ironpedestals.tool.augment.diffuser": "Has Particle & Render Augment",
   "ironpedestals.tool.augment.diffuser_not": "Does not have Particle & Render Augment",
   "ironpedestals.tool.augment.collide": "Has Collision Augment",
-  "ironpedestals.tool.augment.collide_not": "Does not have Collision Augment"
+  "ironpedestals.tool.augment.collide_not": "Does not have Collision Augment",
+  "ironpedestals.screen.pedestal": "Pedestal",
+  "ironpedestals.screen.tier": " (Tier %s)",
+  "ironpedestals.screen.items": "Items",
+  "ironpedestals.screen.upgrade": "Upgrade",
+  "ironpedestals.screen.tool": "Tool",
+  "ironpedestals.screen.workcard": "Work Card",
+  "ironpedestals.screen.filter": "Filter",
+  "ironpedestals.screen.augment_roundrobin": "Round Robin",
+  "ironpedestals.screen.augment_diffuser": "Render",
+  "ironpedestals.screen.augment_collide": "Collision",
+  "ironpedestals.screen.links": "Linked Pedestals (%s/%s)",
+  "ironpedestals.screen.no_links": "No links (use a Linking Tool)",
+  "ironpedestals.screen.unloaded": "Not loaded",
+  "ironpedestals.screen.link_at": "%s, %s, %s (%s blocks)",
+  "ironpedestals.screen.outline_show": "Click: outline it in the world",
+  "ironpedestals.screen.outline_hide": "Click: hide its outline",
+  "ironpedestals.screen.empty": "%s: empty"
 }
