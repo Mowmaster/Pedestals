@@ -14,6 +14,16 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import com.mowmaster.ironpedestals.Transport.PedestalFluidStorage;
+import com.mowmaster.mowlib.storage.StorageInteractions;
+import com.mowmaster.mowlib.transport.FluidTransportType;
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // The pedestal's menu (empty-hand right-click): its item stacks, the upgrade / tool / filter / work card slots, and
 // the player's inventory (the three augments are buttons the screen draws at AUGMENTS_X, see clickMenuButton). Server and client each build one: the server's from the block
@@ -124,6 +134,8 @@ public class PedestalMenu extends AbstractContainerMenu
     // 0-2 switch that augment (AugmentType order) on or off, CYCLE_DIFFUSER picks the particle & render augment's
     // next mode. This runs on the server, which checks the id.
     public static final int CYCLE_DIFFUSER = 10;
+    // FLUID_TANK + n: the cursor's bucket / tank used on fluid tank n (fill it or empty it)
+    public static final int FLUID_TANK = 100;
 
     @Override
     public boolean clickMenuButton(Player player, int id)
@@ -139,7 +151,43 @@ public class PedestalMenu extends AbstractContainerMenu
             pedestal.cycleDiffuserMode();
             return true;
         }
+        if (id >= FLUID_TANK && id < FLUID_TANK + 64) return useFluidContainer(player, id - FLUID_TANK);
         return false;
+    }
+
+    // The item on the cursor (a bucket, a tank...) used on one fluid tank: a full one empties into it, otherwise the
+    // tank's fluid fills it. MowLib's cursorAccess lets the item change in place (bucket -> water bucket), and the
+    // menu sends the new cursor item to the client. Server only.
+    private boolean useFluidContainer(Player player, int tank)
+    {
+        if (getCarried().isEmpty() || !(pedestal.getStorage(TransportTypes.FLUIDS.get()) instanceof PedestalFluidStorage tanks)) return false;
+        if (tank < 0 || tank >= tanks.size()) return false;
+        FluidTransportType fluids = TransportTypes.FLUIDS.get();
+        ResourceHandler<FluidResource> item = fluids.getItemHandler(StorageInteractions.cursorAccess(player));
+        if (item == null) return false;
+        // Just this tank (NeoForge's RangedResourceHandler view), so the fluid goes in or comes out of the one clicked
+        ResourceHandler<FluidResource> tankHandler = tanks.tank(tank);
+        if (StorageInteractions.move(fluids, item, tankHandler, Integer.MAX_VALUE) > 0) return true;
+        return StorageInteractions.move(fluids, tankHandler, item, Integer.MAX_VALUE) > 0;
+    }
+
+    // ---- Gauges for the other storages ----
+
+    // One gauge: a type's storage, and which of its slots (fluids: one gauge per tank; amount types like energy and
+    // experience have one). TransportType<?>: the gauge works for any type, the screen reads it generically.
+    public record Gauge(TransportType<?> type, int index) {}
+
+    // Every storage but items, in registry order: each fluid tank, energy, experience, then add-on types
+    public List<Gauge> gauges()
+    {
+        List<Gauge> gauges = new ArrayList<>();
+        for (TransportType<?> type : TransportTypes.REGISTRY)
+        {
+            if (type == TransportTypes.ITEMS.get()) continue;
+            int slots = pedestal.getStorage(type).size();
+            for (int index = 0; index < slots; index++) gauges.add(new Gauge(type, index));
+        }
+        return gauges;
     }
 
     // ---- Shift-click ----

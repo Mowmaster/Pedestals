@@ -171,5 +171,6 @@
   "ironpedestals.screen.augment.collide": "Collision Augment: import, magnet and void upgrades also act on what touches the pedestal",
   "ironpedestals.screen.augment_on": "On (click to switch off)",
   "ironpedestals.screen.augment_off": "Off (click to switch on)",
-  "ironpedestals.screen.augment_mode_hint": "Right-click: next mode"
+  "ironpedestals.screen.augment_mode_hint": "Right-click: next mode",
+  "ironpedestals.screen.fluid_hint": "Click with a bucket or tank: empty it in, or fill it"
 }

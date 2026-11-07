@@ -9,7 +9,14 @@ import com.mowmaster.ironpedestals.Menus.PedestalLinkPayload;
 import com.mowmaster.ironpedestals.Menus.PedestalMenu;
 import com.mowmaster.ironpedestals.Menus.PedestalSlots;
 import com.mowmaster.mowlib.MowLibReferences;
+import com.mowmaster.mowlib.client.MowLibClientParticles;
 import com.mowmaster.mowlib.client.SlotGrid;
+import com.mowmaster.mowlib.transport.TransportStorage;
+import com.mowmaster.mowlib.transport.TransportType;
+import com.mowmaster.mowlib.transport.TransportTypes;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -21,6 +28,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.resource.Resource;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -63,6 +72,14 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
     private static final int LINK_ROWS_SHOWN = 12;
     private static final int LINKS_HEIGHT = PAD * 2 + LINE + 2 + LINK_ROWS_SHOWN * LINK_ROW;
 
+    // Gauges for the other storages (fluid tanks, energy, experience...), in a column right of the item stacks
+    private static final int GAUGE_WIDTH = 10;
+    private static final int GAUGE_STEP = 12;
+    private static final int GAUGE_HEIGHT = PedestalMenu.ROWS * 18;
+    private static final int TICK = 0x993B2A1A;
+
+    // The left paper's width: the menu's, plus the gauge column
+    private final int mainWidth;
     private int linkScroll;
     // The rows drawn last frame (for clicks and tooltips)
     private final List<LinkRow> shownLinks = new ArrayList<>();
@@ -73,7 +90,8 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
     public PedestalScreen(PedestalMenu menu, Inventory inventory, Component title)
     {
         // The image is both papers side by side, so vanilla centres the pair
-        super(menu, inventory, title, PedestalMenu.WIDTH + GAP + LINKS_WIDTH, PedestalMenu.HEIGHT);
+        super(menu, inventory, title, mainWidth(menu) + GAP + LINKS_WIDTH, PedestalMenu.HEIGHT);
+        this.mainWidth = mainWidth(menu);
         inventoryLabelY = PedestalMenu.INVENTORY_Y - 11;
     }
 
@@ -82,9 +100,17 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
         return menu.getPedestal();
     }
 
+    // The left paper is wider by one gauge per tank / amount storage (worked out once: a storage that changes size
+    // closes the menu anyway). Static: it's needed before super() has run.
+    private static int mainWidth(PedestalMenu menu)
+    {
+        int gauges = menu.gauges().size();
+        return gauges == 0 ? PedestalMenu.WIDTH : PedestalMenu.WIDTH + gauges * GAUGE_STEP + 2;
+    }
+
     private int linksLeft()
     {
-        return leftPos + PedestalMenu.WIDTH + GAP;
+        return leftPos + mainWidth + GAP;
     }
 
     // ---- Drawing ----
@@ -94,7 +120,7 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
     {
         super.extractBackground(graphics, mouseX, mouseY, partialTick);
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PAPER, leftPos, topPos, PedestalMenu.WIDTH, PedestalMenu.HEIGHT);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PAPER, leftPos, topPos, mainWidth, PedestalMenu.HEIGHT);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PAPER, linksLeft(), topPos, LINKS_WIDTH, LINKS_HEIGHT);
 
         for (Slot slot : menu.slots)
@@ -111,7 +137,96 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
             }
         }
         extractAugmentButtons(graphics);
+        extractGauges(graphics);
         extractLinks(graphics);
+    }
+
+    // ---- Gauges ----
+
+    private int gaugeX(int index)
+    {
+        return leftPos + PedestalMenu.WIDTH - 2 + index * GAUGE_STEP;
+    }
+
+    private int gaugeY()
+    {
+        return topPos + PedestalMenu.ITEMS_Y - 1;
+    }
+
+    // The gauge under the point, or -1
+    private int gaugeAt(double mouseX, double mouseY)
+    {
+        if (mouseY < gaugeY() || mouseY >= gaugeY() + GAUGE_HEIGHT) return -1;
+        List<PedestalMenu.Gauge> gauges = menu.gauges();
+        for (int index = 0; index < gauges.size(); index++)
+        {
+            if (mouseX >= gaugeX(index) && mouseX < gaugeX(index) + GAUGE_WIDTH) return index;
+        }
+        return -1;
+    }
+
+    private void extractGauges(GuiGraphicsExtractor graphics)
+    {
+        List<PedestalMenu.Gauge> gauges = menu.gauges();
+        for (int index = 0; index < gauges.size(); index++) extractGauge(graphics, gauges.get(index).type(), gauges.get(index).index(), gaugeX(index), gaugeY());
+    }
+
+    // One gauge: a framed column, filled from the bottom as far as the storage is full (a fluid shows its own
+    // texture and tint, other types their colour), with tick marks every eighth (longer at the quarters and half).
+    // A generic helper so the storage's resource and the type agree on R (see BasePedestalBlockEntity#send).
+    private <R extends Resource> void extractGauge(GuiGraphicsExtractor graphics, TransportType<R> type, int index, int x, int y)
+    {
+        TransportStorage<R> storage = pedestal().getStorage(type);
+        graphics.fill(x, y, x + GAUGE_WIDTH, y + GAUGE_HEIGHT, SLOT_BORDER);
+        graphics.fill(x + 1, y + 1, x + GAUGE_WIDTH - 1, y + GAUGE_HEIGHT - 1, SLOT_FILL);
+        if (index >= storage.size()) return;
+        R resource = storage.getResource(index);
+        long amount = storage.getAmountAsLong(index);
+        long capacity = storage.getCapacityAsLong(index, resource);
+        int inner = GAUGE_HEIGHT - 2;
+        int filled = capacity <= 0 || amount <= 0 ? 0 : (int) Math.max(1, Math.min(inner, amount * inner / capacity));
+        if (filled > 0)
+        {
+            int top = y + 1 + inner - filled;
+            if (resource instanceof FluidResource fluid) extractFluid(graphics, fluid, x + 1, top, GAUGE_WIDTH - 2, filled);
+            else graphics.fill(x + 1, top, x + GAUGE_WIDTH - 1, y + 1 + inner, 0xFF000000 | type.getRgb());
+        }
+        for (int tick = 1; tick < 8; tick++)
+        {
+            int tickY = y + 1 + inner - inner * tick / 8;
+            int length = tick == 4 ? 6 : tick % 2 == 0 ? 4 : 2;
+            graphics.fill(x + 1, tickY, x + 1 + length, tickY + 1, TICK);
+        }
+    }
+
+    // A fluid's still texture (from its block model, the same sprite the world uses), tinted the way NeoForge tints it
+    // in buckets (MowLib's fluidColor; -1 = untinted, like lava), stacked in squares up the column
+    private static void extractFluid(GuiGraphicsExtractor graphics, FluidResource fluid, int x, int y, int width, int height)
+    {
+        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getFluidStateModelSet()
+                .get(fluid.getFluid().defaultFluidState()).stillMaterial().sprite();
+        int tint = MowLibClientParticles.fluidColor(fluid);
+        int color = tint == -1 ? 0xFFFFFFFF : 0xFF000000 | tint;
+        for (int drawn = 0; drawn < height; drawn += width)
+        {
+            int piece = Math.min(width, height - drawn);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y + height - drawn - piece, width, piece, color);
+        }
+    }
+
+    // The hover text: "Water: 1000 mB / 32000 mB", or the type's name with 0 / capacity when empty
+    private <R extends Resource> List<Component> gaugeTooltip(TransportType<R> type, int index)
+    {
+        TransportStorage<R> storage = pedestal().getStorage(type);
+        List<Component> lines = new ArrayList<>();
+        if (index >= storage.size()) return lines;
+        R resource = storage.getResource(index);
+        long amount = storage.getAmountAsLong(index);
+        long capacity = storage.getCapacityAsLong(index, resource);
+        lines.add(amount > 0 ? type.describeStored(resource, amount, capacity)
+                : Component.empty().append(type.getName()).append(": " + type.amountText(0) + " / " + type.amountText(capacity)));
+        if (type == TransportTypes.FLUIDS.get()) lines.add(Component.translatable(MODID + ".screen.fluid_hint").withStyle(ChatFormatting.GRAY));
+        return lines;
     }
 
     // ---- Augment buttons ----
@@ -256,6 +371,11 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
                     : List.of(Component.translatable(MODID + key), Component.translatable(MODID + ".screen.unloaded"));
             graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
         }
+        else if (gaugeAt(mouseX, mouseY) >= 0 && menu.getCarried().isEmpty())
+        {
+            PedestalMenu.Gauge gauge = menu.gauges().get(gaugeAt(mouseX, mouseY));
+            graphics.setTooltipForNextFrame(font, gaugeTooltip(gauge.type(), gauge.index()), Optional.empty(), mouseX, mouseY);
+        }
         else if (augmentAt(mouseX, mouseY) != null)
         {
             AugmentType type = augmentAt(mouseX, mouseY);
@@ -295,6 +415,18 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
         // Augment buttons: left-click switches it on/off, right-click on the particle & render one changes its mode.
         // The server does it (vanilla's menu button message, PedestalMenu#clickMenuButton); the screen shows the
         // result when the pedestal's update arrives.
+        // A fluid gauge clicked with something on the cursor: the server fills or empties it (a bucket, a tank...)
+        int gauge = gaugeAt(event.x(), event.y());
+        if (gauge >= 0)
+        {
+            PedestalMenu.Gauge clicked = menu.gauges().get(gauge);
+            if (clicked.type() == TransportTypes.FLUIDS.get() && !menu.getCarried().isEmpty())
+            {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, PedestalMenu.FLUID_TANK + clicked.index());
+            }
+            return true;
+        }
+
         AugmentType augment = augmentAt(event.x(), event.y());
         if (augment != null)
         {
