@@ -4,165 +4,129 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.ironpedestals.Config;
 import com.mowmaster.ironpedestals.IronPedestalReferences;
-import com.mowmaster.ironpedestals.Items.Augments.AugmentType;
-import com.mowmaster.ironpedestals.api.upgrade.IPedestalUpgrade;
+import com.mowmaster.ironpedestals.Menus.PedestalMenu;
+import com.mowmaster.ironpedestals.Menus.PedestalSlots;
 import com.mowmaster.mowlib.MowLibReferences;
 import com.mowmaster.mowlib.client.SlotGrid;
-import com.mowmaster.mowlib.transport.TransportStorage;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemUtil;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
-// What's in a pedestal, on MowLib's reading paper (empty-hand right-click opens it; see BasePedestalBlock):
-//   the item stacks; the upgrade, tool, work card (when the upgrade uses one) and filter; the three augments; and the
-//   linked pedestals, each with a toggle that outlines it in the world (PedestalOutlines).
-// It only shows things (nothing can be taken out here), so there's no menu or packets: the client's copy of the block
-// entity already has everything (BasePedestalBlockEntity#getUpdateTag), and it's read again every frame so the
-// screen stays current. It closes when the pedestal is gone or the player walks away.
-public class PedestalScreen extends Screen
+// The pedestal's menu screen (PedestalMenu), on MowLib's reading paper:
+//   left paper  - the pedestal's item stacks (pages of 27 past the first 27: click the arrows or use the mouse
+//                 wheel), the upgrade / tool / filter / work card slots and the three augment slots (empty ones show
+//                 their item faded: a "ghost"), and the player's inventory
+//   right paper - the linked pedestals, each with a toggle that outlines it in the world (PedestalOutlines)
+// Slots, clicks, shift-clicks and dragging are vanilla's (AbstractContainerScreen); this only draws the paper,
+// slot frames, ghosts and the link list, and handles the link toggles and page turning.
+public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
 {
     private static final String MODID = IronPedestalReferences.MODID;
     // MowLib's GUI sprite (textures/gui/sprites/reading_paper.png, nine-sliced by its .png.mcmeta)
     private static final Identifier PAPER = MowLibReferences.id("reading_paper");
-    // Ink on paper (0xAARRGGBB): the reading HUD's dark brown, and a faded one for empty things
+    // Ink on paper (0xAARRGGBB): the reading HUD's dark brown, and a faded one
     private static final int INK = 0xFF3B2A1A;
     private static final int FADED_INK = 0x993B2A1A;
-    // Slots on paper: a tan border, a slightly darker cream than the paper inside
+    // Slots on paper: a tan border, a slightly darker cream inside; the ghost is faded with the slot colour
     private static final int SLOT_BORDER = 0xFFA08A5E;
     private static final int SLOT_FILL = 0xFFDCCCA0;
-    private static final int HOVER = 0x80FFFFFF;
+    private static final int GHOST_FADE = 0xB0DCCCA0;
 
-    private static final int PAD = 10;
-    private static final int SLOT = SlotGrid.SLOT;
-    private static final int COLUMNS = 9;
-    // One labelled slot (upgrade, tool...): the caption above, the slot under it, this wide
-    private static final int CELL = 58;
+    private static final int GAP = 4;
+    private static final int LINKS_WIDTH = 150;
+    private static final int PAD = 8;
     private static final int LINE = 10;
     private static final int LINK_ROW = 12;
-    private static final int LINK_ROWS_SHOWN = 6;
-    private static final int PAPER_WIDTH = PAD * 2 + CELL * 4;
-    private static final double MAX_DISTANCE_SQR = 10 * 10;
+    private static final int LINK_ROWS_SHOWN = 12;
+    private static final int LINKS_HEIGHT = PAD * 2 + LINE + 2 + LINK_ROWS_SHOWN * LINK_ROW;
 
-    private final BlockPos pos;
-    // Worked out while drawing, for clicks and scrolling
-    private int left;
-    private int linksTop;
     private int linkScroll;
     private final List<BlockPos> shownLinks = new ArrayList<>();
 
-    public PedestalScreen(BlockPos pos)
+    public PedestalScreen(PedestalMenu menu, Inventory inventory, Component title)
     {
-        super(Component.translatable(MODID + ".screen.pedestal"));
-        this.pos = pos.immutable();
+        // The image is both papers side by side, so vanilla centres the pair
+        super(menu, inventory, title, PedestalMenu.WIDTH + GAP + LINKS_WIDTH, PedestalMenu.HEIGHT);
+        inventoryLabelY = PedestalMenu.INVENTORY_Y - 11;
     }
 
-    // Screens are set on the Gui since 26.2 (Minecraft#gui)
-    public static void open(BlockPos pos)
+    private BasePedestalBlockEntity pedestal()
     {
-        Minecraft.getInstance().gui.setScreen(new PedestalScreen(pos));
+        return menu.getPedestal();
     }
 
-    // The game keeps running behind it, so the contents update while it's open
+    private int linksLeft()
+    {
+        return leftPos + PedestalMenu.WIDTH + GAP;
+    }
+
+    // ---- Drawing ----
+
+    // Under the slots: the papers, the slot frames, the ghosts and the link list
     @Override
-    public boolean isPauseScreen()
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
     {
-        return false;
-    }
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PAPER, leftPos, topPos, PedestalMenu.WIDTH, PedestalMenu.HEIGHT);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PAPER, linksLeft(), topPos, LINKS_WIDTH, LINKS_HEIGHT);
 
-    private @Nullable BasePedestalBlockEntity pedestal()
-    {
-        Level level = minecraft.level;
-        return level != null && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal ? pedestal : null;
-    }
-
-    @Override
-    public void tick()
-    {
-        super.tick();
-        if (pedestal() == null || minecraft.player == null || minecraft.player.distanceToSqr(Vec3.atCenterOf(pos)) > MAX_DISTANCE_SQR) onClose();    }
-
-    // ---- Drawing (every frame) ----
-
-    @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
-    {
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
-        BasePedestalBlockEntity pedestal = pedestal();
-        if (pedestal == null) return;
-
-        TransportStorage<ItemResource> items = pedestal.getItemStorage();
-        int itemRows = SlotGrid.rows(items.size(), COLUMNS);
-        List<BlockPos> links = pedestal.getLinks();
-        int linkRows = Math.min(LINK_ROWS_SHOWN, Math.max(1, links.size()));
-        int height = PAD + LINE + 4                         // title
-                + LINE + itemRows * SLOT + 6                // items
-                + LINE + SLOT + 6                           // upgrade, tool, work card, filter
-                + LINE + SLOT + 6                           // augments
-                + LINE + linkRows * LINK_ROW + PAD;         // links
-        left = width / 2 - PAPER_WIDTH / 2;
-        int top = Math.max(4, this.height / 2 - height / 2);
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PAPER, left, top, PAPER_WIDTH, height);
-
-        int y = top + PAD;
-        // Title: the block's name (Copper Pedestal...) and its tier
-        Component title = pedestal.getBlockState().getBlock().getName().copy()
-                .append(Component.translatable(MODID + ".screen.tier", pedestal.getTier().tier()));
-        inkCentred(graphics, title, width / 2, y, INK);
-        y += LINE + 4;
-
-        // Item stacks, rows of 9, centred. The count can be past 99 (big stack slots), so it's written separately.
-        graphics.text(font, Component.translatable(MODID + ".screen.items"), left + PAD, y, INK, false);
-        y += LINE;
-        int gridLeft = width / 2 - COLUMNS * SLOT / 2;
-        for (int index = 0; index < items.size(); index++)
+        for (Slot slot : menu.slots)
         {
-            int x = SlotGrid.slotX(gridLeft, index, COLUMNS);
-            int slotY = SlotGrid.slotY(y, index, COLUMNS, 0);
-            ItemStack stack = ItemUtil.getStack(items, index);
-            drawSlot(graphics, stack, x, slotY, stack.getCount(), mouseX, mouseY, null);
+            if (!slot.isActive()) continue;
+            // A slot's x/y is where its item goes; the frame is one pixel further out
+            int x = leftPos + slot.x - 1;
+            int y = topPos + slot.y - 1;
+            SlotGrid.slot(graphics, x, y, SLOT_BORDER, SLOT_FILL);
+            if (slot instanceof PedestalSlots.Part part && !slot.hasItem())
+            {
+                graphics.item(part.getPart().ghost(), x + 1, y + 1);
+                SlotGrid.fill(graphics, x, y, GHOST_FADE);
+            }
         }
-        y += itemRows * SLOT + 6;
+        extractLinks(graphics);
+    }
 
-        // Upgrade, tool, work card (only if the upgrade uses one, or one is in), filter
-        ItemStack upgrade = pedestal.getUpgrade();
-        boolean usesCard = upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade && pedestalUpgrade.getWorkCardType(upgrade) != null;
-        List<Cell> parts = new ArrayList<>();
-        parts.add(new Cell("upgrade", upgrade));
-        parts.add(new Cell("tool", pedestal.getTool()));
-        if (usesCard || pedestal.hasWorkCard()) parts.add(new Cell("workcard", pedestal.getWorkCard()));
-        parts.add(new Cell("filter", pedestal.getFilter()));
-        drawCells(graphics, parts, y, mouseX, mouseY);
-        y += LINE + SLOT + 6;
+    // The labels, relative to the left paper's corner: the title and tier, the page (when there's more than one),
+    // "Inventory". text(..., false): no drop shadow (ink has none).
+    @Override
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
+    {
+        Component heading = title.copy().append(Component.translatable(MODID + ".screen.tier", pedestal().getTier().tier()));
+        graphics.text(font, heading, titleLabelX, titleLabelY, INK, false);
+        graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, INK, false);
+        if (menu.getPageCount() > 1)
+        {
+            String page = "< " + (menu.getPage() + 1) + "/" + menu.getPageCount() + " >";
+            graphics.text(font, page, PedestalMenu.WIDTH - PAD - font.width(page), titleLabelY, FADED_INK, false);
+        }
+    }
 
-        // The augments left after the tiers: round robin, particle & render, collision
-        List<Cell> augments = new ArrayList<>();
-        for (AugmentType type : AugmentType.values()) augments.add(new Cell("augment_" + type.key(), pedestal.getAugment(type)));
-        drawCells(graphics, augments, y, mouseX, mouseY);
-        y += LINE + SLOT + 6;
-
-        // Linked pedestals, with a toggle each for its outline
-        graphics.text(font, Component.translatable(MODID + ".screen.links", links.size(), Config.MAX_LINKS.getAsInt()), left + PAD, y, INK, false);
-        y += LINE;
-        linksTop = y;
+    // The link list on the right paper: a toggle box (the outline's colour when on) and where each link is
+    private void extractLinks(GuiGraphicsExtractor graphics)
+    {
+        Level level = pedestal().getLevel();
+        List<BlockPos> links = pedestal().getLinks();
+        int left = linksLeft() + PAD;
+        int y = topPos + PAD;
+        graphics.text(font, Component.translatable(MODID + ".screen.links", links.size(), Config.MAX_LINKS.getAsInt()), left, y, INK, false);
+        y += LINE + 2;
         linkScroll = Math.clamp(linkScroll, 0, Math.max(0, links.size() - LINK_ROWS_SHOWN));
         shownLinks.clear();
-        if (links.isEmpty())
+        if (links.isEmpty() || level == null)
         {
-            graphics.text(font, Component.translatable(MODID + ".screen.no_links"), left + PAD, y + 2, FADED_INK, false);
+            graphics.textWithWordWrap(font, Component.translatable(MODID + ".screen.no_links"), left, y, LINKS_WIDTH - PAD * 2, FADED_INK, false);
             return;
         }
         for (int row = 0; row < LINK_ROWS_SHOWN && linkScroll + row < links.size(); row++)
@@ -171,96 +135,90 @@ public class PedestalScreen extends Screen
             BlockPos link = links.get(index);
             shownLinks.add(link);
             int rowY = y + row * LINK_ROW;
-            boolean on = PedestalOutlines.isShown(minecraft.level.dimension(), link);
-            // The toggle: a box, filled with the outline's colour when on
-            int boxX = left + PAD;
-            graphics.fill(boxX, rowY + 1, boxX + 9, rowY + 10, SLOT_BORDER);
-            graphics.fill(boxX + 1, rowY + 2, boxX + 8, rowY + 9, on ? PedestalOutlines.colorFor(index) : SLOT_FILL);
-            // What's there and where, and how far
-            Component name = minecraft.level.isLoaded(link) ? minecraft.level.getBlockState(link).getBlock().getName() : Component.translatable(MODID + ".screen.unloaded");
-            int distance = (int) Math.round(Math.sqrt(link.distSqr(pos)));
-            Component where = Component.translatable(MODID + ".screen.link_at", link.getX(), link.getY(), link.getZ(), distance);
-            Component text = Component.empty().append(name).append(" ").append(where);
-            // Too wide for the paper (long names, big coordinates): just where it is
-            if (font.width(text) > PAPER_WIDTH - PAD * 2 - 14) text = where;
-            graphics.text(font, text, boxX + 14, rowY + 2, INK, false);
-            if (overLinkRow(row, mouseX, mouseY)) graphics.setTooltipForNextFrame(font, Component.translatable(MODID + (on ? ".screen.outline_hide" : ".screen.outline_show")), mouseX, mouseY);
+            boolean on = PedestalOutlines.isShown(level.dimension(), link);
+            graphics.fill(left, rowY, left + 9, rowY + 9, SLOT_BORDER);
+            graphics.fill(left + 1, rowY + 1, left + 8, rowY + 8, on ? PedestalOutlines.colorFor(index) : SLOT_FILL);
+            int distance = (int) Math.round(Math.sqrt(link.distSqr(pedestal().getBlockPos())));
+            graphics.text(font, Component.translatable(MODID + ".screen.link_at", link.getX(), link.getY(), link.getZ(), distance), left + 13, rowY + 1, INK, false);
         }
-        if (links.size() > LINK_ROWS_SHOWN)
+    }
+
+    // On top of everything: tooltips for the link rows and the empty part slots (vanilla does the items' own)
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
+    {
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+        Level level = pedestal().getLevel();
+        int row = linkRowAt(mouseX, mouseY);
+        if (row >= 0 && level != null)
         {
-            String more = (linkScroll + 1) + "-" + (linkScroll + shownLinks.size()) + "/" + links.size();
-            graphics.text(font, more, left + PAPER_WIDTH - PAD - font.width(more), linksTop - LINE, FADED_INK, false);
+            BlockPos link = shownLinks.get(row);
+            Component name = level.isLoaded(link) ? level.getBlockState(link).getBlock().getName() : Component.translatable(MODID + ".screen.unloaded");
+            boolean on = PedestalOutlines.isShown(level.dimension(), link);
+            graphics.setTooltipForNextFrame(font, List.of(name, Component.translatable(MODID + (on ? ".screen.outline_hide" : ".screen.outline_show"))),
+                    Optional.empty(), mouseX, mouseY);
         }
-    }
-
-    // A caption over a slot, for each cell, spread across the paper
-    private void drawCells(GuiGraphicsExtractor graphics, List<Cell> cells, int y, int mouseX, int mouseY)
-    {
-        int cellsLeft = width / 2 - cells.size() * CELL / 2;
-        for (int index = 0; index < cells.size(); index++)
+        else if (hoveredSlot instanceof PedestalSlots.Part part && !part.hasItem() && menu.getCarried().isEmpty())
         {
-            Cell cell = cells.get(index);
-            int centre = cellsLeft + index * CELL + CELL / 2;
-            Component caption = Component.translatable(MODID + ".screen." + cell.key());
-            inkCentred(graphics, caption, centre, y, cell.stack().isEmpty() ? FADED_INK : INK);
-            drawSlot(graphics, cell.stack(), centre - SLOT / 2, y + LINE, cell.stack().getCount(), mouseX, mouseY, caption);
+            // ironpedestals.screen.slot.<part>: what goes in it
+            graphics.setTooltipForNextFrame(font, Component.translatable(MODID + ".screen.slot." + part.getPart().name().toLowerCase(Locale.ROOT)), mouseX, mouseY);
         }
     }
 
-    // Text centred on x, without a drop shadow (ink has none; centeredText always draws one)
-    private void inkCentred(GuiGraphicsExtractor graphics, Component text, int x, int y, int color)
+    // ---- Clicks and scrolling ----
+
+    // The link row under the point, or -1
+    private int linkRowAt(double mouseX, double mouseY)
     {
-        graphics.text(font, text, x - font.width(text) / 2, y, color, false);
+        int left = linksLeft() + PAD;
+        int top = topPos + PAD + LINE + 2;
+        if (mouseX < left || mouseX >= linksLeft() + LINKS_WIDTH - PAD || mouseY < top) return -1;
+        int row = (int) ((mouseY - top) / LINK_ROW);
+        return row < shownLinks.size() ? row : -1;
     }
 
-    // One slot with its item; the item's tooltip (or, when empty, what goes there) under the mouse
-    private void drawSlot(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y, long amount, int mouseX, int mouseY, @Nullable Component emptyName)
-    {
-        SlotGrid.slot(graphics, x, y, SLOT_BORDER, SLOT_FILL);
-        SlotGrid.item(graphics, font, stack, x, y, amount);
-        if (mouseX < x || mouseX >= x + SLOT || mouseY < y || mouseY >= y + SLOT) return;
-        SlotGrid.fill(graphics, x, y, HOVER);
-        if (!stack.isEmpty()) graphics.setTooltipForNextFrame(font, stack, mouseX, mouseY);
-        else if (emptyName != null) graphics.setTooltipForNextFrame(font, Component.translatable(MODID + ".screen.empty", emptyName), mouseX, mouseY);
-    }
-
-    private boolean overLinkRow(int row, double mouseX, double mouseY)
-    {
-        int rowY = linksTop + row * LINK_ROW;
-        return mouseX >= left + PAD && mouseX < left + PAPER_WIDTH - PAD && mouseY >= rowY && mouseY < rowY + LINK_ROW;
-    }
-
-    // ---- Clicking and scrolling ----
-
-    // A left click on a link row toggles its outline
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
         // Since 26.3 mouse buttons use SDL's numbers, so compare with InputConstants rather than 0
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && minecraft.level != null)
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT)
         {
-            for (int row = 0; row < shownLinks.size(); row++)
+            Level level = pedestal().getLevel();
+            int row = linkRowAt(event.x(), event.y());
+            if (row >= 0 && level != null)
             {
-                if (!overLinkRow(row, event.x(), event.y())) continue;
-                PedestalOutlines.toggle(minecraft.level.dimension(), shownLinks.get(row), PedestalOutlines.colorFor(linkScroll + row));
+                PedestalOutlines.toggle(level.dimension(), shownLinks.get(row), PedestalOutlines.colorFor(linkScroll + row));
+                return true;
+            }
+            // The page label "< 1/2 >": its left part goes back, its right part forward
+            if (menu.getPageCount() > 1 && event.y() >= topPos + titleLabelY - 2 && event.y() < topPos + titleLabelY + 10
+                    && event.x() >= leftPos + PedestalMenu.WIDTH / 2 && event.x() < leftPos + PedestalMenu.WIDTH)
+            {
+                menu.setPage(menu.getPage() + (event.x() < leftPos + PedestalMenu.WIDTH - PAD - 20 ? -1 : 1));
                 return true;
             }
         }
         return super.mouseClicked(event, doubleClick);
     }
 
-    // The mouse wheel scrolls the link list when there are more than fit
+    // The wheel scrolls the link list (over the right paper) or turns item pages (over the items)
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY)
     {
         if (scrollY != 0)
         {
-            linkScroll -= (int) Math.signum(scrollY);
-            return true;
+            int step = (int) -Math.signum(scrollY);
+            if (mouseX >= linksLeft())
+            {
+                linkScroll += step;
+                return true;
+            }
+            if (menu.getPageCount() > 1 && mouseY < topPos + PedestalMenu.PARTS_Y)
+            {
+                menu.setPage(menu.getPage() + step);
+                return true;
+            }
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
-
-    // A captioned slot: its lang key (ironpedestals.screen.<key>) and what's in it
-    private record Cell(String key, ItemStack stack) {}
 }

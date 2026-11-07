@@ -8,7 +8,7 @@ import com.mowmaster.mowlib.tint.ITintHolder;
 import com.mowmaster.mowlib.util.CBPixelBox;
 import com.mowmaster.mowlib.workcard.IWorkCard;
 import com.mowmaster.ironpedestals.Blocks.libBlockEntityRegistry;
-import com.mowmaster.ironpedestals.ClientSide.PedestalClientHooks;
+import com.mowmaster.ironpedestals.Menus.PedestalMenu;
 import com.mowmaster.ironpedestals.Items.Augments.AugmentItem;
 import com.mowmaster.ironpedestals.Items.ItemRegistry;
 import com.mowmaster.ironpedestals.Items.Tools.AugmentToolItem;
@@ -23,6 +23,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -290,20 +291,23 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         return InteractionResult.PASS;
     }
 
-    // Empty main hand: the pedestal screen (items, upgrade, tool, work card, filter, augments, links; client only, it
-    // reads the synced block entity), or (sneaking) the fluid, energy and experience in chat
+    // Empty main hand: the pedestal's menu (its stacks, upgrade, tool, filter, work card, augments, links, and the
+    // player's inventory), or (sneaking) the fluid, energy and experience in chat. Menus are opened by the server;
+    // openMenu(provider, pos) also sends the position, so the client's menu finds the same pedestal.
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult)
     {
-        if (level.isClientSide())
-        {
-            if (!player.isShiftKeyDown()) PedestalClientHooks.openPedestalScreen(pos);
-            return InteractionResult.SUCCESS;
-        }
-        if (player.isShiftKeyDown() && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
+        if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)) return InteractionResult.SUCCESS;
+        if (player.isShiftKeyDown())
         {
             // Sneaking: tier, fluid, energy, experience (and add-on types), upgrade, tool and work card in chat
             pedestal.describeOtherContents().forEach(player::sendSystemMessage);
+        }
+        else
+        {
+            // SimpleMenuProvider: the screen's title and how to make the server's menu
+            player.openMenu(new SimpleMenuProvider((containerId, inventory, menuPlayer) -> new PedestalMenu(containerId, inventory, pedestal),
+                    state.getBlock().getName()), pos);
         }
         return InteractionResult.SUCCESS;
     }

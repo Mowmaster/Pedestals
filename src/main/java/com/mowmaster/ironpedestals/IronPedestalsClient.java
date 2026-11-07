@@ -2,7 +2,9 @@ package com.mowmaster.ironpedestals;
 
 import com.mowmaster.ironpedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.ironpedestals.ClientSide.BasePedestalBlockEntityRenderer;
+import com.mowmaster.ironpedestals.ClientSide.PedestalScreen;
 import com.mowmaster.ironpedestals.ClientSide.UpgradeTierTint;
+import com.mowmaster.ironpedestals.Menus.PedestalMenus;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -11,6 +13,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -28,6 +31,13 @@ public class IronPedestalsClient {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event)
     {
         event.registerBlockEntityRenderer(libBlockEntityRegistry.PEDESTAL.get(), BasePedestalBlockEntityRenderer::new);
+    }
+
+    // Which screen opens for which menu type (the menu itself is registered in PedestalMenus)
+    @SubscribeEvent
+    public static void registerMenuScreens(RegisterMenuScreensEvent event)
+    {
+        event.register(PedestalMenus.PEDESTAL.get(), PedestalScreen::new);
     }
 
     // "ironpedestals:upgrade_tier": an upgrade's item model tinted by its tier

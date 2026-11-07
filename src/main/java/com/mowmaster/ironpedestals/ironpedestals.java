@@ -6,6 +6,7 @@ import com.mowmaster.ironpedestals.Blocks.libBlockEntityRegistry;
 import com.mowmaster.ironpedestals.Items.ItemRegistry;
 import com.mowmaster.ironpedestals.Items.PedestalDataComponents;
 import com.mowmaster.ironpedestals.QOLHandler.CreativeTabRegistry;
+import com.mowmaster.ironpedestals.Menus.PedestalMenus;
 import com.mowmaster.ironpedestals.Recipes.PedestalRecipes;
 import com.mowmaster.ironpedestals.Transport.PedestalTransportRules;
 import com.mowmaster.ironpedestals.Transport.PedestalTransportTypeAliases;
@@ -34,6 +35,7 @@ public class ironpedestals {
         libBlockEntityRegistry.register(modEventBus);
         CreativeTabRegistry.register(modEventBus);
         PedestalRecipes.register(modEventBus);
+        PedestalMenus.register(modEventBus);
 
         // Pedestals' numbers for MowLib's types (rates and capacities per tier), once every registry is done
         modEventBus.addListener(FMLCommonSetupEvent.class, event -> PedestalTransportRules.registerBuiltIn());
