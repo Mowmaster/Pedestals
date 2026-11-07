@@ -14,6 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 
+import java.util.List;
+
 // The pedestal's menu (empty-hand right-click): its item stacks, the upgrade / tool / filter / work card slots, the
 // three augment slots, and the player's inventory. Server and client each build one: the server's from the block
 // entity (PedestalMenu(id, inventory, pedestal)), the client's from the position the server sends (fromNetwork),
@@ -119,6 +121,19 @@ public class PedestalMenu extends AbstractContainerMenu
         ItemStack upgrade = pedestal.getUpgrade();
         boolean usesCard = upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade && pedestalUpgrade.getWorkCardType(upgrade) != null;
         return usesCard || pedestal.hasWorkCard();
+    }
+
+    // ---- Buttons ----
+
+    // The screen's X buttons remove links. The client sends vanilla's "menu button" message
+    // (MultiPlayerGameMode#handleInventoryButtonClick) with the link's index as the button id; this runs on the server.
+    // The index is checked against the current list, since it may have changed since the screen drew it.
+    @Override
+    public boolean clickMenuButton(Player player, int id)
+    {
+        List<BlockPos> links = pedestal.getLinks();
+        if (id < 0 || id >= links.size()) return false;
+        return pedestal.removeLink(links.get(id));
     }
 
     // ---- Shift-click ----

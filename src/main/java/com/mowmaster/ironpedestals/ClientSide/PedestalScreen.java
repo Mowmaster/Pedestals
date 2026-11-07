@@ -43,9 +43,13 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
     private static final int SLOT_BORDER = 0xFFA08A5E;
     private static final int SLOT_FILL = 0xFFDCCCA0;
     private static final int GHOST_FADE = 0xB0DCCCA0;
+    // A link row's remove button and the square for a link that isn't loaded (no colour to show)
+    private static final int REMOVE_RED = 0xFFC0302A;
+    private static final int UNKNOWN_TINT = 0xFF8A8A8A;
+    private static final int BOX = 9;
 
     private static final int GAP = 4;
-    private static final int LINKS_WIDTH = 150;
+    private static final int LINKS_WIDTH = 172;
     private static final int PAD = 8;
     private static final int LINE = 10;
     private static final int LINK_ROW = 12;
@@ -113,7 +117,8 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
         }
     }
 
-    // The link list on the right paper: a toggle box (the outline's colour when on) and where each link is
+    // The link list on the right paper. Each row: a toggle box (the outline's colour when on), a square in the linked
+    // pedestal's own colour (its dye, or its tier colour), where it is, and a red X that removes the link
     private void extractLinks(GuiGraphicsExtractor graphics)
     {
         Level level = pedestal().getLevel();
@@ -136,11 +141,34 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
             shownLinks.add(link);
             int rowY = y + row * LINK_ROW;
             boolean on = PedestalOutlines.isShown(level.dimension(), link);
-            graphics.fill(left, rowY, left + 9, rowY + 9, SLOT_BORDER);
-            graphics.fill(left + 1, rowY + 1, left + 8, rowY + 8, on ? PedestalOutlines.colorFor(index) : SLOT_FILL);
+            box(graphics, left, rowY, on ? PedestalOutlines.colorFor(index) : SLOT_FILL);
+            box(graphics, left + BOX + 3, rowY, pedestalTint(level, link));
             int distance = (int) Math.round(Math.sqrt(link.distSqr(pedestal().getBlockPos())));
-            graphics.text(font, Component.translatable(MODID + ".screen.link_at", link.getX(), link.getY(), link.getZ(), distance), left + 13, rowY + 1, INK, false);
+            graphics.text(font, Component.translatable(MODID + ".screen.link_at", link.getX(), link.getY(), link.getZ(), distance), left + 2 * (BOX + 3), rowY + 1, INK, false);
+            // The remove button: a red X at the row's right end
+            int removeX = removeX();
+            graphics.fill(removeX, rowY, removeX + BOX, rowY + BOX, SLOT_BORDER);
+            graphics.text(font, "x", removeX + 2, rowY, REMOVE_RED, false);
         }
+    }
+
+    // A small framed square of one colour
+    private static void box(GuiGraphicsExtractor graphics, int x, int y, int color)
+    {
+        graphics.fill(x, y, x + BOX, y + BOX, SLOT_BORDER);
+        graphics.fill(x + 1, y + 1, x + BOX - 1, y + BOX - 1, color);
+    }
+
+    // The colour a linked pedestal shows (what its model is tinted with), grey if it isn't loaded or isn't a pedestal
+    private static int pedestalTint(Level level, BlockPos pos)
+    {
+        if (!level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof BasePedestalBlockEntity linked)) return UNKNOWN_TINT;
+        return 0xFF000000 | linked.getTint(0);
+    }
+
+    private int removeX()
+    {
+        return linksLeft() + LINKS_WIDTH - PAD - BOX;
     }
 
     // On top of everything: tooltips for the link rows and the empty part slots (vanilla does the items' own)
@@ -153,10 +181,11 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
         if (row >= 0 && level != null)
         {
             BlockPos link = shownLinks.get(row);
-            Component name = level.isLoaded(link) ? level.getBlockState(link).getBlock().getName() : Component.translatable(MODID + ".screen.unloaded");
             boolean on = PedestalOutlines.isShown(level.dimension(), link);
-            graphics.setTooltipForNextFrame(font, List.of(name, Component.translatable(MODID + (on ? ".screen.outline_hide" : ".screen.outline_show"))),
-                    Optional.empty(), mouseX, mouseY);
+            String key = mouseX >= removeX() ? ".screen.link_remove" : on ? ".screen.outline_hide" : ".screen.outline_show";
+            List<Component> lines = level.isLoaded(link) ? List.of(Component.translatable(MODID + key))
+                    : List.of(Component.translatable(MODID + key), Component.translatable(MODID + ".screen.unloaded"));
+            graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
         }
         else if (hoveredSlot instanceof PedestalSlots.Part part && !part.hasItem() && menu.getCarried().isEmpty())
         {
@@ -187,7 +216,18 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
             int row = linkRowAt(event.x(), event.y());
             if (row >= 0 && level != null)
             {
-                PedestalOutlines.toggle(level.dimension(), shownLinks.get(row), PedestalOutlines.colorFor(linkScroll + row));
+                BlockPos link = shownLinks.get(row);
+                if (event.x() >= removeX())
+                {
+                    // Removing happens on the server: vanilla's menu button message, the link's index as the id
+                    // (PedestalMenu#clickMenuButton). Its outline goes too.
+                    minecraft.gameMode.handleInventoryButtonClick(menu.containerId, linkScroll + row);
+                    PedestalOutlines.hide(level.dimension(), link);
+                }
+                else
+                {
+                    PedestalOutlines.toggle(level.dimension(), pedestal().getBlockPos(), link, PedestalOutlines.colorFor(linkScroll + row));
+                }
                 return true;
             }
             // The page label "< 1/2 >": its left part goes back, its right part forward

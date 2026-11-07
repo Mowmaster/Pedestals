@@ -165,8 +165,8 @@
   "ironpedestals.screen.tier": " (Tier %s)",
   "ironpedestals.screen.links": "Linked Pedestals (%s/%s)",
   "ironpedestals.screen.no_links": "No links yet. Link pedestals with a Linking Tool.",
-  "ironpedestals.screen.unloaded": "Not loaded",
-  "ironpedestals.screen.link_at": "%s, %s, %s (%s blocks)",
+  "ironpedestals.screen.unloaded": "(not loaded)",
+  "ironpedestals.screen.link_at": "%s, %s, %s (%sm)",
   "ironpedestals.screen.outline_show": "Click: outline it in the world",
   "ironpedestals.screen.outline_hide": "Click: hide its outline",
   "ironpedestals.screen.slot.upgrade": "Upgrade slot",
@@ -175,5 +175,6 @@
   "ironpedestals.screen.slot.filter": "Filter slot",
   "ironpedestals.screen.slot.round_robin": "Round Robin Augment slot",
   "ironpedestals.screen.slot.diffuser": "Particle & Render Augment slot",
-  "ironpedestals.screen.slot.collide": "Collision Augment slot"
+  "ironpedestals.screen.slot.collide": "Collision Augment slot",
+  "ironpedestals.screen.link_remove": "Click: remove this link"
 }

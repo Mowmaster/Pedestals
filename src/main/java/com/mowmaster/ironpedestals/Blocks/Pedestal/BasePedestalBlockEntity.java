@@ -761,6 +761,14 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         }
     }
 
+    // Removes a link (the pedestal menu's X buttons); false if it wasn't linked
+    public boolean removeLink(BlockPos target)
+    {
+        if (!links.remove(target)) return false;
+        update();
+        return true;
+    }
+
     // Adds a link to target, or removes it if it's already linked
     public LinkResult toggleLink(BlockPos target)
     {

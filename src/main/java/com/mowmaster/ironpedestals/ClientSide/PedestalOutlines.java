@@ -1,6 +1,7 @@
 package com.mowmaster.ironpedestals.ClientSide;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.ironpedestals.IronPedestalReferences;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -24,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 // Outlines round linked pedestals, switched on from the pedestal screen's link list (client only; nothing is saved
-// or sent to the server). Each outline has its own colour, the same one its row in the list shows.
+// or sent to the server). Each outline has its own colour, the same one its row in the list shows. An outline goes
+// away by itself once the outlined block isn't a pedestal any more (broken), the pedestal that links to it is gone,
+// or that link was removed (checked each frame, while those blocks are loaded).
 //
 // 26.x draws the level in two steps, and NeoForge has an event for each:
 //   ExtractLevelRenderStateEvent - copy what will be drawn into the frame's LevelRenderState (here: which blocks
@@ -42,8 +45,11 @@ public final class PedestalOutlines
     // A ContextKey names one piece of custom data on the render state (like a typed map key)
     private static final ContextKey<List<Outline>> OUTLINES = new ContextKey<>(Identifier.fromNamespaceAndPath(IronPedestalReferences.MODID, "link_outlines"));
 
-    // Shown outlines: position -> colour, per dimension (a pedestal's link is always in its own dimension)
-    private static final Map<ResourceKey<Level>, Map<BlockPos, Integer>> SHOWN = new LinkedHashMap<>();
+    // Shown outlines: outlined position -> which pedestal links to it and the colour, per dimension (a pedestal's
+    // link is always in its own dimension)
+    private static final Map<ResourceKey<Level>, Map<BlockPos, Shown>> SHOWN = new LinkedHashMap<>();
+
+    private record Shown(BlockPos source, int color) {}
 
     // What one outline needs once extracted: where, which shape, which colour
     private record Outline(BlockPos pos, VoxelShape shape, int color) {}
@@ -55,17 +61,31 @@ public final class PedestalOutlines
 
     public static boolean isShown(ResourceKey<Level> dimension, BlockPos pos)
     {
-        Map<BlockPos, Integer> shown = SHOWN.get(dimension);
+        Map<BlockPos, Shown> shown = SHOWN.get(dimension);
         return shown != null && shown.containsKey(pos);
     }
 
-    // Turns one outline on or off; returns whether it's on now
-    public static boolean toggle(ResourceKey<Level> dimension, BlockPos pos, int color)
+    // Turns one outline on or off; returns whether it's on now. source: the pedestal whose link it is.
+    public static boolean toggle(ResourceKey<Level> dimension, BlockPos source, BlockPos pos, int color)
     {
-        Map<BlockPos, Integer> shown = SHOWN.computeIfAbsent(dimension, key -> new LinkedHashMap<>());
+        Map<BlockPos, Shown> shown = SHOWN.computeIfAbsent(dimension, key -> new LinkedHashMap<>());
         if (shown.remove(pos) != null) return false;
-        shown.put(pos.immutable(), color);
+        shown.put(pos.immutable(), new Shown(source.immutable(), color));
         return true;
+    }
+
+    public static void hide(ResourceKey<Level> dimension, BlockPos pos)
+    {
+        Map<BlockPos, Shown> shown = SHOWN.get(dimension);
+        if (shown != null) shown.remove(pos);
+    }
+
+    // Still worth showing? Only blocks that are loaded can be checked; unloaded ones keep their outline for now.
+    private static boolean stillLinked(ClientLevel level, BlockPos pos, Shown shown)
+    {
+        if (level.isLoaded(pos) && !(level.getBlockEntity(pos) instanceof BasePedestalBlockEntity)) return false;
+        if (!level.isLoaded(shown.source())) return true;
+        return level.getBlockEntity(shown.source()) instanceof BasePedestalBlockEntity source && source.getLinks().contains(pos);
     }
 
     // ---- Step 1: what to draw (the level can be read here) ----
@@ -74,14 +94,15 @@ public final class PedestalOutlines
     public static void extract(ExtractLevelRenderStateEvent event)
     {
         ClientLevel level = event.getLevel();
-        Map<BlockPos, Integer> shown = SHOWN.get(level.dimension());
+        Map<BlockPos, Shown> shown = SHOWN.get(level.dimension());
         if (shown == null || shown.isEmpty()) return;
+        // Broken pedestals and removed links lose their outline (removeIf: removes every entry the test is true for)
+        shown.entrySet().removeIf(entry -> !stillLinked(level, entry.getKey(), entry.getValue()));
         List<Outline> outlines = new ArrayList<>();
-        shown.forEach((pos, color) -> {
+        shown.forEach((pos, entry) -> {
             if (!level.isLoaded(pos)) return;
             VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
-            // A full block outline if the block there has no shape any more (broken pedestal), so it can still be found
-            outlines.add(new Outline(pos, shape.isEmpty() ? Shapes.block() : shape, color));
+            outlines.add(new Outline(pos, shape.isEmpty() ? Shapes.block() : shape, entry.color()));
         });
         event.getRenderState().setRenderData(OUTLINES, outlines);
     }
