@@ -717,11 +717,19 @@ public class ItemUpgradeAnvil extends ItemUpgradeBase
                 TransportType<?> type = packet.getType();
                 if (type == TransportTypes.FLUIDS.get())
                 {
+                    // The first tank's fluid (a source gives one fluid), all of it across the tanks; full = no
+                    // more of it fits anywhere (checked by trying to put 1 mB in, without committing)
                     TransportStorage<FluidResource> fluids = pedestal.getStorage(TransportTypes.FLUIDS.get());
-                    fluid = fluids.getResource(0);
-                    fluidAmount = fluids.getAmountAsInt(0);
+                    fluid = pedestal.findFluid(stored -> true);
+                    fluidAmount = pedestal.getFluidAmount(fluid);
                     fluidPacket = true;
-                    fluidFull = !fluid.isEmpty() && fluidAmount >= fluids.getCapacityAsInt(0, fluid);
+                    if (!fluid.isEmpty())
+                    {
+                        try (Transaction check = Transaction.openRoot())
+                        {
+                            fluidFull = fluids.insert(fluid, 1, check) == 0;
+                        }
+                    }
                 }
                 else if (type == TransportTypes.ENERGY.get())
                 {

@@ -105,39 +105,19 @@ public class ItemRegistry {
     // Made by the sacrifice upgrade, burned by the reactor
     public static final DeferredItem<SacrificeItem> SACRIFICE = PEDESTAL_ITEMS.registerItem("sacrifice", SacrificeItem::new);
 
-    // ---- Augments (same ids as 1.20) ----
-    public static final DeferredItem<AugmentItem> AUGMENT_T1_SPEED = augment("augment_pedestal_t1_speed", AugmentType.SPEED, 1);
-    public static final DeferredItem<AugmentItem> AUGMENT_T2_SPEED = augment("augment_pedestal_t2_speed", AugmentType.SPEED, 2);
-    public static final DeferredItem<AugmentItem> AUGMENT_T3_SPEED = augment("augment_pedestal_t3_speed", AugmentType.SPEED, 3);
-    public static final DeferredItem<AugmentItem> AUGMENT_T4_SPEED = augment("augment_pedestal_t4_speed", AugmentType.SPEED, 4);
-    public static final DeferredItem<AugmentItem> AUGMENT_T1_CAPACITY = augment("augment_pedestal_t1_capacity", AugmentType.CAPACITY, 1);
-    public static final DeferredItem<AugmentItem> AUGMENT_T2_CAPACITY = augment("augment_pedestal_t2_capacity", AugmentType.CAPACITY, 2);
-    public static final DeferredItem<AugmentItem> AUGMENT_T3_CAPACITY = augment("augment_pedestal_t3_capacity", AugmentType.CAPACITY, 3);
-    public static final DeferredItem<AugmentItem> AUGMENT_T4_CAPACITY = augment("augment_pedestal_t4_capacity", AugmentType.CAPACITY, 4);
-    public static final DeferredItem<AugmentItem> AUGMENT_T1_STORAGE = augment("augment_pedestal_t1_storage", AugmentType.STORAGE, 1);
-    public static final DeferredItem<AugmentItem> AUGMENT_T2_STORAGE = augment("augment_pedestal_t2_storage", AugmentType.STORAGE, 2);
-    public static final DeferredItem<AugmentItem> AUGMENT_T3_STORAGE = augment("augment_pedestal_t3_storage", AugmentType.STORAGE, 3);
-    public static final DeferredItem<AugmentItem> AUGMENT_T4_STORAGE = augment("augment_pedestal_t4_storage", AugmentType.STORAGE, 4);
-    public static final DeferredItem<AugmentItem> AUGMENT_T1_RANGE = augment("augment_pedestal_t1_range", AugmentType.RANGE, 1);
-    public static final DeferredItem<AugmentItem> AUGMENT_T2_RANGE = augment("augment_pedestal_t2_range", AugmentType.RANGE, 2);
-    public static final DeferredItem<AugmentItem> AUGMENT_T3_RANGE = augment("augment_pedestal_t3_range", AugmentType.RANGE, 3);
-    public static final DeferredItem<AugmentItem> AUGMENT_T4_RANGE = augment("augment_pedestal_t4_range", AugmentType.RANGE, 4);
-    public static final DeferredItem<AugmentItem> AUGMENT_ROUNDROBIN = augment("augment_pedestal_roundrobin", AugmentType.ROUND_ROBIN, 0);
-    public static final DeferredItem<AugmentItem> AUGMENT_RENDERDIFFUSER = augment("augment_pedestal_renderdiffuser", AugmentType.DIFFUSER, 0);
-    public static final DeferredItem<AugmentItem> AUGMENT_NOCOLLIDE = augment("augment_pedestal_nocollide", AugmentType.COLLIDE, 0);
+    // ---- Augments (same ids as 1.20; the tiered speed / capacity / storage / range ones became pedestal tiers) ----
+    public static final DeferredItem<AugmentItem> AUGMENT_ROUNDROBIN = augment("augment_pedestal_roundrobin", AugmentType.ROUND_ROBIN);
+    public static final DeferredItem<AugmentItem> AUGMENT_RENDERDIFFUSER = augment("augment_pedestal_renderdiffuser", AugmentType.DIFFUSER);
+    public static final DeferredItem<AugmentItem> AUGMENT_NOCOLLIDE = augment("augment_pedestal_nocollide", AugmentType.COLLIDE);
 
     // The augment tools, one per kind (ids tool_augments_<key>)
-    public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_SPEED = registerAugmentTool(AugmentType.SPEED);
-    public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_CAPACITY = registerAugmentTool(AugmentType.CAPACITY);
-    public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_STORAGE = registerAugmentTool(AugmentType.STORAGE);
-    public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_RANGE = registerAugmentTool(AugmentType.RANGE);
     public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_ROUNDROBIN = registerAugmentTool(AugmentType.ROUND_ROBIN);
     public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_DIFFUSER = registerAugmentTool(AugmentType.DIFFUSER);
     public static final DeferredItem<AugmentToolItem> TOOL_AUGMENTS_COLLIDE = registerAugmentTool(AugmentType.COLLIDE);
 
-    private static DeferredItem<AugmentItem> augment(String id, AugmentType type, int tier)
+    private static DeferredItem<AugmentItem> augment(String id, AugmentType type)
     {
-        return PEDESTAL_ITEMS.registerItem(id, properties -> new AugmentItem(properties, type, tier));
+        return PEDESTAL_ITEMS.registerItem(id, properties -> new AugmentItem(properties, type));
     }
 
     private static DeferredItem<AugmentToolItem> registerAugmentTool(AugmentType type)
@@ -150,10 +130,6 @@ public class ItemRegistry {
     {
         return switch (type)
         {
-            case SPEED -> TOOL_AUGMENTS_SPEED.get();
-            case CAPACITY -> TOOL_AUGMENTS_CAPACITY.get();
-            case STORAGE -> TOOL_AUGMENTS_STORAGE.get();
-            case RANGE -> TOOL_AUGMENTS_RANGE.get();
             case ROUND_ROBIN -> TOOL_AUGMENTS_ROUNDROBIN.get();
             case DIFFUSER -> TOOL_AUGMENTS_DIFFUSER.get();
             case COLLIDE -> TOOL_AUGMENTS_COLLIDE.get();
@@ -172,11 +148,9 @@ public class ItemRegistry {
             PEDESTAL_UPGRADE_SMOKER, PEDESTAL_UPGRADE_BLASTER, PEDESTAL_UPGRADE_GENERATOR, PEDESTAL_UPGRADE_COBBLEGEN,
             PEDESTAL_UPGRADE_ENCHANTER, PEDESTAL_UPGRADE_ANVIL, PEDESTAL_UPGRADE_SACRIFICE, PEDESTAL_UPGRADE_REACTOR);
 
-    public static final List<DeferredItem<? extends Item>> AUGMENTS = List.of(AUGMENT_T1_SPEED, AUGMENT_T2_SPEED, AUGMENT_T3_SPEED, AUGMENT_T4_SPEED, AUGMENT_T1_CAPACITY, AUGMENT_T2_CAPACITY, AUGMENT_T3_CAPACITY, AUGMENT_T4_CAPACITY, AUGMENT_T1_STORAGE, AUGMENT_T2_STORAGE, AUGMENT_T3_STORAGE, AUGMENT_T4_STORAGE, AUGMENT_T1_RANGE, AUGMENT_T2_RANGE, AUGMENT_T3_RANGE, AUGMENT_T4_RANGE,
-            AUGMENT_ROUNDROBIN, AUGMENT_RENDERDIFFUSER, AUGMENT_NOCOLLIDE);
+    public static final List<DeferredItem<? extends Item>> AUGMENTS = List.of(AUGMENT_ROUNDROBIN, AUGMENT_RENDERDIFFUSER, AUGMENT_NOCOLLIDE);
 
-    public static final List<DeferredItem<? extends Item>> AUGMENT_TOOLS = List.of(TOOL_AUGMENTS_SPEED, TOOL_AUGMENTS_CAPACITY, TOOL_AUGMENTS_STORAGE,
-            TOOL_AUGMENTS_RANGE, TOOL_AUGMENTS_ROUNDROBIN, TOOL_AUGMENTS_DIFFUSER, TOOL_AUGMENTS_COLLIDE);
+    public static final List<DeferredItem<? extends Item>> AUGMENT_TOOLS = List.of(TOOL_AUGMENTS_ROUNDROBIN, TOOL_AUGMENTS_DIFFUSER, TOOL_AUGMENTS_COLLIDE);
 
     // For the creative tab: MowLib's work cards, then Pedestals' own
     public static final List<DeferredItem<? extends Item>> WORKCARDS = List.of(MowLibItems.WORKCARD_BASE, MowLibItems.WORKCARD_AREA,

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "M": "#c:ingots/iron",
+    "P": "ironpedestals:block_pedestal_copper"
+  },
+  "pattern": [
+    "MMM",
+    "MPM",
+    "MMM"
+  ],
+  "result": {
+    "id": "ironpedestals:block_pedestal_iron"
+  }
+}

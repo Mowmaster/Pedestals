@@ -48,13 +48,14 @@ public interface IPedestalUpgrade
         return -1;
     }
 
-    // Which work cards the upgrade uses (null = none), and how far away their positions may be
+    // Which work cards the upgrade uses (null = none), and how far away their positions may be from this pedestal
+    // (ItemUpgradeBase: the pedestal tier's range plus the upgrade's range modifier)
     default @Nullable WorkCardType getWorkCardType(ItemStack upgrade)
     {
         return null;
     }
 
-    default int getWorkRange(ItemStack upgrade)
+    default int getWorkRange(BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
         return 0;
     }

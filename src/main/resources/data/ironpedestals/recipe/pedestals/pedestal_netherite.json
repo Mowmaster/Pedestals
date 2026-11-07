@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "M": "#c:ingots/netherite",
+    "P": "ironpedestals:block_pedestal_diamond"
+  },
+  "pattern": [
+    "MMM",
+    "MPM",
+    "MMM"
+  ],
+  "result": {
+    "id": "ironpedestals:block_pedestal_netherite"
+  }
+}

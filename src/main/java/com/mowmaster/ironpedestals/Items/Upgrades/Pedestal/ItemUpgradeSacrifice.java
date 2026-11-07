@@ -302,9 +302,9 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
             {
                 if (!hasPacket(source, TransportTypes.FLUIDS.get())) continue;
                 TransportStorage<FluidResource> fluids = source.getStorage(TransportTypes.FLUIDS.get());
-                FluidResource stored = fluids.getResource(0);
-                if (stored.isEmpty() || !input.fluid().ingredient().test(stored.toStack(1))) continue;
-                taken = fluids.extract(stored, needed - found, transaction);
+                FluidResource stored = source.findFluid(fluid -> input.fluid().ingredient().test(fluid.toStack(1)));
+                if (stored.isEmpty()) continue;
+                taken = fluids.extract(stored, needed - found, transaction); // from every tank holding it
                 Vec3 from = topOf(source);
                 if (taken > 0) particles.add(() -> TransportTypes.FLUIDS.get().sendTransferParticles(level, from, to, stored));
             }
@@ -394,11 +394,8 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
             }
             else if (input.fluid() != null)
             {
-                FluidResource stored = source.getStorage(TransportTypes.FLUIDS.get()).getResource(0);
-                if (hasPacket(source, TransportTypes.FLUIDS.get()) && !stored.isEmpty() && input.fluid().ingredient().test(stored.toStack(1)))
-                {
-                    total += source.getStorage(TransportTypes.FLUIDS.get()).getAmountAsInt(0);
-                }
+                FluidResource stored = source.findFluid(fluid -> input.fluid().ingredient().test(fluid.toStack(1)));
+                if (hasPacket(source, TransportTypes.FLUIDS.get()) && !stored.isEmpty()) total += source.getFluidAmount(stored);
             }
             else if (hasPacket(source, TransportTypes.ENERGY.get()))
             {
@@ -422,8 +419,8 @@ public class ItemUpgradeSacrifice extends ItemUpgradeBase
             }
             else if (input.fluid() != null)
             {
-                FluidResource stored = source.getStorage(TransportTypes.FLUIDS.get()).getResource(0);
-                if (hasPacket(source, TransportTypes.FLUIDS.get()) && !stored.isEmpty() && input.fluid().ingredient().test(stored.toStack(1))) return source;
+                FluidResource stored = source.findFluid(fluid -> input.fluid().ingredient().test(fluid.toStack(1)));
+                if (hasPacket(source, TransportTypes.FLUIDS.get()) && !stored.isEmpty()) return source;
             }
             else if (hasPacket(source, TransportTypes.ENERGY.get())) return source;
         }

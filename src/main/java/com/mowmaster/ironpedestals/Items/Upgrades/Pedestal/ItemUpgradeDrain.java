@@ -6,6 +6,7 @@ import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.ironpedestals.Config;
+import com.mowmaster.ironpedestals.Transport.PedestalFluidStorage;
 import com.mowmaster.ironpedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.ironpedestals.Items.Upgrades.UpgradeModifiers;
 import com.mowmaster.ironpedestals.IronPedestalTags;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
@@ -56,14 +58,16 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
         List<BlockPos> positions = pedestal.getWorkPositions();
         FluidTransportType fluids = TransportTypes.FLUIDS.get();
         TransportStorage<FluidResource> storage = pedestal.getStorage(fluids);
-        if (positions.isEmpty() || storage.getAmountAsInt(0) < FluidType.BUCKET_VOLUME) return;
-        FluidResource stored = storage.getResource(0);
-        if (stored.getFluid().is(IronPedestalTags.CANNOT_PLACE_FLUID) || !pedestal.machineFilterAllows(fluids, stored)) return;
+        if (positions.isEmpty()) return;
+        // The first tank's fluid that may be placed, that the filter allows, and that there's a bucket of
+        FluidResource stored = pedestal.findFluid(fluid -> !fluid.getFluid().is(IronPedestalTags.CANNOT_PLACE_FLUID)
+                && pedestal.machineFilterAllows(fluids, fluid) && pedestal.getFluidAmount(fluid) >= FluidType.BUCKET_VOLUME);
+        if (stored.isEmpty()) return;
 
         int blocks = Config.DRAIN_BLOCKS.getAsInt() + getModifier(upgrade, UpgradeModifiers.BLOCK_CAPACITY);
         int index = pedestal.getUpgradeData().getIntOr("position", 0);
         if (index >= positions.size()) index = 0;
-        for (int checked = 0; checked < positions.size() && blocks > 0 && storage.getAmountAsInt(0) >= FluidType.BUCKET_VOLUME; checked++)
+        for (int checked = 0; checked < positions.size() && blocks > 0 && pedestal.getFluidAmount(stored) >= FluidType.BUCKET_VOLUME; checked++)
         {
             BlockPos target = positions.get(index);
             index = (index + 1) % positions.size();
@@ -96,7 +100,10 @@ public class ItemUpgradeDrain extends ItemUpgradeBase
             level.setBlockAndUpdate(target, state.setValue(BlockStateProperties.WATERLOGGED, true));
             return true;
         }
-        // Otherwise the same as the dropper: a source block where there's room (water boils away in the nether)
-        return TransportTypes.FLUIDS.get().dropInWorld(level, target, storage, FluidType.BUCKET_VOLUME, pedestal.getFakePlayer(level));
+        // Otherwise the same as the dropper: a source block where there's room (water boils away in the nether).
+        // MowLib's dropInWorld only looks at a storage's first tank, so it gets just the tank holding this fluid.
+        ResourceHandler<FluidResource> tank = storage instanceof PedestalFluidStorage tanks ? tanks.tankHolding(stored, FluidType.BUCKET_VOLUME) : storage;
+        if (tank == null) return false;
+        return TransportTypes.FLUIDS.get().dropInWorld(level, target, tank, FluidType.BUCKET_VOLUME, pedestal.getFakePlayer(level));
     }
 }

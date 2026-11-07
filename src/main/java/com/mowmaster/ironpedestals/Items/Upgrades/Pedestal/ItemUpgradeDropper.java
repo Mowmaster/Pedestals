@@ -4,6 +4,7 @@ import com.mowmaster.mowlib.transport.TransportType;
 import com.mowmaster.mowlib.workcard.WorkCardType;
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.ironpedestals.Config;
+import com.mowmaster.ironpedestals.Transport.PedestalFluidStorage;
 import com.mowmaster.ironpedestals.Items.Upgrades.ItemUpgradeBase;
 import com.mowmaster.ironpedestals.Items.Upgrades.UpgradeModifiers;
 import net.minecraft.core.BlockPos;
@@ -63,6 +64,8 @@ public class ItemUpgradeDropper extends ItemUpgradeBase
     {
         if (pedestal.getStorage(type).isEmpty()) return false;
         int amount = getRate(upgrade, type, Config.DROPPER_RATES.get(type, pedestal));
+        // Fluids: each tank in turn (MowLib's dropInWorld only looks at a storage's first tank)
+        if (pedestal.getStorage(type) instanceof PedestalFluidStorage tanks) return tanks.dropInWorld(level, target, amount, cause);
         return type.dropInWorld(level, target, pedestal.getStorage(type), amount, cause);
     }
 }

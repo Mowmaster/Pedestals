@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:copy_components",
+            "include": [
+              "minecraft:dyed_color"
+            ],
+            "source": "block_entity"
+          },
+          "name": "ironpedestals:block_pedestal_copper"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "ironpedestals:blocks/block_pedestal_copper"
+}

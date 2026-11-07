@@ -11,6 +11,7 @@ import com.mowmaster.mowlib.tint.ITintHolder;
 import com.mowmaster.mowlib.transport.EnergyTransportType;
 import com.mowmaster.mowlib.transport.ExperienceTransportType;
 import com.mowmaster.mowlib.transport.ItemTransportType;
+import com.mowmaster.mowlib.transport.TransportContents;
 import com.mowmaster.mowlib.transport.TransportStorage;
 import com.mowmaster.mowlib.transport.TransportStorageHost;
 import com.mowmaster.mowlib.transport.TransportType;
@@ -25,6 +26,8 @@ import com.mowmaster.ironpedestals.Items.Augments.AugmentType;
 import com.mowmaster.ironpedestals.Items.PedestalDataComponents;
 import com.mowmaster.ironpedestals.Items.Storage.StoragePacketItem;
 import com.mowmaster.ironpedestals.Items.Upgrades.ItemUpgradeBase;
+import com.mowmaster.ironpedestals.Transport.PedestalFluidStorage;
+import com.mowmaster.ironpedestals.Transport.PedestalItemStorage;
 import com.mowmaster.ironpedestals.Transport.PedestalTransportRules;
 import com.mowmaster.ironpedestals.api.upgrade.IPedestalUpgrade;
 import net.minecraft.ChatFormatting;
@@ -44,6 +47,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.ShearsItem;
@@ -57,10 +61,13 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
 import net.neoforged.neoforge.transfer.resource.Resource;
+import net.neoforged.neoforge.transfer.resource.ResourceStack;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,6 +77,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 // The pedestal's storage, links, filter, upgrade and colour.
 // Storage: one TransportStorage per registered transport type (items, fluids, energy, experience, and any type
@@ -78,9 +86,10 @@ import java.util.Optional;
 // Links: every TICKS_TO_TRANSFER ticks it sends to the first linked pedestal that accepts anything, every type at once.
 // Upgrades: one upgrade, one tool and one work card, all put in from the offhand. The upgrade is ticked every
 // server tick (IPedestalUpgrade#tick) and keeps its per-pedestal state in getUpgradeData().
-// Augments (see AugmentItem / AugmentType): speed (fewer ticks between link transfers), capacity (higher transfer
-// rates), storage (bigger storages, more item stacks), range (longer links), round robin (links take turns),
-// particle & render (hides particles / the item / the upgrade) and collision (upgrades also act on touching entities).
+// Tier (PedestalTier, from the block): ticks between link transfers, link transfer rates, item stacks and how much
+// each holds, fluid tanks, storage sizes and the link / work card range, all from Config.TIERS.
+// Augments (see AugmentItem / AugmentType): round robin (links take turns), particle & render (hides particles /
+// the item / the upgrade) and collision (upgrades also act on touching entities).
 // Not ported yet: redstone counts.
 public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder, TransportStorageHost, IFilterHolder, IWorkCardHolder
 {
@@ -95,8 +104,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     private ItemStack upgrade = ItemStack.EMPTY;
     private ItemStack tool = ItemStack.EMPTY;
     private ItemStack workCard = ItemStack.EMPTY;
-    // Augments by kind; a tiered kind is a stack of up to its tier's insertable amount. EnumMap: a map keyed by an
-    // enum, kept in the enum's order.
+    // Augments by kind, one of each. EnumMap: a map keyed by an enum, kept in the enum's order.
     private final Map<AugmentType, ItemStack> augments = new EnumMap<>(AugmentType.class);
     // With the round robin augment: the link to try first next time
     private int roundRobinNext;
@@ -114,8 +122,17 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         super(libBlockEntityRegistry.PEDESTAL.get(), pos, state);
         for (TransportType<?> type : TransportTypes.REGISTRY)
         {
-            storages.put(type, type.createStorage(this));
+            storages.put(type, createStorage(type));
         }
+    }
+
+    // Items and fluids get Pedestals' own storages (bigger stack slots, several tanks: see PedestalItemStorage /
+    // PedestalFluidStorage); every other type makes its own
+    private TransportStorage<?> createStorage(TransportType<?> type)
+    {
+        if (type == TransportTypes.ITEMS.get()) return new PedestalItemStorage(this, TransportTypes.ITEMS.get());
+        if (type == TransportTypes.FLUIDS.get()) return new PedestalFluidStorage(this, TransportTypes.FLUIDS.get());
+        return type.createStorage(this);
     }
 
     // Saves, and sends the new contents to nearby clients
@@ -123,6 +140,19 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     {
         setChanged();
         if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    // ---- Tier ----
+
+    // The tier comes from the block (each tier is its own block)
+    public PedestalTier getTier()
+    {
+        return getBlockState().getBlock() instanceof BasePedestalBlock block ? block.getTier() : PedestalTier.BASE;
+    }
+
+    public Config.TierValues getTierValues()
+    {
+        return getTier().config();
     }
 
     // ---- Where it points ----
@@ -165,14 +195,31 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return getStorage(TransportTypes.ITEMS.get());
     }
 
-    // How big a type's storage is (MowLib's storages ask this): the config plus storage augments
+    // How big a type's storage is (MowLib's storages ask this): the tier's value
     @Override
     public int getCapacity(TransportType<?> type)
     {
         return PedestalTransportRules.of(type).capacity(this);
     }
 
-    // How much one link transfer moves: the config plus capacity augments
+    // How much of one item a stack slot holds (PedestalItemStorage asks this): the tier's stack capacity for items
+    // that normally stack to 64, the same share of it for items that stack to less (16 -> a quarter), and still 1
+    // for unstackable items (upgrades count on one potion per slot)
+    public int getItemSlotLimit(ItemResource resource)
+    {
+        int normal = Math.min(resource.getMaxStackSize(), Item.ABSOLUTE_MAX_STACK_SIZE);
+        if (normal <= 1) return normal;
+        long limit = (long) getTierValues().itemStackCapacity().getAsInt() * normal / Item.DEFAULT_MAX_STACK_SIZE;
+        return (int) Math.max(1, Math.min(Integer.MAX_VALUE, limit));
+    }
+
+    // How many fluid tanks the pedestal has (PedestalFluidStorage asks this): the tier's value
+    public int getFluidTankCount()
+    {
+        return getTierValues().fluidTanks().getAsInt();
+    }
+
+    // How much one link transfer moves: the tier's value
     public int getTransferRate(TransportType<?> type)
     {
         return PedestalTransportRules.of(type).transferRate(this);
@@ -197,6 +244,34 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
             if (!simulate) transaction.commit();
             return true;
         }
+    }
+
+    // ---- Fluids (a tier may have several tanks, each holding its own fluid) ----
+
+    // The fluid in the first tank whose fluid passes the test (EMPTY if none does)
+    public FluidResource findFluid(Predicate<FluidResource> test)
+    {
+        TransportStorage<FluidResource> fluids = getStorage(TransportTypes.FLUIDS.get());
+        for (int index = 0; index < fluids.size(); index++)
+        {
+            FluidResource stored = fluids.getResource(index);
+            if (!stored.isEmpty() && test.test(stored)) return stored;
+        }
+        return FluidResource.EMPTY;
+    }
+
+    // How much of this fluid the pedestal holds, every tank together. Taking it out works across tanks too:
+    // storage.extract(fluid, amount, transaction) without an index takes from every tank holding it.
+    public int getFluidAmount(FluidResource fluid)
+    {
+        if (fluid.isEmpty()) return 0;
+        TransportStorage<FluidResource> fluids = getStorage(TransportTypes.FLUIDS.get());
+        long total = 0;
+        for (int index = 0; index < fluids.size(); index++)
+        {
+            if (fluids.getResource(index).equals(fluid)) total += fluids.getAmountAsLong(index);
+        }
+        return (int) Math.min(Integer.MAX_VALUE, total);
     }
 
     // ---- Items (used by the block's clicks, the renderer and upgrades) ----
@@ -270,6 +345,8 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     public List<Component> describeOtherContents()
     {
         List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable(IronPedestalReferences.MODID + ".pedestal.message_tier", getTier().tier(), getLinkingRange(), getTransferTicks())
+                .withStyle(ChatFormatting.GOLD));
         storages.forEach((type, storage) -> {
             if (type == TransportTypes.ITEMS.get()) return; // "return" in a lambda just skips this entry
             Component line = storage.describe();
@@ -556,7 +633,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
                 WorkCardType wanted = pedestalUpgrade.getWorkCardType(upgrade);
                 if (wanted != null && wanted.accepts(card.getWorkCardType()))
                 {
-                    workPositions = List.copyOf(card.getPositions(workCard, this, pedestalUpgrade.getWorkRange(upgrade)));
+                    workPositions = List.copyOf(card.getPositions(workCard, this, pedestalUpgrade.getWorkRange(this, upgrade)));
                 }
             }
         }
@@ -579,7 +656,7 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
             WorkCardType wanted = pedestalUpgrade.getWorkCardType(upgrade);
             if (wanted != null && wanted.accepts(card.getWorkCardType()))
             {
-                return card.getArea(workCard, this, pedestalUpgrade.getWorkRange(upgrade));
+                return card.getArea(workCard, this, pedestalUpgrade.getWorkRange(this, upgrade));
             }
         }
         return Optional.empty();
@@ -633,9 +710,10 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return List.copyOf(links);
     }
 
+    // The tier's link range
     public int getLinkingRange()
     {
-        return Config.LINKING_RANGE.getAsInt() + getAugmentAmount(AugmentType.RANGE);
+        return getTierValues().linkRange().getAsInt();
     }
 
     // Within the range on every axis (a cube around the pedestal, as in 1.20)
@@ -705,6 +783,9 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
     {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
+        // Once a second: item stacks and fluid tanks follow the tier's config, so config changes apply on the fly
+        if (serverLevel.getGameTime() % 20 == 0) resizeStorages(true);
+
         if (upgrade.getItem() instanceof IPedestalUpgrade pedestalUpgrade)
         {
             pedestalUpgrade.tick(serverLevel, this, upgrade);
@@ -745,10 +826,10 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         }
     }
 
-    // Ticks between link transfers: the config's, less the speed augments (at least 1)
+    // Ticks between link transfers: the config's, less the tier's ticks_reduced (at least 1)
     public int getTransferTicks()
     {
-        return Math.max(1, Config.TICKS_TO_TRANSFER.getAsInt() - getAugmentAmount(AugmentType.SPEED));
+        return Math.max(1, Config.TICKS_TO_TRANSFER.getAsInt() - getTierValues().ticksReduced().getAsInt());
     }
 
     // ---- Augments ----
@@ -763,70 +844,47 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return !getAugment(type).isEmpty();
     }
 
-    // Puts one augment from the stack in: into an empty slot, or onto the same tier of a tiered kind while there's
-    // room. false if it can't go in.
+    // Puts one augment from the stack in; false if it isn't one or the pedestal has that kind already
     public boolean insertAugment(ItemStack stack)
     {
-        if (!(stack.getItem() instanceof AugmentItem augment)) return false;
-        AugmentType type = augment.getType();
-        ItemStack current = getAugment(type);
-        if (current.isEmpty()) augments.put(type, stack.split(1));
-        else if (type.tiered() && current.is(stack.getItem()) && current.getCount() < augment.getInsertable())
-        {
-            stack.shrink(1);
-            current.grow(1);
-        }
-        else return false;
-        augmentsChanged(type);
+        if (!(stack.getItem() instanceof AugmentItem augment) || hasAugment(augment.getType())) return false;
+        augments.put(augment.getType(), stack.split(1));
+        update(); // clients need the augments too (the particle & render augment changes what's drawn)
         return true;
     }
 
-    // Takes one augment of a kind out, or all of them
-    public ItemStack removeAugment(AugmentType type, boolean all)
+    // Takes that kind of augment out (EMPTY if there isn't one)
+    public ItemStack removeAugment(AugmentType type)
     {
-        ItemStack current = getAugment(type);
-        if (current.isEmpty()) return ItemStack.EMPTY;
-        ItemStack removed = all ? current : current.split(1);
-        if (all || current.isEmpty()) augments.remove(type);
-        augmentsChanged(type);
+        ItemStack removed = augments.remove(type);
+        if (removed == null) return ItemStack.EMPTY;
+        update();
         return removed;
     }
 
-    private void augmentsChanged(AugmentType type)
+    // Item stacks and fluid tanks follow the tier (the storages resize to what getCapacity / getFluidTankCount say).
+    // shrink = false only grows them (when loading, where nothing can be dropped yet). Stacks that no longer fit drop
+    // above the pedestal; fluid from tanks that no longer exist drops as a fluid packet.
+    private void resizeStorages(boolean shrink)
     {
-        if (type == AugmentType.STORAGE) resizeItemStorage(true);
-        update(); // clients need the augments too (the particle & render augment changes what's drawn)
-    }
-
-    // Storage augments add or take away item stacks; stacks that no longer fit drop above the pedestal
-    private void resizeItemStorage(boolean shrink)
-    {
-        if (!(getItemStorage() instanceof ItemTransportType.Storage itemStorage)) return;
-        List<ItemStack> overflow = itemStorage.resize(shrink);
-        if (level == null) return;
         BlockPos above = getPosAbove();
-        overflow.forEach(stack -> Containers.dropItemStack(level, above.getX(), above.getY(), above.getZ(), stack));
-    }
-
-    // Ticks taken off (speed) or blocks added (range) by all the augments of that kind
-    public int getAugmentAmount(AugmentType type)
-    {
-        ItemStack stack = getAugment(type);
-        return stack.getItem() instanceof AugmentItem augment ? augment.getAmount() * stack.getCount() : 0;
-    }
-
-    // What the capacity augments add to a type's transfer rate, and the storage augments to its storage, in the
-    // units the type's rules add them in (experience: levels)
-    public int getTransferBonus(PedestalTransportRules rules)
-    {
-        ItemStack stack = getAugment(AugmentType.CAPACITY);
-        return stack.getItem() instanceof AugmentItem augment ? rules.capacityAugmentBonus(augment.getTier()) * stack.getCount() : 0;
-    }
-
-    public int getStorageBonus(PedestalTransportRules rules)
-    {
-        ItemStack stack = getAugment(AugmentType.STORAGE);
-        return stack.getItem() instanceof AugmentItem augment ? rules.storageAugmentBonus(augment.getTier()) * stack.getCount() : 0;
+        if (getItemStorage() instanceof ItemTransportType.Storage itemStorage)
+        {
+            List<ItemStack> overflow = itemStorage.resize(shrink);
+            if (level != null) overflow.forEach(stack -> Containers.dropItemStack(level, above.getX(), above.getY(), above.getZ(), stack));
+        }
+        if (getStorage(TransportTypes.FLUIDS.get()) instanceof PedestalFluidStorage fluidStorage)
+        {
+            List<FluidStack> overflow = fluidStorage.resize(shrink);
+            if (level != null && !overflow.isEmpty())
+            {
+                // ResourceStack: NeoForge's (resource, amount) pair, what a packet's contents are made of
+                List<ResourceStack<FluidResource>> contents = overflow.stream()
+                        .map(stack -> new ResourceStack<>(FluidResource.of(stack), stack.getAmount())).toList();
+                ItemStack packet = StoragePacketItem.create(new TransportContents<>(TransportTypes.FLUIDS.get(), contents));
+                Containers.dropItemStack(level, above.getX(), above.getY(), above.getZ(), packet);
+            }
+        }
     }
 
     // The particle & render augment's choices (all true without one)
@@ -845,45 +903,13 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return !hasAugment(AugmentType.DIFFUSER) || !AugmentItem.hidesUpgrade(AugmentItem.getDiffuserMode(getAugment(AugmentType.DIFFUSER)));
     }
 
-    // What the pedestal has of one kind, for the augment tools (1.20's getPedestalDetail)
+    // Whether the pedestal has that kind, for the augment tools (1.20's getPedestalDetail)
     public List<Component> describeAugment(AugmentType type)
     {
-        String modid = IronPedestalReferences.MODID;
-        List<Component> lines = new ArrayList<>();
-        ItemStack stack = getAugment(type);
-        if (stack.isEmpty())
-        {
-            lines.add(Component.translatable(modid + ".tool.augment." + type.key() + "_not").withStyle(ChatFormatting.DARK_AQUA));
-            return lines;
-        }
-        if (!type.tiered())
-        {
-            lines.add(Component.translatable(modid + ".tool.augment." + type.key()).withStyle(ChatFormatting.AQUA));
-            return lines;
-        }
-        int insertable = stack.getItem() instanceof AugmentItem augment ? augment.getInsertable() : stack.getCount();
-        lines.add(stack.getHoverName().copy().append(" ").append(Component.translatable(modid + ".tool.augment.inserted").withStyle(ChatFormatting.AQUA))
-                .append(Component.literal(stack.getCount() + "/" + insertable).withStyle(ChatFormatting.WHITE)));
-        switch (type)
-        {
-            case SPEED -> lines.add(Component.translatable(modid + ".tool.augment.speed").withStyle(ChatFormatting.AQUA)
-                    .append(Component.literal(getTransferTicks() + "/" + Config.TICKS_TO_TRANSFER.getAsInt()).withStyle(ChatFormatting.WHITE)));
-            case RANGE -> lines.add(Component.translatable(modid + ".tool.augment.range").withStyle(ChatFormatting.AQUA)
-                    .append(Component.literal(String.valueOf(getLinkingRange())).withStyle(ChatFormatting.WHITE)));
-            case CAPACITY -> storages.keySet().forEach(transportType -> lines.add(Component.literal(" ").append(transportType.getName())
-                    .append(Component.translatable(modid + ".tool.augment.rate").append(String.valueOf(getTransferRate(transportType))).withStyle(ChatFormatting.WHITE))));
-            case STORAGE -> storages.forEach((transportType, storage) -> lines.add(Component.literal(" ").append(transportType.getName())
-                    .append(Component.translatable(modid + ".tool.augment.capacity").append(capacityText(transportType, storage)).withStyle(ChatFormatting.WHITE))));
-            default -> {}
-        }
-        return lines;
-    }
-
-    // Items: how many stacks; anything else: the first slot's capacity
-    private static <R extends Resource> String capacityText(TransportType<?> type, TransportStorage<R> storage)
-    {
-        if (type == TransportTypes.ITEMS.get()) return String.valueOf(storage.size());
-        return String.valueOf(storage.getCapacityAsLong(0, storage.getResource(0)));
+        String key = IronPedestalReferences.MODID + ".tool.augment." + type.key();
+        return hasAugment(type)
+                ? List.of(Component.translatable(key).withStyle(ChatFormatting.AQUA))
+                : List.of(Component.translatable(key + "_not").withStyle(ChatFormatting.DARK_AQUA));
     }
 
     private boolean sendTo(BasePedestalBlockEntity receiver)
@@ -952,8 +978,8 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         roundRobinNext = input.getIntOr("round_robin_next", 0);
         ValueInput storageInput = input.childOrEmpty("storage");
         storages.forEach((type, storage) -> storage.deserialize(storageFor(storageInput, type)));
-        // A saved item storage has the size it was saved with; make room for the storage augments
-        resizeItemStorage(false);
+        // A saved storage has the size it was saved with; make room for the tier's stacks and tanks
+        resizeStorages(false);
         links.clear();
         input.read("links", BlockPos.CODEC.listOf()).ifPresent(links::addAll);
         filter = input.read("filter", ItemStack.CODEC).orElse(ItemStack.EMPTY);

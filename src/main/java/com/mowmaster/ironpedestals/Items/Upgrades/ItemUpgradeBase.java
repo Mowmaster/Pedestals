@@ -157,11 +157,11 @@ public abstract class ItemUpgradeBase extends Item implements IPedestalUpgrade
 
     // ---- Work cards ----
 
-    // How far work card positions may be: the base selection range plus the range modifier (0 without a card type)
+    // How far work card positions may be: the pedestal tier's work range plus the range modifier (0 without a card type)
     @Override
-    public int getWorkRange(ItemStack upgrade)
+    public int getWorkRange(BasePedestalBlockEntity pedestal, ItemStack upgrade)
     {
-        return getWorkCardType(upgrade) == null ? 0 : Config.SELECTION_RANGE.getAsInt() + getModifier(upgrade, UpgradeModifiers.RANGE);
+        return getWorkCardType(upgrade) == null ? 0 : pedestal.getTierValues().workRange().getAsInt() + getModifier(upgrade, UpgradeModifiers.RANGE);
     }
 
     // The largest area card the upgrade works with when REQUIRE_SIZED_AREA is on (2 = a 3x3x3 box)

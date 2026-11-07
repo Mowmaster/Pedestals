@@ -20,8 +20,8 @@ public class CreativeTabRegistry
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, IronPedestalReferences.MODID);
 
 
-    // Tools, filters, work cards, upgrades, (empty) storage packets, the plain pedestal, then one pre-dyed pedestal
-    // per dye colour (the colour rides on dyed_color)
+    // Tools, filters, work cards, upgrades, (empty) storage packets, the pedestal tiers (plain first), then one
+    // pre-dyed plain pedestal per dye colour (the colour rides on dyed_color)
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> PEDESTALS_TAB = TABS.register("ironpedestals", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.ironpedestals"))
             .icon(() -> new ItemStack(BlockRegistry.BLOCK_PEDESTAL.get()))
@@ -39,13 +39,8 @@ public class CreativeTabRegistry
                 ItemRegistry.AUGMENTS.forEach(augment -> output.accept(augment.get()));
                 ItemRegistry.PACKETS.forEach(packet -> output.accept(packet.get()));
                 output.accept(ItemRegistry.SACRIFICE.get());
-                output.accept(BlockRegistry.BLOCK_PEDESTAL.get());
-                for (DyeColor dye : DyeColor.values())
-                {
-                    ItemStack dyed = new ItemStack(BlockRegistry.BLOCK_PEDESTAL.get());
-                    dyed.set(DataComponents.DYED_COLOR, new DyedItemColor(dye.getTextureDiffuseColor() & 0xFFFFFF));
-                    output.accept(dyed);
-                }
+                BlockRegistry.PEDESTALS.forEach(pedestal -> output.accept(pedestal.get()));
+
             }).build());
 
     /*public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BIBLIOMANIA_TAB = TABS.register("bibliomania", () -> CreativeModeTab.builder()

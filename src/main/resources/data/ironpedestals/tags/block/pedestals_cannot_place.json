@@ -1,6 +1,6 @@
 {
   "replace": false,
   "values": [
-    "ironpedestals:block_pedestal"
+    "#ironpedestals:pedestals"
   ]
 }

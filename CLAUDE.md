@@ -3,10 +3,13 @@ NeoForge 26.3.0.94, Minecraft 26.3, Java 25. Used NeoForge-26x version of Pedest
 ## Project state
 - Transport types are MowLib's (`com.mowmaster.mowlib.transport`: `TransportType`, `TransportTypes` ITEMS/FLUIDS/ENERGY/EXPERIENCE, ids `mowlib:*`). Pedestals' own numbers per type (link rate, capacity, augment bonuses, capacity modifier, upgrade rates) are in `Transport/PedestalTransportRules` (built-in rules registered in common setup; add-on types register their own, or get rate/capacity 0). The pedestal answers `TransportStorageHost#getCapacity` from those rules. `PedestalTransportTypeAliases` keeps the old `pedestals:items`... ids as aliases.
 - From MowLib too: filters (`mowlib:filter_*`, filter tool), work cards (`mowlib:workcard_*`, Blank Work Card picker; `WorkCardPedestalsItem` is Pedestals' own and shows up in that picker), ghost items + `GhostItemRenderer`, `StorageInteractions` (pedestal clicks), `MowLibFakePlayer` (`PedestalFakePlayer` is a thin subclass), `MowLibBlockActions`, `MowLibXpUtils`, tinting (`IColorableBlock`, `CBTintData`; MowLibClient registers the tint sources). Old `pedestals:` ids of moved items and components are aliased in `ItemRegistry` / `PedestalDataComponents`; pedestals saved before the move load their storages from `storage/pedestals:<type>`.
-- Pedestal (`Blocks/Pedestal/BasePedestalBlockEntity`, a `TransportStorageHost`, `IFilterHolder` and `IWorkCardHolder`): one storage per type, links (round robin optional), filter, upgrade, tool, work card, augments (`EnumMap<AugmentType, ItemStack>`). Item storage grows with storage augments (MowLib's `ItemTransportType.Storage#resize`); overflow drops above the pedestal.
+- Pedestal (`Blocks/Pedestal/BasePedestalBlockEntity`, a `TransportStorageHost`, `IFilterHolder` and `IWorkCardHolder`): one storage per type, links (round robin optional), filter, upgrade, tool, work card, augments (`EnumMap<AugmentType, ItemStack>`, one of each).
+- Tiers (`Blocks/Pedestal/PedestalTier`): one block per tier (`block_pedestal` = tier 0, then `block_pedestal_copper/iron/gold/diamond/netherite/netherstar`), one shared block entity type. Numbers in `Config.TIERS` (`TierValues`; tier 0 = the `[pedestal]` section, tiers 1-6 under `[tiers]`): ticks taken off link transfers, link rates, item stacks, items per stack slot (`getItemSlotLimit`, scaled for <64 stackers, unstackables stay 1), fluid tanks (`getFluidTankCount`), capacities, link + work card range (upgrades' `getWorkRange(pedestal, upgrade)` = tier range + range modifier). Storages resize on load and once a second (config changes apply live); item overflow drops, fluid overflow drops as a packet. Undyed colour = tier block's `mowlib:block_colors` entry (item JSON `dye` default holds the same colour). Recipes: 8 of the tier material around the previous tier. Tiers speed up links only, not upgrades.
+- Pedestals' own storages for items and fluids (`Transport/PedestalItemStorage`, `PedestalFluidStorage`, subclasses of MowLib's): bigger stack slots (saved as `bulk_stacks` when a slot is past what an ItemStack can save) and several tanks. Other types use `type.createStorage`.
+- Fluids: several tanks per pedestal; read with `findFluid(test)` / `getFluidAmount(fluid)`, never `getResource(0)`. MowLib's `FluidTransportType#dropInWorld` only sees index 0: use `PedestalFluidStorage#dropInWorld` / `#tankHolding`.
 - Upgrades (`Items/Upgrades/ItemUpgradeBase`, `api/upgrade/IPedestalUpgrade`): modes pick which transport types are on (`getTransportTypes`), modifiers (speed, range, capacity per type...), work cards, fuel costs, tool rules. `onCollide` runs each operation when the collision augment is fitted (import/magnet pull, void destroys; players are never killed).
 - 1.16 ports: XP Enchanter (work-card power blocks, power capped at 100), Recycler (XP grindstone + recycler, `pedestals:recycling` item data map, paid curse removal), XP Anvil (input pedestals, over-level and conflict recipes, ghost items with labels, pauses on a stuck craft, redstone skips it), Sacrifice upgrade + Enchantment Sacrifice Reactor (`pedestals:reactor_effects` mob-effect data map; Mob mode not done yet).
-- Augments (`Items/Augments`): speed / capacity / storage / range in tiers 1-4, round robin, particle & render diffuser (modes 0-6 in `DIFFUSER_MODE`), collision. Offhand right-click inserts; offhand augment tool + left-click removes (sneak = all of that kind); main-hand tool right-click describes them. Speed only affects link transfers.
+- Augments (`Items/Augments`): round robin, particle & render diffuser (modes 0-6 in `DIFFUSER_MODE`), collision (speed / capacity / storage / range augments were replaced by tiers). Offhand right-click inserts; offhand augment tool + left-click removes; main-hand tool right-click describes them.
 - Transfer particles: `TransportType#sendTransferParticles` (MowLib's payload); every particle call checks `pedestal.canSpawnParticles()`.
 - Pedestal item storage holds one unstackable item (potion) per slot, so potion costs are always 1.
 - Not ported: the manifest tool, range boxes in the renderer. Tool cycling in the crafting grid is gone (only the Pedestals-only cycles are left), to be replaced by right-hand swapping; MowLib now has Dual Handed crafting (`recipes/DualHandedRecipe`) if 1.20's in-world recipes come back.
@@ -33,8 +36,8 @@ NeoForge 26.3.0.94, Minecraft 26.3, Java 25. Used NeoForge-26x version of Pedest
   `NeoForge-26x`; the version this project builds against is the tag matching `prefer` in build.gradle.
 - Before writing a shared system (tinting, storage, filters, transport, paging, knapping, bonus drops, tooltips,
   renderers...), clone MowLib and check whether it already exists there. Use it; don't copy it into this mod.
-- Don't edit MowLib from this project's session. If something belongs in MowLib, or MowLib needs a change, write
-  it up as a `mowlib-from-<mod id>.zip` (MowLib files + notes + migration), the same way as before.
+- Never edit MowLib or send MowLib files from this project. If MowLib doesn't have something, make it here or
+  override MowLib's class here; add the idea to "MowLib TODO" below as a suggestion only.
 - MowLib's CLAUDE.md lists what it contains and its rules.
 
 ## Working with Claude
@@ -44,3 +47,10 @@ NeoForge 26.3.0.94, Minecraft 26.3, Java 25. Used NeoForge-26x version of Pedest
 - If I haven't applied earlier changes yet, re-output the full changed files so I don't have to merge them.
 - For simple model fixes (a missing `tintindex`, `#`, texture key), just tell me the line to change; only send a model file when the geometry changes.
 - To check 26.3 APIs, clone the public `neoforged/neoforge` repo (branch `26.3.x`) and read the 26.3 porting primer in `neoforged/.github` (`primers/26.3/index.md`; 26.1 and 26.2 primers cover earlier changes). NeoForge's docs are in the public `neoforged/Documentation` repo (`docs/`).
+
+## MowLib TODO (suggestions only; this mod works around them)
+- `TransportStorageHost#getSlotLimit(type, resource, normalLimit)` + bulk saving (`{resource, amount}` when a slot
+  passes 99) in `ItemTransportType.Storage`. Would replace `PedestalItemStorage`.
+- `TransportStorageHost#getTankCount(type)` + `resize` + per-tank `describe()` in `FluidTransportType.Storage`.
+  Would replace `PedestalFluidStorage`.
+- `FluidTransportType#dropInWorld` trying every tank, not only index 0 (then the dropper/drain tank workarounds go).

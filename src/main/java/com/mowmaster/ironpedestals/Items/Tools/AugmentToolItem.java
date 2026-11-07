@@ -13,8 +13,8 @@ import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-// One per augment kind (1.20's AugmentTool_*). In the OFFHAND, left-click a pedestal: take that kind of augment out
-// (sneak: all of a tiered kind). In the main hand, right-click a pedestal: what it has of that kind, in chat.
+// One per augment kind (1.20's AugmentTool_*). In the OFFHAND, left-click a pedestal: take that kind of augment out.
+// In the main hand, right-click a pedestal: whether it has that kind, in chat.
 // Sneak + right-click the air: switch to the next kind's tool. It's also the base of that kind's augment recipes,
 // and comes back out of the crafting grid.
 public class AugmentToolItem extends PedestalToolItem

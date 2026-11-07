@@ -35,7 +35,7 @@ public class ironpedestals {
         CreativeTabRegistry.register(modEventBus);
         PedestalRecipes.register(modEventBus);
 
-        // Pedestals' numbers for MowLib's types (rates, capacities, augments), once every registry is done
+        // Pedestals' numbers for MowLib's types (rates and capacities per tier), once every registry is done
         modEventBus.addListener(FMLCommonSetupEvent.class, event -> PedestalTransportRules.registerBuiltIn());
 
         modContainer.registerConfig(ModConfig.Type.LOCAL, Config.SPEC);

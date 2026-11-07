@@ -7,9 +7,12 @@ import com.mowmaster.ironpedestals.Transport.PedestalTransportRules;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
+import java.util.function.IntSupplier;
 
 // Pedestal and upgrade settings, same names and defaults as 1.20's PedestalConfig (the template's example values
-// are gone). Augment values come back with the augments; dust values and the packets' discharge timers are gone.
+// are gone). The [pedestal] section is tier 0 (the plain pedestal); [tiers] has tiers 1-6 (copper to nether star),
+// which replace 1.20's speed, capacity, storage and range augments. Dust values and the packets' discharge timers
+// are gone.
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
@@ -18,39 +21,45 @@ public class Config {
     }
 
     public static final ModConfigSpec.IntValue TICKS_TO_TRANSFER = BUILDER
-            .comment("Ticks between transfers to linked ironpedestals (before augments), and between upgrade operations (before speed modifiers)")
+            .comment("Ticks between transfers to linked pedestals (before the tier's ticks_reduced), and between upgrade operations (before speed modifiers)")
             .defineInRange("pedestal_ticksToTransfer", 40, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue LINKING_RANGE = BUILDER
-            .comment("How far (in blocks, on each axis) a pedestal can link (before augments)")
+            .comment("How far (in blocks, on each axis) a tier 0 pedestal can link")
             .defineInRange("pedestal_baseLinkingRange", 8, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue MAX_LINKS = BUILDER
-            .comment("How many ironpedestals one pedestal can send to")
+            .comment("How many pedestals one pedestal can send to")
             .defineInRange("pedestal_maxLinks", 8, 1, 64);
 
     public static final ModConfigSpec.IntValue ITEM_TRANSFER_RATE = BUILDER
-            .comment("Items sent per transfer")
+            .comment("Items sent per transfer [tier 0]")
             .defineInRange("pedestal_baseItemTransferRate", 4, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue FLUID_TRANSFER_RATE = BUILDER
-            .comment("Fluid (mB) sent per transfer")
+            .comment("Fluid (mB) sent per transfer [tier 0]")
             .defineInRange("pedestal_baseFluidTransferRate", 1000, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue ENERGY_TRANSFER_RATE = BUILDER
-            .comment("Energy sent per transfer")
+            .comment("Energy sent per transfer [tier 0]")
             .defineInRange("pedestal_baseEnergyTransferRate", 5000, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue XP_TRANSFER_RATE = BUILDER
-            .comment("Experience sent per transfer, in levels (counted from level 0)")
+            .comment("Experience sent per transfer, in levels (counted from level 0) [tier 0]")
             .defineInRange("pedestal_baseXpTransferRate", 1, 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue ITEM_SLOTS = BUILDER
-            .comment("Stacks a pedestal holds (before augments)")
-            .defineInRange("pedestal_baseItemStacks", 1, 1, 27);
+            .comment("Item stacks a pedestal holds [tier 0]")
+            .defineInRange("pedestal_baseItemStacks", 1, 1, 128);
+    public static final ModConfigSpec.IntValue ITEM_STACK_CAPACITY = BUILDER
+            .comment("Items one stack slot holds, for items that normally stack to 64 (items that stack to less get the same share: 16-stackers get a quarter; unstackable items stay at 1) [tier 0]")
+            .defineInRange("pedestal_baseItemStackCapacity", 64, 1, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue FLUID_TANKS = BUILDER
+            .comment("Fluid tanks a pedestal has, each holding one fluid [tier 0]")
+            .defineInRange("pedestal_baseFluidTanks", 1, 1, 16);
     public static final ModConfigSpec.IntValue FLUID_STORAGE = BUILDER
-            .comment("Fluid a pedestal holds, in mB (before augments)")
+            .comment("Fluid one tank holds, in mB [tier 0]")
             .defineInRange("pedestal_baseFluidStorage", 16000, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue ENERGY_STORAGE = BUILDER
-            .comment("Energy a pedestal holds (before augments)")
+            .comment("Energy a pedestal holds [tier 0]")
             .defineInRange("pedestal_baseEnergyStorage", 20000, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue XP_STORAGE = BUILDER
-            .comment("Experience a pedestal holds, in levels (before augments)")
+            .comment("Experience a pedestal holds, in levels [tier 0]")
             .defineInRange("pedestal_baseXpStorage", 30, 1, 21000);
 
     static {
@@ -67,7 +76,7 @@ public class Config {
             .comment("Limit a work card area's size by the upgrade's area modifier (3x3x3 without modifiers)")
             .define("upgrade_toggleable_require_selectable_size", false);
     public static final ModConfigSpec.IntValue SELECTION_RANGE = BUILDER
-            .comment("How far (in blocks, on each axis) a work card's positions can be from the pedestal (before range modifiers)")
+            .comment("How far (in blocks, on each axis) a work card's positions can be from a tier 0 pedestal (before range modifiers; tiers 1-6 use their own range)")
             .defineInRange("upgrades_baseSelectionRange", 8, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue PACKAGE_MAX_STACKS = BUILDER
             .comment("Most item stacks the packager puts in one package")
@@ -180,28 +189,23 @@ public class Config {
             .comment("Extra blocks of effect range per tier")
             .defineInRange("upgrade_reactor_effect_range_per_tier", 10, 0, Integer.MAX_VALUE);
 
-    // ---- Augments (tiers 1-4, same values as 1.20). Each list is tier 1 first. ----
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Pedestal tiers 1-6. Tier 0 (the plain pedestal) uses the [pedestal] section's values.").push("tiers");
+    }
 
-    public static final List<AmountAugment> CAPACITY_AUGMENTS = List.of(
-            AmountAugment.define("capacity", 1, 2, 2000, 5000, 1, 4),
-            AmountAugment.define("capacity", 2, 4, 4000, 10000, 5, 8),
-            AmountAugment.define("capacity", 3, 8, 8000, 100000, 10, 12),
-            AmountAugment.define("capacity", 4, 16, 16000, 1000000, 15, 16));
-    public static final List<AmountAugment> STORAGE_AUGMENTS = List.of(
-            AmountAugment.define("storage", 1, 1, 4000, 20000, 10, 3),
-            AmountAugment.define("storage", 2, 1, 16000, 100000, 15, 7),
-            AmountAugment.define("storage", 3, 1, 64000, 1000000, 20, 11),
-            AmountAugment.define("storage", 4, 1, 265000, 10000000, 25, 15));
-    public static final List<SimpleAugment> SPEED_AUGMENTS = List.of(
-            SimpleAugment.define("speed", "Ticks taken off the time between link transfers", 1, 2, 5),
-            SimpleAugment.define("speed", "Ticks taken off the time between link transfers", 2, 4, 5),
-            SimpleAugment.define("speed", "Ticks taken off the time between link transfers", 3, 6, 5),
-            SimpleAugment.define("speed", "Ticks taken off the time between link transfers", 4, 8, 5));
-    public static final List<SimpleAugment> RANGE_AUGMENTS = List.of(
-            SimpleAugment.define("range", "Blocks added to the linking range", 1, 2, 4),
-            SimpleAugment.define("range", "Blocks added to the linking range", 2, 6, 4),
-            SimpleAugment.define("range", "Blocks added to the linking range", 3, 8, 5),
-            SimpleAugment.define("range", "Blocks added to the linking range", 4, 8, 7));
+    // ---- Pedestal tiers: index = tier (0 = the plain pedestal, from the [pedestal] section; see PedestalTier) ----
+    // Values: ticks taken off pedestal_ticksToTransfer; link transfer rates (items, mB, FE, levels); item stacks,
+    // items per stack slot, fluid tanks, mB per tank, FE, levels; link and work card range.
+
+    public static final List<TierValues> TIERS = List.of(
+            TierValues.base(),
+            TierValues.define(1, "copper", 5, 8, 8000, 10000, 5, 2, 96, 1, 32000, 100000, 50, 16),
+            TierValues.define(2, "iron", 10, 16, 16000, 20000, 10, 4, 128, 1, 64000, 200000, 100, 32),
+            TierValues.define(3, "gold", 15, 32, 32000, 50000, 15, 8, 196, 1, 128000, 500000, 150, 48),
+            TierValues.define(4, "diamond", 20, 64, 64000, 100000, 20, 12, 256, 2, 256000, 1000000, 200, 64),
+            TierValues.define(5, "netherite", 30, 128, 128000, 500000, 30, 16, 512, 3, 512000, 20000000, 500, 96),
+            TierValues.define(6, "netherstar", 40, 256, 256000, 1000000, 50, 20, 1024, 4, 1024000, 100000000, 1000, 128));
 
     static {
         BUILDER.pop();
@@ -236,36 +240,63 @@ public class Config {
         }
     }
 
-    // A capacity or storage augment tier: what one augment adds per built-in transport type (capacity: to the link
-    // transfer rate; storage: to the storage, items as extra stacks), experience in levels, and how many can go in.
-    // Add-on types give their own values (PedestalTransportRules#capacityAugmentBonus / storageAugmentBonus).
-    public record AmountAugment(ModConfigSpec.IntValue items, ModConfigSpec.IntValue fluids, ModConfigSpec.IntValue energy,
-                                ModConfigSpec.IntValue experience, ModConfigSpec.IntValue insertable)
+    // One pedestal tier's numbers. IntSupplier: anything with getAsInt() (a config value, or a lambda like () -> 0).
+    // Tier 0 is made from the [pedestal] section's values; tiers 1-6 get their own subsection under [tiers].
+    // Experience values are in levels; PedestalTransportRules turns them into points.
+    public record TierValues(IntSupplier ticksReduced,
+                             IntSupplier itemRate, IntSupplier fluidRate, IntSupplier energyRate, IntSupplier xpRate,
+                             IntSupplier itemStacks, IntSupplier itemStackCapacity, IntSupplier fluidTanks,
+                             IntSupplier fluidCapacity, IntSupplier energyCapacity, IntSupplier xpCapacity,
+                             IntSupplier linkRange, IntSupplier workRange)
     {
-        static AmountAugment define(String kind, int tier, int items, int fluids, int energy, int experience, int insertable)
+        // Tier 0: the plain pedestal, exactly as before the tiers (no ticks taken off; the link range and the work
+        // card range are the two separate base settings)
+        static TierValues base()
         {
-            String prefix = "augment_t" + tier + "_" + kind + "_";
-            String name = " [" + kind + " augment, tier " + tier + "]";
-            String what = kind.equals("capacity") ? "Added to the transfer rate: " : "Added to the storage: ";
-            return new AmountAugment(
-                    BUILDER.comment(what + (kind.equals("capacity") ? "items" : "item stacks") + name).defineInRange(prefix + "items", items, 0, Integer.MAX_VALUE),
-                    BUILDER.comment(what + "fluid (mB)" + name).defineInRange(prefix + "fluids", fluids, 0, Integer.MAX_VALUE),
-                    BUILDER.comment(what + "energy" + name).defineInRange(prefix + "energy", energy, 0, Integer.MAX_VALUE),
-                    BUILDER.comment(what + "experience (levels)" + name).defineInRange(prefix + "experience", experience, 0, Integer.MAX_VALUE),
-                    BUILDER.comment("How many can go in one pedestal" + name).defineInRange(prefix + "insertable", insertable, 1, 64));
+            return new TierValues(() -> 0,
+                    ITEM_TRANSFER_RATE::getAsInt, FLUID_TRANSFER_RATE::getAsInt, ENERGY_TRANSFER_RATE::getAsInt, XP_TRANSFER_RATE::getAsInt,
+                    ITEM_SLOTS::getAsInt, ITEM_STACK_CAPACITY::getAsInt, FLUID_TANKS::getAsInt,
+                    FLUID_STORAGE::getAsInt, ENERGY_STORAGE::getAsInt, XP_STORAGE::getAsInt,
+                    LINKING_RANGE::getAsInt, SELECTION_RANGE::getAsInt);
         }
-    }
 
-    // A speed or range augment tier: what one augment does, and how many can go in
-    public record SimpleAugment(ModConfigSpec.IntValue amount, ModConfigSpec.IntValue insertable)
-    {
-        static SimpleAugment define(String kind, String comment, int tier, int amount, int insertable)
+        // Tiers 1-6: [tiers.tier_<n>_<name>]. One range setting covers both linking and work cards.
+        static TierValues define(int tier, String name, int ticksReduced,
+                                 int itemRate, int fluidRate, int energyRate, int xpRate,
+                                 int itemStacks, int itemStackCapacity, int fluidTanks,
+                                 int fluidCapacity, int energyCapacity, int xpCapacity, int range)
         {
-            String prefix = "augment_t" + tier + "_" + kind + "_";
-            String name = " [" + kind + " augment, tier " + tier + "]";
-            return new SimpleAugment(
-                    BUILDER.comment(comment + name).defineInRange(prefix + "amount", amount, 0, Integer.MAX_VALUE),
-                    BUILDER.comment("How many can go in one pedestal" + name).defineInRange(prefix + "insertable", insertable, 1, 64));
+            String label = " [tier " + tier + ": " + name + "]";
+            BUILDER.push("tier_" + tier + "_" + name);
+            ModConfigSpec.IntValue speed = BUILDER.comment("Ticks taken off pedestal_ticksToTransfer (40 by default) between link transfers; never fewer than 1 tick" + label)
+                    .defineInRange("ticks_reduced", ticksReduced, 0, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue items = BUILDER.comment("Items sent per link transfer" + label)
+                    .defineInRange("item_transfer_rate", itemRate, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue fluids = BUILDER.comment("Fluid (mB) sent per link transfer" + label)
+                    .defineInRange("fluid_transfer_rate", fluidRate, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue energy = BUILDER.comment("Energy sent per link transfer" + label)
+                    .defineInRange("energy_transfer_rate", energyRate, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue xp = BUILDER.comment("Experience sent per link transfer, in levels (counted from level 0)" + label)
+                    .defineInRange("xp_transfer_rate", xpRate, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue stacks = BUILDER.comment("Item stacks the pedestal holds" + label)
+                    .defineInRange("item_stacks", itemStacks, 1, 128);
+            ModConfigSpec.IntValue stackCapacity = BUILDER.comment("Items one stack slot holds, for items that normally stack to 64 (16-stackers get a quarter; unstackable items stay at 1)" + label)
+                    .defineInRange("item_stack_capacity", itemStackCapacity, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue tanks = BUILDER.comment("Fluid tanks, each holding one fluid" + label)
+                    .defineInRange("fluid_tanks", fluidTanks, 1, 16);
+            ModConfigSpec.IntValue fluidStorage = BUILDER.comment("Fluid one tank holds, in mB" + label)
+                    .defineInRange("fluid_capacity", fluidCapacity, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue energyStorage = BUILDER.comment("Energy the pedestal holds" + label)
+                    .defineInRange("energy_capacity", energyCapacity, 1, Integer.MAX_VALUE);
+            ModConfigSpec.IntValue xpStorage = BUILDER.comment("Experience the pedestal holds, in levels" + label)
+                    .defineInRange("xp_capacity", xpCapacity, 1, 21000);
+            ModConfigSpec.IntValue rangeValue = BUILDER.comment("How far (in blocks, on each axis) the pedestal links, and how far work card positions may be (upgrade range modifiers add to it)" + label)
+                    .defineInRange("range", range, 1, Integer.MAX_VALUE);
+            BUILDER.pop();
+            return new TierValues(speed::getAsInt, items::getAsInt, fluids::getAsInt, energy::getAsInt, xp::getAsInt,
+                    stacks::getAsInt, stackCapacity::getAsInt, tanks::getAsInt,
+                    fluidStorage::getAsInt, energyStorage::getAsInt, xpStorage::getAsInt,
+                    rangeValue::getAsInt, rangeValue::getAsInt);
         }
     }
 

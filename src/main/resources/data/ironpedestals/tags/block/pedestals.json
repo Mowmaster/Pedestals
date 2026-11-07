@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "ironpedestals:block_pedestal",
+    "ironpedestals:block_pedestal_copper",
+    "ironpedestals:block_pedestal_iron",
+    "ironpedestals:block_pedestal_gold",
+    "ironpedestals:block_pedestal_diamond",
+    "ironpedestals:block_pedestal_netherite",
+    "ironpedestals:block_pedestal_netherstar"
+  ]
+}

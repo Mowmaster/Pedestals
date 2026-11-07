@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "ironpedestals:block/ironpedestals/pedestal",
+    "tints": [
+      {
+        "type": "minecraft:dye",
+        "default": -602051
+      }
+    ]
+  }
+}

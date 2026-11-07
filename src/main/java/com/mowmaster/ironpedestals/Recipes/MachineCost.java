@@ -43,13 +43,19 @@ public record MachineCost(Optional<SizedFluidIngredient> fluid, int energy, int 
         return fluid.isEmpty() && energy <= 0 && experience <= 0;
     }
 
-    // Does the pedestal hold the right fluid at all? (Recipes match on this, so a bottle picks the right recipe for
-    // the fluid that's in the pedestal.)
+    // Does the pedestal hold the right fluid at all, in any tank? (Recipes match on this, so a bottle picks the
+    // right recipe for the fluid that's in the pedestal.)
     public boolean fluidMatches(BasePedestalBlockEntity pedestal)
     {
-        if (fluid.isEmpty()) return true;
-        FluidResource stored = pedestal.getStorage(TransportTypes.FLUIDS.get()).getResource(0);
-        return !stored.isEmpty() && fluid.get().ingredient().test(stored.toStack(fluid.get().amount()));
+        return fluid.isEmpty() || !matchingFluid(pedestal).isEmpty();
+    }
+
+    // The first tank's fluid that the cost's ingredient accepts (EMPTY if none, or if the cost has no fluid)
+    private FluidResource matchingFluid(BasePedestalBlockEntity pedestal)
+    {
+        if (fluid.isEmpty()) return FluidResource.EMPTY;
+        SizedFluidIngredient wanted = fluid.get();
+        return pedestal.findFluid(stored -> wanted.ingredient().test(stored.toStack(wanted.amount())));
     }
 
     // Takes times x the cost from the pedestal as part of the transaction; false if there isn't enough
@@ -58,9 +64,10 @@ public record MachineCost(Optional<SizedFluidIngredient> fluid, int energy, int 
         if (fluid.isPresent())
         {
             TransportStorage<FluidResource> fluids = pedestal.getStorage(TransportTypes.FLUIDS.get());
-            FluidResource stored = fluids.getResource(0);
+            FluidResource stored = matchingFluid(pedestal);
             int amount = fluid.get().amount() * times;
-            if (!fluidMatches(pedestal) || fluids.extract(stored, amount, transaction) < amount) return false;
+            // extract without an index takes from every tank holding that fluid
+            if (stored.isEmpty() || fluids.extract(stored, amount, transaction) < amount) return false;
         }
         if (energy > 0 && pedestal.getStorage(TransportTypes.ENERGY.get()).extract(EnergyTransportType.ENERGY, energy * times, transaction) < energy * times) return false;
         if (experience > 0 && pedestal.getStorage(TransportTypes.EXPERIENCE.get()).extract(ExperienceTransportType.EXPERIENCE, experience * times, transaction) < experience * times) return false;

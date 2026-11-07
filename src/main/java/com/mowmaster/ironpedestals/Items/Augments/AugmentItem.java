@@ -1,11 +1,7 @@
 package com.mowmaster.ironpedestals.Items.Augments;
 
-import com.mowmaster.mowlib.transport.TransportType;
-import com.mowmaster.mowlib.transport.TransportTypes;
-import com.mowmaster.ironpedestals.Config;
 import com.mowmaster.ironpedestals.Items.PedestalDataComponents;
 import com.mowmaster.ironpedestals.IronPedestalReferences;
-import com.mowmaster.ironpedestals.Transport.PedestalTransportRules;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -19,9 +15,9 @@ import net.minecraft.world.level.Level;
 
 import java.util.function.Consumer;
 
-// A pedestal augment (1.20's AugmentTiered* and the round robin, render diffuser and no-collide augments). Put one in
-// with it in the OFFHAND, right-clicking the pedestal; take them out with the matching augment tool in the offhand,
-// left-clicking (sneak for all of a tiered kind). tier is 1-4 for the tiered kinds, 0 for the others.
+// A pedestal augment (1.20's round robin, render diffuser and no-collide augments; the tiered speed, capacity, storage
+// and range augments became pedestal tiers). Put one in with it in the OFFHAND, right-clicking the pedestal; take it
+// out with the matching augment tool in the offhand, left-clicking. One of each kind per pedestal.
 //
 // The particle & render augment (DIFFUSER) has a mode: sneak + right-click with it in hand to switch.
 //   0 particles, 1 item, 2 upgrade, 3 particles + item, 4 particles + upgrade, 5 item + upgrade, 6 all three hidden
@@ -31,47 +27,16 @@ public class AugmentItem extends Item
     public static final int DIFFUSER_MODES = 7;
 
     private final AugmentType type;
-    private final int tier;
 
-    public AugmentItem(Properties properties, AugmentType type, int tier)
+    public AugmentItem(Properties properties, AugmentType type)
     {
         super(properties);
         this.type = type;
-        this.tier = tier;
     }
 
     public AugmentType getType()
     {
         return type;
-    }
-
-    public int getTier()
-    {
-        return tier;
-    }
-
-    // How many of this one can go in a pedestal
-    public int getInsertable()
-    {
-        return switch (type)
-        {
-            case SPEED -> Config.SPEED_AUGMENTS.get(tier - 1).insertable().getAsInt();
-            case CAPACITY -> Config.CAPACITY_AUGMENTS.get(tier - 1).insertable().getAsInt();
-            case STORAGE -> Config.STORAGE_AUGMENTS.get(tier - 1).insertable().getAsInt();
-            case RANGE -> Config.RANGE_AUGMENTS.get(tier - 1).insertable().getAsInt();
-            default -> 1;
-        };
-    }
-
-    // What one does: ticks taken off (speed) or blocks added (range); 0 for the other kinds
-    public int getAmount()
-    {
-        return switch (type)
-        {
-            case SPEED -> Config.SPEED_AUGMENTS.get(tier - 1).amount().getAsInt();
-            case RANGE -> Config.RANGE_AUGMENTS.get(tier - 1).amount().getAsInt();
-            default -> 0;
-        };
     }
 
     // ---- Particle & render augment modes ----
@@ -121,27 +86,10 @@ public class AugmentItem extends Item
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag)
     {
         super.appendHoverText(stack, context, display, tooltip, flag);
-        switch (type)
+        if (type == AugmentType.DIFFUSER)
         {
-            case SPEED -> tooltip.accept(Component.translatable(MODID + ".augments_speed_ticksreduced").append(String.valueOf(getAmount())).withStyle(ChatFormatting.YELLOW));
-            case RANGE -> tooltip.accept(Component.translatable(MODID + ".augments_range_increase").append(String.valueOf(getAmount())).withStyle(ChatFormatting.YELLOW));
-            case CAPACITY, STORAGE -> {
-                tooltip.accept(Component.translatable(MODID + (type == AugmentType.CAPACITY ? ".augments_capacity_title" : ".augments_storage_title")).withStyle(ChatFormatting.YELLOW));
-                for (TransportType<?> transportType : TransportTypes.REGISTRY)
-                {
-                    PedestalTransportRules rules = PedestalTransportRules.of(transportType);
-                    int amount = type == AugmentType.CAPACITY ? rules.capacityAugmentBonus(tier) : rules.storageAugmentBonus(tier);
-                    if (amount <= 0) continue;
-                    // ironpedestals.augment_amount.<capacity|storage>.<type namespace>.<type path>, e.g. "+%s mB"; plain "+N" if missing
-                    String key = MODID + ".augment_amount." + type.key() + "." + transportType.getId().getNamespace() + "." + transportType.getId().getPath();
-                    tooltip.accept(Component.literal(" ").append(transportType.getName()).append(": ")
-                            .append(Component.translatableWithFallback(key, "+" + amount, amount).withStyle(ChatFormatting.WHITE)));
-                }
-            }
-            case DIFFUSER -> tooltip.accept(Component.translatable(MODID + ".upgrade_tooltip_mode").append(modeName(getDiffuserMode(stack))).withStyle(ChatFormatting.GOLD));
-            default -> {}
+            tooltip.accept(Component.translatable(MODID + ".upgrade_tooltip_mode").append(modeName(getDiffuserMode(stack))).withStyle(ChatFormatting.GOLD));
         }
         tooltip.accept(Component.translatable("item." + MODID + ".augment_" + type.key() + ".tooltip").withStyle(ChatFormatting.GRAY));
-        if (type.tiered()) tooltip.accept(Component.translatable(MODID + ".augments_insertable").append(String.valueOf(getInsertable())).withStyle(ChatFormatting.LIGHT_PURPLE));
     }
 }

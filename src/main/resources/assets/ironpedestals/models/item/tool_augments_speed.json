@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "ironpedestals:item/tool_augments_speed"
-  }
-}

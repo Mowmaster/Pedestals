@@ -3,7 +3,6 @@ package com.mowmaster.ironpedestals.Recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.mowmaster.mowlib.transport.TransportTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -12,7 +11,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import java.util.Optional;
 
@@ -69,8 +67,8 @@ public final class FluidConverterRecipe extends PedestalMachineRecipe<PedestalRe
     @Override
     public boolean matches(PedestalRecipeInput recipeInput, Level level)
     {
-        FluidResource stored = recipeInput.pedestal().getStorage(TransportTypes.FLUIDS.get()).getResource(0);
-        return !stored.isEmpty() && fluid.ingredient().test(stored.toStack(fluid.amount()));
+        // Any of the pedestal's tanks
+        return !recipeInput.pedestal().findFluid(stored -> fluid.ingredient().test(stored.toStack(fluid.amount()))).isEmpty();
     }
 
     @Override

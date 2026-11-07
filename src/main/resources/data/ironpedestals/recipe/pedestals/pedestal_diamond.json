@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "M": "#c:gems/diamond",
+    "P": "ironpedestals:block_pedestal_gold"
+  },
+  "pattern": [
+    "MMM",
+    "MPM",
+    "MMM"
+  ],
+  "result": {
+    "id": "ironpedestals:block_pedestal_diamond"
+  }
+}

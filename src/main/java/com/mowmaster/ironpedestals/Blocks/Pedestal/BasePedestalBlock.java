@@ -57,7 +57,8 @@ import java.util.List;
 import java.util.Map;
 
 // The pedestal: holds items, fluid, energy and experience (and add-on transport types), sends them down its links,
-// and takes an upgrade, a tool and a work card (augments come later).
+// and takes an upgrade, a tool, a work card and augments. One block per tier (PedestalTier): the tier sets how fast
+// and how much it moves, how much it holds, its range and its undyed colour.
 // Ported from 1.20: the colour now lives in the block entity (ITintHolder) instead of three blockstate properties,
 // so it can be any RGB colour and dyes mix like CrystalBlocks' blocks.
 // Controls (as in 1.20): right-click inserts the held item (buckets fill/empty the tank), left-click takes one out
@@ -88,10 +89,12 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
             new CBPixelBox(4, 10, 4, 12, 12, 12));
 
     private final Map<BlockState, VoxelShape> shapes = new HashMap<>();
+    private final PedestalTier tier;
 
-    public BasePedestalBlock(Properties properties)
+    public BasePedestalBlock(Properties properties, PedestalTier tier)
     {
         super(properties);
+        this.tier = tier;
         registerDefaultState(stateDefinition.any()
                 .setValue(FACING, Direction.UP)
                 .setValue(LIT, false)
@@ -121,7 +124,19 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         return shapes.get(state);
     }
 
+    public PedestalTier getTier()
+    {
+        return tier;
+    }
+
     // ---- Colour: one region, coloured by the pedestal's own block entity ----
+
+    // An undyed pedestal shows its tier's colour (white for tier 0)
+    @Override
+    public int getDefaultColor(int region)
+    {
+        return tier.color();
+    }
 
     @Override
     public boolean usesTintBlockEntity()
@@ -135,7 +150,7 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         return new BasePedestalBlockEntity(pos, state);
     }
 
-    // Only the server ticks ironpedestals (transfers). The cast is safe because of the type check before it.
+    // Only the server ticks pedestals (transfers). The cast is safe because of the type check before it.
     @SuppressWarnings("unchecked")
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
@@ -147,13 +162,13 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
     // ---- Placement ----
 
     // Like the end rod: the top points away from the face you clicked, and placing onto the top of another
-    // pedestal that points the same way flips it, so two ironpedestals can face each other.
+    // pedestal (any tier) that points the same way flips it, so two pedestals can face each other.
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context)
     {
         Direction direction = context.getClickedFace();
         BlockState clicked = context.getLevel().getBlockState(context.getClickedPos().relative(direction.getOpposite()));
-        Direction facing = clicked.is(this) && clicked.getValue(FACING) == direction ? direction.getOpposite() : direction;
+        Direction facing = clicked.getBlock() instanceof BasePedestalBlock && clicked.getValue(FACING) == direction ? direction.getOpposite() : direction;
         boolean inWater = context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER;
         return defaultBlockState().setValue(FACING, facing).setValue(WATERLOGGED, inWater);
     }
@@ -205,7 +220,7 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
             return InteractionResult.SUCCESS;
         }
 
-        // Augment in the offhand: put one in (tiered ones stack up to their limit)
+        // Augment in the offhand: put it in (one of each kind)
         if (offhand.getItem() instanceof AugmentItem && level.getBlockEntity(pos) instanceof BasePedestalBlockEntity pedestal)
         {
             if (!level.isClientSide() && !pedestal.insertAugment(offhand)) return InteractionResult.FAIL;
@@ -329,10 +344,10 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
                 else player.sendOverlayMessage(Component.translatable("ironpedestals.tool_workcard_missing"));
                 return;
             }
-            // Augment tool: take that kind of augment out (sneak: all of them)
+            // Augment tool: take that kind of augment out
             if (offhand.getItem() instanceof AugmentToolItem augmentTool)
             {
-                if (pedestal.hasAugment(augmentTool.getType())) giveToPlayer(player, pedestal.removeAugment(augmentTool.getType(), player.isShiftKeyDown()));
+                if (pedestal.hasAugment(augmentTool.getType())) giveToPlayer(player, pedestal.removeAugment(augmentTool.getType()));
                 else player.sendOverlayMessage(Component.translatable("ironpedestals.tool.augment." + augmentTool.getType().key() + "_not"));
                 return;
             }
@@ -359,7 +374,7 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         StorageInteractions.giveToPlayer(player, stack);
     }
 
-    // Creative players don't break ironpedestals by left-clicking (that takes items out instead, as in 1.20);
+    // Creative players don't break pedestals by left-clicking (that takes items out instead, as in 1.20);
     // sneak to break one. Fake players (other mods' machines) can't break them at all.
     // Vanilla skips attack() in creative and goes straight here, so the left-click action runs here instead.
     @Override
