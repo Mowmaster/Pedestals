@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mowmaster.ironpedestals.Blocks.Pedestal.BasePedestalBlockEntity;
 import com.mowmaster.ironpedestals.Config;
 import com.mowmaster.ironpedestals.IronPedestalReferences;
+import com.mowmaster.ironpedestals.Menus.PedestalLinkPayload;
 import com.mowmaster.ironpedestals.Menus.PedestalMenu;
 import com.mowmaster.ironpedestals.Menus.PedestalSlots;
 import com.mowmaster.mowlib.MowLibReferences;
@@ -18,6 +19,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +59,11 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
     private static final int LINKS_HEIGHT = PAD * 2 + LINE + 2 + LINK_ROWS_SHOWN * LINK_ROW;
 
     private int linkScroll;
-    private final List<BlockPos> shownLinks = new ArrayList<>();
+    // The rows drawn last frame (for clicks and tooltips)
+    private final List<LinkRow> shownLinks = new ArrayList<>();
+
+    // One row of the link list: the other pedestal, and whether this one sends to it (or it sends here)
+    private record LinkRow(BlockPos other, boolean outgoing) {}
 
     public PedestalScreen(PedestalMenu menu, Inventory inventory, Component title)
     {
@@ -117,39 +123,59 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
         }
     }
 
-    // The link list on the right paper. Each row: a toggle box (the outline's colour when on), a square in the linked
-    // pedestal's own colour (its dye, or its tier colour), where it is, and a red X that removes the link
+    // The link list on the right paper: the pedestals this one sends to, then the ones that send to it (loaded ones;
+    // only the sender stores a link, so these are found among the client's loaded pedestals). Each row: a toggle box
+    // (the outline's colour when on), a square in that pedestal's own colour (its dye, or its tier colour), an arrow
+    // button showing the direction (click: turn it round), where it is, and a red X that removes the link.
     private void extractLinks(GuiGraphicsExtractor graphics)
     {
         Level level = pedestal().getLevel();
-        List<BlockPos> links = pedestal().getLinks();
+        List<LinkRow> rows = new ArrayList<>();
+        pedestal().getLinks().forEach(link -> rows.add(new LinkRow(link, true)));
+        pedestal().getClientSenders().forEach(sender -> rows.add(new LinkRow(sender.getBlockPos(), false)));
+        int outgoing = pedestal().getLinks().size();
         int left = linksLeft() + PAD;
         int y = topPos + PAD;
-        graphics.text(font, Component.translatable(MODID + ".screen.links", links.size(), Config.MAX_LINKS.getAsInt()), left, y, INK, false);
+        graphics.text(font, Component.translatable(MODID + ".screen.links", outgoing, Config.MAX_LINKS.getAsInt(), rows.size() - outgoing), left, y, INK, false);
         y += LINE + 2;
-        linkScroll = Math.clamp(linkScroll, 0, Math.max(0, links.size() - LINK_ROWS_SHOWN));
+        linkScroll = Math.clamp(linkScroll, 0, Math.max(0, rows.size() - LINK_ROWS_SHOWN));
         shownLinks.clear();
-        if (links.isEmpty() || level == null)
+        if (rows.isEmpty() || level == null)
         {
             graphics.textWithWordWrap(font, Component.translatable(MODID + ".screen.no_links"), left, y, LINKS_WIDTH - PAD * 2, FADED_INK, false);
             return;
         }
-        for (int row = 0; row < LINK_ROWS_SHOWN && linkScroll + row < links.size(); row++)
+        for (int row = 0; row < LINK_ROWS_SHOWN && linkScroll + row < rows.size(); row++)
         {
             int index = linkScroll + row;
-            BlockPos link = links.get(index);
+            LinkRow link = rows.get(index);
+            BlockPos other = link.other();
             shownLinks.add(link);
             int rowY = y + row * LINK_ROW;
-            boolean on = PedestalOutlines.isShown(level.dimension(), link);
+            boolean on = PedestalOutlines.isShown(level.dimension(), other);
             box(graphics, left, rowY, on ? PedestalOutlines.colorFor(index) : SLOT_FILL);
-            box(graphics, left + BOX + 3, rowY, pedestalTint(level, link));
-            int distance = (int) Math.round(Math.sqrt(link.distSqr(pedestal().getBlockPos())));
-            graphics.text(font, Component.translatable(MODID + ".screen.link_at", link.getX(), link.getY(), link.getZ(), distance), left + 2 * (BOX + 3), rowY + 1, INK, false);
+            box(graphics, left + BOX + 3, rowY, pedestalTint(level, other));
+            // The direction button: an arrow, right = this pedestal sends to it, left = it sends here
+            int arrowX = arrowX();
+            box(graphics, arrowX, rowY, SLOT_FILL);
+            graphics.text(font, link.outgoing() ? "\u2192" : "\u2190", arrowX + 1, rowY, INK, false);
+            int distance = (int) Math.round(Math.sqrt(other.distSqr(pedestal().getBlockPos())));
+            graphics.text(font, Component.translatable(MODID + ".screen.link_at", other.getX(), other.getY(), other.getZ(), distance), arrowX + BOX + 3, rowY + 1, INK, false);
             // The remove button: a red X at the row's right end
             int removeX = removeX();
             graphics.fill(removeX, rowY, removeX + BOX, rowY + BOX, SLOT_BORDER);
             graphics.text(font, "x", removeX + 2, rowY, REMOVE_RED, false);
         }
+    }
+
+    private int arrowX()
+    {
+        return linksLeft() + PAD + 2 * (BOX + 3);
+    }
+
+    private boolean overArrow(double mouseX)
+    {
+        return mouseX >= arrowX() && mouseX < arrowX() + BOX;
     }
 
     // A small framed square of one colour
@@ -180,10 +206,12 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
         int row = linkRowAt(mouseX, mouseY);
         if (row >= 0 && level != null)
         {
-            BlockPos link = shownLinks.get(row);
-            boolean on = PedestalOutlines.isShown(level.dimension(), link);
-            String key = mouseX >= removeX() ? ".screen.link_remove" : on ? ".screen.outline_hide" : ".screen.outline_show";
-            List<Component> lines = level.isLoaded(link) ? List.of(Component.translatable(MODID + key))
+            LinkRow link = shownLinks.get(row);
+            boolean on = PedestalOutlines.isShown(level.dimension(), link.other());
+            String key = mouseX >= removeX() ? ".screen.link_remove"
+                    : overArrow(mouseX) ? (link.outgoing() ? ".screen.link_sends" : ".screen.link_receives")
+                    : on ? ".screen.outline_hide" : ".screen.outline_show";
+            List<Component> lines = level.isLoaded(link.other()) ? List.of(Component.translatable(MODID + key))
                     : List.of(Component.translatable(MODID + key), Component.translatable(MODID + ".screen.unloaded"));
             graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
         }
@@ -216,17 +244,20 @@ public class PedestalScreen extends AbstractContainerScreen<PedestalMenu>
             int row = linkRowAt(event.x(), event.y());
             if (row >= 0 && level != null)
             {
-                BlockPos link = shownLinks.get(row);
+                LinkRow link = shownLinks.get(row);
                 if (event.x() >= removeX())
                 {
-                    // Removing happens on the server: vanilla's menu button message, the link's index as the id
-                    // (PedestalMenu#clickMenuButton). Its outline goes too.
-                    minecraft.gameMode.handleInventoryButtonClick(menu.containerId, linkScroll + row);
-                    PedestalOutlines.hide(level.dimension(), link);
+                    // Removing and turning round happen on the server (PedestalLinkPayload); the outline goes now
+                    ClientPacketDistributor.sendToServer(new PedestalLinkPayload(link.other(), false));
+                    PedestalOutlines.hide(level.dimension(), link.other());
+                }
+                else if (overArrow(event.x()))
+                {
+                    ClientPacketDistributor.sendToServer(new PedestalLinkPayload(link.other(), true));
                 }
                 else
                 {
-                    PedestalOutlines.toggle(level.dimension(), pedestal().getBlockPos(), link, PedestalOutlines.colorFor(linkScroll + row));
+                    PedestalOutlines.toggle(level.dimension(), pedestal().getBlockPos(), link.other(), PedestalOutlines.colorFor(linkScroll + row));
                 }
                 return true;
             }

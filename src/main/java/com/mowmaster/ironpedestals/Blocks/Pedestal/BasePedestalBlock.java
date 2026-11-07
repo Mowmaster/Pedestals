@@ -209,6 +209,9 @@ public class BasePedestalBlock extends Block implements IColorableBlock, SimpleW
         // Everything is handled on the main hand's turn; the offhand only holds what gets applied
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 
+        // The linking tool does its own thing (LinkingToolItem#useOn); PASS hands the click on to the item
+        if (stack.getItem() instanceof LinkingToolItem) return InteractionResult.PASS;
+
         ItemStack offhand = player.getOffhandItem();
 
         // Filter in the offhand: put it in (one filter per pedestal; the filter tool takes it out)

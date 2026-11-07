@@ -27,7 +27,6 @@ public class CreativeTabRegistry
             .icon(() -> new ItemStack(BlockRegistry.BLOCK_PEDESTAL.get()))
             .displayItems((parameters, output) -> {
                 output.accept(ItemRegistry.TOOL_LINKINGTOOL.get());
-                output.accept(ItemRegistry.TOOL_LINKINGTOOLBACKWARDS.get());
                 output.accept(MowLibItems.TOOL_FILTER.get());
                 output.accept(ItemRegistry.TOOL_UPGRADETOOL.get());
                 output.accept(ItemRegistry.TOOL_TOOLSWAPPER.get());

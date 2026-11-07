@@ -85,7 +85,10 @@ public final class PedestalOutlines
     {
         if (level.isLoaded(pos) && !(level.getBlockEntity(pos) instanceof BasePedestalBlockEntity)) return false;
         if (!level.isLoaded(shown.source())) return true;
-        return level.getBlockEntity(shown.source()) instanceof BasePedestalBlockEntity source && source.getLinks().contains(pos);
+        if (!(level.getBlockEntity(shown.source()) instanceof BasePedestalBlockEntity source)) return false;
+        // Linked either way round (the menu also lists pedestals that send to it)
+        return source.getLinks().contains(pos)
+                || level.getBlockEntity(pos) instanceof BasePedestalBlockEntity other && other.getLinks().contains(shown.source());
     }
 
     // ---- Step 1: what to draw (the level can be read here) ----

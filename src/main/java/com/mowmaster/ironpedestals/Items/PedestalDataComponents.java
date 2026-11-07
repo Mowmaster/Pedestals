@@ -28,6 +28,10 @@ public class PedestalDataComponents
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockPos>> LINKED_POS =
             COMPONENTS.registerComponentType("linked_pos", builder -> builder.persistent(BlockPos.CODEC).networkSynchronized(BlockPos.STREAM_CODEC));
 
+    // On a linking tool: the saved pedestal stays for many links (sneak + right-click); absent = used up by one link
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> LINK_STICKY =
+            COMPONENTS.registerComponentType("link_sticky", builder -> builder.persistent(Unit.CODEC).networkSynchronized(Unit.STREAM_CODEC));
+
     // ---- Upgrades ----
 
     // The upgrade's tier, 1-6 (absent = tier 0; see UpgradeTier). Also picks the tint of its item model.

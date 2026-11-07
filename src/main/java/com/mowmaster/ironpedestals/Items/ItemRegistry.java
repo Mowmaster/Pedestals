@@ -34,10 +34,8 @@ public class ItemRegistry {
     public static final DeferredRegister.Items PEDESTAL_ITEMS = DeferredRegister.createItems(IronPedestalReferences.MODID);
 
     // ---- Tools (same ids as 1.20) ----
-    public static final DeferredItem<LinkingToolItem> TOOL_LINKINGTOOL = PEDESTAL_ITEMS.registerItem("tool_linkingtool",
-            properties -> new LinkingToolItem(properties, false));
-    public static final DeferredItem<LinkingToolItem> TOOL_LINKINGTOOLBACKWARDS = PEDESTAL_ITEMS.registerItem("tool_linkingtoolbackwards",
-            properties -> new LinkingToolItem(properties, true));
+    // The linking tool (Send To / Receive From switched with the activation key; the backwards tool is gone, see register)
+    public static final DeferredItem<LinkingToolItem> TOOL_LINKINGTOOL = PEDESTAL_ITEMS.registerItem("tool_linkingtool", LinkingToolItem::new);
     // In the offhand, left-click a pedestal to take its upgrade / tool out (the filter tool and work card tool are
     // MowLib's: MowLibItems.TOOL_FILTER / TOOL_WORK)
     public static final DeferredItem<PedestalToolItem> TOOL_UPGRADETOOL = PEDESTAL_ITEMS.registerItem("tool_upgradetool", PedestalToolItem::new);
@@ -193,6 +191,9 @@ public class ItemRegistry {
         {
             PEDESTAL_ITEMS.addAlias(Identifier.fromNamespaceAndPath(IronPedestalReferences.MODID, id), MowLibReferences.id(id));
         }
+        // The backwards linking tool was folded into the linking tool: old ones load as linking tools
+        PEDESTAL_ITEMS.addAlias(Identifier.fromNamespaceAndPath(IronPedestalReferences.MODID, "tool_linkingtoolbackwards"),
+                Identifier.fromNamespaceAndPath(IronPedestalReferences.MODID, "tool_linkingtool"));
         PEDESTAL_ITEMS.register(eventBus);
     }
 }

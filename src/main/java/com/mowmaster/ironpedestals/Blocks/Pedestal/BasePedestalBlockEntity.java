@@ -77,6 +77,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 // The pedestal's storage, links, filter, upgrade and colour.
@@ -753,10 +755,10 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
             return changed;
         }
 
-        public Component message(boolean backwards)
+        // receiving: the link was made from the receiving end (the linking tool's Receive From mode)
+        public Component message(boolean receiving)
         {
-            String key = messageKey != null ? messageKey
-                    : backwards ? ".tool_link_success_backwardslinkingtool" : ".tool_link_success_linkingtool";
+            String key = messageKey != null ? messageKey : receiving ? ".tool_link_success_receive" : ".tool_link_success_send";
             return Component.translatable(IronPedestalReferences.MODID + key).withStyle(changed ? ChatFormatting.WHITE : ChatFormatting.RED);
         }
     }
@@ -769,20 +771,84 @@ public class BasePedestalBlockEntity extends BlockEntity implements ITintHolder,
         return true;
     }
 
-    // Adds a link to target, or removes it if it's already linked
-    public LinkResult toggleLink(BlockPos target)
+    // Adds a link to target (if it's already there: ADDED, nothing changes). A pair of pedestals links one way only,
+    // so a link back from target to this one is removed (that pedestal updates too).
+    public LinkResult addLink(BlockPos target)
     {
         if (target.equals(worldPosition)) return LinkResult.SELF;
-        if (links.remove(target))
-        {
-            update();
-            return LinkResult.REMOVED;
-        }
+        if (links.contains(target)) return LinkResult.ADDED;
         if (!isInRange(target)) return LinkResult.OUT_OF_RANGE;
         if (links.size() >= Config.MAX_LINKS.getAsInt()) return LinkResult.FULL;
         links.add(target.immutable());
         update();
+        if (level != null && level.getBlockEntity(target) instanceof BasePedestalBlockEntity other) other.removeLink(worldPosition);
         return LinkResult.ADDED;
+    }
+
+    // Adds a link to target, or removes it if it's already linked (the linking tool)
+    public LinkResult toggleLink(BlockPos target)
+    {
+        if (target.equals(worldPosition)) return LinkResult.SELF;
+        if (removeLink(target)) return LinkResult.REMOVED;
+        return addLink(target);
+    }
+
+    // Turns the link between this pedestal and other round: this -> other becomes other -> this, and the other way.
+    // Both pedestals update. If the new sender can't take the link (out of its range, no room), nothing changes.
+    public LinkResult flipLink(BlockPos other)
+    {
+        if (level == null || !(level.getBlockEntity(other) instanceof BasePedestalBlockEntity otherPedestal)) return LinkResult.OUT_OF_RANGE;
+        BasePedestalBlockEntity sender = links.contains(other) ? this : otherPedestal.links.contains(worldPosition) ? otherPedestal : null;
+        if (sender == null) return LinkResult.OUT_OF_RANGE;
+        BasePedestalBlockEntity receiver = sender == this ? otherPedestal : this;
+        sender.removeLink(receiver.worldPosition);
+        LinkResult result = receiver.addLink(sender.worldPosition);
+        if (!result.changed())
+        {
+            sender.links.add(receiver.worldPosition.immutable()); // put it back as it was
+            sender.update();
+        }
+        return result;
+    }
+
+    // ---- Pedestals loaded on the client ----
+    // The client keeps a set of its loaded pedestals, so the link beams (ClientSide/PedestalBeams) and the menu's list
+    // of pedestals sending here can find them. Only filled on the client; a set of objects, not positions, so each
+    // dimension's pedestals are told apart by their level.
+
+    public static final Set<BasePedestalBlockEntity> CLIENT_LOADED = ConcurrentHashMap.newKeySet();
+
+    @Override
+    public void onLoad()
+    {
+        super.onLoad();
+        if (level != null && level.isClientSide()) CLIENT_LOADED.add(this);
+    }
+
+    @Override
+    public void onChunkUnloaded()
+    {
+        super.onChunkUnloaded();
+        CLIENT_LOADED.remove(this);
+    }
+
+    @Override
+    public void setRemoved()
+    {
+        super.setRemoved();
+        CLIENT_LOADED.remove(this);
+    }
+
+    // The loaded pedestals (client) that send to this one
+    public List<BasePedestalBlockEntity> getClientSenders()
+    {
+        List<BasePedestalBlockEntity> senders = new ArrayList<>();
+        for (BasePedestalBlockEntity other : CLIENT_LOADED)
+        {
+            if (other != this && other.level == level && other.links.contains(worldPosition)) senders.add(other);
+        }
+        senders.sort(java.util.Comparator.comparingDouble(other -> other.worldPosition.distSqr(worldPosition)));
+        return senders;
     }
 
     // ---- Ticking (server only, called every tick by the block's ticker) ----
