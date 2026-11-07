@@ -51,10 +51,18 @@ public final class PedestalBeams
     private static final float SPEED = 0.05f;
     private static final int ALPHA = 0xC0;
     private static final int TOOL_BEAM_COLOR = 0xFFFFFF;
+    // The tool's beam once the tool is further from the saved pedestal than it can link
+    private static final int OUT_OF_RANGE_COLOR = 0xFF3030;
 
     // One beam: from the sender's end to the receiver's, and its colour (0xAARRGGBB)
-    private record Beam(Vec3 from, Vec3 to, int color) {}
-
+    // One beam: from the sender's end to the receiver's, its colour (0xAARRGGBB), and whether its chevrons move
+    private record Beam(Vec3 from, Vec3 to, int color, boolean animated)
+    {
+        Beam(Vec3 from, Vec3 to, int color)
+        {
+            this(from, to, color, true);
+        }
+    }
     // Everything one frame draws, and the time that slides the chevrons
     private record Frame(List<Beam> beams, float time) {}
 
@@ -87,8 +95,16 @@ public final class PedestalBeams
         {
             Vec3 hand = handPosition(player, toolHand, partialTick);
             Vec3 pedestalEnd = top(level, saved);
-            int color = (ALPHA << 24) | TOOL_BEAM_COLOR;
-            beams.add(LinkingToolItem.isReceiving(tool) ? new Beam(hand, pedestalEnd, color) : new Beam(pedestalEnd, hand, color));
+            boolean inRange = true;
+            // Out of the saved pedestal's link range: the beam stops at the edge of the range, red and still
+            if (level.getBlockEntity(saved) instanceof BasePedestalBlockEntity savedPedestal)
+            {
+                int range = savedPedestal.getLinkingRange();
+                inRange = savedPedestal.isInRange(BlockPos.containing(hand), range);
+                if (!inRange) hand = clipToRange(saved, range, pedestalEnd, hand);
+            }
+            int color = (ALPHA << 24) | (inRange ? TOOL_BEAM_COLOR : OUT_OF_RANGE_COLOR);
+            beams.add(LinkingToolItem.isReceiving(tool) ? new Beam(hand, pedestalEnd, color, inRange) : new Beam(pedestalEnd, hand, color, inRange));
         }
         if (beams.isEmpty()) return;
         event.getRenderState().setRenderData(BEAMS, new Frame(beams, level.getGameTime() + partialTick));
@@ -100,6 +116,25 @@ public final class PedestalBeams
         if (player.getMainHandItem().getItem() instanceof LinkingToolItem) return InteractionHand.MAIN_HAND;
         if (player.getOffhandItem().getItem() instanceof LinkingToolItem) return InteractionHand.OFF_HAND;
         return null;
+    }
+
+    // Where the line from start (inside the range) towards end leaves the pedestal's link range: the cube of blocks
+    // up to range away on each axis (BasePedestalBlockEntity#isInRange). Each axis says how far along the line its
+    // wall is (t, 0 = start, 1 = end); the nearest wall is where the line gets out.
+    private static Vec3 clipToRange(BlockPos centre, int range, Vec3 start, Vec3 end)
+    {
+        Vec3 along = end.subtract(start);
+        double[] origin = {start.x, start.y, start.z};
+        double[] step = {along.x, along.y, along.z};
+        double[] low = {centre.getX() - range, centre.getY() - range, centre.getZ() - range};
+        double[] high = {centre.getX() + range + 1, centre.getY() + range + 1, centre.getZ() + range + 1};
+        double t = 1;
+        for (int axis = 0; axis < 3; axis++)
+        {
+            if (step[axis] > 0) t = Math.min(t, (high[axis] - origin[axis]) / step[axis]);
+            else if (step[axis] < 0) t = Math.min(t, (low[axis] - origin[axis]) / step[axis]);
+        }
+        return start.add(along.scale(Math.max(0, t)));
     }
 
     // A point just above a pedestal's top (whichever way it faces); the block's centre if it isn't a pedestal
@@ -131,8 +166,11 @@ public final class PedestalBeams
         PoseStack poseStack = event.getPoseStack();
         // The lambda is called later in the frame with the pose and a buffer to write vertices into
         event.getSubmitNodeCollector().submitCustomGeometry(poseStack, RenderTypes.beaconBeam(TEXTURE, true), (pose, buffer) -> {
-            for (Beam beam : frame.beams()) strip(pose, buffer, beam.from().subtract(camera), beam.to().subtract(camera), beam.color(), frame.time());
-        });
+            for (Beam beam : frame.beams())
+            {
+                // A still beam keeps its chevrons where they are (time 0)
+                strip(pose, buffer, beam.from().subtract(camera), beam.to().subtract(camera), beam.color(), beam.animated() ? frame.time() : 0);
+            }        });
     }
 
     // A flat strip from a to b (camera-relative), turned towards the camera: its sideways direction is at right
