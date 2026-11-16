@@ -9,6 +9,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.ItemStack;
+// Stonecutter: BonemealSource is new in 26.3 (who bonemealed the block); older versions don't have it
+//? if >=26.3
 import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.LevelEvent;
@@ -59,7 +61,10 @@ public class ItemUpgradeFertilizer extends ItemUpgradeBase
 
             boolean worked = false;
             if (item.getItem() instanceof BoneMealItem && state.getBlock() instanceof BonemealableBlock bonemealable
+                    //? if >=26.3 {
                     && bonemealable.isValidBonemealTarget(level, target, state, BonemealSource.INTERACTION))
+                    //?} else
+                    //&& bonemealable.isValidBonemealTarget(level, target, state))
             {
                 // growCrop uses up one of the stack it's given, so give it a copy and take one from the pedestal
                 if (BoneMealItem.growCrop(item.copyWithCount(1), level, target))

@@ -98,7 +98,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             // Just above the top (which is at y 12), three quarters size, spinning
             poseStack.translate(0.5f, 1.0f, 0.5f);
             poseStack.scale(0.75f, 0.75f, 0.75f);
-            poseStack.rotateDegrees(Axis.YP, state.spin);
+            poseStack.rotate(Axis.YP.rotationDegrees(state.spin));
             state.item.submit(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }
@@ -110,7 +110,7 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
                 poseStack.pushPose();
                 poseStack.translate(spot[0], COIN_Y, spot[1]);
                 poseStack.scale(0.1875f, 0.1875f, 0.1875f);
-                poseStack.rotateDegrees(Axis.YP, spot[2]);
+                poseStack.rotate(Axis.YP.rotationDegrees(spot[2]));
                 state.upgrade.submit(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
                 poseStack.popPose();
             }
@@ -122,8 +122,8 @@ public class BasePedestalBlockEntityRenderer implements BlockEntityRenderer<Base
             // Lying flat on the top face (y 12), half size, pointing along X
             poseStack.translate(0.5f, 0.75f, 0.5f);
             poseStack.scale(0.5f, 0.5f, 0.5f);
-            poseStack.rotateDegrees(Axis.YP, 90f);
-            poseStack.rotateDegrees(Axis.XP, 90f);
+            poseStack.rotate(Axis.YP.rotationDegrees(90f));
+            poseStack.rotate(Axis.XP.rotationDegrees(90f));
             state.tool.submit(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }

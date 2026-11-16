@@ -4,7 +4,7 @@ import com.mowmaster.ironpedestals.Config;
 import com.mowmaster.ironpedestals.Items.PedestalDataComponents;
 import com.mowmaster.mowlib.datamaps.CBBlockColor;
 import com.mowmaster.mowlib.datamaps.CBDataMaps;
-import net.minecraft.world.item.DyeColor;
+import com.mowmaster.ironpedestals.Blocks.Pedestal.PedestalTier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -20,14 +20,13 @@ import java.util.function.Supplier;
 public enum UpgradeTier
 {
     BASE(0, "stone", () -> Blocks.STONE, 0x7D7D7D),
-    // 26.x: COPPER_BLOCK is every oxidation stage of the copper block; weathering().unaffected() is the plain one
-    COPPER(1, "copper", () -> Blocks.COPPER_BLOCK.weathering().unaffected(), 0xC06B4F),
+    // copperBlock / purpleConcrete: the names differ between Minecraft versions, so PedestalTier looks them up
+    COPPER(1, "copper", PedestalTier::copperBlock, 0xC06B4F),
     IRON(2, "iron", () -> Blocks.IRON_BLOCK, 0xDCDCDC),
     GOLD(3, "gold", () -> Blocks.GOLD_BLOCK, 0xF6D03D),
     DIAMOND(4, "diamond", () -> Blocks.DIAMOND_BLOCK, 0x62EDE4),
     NETHERITE(5, "netherite", () -> Blocks.NETHERITE_BLOCK, 0x423D3F),
-    // 26.x: the 16 concretes are one collection by dye colour
-    NETHERSTAR(6, "netherstar", () -> Blocks.CONCRETE.pick(DyeColor.PURPLE), 0x641F9C);
+    NETHERSTAR(6, "netherstar", PedestalTier::purpleConcrete, 0x641F9C);
 
     public static final int MAX = 6;
 

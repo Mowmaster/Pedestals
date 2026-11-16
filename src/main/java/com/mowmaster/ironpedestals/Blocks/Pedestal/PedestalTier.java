@@ -23,14 +23,35 @@ import java.util.function.Supplier;
 public enum PedestalTier
 {
     BASE(0, "block_pedestal", null, CBTintBlockEntity.DEFAULT_TINT),
-    // 26.x: COPPER_BLOCK is every oxidation stage of the copper block (a WeatheringCopperCollection);
-    // weathering().unaffected() is the plain, unoxidised block (same call NeoForge's own tags use)
-    COPPER(1, "block_pedestal_copper", () -> Blocks.COPPER_BLOCK.weathering().unaffected(), 0xC06B4F),    IRON(2, "block_pedestal_iron", () -> Blocks.IRON_BLOCK, 0xDCDCDC),
+    COPPER(1, "block_pedestal_copper", PedestalTier::copperBlock, 0xC06B4F),
+    IRON(2, "block_pedestal_iron", () -> Blocks.IRON_BLOCK, 0xDCDCDC),
     GOLD(3, "block_pedestal_gold", () -> Blocks.GOLD_BLOCK, 0xF6D03D),
     DIAMOND(4, "block_pedestal_diamond", () -> Blocks.DIAMOND_BLOCK, 0x62EDE4),
     NETHERITE(5, "block_pedestal_netherite", () -> Blocks.NETHERITE_BLOCK, 0x423D3F),
-    // 26.x: the 16 concretes are one collection by dye colour; pick(DyeColor.WHITE) is white concrete
-    NETHERSTAR(6, "block_pedestal_netherstar", () -> Blocks.CONCRETE.pick(DyeColor.PURPLE), 0x641F9C);
+    NETHERSTAR(6, "block_pedestal_netherstar", PedestalTier::purpleConcrete, 0x641F9C);
+
+    // ---- Vanilla blocks whose names differ between Minecraft versions (UpgradeTier uses these too) ----
+    // A method reference (PedestalTier::copperBlock) is a Supplier<Block> here: Java turns it into a lambda that
+    // calls the method, so the block is only looked up when the colour is first needed.
+
+    // The plain, unoxidised copper block. 26.2 made COPPER_BLOCK every oxidation stage (a WeatheringCopperCollection);
+    // weathering().unaffected() is the plain one (same call NeoForge's own tags use). Before 26.2 it was a Block.
+    public static Block copperBlock()
+    {
+        //? if >=26.2 {
+        return Blocks.COPPER_BLOCK.weathering().unaffected();
+        //?} else
+        //return Blocks.COPPER_BLOCK;
+    }
+
+    // Purple concrete. 26.2 made the 16 concretes one collection by dye colour (pick(colour)); before, one field each.
+    public static Block purpleConcrete()
+    {
+        //? if >=26.2 {
+        return Blocks.CONCRETE.pick(DyeColor.PURPLE);
+        //?} else
+        //return Blocks.PURPLE_CONCRETE;
+    }
     private final int tier;
     private final String id;
     private final @Nullable Supplier<Block> colorBlock;

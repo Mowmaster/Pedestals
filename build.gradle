@@ -33,6 +33,18 @@ stonecutter {
     replacements.string(current.parsed.matches('>=26.3')) {
         replace 'poseStack.mulPose(', 'poseStack.rotate('
     }
+    // 26.3 renamed PushReaction's values (NORMAL -> PUSH_PULL, DESTROY -> POPPED, BLOCK -> IMMOVEABLE)
+    replacements.string(current.parsed.matches('>=26.3')) {
+        replace 'PushReaction.NORMAL', 'PushReaction.PUSH_PULL'
+        replace 'PushReaction.DESTROY', 'PushReaction.POPPED'
+        replace 'PushReaction.BLOCK', 'PushReaction.IMMOVEABLE'
+    }
+    // 26.3 (FancyModLoader) renamed the config types: COMMON -> LOCAL (each side's own file), SERVER -> SYNCED
+    // (per world, sent to clients). CLIENT is unchanged.
+    replacements.string(current.parsed.matches('>=26.3')) {
+        replace 'ModConfig.Type.COMMON', 'ModConfig.Type.LOCAL'
+        replace 'ModConfig.Type.SERVER', 'ModConfig.Type.SYNCED'
+    }
 }
 
 sourceSets.main.resources {
