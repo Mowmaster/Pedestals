@@ -11,12 +11,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
+// Stonecutter: CookingFuel and ResolvableInt are new in 26.3 (fuel became a data component), so 26.1.2 doesn't
+// import them. "//? if >=26.3 {" ... "//?}" with no else: the lines are left out of older versions.
+//? if >=26.3 {
 import net.minecraft.world.item.component.CookingFuel;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
+//?}
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.item.ItemResource;
@@ -91,8 +95,11 @@ public class ItemUpgradeGenerator extends ItemUpgradeBase
 
     // In 26.3 fuel is a data component whose burn time can depend on where it burns, so it's read through a loot
     // context, the same one a furnace builds (BaseContainerBlockEntity#getLootContext). The container is a stand-in.
+    // Stonecutter: before 26.3 fuel came from the level's FuelValues (plus NeoForge's burn time data map and
+    // FurnaceFuelBurnTimeEvent), all of which ItemStack#getBurnTime asks, with the furnace's recipe type.
     private static int getBurnTime(ServerLevel level, BasePedestalBlockEntity pedestal, ItemStack fuel)
     {
+        //? if >=26.3 {
         if (!fuel.has(DataComponents.COOKING_FUEL)) return 0;
         LootParams params = new LootParams.Builder(level)
                 .withParameter(LootContextParams.BLOCK_STATE, pedestal.getBlockState())
@@ -102,5 +109,7 @@ public class ItemUpgradeGenerator extends ItemUpgradeBase
                 .create(LootContextParamSets.CONTAINER_PROCESS);
         LootContext context = new LootContext.Builder(params).create(Optional.empty());
         return ResolvableInt.getFromItem(fuel, DataComponents.COOKING_FUEL, CookingFuel::burnTime, context, 0);
+        //?} else
+        //return fuel.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING, level.fuelValues());
     }
 }

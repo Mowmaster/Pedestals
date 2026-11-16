@@ -124,7 +124,16 @@ public final class PedestalOutlines
         {
             poseStack.pushPose();
             poseStack.translate(outline.pos().getX() - camera.x, outline.pos().getY() - camera.y, outline.pos().getZ() - camera.z);
+            // Stonecutter: shape outlines became a render feature in 26.2; before that, ShapeRenderer drew the lines
+            // straight into the game's line buffer (as MowLib's LinkOutlines does). The //? lines are read by
+            // Stonecutter: while 26.3 is active the older code sits inside the /* */ comment, and building 26.1.2
+            // swaps the two sides round. Full class names in the old code, so no imports need switching.
+            //? if >=26.2 {
             event.getSubmitNodeCollector().submitShapeOutline(poseStack, outline.shape(), RenderTypes.lines(), outline.color(), LINE_WIDTH, false);
+            //?} else {
+            /*com.mojang.blaze3d.vertex.VertexConsumer lines = net.minecraft.client.Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+            net.minecraft.client.renderer.ShapeRenderer.renderShape(poseStack, lines, outline.shape(), 0, 0, 0, outline.color(), LINE_WIDTH);
+            *///?}
             poseStack.popPose();
         }
     }

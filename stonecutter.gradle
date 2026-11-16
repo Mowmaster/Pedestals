@@ -1,0 +1,18 @@
+plugins {
+    id 'dev.kikugie.stonecutter'
+}
+
+// The "active" version: the one the files in src/ are written for right now, and the one the IDE compiles and runs.
+// Don't edit this by hand: switch with the Gradle tasks Stonecutter adds (group "stonecutter", e.g. "Set active
+// project to 26.1.2"), which rewrites the //? comments in src/ and this line together. Keep it on 26.3 when you commit.
+stonecutter.active '26.3'
+
+// The Gradle wrapper belongs to the root project, and with Stonecutter this file is the root project's script
+// (build.gradle runs inside each version's project, which has no wrapper task).
+tasks.named('wrapper', Wrapper).configure {
+    // Switching this to Wrapper.DistributionType.ALL will download the full gradle sources that comes with
+    // documentation attached on cursor hover of gradle classes and methods. However, this comes with increased
+    // file size for Gradle. If you do switch this to ALL, run the Gradle wrapper task twice afterwards.
+    // (Verify by checking gradle/wrapper/gradle-wrapper.properties to see if distributionUrl now points to `-all`)
+    distributionType = Wrapper.DistributionType.BIN
+}

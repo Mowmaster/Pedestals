@@ -6,4 +6,20 @@ pluginManagement {
 
 plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+    // Stonecutter: builds one set of sources for several Minecraft versions. It must go here (not in build.gradle)
+    // because it creates a Gradle subproject per version: versions/26.3/ and versions/26.1.2/.
+    id 'dev.kikugie.stonecutter' version '0.10'
+}
+
+stonecutter {
+    // We write our build scripts in Groovy (Stonecutter defaults to Kotlin ones)
+    kotlinController = false
+    // build.gradle is run once per version, each time with that version's versions/<v>/gradle.properties
+    centralScript = "build.gradle"
+
+    // getRootProject(): the versions become subprojects of this (the root) project, named after their folders
+    create(getRootProject()) {
+        // Folder names under versions/, also the versions //? if >=26.3 comments compare against
+        versions '26.3', '26.1.2'
+    }
 }
