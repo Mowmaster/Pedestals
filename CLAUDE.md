@@ -37,12 +37,22 @@ NeoForge 26.3.0.94, Minecraft 26.3, Java 25. Used NeoForge-26x version of Pedest
 
 ## MowLib (shared library)
 - This mod depends on MowLib (mod id `mowlib`, package `com.mowmaster.mowlib`), bundled with Jar-in-Jar from
-  mavenLocal (`com.mowmaster.mowlib:mowlib`, range `[0.0.4,1.0.0)`). Source: `Mowmaster/MowLib`, branch
-  `NeoForge-26x`; the version this project builds against is the tag matching `prefer` in build.gradle.
+  mavenLocal. MowLib builds for two Minecraft versions from one set of sources (Stonecutter: 26.3 and 26.1.2) and
+  publishes each under its own name, `com.mowmaster.mowlib:mowlib-26.3` / `mowlib-26.1.2` (the old
+  `com.mowmaster.mowlib:mowlib` is gone). build.gradle asks for `name: "mowlib-${minecraft_version}"`, range
+  `[0.0.5,1.0.0)`. Source: `Mowmaster/MowLib`, branch `NeoForge-26x`; the version this project builds against is
+  the tag matching `prefer` in build.gradle. When updating MowLib, read the "Check" lines in its CHANGELOG.md for
+  every version since the one we used.
+- This mod is still 26.3 only (not on Stonecutter yet).
 - Before writing a shared system (tinting, storage, filters, transport, paging, knapping, bonus drops, tooltips,
   renderers...), clone MowLib and check whether it already exists there. Use it; don't copy it into this mod.
-- Never edit MowLib or send MowLib files from this project. If MowLib doesn't have something, make it here or
-  override MowLib's class here; add the idea to "MowLib TODO" below as a suggestion only.
+- Never edit MowLib from this project. If MowLib doesn't have something, make it here or override MowLib's class
+  here and add the idea to "MowLib TODO" below. Only when I ask for an extraction, package it as
+  `mowlib-from-ironpedestals.zip` (layout in MowLib's CLAUDE.md "New code from other projects": `mowlib/`
+  at MowLib repo paths, `NOTES.md`, `MIGRATION_ironpedestals.md`...). Extracted code must
+  compile for 26.1.2 as well as 26.3: list every API that differs between them in the zip's NOTES.md, with the
+  26.1.2 code if known, so MowLib can add a version comment. MowLib's CLAUDE.md "Versions (Stonecutter)" lists the
+  differences it already handles; check 26.1.2 APIs in NeoForge's `26.1.x` branch.
 - MowLib's CLAUDE.md lists what it contains and its rules.
 
 ## Working with Claude
@@ -53,9 +63,9 @@ NeoForge 26.3.0.94, Minecraft 26.3, Java 25. Used NeoForge-26x version of Pedest
 - For simple model fixes (a missing `tintindex`, `#`, texture key), just tell me the line to change; only send a model file when the geometry changes.
 - To check 26.3 APIs, clone the public `neoforged/neoforge` repo (branch `26.3.x`) and read the 26.3 porting primer in `neoforged/.github` (`primers/26.3/index.md`; 26.1 and 26.2 primers cover earlier changes). NeoForge's docs are in the public `neoforged/Documentation` repo (`docs/`).
 
-## MowLib TODO (suggestions only; this mod works around them)
-- `TransportStorageHost#getSlotLimit(type, resource, normalLimit)` + bulk saving (`{resource, amount}` when a slot
-  passes 99) in `ItemTransportType.Storage`. Would replace `PedestalItemStorage`.
-- `TransportStorageHost#getTankCount(type)` + `resize` + per-tank `describe()` in `FluidTransportType.Storage`.
-  Would replace `PedestalFluidStorage`.
-- `FluidTransportType#dropInWorld` trying every tank, not only index 0 (then the dropper/drain tank workarounds go).
+## MowLib TODO
+- Nothing open. The earlier list (slot limit + bulk saving, fluid tanks, `dropInWorld` on every tank, linking
+  system, link beams, outlines, paper screen helpers, storage gauge, cursor container clicks, client loaded block
+  entities) is merged into MowLib (after 0.0.5). This mod still uses its own versions until the migration in
+  `MOWLIB_MIGRATION_PLAN.md` is done; `PedestalItemStorage` / `PedestalFluidStorage` now override MowLib's
+  matching methods (`resize`, `tank`, `tankHolding`, `describe`, `serialize`...) with the same behaviour.

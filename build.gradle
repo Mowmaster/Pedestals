@@ -142,7 +142,10 @@ dependencies {
     // MowLib: compile against it, run with it in dev, and bundle it inside the Pedestals jar (Jar-in-Jar),
     // so players don't install it separately. Jar-in-Jar needs a version range: if several mods bundle MowLib,
     // NeoForge loads the newest version every range allows.
-    jarJar(implementation(group: 'com.mowmaster.mowlib', name: 'mowlib')) {
+    // MowLib is published once per Minecraft version (mowlib-26.3, mowlib-26.1.2), so the name includes ours.
+    // Double quotes: Groovy only fills in ${...} (here minecraft_version from gradle.properties) in "..." strings;
+    // in '...' it would look for an artifact literally called mowlib-${minecraft_version}.
+    jarJar(implementation(group: 'com.mowmaster.mowlib', name: "mowlib-${minecraft_version}")) {
         version {
             strictly '[0.0.5,1.0.0)'
             prefer '0.0.5'
